@@ -14,7 +14,7 @@
         "contraindications": [],
         "formulary_status": "on formulary",
         "interactions": [],
-        "proposed": "(agent not specified on this case's pathway)",
+        "proposed": "Medication list review",
         "warnings": [
           "Non-specific interaction check; verify against a current formulary or interaction reference before prescribing."
         ]
@@ -83,7 +83,7 @@
         },
         "glucose": "62 mg/dL",
         "glucose_ratio": "0.70",
-        "interpretation": "Opening pressure: 134 mmH2O. WBC: 2 cells/mm3 (N/A PMN/N/A lymph). Protein: 78 mg/dL (elevated). Glucose: 62 mg/dL (ratio 0.70). Gram stain: No organisms. AFB smear: Negative. Culture: No growth. Cryptococcal antigen: Negative.",
+        "interpretation": "Opening pressure 134 mmH2O (normal). Nucleated cells 2/mm3. Protein 78 mg/dL (elevated). Glucose 62 mg/dL (CSF:serum ratio 0.70). Gram stain, AFB smear and cryptococcal antigen negative; culture no growth. Elevated protein with a normal cell count (albuminocytological dissociation). Clinical correlation recommended.",
         "opening_pressure": "134 mmH2O",
         "protein": "78 mg/dL (elevated)",
         "special_tests": {
@@ -99,66 +99,39 @@
     {
       "output": {
         "additional_observations": [
-          "No hilar or mediastinal lymphadenopathy.",
-          "No pulmonary nodules or masses.",
-          "Lung parenchyma clear bilaterally \u2014 no infiltrate, pleural effusion, or interstitial pattern."
+          "Technique: axial and coronal T1 before and after gadolinium with thin sections through the internal auditory canals, axial T2, FLAIR and DWI.",
+          "No brainstem or parenchymal signal abnormality; no restricted diffusion.",
+          "No leptomeningeal or pachymeningeal enhancement; no enhancement of other cranial nerves.",
+          "No cerebellopontine angle or parotid mass."
         ],
-        "angiography_findings": null,
-        "contrast_used": false,
-        "findings": [],
-        "impression": "No hilar or mediastinal lymphadenopathy. No pulmonary nodules or masses. Lung parenchyma clear bilaterally. Normal CT chest.",
-        "recommended_actions": []
-      },
-      "tool_name": "order_ct_scan",
-      "trigger_action": "request_chest_imaging"
-    },
-    {
-      "output": {
         "findings": [
           {
-            "finding": "Mild enhancement of bilateral facial nerves at the geniculate ganglion level \u2014 consistent with inflammatory cranial neuropathy",
-            "region": "Bilateral facial nerve (CN VII)"
-          },
-          {
-            "finding": "No parenchymal lesion",
-            "region": "Brain parenchyma"
-          },
-          {
-            "finding": "No aneurysm, vasospasm, or proximal vascular occlusion",
-            "region": "MR angiography"
+            "location": "Bilateral facial nerves, labyrinthine segment and geniculate ganglion",
+            "signal_characteristics": {
+              "T1_post_contrast": "mild smooth symmetric enhancement",
+              "T2": "no signal abnormality"
+            },
+            "type": "cranial_nerve_enhancement"
           }
         ],
-        "impression": "1. Mild bilateral facial nerve enhancement at the geniculate ganglion level \u2014 consistent with inflammatory cranial neuropathy. 2. No intracranial mass, parenchymal lesion, or leptomeningeal enhancement. 3. MRA: no aneurysm, vasospasm, or proximal vascular occlusion",
-        "modality": "MRI brain with gadolinium and MR angiography",
-        "quantitative_data": {
-          "enhancement_pattern": "Bilateral facial nerve enhancement"
-        },
+        "impression": "1. Mild smooth bilateral enhancement of the labyrinthine segments and geniculate ganglia of the facial nerves, consistent with an inflammatory facial neuropathy. 2. No brainstem lesion, mass or leptomeningeal enhancement.",
         "recommended_actions": [],
-        "tracer_or_protocol": "3T gadolinium + MRA"
+        "volumetrics": null
       },
-      "tool_name": "order_advanced_imaging",
-      "trigger_action": "request_brain_mri"
+      "tool_name": "analyze_brain_mri",
+      "trigger_action": "order_brain_mri_facial_nerves"
     },
     {
       "output": {
-        "abnormal_values_summary": [
-          "Anti-GQ1b IgG low titer (1:40) (H)"
-        ],
-        "interpretation": "Abnormal values: Anti-GQ1b IgG Positive (titer 1:40) (H).",
+        "abnormal_values_summary": [],
+        "interpretation": "Lyme disease antibody screen (ELISA) negative; reflex immunoblot not performed. Serum antibodies may be absent in early infection. Clinical correlation recommended.",
         "panels": {
-          "Ganglioside_Antibodies": [
+          "Lyme_serology": [
             {
               "clinical_significance": null,
-              "is_abnormal": true,
-              "reference_range": "negative",
-              "test": "Anti-GQ1b IgG",
-              "unit": "",
-              "value": "Positive (titer 1:40)"
-            },
-            {
               "is_abnormal": false,
               "reference_range": "negative",
-              "test": "Anti-GM1 IgG",
+              "test": "Borrelia burgdorferi total antibody (ELISA)",
               "unit": "",
               "value": "Negative"
             }
@@ -166,28 +139,62 @@
         }
       },
       "tool_name": "interpret_labs",
-      "trigger_action": "request_anti_ganglioside_panel"
+      "trigger_action": "request_lyme_serology"
+    },
+    {
+      "output": {
+        "contrast": false,
+        "findings": [
+          {
+            "finding": "No hilar or mediastinal lymphadenopathy",
+            "region": "Mediastinum and hila"
+          },
+          {
+            "finding": "No nodules, masses, infiltrates, interstitial change or pleural effusion",
+            "region": "Lungs"
+          }
+        ],
+        "impression": "Normal non-contrast CT of the chest. No hilar or mediastinal lymphadenopathy and no parenchymal lung abnormality.",
+        "measurements": null,
+        "modality": "CT",
+        "recommended_actions": [],
+        "region": "chest"
+      },
+      "tool_name": "order_body_imaging",
+      "trigger_action": "request_chest_ct"
     },
     {
       "output": {
         "findings": [
           {
-            "panel": "Respiratory",
-            "reference_range": "68% predicted",
-            "result": "3.0 L",
+            "flag": "L",
+            "reference_range": ">=80% predicted",
+            "result": "3.0 L (68% predicted; 39 mL/kg at 76 kg)",
             "test": "FVC"
           },
           {
-            "panel": "Respiratory",
-            "reference_range": "Well above threshold",
-            "result": "-40 cmH2O",
-            "test": "NIF"
+            "flag": "L",
+            "reference_range": "-80 cmH2O or more negative",
+            "result": "-58 cmH2O",
+            "test": "MIP"
+          },
+          {
+            "flag": "L",
+            "reference_range": ">=100 cmH2O",
+            "result": "86 cmH2O",
+            "test": "MEP"
           }
         ],
-        "impression": "All values within normal limits.",
+        "impression": "Bedside respiratory function on admission, measured with a face mask because of poor lip seal: FVC 3.0 L (68% predicted; 39 mL/kg at 76 kg) L. MIP -58 cmH2O L. MEP 86 cmH2O L. Cough effective.",
         "quantitative_data": {
           "FVC": "3.0 L",
-          "NIF": "-40 cmH2O"
+          "FVC_mL_per_kg": "39 mL/kg",
+          "FVC_percent_predicted": "68%",
+          "MEP": "86 cmH2O",
+          "MIP": "-58 cmH2O",
+          "cough": "effective",
+          "technique": "face mask (poor lip seal on a mouthpiece)",
+          "weight": "76 kg"
         },
         "recommended_actions": [],
         "test_type": "respiratory_function"
@@ -197,16 +204,17 @@
     },
     {
       "output": {
-        "duration_hours": 48,
+        "duration_hours": 24,
         "events": [],
         "findings": [
-          "Normal sinus rhythm throughout monitoring period"
+          "Normal sinus rhythm 64-92 bpm",
+          "Non-invasive blood pressure 114/70 to 132/82 mmHg"
         ],
         "heart_rate_range": {
           "max": 92,
-          "min": 72
+          "min": 64
         },
-        "impression": "Normal sinus rhythm throughout 48-hour monitoring. Heart rate range 72\u201392 bpm. No arrhythmia or conduction abnormality detected",
+        "impression": "24-hour continuous telemetry. Normal sinus rhythm, heart rate 64-92 bpm. No pauses, bradyarrhythmia or tachyarrhythmia. Blood pressure 114/70 to 132/82 mmHg.",
         "monitor_type": "Continuous telemetry",
         "recommended_actions": [],
         "rhythm_summary": "Normal sinus rhythm throughout."
@@ -216,56 +224,27 @@
     },
     {
       "output": {
-        "query": "general",
-        "results": [],
-        "summary": ""
+        "abnormal_values_summary": [],
+        "interpretation": "Anti-GQ1b IgG negative. Anti-GQ1b IgG antibodies are found in most patients with Miller Fisher syndrome and related overlap syndromes; a negative result does not exclude GBS. Clinical correlation recommended.",
+        "panels": {
+          "Ganglioside_Antibodies": [
+            {
+              "clinical_significance": null,
+              "is_abnormal": false,
+              "reference_range": "negative (<1:100)",
+              "test": "Anti-GQ1b IgG",
+              "unit": "titer",
+              "value": "Negative"
+            }
+          ]
+        }
       },
-      "tool_name": "search_medical_literature",
-      "trigger_action": "search_gbs_treatment"
-    },
-    {
-      "output": {
-        "alternatives": [],
-        "contraindications": [],
-        "formulary_status": "on formulary",
-        "interactions": [],
-        "proposed": "(agent not specified on this case's pathway)",
-        "summary": "",
-        "warnings": [
-          "Non-specific interaction check; verify against a current formulary or interaction reference before prescribing."
-        ]
-      },
-      "tool_name": "check_drug_interactions",
-      "trigger_action": "check_ivig_drug_interactions"
+      "tool_name": "interpret_labs",
+      "trigger_action": "request_anti_gq1b_gt1a_ganglioside_panel"
     }
   ],
   "ground_truth": {
     "action_criteria": [
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "panels": [
-                "CBC",
-                "CMP",
-                "HIV",
-                "inflammatory_markers",
-                "anti-GM1 IgM"
-              ]
-            },
-            "tool_name": "interpret_labs"
-          }
-        ],
-        "citations": [
-          "[Yuki_2012]",
-          "GBS criteria pack \u00a72"
-        ],
-        "criterion_id": "action-1-interpret-labs",
-        "expected_evidence": "Mild leukocytosis / elevated inflammatory markers reflecting antecedent infection; ganglioside antibodies for variant typing; trigger identification (Campylobacter, CMV, EBV, Mycoplasma, HIV)",
-        "importance": "required",
-        "label": "Obtain CBC, CMP, HIV, anti-GM1/anti-GQ1b ganglioside antibodies, and stool culture / Campylobacter serology if recent diarrhea",
-        "rationale": "Obtain CBC, CMP, HIV, anti-GM1/anti-GQ1b ganglioside antibodies, and stool culture / Campylobacter serology if recent diarrhea"
-      },
       {
         "alternatives": [
           {
@@ -276,14 +255,13 @@
           }
         ],
         "citations": [
-          "[Hadden_1998]",
-          "GBS criteria pack \u00a72"
+          "[EAN_PNS_2023]"
         ],
         "criterion_id": "action-2-order-specialized-test",
-        "expected_evidence": "Demyelinating pattern (prolonged DML, conduction block, reduced CV, absent F-waves) consistent with AIDP, or reduced CMAP amplitudes in axonal variants (AMAN/AMSAN)",
+        "expected_evidence": "Polyradiculoneuropathy pattern (demyelinating or axonal features, absent F-waves, sural sparing where present); may be normal in the first week",
         "importance": "required",
-        "label": "Order nerve conduction studies and needle EMG (EMG/NCS)",
-        "rationale": "Order nerve conduction studies and needle EMG (EMG/NCS)"
+        "label": "Nerve conduction studies and needle EMG",
+        "rationale": "Limb NCS shows whether the facial diplegia is part of a generalised polyradiculoneuropathy, which separates the GBS variant from bilateral Bell's palsy and other cranial neuropathies; facial and blink studies document the facial nerve involvement [EAN_PNS_2023]."
       },
       {
         "alternatives": [
@@ -293,14 +271,72 @@
           }
         ],
         "citations": [
-          "[Asbury_1990]",
-          "GBS criteria pack \u00a72"
+          "[EAN_PNS_2023]"
         ],
         "criterion_id": "action-3-analyze-csf",
-        "expected_evidence": "Albuminocytologic dissociation \u2014 elevated protein with cell count <10/\u03bcL; may be normal in the first week of illness",
+        "expected_evidence": "Albuminocytological dissociation: raised protein with cells <5/mm3 (5-50/mm3 compatible but prompts an alternative; >50/mm3 suggests another diagnosis); protein may be normal in the first week",
         "importance": "required",
-        "label": "Perform lumbar puncture for CSF analysis",
-        "rationale": "Perform lumbar puncture for CSF analysis"
+        "label": "Lumbar puncture for CSF cell count, protein and glucose",
+        "rationale": "CSF supports GBS and excludes the lymphocytic meningitis of Lyme neuroborreliosis, neurosarcoidosis, HIV and basal infective or malignant meningitis, the main causes of facial diplegia [EAN_PNS_2023]."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_brain_mri"
+          }
+        ],
+        "citations": [
+          "[Wakerley_2014]",
+          "[EAN_PNS_2023]"
+        ],
+        "criterion_id": "action-10-analyze-brain-mri",
+        "expected_evidence": "No brainstem lesion, mass or leptomeningeal enhancement; facial nerve enhancement may be seen",
+        "importance": "recommended",
+        "label": "Brain MRI with gadolinium and thin sections through the facial nerves",
+        "rationale": "Bilateral facial palsy calls for imaging to exclude a pontine lesion, a skull-base or parotid mass and leptomeningeal disease before it is attributed to a polyradiculoneuropathy."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "panels": [
+                "Lyme_serology"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          }
+        ],
+        "citations": [
+          "[Wakerley_2014]"
+        ],
+        "criterion_id": "action-11-interpret-labs-lyme",
+        "expected_evidence": "Negative Lyme antibody screen",
+        "importance": "recommended",
+        "label": "Lyme serology",
+        "rationale": "Lyme neuroborreliosis is a leading cause of bilateral facial palsy and is treatable; serology is part of the facial diplegia work-up."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "panels": [
+                "CBC",
+                "CMP",
+                "CK"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          }
+        ],
+        "citations": [
+          "[EAN_PNS_2023]"
+        ],
+        "criterion_id": "action-1-interpret-labs",
+        "expected_evidence": "Baseline values before treatment; abnormal liver tests or low albumin mark a higher risk of a severe course; no metabolic or toxic alternative",
+        "importance": "required",
+        "label": "Baseline blood tests: full blood count, renal function and electrolytes, liver tests, albumin, glucose and CK",
+        "rationale": "Routine blood tests exclude metabolic mimics and give the baseline before any immunotherapy [EAN_PNS_2023]."
       },
       {
         "alternatives": [
@@ -312,65 +348,15 @@
           }
         ],
         "citations": [
-          "[Sharshar_2003]",
-          "GBS criteria pack \u00a72"
+          "[Lawn_2001]",
+          "[EAN_PNS_2023]",
+          "[Leonhard_2019]"
         ],
         "criterion_id": "action-4-order-specialized-test",
-        "expected_evidence": "Baseline and serial FVC, MIP/MEP, NIF; deterioration to FVC <20 mL/kg, MIP worse than -30 cmH2O, or VC <40% predicted triggers ICU transfer / intubation",
+        "expected_evidence": "FVC in L, % predicted and mL/kg, MIP and MEP, with the trend; ICU-level monitoring if FVC <20 mL/kg or <60% predicted, MIP weaker than -30 cmH2O, MEP <40 cmH2O, a fall of more than 30%, or bulbar weakness with weak cough",
         "importance": "required",
-        "label": "Order bedside respiratory function testing (FVC, MIP/MEP, NIF) and repeat every 4\u20136 hours",
-        "rationale": "Order bedside respiratory function testing (FVC, MIP/MEP, NIF) and repeat every 4\u20136 hours"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[van_den_Berg_2014]",
-          "GBS criteria pack \u00a72"
-        ],
-        "criterion_id": "action-5-search-medical-literature",
-        "expected_evidence": "IVIG (0.4 g/kg/day x 5 days) and plasma exchange are equivalently effective first-line therapies; combination not superior",
-        "importance": "required",
-        "label": "Search the medical literature for IVIG vs plasma exchange evidence to guide disease-modifying therapy",
-        "rationale": "Search the medical literature for IVIG vs plasma exchange evidence to guide disease-modifying therapy"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "check_drug_interactions"
-          }
-        ],
-        "citations": [
-          "[van_den_Berg_2014]",
-          "GBS criteria pack \u00a72"
-        ],
-        "criterion_id": "action-6-check-drug-interactions",
-        "expected_evidence": "Confirmation that IVIG can be given safely (no severe renal impairment, no IgA deficiency) or that plasma exchange is appropriate (adequate vascular access, stable coagulation)",
-        "importance": "required",
-        "label": "Check drug interactions / contraindications for IVIG (renal function, IgA deficiency screen) and/or plasma exchange (coagulation, calcium, hemodynamics)",
-        "rationale": "Check drug interactions / contraindications for IVIG (renal function, IgA deficiency screen) and/or plasma exchange (coagulation, calcium, hemodynamics)"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "analyze_ecg"
-          }
-        ],
-        "citations": [
-          "[Asbury_1990]",
-          "GBS criteria pack \u00a72"
-        ],
-        "criterion_id": "action-7-analyze-ecg",
-        "expected_evidence": "Sinus tachycardia or bradycardia; conduction or repolarisation abnormalities reflecting autonomic involvement",
-        "importance": "recommended",
-        "label": "Obtain a 12-lead ECG to screen for autonomic dysrhythmias and baseline QTc",
-        "rationale": "Obtain a 12-lead ECG to screen for autonomic dysrhythmias and baseline QTc"
+        "label": "Bedside respiratory function (FVC, MIP, MEP), repeated serially while weakness progresses",
+        "rationale": "The variant can progress to limb, bulbar and respiratory weakness within days; serial FVC, MIP and MEP (with a face mask when lip seal is poor) set the level of monitoring [Lawn_2001, EAN_PNS_2023]."
       },
       {
         "alternatives": [
@@ -382,25 +368,91 @@
           }
         ],
         "citations": [
-          "[Asbury_1990]",
-          "GBS criteria pack \u00a72"
+          "[EAN_PNS_2023]"
         ],
         "criterion_id": "action-8-order-cardiac-monitoring",
-        "expected_evidence": "Normal sinus rhythm throughout \u2014 the recording is read for the bradyarrhythmias, pauses beyond 3 seconds and blood-pressure lability that trigger ICU escalation",
+        "expected_evidence": "Continuous telemetry with blood pressure monitoring: normal sinus rhythm 64-92 bpm and blood pressure 114/70 to 132/82 mmHg in the first 24 hours; autonomic instability (rate and blood pressure lability, bradyarrhythmia) requires continued monitoring while weakness progresses",
         "importance": "required",
-        "label": "Start continuous inpatient cardiac telemetry for the period of maximal weakness and keep it running alongside serial respiratory function. Autonomic instability affects about two thirds of patients and is a leading cause of in-hospital death: bradyarrhythmias, pauses beyond 3 seconds and blood-pressure lability are what trigger ICU escalation",
-        "rationale": "Start continuous inpatient cardiac telemetry for the period of maximal weakness and keep it running alongside serial respiratory function. Autonomic instability affects about two thirds of patients and is a leading cause of in-hospital death: bradyarrhythmias, pauses beyond 3 seconds and blood-pressure lability are what trigger ICU escalation"
+        "label": "Continuous inpatient cardiac telemetry with blood pressure monitoring while weakness progresses",
+        "rationale": "Autonomic dysfunction can occur in any GBS variant and cause bradyarrhythmias and blood-pressure lability; monitoring continues while the disease progresses [EAN_PNS_2023]."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_ecg"
+          }
+        ],
+        "citations": [
+          "[EAN_PNS_2023]"
+        ],
+        "criterion_id": "action-7-analyze-ecg",
+        "expected_evidence": "Normal sinus rhythm with normal PR, QRS and QTc intervals as the baseline",
+        "importance": "recommended",
+        "label": "Obtain a 12-lead ECG to screen for autonomic dysrhythmias and baseline QTc",
+        "rationale": "A baseline 12-lead ECG screens for autonomic rhythm and conduction changes [EAN_PNS_2023]."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "study": "chest_CT"
+            },
+            "tool_name": "order_body_imaging"
+          }
+        ],
+        "citations": [
+          "[Wakerley_2014]"
+        ],
+        "criterion_id": "action-12-order-body-imaging-chest-ct",
+        "expected_evidence": "No hilar or mediastinal lymphadenopathy",
+        "importance": "optional",
+        "label": "Optional chest CT for hilar lymphadenopathy (sarcoidosis)",
+        "rationale": "Sarcoidosis is a cause of facial diplegia; chest imaging looks for hilar lymphadenopathy, but the acellular CSF and the polyradiculoneuropathy already make it unlikely."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "check_drug_interactions"
+          }
+        ],
+        "citations": [
+          "[EAN_PNS_2023]"
+        ],
+        "criterion_id": "action-6-check-drug-interactions",
+        "expected_evidence": "No current medications, so no interaction with IVIg or plasma exchange",
+        "importance": "optional",
+        "label": "Optional interaction check before IVIg or plasma exchange (no current medications)",
+        "rationale": "He takes no medicines, so the check cannot change management (ROUND_POLICY ruling 6)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "search_medical_literature"
+          }
+        ],
+        "citations": [
+          "[EAN_PNS_2023]"
+        ],
+        "criterion_id": "action-5-search-medical-literature",
+        "expected_evidence": "General evidence on the variant and on immunotherapy in GBS; not needed for the diagnosis or the treatment decision",
+        "importance": "optional",
+        "label": "Optional literature search on the bifacial weakness with paresthesias variant",
+        "rationale": "Background evidence only; not a clinical step of the work-up."
       }
     ],
     "assessment": {
       "prohibited_recommendations": [
-        "Do not start corticosteroids as monotherapy."
+        "Do not treat with corticosteroids: oral corticosteroids are strongly advised against and IV methylprednisolone is not recommended [EAN_PNS_2023].",
+        "Do not start IVIg without checking renal function."
       ],
       "required_recommendations": [
-        "Initiate IVIG / plasma exchange.",
-        "Continuous cardiac telemetry.",
-        "Lyme serology and CSF analysis.",
-        "Eye protection (lubrication, eye patches) for bilateral facial palsy."
+        "Admit to a monitored bed with serial FVC, MIP and MEP every 4-6 hours (face mask, since lip seal is poor) and a bedside swallow and cough assessment before oral intake; move to ICU-level monitoring if FVC falls below 60% predicted or 20 mL/kg (about 1.5 L at 76 kg), MIP becomes weaker than -30 cmH2O, MEP falls below 40 cmH2O, FVC falls by more than 30%, or bulbar weakness with weak cough or pooled secretions develops [EAN_PNS_2023, Lawn_2001].",
+        "IVIg or plasma exchange is not routinely advised while he walks unaided and the weakness stays confined to the face; start IVIg 0.4 g/kg/day for 5 days (2 g/kg total) or plasma exchange if he loses the ability to walk unaided or develops bulbar, respiratory or autonomic involvement [EAN_PNS_2023].",
+        "Protect both corneas: lubricating drops by day and ointment with lid taping or a moisture chamber at night for bilateral lagophthalmos.",
+        "Continuous cardiac telemetry with blood pressure monitoring while the disease progresses."
       ]
     },
     "avoided_actions": [
@@ -412,7 +464,7 @@
           }
         ],
         "citations": [
-          "[van_den_Berg_2014]"
+          "[EAN_PNS_2023]"
         ],
         "criterion_id": "avoid-waste-1-analyze-eeg",
         "rationale": "GBS is a peripheral nerve / nerve-root disorder; EEG has no role in diagnosis unless atypical CNS features (encephalopathy, seizures) are present.",
@@ -426,30 +478,16 @@
           }
         ],
         "citations": [
-          "[van_den_Berg_2014]"
+          "[EAN_PNS_2023]"
         ],
         "criterion_id": "avoid-waste-2-order-echocardiogram",
         "rationale": "Echocardiography is not indicated in typical GBS; reserve for pre-existing cardiac disease or unexplained hemodynamic instability after autonomic causes are excluded.",
-        "severity": "waste"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "analyze_brain_mri"
-          }
-        ],
-        "citations": [
-          "[van_den_Berg_2014]"
-        ],
-        "criterion_id": "avoid-waste-3-analyze-brain-mri",
-        "rationale": "Brain MRI is reserved for atypical features (encephalopathy, CNS signs, transverse myelitis on differential). In classic GBS it does not aid diagnosis.",
         "severity": "waste"
       }
     ],
     "diagnosis": {
       "accepted": [
-        "Guillain-Barr\u00e9 syndrome, bilateral facial diplegia variant",
+        "Guillain-Barr\u00e9 syndrome, bifacial weakness with paresthesias variant",
         "guillain barre syndrome",
         "guillain-barre syndrome",
         "guillain-barr\u00e9 syndrome",
@@ -467,71 +505,73 @@
     },
     "differential": [
       {
-        "diagnosis": "Lyme bilateral facial palsy",
+        "diagnosis": "Lyme neuroborreliosis (bilateral facial palsy)",
         "icd_code": "A69.22",
-        "key_features": "Endemic exposure, erythema migrans, CSF Lyme serology cover.",
-        "likelihood": "moderate"
+        "key_features": "A leading cause of facial diplegia, but there is no tick bite, rash or travel, Lyme serology is negative and the CSF has 2 cells/mm3 (neuroborreliosis gives a lymphocytic pleocytosis).",
+        "likelihood": "low"
       },
       {
-        "diagnosis": "Sarcoidosis cranial neuropathy",
+        "diagnosis": "Neurosarcoidosis",
         "icd_code": "D86.82",
-        "key_features": "Chest imaging, CSF ACE, MRI; cranial nerve VII commonly involved.",
-        "likelihood": "low"
+        "key_features": "Facial nerve is the cranial nerve most often involved, but there are no systemic features, serum ACE is normal, the CSF is acellular and MRI shows no leptomeningeal enhancement (chest CT, if done, shows no hilar lymphadenopathy).",
+        "likelihood": "very_low"
       },
       {
         "diagnosis": "Bilateral idiopathic Bell's palsy",
         "icd_code": "G51.0",
-        "key_features": "Diagnosis of exclusion; CSF dissociation and limb areflexia redirect to GBS.",
-        "likelihood": "low"
+        "key_features": "A diagnosis of exclusion; distal paresthesias, generalised hyporeflexia, CSF albuminocytological dissociation and demyelinating limb NCS show a polyradiculoneuropathy.",
+        "likelihood": "very_low"
+      },
+      {
+        "diagnosis": "Miller Fisher syndrome or GBS overlap",
+        "icd_code": "G61.0",
+        "key_features": "Full eye movements, no ataxia, no limb weakness and anti-GQ1b negative.",
+        "likelihood": "very_low"
+      },
+      {
+        "diagnosis": "Basal meningeal process (infective or malignant)",
+        "icd_code": "G03.9",
+        "key_features": "No headache or fever, CSF acellular with normal glucose and negative Gram stain, AFB smear, cryptococcal antigen and culture, and no meningeal enhancement on MRI.",
+        "likelihood": "very_low"
       },
       {
         "diagnosis": "Acute-onset CIDP",
         "icd_code": "G61.81",
-        "key_features": "Reassess at 8 weeks.",
+        "key_features": "Cannot be excluded at presentation; progression beyond 8 weeks or 3 or more treatment-related fluctuations would point to it. Reassess at 8 weeks.",
         "likelihood": "low"
       },
       {
         "diagnosis": "Myasthenia gravis",
         "icd_code": "G70.0",
-        "key_features": "Preserved reflexes; CSF normal; AChR antibodies / RNS distinguish.",
+        "key_features": "No ptosis, ophthalmoparesis or fatigability; areflexia, paresthesias, CSF dissociation and demyelinating NCS are not features of MG.",
         "likelihood": "very_low"
       }
     ],
     "key_clinical_evidence": [
-      "Bilateral simultaneous facial diplegia is rarely idiopathic; GBS, Lyme, and sarcoidosis dominate the differential.",
-      "Limb areflexia and CSF dissociation tip the diagnosis toward GBS."
+      "Bilateral lower motor neuron facial weakness with distal paresthesias, reduced reflexes and no limb weakness is the bifacial weakness with paresthesias variant of GBS [Wakerley_2014]; the Brighton certainty levels do not apply without limb weakness.",
+      "CSF albuminocytological dissociation (protein 78 mg/dL, 2 cells/mm3) and demyelinating limb nerve conduction with sural sparing show a polyradiculoneuropathy beyond the facial nerves, which bilateral Bell's palsy does not produce and which argues against Lyme neuroborreliosis and neurosarcoidosis, both of which usually raise the CSF cell count.",
+      "Bilateral facial palsy is rarely idiopathic: Lyme disease, sarcoidosis, HIV, basal meningeal processes and brainstem lesions are excluded with serology, CSF and MRI.",
+      "Anti-ganglioside antibodies are not needed to diagnose typical GBS; anti-GQ1b is tested when Miller Fisher syndrome or an overlap is suspected [EAN_PNS_2023].",
+      "He walks and runs (GBS disability score 1), so IVIg is not routinely advised; he is admitted and monitored because the variant can progress to limb, bulbar or respiratory weakness [EAN_PNS_2023]."
     ],
-    "red_herrings": [],
-    "review_status": "draft",
-    "sequence_constraints": [
+    "red_herrings": [
       {
-        "after_criterion_id": "action-6-check-drug-interactions",
-        "before_criterion_id": "action-2-order-specialized-test",
-        "citations": [
-          "[Sharshar_2003]"
-        ],
-        "reason": "Document respiratory status (FVC/NIF) before committing to IVIG vs plasma exchange \u2014 severe respiratory compromise mandates ICU triage and may influence treatment choice and timing.",
-        "severity": "soft"
-      },
-      {
-        "after_criterion_id": "action-6-check-drug-interactions",
-        "before_criterion_id": "action-1-interpret-labs",
-        "citations": [
-          "[van_den_Berg_2014]"
-        ],
-        "reason": "Renal function, IgA screen, and CBC must be reviewed before IVIG to mitigate renal failure, anaphylaxis (IgA-deficient patients), and aseptic meningitis risk.",
-        "severity": "soft"
+        "correct_interpretation": "Sequential bilateral facial palsy within two days, preceded by distal paresthesias and accompanied by generalised hyporeflexia, is a polyradiculoneuropathy until proven otherwise; the CSF and NCS confirm it.",
+        "data_point": "Primary care diagnosis of right Bell's palsy two days ago",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Anchors on idiopathic facial palsy, so the second side is read as bilateral Bell's palsy",
+        "location": "History of present illness"
       }
     ],
+    "review_status": "draft",
+    "sequence_constraints": [],
     "stop_rule": {
-      "max_additional_actions": 0,
+      "max_additional_actions": 3,
       "required_before_assessment": [
-        "action-1-interpret-labs",
         "action-2-order-specialized-test",
         "action-3-analyze-csf",
+        "action-1-interpret-labs",
         "action-4-order-specialized-test",
-        "action-5-search-medical-literature",
-        "action-6-check-drug-interactions",
         "action-8-order-cardiac-monitoring"
       ]
     }
@@ -547,7 +587,7 @@
         "proposed": "",
         "summary": "No current medications are recorded for this patient, so there is nothing to review for interactions.",
         "warnings": [
-          "Interaction review performed against the current medication list above. Clinical relevance \u2014 which agents to taper, and in what order \u2014 is a prescribing decision, not an output of this check."
+          "Interaction review performed against the recorded medication list (none)."
         ]
       }
     },
@@ -568,7 +608,7 @@
     },
     "labs": {
       "abnormal_values_summary": [],
-      "interpretation": "All values within normal limits.",
+      "interpretation": "All values within reference ranges.",
       "panels": {
         "ACE": [
           {
@@ -582,6 +622,7 @@
         ],
         "Autoimmune": [
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "negative",
             "test": "ANA",
@@ -589,6 +630,7 @@
             "value": "Negative"
           },
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "negative",
             "test": "Anti-dsDNA",
@@ -596,6 +638,7 @@
             "value": "Negative"
           },
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "negative",
             "test": "ANCA (p and c)",
@@ -603,24 +646,9 @@
             "value": "Negative"
           }
         ],
-        "BMP": [
-          {
-            "is_abnormal": false,
-            "reference_range": "136-145",
-            "test": "Sodium",
-            "unit": "mEq/L",
-            "value": 139
-          },
-          {
-            "is_abnormal": false,
-            "reference_range": "0.7-1.2",
-            "test": "Creatinine",
-            "unit": "mg/dL",
-            "value": 0.9
-          }
-        ],
         "CBC": [
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "4.5-11.0",
             "test": "WBC",
@@ -628,25 +656,125 @@
             "value": 9.2
           },
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "13.5-17.5",
             "test": "Hemoglobin",
             "unit": "g/dL",
             "value": 15.4
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "150-400",
+            "test": "Platelets",
+            "unit": "x10^9/L",
+            "value": 236
           }
         ],
-        "Exclusion studies": [
+        "CK": [
           {
-            "clinical_significance": "Ordered to exclude an alternative cause; the result does not support one, which is what this case's diagnosis rests on",
+            "clinical_significance": null,
             "is_abnormal": false,
-            "reference_range": "",
-            "test": "HIV",
-            "unit": "",
-            "value": "Non-reactive"
+            "reference_range": "39-308",
+            "test": "Creatine kinase",
+            "unit": "U/L",
+            "value": 142
+          }
+        ],
+        "CMP": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "136-145",
+            "test": "Sodium",
+            "unit": "mEq/L",
+            "value": 139
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "3.5-5.1",
+            "test": "Potassium",
+            "unit": "mEq/L",
+            "value": 4.3
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.7-1.2",
+            "test": "Creatinine",
+            "unit": "mg/dL",
+            "value": 0.9
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "7-20",
+            "test": "BUN",
+            "unit": "mg/dL",
+            "value": 13
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "70-99",
+            "test": "Glucose",
+            "unit": "mg/dL",
+            "value": 89
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "8.6-10.2",
+            "test": "Calcium",
+            "unit": "mg/dL",
+            "value": 9.4
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "7-55",
+            "test": "ALT",
+            "unit": "U/L",
+            "value": 27
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "8-48",
+            "test": "AST",
+            "unit": "U/L",
+            "value": 23
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "40-129",
+            "test": "Alkaline phosphatase",
+            "unit": "U/L",
+            "value": 74
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.2-1.2",
+            "test": "Total bilirubin",
+            "unit": "mg/dL",
+            "value": 0.7
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "3.5-5.0",
+            "test": "Albumin",
+            "unit": "g/dL",
+            "value": 4.5
           }
         ],
         "Inflammatory": [
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "<5.0",
             "test": "CRP",
@@ -654,6 +782,7 @@
             "value": 4.8
           },
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "0-22",
             "test": "ESR",
@@ -665,88 +794,77 @@
           {
             "clinical_significance": null,
             "is_abnormal": false,
-            "reference_range": "negative",
-            "test": "Lyme disease (ELISA)",
+            "reference_range": "non-reactive",
+            "test": "HIV-1/2 Ag/Ab",
             "unit": "",
-            "value": "Negative"
-          },
-          {
-            "is_abnormal": false,
-            "reference_range": "negative",
-            "test": "HIV Ag/Ab",
-            "unit": "",
-            "value": "Negative"
-          },
-          {
-            "is_abnormal": false,
-            "reference_range": "negative",
-            "test": "EBV VCA IgM",
-            "unit": "",
-            "value": "Negative"
-          },
-          {
-            "is_abnormal": false,
-            "reference_range": "negative",
-            "test": "CMV IgM",
-            "unit": "",
-            "value": "Negative"
-          },
-          {
-            "is_abnormal": false,
-            "reference_range": "negative",
-            "test": "HSV PCR serum",
-            "unit": "",
-            "value": "Not detected"
+            "value": "Non-reactive"
           }
         ]
       }
     },
     "literature_search": {
       "general": {
-        "query": "the medical literature for IVIG vs plasma exchange evidence to guide disease-modifying therapy",
+        "query": "bifacial weakness with paresthesias variant of Guillain-Barre syndrome",
         "results": [
           {
-            "evidence_level": "guideline recommendation",
-            "finding": "IVIG (0.4 g/kg/day x 5 days) and plasma exchange are equivalently effective first-line therapies; combination not superior",
-            "source": "van_den_Berg_2014"
+            "evidence_level": "classification review",
+            "finding": "Bifacial weakness with paresthesias is a localised GBS variant: facial diplegia, distal paresthesias and reduced reflexes without limb weakness; it is distinguished from facial diplegia due to Lyme disease, sarcoidosis, HIV and basal meningeal processes.",
+            "source": "[Wakerley_2014]"
+          },
+          {
+            "evidence_level": "guideline",
+            "finding": "IVIg or plasma exchange is advised for adults with GBS who cannot walk unaided; in mildly affected patients treatment is not routinely advised within 2 weeks of onset unless they progress; corticosteroids are not advised.",
+            "source": "[EAN_PNS_2023]"
           }
         ],
-        "summary": "IVIG (0.4 g/kg/day x 5 days) and plasma exchange are equivalently effective first-line therapies; combination not superior"
+        "summary": "Bifacial weakness with paresthesias is a recognised localised GBS variant; there is no trial evidence for immunotherapy in localised variants, and the guideline indication for IVIg or plasma exchange is inability to walk unaided or progression [Wakerley_2014, EAN_PNS_2023]."
       }
     },
     "specialized_test": {
       "findings": [
         {
-          "finding": "Bilateral absent R1 and abnormal R2 responses \u2014 bilateral facial nerve demyelination confirmed",
-          "nerve": "Facial nerve \u2014 blink reflex"
+          "finding": "Distal latency 5.8 ms right, 6.1 ms left (normal <4.2); CMAP 0.6 mV right, 0.5 mV left (normal >1.0)",
+          "nerve": "Facial motor (nasalis), bilateral"
         },
         {
-          "finding": "Markedly prolonged distal latency bilaterally; severely reduced CMAP amplitudes",
-          "nerve": "Bilateral facial nerve motor"
+          "finding": "R1 absent with stimulation on either side; R2 absent ipsilaterally and contralaterally (efferent pattern, bilateral)",
+          "nerve": "Blink reflex"
         },
         {
-          "finding": "DML 5.6 ms (mildly prolonged); CV 44 m/s (borderline); F-waves prolonged",
-          "nerve": "Bilateral median motor"
+          "finding": "DML 5.6 ms (prolonged; normal <4.4); CV 44 m/s (reduced; normal >49); CMAP 7.8 mV (normal >4.0)",
+          "nerve": "Median motor, bilateral"
         },
         {
-          "finding": "SNAP 14 \u00b5V (mildly reduced)",
-          "nerve": "Bilateral sural sensory"
+          "finding": "DML 6.4 ms (prolonged; normal <6.0); CV 39 m/s (reduced; normal >41); CMAP 3.6 mV (normal >2.0)",
+          "nerve": "Peroneal motor, bilateral"
         },
         {
-          "finding": "Prolonged bilateral median (54 ms); absent bilateral peroneal",
+          "finding": "Median minimum latency 34 ms (prolonged; normal <31); peroneal absent bilaterally",
           "nerve": "F-waves"
         },
         {
           "finding": "Absent bilaterally",
           "nerve": "H-reflex"
+        },
+        {
+          "finding": "SNAP 9 uV (reduced; normal >15)",
+          "nerve": "Median sensory, bilateral"
+        },
+        {
+          "finding": "SNAP 14 uV (normal >6)",
+          "nerve": "Sural sensory, bilateral"
+        },
+        {
+          "finding": "Orbicularis oris and frontalis bilaterally: markedly reduced recruitment, no fibrillation potentials. Tibialis anterior and first dorsal interosseous: normal recruitment and motor unit morphology, no spontaneous activity",
+          "nerve": "Needle EMG"
         }
       ],
-      "impression": "Demyelinating polyneuropathy. Abnormal blink reflex bilaterally \u2014 absent R1 and abnormal R2 responses confirming bilateral facial nerve conduction delay. Absent H-reflex. Prolonged F-waves bilaterally. Mildly prolonged distal motor latencies and borderline reduced conduction velocities in limb nerves. Mildly reduced sural SNAP amplitudes. Findings are consistent with a demyelinating polyradiculoneuropathy with prominent bilateral cranial nerve involvement",
+      "impression": "This is an ABNORMAL study. 1. Bilateral facial motor neuropathy: prolonged distal latencies and low CMAP amplitudes, with absent R1 and R2 blink responses in an efferent pattern. 2. Prolonged distal motor latencies and reduced conduction velocities in median and peroneal nerves. 3. Prolonged median and absent peroneal F-waves; absent H-reflexes. 4. Reduced median with normal sural sensory amplitudes. 5. Reduced recruitment in facial muscles; normal limb needle EMG. Findings are consistent with a demyelinating polyradiculoneuropathy with bilateral facial nerve involvement. Clinical correlation recommended.",
       "quantitative_data": {
-        "pattern": "Demyelinating polyneuropathy with prominent bilateral facial nerve involvement (abnormal blink reflexes)"
+        "pattern": "Demyelinating polyradiculoneuropathy with bilateral facial nerve involvement"
       },
       "recommended_actions": [],
-      "test_type": "Nerve Conduction Studies, EMG, and Blink Reflex Study"
+      "test_type": "emg_ncs"
     }
   },
   "metadata": {
@@ -754,8 +872,8 @@
     "citation_gap": [],
     "condition_full_name": "Guillain-Barr\u00e9 syndrome (AIDP)",
     "criteria_pack_version": "1.0",
-    "difficulty_description": "Bilateral facial diplegia as presenting GBS manifestation \u2014 requires exclusion of Lyme, sarcoid, and intracranial causes; systemic neuropathy confirmed by diminished reflexes",
-    "difficulty_rationale": "6 required tools, 0 red herring(s); textbook GBS / variant presentation reachable with the standard required workup chain.",
+    "difficulty_description": "Bilateral facial palsy with distal paresthesias and hyporeflexia but no limb weakness: the bifacial weakness with paresthesias variant of GBS, after exclusion of Lyme disease, sarcoidosis and intracranial causes.",
+    "difficulty_rationale": "5 required actions (NCS/EMG, CSF, baseline labs, respiratory function, telemetry) plus brain MRI and Lyme serology to exclude the mimics of facial diplegia; 1 red herring (the initial Bell's palsy diagnosis).",
     "expected_agent_confidence": 0.88,
     "fallback_tool_kinds": {
       "drug_interactions": "normal",
@@ -776,7 +894,7 @@
     "vocab_gap": []
   },
   "patient": {
-    "chief_complaint": "One-day sudden-onset bilateral facial paralysis with loss of taste, drooling, and inability to close eyes \u2014 no limb weakness.",
+    "chief_complaint": "Two days of progressive weakness of both sides of the face, with drooling and inability to close the eyes; tingling in the fingers and feet for six days.",
     "clinical_history": {
       "allergies": [
         "No known drug allergies"
@@ -803,18 +921,21 @@
       "handedness": "right",
       "sex": "male"
     },
-    "history_present_illness": "Mr. H. is a 36-year-old IT specialist presenting with a 1-day history of sudden-onset bilateral facial paralysis. He awoke this morning unable to close either eye completely, with bilateral drooping of both cheeks, inability to purse his lips, and drooling of saliva. He cannot close his eyes, frown, show his teeth, blow, or whistle. He has lost taste bilaterally and has mild slurring of speech. There is no earache, hearing change, tinnitus, headache, neck stiffness, photophobia, or fever. He has no limb weakness or sensory symptoms. There is no history of recent infection, travel, sick contacts, insect bites, or trauma. He does not smoke, drink alcohol, or use illicit drugs. He has never had a similar episode. His primary care physician initially considered Bell's palsy but was concerned because bilateral simultaneous facial palsy is rare and strongly suggests an underlying systemic process. The finding of globally diminished reflexes on neurological exam, despite the patient's primary complaint being facial, raises the clinical suspicion for a broader peripheral neuropathy.",
+    "history_present_illness": "Mr. H. is a 36-year-old IT specialist. Six days ago he noticed tingling in the tips of his fingers and in both feet, which has persisted without spreading. Two days ago the right side of his face became weak; his primary care physician diagnosed a right Bell's palsy. Yesterday the left side became weak as well, and this morning he awoke unable to close either eye, with drooping of both cheeks, inability to purse his lips and drooling of saliva. He cannot frown, show his teeth, blow or whistle. He has lost taste bilaterally and his speech is slurred because he cannot move his lips. He has no limb weakness, difficulty walking, double vision, unsteadiness, swallowing difficulty or shortness of breath. There is no earache, hearing change, tinnitus, rash, headache, neck stiffness, photophobia or fever, and no bladder or bowel symptoms. He reports no recent infection, travel, tick or insect bites, or trauma. He has never had a similar episode.",
     "neurological_exam": {
-      "additional": "FVC: 3.2 L (predicted 4.4 L \u2014 73%). NIF: -42 cmH2O. No preceding illness, no recent travel, no sick contacts, no insect bites. Bilateral simultaneous facial nerve palsy \u2014 bilateral Bell's palsy is rare and should trigger systemic workup.",
-      "coordination": "Intact.",
-      "cranial_nerves": "Bilateral complete facial paralysis \u2014 unable to close either eye, bilateral lagophthalmos with Bell's phenomenon preserved. Unable to clench teeth, frown, show teeth, blow, or whistle. Nasolabial folds absent bilaterally. Drooling. Loss of taste bilaterally. Slurred speech. No ptosis. Pupils equal and reactive. Full extraocular movements. No diplopia.",
-      "gait": "Slightly unsteady \u2014 can walk with careful monitoring.",
-      "mental_status": "Alert, oriented, frightened.",
-      "motor": "Bilateral lower extremity: hip flexion 4/5, knee extension 4+/5 bilaterally. Upper extremity 4+/5.",
-      "reflexes": "Diminished deep tendon reflexes throughout \u2014 ankle jerks absent bilaterally, patellar and upper extremity 1+.",
-      "sensory": "Intact. No limb paresthesias."
+      "additional": null,
+      "coordination": "Finger-nose and heel-shin testing normal. Romberg negative.",
+      "cranial_nerves": "Bilateral complete lower motor neuron facial weakness: unable to close either eye, bilateral lagophthalmos with Bell's phenomenon preserved; unable to frown, show teeth, blow or whistle; nasolabial folds absent bilaterally; drooling. Taste reduced bilaterally on the anterior tongue. Labial dysarthria. Jaw closure strong; facial sensation intact. No ptosis. Pupils equal and reactive. Full extraocular movements without diplopia or fatigable weakness. Palate elevates symmetrically; gag present; tongue and neck flexion strength normal.",
+      "gait": "Normal gait; walks on heels and toes and can run.",
+      "mental_status": "Alert, fully oriented, anxious.",
+      "motor": "Normal bulk and tone. Power 5/5 in all muscle groups of the upper and lower limbs, including neck flexion and extension.",
+      "reflexes": "Ankle jerks absent bilaterally; knee, biceps, triceps and brachioradialis reflexes 1+ and symmetric. Plantar responses flexor.",
+      "sensory": "Distal tingling in the fingers and toes. Vibration sense mildly reduced at the great toes (6 s at the halluces), normal at the ankles and fingers. Pinprick, temperature and joint position sense intact. No sensory level."
     },
     "patient_id": "NB-GBS-RS11",
+    "physical_exam": {
+      "general": "Weight 76 kg, height 175 cm. No rash, lymphadenopathy, parotid swelling or uveitis."
+    },
     "vitals": {
       "bp_diastolic": 76,
       "bp_systolic": 122,

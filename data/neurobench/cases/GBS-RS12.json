@@ -72,6 +72,39 @@
   "followup_outputs": [
     {
       "output": {
+        "contrast": true,
+        "findings": [
+          {
+            "description": "Expected postoperative change. No epidural haematoma or fluid collection; no abnormal enhancement suggesting infection. Posterior fusion hardware in satisfactory position without loosening.",
+            "location": "L1-L5 laminectomy bed and L4/5 fusion",
+            "type": "Surgical site L4/5"
+          },
+          {
+            "description": "Mild smooth enhancement of the cauda equina nerve roots, including levels away from the operative bed",
+            "location": "Conus, cauda equina and lumbar nerve roots above and below the operated levels",
+            "type": "Nerve roots"
+          },
+          {
+            "description": "No cord compression or signal change",
+            "location": "Thoracic cord and conus",
+            "type": "Cord"
+          }
+        ],
+        "impression": "1. Expected postoperative appearance after L1-L5 laminectomy and L4/5 fusion; no epidural haematoma, fluid collection or hardware complication. 2. Mild smooth enhancement of the cauda equina nerve roots extending beyond the operative bed; postoperative change limits assessment at the operated levels. 3. No cord compression or cord signal abnormality.",
+        "measurements": null,
+        "modality": "MRI",
+        "recommended_actions": [],
+        "region": "spine"
+      },
+      "tool_name": "order_body_imaging",
+      "tool_parameters": {
+        "contrast": true,
+        "study": "spine_MRI"
+      },
+      "trigger_action": "request_spine_mri_contrast"
+    },
+    {
+      "output": {
         "appearance": "Clear, colorless",
         "cell_count": {
           "RBC": "0",
@@ -79,7 +112,7 @@
         },
         "glucose": "60 mg/dL",
         "glucose_ratio": "0.70",
-        "interpretation": "Opening pressure: 136 mmH2O. WBC: 3 cells/mm3 (N/A PMN/N/A lymph). Protein: 86 mg/dL (elevated). Glucose: 60 mg/dL (ratio 0.70). Gram stain: No organisms. Culture: No growth.",
+        "interpretation": "Opening pressure 136 mmH2O (normal). Nucleated cells 3/mm3. Protein 86 mg/dL (elevated). Glucose 60 mg/dL (CSF:serum ratio 0.70). Gram stain no organisms; culture no growth. Elevated protein with a normal cell count (albuminocytological dissociation). Clinical correlation recommended.",
         "opening_pressure": "136 mmH2O",
         "protein": "86 mg/dL (elevated)",
         "special_tests": {
@@ -94,22 +127,39 @@
       "output": {
         "findings": [
           {
-            "panel": "Respiratory",
-            "reference_range": "predicted 2.6 L (62%)",
-            "result": "1.6 L",
+            "flag": "L",
+            "reference_range": ">=80% predicted",
+            "result": "1.8 L (69% predicted; 29 mL/kg)",
+            "test": "FVC (first measurement)"
+          },
+          {
+            "flag": "L",
+            "reference_range": ">=80% predicted",
+            "result": "1.6 L (62% predicted; 26 mL/kg at 62 kg)",
             "test": "FVC"
           },
           {
-            "panel": "Respiratory",
-            "reference_range": "Marginally above threshold",
+            "flag": "L",
+            "reference_range": "-45 cmH2O or more negative",
             "result": "-26 cmH2O",
-            "test": "NIF"
+            "test": "MIP"
+          },
+          {
+            "flag": "L",
+            "reference_range": ">=70 cmH2O",
+            "result": "42 cmH2O",
+            "test": "MEP"
           }
         ],
-        "impression": "Abnormal values: FVC 1.6 L (62% predicted, declining from 1.8 L); NIF -26 cmH2O (marginally above intubation threshold).",
+        "impression": "Bedside respiratory function over 4 hours on postoperative day 14: FVC 1.6 L (62% predicted; 26 mL/kg at 62 kg) L. MIP -26 cmH2O L. MEP 42 cmH2O L. Change: FVC 1.8 L to 1.6 L over 4 h (11% fall). Cough weak.",
         "quantitative_data": {
           "FVC": "1.6 L",
-          "NIF": "-26 cmH2O"
+          "FVC_mL_per_kg": "26 mL/kg",
+          "FVC_percent_predicted": "62%",
+          "MEP": "42 cmH2O",
+          "MIP": "-26 cmH2O",
+          "cough": "weak",
+          "weight": "62 kg"
         },
         "recommended_actions": [],
         "test_type": "respiratory_function"
@@ -119,244 +169,27 @@
     },
     {
       "output": {
-        "duration_hours": 72,
+        "duration_hours": 24,
         "events": [],
         "findings": [
-          "Mild autonomic dysfunction"
+          "Sinus rhythm 62-102 bpm",
+          "Non-invasive blood pressure 126/72 to 168/94 mmHg"
         ],
         "heart_rate_range": {
           "max": 102,
           "min": 62
         },
-        "impression": "Mild autonomic lability. Heart rate range 62\u2013102 bpm. No sustained arrhythmia detected during 72-hour monitoring",
-        "monitor_type": "Continuous ICU telemetry",
+        "impression": "24-hour continuous telemetry. Sinus rhythm, heart rate 62-102 bpm, with sinus tachycardia during pain episodes. No pauses or sustained arrhythmia. Blood pressure 126/72 to 168/94 mmHg.",
+        "monitor_type": "Continuous telemetry",
         "recommended_actions": [],
-        "rhythm_summary": "Mild sinus tachycardia. No significant arrhythmias."
+        "rhythm_summary": "Sinus rhythm with sinus tachycardia to 102 bpm during pain episodes."
       },
       "tool_name": "order_cardiac_monitoring",
       "trigger_action": "request_cardiac_monitoring"
-    },
-    {
-      "output": {
-        "alternatives": [
-          "Enoxaparin for VTE prophylaxis \u2014 dose adjust for age and renal function"
-        ],
-        "contraindications": [],
-        "formulary_status": "IVIG: formulary",
-        "interactions": [
-          "IVIG can increase blood viscosity \u2014 DVT risk elevated in post-surgical + IVIG setting"
-        ],
-        "proposed": "IVIG + VTE prophylaxis in post-surgical GBS patient",
-        "warnings": [
-          "DVT prophylaxis mandatory in immobile post-surgical patient receiving IVIG",
-          "Sequential compression devices for lower extremities \u2014 mechanical VTE prophylaxis"
-        ]
-      },
-      "tool_name": "check_drug_interactions",
-      "trigger_action": "request_dvt_prophylaxis"
-    },
-    {
-      "output": {
-        "query": "general",
-        "results": [],
-        "summary": ""
-      },
-      "tool_name": "search_medical_literature",
-      "trigger_action": "search_gbs_treatment"
-    },
-    {
-      "output": {
-        "contrast": true,
-        "findings": [
-          {
-            "description": "No epidural hematoma. No fluid collection. Posterior fusion hardware in satisfactory position.",
-            "location": "Surgical site L4/5",
-            "type": "Surgical site L4/5"
-          },
-          {
-            "description": "Mild nerve root enhancement \u2014 consistent with inflammatory polyradiculopathy",
-            "location": "Spinal cord and cauda equina",
-            "type": "Spinal cord and cauda equina"
-          },
-          {
-            "description": "No cord compression, no cord signal change",
-            "location": "Cord",
-            "type": "Cord"
-          },
-          {
-            "description": "No hardware displacement or loosening",
-            "location": "Lumbar vertebrae",
-            "type": "Lumbar vertebrae"
-          }
-        ],
-        "impression": "1. No epidural hematoma or fluid collection at the surgical site. Posterior fusion hardware in satisfactory position. 2. Mild cauda equina and nerve root enhancement \u2014 consistent with inflammatory polyradiculopathy. 3. No cord compression or cord signal abnormality",
-        "measurements": {
-          "enhancement_pattern": "Cauda equina nerve root enhancement"
-        },
-        "modality": "MRI",
-        "recommended_actions": [],
-        "region": "spine"
-      },
-      "tool_name": "order_body_imaging",
-      "tool_parameters": {
-        "contrast": true,
-        "study": "spine_MRI"
-      },
-      "trigger_action": "request_spine_mri_contrast"
     }
   ],
   "ground_truth": {
     "action_criteria": [
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "panels": [
-                "CBC",
-                "CMP",
-                "HIV",
-                "inflammatory_markers",
-                "anti-GM1 IgM"
-              ]
-            },
-            "tool_name": "interpret_labs"
-          }
-        ],
-        "citations": [
-          "[Yuki_2012]",
-          "GBS criteria pack \u00a72"
-        ],
-        "criterion_id": "action-1-interpret-labs",
-        "expected_evidence": "Mild leukocytosis / elevated inflammatory markers reflecting antecedent infection; ganglioside antibodies for variant typing; trigger identification (Campylobacter, CMV, EBV, Mycoplasma, HIV)",
-        "importance": "required",
-        "label": "Obtain CBC, CMP, HIV, anti-GM1/anti-GQ1b ganglioside antibodies, and stool culture / Campylobacter serology if recent diarrhea",
-        "rationale": "Obtain CBC, CMP, HIV, anti-GM1/anti-GQ1b ganglioside antibodies, and stool culture / Campylobacter serology if recent diarrhea"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "test_type": "emg_ncs"
-            },
-            "tool_name": "order_specialized_test"
-          }
-        ],
-        "citations": [
-          "[Hadden_1998]",
-          "GBS criteria pack \u00a72"
-        ],
-        "criterion_id": "action-2-order-specialized-test",
-        "expected_evidence": "Demyelinating pattern (prolonged DML, conduction block, reduced CV, absent F-waves) consistent with AIDP, or reduced CMAP amplitudes in axonal variants (AMAN/AMSAN)",
-        "importance": "required",
-        "label": "Order nerve conduction studies and needle EMG (EMG/NCS)",
-        "rationale": "Order nerve conduction studies and needle EMG (EMG/NCS)"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "analyze_csf"
-          }
-        ],
-        "citations": [
-          "[Asbury_1990]",
-          "GBS criteria pack \u00a72"
-        ],
-        "criterion_id": "action-3-analyze-csf",
-        "expected_evidence": "Albuminocytologic dissociation \u2014 elevated protein with cell count <10/\u03bcL; may be normal in the first week of illness",
-        "importance": "required",
-        "label": "Perform lumbar puncture for CSF analysis",
-        "rationale": "Perform lumbar puncture for CSF analysis"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "test_type": "respiratory_function"
-            },
-            "tool_name": "order_specialized_test"
-          }
-        ],
-        "citations": [
-          "[Sharshar_2003]",
-          "GBS criteria pack \u00a72"
-        ],
-        "criterion_id": "action-4-order-specialized-test",
-        "expected_evidence": "Baseline and serial FVC, MIP/MEP, NIF; deterioration to FVC <20 mL/kg, MIP worse than -30 cmH2O, or VC <40% predicted triggers ICU transfer / intubation",
-        "importance": "required",
-        "label": "Order bedside respiratory function testing (FVC, MIP/MEP, NIF) and repeat every 4\u20136 hours",
-        "rationale": "Order bedside respiratory function testing (FVC, MIP/MEP, NIF) and repeat every 4\u20136 hours"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[van_den_Berg_2014]",
-          "GBS criteria pack \u00a72"
-        ],
-        "criterion_id": "action-5-search-medical-literature",
-        "expected_evidence": "IVIG (0.4 g/kg/day x 5 days) and plasma exchange are equivalently effective first-line therapies; combination not superior",
-        "importance": "required",
-        "label": "Search the medical literature for IVIG vs plasma exchange evidence to guide disease-modifying therapy",
-        "rationale": "Search the medical literature for IVIG vs plasma exchange evidence to guide disease-modifying therapy"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "check_drug_interactions"
-          }
-        ],
-        "citations": [
-          "[van_den_Berg_2014]",
-          "GBS criteria pack \u00a72"
-        ],
-        "criterion_id": "action-6-check-drug-interactions",
-        "expected_evidence": "Confirmation that IVIG can be given safely (no severe renal impairment, no IgA deficiency) or that plasma exchange is appropriate (adequate vascular access, stable coagulation)",
-        "importance": "required",
-        "label": "Check drug interactions / contraindications for IVIG (renal function, IgA deficiency screen) and/or plasma exchange (coagulation, calcium, hemodynamics)",
-        "rationale": "Check drug interactions / contraindications for IVIG (renal function, IgA deficiency screen) and/or plasma exchange (coagulation, calcium, hemodynamics)"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "analyze_ecg"
-          }
-        ],
-        "citations": [
-          "[Asbury_1990]",
-          "GBS criteria pack \u00a72"
-        ],
-        "criterion_id": "action-7-analyze-ecg",
-        "expected_evidence": "Sinus tachycardia or bradycardia; conduction or repolarisation abnormalities reflecting autonomic involvement",
-        "importance": "recommended",
-        "label": "Obtain a 12-lead ECG to screen for autonomic dysrhythmias and baseline QTc",
-        "rationale": "Obtain a 12-lead ECG to screen for autonomic dysrhythmias and baseline QTc"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "monitor_type": "telemetry"
-            },
-            "tool_name": "order_cardiac_monitoring"
-          }
-        ],
-        "citations": [
-          "[Asbury_1990]",
-          "GBS criteria pack \u00a72"
-        ],
-        "criterion_id": "action-8-order-cardiac-monitoring",
-        "expected_evidence": "Mild sinus tachycardia. No significant arrhythmias \u2014 the recording is read for the bradyarrhythmias, pauses beyond 3 seconds and blood-pressure lability that trigger ICU escalation",
-        "importance": "required",
-        "label": "Start continuous inpatient cardiac telemetry for the period of maximal weakness and keep it running alongside serial respiratory function. Autonomic instability affects about two thirds of patients and is a leading cause of in-hospital death: bradyarrhythmias, pauses beyond 3 seconds and blood-pressure lability are what trigger ICU escalation",
-        "rationale": "Start continuous inpatient cardiac telemetry for the period of maximal weakness and keep it running alongside serial respiratory function. Autonomic instability affects about two thirds of patients and is a leading cause of in-hospital death: bradyarrhythmias, pauses beyond 3 seconds and blood-pressure lability are what trigger ICU escalation"
-      },
       {
         "alternatives": [
           {
@@ -368,25 +201,169 @@
           }
         ],
         "citations": [
-          "[EAN_PNS_GBS_2023]",
-          "EAN/PNS 2023 Guillain-Barr\u00e9 syndrome guideline"
+          "[EAN_PNS_2023]",
+          "[Leonhard_2019]"
         ],
         "criterion_id": "action-9-order-body-imaging",
-        "expected_evidence": "Cord compression, traumatic/postoperative lesion, infection, myelitis or nerve-root enhancement relevant to the stated alternative.",
+        "expected_evidence": "No epidural haematoma, collection, hardware failure or cord compression; nerve root enhancement may be seen but is non-specific near the operative bed",
+        "importance": "recommended",
+        "label": "Contrast MRI of the spine to exclude a postoperative compressive or infective complication",
+        "rationale": "Leg weakness with severe pain two weeks after multilevel lumbar surgery raises epidural haematoma, abscess and hardware complications, which need imaging before the weakness is attributed to GBS and before a lumbar puncture near the operative field [EAN_PNS_2023, Leonhard_2019]."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "emg_ncs"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[EAN_PNS_2023]"
+        ],
+        "criterion_id": "action-2-order-specialized-test",
+        "expected_evidence": "Polyradiculoneuropathy pattern (demyelinating or axonal features, absent F-waves, sural sparing where present); may be normal in the first week",
+        "importance": "required",
+        "label": "Nerve conduction studies and needle EMG",
+        "rationale": "Nerve conduction studies show the demyelinating polyradiculoneuropathy and its extent beyond the operated levels, which a postoperative root injury does not produce [EAN_PNS_2023]."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_csf"
+          }
+        ],
+        "citations": [
+          "[EAN_PNS_2023]"
+        ],
+        "criterion_id": "action-3-analyze-csf",
+        "expected_evidence": "Albuminocytological dissociation: raised protein with cells <5/mm3 (5-50/mm3 compatible but prompts an alternative; >50/mm3 suggests another diagnosis); protein may be normal in the first week",
+        "importance": "required",
+        "label": "Lumbar puncture for CSF cell count, protein and glucose",
+        "rationale": "CSF supports the diagnosis and excludes the infective causes of polyradiculopathy that raise the cell count [EAN_PNS_2023]."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "panels": [
+                "CBC",
+                "CMP",
+                "CK"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          }
+        ],
+        "citations": [
+          "[EAN_PNS_2023]"
+        ],
+        "criterion_id": "action-1-interpret-labs",
+        "expected_evidence": "Baseline values before treatment; abnormal liver tests or low albumin mark a higher risk of a severe course; no metabolic or toxic alternative",
+        "importance": "required",
+        "label": "Baseline blood tests: full blood count, renal function and electrolytes, liver tests, albumin, glucose and CK",
+        "rationale": "Routine blood tests exclude metabolic mimics and give the baseline before IVIg; liver tests and albumin carry prognostic weight [EAN_PNS_2023]."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "respiratory_function"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[Lawn_2001]",
+          "[EAN_PNS_2023]",
+          "[Leonhard_2019]"
+        ],
+        "criterion_id": "action-4-order-specialized-test",
+        "expected_evidence": "FVC in L, % predicted and mL/kg, MIP and MEP, with the trend; ICU-level monitoring if FVC <20 mL/kg or <60% predicted, MIP weaker than -30 cmH2O, MEP <40 cmH2O, a fall of more than 30%, or bulbar weakness with weak cough",
+        "importance": "required",
+        "label": "Bedside respiratory function (FVC, MIP, MEP), repeated serially while weakness progresses",
+        "rationale": "She cannot stand, is progressing and is breathless lying flat; serial FVC, MIP and MEP decide ICU-level monitoring and intubation planning [Lawn_2001, EAN_PNS_2023]."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "monitor_type": "telemetry"
+            },
+            "tool_name": "order_cardiac_monitoring"
+          }
+        ],
+        "citations": [
+          "[EAN_PNS_2023]"
+        ],
+        "criterion_id": "action-8-order-cardiac-monitoring",
+        "expected_evidence": "Continuous telemetry with blood pressure monitoring: sinus rhythm 62-102 bpm with sinus tachycardia during pain and blood pressure 126/72 to 168/94 mmHg in the first 24 hours; autonomic instability (rate and blood pressure lability, bradyarrhythmia) requires continued monitoring while weakness progresses",
+        "importance": "required",
+        "label": "Continuous inpatient cardiac telemetry with blood pressure monitoring while weakness progresses",
+        "rationale": "Autonomic dysfunction is common in GBS and can cause bradyarrhythmias, pauses and blood-pressure lability; monitoring continues while weakness progresses [EAN_PNS_2023]."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_ecg"
+          }
+        ],
+        "citations": [
+          "[EAN_PNS_2023]"
+        ],
+        "criterion_id": "action-7-analyze-ecg",
+        "expected_evidence": "Normal sinus rhythm, rate 92, with normal PR, QRS and QTc (446 ms) as the baseline",
+        "importance": "recommended",
+        "label": "Obtain a 12-lead ECG to screen for autonomic dysrhythmias and baseline QTc",
+        "rationale": "A baseline 12-lead ECG screens for autonomic rhythm and conduction changes and gives the QTc before treatment [EAN_PNS_2023]."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "check_drug_interactions"
+          }
+        ],
+        "citations": [
+          "[EAN_PNS_2023]"
+        ],
+        "criterion_id": "action-6-check-drug-interactions",
+        "expected_evidence": "ACE inhibitor caution before albumin-replacement plasma exchange (hold lisinopril); IVIg thrombotic and renal warnings in an older immobile postoperative patient; nothing relevant with alendronate or acetaminophen",
+        "importance": "required",
+        "label": "Check the medication list for interactions with lisinopril before plasma exchange and with IVIg in an immobile postoperative patient",
+        "rationale": "Lisinopril changes the safety of albumin-replacement plasma exchange, and recent surgery with immobility raises the thrombotic risk of IVIg (ROUND_POLICY ruling 6)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "search_medical_literature"
+          }
+        ],
+        "citations": [
+          "[EAN_PNS_2023]"
+        ],
+        "criterion_id": "action-5-search-medical-literature",
+        "expected_evidence": "General evidence on immunotherapy in GBS; not needed for the diagnosis or the treatment decision",
         "importance": "optional",
-        "label": "Obtain contrast spine MRI only because New severe pain and paralysis days after lumbar surgery require urgent exclusion of a postoperative compressive complication.",
-        "rationale": "Obtain contrast spine MRI only because New severe pain and paralysis days after lumbar surgery require urgent exclusion of a postoperative compressive complication."
+        "label": "Optional literature search on IVIg versus plasma exchange in GBS",
+        "rationale": "Background evidence only; not a clinical step of the work-up."
       }
     ],
     "assessment": {
       "prohibited_recommendations": [
-        "Do not start corticosteroids as monotherapy."
+        "Do not treat with corticosteroids: oral corticosteroids are strongly advised against and IV methylprednisolone is not recommended [EAN_PNS_2023].",
+        "Do not start IVIg without checking renal function."
       ],
       "required_recommendations": [
-        "MRI spine to exclude epidural haematoma, residual compression, or operative complication.",
-        "Initiate IVIG / plasma exchange.",
-        "Continuous cardiac telemetry.",
-        "Coordinate with surgical team for post-op review."
+        "Admit to ICU-level monitoring now (MIP -26 cmH2O, weaker than -30, MEP 42 cmH2O, FVC falling from 1.8 to 1.6 L, weak cough) with FVC, MIP and MEP every 2-4 hours; plan elective intubation if FVC falls below 20 mL/kg (about 1.2 L at 62 kg) or MIP and MEP keep falling, or cough, secretions, bulbar function or fatigue worsen, and intubate regardless of the numbers for respiratory distress, hypoxaemia or hypercapnia [EAN_PNS_2023, Lawn_2001].",
+        "Start IVIg 0.4 g/kg/day for 5 days (2 g/kg total, about 25 g/day at 62 kg) now, because she cannot walk and is within 2 weeks of onset; plasma exchange (200-250 mL/kg over 5 sessions) is an equivalent alternative, with lisinopril held for 24 hours before albumin-replacement exchange [EAN_PNS_2023].",
+        "Continuous cardiac telemetry with blood pressure monitoring while weakness progresses.",
+        "Thromboprophylaxis: intermittent pneumatic compression now and subcutaneous low-molecular-weight heparin once the spinal surgeon confirms it is safe, while she cannot walk [Leonhard_2019].",
+        "Review with the spinal surgical team (wound, hardware, timing of anticoagulant prophylaxis and of any procedure)."
       ]
     },
     "avoided_actions": [
@@ -398,7 +375,7 @@
           }
         ],
         "citations": [
-          "[van_den_Berg_2014]"
+          "[EAN_PNS_2023]"
         ],
         "criterion_id": "avoid-waste-1-analyze-eeg",
         "rationale": "GBS is a peripheral nerve / nerve-root disorder; EEG has no role in diagnosis unless atypical CNS features (encephalopathy, seizures) are present.",
@@ -412,7 +389,7 @@
           }
         ],
         "citations": [
-          "[van_den_Berg_2014]"
+          "[EAN_PNS_2023]"
         ],
         "criterion_id": "avoid-waste-2-order-echocardiogram",
         "rationale": "Echocardiography is not indicated in typical GBS; reserve for pre-existing cardiac disease or unexplained hemodynamic instability after autonomic causes are excluded.",
@@ -426,7 +403,7 @@
           }
         ],
         "citations": [
-          "[van_den_Berg_2014]"
+          "[EAN_PNS_2023]"
         ],
         "criterion_id": "avoid-waste-3-order-ct-scan",
         "rationale": "Head CT contributes no diagnostic information in GBS; the disease is peripheral and CT does not visualise nerve roots reliably.",
@@ -440,7 +417,7 @@
           }
         ],
         "citations": [
-          "[van_den_Berg_2014]"
+          "[EAN_PNS_2023]"
         ],
         "criterion_id": "avoid-waste-4-analyze-brain-mri",
         "rationale": "Brain MRI is reserved for atypical features (encephalopathy, CNS signs, transverse myelitis on differential). In classic GBS it does not aid diagnosis.",
@@ -449,7 +426,7 @@
     ],
     "diagnosis": {
       "accepted": [
-        "Guillain-Barr\u00e9 syndrome, AIDP (post-spinal-surgery trigger, possible mechanical contribution)",
+        "Guillain-Barr\u00e9 syndrome (acute inflammatory demyelinating polyradiculoneuropathy) after spinal surgery",
         "guillain barre syndrome",
         "guillain-barre syndrome",
         "guillain-barr\u00e9 syndrome",
@@ -467,128 +444,142 @@
     },
     "differential": [
       {
-        "diagnosis": "Post-surgical mechanical nerve injury",
-        "icd_code": "G97.0",
-        "key_features": "Anatomically restricted distribution and asymmetric pattern; symmetric ascending weakness with areflexia argues against pure mechanical injury.",
-        "likelihood": "moderate"
-      },
-      {
-        "diagnosis": "Epidural haematoma / spinal cord compression",
+        "diagnosis": "Epidural haematoma or other postoperative spinal compression",
         "icd_code": "G95.20",
-        "key_features": "Spinal MRI required; sensory level and sphincter dysfunction absent here; MRI excludes.",
-        "likelihood": "moderate"
+        "key_features": "Pain and leg weakness after multilevel surgery raise it, but the hand weakness and arm hyporeflexia lie above the operated levels, there is no sensory level or sphincter dysfunction, and contrast MRI shows no haematoma, collection or cord compression.",
+        "likelihood": "very_low"
       },
       {
-        "diagnosis": "Acute-onset CIDP",
-        "icd_code": "G61.81",
-        "key_features": "Reassess at 8 weeks.",
-        "likelihood": "low"
+        "diagnosis": "Postoperative mechanical root injury",
+        "icd_code": "G97.0",
+        "key_features": "Would be restricted to the operated roots and present from surgery; symmetric ascending weakness reaching the hands after an asymptomatic interval, with demyelinating NCS, excludes it.",
+        "likelihood": "very_low"
       },
       {
-        "diagnosis": "Critical illness polyneuropathy",
-        "icd_code": "G62.81",
-        "key_features": "Post-op ICU course increases risk; pattern of CSF dissociation and demyelinating EMG argues for GBS.",
-        "likelihood": "low"
+        "diagnosis": "Postoperative spinal infection (epidural abscess, discitis)",
+        "icd_code": "G06.1",
+        "key_features": "Afebrile, wound healing well, CSF acellular, no collection or abnormal enhancement on MRI; CRP and ESR are modestly raised, as expected two weeks after surgery.",
+        "likelihood": "very_low"
       },
       {
         "diagnosis": "Cauda equina syndrome",
         "icd_code": "G83.4",
-        "key_features": "Sphincter and saddle anaesthesia absent; not consistent.",
+        "key_features": "Perineal sensation, anal tone and bladder emptying are normal, and the arms are involved.",
         "likelihood": "very_low"
+      },
+      {
+        "diagnosis": "Critical illness polyneuropathy",
+        "icd_code": "G62.81",
+        "key_features": "No ICU course before onset; uncomplicated surgery and ward recovery.",
+        "likelihood": "very_low"
+      },
+      {
+        "diagnosis": "Acute-onset CIDP",
+        "icd_code": "G61.81",
+        "key_features": "Cannot be excluded at presentation; progression beyond 8 weeks or 3 or more treatment-related fluctuations would point to it. Reassess at 8 weeks.",
+        "likelihood": "low"
       }
     ],
     "key_clinical_evidence": [
-      "Surgery is a recognised immune-trigger for GBS; mechanical injury alone is restricted in distribution and timing.",
-      "Imaging rules out structural / surgical complication; GBS is diagnosed by Brighton-level clinical and laboratory criteria."
+      "Surgery is a recognised antecedent event of GBS; weakness that begins after an asymptomatic postoperative interval and spreads beyond the operated segments is not a surgical root injury.",
+      "Contrast spine MRI excludes an epidural haematoma, collection or hardware complication; postoperative root enhancement near the operative bed is non-specific.",
+      "Ascending weakness reaching the hands with areflexia, CSF albuminocytological dissociation (protein 86 mg/dL, 3 cells/mm3) and a demyelinating NCS with sural sparing: Brighton level 1 once the course plateaus within 4 weeks [Brighton_2011].",
+      "A single loose stool is not a diarrhoeal illness. The antecedent infection is a history finding; serology is not needed for the diagnosis, and a positive IgM does not prove the trigger.",
+      "MIP -26 cmH2O and a falling FVC call for ICU-level monitoring even with FVC still above 20 mL/kg [Lawn_2001, EAN_PNS_2023]."
     ],
     "red_herrings": [
       {
-        "correct_interpretation": "Symmetric ascending paralysis with CSF dissociation and demyelinating EMG indicates GBS triggered by the surgical inflammatory milieu, not direct surgical injury.",
-        "data_point": "Recent spinal surgery",
+        "correct_interpretation": "The MRI excludes a compressive or infective complication; ascending weakness reaching the hands with areflexia, CSF dissociation and demyelinating NCS indicates GBS after surgery, not surgical injury.",
+        "data_point": "Recent multilevel lumbar spinal surgery",
         "field_path": "patient.clinical_history.past_medical_history",
-        "intended_effect": "Anchor on mechanical / surgical injury rather than autoimmune polyradiculoneuropathy.",
-        "location": "patient.clinical_history"
+        "intended_effect": "Anchors on a mechanical or surgical complication rather than an autoimmune polyradiculoneuropathy.",
+        "location": "Past medical history and history of present illness"
+      },
+      {
+        "correct_interpretation": "A single loose stool without fever or further diarrhoea is non-specific and does not count as a diarrhoeal illness; antecedent-infection testing is not needed for the diagnosis or the treatment decision.",
+        "data_point": "Single loose stool on postoperative day 9",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Suggests a Campylobacter trigger to be confirmed with stool culture or serology.",
+        "location": "History of present illness"
       }
     ],
     "review_status": "draft",
     "sequence_constraints": [
       {
-        "after_criterion_id": "action-6-check-drug-interactions",
-        "before_criterion_id": "action-2-order-specialized-test",
+        "after_criterion_id": "action-3-analyze-csf",
+        "before_criterion_id": "action-9-order-body-imaging",
         "citations": [
-          "[Sharshar_2003]"
+          "[Leonhard_2019]"
         ],
-        "reason": "Document respiratory status (FVC/NIF) before committing to IVIG vs plasma exchange \u2014 severe respiratory compromise mandates ICU triage and may influence treatment choice and timing.",
+        "reason": "Image the operated lumbar spine before the lumbar puncture: an epidural haematoma or collection changes the diagnosis and the safety and route of the puncture.",
         "severity": "soft"
       },
       {
         "after_criterion_id": "action-6-check-drug-interactions",
         "before_criterion_id": "action-1-interpret-labs",
         "citations": [
-          "[van_den_Berg_2014]"
+          "[EAN_PNS_2023]"
         ],
-        "reason": "Renal function, IgA screen, and CBC must be reviewed before IVIG to mitigate renal failure, anaphylaxis (IgA-deficient patients), and aseptic meningitis risk.",
+        "reason": "Renal function and the blood count are reviewed with the medication list before IVIg or plasma exchange is chosen.",
         "severity": "soft"
       }
     ],
     "stop_rule": {
-      "max_additional_actions": 0,
+      "max_additional_actions": 3,
       "required_before_assessment": [
-        "action-1-interpret-labs",
         "action-2-order-specialized-test",
         "action-3-analyze-csf",
+        "action-1-interpret-labs",
         "action-4-order-specialized-test",
-        "action-5-search-medical-literature",
-        "action-6-check-drug-interactions",
-        "action-8-order-cardiac-monitoring"
+        "action-8-order-cardiac-monitoring",
+        "action-6-check-drug-interactions"
       ]
     }
   },
   "initial_tool_outputs": {
     "cardiac_monitoring": null,
+    "drug_interactions": {
+      "general": {
+        "alternatives": [],
+        "contraindications": [],
+        "formulary_status": "IVIg and plasma exchange available",
+        "interactions": [
+          "Lisinopril (ACE inhibitor) and albumin-replacement plasma exchange: ACE inhibition blocks bradykinin breakdown and is associated with flushing, hypotension and bradycardia during apheresis; the ACE inhibitor is usually held for at least 24 hours before an exchange (category-level caution).",
+          "IVIg: thromboembolic events are reported, with higher risk in older patients, immobility, recent surgery and hyperviscosity; ensure adequate hydration and use the lowest practical infusion rate (product labelling warning).",
+          "IVIg and renal function: renal dysfunction is reported, more often with sucrose-stabilised products; concurrent ACE inhibitor is a relative caution, monitor creatinine."
+        ],
+        "proposed": "IVIg or albumin-replacement plasma exchange; current medicines lisinopril, alendronate, acetaminophen",
+        "summary": "Two category-level cautions: an ACE inhibitor with albumin-replacement plasma exchange (bradykinin-mediated reactions), and the thrombotic and renal warnings of IVIg, which weigh more after recent surgery and with immobility.",
+        "warnings": [
+          "No interaction identified between IVIg or plasma exchange and alendronate or acetaminophen."
+        ]
+      }
+    },
     "ecg": {
       "axis": "Normal",
-      "clinical_correlation": "",
       "findings": [
-        "Mild sinus tachycardia",
-        "Borderline QTc"
+        "Normal sinus rhythm, rate 92"
       ],
-      "interpretation": "Mild sinus tachycardia. Borderline QTc prolongation.",
+      "interpretation": "Normal sinus rhythm, rate 92. Normal PR, QRS and QTc (446 ms) intervals. No acute ST-T changes.",
       "intervals": {
         "PR": "168 ms",
         "QRS": "90 ms",
         "QTc": "446 ms"
       },
       "rate": 92,
-      "rhythm": "Sinus tachycardia"
+      "rhythm": "Normal sinus rhythm"
     },
     "labs": {
       "abnormal_values_summary": [
-        "Anti-GM1 IgG positive",
-        "Anti-GalNAc-GD1a IgG positive",
-        "CRP 9.2",
-        "ESR 44"
+        "Hemoglobin 11.8 g/dL (L)",
+        "CRP 9.2 mg/L (H)",
+        "ESR 44 mm/hr (H)"
       ],
-      "interpretation": "Abnormal values: Hemoglobin 11.8 g/dL (L), CRP 9.2 mg/L (H), ESR 44 mm/hr (H), Anti-GM1 IgG Positive (OD 0.157) optical density (H), Anti-GalNAc-GD1a IgG Positive (OD 0.135) optical density (H).",
+      "interpretation": "Mild anaemia (Hb 11.8 g/dL). CRP 9.2 mg/L and ESR 44 mm/hr (elevated). Remaining values within reference ranges.",
       "panels": {
-        "BMP": [
-          {
-            "is_abnormal": false,
-            "reference_range": "136-145",
-            "test": "Sodium",
-            "unit": "mEq/L",
-            "value": 138
-          },
-          {
-            "is_abnormal": false,
-            "reference_range": "0.5-1.1",
-            "test": "Creatinine",
-            "unit": "mg/dL",
-            "value": 0.8
-          }
-        ],
         "CBC": [
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "4.5-11.0",
             "test": "WBC",
@@ -604,6 +595,7 @@
             "value": 11.8
           },
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "150-400",
             "test": "Platelets",
@@ -611,14 +603,104 @@
             "value": 312
           }
         ],
-        "Exclusion studies": [
+        "CK": [
           {
-            "clinical_significance": "Ordered to exclude an alternative cause; the result does not support one, which is what this case's diagnosis rests on",
+            "clinical_significance": null,
             "is_abnormal": false,
-            "reference_range": "",
-            "test": "HIV",
-            "unit": "",
-            "value": "Non-reactive"
+            "reference_range": "26-192",
+            "test": "Creatine kinase",
+            "unit": "U/L",
+            "value": 96
+          }
+        ],
+        "CMP": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "136-145",
+            "test": "Sodium",
+            "unit": "mEq/L",
+            "value": 138
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "3.5-5.1",
+            "test": "Potassium",
+            "unit": "mEq/L",
+            "value": 4.4
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.5-1.1",
+            "test": "Creatinine",
+            "unit": "mg/dL",
+            "value": 0.8
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "7-20",
+            "test": "BUN",
+            "unit": "mg/dL",
+            "value": 16
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "70-99",
+            "test": "Glucose",
+            "unit": "mg/dL",
+            "value": 86
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "8.6-10.2",
+            "test": "Calcium",
+            "unit": "mg/dL",
+            "value": 9.1
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "7-35",
+            "test": "ALT",
+            "unit": "U/L",
+            "value": 19
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "10-35",
+            "test": "AST",
+            "unit": "U/L",
+            "value": 21
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "35-104",
+            "test": "Alkaline phosphatase",
+            "unit": "U/L",
+            "value": 88
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.2-1.2",
+            "test": "Total bilirubin",
+            "unit": "mg/dL",
+            "value": 0.5
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "3.5-5.0",
+            "test": "Albumin",
+            "unit": "g/dL",
+            "value": 3.6
           }
         ],
         "Inflammatory": [
@@ -633,7 +715,7 @@
           {
             "clinical_significance": null,
             "is_abnormal": true,
-            "reference_range": "0-20",
+            "reference_range": "0-30",
             "test": "ESR",
             "unit": "mm/hr",
             "value": 44
@@ -642,53 +724,50 @@
         "Serology": [
           {
             "clinical_significance": null,
-            "is_abnormal": true,
-            "reference_range": "<0.1",
-            "test": "Anti-GM1 IgG",
-            "unit": "optical density",
-            "value": "Positive (OD 0.157)"
-          },
-          {
-            "clinical_significance": null,
-            "is_abnormal": true,
-            "reference_range": "<0.1",
-            "test": "Anti-GalNAc-GD1a IgG",
-            "unit": "optical density",
-            "value": "Positive (OD 0.135)"
+            "is_abnormal": false,
+            "reference_range": "non-reactive",
+            "test": "HIV-1/2 Ag/Ab",
+            "unit": "",
+            "value": "Non-reactive"
           }
         ]
       }
     },
     "literature_search": {
       "general": {
-        "query": "the medical literature for IVIG vs plasma exchange evidence to guide disease-modifying therapy",
+        "query": "first-line immunotherapy in Guillain-Barre syndrome",
         "results": [
           {
-            "evidence_level": "guideline recommendation",
-            "finding": "IVIG (0.4 g/kg/day x 5 days) and plasma exchange are equivalently effective first-line therapies; combination not superior",
-            "source": "van_den_Berg_2014"
+            "evidence_level": "guideline",
+            "finding": "Guidelines for adults with GBS who cannot walk unaided advise IVIg 2 g/kg over 5 days within 2 weeks of onset or plasma exchange within 4 weeks, with no preference between them; corticosteroids are not advised.",
+            "source": "[EAN_PNS_2023]"
+          },
+          {
+            "evidence_level": "randomised controlled trial",
+            "finding": "A second IVIg course in patients with a poor predicted prognosis did not improve outcome and caused more serious adverse events.",
+            "source": "[Walgaard_2021]"
           }
         ],
-        "summary": "IVIG (0.4 g/kg/day x 5 days) and plasma exchange are equivalently effective first-line therapies; combination not superior"
+        "summary": "IVIg or plasma exchange is advised for adults with GBS unable to walk unaided; neither is preferred, and a second IVIg course is not advised [EAN_PNS_2023, Walgaard_2021]."
       }
     },
     "specialized_test": {
       "findings": [
         {
-          "finding": "DML 7.2 ms (prolonged); CV 36 m/s (reduced); temporal dispersion noted; CMAP 3.4 mV",
-          "nerve": "Bilateral median motor"
+          "finding": "DML 7.2 ms (prolonged; normal <4.4); CV 36 m/s (reduced; normal >49); temporal dispersion on proximal stimulation; CMAP 3.4 mV (reduced; normal >4.0)",
+          "nerve": "Median motor, bilateral"
         },
         {
-          "finding": "SNAP normal (18 \u00b5V)",
-          "nerve": "Bilateral sural sensory"
+          "finding": "DML 8.6 ms (prolonged; normal <6.0); CV 28 m/s (reduced; normal >41); CMAP 2.2 mV (normal >2.0)",
+          "nerve": "Peroneal motor, bilateral"
         },
         {
-          "finding": "SNAP 8 \u00b5V (reduced) \u2014 abnormal median with normal sural: characteristic AIDP pattern",
-          "nerve": "Bilateral median sensory"
+          "finding": "SNAP 8 uV (reduced; normal >15)",
+          "nerve": "Median sensory, bilateral"
         },
         {
-          "finding": "DML 8.6 ms (prolonged); CV 28 m/s; CMAP 2.2 mV",
-          "nerve": "Bilateral peroneal motor"
+          "finding": "SNAP 18 uV (normal >6)",
+          "nerve": "Sural sensory, bilateral"
         },
         {
           "finding": "Absent bilateral peroneal; prolonged bilateral median",
@@ -697,14 +776,18 @@
         {
           "finding": "Absent bilaterally",
           "nerve": "H-reflex"
+        },
+        {
+          "finding": "Tibialis anterior, vastus lateralis and first dorsal interosseous: reduced recruitment of normal-morphology motor units; no fibrillation potentials or positive sharp waves. Lumbar paraspinal muscles not examined (recent surgery)",
+          "nerve": "Needle EMG"
         }
       ],
-      "impression": "Acute demyelinating polyradiculoneuropathy. Prolonged distal motor latencies bilaterally with reduced conduction velocities and temporal dispersion on proximal stimulation. Abnormal median sensory with preserved sural sensory response. Absent F-waves and H-reflex. Findings are consistent with acute demyelinating polyradiculoneuropathy",
+      "impression": "This is an ABNORMAL study. 1. Prolonged distal motor latencies, reduced conduction velocities and temporal dispersion in median and peroneal motor nerves. 2. Reduced median with normal sural sensory amplitudes. 3. Absent peroneal and prolonged median F-waves; absent H-reflexes. 4. Reduced recruitment without denervation on needle EMG. Findings are consistent with an acute demyelinating polyradiculoneuropathy. Clinical correlation recommended.",
       "quantitative_data": {
-        "pattern": "Acute demyelinating polyradiculoneuropathy with temporal dispersion on proximal stimulation"
+        "pattern": "Demyelinating polyradiculoneuropathy with temporal dispersion"
       },
       "recommended_actions": [],
-      "test_type": "Nerve Conduction Studies and EMG"
+      "test_type": "emg_ncs"
     }
   },
   "metadata": {
@@ -712,8 +795,8 @@
     "citation_gap": [],
     "condition_full_name": "Guillain-Barr\u00e9 syndrome (AIDP)",
     "criteria_pack_version": "1.0",
-    "difficulty_description": "Post-laminectomy GBS \u2014 requires urgent MRI spine to exclude surgical complication first; anti-GM1/GalNAc-GD1a positive; AIDP distinguished from nodopathy by temporal dispersion",
-    "difficulty_rationale": "6 required tools, 1 red herring(s); textbook GBS / variant presentation reachable with the standard required workup chain.",
+    "difficulty_description": "GBS two weeks after lumbar spinal surgery: a postoperative compressive or infective complication is excluded with contrast spine MRI before the polyradiculoneuropathy is confirmed with NCS and CSF; respiratory function already calls for ICU-level monitoring.",
+    "difficulty_rationale": "6 required actions (NCS/EMG, CSF, baseline labs, respiratory function, telemetry, interaction check for lisinopril and IVIg) plus recommended spine MRI; 2 red herrings (recent surgery, single loose stool).",
     "expected_agent_confidence": 0.88,
     "fallback_tool_kinds": {
       "ct": "normal",
@@ -734,7 +817,7 @@
     "vocab_gap": []
   },
   "patient": {
-    "chief_complaint": "Sudden bilateral thigh pain on postoperative day 11 after L1-L5 laminectomy, followed by rapidly ascending lower extremity weakness and tingling, with absent reflexes.",
+    "chief_complaint": "Bilateral thigh pain and tingling in the feet starting on postoperative day 11 after L1-L5 laminectomy, followed by ascending leg weakness; since yesterday she cannot stand.",
     "clinical_history": {
       "allergies": [
         "No known drug allergies"
@@ -763,7 +846,7 @@
         }
       ],
       "past_medical_history": [
-        "Lumbar spinal stenosis L1-L5 with L4/5 spondylolisthesis \u2014 underwent L1-L5 laminectomy with L4/5 posterolateral fusion 11 days ago",
+        "Lumbar spinal stenosis L1-L5 with L4/5 spondylolisthesis: L1-L5 laminectomy with L4/5 posterolateral fusion 14 days ago",
         "Hypertension",
         "Osteoporosis"
       ],
@@ -782,18 +865,21 @@
       "handedness": "right",
       "sex": "female"
     },
-    "history_present_illness": "Mrs. T. is a 78-year-old woman presenting on postoperative day 11 after an uncomplicated L1-L5 laminectomy with L4/5 posterolateral fusion performed for lumbar spinal stenosis and spondylolisthesis. She had been ambulating with a walker and was progressing appropriately until postoperative day 9, when she had a single episode of loose stool without systemic symptoms. On postoperative day 11, she experienced sudden severe bilateral thigh pain, followed over the next several hours by ascending weakness and worsening tingling in both lower extremities. By the time of evaluation, she cannot stand or walk. The weakness developed rapidly over 12 hours. She is afebrile and her surgical wound appears to be healing well. The immediate concern is a surgical complication \u2014 epidural hematoma, hardware displacement, or infection \u2014 all of which must be excluded emergently. The single loose stool episode occurred 2 days before the onset of the neurological symptoms.",
+    "history_present_illness": "Mrs. T. is a 78-year-old woman seen on postoperative day 14 after an uncomplicated L1-L5 laminectomy with L4/5 posterolateral fusion for lumbar spinal stenosis and spondylolisthesis. She had been walking with a walker and progressing as expected. On postoperative day 9 she had a single loose stool without fever, abdominal pain or further diarrhoea. On postoperative day 11 she developed severe bilateral thigh pain and tingling in both feet, followed over the next three days by ascending weakness of both legs and, since this morning, clumsiness of both hands. Since yesterday she cannot stand or walk. She has no back pain at the operated level beyond the expected incisional discomfort, no urinary retention or incontinence and no bowel change since the single loose stool. She has no double vision, facial weakness or difficulty swallowing, and reports mild breathlessness when lying flat. She is afebrile and her wound is healing well.",
     "neurological_exam": {
-      "additional": "FVC: 1.8 L (predicted 2.6 L \u2014 69%). NIF: -30 cmH2O. Post-operative day 11. Single loose stool episode on postoperative day 9. Surgical wound healing well \u2014 no erythema, no fluctuance. No fever. Spinal hardware intact on imaging. A post-surgical complication (hematoma, infection, hardware failure) must be excluded.",
+      "additional": "Surgical wound healing well, no erythema, tenderness or fluctuance. Perineal sensation intact; normal anal tone; bladder scan post-void residual 40 mL.",
       "coordination": "Cannot assess lower limbs. Upper limbs intact.",
-      "cranial_nerves": "Intact. No facial weakness.",
-      "gait": "Unable to walk \u2014 leg weakness too severe.",
+      "cranial_nerves": "Intact. No facial weakness, ophthalmoparesis or bulbar weakness.",
+      "gait": "Unable to stand or walk.",
       "mental_status": "Alert, oriented, distressed.",
       "motor": "Bilateral lower extremity weakness: hip flexion 3/5, knee extension 3/5, ankle dorsiflexion 3/5. Upper extremity distal: 4/5 bilaterally.",
       "reflexes": "Absent bilateral patellar and Achilles. Trace bilateral upper extremity reflexes.",
-      "sensory": "Bilateral hyperesthesia of distal lower legs and feet \u2014 allodynia. Bilateral tingling."
+      "sensory": "Hyperaesthesia and allodynia of the distal legs and feet with bilateral tingling. Vibration reduced at the toes. No sensory level."
     },
     "patient_id": "NB-GBS-RS12",
+    "physical_exam": {
+      "general": "Weight 62 kg, height 160 cm."
+    },
     "vitals": {
       "bp_diastolic": 86,
       "bp_systolic": 144,

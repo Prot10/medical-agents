@@ -69,13 +69,7 @@
     },
     "eeg": null,
     "labs": null,
-    "literature_search": {
-      "general": {
-        "query": "general",
-        "results": [],
-        "summary": "No directly applicable, high-quality evidence was retrieved for this query. Recommend correlating with current society guidelines."
-      }
-    },
+    "literature_search": null,
     "mri": null,
     "specialized_test": null
   },
@@ -150,7 +144,7 @@
             "value": "6/15 points"
           }
         ],
-        "impression": "Neuropsychological evaluation reveals a multi-domain profile with prominent amnestic and language features. Verbal memory is impaired: RAVLT delayed recall 5th percentile, immediate recall 15th percentile, consistent with a storage-type deficit. Confrontation naming (Boston Naming Test, 18th percentile), semantic fluency (Category Fluency Animals, 15th percentile), and phonemic fluency (FAS, 22nd percentile) are each mildly to moderately impaired. Executive function is impaired (Trail Making B, 15th percentile). Basic visuoconstructive skill and simple processing speed (Trail Making A, 28th percentile) are preserved. Screening: MoCA 21/30, MMSE 26/30. Geriatric Depression Scale 6/15 (borderline). Profile is consistent with amnestic mild cognitive impairment with anomia",
+        "impression": "Tests were administered in English, his dominant language, using norms adjusted for age, education and, where available, for Spanish-English bilingual speakers; fluency and naming scores are interpreted with caution because bilingual speakers can score lower on these measures. Neuropsychological evaluation reveals a multi-domain profile with prominent amnestic and language features. Verbal memory is impaired: RAVLT delayed recall 5th percentile, immediate recall 15th percentile. Confrontation naming (Boston Naming Test, 18th percentile), semantic fluency (Category Fluency Animals, 15th percentile) and phonemic fluency (FAS, 22nd percentile) are mildly impaired. Set-shifting is impaired (Trail Making B, 15th percentile). Visuoconstruction (Rey Complex Figure copy, 40th percentile) and simple processing speed (Trail Making A, 28th percentile) are preserved. Screening: MoCA 21/30, MMSE 26/30. Geriatric Depression Scale 6/15 (borderline). The profile is consistent with amnestic multi-domain mild cognitive impairment.",
         "quantitative_data": {
           "Boston Naming Test": "18th percentile",
           "Category Fluency (Animals)": "15th percentile",
@@ -172,6 +166,26 @@
     },
     {
       "output": {
+        "abnormal_values_summary": [],
+        "interpretation": "Methylmalonic acid 0.26 umol/L, within the reference range.",
+        "panels": {
+          "MMA": [
+            {
+              "clinical_significance": null,
+              "is_abnormal": false,
+              "reference_range": "0.00-0.40",
+              "test": "Methylmalonic acid",
+              "unit": "umol/L",
+              "value": 0.26
+            }
+          ]
+        }
+      },
+      "tool_name": "interpret_labs",
+      "trigger_action": "request_mma_methylmalonic_acid"
+    },
+    {
+      "output": {
         "appearance": "Clear, colorless",
         "cell_count": {
           "Differential": "100% lymphocytes",
@@ -180,17 +194,15 @@
         },
         "glucose": "64.3 mg/dL",
         "glucose_ratio": "0.54 (serum glucose 118 mg/dL)",
-        "interpretation": "Opening pressure: 15 cmH2O. WBC: 2 cells/uL (N/A PMN/N/A lymph). Protein: 44.9 mg/dL. Glucose: 64.3 mg/dL (ratio 0.54 (serum glucose 118 mg/dL)). Amyloid_beta_42: 478 pg/mL (reference >500 pg/mL) - BORDERLINE DECREASED. Amyloid_beta_40: 9100 pg/mL (reference range 5000-12000 pg/mL) - Normal. Amyloid_beta_42_40_ratio: 0.053 (reference >0.065) - DECREASED. Phosphorylated_tau_181: 52 pg/mL (reference <60 pg/mL) - HIGH NORMAL. Total_tau: 345 pg/mL (reference <400 pg/mL) - HIGH NORMAL. 14-3-3_protein: Negative. RT-QuIC: Negative.",
+        "interpretation": "Opening pressure 15 cmH2O. No pleocytosis (WBC 2 cells/uL, lymphocytes). Protein 44.9 mg/dL. Glucose 64.3 mg/dL (CSF/serum ratio 0.54). Abeta42/40 ratio 0.053, decreased (Abeta42 478 pg/mL, borderline; Abeta40 9100 pg/mL). p-tau181 56 pg/mL and total tau 371 pg/mL, high-normal, within the laboratory range. Pattern: decreased amyloid ratio with tau markers within range. Clinical correlation recommended.",
         "opening_pressure": "15 cmH2O",
         "protein": "44.9 mg/dL",
         "special_tests": {
-          "14-3-3_protein": "Negative",
-          "Amyloid_beta_40": "9100 pg/mL (reference range 5000-12000 pg/mL) - Normal",
-          "Amyloid_beta_42": "478 pg/mL (reference >500 pg/mL) - BORDERLINE DECREASED",
-          "Amyloid_beta_42_40_ratio": "0.053 (reference >0.065) - DECREASED",
-          "Phosphorylated_tau_181": "52 pg/mL (reference <60 pg/mL) - HIGH NORMAL",
-          "RT-QuIC": "Negative",
-          "Total_tau": "345 pg/mL (reference <400 pg/mL) - HIGH NORMAL"
+          "Abeta40": "9100 pg/mL (reference 5000-12000 pg/mL) - normal",
+          "Abeta42": "478 pg/mL (reference >500 pg/mL) - borderline decreased",
+          "Abeta42_40_ratio": "0.053 (reference >0.065) - decreased",
+          "phospho_tau": "p-tau181 56 pg/mL (reference <60 pg/mL) - high-normal",
+          "total_tau": "371 pg/mL (reference <400 pg/mL) - high-normal"
         }
       },
       "tool_name": "analyze_csf",
@@ -198,25 +210,33 @@
     },
     {
       "output": {
-        "alternatives": [
-          "Rivastigmine (patch or oral) - alternative cholinesterase inhibitor, transdermal may be better tolerated with GI issues",
-          "Galantamine - alternative cholinesterase inhibitor"
+        "findings": [
+          {
+            "interpretation": "Abnormal cortical binding",
+            "region": "Posterior cingulate and precuneus",
+            "signal": "Tracer uptake extending into cortical grey matter with loss of grey-white matter contrast"
+          },
+          {
+            "interpretation": "Abnormal cortical binding",
+            "region": "Lateral temporal and parietal cortex",
+            "signal": "Patchy cortical uptake bilaterally"
+          },
+          {
+            "interpretation": "Abnormal cortical binding",
+            "region": "Frontal cortex",
+            "signal": "Small areas of cortical uptake"
+          }
         ],
-        "contraindications": [],
-        "formulary_status": "Preferred formulary - generic available",
-        "interactions": [
-          "No significant interactions with metformin, amlodipine, losartan, rosuvastatin, tamsulosin, or aspirin"
-        ],
-        "proposed": "Donepezil 5 mg daily",
-        "warnings": [
-          "May cause bradycardia; monitor heart rate, especially given the patient is on amlodipine which can also slow heart rate in some patients",
-          "GI side effects (nausea, diarrhea, anorexia) common at initiation; monitor in a patient on metformin which can also cause GI upset",
-          "Use caution with concurrent anticholinergic medications as they may reduce efficacy",
-          "Tamsulosin has weak anticholinergic properties; clinically significant interaction unlikely but monitor"
-        ]
+        "impression": "Positive amyloid PET: moderate cortical amyloid neuritic plaque density (Centiloid 43). Clinical correlation recommended.",
+        "modality": "amyloid_PET",
+        "quantitative_data": {
+          "Centiloid": "43"
+        },
+        "recommended_actions": [],
+        "tracer_or_protocol": "18F-florbetaben, static acquisition 90-110 minutes after injection"
       },
-      "tool_name": "check_drug_interactions",
-      "trigger_action": "check_drug_interactions_donepezil"
+      "tool_name": "order_advanced_imaging",
+      "trigger_action": "order_amyloid_pet"
     }
   ],
   "ground_truth": {
@@ -231,14 +251,13 @@
           }
         ],
         "citations": [
-          "[NIA_AA_2011]",
-          "NIA_AA_2011"
+          "[NIA_AA_MCI_2011]"
         ],
         "criterion_id": "action-4-perform-clinical-assessment",
-        "expected_evidence": "Impairment documented on a validated instrument with an amnestic-predominant profile and informant-confirmed decline from a previous level, staged by whether independence in instrumental activities is preserved (mild cognitive impairment) or lost (dementia)",
+        "expected_evidence": "MMSE 26/30 with delayed recall 1/3 not improved by cues, informant-confirmed decline over twelve months, and preserved instrumental independence, staging the syndrome as mild cognitive impairment",
         "importance": "required",
         "label": "Perform a structured cognitive and behavioural assessment with informant history: a validated bedside instrument with the per-domain breakdown, whether delayed recall improves with cueing, and an explicit account of which instrumental activities have been lost. The syndrome must be documented before it is attributed",
-        "rationale": "Perform a structured cognitive and behavioural assessment with informant history: a validated bedside instrument with the per-domain breakdown, whether delayed recall improves with cueing, and an explicit account of which instrumental activities have been lost. The syndrome must be documented before it is attributed"
+        "rationale": "Bedside testing with cueing and his wife's account of his finances, schedule and driving decide whether he has mild cognitive impairment or dementia [NIA_AA_MCI_2011]."
       },
       {
         "alternatives": [
@@ -250,14 +269,13 @@
           }
         ],
         "citations": [
-          "[NIA_AA_2011]",
-          "NIA_AA_2011"
+          "[NIA_AA_MCI_2011]"
         ],
         "criterion_id": "action-5-order-specialized-test",
-        "expected_evidence": "Amnestic profile with disproportionate impairment of delayed recall and limited benefit from cueing, plus involvement of at least one other cognitive domain",
+        "expected_evidence": "Amnestic multi-domain profile: impaired verbal delayed recall with milder naming, fluency and set-shifting deficits, interpreted with caution for a bilingual speaker",
         "importance": "required",
-        "label": "Order comprehensive neuropsychological testing to characterize the cognitive profile and establish a baseline for tracking",
-        "rationale": "Order comprehensive neuropsychological testing to characterize the cognitive profile and establish a baseline for tracking"
+        "label": "Order comprehensive neuropsychological testing, interpreted with norms appropriate for his language, education and culture, to characterize the cognitive profile and set a baseline",
+        "rationale": "Formal testing defines the amnestic profile and the second domain; in a bilingual man with high-school education, naming and fluency must be read against appropriate norms [NIA_AA_MCI_2011]."
       },
       {
         "alternatives": [
@@ -279,14 +297,33 @@
           }
         ],
         "citations": [
-          "[AAN_dementia_2018]",
-          "AAN_dementia_2018"
+          "[AAN_dementia_2018]"
         ],
         "criterion_id": "action-6-interpret-labs",
-        "expected_evidence": "Reversible mimics (hypothyroidism, B12 deficiency, neurosyphilis) excluded; identify and address co-morbid metabolic factors",
+        "expected_evidence": "TSH, folate, syphilis and HIV serology normal; B12 299 pg/mL low-normal; HbA1c 6.5%",
         "importance": "required",
-        "label": "Order the reviewed cognitive laboratory panel to identify reversible or contributing causes",
-        "rationale": "Order the reviewed cognitive laboratory panel to identify reversible or contributing causes"
+        "label": "Order the cognitive laboratory panel to identify reversible or contributing causes",
+        "rationale": "Thyroid disease, B12 deficiency (twelve years of metformin), syphilis and metabolic factors must be excluded or addressed before the decline is attributed to neurodegeneration [AAN_dementia_2018]."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "panels": [
+                "MMA"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          }
+        ],
+        "citations": [
+          "[BSH_B12_2014]"
+        ],
+        "criterion_id": "action-10-interpret-labs-mma",
+        "expected_evidence": "Methylmalonic acid 0.26 umol/L, normal: no functional B12 deficiency",
+        "importance": "recommended",
+        "label": "Measure methylmalonic acid to resolve the low-normal vitamin B12",
+        "rationale": "A serum B12 of 299 pg/mL is indeterminate in a man on long-term metformin with reduced vibration sense at the toes; a normal methylmalonic acid excludes functional deficiency [BSH_B12_2014]."
       },
       {
         "alternatives": [
@@ -300,13 +337,13 @@
         ],
         "citations": [
           "[NIA_AA_2011]",
-          "NIA_AA_2011"
+          "[STRIVE_2013]"
         ],
         "criterion_id": "action-7-analyze-brain-mri",
-        "expected_evidence": "Subtle medial-temporal atrophy (Scheltens MTA grade 1-2) with or without temporoparietal volume loss",
+        "expected_evidence": "Mild bilateral hippocampal atrophy (MTA 1-2) with subtle temporoparietal volume loss, Fazekas 2 white matter disease and a chronic putaminal lacune",
         "importance": "required",
         "label": "Obtain brain MRI with dementia (volumetric) protocol to assess medial-temporal atrophy and exclude vascular disease, hippocampal sclerosis, NPH, and mass lesions",
-        "rationale": "Obtain brain MRI with dementia (volumetric) protocol to assess medial-temporal atrophy and exclude vascular disease, hippocampal sclerosis, NPH, and mass lesions"
+        "rationale": "MRI shows the medial temporal atrophy that supports a neurodegenerative cause, quantifies the small vessel disease of his diabetes and hypertension, and excludes a mass, hydrocephalus or post-traumatic lesion [NIA_AA_2011] [STRIVE_2013]."
       },
       {
         "alternatives": [
@@ -320,53 +357,37 @@
               ]
             },
             "tool_name": "analyze_csf"
+          },
+          {
+            "required_arguments": {
+              "modality": "amyloid_PET"
+            },
+            "tool_name": "order_advanced_imaging"
           }
         ],
         "citations": [
           "[NIA_AA_2018]",
-          "NIA_AA_2018"
+          "[Appropriate_Use_Amyloid_PET]"
         ],
         "criterion_id": "action-8-analyze-csf",
-        "expected_evidence": "Reduced A\u03b242 (or reduced A\u03b242/40 ratio) with elevated p-tau supporting A+T+ profile consistent with Alzheimer pathology",
+        "expected_evidence": "Amyloid positivity without established tau pathology: decreased CSF Abeta42/40 ratio (0.053) with p-tau181 and total tau high-normal, or a positive amyloid PET",
         "importance": "optional",
-        "label": "Obtain CSF Alzheimer biomarkers as the single optional biological-confirmation route",
-        "rationale": "Obtain CSF Alzheimer biomarkers as the single optional biological-confirmation route"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "check_drug_interactions"
-          }
-        ],
-        "citations": [
-          "[NIA_AA_2011]",
-          "NIA_AA_2011"
-        ],
-        "criterion_id": "action-9-check-drug-interactions",
-        "expected_evidence": "No clinically significant interactions; counsel on GI side effects and bradycardia risk",
-        "importance": "optional",
-        "label": "Check drug interactions before initiating cholinesterase inhibitor (donepezil, rivastigmine, or galantamine)",
-        "rationale": "Check drug interactions before initiating cholinesterase inhibitor (donepezil, rivastigmine, or galantamine)"
+        "label": "Establish amyloid status with CSF biomarkers or amyloid PET when the result would change management",
+        "rationale": "Either CSF Abeta42/40 with p-tau or amyloid PET establishes amyloid status; one conclusive test is enough, and it is needed when the diagnosis remains uncertain after the clinical, neuropsychological and MRI assessment or when disease-modifying treatment is being considered [NIA_AA_2018] [Appropriate_Use_Amyloid_PET]."
       }
     ],
     "assessment": {
       "prohibited_recommendations": [
-        "Do not prescribe anticholinergic medications (e.g., diphenhydramine, oxybutynin, tricyclics) which worsen cognition in patients with AD",
-        "Do not prescribe benzodiazepines as first-line management of anxiety or insomnia given fall and cognitive risk",
-        "Do not start antipsychotics without a clear behavioral indication given the FDA boxed warning for increased mortality in dementia",
-        "Do not attribute symptoms entirely to normal aging, depression, or sleep apnea without completing the dementia workup",
-        "Do not start memantine monotherapy at the mild stage (memantine is approved for moderate-to-severe AD)"
+        "Do not start a cholinesterase inhibitor or memantine as routine treatment for mild cognitive impairment; neither is approved for MCI and the guideline does not support routine use [AAN_dementia_2018].",
+        "Do not add an antimuscarinic bladder drug (e.g. oxybutynin) for his nocturia; anticholinergic burden worsens cognition, and tamsulosin, an alpha-1 blocker without anticholinergic effect, can continue [Beers_2023].",
+        "Do not attribute the decline to sleep apnea, poor sleep or normal aging alone, as the patient does; the amnestic multi-domain profile with hippocampal atrophy needs follow-up as mild cognitive impairment."
       ],
       "required_recommendations": [
-        "Obtain collateral history from an informant who knows the patient well",
-        "Exclude reversible causes of cognitive decline with screening labs (CBC, CMP, TSH, B12, folate; HIV/RPR per risk)",
-        "Obtain structural brain MRI with dementia/volumetric protocol",
-        "Quantify cognitive impairment with a standardized cognitive battery (MoCA at minimum; formal neuropsychological testing when feasible)",
-        "Assess safety: driving, medication management, finances, and need for caregiver support",
-        "Disclose the diagnosis and discuss prognosis, advance directives, and treatment options with the patient and family",
-        "Optimize vascular risk factor management (glycemic control, blood pressure, lipid management, smoking cessation, CPAP adherence)",
-        "Consider the single case-designated optional biomarker route if biological confirmation would change management or uncertainty remains when MRI is equivocal or when an atypical AD variant is suspected"
+        "Disclose amnestic multi-domain mild cognitive impairment with suspected Alzheimer disease pathology and a vascular contribution to the patient and his wife, explaining that it is not dementia, the risk of progression, and the value of advance planning while he has full capacity [NIA_AA_MCI_2011].",
+        "Arrange cognitive and functional reassessment in 6 to 12 months and recommend regular exercise (at least twice weekly); explain that no medicine is approved for mild cognitive impairment [AAN_dementia_2018].",
+        "Manage vascular risk factors: blood pressure is above target in clinic (153/84 mmHg) and needs review of his antihypertensive regimen, continue glycaemic control (HbA1c 6.5%) and statin therapy, and address CPAP non-adherence for his sleep apnea [AAN_dementia_2018].",
+        "Review safety with the patient and his wife: driving (hesitation at familiar intersections) at each visit, and automatic payments or a shared check of the credit card accounts after the late payments [AAN_dementia_2018].",
+        "Offer amyloid biomarker testing (CSF or amyloid PET) if a biological diagnosis would change management, such as eligibility for anti-amyloid treatment or diagnostic uncertainty; one conclusive test is sufficient [Appropriate_Use_Amyloid_PET]."
       ]
     },
     "avoided_actions": [
@@ -429,7 +450,7 @@
     ],
     "diagnosis": {
       "accepted": [
-        "Mild cognitive impairment due to Alzheimer's disease (amnestic, multi-domain)",
+        "Amnestic multidomain mild cognitive impairment, suspected Alzheimer disease pathology (intermediate likelihood) with vascular contribution",
         "mild cognitive impairment",
         "MCI",
         "amnestic mild cognitive impairment",
@@ -458,8 +479,8 @@
       {
         "diagnosis": "Vascular cognitive impairment / vascular contribution to dementia",
         "icd_code": "F01.50",
-        "key_features": "Concurrent small-vessel ischemic disease (Fazekas, lacunar infarct, microbleeds) and vascular risk factors suggest a vascular contribution; however, the gradual amnestic profile and biomarker positivity argue for mixed pathology rather than pure vascular dementia",
-        "likelihood": "high"
+        "key_features": "Fazekas 2 small vessel disease, a putaminal lacune, diabetes and hypertension make a vascular contribution likely; the gradual amnestic-predominant course with hippocampal atrophy, and a decreased CSF Abeta42/40 ratio when tested, argue against pure vascular cognitive impairment",
+        "likelihood": "moderate"
       },
       {
         "diagnosis": "Dementia with Lewy bodies",
@@ -476,23 +497,21 @@
       {
         "diagnosis": "Depression (pseudodementia)",
         "icd_code": "F32.A",
-        "key_features": "Insidious course over months to years with disproportionate delayed-recall impairment and limited benefit from cueing is not typical of pseudodementia",
+        "key_features": "GDS 6/15 is borderline and he admits frustration, but he denies persistent low mood, and recall that does not improve with cues is not typical of depression-related cognitive impairment",
         "likelihood": "low"
       },
       {
         "diagnosis": "Reversible cognitive impairment from thyroid disease, B12 deficiency, or untreated sleep apnea",
         "icd_code": null,
-        "key_features": "Screening labs and (when relevant) PSG are needed to exclude; the progressive amnestic profile would not normalize with treatment of these conditions alone",
+        "key_features": "TSH 2.9 mIU/L, folate normal, B12 299 pg/mL with normal methylmalonic acid (0.26 umol/L) and homocysteine (12.3 umol/L); untreated mild OSA and nocturia fragment his sleep and may contribute, but do not explain a progressive amnestic multi-domain decline",
         "likelihood": "low"
       }
     ],
     "key_clinical_evidence": [
-      "MMSE may remain within the 'normal' range in highly educated patients with early AD; MoCA and formal neuropsychological testing are more sensitive at the MCI / mild dementia interface",
-      "The hallmark cognitive feature of AD is impaired delayed recall with rapid forgetting and limited benefit from cueing, reflecting a storage-type (hippocampal) memory deficit",
-      "Mixed vascular and neurodegenerative pathology is common in older adults; the presence of small-vessel disease does not exclude AD and should not stop the biomarker workup",
-      "APOE genotyping is a risk modifier and is not used to make the diagnosis; an E3/E4 or E4/E4 result is supportive but neither sufficient nor required for diagnosis",
-      "Low-normal B12 should prompt methylmalonic acid testing before being dismissed as a non-contributor",
-      "Cholinesterase inhibitors are first-line symptomatic therapy in mild-to-moderate AD; memantine is reserved for moderate-to-severe disease"
+      "Impaired delayed recall that does not improve with cueing points to a storage-type (hippocampal) memory deficit, the typical amnestic presentation of Alzheimer pathology [NIA_AA_MCI_2011].",
+      "In bilingual patients, naming and verbal fluency should be interpreted with language-, education- and culture-appropriate norms; lower scores on these measures alone do not establish a deficit.",
+      "A low-normal B12 in a patient on long-term metformin is indeterminate and should prompt methylmalonic acid testing before B12 deficiency is dismissed as a contributor [BSH_B12_2014].",
+      "Cholinesterase inhibitors are not approved for mild cognitive impairment and are not recommended routinely at this stage; serial assessment and vascular risk management are the evidence-based steps [AAN_dementia_2018]."
     ],
     "red_herrings": [
       {
@@ -504,7 +523,7 @@
       },
       {
         "correct_interpretation": "Vague late-life cognitive decline in a parent is consistent with sporadic AD; targeted genetic testing is optional, not required, in the absence of a clearly autosomal-dominant family pattern",
-        "data_point": "Father's death attributed to 'senility' \u2014 vague family history of dementia",
+        "data_point": "Father's death attributed to 'senility', a vague family history of dementia",
         "field_path": "patient.clinical_history.family_history[0]",
         "intended_effect": "Inflate concern for autosomal-dominant early-onset AD and over-prioritize genetic testing",
         "location": "Family history"
@@ -518,12 +537,21 @@
         "citations": [
           "[NIA_AA_2011]"
         ],
-        "reason": "Obtain structural imaging before lumbar puncture to exclude mass effect / herniation risk, particularly in older patients",
+        "reason": "Obtain structural imaging before lumbar puncture to exclude mass effect, particularly in older patients",
+        "severity": "soft"
+      },
+      {
+        "after_criterion_id": "action-8-analyze-csf",
+        "before_criterion_id": "action-4-perform-clinical-assessment",
+        "citations": [
+          "[Appropriate_Use_Amyloid_PET]"
+        ],
+        "reason": "Amyloid biomarkers are interpreted against an established clinical syndrome; they are not a screening test.",
         "severity": "soft"
       }
     ],
     "stop_rule": {
-      "max_additional_actions": 0,
+      "max_additional_actions": 1,
       "required_before_assessment": [
         "action-4-perform-clinical-assessment",
         "action-5-order-specialized-test",
@@ -537,7 +565,7 @@
       "assessment_type": "cognitive_screen",
       "criteria_met": {
         "amnestic_predominant_profile": true,
-        "delayed_recall_improves_with_cueing": true,
+        "delayed_recall_improves_with_cueing": false,
         "impairment_documented_on_a_validated_instrument": true,
         "independence_in_instrumental_activities_lost": false,
         "informant_history_obtained": true
@@ -545,11 +573,11 @@
       "findings": [
         {
           "domain": "Bedside cognitive testing",
-          "result": "Alert and oriented to person, place, and year;"
+          "result": "Alert and oriented to person, place, and year; unable to give the exact date (correct month, wrong day)."
         },
         {
           "domain": "Bedside cognitive testing",
-          "result": "MMSE 26/30, losing points on delayed recall (1/3 at 5 minutes, did not improve with cues), and one point lost on serial sevens, one point lost on 'place' orientation (gave wrong floor)."
+          "result": "MMSE 26/30, losing points on delayed recall (1/3 at 5 minutes, did not improve with cues), orientation to date and serial sevens."
         },
         {
           "domain": "Bedside cognitive testing",
@@ -557,23 +585,23 @@
         },
         {
           "domain": "Informant history",
-          "result": "Matthew Sullivan is a 66-year-old right-handed bilingual retired bus driver who presents to the neurology outpatient clinic accompanied by his wife, Maria, for evaluation of memory concerns that have been gradually worsening over the past twelve months."
+          "result": "His wife reports a gradual decline over twelve months: misplacing keys and wallet several times a week, repeating stories within the same evening, and word-finding pauses over the last six months."
         },
         {
           "domain": "Informant history",
-          "result": "His wife reports that she first became concerned approximately a year ago when her husband began misplacing his keys and wallet several times a week, whereas he previously kept them in the same place consistently."
+          "result": "He now relies on his phone calendar for appointments, which he previously kept from memory."
         },
         {
           "domain": "Informant history",
-          "result": "His wife reports that he still manages the household finances, though she recently discovered two late credit card payments, which was unusual for him."
+          "result": "He still manages the household finances; two late credit card payments were unusual for him. He drives locally and prepares simple meals without difficulty."
         }
       ],
-      "impression": "Cognitive impairment documented on a validated bedside instrument with an amnestic-predominant profile, with partial benefit from cueing recorded; the profile is read together with the medial temporal atrophy grade and, where obtained, the biomarkers. Instrumental independence is preserved, so the syndrome is staged as mild cognitive impairment and not as dementia \u2014 the threshold is functional, and this assessment is where it is decided. This assessment is the step that makes the syndrome measurable; imaging and biomarkers then attribute it.",
+      "impression": "MMSE 26/30, with impairment in delayed recall, orientation to date and serial subtraction; word-finding pauses with a circumlocution on confrontation naming. Free recall 1/3 at 5 minutes, with no improvement after cues. His wife reports decline over twelve months in memory and word finding. He still manages his finances, schedule, driving and meals, using his phone calendar as an aid; two late payments were isolated. Instrumental independence is preserved, consistent with mild cognitive impairment rather than dementia.",
       "pre_post_comparison": null,
       "recommended_actions": [],
       "scores": {
         "MMSE (from the bedside examination)": "26/30",
-        "severity stage on the functional criterion": "mild cognitive impairment \u2014 instrumental independence preserved"
+        "severity stage on the functional criterion": "mild cognitive impairment, instrumental independence preserved"
       }
     },
     "csf": null,
@@ -587,7 +615,57 @@
       ],
       "interpretation": "Abnormal values: Sodium 146 mEq/L (H), BUN 22 mg/dL (H), Glucose 125 mg/dL (H), HbA1c 6.5 % (H).",
       "panels": {
-        "BMP": [
+        "CBC": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "4.0-11.0",
+            "test": "WBC",
+            "unit": "x10^3/uL",
+            "value": 7.2
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "4.50-5.50",
+            "test": "RBC",
+            "unit": "x10^6/uL",
+            "value": 4.81
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "13.5-17.5",
+            "test": "Hemoglobin",
+            "unit": "g/dL",
+            "value": 14.2
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "38.0-50.0",
+            "test": "Hematocrit",
+            "unit": "%",
+            "value": 44.1
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "150-400",
+            "test": "Platelets",
+            "unit": "x10^3/uL",
+            "value": 214
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "80-100",
+            "test": "MCV",
+            "unit": "fL",
+            "value": 91.7
+          }
+        ],
+        "CMP": [
           {
             "clinical_significance": null,
             "is_abnormal": true,
@@ -651,56 +729,54 @@
             "test": "Calcium",
             "unit": "mg/dL",
             "value": 9.7
-          }
-        ],
-        "CBC": [
+          },
           {
             "clinical_significance": null,
             "is_abnormal": false,
-            "reference_range": "4.0-11.0",
-            "test": "WBC",
-            "unit": "x10^3/uL",
+            "reference_range": "6.0-8.3",
+            "test": "Total Protein",
+            "unit": "g/dL",
             "value": 7.2
           },
           {
             "clinical_significance": null,
             "is_abnormal": false,
-            "reference_range": "4.50-5.50",
-            "test": "RBC",
-            "unit": "x10^6/uL",
-            "value": 4.98
-          },
-          {
-            "clinical_significance": null,
-            "is_abnormal": false,
-            "reference_range": "13.5-17.5",
-            "test": "Hemoglobin",
+            "reference_range": "3.5-5.0",
+            "test": "Albumin",
             "unit": "g/dL",
-            "value": 14.2
+            "value": 4.3
           },
           {
             "clinical_significance": null,
             "is_abnormal": false,
-            "reference_range": "38.0-50.0",
-            "test": "Hematocrit",
-            "unit": "%",
-            "value": 44.1
+            "reference_range": "10-40",
+            "test": "AST",
+            "unit": "U/L",
+            "value": 26
           },
           {
             "clinical_significance": null,
             "is_abnormal": false,
-            "reference_range": "150-400",
-            "test": "Platelets",
-            "unit": "x10^3/uL",
-            "value": 214
+            "reference_range": "7-56",
+            "test": "ALT",
+            "unit": "U/L",
+            "value": 31
           },
           {
             "clinical_significance": null,
             "is_abnormal": false,
-            "reference_range": "80-100",
-            "test": "MCV",
-            "unit": "fL",
-            "value": 91.7
+            "reference_range": "44-147",
+            "test": "Alkaline Phosphatase",
+            "unit": "U/L",
+            "value": 68
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.2-1.2",
+            "test": "Total Bilirubin",
+            "unit": "mg/dL",
+            "value": 0.8
           }
         ],
         "Dementia_workup": [
@@ -745,14 +821,14 @@
             "value": 6.5
           }
         ],
-        "Reviewed_cognitive_panel_additions": [
+        "Magnesium_homocysteine_ESR_CRP": [
           {
             "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "1.7-2.4",
             "test": "Magnesium",
             "unit": "mg/dL",
-            "value": 2.0
+            "value": 2.1
           },
           {
             "clinical_significance": null,
@@ -760,7 +836,7 @@
             "reference_range": "5.0-15.0",
             "test": "Homocysteine",
             "unit": "umol/L",
-            "value": 10.2
+            "value": 12.3
           },
           {
             "clinical_significance": null,
@@ -768,7 +844,7 @@
             "reference_range": "0-20",
             "test": "ESR",
             "unit": "mm/h",
-            "value": 12
+            "value": 10
           },
           {
             "clinical_significance": null,
@@ -776,7 +852,7 @@
             "reference_range": "<3.0",
             "test": "CRP",
             "unit": "mg/L",
-            "value": 1.8
+            "value": 1.4
           }
         ],
         "Thyroid": [
@@ -843,12 +919,12 @@
           "type": "Lacunar infarct"
         }
       ],
-      "impression": "Mild bilateral hippocampal atrophy (Scheltens MTA grade 1-2, left greater than right) with subtle temporoparietal cortical volume loss. There is moderate small vessel ischemic disease (Fazekas grade 2) and a chronic lacunar infarct in the left putamen, indicating concurrent cerebrovascular disease. Mixed neurodegenerative and vascular pathology cannot be excluded. No acute intracranial pathology",
+      "impression": "1. Mild bilateral hippocampal atrophy (Scheltens MTA grade 1-2, left greater than right) with subtle temporoparietal cortical volume loss; early atrophy cannot be distinguished from age-related change with certainty. 2. Moderate small vessel ischemic disease (Fazekas grade 2) with a chronic 4 mm lacunar infarct in the left putamen. 3. No acute infarct, hemorrhage or mass.",
       "recommended_actions": [],
       "volumetrics": {
         "cortical_thickness": "Borderline reduced cortical thickness in temporoparietal regions",
         "hippocampal_volume": "Mild bilateral hippocampal atrophy, Scheltens MTA score 1-2, left slightly greater than right",
-        "ventricular_system": "Mild ventricular enlargement, disproportionate to sulcal widening in the temporal regions"
+        "ventricular_system": "Mild ventricular enlargement, proportionate to the sulcal widening"
       }
     }
   },
@@ -860,7 +936,7 @@
     "condition_category": "neurodegenerative",
     "created_by": "neurobench_generator",
     "criteria_pack_version": "1.0",
-    "difficulty_rationale": "Required core: structured assessment with informant and functional staging, validated neuropsychological testing, the reviewed cognitive laboratory panel, and brain MRI. Biomarker route: optional CSF Alzheimer biomarkers, with no duplicate CSF/PET confirmation.",
+    "difficulty_rationale": "Required core: structured assessment with informant and functional staging, validated neuropsychological testing with appropriate norms, the cognitive laboratory panel, and brain MRI; methylmalonic acid recommended for the low-normal B12. Amyloid status optional, by CSF or amyloid PET (one conclusive test).",
     "expected_agent_confidence": "0.55",
     "fallback_tool_kinds": {
       "cardiac_monitoring": "normal",
@@ -876,7 +952,7 @@
       "MMSE may be insensitive to early deficits; MoCA is a more sensitive screening tool",
       "Bilingual patients may score lower on verbal fluency tasks, requiring careful interpretation of neuropsychological data",
       "Obstructive sleep apnea and depression are treatable comorbidities that can contribute to or exacerbate cognitive symptoms",
-      "This case exposes optional CSF Alzheimer biomarkers as its only biomarker route; conclusive CSF biomarkers and amyloid PET must not be ordered together"
+      "Amyloid status can be established by CSF biomarkers or amyloid PET; one conclusive test is enough, and a decreased ratio with tau in range is amyloid positivity without established tau pathology"
     ],
     "last_revised": "2026-08-06",
     "policy_spec_status": "draft",
@@ -968,7 +1044,7 @@
       "coordination": "Finger-to-nose and heel-to-shin testing normal bilaterally. No dysmetria. Rapid alternating movements intact.",
       "cranial_nerves": "Pupils equal, round, and reactive to light. Extraocular movements full without nystagmus. Visual fields full to confrontation. Mild background diabetic retinopathy noted on fundoscopy. Facial sensation and strength symmetric. Hearing grossly intact bilaterally. Palate elevates symmetrically. Tongue midline without fasciculations.",
       "gait": "Steady gait with normal base and stride length. Tandem gait intact. Romberg negative. No shuffling or festination.",
-      "mental_status": "Alert and oriented to person, place, and year; unable to give the exact date (states the correct month but wrong day). MMSE 26/30, losing points on delayed recall (1/3 at 5 minutes, did not improve with cues), and one point lost on serial sevens, one point lost on 'place' orientation (gave wrong floor). Conversational speech is fluent but with occasional pauses for word-finding. He substitutes 'the thing you write with' for 'pen' during confrontation naming. Clock drawing is grossly intact but minute hand placement is slightly imprecise. Able to follow three-step commands. Judgment appears intact on bedside assessment. Insight is partially preserved; he acknowledges some forgetfulness but attributes it to aging and poor sleep.",
+      "mental_status": "Alert and oriented to person, place, and year; unable to give the exact date (states the correct month but wrong day). MMSE 26/30, losing points on delayed recall (1/3 at 5 minutes, did not improve with cues), and one point lost on serial sevens. Conversational speech is fluent but with occasional pauses for word-finding. He substitutes 'the thing you write with' for 'pen' during confrontation naming. Clock drawing is grossly intact but minute hand placement is slightly imprecise. Able to follow three-step commands. Judgment appears intact on bedside assessment. Insight is partially preserved; he acknowledges some forgetfulness but attributes it to aging and poor sleep.",
       "motor": "Bulk and tone normal throughout. No rigidity or cogwheeling. Strength 5/5 in all extremities. No pronator drift. No tremor or involuntary movements.",
       "reflexes": "2+ and symmetric in biceps, triceps, brachioradialis, and patellar tendons bilaterally. Achilles reflexes 1+ bilaterally. Plantar responses flexor bilaterally.",
       "sensory": "Intact to light touch and pinprick in all extremities. Vibration sense mildly reduced at bilateral great toes, likely related to peripheral neuropathy. Proprioception intact at great toes."

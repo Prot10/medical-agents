@@ -29,7 +29,7 @@
         "contraindications": [],
         "formulary_status": "on formulary",
         "interactions": [],
-        "proposed": "(agent not specified on this case's pathway)",
+        "proposed": "Medication list review",
         "warnings": [
           "Non-specific interaction check; verify against a current formulary or interaction reference before prescribing."
         ]
@@ -100,7 +100,7 @@
         },
         "glucose": "65 mg/dL",
         "glucose_ratio": "0.72",
-        "interpretation": "Opening pressure: 132 mmH2O (normal). Nucleated cell count: 3 cells/mm3. Protein: 62 mg/dL (elevated). Glucose: 65 mg/dL (CSF:serum ratio 0.72). Gram stain: No organisms. Cultures: No growth. VDRL: Non-reactive. Elevated protein with near-normal cell count \u2014 a pattern of albuminocytologic dissociation",
+        "interpretation": "Opening pressure 132 mmH2O (normal). Nucleated cells 3/mm3. Protein 62 mg/dL (elevated). Glucose 65 mg/dL (CSF:serum ratio 0.72). Gram stain: no organisms. Cultures: no growth. VDRL non-reactive. Elevated protein with a normal cell count (albuminocytological dissociation). Clinical correlation recommended.",
         "opening_pressure": "132 mmH2O",
         "protein": "62 mg/dL (elevated)",
         "special_tests": {
@@ -115,28 +115,30 @@
     {
       "output": {
         "abnormal_values_summary": [],
-        "interpretation": "All values within normal limits.",
+        "interpretation": "AChR, MuSK and LRP4 antibodies negative.",
         "panels": {
-          "Ganglioside_Antibodies": [
+          "Neuromuscular": [
+            {
+              "clinical_significance": "AChR antibodies are found in about half of patients with ocular myasthenia gravis; a negative result does not exclude it. Clinical correlation recommended.",
+              "is_abnormal": false,
+              "reference_range": "negative",
+              "test": "Anti-acetylcholine receptor (AChR) antibody",
+              "unit": "",
+              "value": "Negative"
+            },
             {
               "clinical_significance": null,
               "is_abnormal": false,
               "reference_range": "negative",
-              "test": "Anti-GQ1b IgG",
+              "test": "Anti-MuSK antibody",
               "unit": "",
               "value": "Negative"
             },
             {
+              "clinical_significance": null,
               "is_abnormal": false,
               "reference_range": "negative",
-              "test": "Anti-GT1a IgG",
-              "unit": "",
-              "value": "Negative"
-            },
-            {
-              "is_abnormal": false,
-              "reference_range": "negative",
-              "test": "Anti-GM1 IgG",
+              "test": "Anti-LRP4 antibody",
               "unit": "",
               "value": "Negative"
             }
@@ -144,59 +146,89 @@
         }
       },
       "tool_name": "interpret_labs",
-      "trigger_action": "request_anti_ganglioside_panel"
+      "trigger_action": "request_achr_musk_lrp4_antibodies"
     },
     {
       "output": {
         "findings": [
           {
-            "finding": "No lesion. No signal abnormality.",
-            "region": "Brain parenchyma"
-          },
-          {
-            "finding": "Normal \u2014 no pontine signal change",
-            "region": "Brainstem"
-          },
-          {
-            "finding": "No enhancement, no compression",
-            "region": "Cranial nerve III (oculomotor)"
-          },
-          {
-            "finding": "No abnormal enhancement",
-            "region": "Cranial nerve VII"
+            "result": "Palpebral fissure 1 mm before and 1 mm after on each side (improvement under 2 mm)",
+            "test": "Ice pack test, both upper lids, 2 minutes"
           }
         ],
-        "impression": "Normal MRI brain with and without gadolinium. No parenchymal lesion. No brainstem signal abnormality. No enhancement of cranial nerves III or VII. No leptomeningeal enhancement. Normal study",
-        "modality": "MRI brain with gadolinium",
+        "impression": "Negative ice pack test: no improvement in ptosis.",
         "quantitative_data": {
-          "enhancement_pattern": "No pathological enhancement"
+          "palpebral_fissure_after": "1 mm bilaterally",
+          "palpebral_fissure_before": "1 mm bilaterally"
         },
         "recommended_actions": [],
-        "tracer_or_protocol": "3T gadolinium"
+        "test_type": "ice_pack_test"
       },
-      "tool_name": "order_advanced_imaging",
-      "trigger_action": "request_brain_mri"
+      "tool_name": "order_specialized_test",
+      "trigger_action": "request_ice_pack_test"
+    },
+    {
+      "output": {
+        "abnormal_values_summary": [
+          "Anti-GQ1b IgG positive (titre 1:320)"
+        ],
+        "interpretation": "Anti-GQ1b IgG positive (titre 1:320). Anti-GT1a IgG negative.",
+        "panels": {
+          "Ganglioside_Antibodies": [
+            {
+              "clinical_significance": "IgG antibodies to GQ1b are found in most patients with Miller Fisher syndrome and its incomplete forms; a positive result does not establish the diagnosis on its own. Clinical correlation recommended.",
+              "is_abnormal": true,
+              "reference_range": "negative",
+              "test": "Anti-GQ1b IgG",
+              "unit": "",
+              "value": "Positive (titre 1:320)"
+            },
+            {
+              "clinical_significance": null,
+              "is_abnormal": false,
+              "reference_range": "negative",
+              "test": "Anti-GT1a IgG",
+              "unit": "",
+              "value": "Negative"
+            }
+          ]
+        }
+      },
+      "tool_name": "interpret_labs",
+      "trigger_action": "request_anti_gq1b_gt1a_ganglioside_panel"
     },
     {
       "output": {
         "findings": [
           {
-            "panel": "Respiratory",
-            "reference_range": "94% predicted",
-            "result": "3.4 L",
+            "flag": "normal",
+            "reference_range": ">=80% predicted",
+            "result": "3.4 L (94% predicted; 54 mL/kg at 63 kg)",
             "test": "FVC"
           },
           {
-            "panel": "Respiratory",
-            "reference_range": "Well above threshold",
+            "flag": "L",
+            "reference_range": "-60 cmH2O or more negative",
             "result": "-48 cmH2O",
-            "test": "NIF"
+            "test": "MIP"
+          },
+          {
+            "flag": "normal",
+            "reference_range": ">=80 cmH2O",
+            "result": "84 cmH2O",
+            "test": "MEP"
           }
         ],
-        "impression": "All values within normal limits.",
+        "impression": "Bedside respiratory function on admission: FVC 3.4 L (94% predicted; 54 mL/kg at 63 kg). MIP -48 cmH2O L. MEP 84 cmH2O. Cough effective.",
         "quantitative_data": {
           "FVC": "3.4 L",
-          "NIF": "-48 cmH2O"
+          "FVC_mL_per_kg": "54 mL/kg",
+          "FVC_percent_predicted": "94%",
+          "FVC_predicted": "3.6 L",
+          "MEP": "84 cmH2O",
+          "MIP": "-48 cmH2O",
+          "cough": "effective",
+          "weight": "63 kg"
         },
         "recommended_actions": [],
         "test_type": "respiratory_function"
@@ -206,93 +238,27 @@
     },
     {
       "output": {
-        "duration_hours": 48,
+        "duration_hours": 24,
         "events": [],
         "findings": [
-          "Normal sinus rhythm throughout"
+          "Normal sinus rhythm 72-96 bpm",
+          "Non-invasive blood pressure 108/66 to 126/80 mmHg"
         ],
         "heart_rate_range": {
           "max": 96,
           "min": 72
         },
-        "impression": "48-hour continuous telemetry. Normal sinus rhythm throughout (rate 72\u201396 bpm). No arrhythmia or conduction abnormality recorded",
-        "monitor_type": "Telemetry monitoring \u2014 general ward",
+        "impression": "24-hour continuous telemetry. Normal sinus rhythm (72-96 bpm). No pauses and no arrhythmia. Blood pressure 108/66 to 126/80 mmHg.",
+        "monitor_type": "Continuous telemetry",
         "recommended_actions": [],
         "rhythm_summary": "Normal sinus rhythm throughout."
       },
       "tool_name": "order_cardiac_monitoring",
       "trigger_action": "request_cardiac_monitoring"
-    },
-    {
-      "output": {
-        "findings": [
-          {
-            "finding": "No improvement in ptosis with edrophonium 10 mg IV \u2014 test NEGATIVE",
-            "nerve": "Bilateral levator palpebrae response"
-          }
-        ],
-        "impression": "Edrophonium challenge test negative. No improvement in bilateral ptosis following edrophonium 10 mg IV",
-        "quantitative_data": {
-          "result": "Negative \u2014 no pharmacological improvement in ptosis"
-        },
-        "recommended_actions": [],
-        "test_type": "Edrophonium (Tensilon) challenge test"
-      },
-      "tool_name": "order_specialized_test",
-      "trigger_action": "request_tensilon_test"
-    },
-    {
-      "output": {
-        "query": "general",
-        "results": [],
-        "summary": ""
-      },
-      "tool_name": "search_medical_literature",
-      "trigger_action": "search_gbs_treatment"
-    },
-    {
-      "output": {
-        "alternatives": [],
-        "contraindications": [],
-        "formulary_status": "on formulary",
-        "interactions": [],
-        "proposed": "(agent not specified on this case's pathway)",
-        "summary": "",
-        "warnings": [
-          "Non-specific interaction check; verify against a current formulary or interaction reference before prescribing."
-        ]
-      },
-      "tool_name": "check_drug_interactions",
-      "trigger_action": "check_ivig_drug_interactions"
     }
   ],
   "ground_truth": {
     "action_criteria": [
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "panels": [
-                "CBC",
-                "CMP",
-                "HIV",
-                "inflammatory_markers",
-                "anti-GM1 IgM"
-              ]
-            },
-            "tool_name": "interpret_labs"
-          }
-        ],
-        "citations": [
-          "[Yuki_2012]",
-          "GBS criteria pack \u00a72"
-        ],
-        "criterion_id": "action-1-interpret-labs",
-        "expected_evidence": "Mild leukocytosis / elevated inflammatory markers reflecting antecedent infection; ganglioside antibodies for variant typing; trigger identification (Campylobacter, CMV, EBV, Mycoplasma, HIV)",
-        "importance": "required",
-        "label": "Obtain CBC, CMP, HIV, anti-GM1/anti-GQ1b ganglioside antibodies, and stool culture / Campylobacter serology if recent diarrhea",
-        "rationale": "Obtain CBC, CMP, HIV, anti-GM1/anti-GQ1b ganglioside antibodies, and stool culture / Campylobacter serology if recent diarrhea"
-      },
       {
         "alternatives": [
           {
@@ -303,14 +269,13 @@
           }
         ],
         "citations": [
-          "[Hadden_1998]",
-          "GBS criteria pack \u00a72"
+          "[EAN_PNS_2023]"
         ],
         "criterion_id": "action-2-order-specialized-test",
-        "expected_evidence": "Demyelinating pattern (prolonged DML, conduction block, reduced CV, absent F-waves) consistent with AIDP, or reduced CMAP amplitudes in axonal variants (AMAN/AMSAN)",
+        "expected_evidence": "Polyradiculoneuropathy pattern (demyelinating or axonal features, absent F-waves, sural sparing where present); may be normal in the first week; no decrement on repetitive stimulation",
         "importance": "required",
-        "label": "Order nerve conduction studies and needle EMG (EMG/NCS)",
-        "rationale": "Order nerve conduction studies and needle EMG (EMG/NCS)"
+        "label": "Nerve conduction studies and needle EMG with repetitive nerve stimulation",
+        "rationale": "Nerve conduction studies show the peripheral nerve involvement behind the areflexia, and repetitive stimulation tests the neuromuscular junction, the main alternative for bilateral ptosis [EAN_PNS_2023]."
       },
       {
         "alternatives": [
@@ -320,14 +285,90 @@
           }
         ],
         "citations": [
-          "[Asbury_1990]",
-          "GBS criteria pack \u00a72"
+          "[EAN_PNS_2023]"
         ],
         "criterion_id": "action-3-analyze-csf",
-        "expected_evidence": "Albuminocytologic dissociation \u2014 elevated protein with cell count <10/\u03bcL; may be normal in the first week of illness",
+        "expected_evidence": "Albuminocytological dissociation: raised protein with cells <5/mm3 (5-50/mm3 compatible but prompts an alternative; >50/mm3 suggests another diagnosis); protein may be normal in the first week",
         "importance": "required",
-        "label": "Perform lumbar puncture for CSF analysis",
-        "rationale": "Perform lumbar puncture for CSF analysis"
+        "label": "Lumbar puncture for CSF cell count, protein and glucose",
+        "rationale": "CSF albuminocytological dissociation supports a GBS-spectrum disorder; normal cells exclude an infective or malignant cause [EAN_PNS_2023]."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "panels": [
+                "anti_AChR"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          }
+        ],
+        "citations": [
+          "[EAN_PNS_2023]",
+          "[Wakerley_2014]"
+        ],
+        "criterion_id": "action-10-interpret-labs-anti-achr-musk-lrp4",
+        "expected_evidence": "AChR, MuSK and LRP4 antibodies negative",
+        "importance": "recommended",
+        "label": "Acetylcholine receptor, MuSK and LRP4 antibodies to exclude ocular myasthenia gravis",
+        "rationale": "Bilateral ptosis without ophthalmoplegia is the presentation of ocular myasthenia gravis, the mimic that must be excluded."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_brain_mri"
+          }
+        ],
+        "citations": [
+          "[EAN_PNS_2023]"
+        ],
+        "criterion_id": "action-11-analyze-brain-mri",
+        "expected_evidence": "No midbrain or other brainstem lesion; no cranial nerve enhancement",
+        "importance": "recommended",
+        "label": "Brain MRI with gadolinium to exclude a midbrain lesion",
+        "rationale": "Bilateral ptosis can arise from a lesion of the central caudal oculomotor nucleus; a normal MRI removes it."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "ice_pack_test"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[EAN_PNS_2023]"
+        ],
+        "criterion_id": "action-12-order-specialized-test-ice-pack",
+        "expected_evidence": "No improvement in ptosis after ice",
+        "importance": "optional",
+        "label": "Optional bedside ice pack test for myasthenic ptosis",
+        "rationale": "A cheap bedside test for myasthenic ptosis; the antibodies and neurophysiology already answer the question."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "panels": [
+                "CBC",
+                "CMP",
+                "CK"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          }
+        ],
+        "citations": [
+          "[EAN_PNS_2023]"
+        ],
+        "criterion_id": "action-1-interpret-labs",
+        "expected_evidence": "Baseline values before treatment; abnormal liver tests or low albumin mark a higher risk of a severe course; no metabolic or toxic alternative",
+        "importance": "required",
+        "label": "Baseline blood tests: full blood count, renal function and electrolytes, liver tests, albumin, glucose and CK",
+        "rationale": "Routine blood tests exclude metabolic causes and give a baseline [EAN_PNS_2023]."
       },
       {
         "alternatives": [
@@ -339,65 +380,15 @@
           }
         ],
         "citations": [
-          "[Sharshar_2003]",
-          "GBS criteria pack \u00a72"
+          "[Lawn_2001]",
+          "[EAN_PNS_2023]",
+          "[Leonhard_2019]"
         ],
         "criterion_id": "action-4-order-specialized-test",
-        "expected_evidence": "Baseline and serial FVC, MIP/MEP, NIF; deterioration to FVC <20 mL/kg, MIP worse than -30 cmH2O, or VC <40% predicted triggers ICU transfer / intubation",
+        "expected_evidence": "FVC in L, % predicted and mL/kg, MIP and MEP, with the trend; ICU-level monitoring if FVC <20 mL/kg or <60% predicted, MIP weaker than -30 cmH2O, MEP <40 cmH2O, a fall of more than 30%, or bulbar weakness with weak cough",
         "importance": "required",
-        "label": "Order bedside respiratory function testing (FVC, MIP/MEP, NIF) and repeat every 4\u20136 hours",
-        "rationale": "Order bedside respiratory function testing (FVC, MIP/MEP, NIF) and repeat every 4\u20136 hours"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[van_den_Berg_2014]",
-          "GBS criteria pack \u00a72"
-        ],
-        "criterion_id": "action-5-search-medical-literature",
-        "expected_evidence": "IVIG (0.4 g/kg/day x 5 days) and plasma exchange are equivalently effective first-line therapies; combination not superior",
-        "importance": "required",
-        "label": "Search the medical literature for IVIG vs plasma exchange evidence to guide disease-modifying therapy",
-        "rationale": "Search the medical literature for IVIG vs plasma exchange evidence to guide disease-modifying therapy"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "check_drug_interactions"
-          }
-        ],
-        "citations": [
-          "[van_den_Berg_2014]",
-          "GBS criteria pack \u00a72"
-        ],
-        "criterion_id": "action-6-check-drug-interactions",
-        "expected_evidence": "Confirmation that IVIG can be given safely (no severe renal impairment, no IgA deficiency) or that plasma exchange is appropriate (adequate vascular access, stable coagulation)",
-        "importance": "required",
-        "label": "Check drug interactions / contraindications for IVIG (renal function, IgA deficiency screen) and/or plasma exchange (coagulation, calcium, hemodynamics)",
-        "rationale": "Check drug interactions / contraindications for IVIG (renal function, IgA deficiency screen) and/or plasma exchange (coagulation, calcium, hemodynamics)"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "analyze_ecg"
-          }
-        ],
-        "citations": [
-          "[Asbury_1990]",
-          "GBS criteria pack \u00a72"
-        ],
-        "criterion_id": "action-7-analyze-ecg",
-        "expected_evidence": "Sinus tachycardia or bradycardia; conduction or repolarisation abnormalities reflecting autonomic involvement",
-        "importance": "recommended",
-        "label": "Obtain a 12-lead ECG to screen for autonomic dysrhythmias and baseline QTc",
-        "rationale": "Obtain a 12-lead ECG to screen for autonomic dysrhythmias and baseline QTc"
+        "label": "Bedside respiratory function (FVC, MIP, MEP), repeated serially while weakness progresses",
+        "rationale": "Anti-GQ1b disease can extend to bulbar, limb and respiratory weakness; a baseline and serial measurements detect it [EAN_PNS_2023]."
       },
       {
         "alternatives": [
@@ -409,27 +400,73 @@
           }
         ],
         "citations": [
-          "[Asbury_1990]",
-          "GBS criteria pack \u00a72"
+          "[EAN_PNS_2023]"
         ],
         "criterion_id": "action-8-order-cardiac-monitoring",
-        "expected_evidence": "Normal sinus rhythm throughout \u2014 the recording is read for the bradyarrhythmias, pauses beyond 3 seconds and blood-pressure lability that trigger ICU escalation",
+        "expected_evidence": "Continuous telemetry with blood pressure monitoring: normal sinus rhythm 72-96 bpm and blood pressure 108/66 to 126/80 mmHg in the first 24 hours; autonomic instability (rate and blood pressure lability, bradyarrhythmia) requires continued monitoring while weakness progresses",
         "importance": "required",
-        "label": "Start continuous inpatient cardiac telemetry for the period of maximal weakness and keep it running alongside serial respiratory function. Autonomic instability affects about two thirds of patients and is a leading cause of in-hospital death: bradyarrhythmias, pauses beyond 3 seconds and blood-pressure lability are what trigger ICU escalation",
-        "rationale": "Start continuous inpatient cardiac telemetry for the period of maximal weakness and keep it running alongside serial respiratory function. Autonomic instability affects about two thirds of patients and is a leading cause of in-hospital death: bradyarrhythmias, pauses beyond 3 seconds and blood-pressure lability are what trigger ICU escalation"
+        "label": "Continuous inpatient cardiac telemetry with blood pressure monitoring while weakness progresses",
+        "rationale": "Autonomic dysfunction is common in GBS and can cause bradyarrhythmias, pauses and blood-pressure lability; monitoring continues while weakness progresses [EAN_PNS_2023]."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_ecg"
+          }
+        ],
+        "citations": [
+          "[EAN_PNS_2023]"
+        ],
+        "criterion_id": "action-7-analyze-ecg",
+        "expected_evidence": "Normal sinus rhythm 84 bpm with normal intervals (QTc 418 ms) and no conduction or ST-T abnormality: a baseline while autonomic involvement can still develop",
+        "importance": "recommended",
+        "label": "Obtain a 12-lead ECG to screen for autonomic dysrhythmias and baseline QTc",
+        "rationale": "A baseline 12-lead ECG screens for autonomic dysrhythmia and conduction abnormality and gives the QTc before treatment [EAN_PNS_2023]."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "check_drug_interactions"
+          }
+        ],
+        "citations": [
+          "[EAN_PNS_2023]"
+        ],
+        "criterion_id": "action-6-check-drug-interactions",
+        "expected_evidence": "No current medications, so nothing to review",
+        "importance": "optional",
+        "label": "Optional interaction check (no current medications)",
+        "rationale": "She takes no medicines and no drug treatment is planned, so the check cannot change management (ROUND_POLICY ruling 6)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "search_medical_literature"
+          }
+        ],
+        "citations": [
+          "[EAN_PNS_2023]"
+        ],
+        "criterion_id": "action-5-search-medical-literature",
+        "expected_evidence": "General evidence on immunotherapy in Miller Fisher syndrome; not needed for the diagnosis or the management decision",
+        "importance": "optional",
+        "label": "Optional literature search on treatment of Miller Fisher syndrome and its incomplete forms",
+        "rationale": "Background evidence only; not a clinical step of the work-up."
       }
     ],
     "assessment": {
       "prohibited_recommendations": [
-        "Do not start corticosteroids as monotherapy in suspected GBS.",
-        "Do not assume MG and start anticholinesterase / steroid therapy without supportive serology / EMG when areflexia is present."
+        "Do not treat with corticosteroids: oral corticosteroids are strongly advised against and IV methylprednisolone is not recommended [EAN_PNS_2023].",
+        "Do not start pyridostigmine or treat for myasthenia gravis: areflexia, normal repetitive stimulation and single-fibre EMG, negative AChR, MuSK and LRP4 antibodies and a positive anti-GQ1b argue against it."
       ],
       "required_recommendations": [
-        "Obtain anti-GQ1b and broader ganglioside panel.",
-        "Bedside ice-pack test and AChR antibody assay to evaluate MG.",
-        "RNS or single-fibre EMG if MG remains a serious consideration.",
-        "Initiate IVIG / plasma exchange if GBS variant confirmed.",
-        "Brainstem MRI to exclude structural cause."
+        "Admit for monitoring without IVIg or plasma exchange while deficits stay restricted to ptosis and areflexia: immunotherapy is not routinely advised in Miller Fisher-spectrum disease [EAN_PNS_2023].",
+        "Monitor for ophthalmoplegia, ataxia, bulbar, limb or respiratory involvement or reduced consciousness (overlap with GBS or Bickerstaff brainstem encephalitis), with serial FVC, MIP and MEP and swallow checks; treat with IVIg or plasma exchange if limb weakness, bulbar or respiratory involvement develops [EAN_PNS_2023].",
+        "Continuous cardiac telemetry with blood pressure monitoring while deficits may still progress.",
+        "Explain that anti-GQ1b antibody syndrome usually recovers over weeks to months, and arrange neurology follow-up with mobility support while she cannot open her eyes."
       ]
     },
     "avoided_actions": [
@@ -441,7 +478,7 @@
           }
         ],
         "citations": [
-          "[van_den_Berg_2014]"
+          "[EAN_PNS_2023]"
         ],
         "criterion_id": "avoid-waste-1-analyze-eeg",
         "rationale": "GBS is a peripheral nerve / nerve-root disorder; EEG has no role in diagnosis unless atypical CNS features (encephalopathy, seizures) are present.",
@@ -455,7 +492,7 @@
           }
         ],
         "citations": [
-          "[van_den_Berg_2014]"
+          "[EAN_PNS_2023]"
         ],
         "criterion_id": "avoid-waste-2-order-echocardiogram",
         "rationale": "Echocardiography is not indicated in typical GBS; reserve for pre-existing cardiac disease or unexplained hemodynamic instability after autonomic causes are excluded.",
@@ -469,30 +506,16 @@
           }
         ],
         "citations": [
-          "[van_den_Berg_2014]"
+          "[EAN_PNS_2023]"
         ],
         "criterion_id": "avoid-waste-3-order-ct-scan",
         "rationale": "Head CT contributes no diagnostic information in GBS; the disease is peripheral and CT does not visualise nerve roots reliably.",
-        "severity": "waste"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "analyze_brain_mri"
-          }
-        ],
-        "citations": [
-          "[van_den_Berg_2014]"
-        ],
-        "criterion_id": "avoid-waste-4-analyze-brain-mri",
-        "rationale": "Brain MRI is reserved for atypical features (encephalopathy, CNS signs, transverse myelitis on differential). In classic GBS it does not aid diagnosis.",
         "severity": "waste"
       }
     ],
     "diagnosis": {
       "accepted": [
-        "Guillain-Barr\u00e9 syndrome, cranial variant \u2014 isolated bilateral ptosis with global areflexia",
+        "Anti-GQ1b antibody syndrome (acute bilateral ptosis with areflexia), Guillain-Barr\u00e9 syndrome spectrum",
         "guillain barre syndrome",
         "guillain-barre syndrome",
         "guillain-barr\u00e9 syndrome",
@@ -512,78 +535,64 @@
       {
         "diagnosis": "Myasthenia gravis (ocular)",
         "icd_code": "G70.0",
-        "key_features": "Bilateral ptosis is the cardinal MG sign; preserved reflexes and fatigability favour MG. Ice-pack test, AChR antibodies, and RNS / single-fibre EMG distinguish.",
-        "likelihood": "high"
+        "key_features": "Bilateral ptosis is the cardinal ocular MG sign, but there is no fatigability or diurnal variation, reflexes are absent, repetitive stimulation and single-fibre EMG are normal, the ice pack test is negative where done, and AChR, MuSK and LRP4 antibodies are negative.",
+        "likelihood": "low"
       },
       {
-        "diagnosis": "Miller Fisher syndrome",
+        "diagnosis": "Progression to complete Miller Fisher syndrome or GBS overlap",
         "icd_code": "G61.0",
-        "key_features": "Areflexia is shared; absence of ophthalmoplegia and ataxia argues against classic MFS; anti-GQ1b panel helpful.",
-        "likelihood": "moderate"
+        "key_features": "The triad is not met (no ophthalmoplegia or ataxia) but she lies within the same anti-GQ1b spectrum; monitoring during admission detects progression.",
+        "likelihood": "low"
+      },
+      {
+        "diagnosis": "Botulism",
+        "icd_code": "A05.1",
+        "key_features": "Ptosis can be an early sign, but pupils and eye movements are normal, there is no descending weakness, repetitive stimulation is normal and there is no food or wound exposure.",
+        "likelihood": "very_low"
       },
       {
         "diagnosis": "Lambert-Eaton syndrome",
         "icd_code": "G70.80",
-        "key_features": "Proximal weakness and autonomic features dominate; reflexes augment with effort; RNS shows incremental response.",
-        "likelihood": "low"
+        "key_features": "Proximal limb weakness and autonomic features dominate, CMAPs are low with an incremental response; here strength and CMAPs are normal and repetitive stimulation shows no abnormality.",
+        "likelihood": "very_low"
       },
       {
         "diagnosis": "Mitochondrial / chronic progressive external ophthalmoplegia",
         "icd_code": "H49.40",
-        "key_features": "Chronic course over years, not acute days; preserved reflexes.",
-        "likelihood": "low"
+        "key_features": "Chronic course over years, not 7 days; does not cause areflexia.",
+        "likelihood": "very_low"
       },
       {
         "diagnosis": "Brainstem stroke (midbrain)",
         "icd_code": "I63.9",
-        "key_features": "Bilateral isolated ptosis without other brainstem findings is rare in stroke; MRI excludes.",
+        "key_features": "Bilateral isolated ptosis without other brainstem findings is rare in stroke, and the brain MRI is normal.",
         "likelihood": "very_low"
       }
     ],
     "key_clinical_evidence": [
-      "Global areflexia in a patient with isolated ptosis is the discriminating sign \u2014 MG preserves reflexes.",
-      "Albuminocytologic dissociation and demyelinating EMG features support GBS cranial variant.",
-      "Anti-GQ1b and anti-GT1a panel positive in many MFS-spectrum cranial variants."
+      "Global areflexia in a patient with isolated ptosis is the discriminating sign: myasthenia gravis preserves reflexes.",
+      "Acute bilateral ptosis with areflexia and anti-GQ1b IgG is an incomplete form of Miller Fisher syndrome within the anti-GQ1b antibody syndrome [Wakerley_2014]; the antibody supports but does not establish the diagnosis on its own.",
+      "CSF protein 62 mg/dL with 3 cells/mm3 and absent F-waves and H-reflexes with mild demyelinating features support a GBS-spectrum disorder.",
+      "IVIg and plasma exchange are not routinely advised in Miller Fisher-spectrum disease; the scored behaviour is admission and monitoring for overlap [EAN_PNS_2023]."
     ],
     "red_herrings": [
       {
-        "correct_interpretation": "Global areflexia, elevated CSF protein, and demyelinating EMG indicate a GBS cranial variant rather than MG.",
+        "correct_interpretation": "Global areflexia, CSF albuminocytological dissociation, absent late responses, normal neuromuscular transmission tests, negative myasthenia antibodies and a positive anti-GQ1b IgG place the ptosis in the anti-GQ1b antibody syndrome, not myasthenia gravis.",
         "data_point": "Isolated bilateral ptosis without ophthalmoplegia or weakness",
         "field_path": "patient.neurological_exam.cranial_nerves",
         "intended_effect": "Anchor on myasthenia gravis as the textbook bilateral-ptosis aetiology.",
-        "location": "patient.neurological_exam"
+        "location": "Neurological examination, cranial nerves"
       }
     ],
     "review_status": "draft",
-    "sequence_constraints": [
-      {
-        "after_criterion_id": "action-6-check-drug-interactions",
-        "before_criterion_id": "action-2-order-specialized-test",
-        "citations": [
-          "[Sharshar_2003]"
-        ],
-        "reason": "Document respiratory status (FVC/NIF) before committing to IVIG vs plasma exchange \u2014 severe respiratory compromise mandates ICU triage and may influence treatment choice and timing.",
-        "severity": "soft"
-      },
-      {
-        "after_criterion_id": "action-6-check-drug-interactions",
-        "before_criterion_id": "action-1-interpret-labs",
-        "citations": [
-          "[van_den_Berg_2014]"
-        ],
-        "reason": "Renal function, IgA screen, and CBC must be reviewed before IVIG to mitigate renal failure, anaphylaxis (IgA-deficient patients), and aseptic meningitis risk.",
-        "severity": "soft"
-      }
-    ],
+    "sequence_constraints": [],
     "stop_rule": {
-      "max_additional_actions": 0,
+      "max_additional_actions": 3,
       "required_before_assessment": [
-        "action-1-interpret-labs",
         "action-2-order-specialized-test",
         "action-3-analyze-csf",
+        "action-1-interpret-labs",
         "action-4-order-specialized-test",
-        "action-5-search-medical-literature",
-        "action-6-check-drug-interactions",
         "action-8-order-cardiac-monitoring"
       ]
     }
@@ -599,7 +608,7 @@
         "proposed": "",
         "summary": "No current medications are recorded for this patient, so there is nothing to review for interactions.",
         "warnings": [
-          "Interaction review performed against the current medication list above. Clinical relevance \u2014 which agents to taper, and in what order \u2014 is a prescribing decision, not an output of this check."
+          "Interaction review performed against the recorded medication list (none)."
         ]
       }
     },
@@ -621,33 +630,11 @@
     },
     "labs": {
       "abnormal_values_summary": [],
-      "interpretation": "All values within normal limits.",
+      "interpretation": "All values within reference ranges.",
       "panels": {
-        "BMP": [
-          {
-            "is_abnormal": false,
-            "reference_range": "136-145",
-            "test": "Sodium",
-            "unit": "mEq/L",
-            "value": 140
-          },
-          {
-            "is_abnormal": false,
-            "reference_range": "3.5-5.1",
-            "test": "Potassium",
-            "unit": "mEq/L",
-            "value": 4.0
-          },
-          {
-            "is_abnormal": false,
-            "reference_range": "0.5-1.1",
-            "test": "Creatinine",
-            "unit": "mg/dL",
-            "value": 0.7
-          }
-        ],
         "CBC": [
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "4.5-11.0",
             "test": "WBC",
@@ -655,25 +642,125 @@
             "value": 8.4
           },
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "12.0-16.0",
             "test": "Hemoglobin",
             "unit": "g/dL",
             "value": 13.8
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "150-400",
+            "test": "Platelets",
+            "unit": "x10^9/L",
+            "value": 264
           }
         ],
-        "Exclusion studies": [
+        "CK": [
           {
-            "clinical_significance": "Ordered to exclude an alternative cause; the result does not support one, which is what this case's diagnosis rests on",
+            "clinical_significance": null,
             "is_abnormal": false,
-            "reference_range": "",
-            "test": "HIV",
-            "unit": "",
-            "value": "Non-reactive"
+            "reference_range": "26-192",
+            "test": "Creatine kinase",
+            "unit": "U/L",
+            "value": 88
+          }
+        ],
+        "CMP": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "136-145",
+            "test": "Sodium",
+            "unit": "mEq/L",
+            "value": 140
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "3.5-5.1",
+            "test": "Potassium",
+            "unit": "mEq/L",
+            "value": 4.0
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.5-1.1",
+            "test": "Creatinine",
+            "unit": "mg/dL",
+            "value": 0.7
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "7-20",
+            "test": "BUN",
+            "unit": "mg/dL",
+            "value": 12
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "70-99",
+            "test": "Glucose",
+            "unit": "mg/dL",
+            "value": 91
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "8.6-10.2",
+            "test": "Calcium",
+            "unit": "mg/dL",
+            "value": 9.5
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "7-35",
+            "test": "ALT",
+            "unit": "U/L",
+            "value": 17
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "10-35",
+            "test": "AST",
+            "unit": "U/L",
+            "value": 19
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "35-104",
+            "test": "Alkaline phosphatase",
+            "unit": "U/L",
+            "value": 64
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.2-1.2",
+            "test": "Total bilirubin",
+            "unit": "mg/dL",
+            "value": 0.4
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "3.5-5.0",
+            "test": "Albumin",
+            "unit": "g/dL",
+            "value": 4.3
           }
         ],
         "Inflammatory": [
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "<5.0",
             "test": "CRP",
@@ -681,68 +768,39 @@
             "value": 3.8
           },
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "0-20",
             "test": "ESR",
             "unit": "mm/hr",
             "value": 14
           }
-        ],
-        "Neuromuscular": [
-          {
-            "clinical_significance": null,
-            "is_abnormal": false,
-            "reference_range": "negative",
-            "test": "Anti-acetylcholine receptor (AChR) antibody",
-            "unit": "",
-            "value": "Negative"
-          },
-          {
-            "clinical_significance": null,
-            "is_abnormal": false,
-            "reference_range": "negative",
-            "test": "Anti-MuSK antibody",
-            "unit": "",
-            "value": "Negative"
-          },
-          {
-            "is_abnormal": false,
-            "reference_range": "negative",
-            "test": "Anti-LRP4 antibody",
-            "unit": "",
-            "value": "Negative"
-          }
-        ],
-        "Serology": [
-          {
-            "is_abnormal": false,
-            "reference_range": "negative",
-            "test": "Campylobacter jejuni IgM",
-            "unit": "",
-            "value": "Negative"
-          },
-          {
-            "is_abnormal": false,
-            "reference_range": "negative",
-            "test": "EBV VCA IgM",
-            "unit": "",
-            "value": "Negative"
-          }
         ]
       }
     },
     "literature_search": {
       "general": {
-        "query": "the medical literature for IVIG vs plasma exchange evidence to guide disease-modifying therapy",
+        "query": "treatment of Miller Fisher syndrome and its incomplete forms",
         "results": [
           {
-            "evidence_level": "guideline recommendation",
-            "finding": "IVIG (0.4 g/kg/day x 5 days) and plasma exchange are equivalently effective first-line therapies; combination not superior",
-            "source": "van_den_Berg_2014"
+            "evidence_level": "guideline",
+            "finding": "In Miller Fisher syndrome, IVIg and plasma exchange are not routinely advised because most patients recover fully without treatment; patients are monitored for overlap with GBS or Bickerstaff brainstem encephalitis, which may need treatment.",
+            "source": "[EAN_PNS_2023]"
           }
         ],
-        "summary": "IVIG (0.4 g/kg/day x 5 days) and plasma exchange are equivalently effective first-line therapies; combination not superior"
+        "summary": "IVIg and plasma exchange are not routinely advised in Miller Fisher syndrome; monitoring for overlap with GBS or Bickerstaff brainstem encephalitis is advised [EAN_PNS_2023]."
       }
+    },
+    "mri": {
+      "additional_observations": [
+        "Brainstem: normal; no midbrain or pontine signal change.",
+        "Oculomotor and facial nerves: no abnormal enhancement or compression.",
+        "No leptomeningeal enhancement."
+      ],
+      "findings": [],
+      "impression": "Normal MRI brain with and without gadolinium. No parenchymal or brainstem lesion. No abnormal cranial nerve or leptomeningeal enhancement.",
+      "recommended_actions": [],
+      "volumetrics": null
     },
     "specialized_test": {
       "findings": [
@@ -771,12 +829,12 @@
           "nerve": "Single-fiber EMG"
         }
       ],
-      "impression": "This is an ABNORMAL nerve conduction study. 1. Mildly prolonged distal motor latencies and borderline reduced conduction velocities in bilateral median motor nerves; CMAP amplitudes preserved. 2. Mildly reduced sural SNAP amplitudes bilaterally; borderline conduction velocities. 3. Absent F-waves bilaterally (median and peroneal). 4. Absent H-reflex bilaterally. 5. Repetitive nerve stimulation at 3 Hz: no decremental response. 6. Single-fiber EMG: normal jitter. Pattern indicates demyelinating polyradiculoneuropathy with proximal involvement. No neuromuscular junction decrement",
+      "impression": "This is an ABNORMAL study. 1. Mildly prolonged distal motor latencies and borderline conduction velocities in bilateral median motor nerves; CMAP amplitudes preserved. 2. Mildly reduced sural sensory amplitudes bilaterally. 3. Absent F-waves (median and peroneal) and H-reflexes bilaterally. 4. No decrement on 3 Hz repetitive nerve stimulation. 5. Normal jitter on single-fibre EMG. Mild demyelinating features with absent late responses; no evidence of a neuromuscular junction disorder.",
       "quantitative_data": {
-        "pattern": "Mild demyelinating polyradiculoneuropathy with absent F-waves and absent H-reflex; proximal conduction failure with relatively preserved limb motor amplitudes"
+        "pattern": "Mild demyelinating features with absent F-waves and H-reflexes; normal neuromuscular transmission"
       },
       "recommended_actions": [],
-      "test_type": "Nerve Conduction Studies, EMG, and Repetitive Nerve Stimulation"
+      "test_type": "emg_ncs"
     }
   },
   "metadata": {
@@ -784,8 +842,8 @@
     "citation_gap": [],
     "condition_full_name": "Guillain-Barr\u00e9 syndrome (AIDP)",
     "criteria_pack_version": "1.0",
-    "difficulty_description": "Isolated bilateral ptosis as sole cranial nerve manifestation of GBS \u2014 closely mimics myasthenia gravis; global areflexia is the discriminating finding",
-    "difficulty_rationale": "6 required tools, 1 red herring(s); atypical or multi-comorbidity presentation requires substantial cross-modality synthesis and active rule-out of strong mimics.",
+    "difficulty_description": "Isolated bilateral ptosis with areflexia in the anti-GQ1b antibody spectrum: closely mimics myasthenia gravis; areflexia and the anti-GQ1b antibody are the discriminating findings",
+    "difficulty_rationale": "5 required actions (NCS/EMG with RNS, CSF, baseline labs, respiratory function, telemetry), 2 recommended mimic exclusions (myasthenia antibodies, brain MRI), 1 red herring (bilateral ptosis).",
     "expected_agent_confidence": 0.6,
     "fallback_tool_kinds": {
       "ct": "incidental",
@@ -829,23 +887,26 @@
     },
     "demographics": {
       "age": 33,
-      "bmi": 22.4,
+      "bmi": 22.3,
       "ethnicity": "White",
       "handedness": "right",
       "sex": "female"
     },
-    "history_present_illness": "Ms. K. is a 33-year-old teacher presenting with a 7-day history of progressive bilateral ptosis. The ptosis began in the left eye and spread to involve the right eye 5 days later. She now has nearly complete bilateral ptosis and cannot open her eyelids voluntarily without using her fingers. She reports mild generalized malaise and fatigue with routine activities over the same period. She denies any diplopia \u2014 eye movements are fully intact. She has no difficulty swallowing, speaking, or breathing. She notes no weakness in her arms or legs and was able to walk to the emergency department without difficulty. She has no sensory symptoms. There is no diurnal variation in her ptosis \u2014 it does not improve in the morning or worsen with prolonged activity. There is no prior history of similar symptoms. She recalls no recent respiratory illness, gastrointestinal illness, or other viral syndrome preceding the onset. She denies exposure to spoiled food, wounds, or ticks. She takes no medications. The initial concern was myasthenia gravis given the bilateral ptosis, though there is no diurnal variation, extraocular movements are fully preserved, and global areflexia is present on exam.",
+    "history_present_illness": "Ms. K. is a 33-year-old teacher presenting with a 7-day history of progressive bilateral ptosis. The ptosis began in the left eye and spread to involve the right eye 5 days later. She now has nearly complete bilateral ptosis and cannot open her eyelids voluntarily without using her fingers. She reports mild generalized malaise and fatigue with routine activities over the same period. She denies diplopia. She has no difficulty swallowing, speaking, or breathing. She notes no weakness in her arms or legs and was able to walk to the emergency department without difficulty. She has no sensory symptoms. Her ptosis does not vary through the day and does not worsen with prolonged activity. There is no prior history of similar symptoms. She recalls no recent respiratory illness, gastrointestinal illness, or other viral syndrome preceding the onset. She denies exposure to spoiled food, wounds, or ticks. She takes no medications.",
     "neurological_exam": {
-      "additional": "FVC: 3.4 L (predicted 3.6 L \u2014 94%). NIF: -48 cmH2O. No diurnal variation in ptosis. Ptosis progressed from left eye to bilateral over 5 days. No fatigability on sustained upgaze. No preceding illness recalled by patient.",
+      "additional": null,
       "coordination": "Finger-nose intact. Heel-shin intact. No ataxia.",
-      "cranial_nerves": "Bilateral ptosis \u2014 complete inability to open eyelids voluntarily without assistance. On attempted upward gaze, minimal voluntary lid elevation. Pupils equal, round, reactive bilaterally. Extraocular movements FULL in all directions \u2014 NO ophthalmoplegia. No diplopia. Bell's phenomenon preserved. No facial weakness. No dysarthria. Gag preserved.",
+      "cranial_nerves": "Bilateral ptosis: unable to open the eyelids voluntarily without assistance; minimal lid elevation on attempted upgaze. No fatigability on sustained upgaze. Pupils equal, round, reactive bilaterally. Extraocular movements full in all directions; no ophthalmoplegia. No diplopia. Bell's phenomenon preserved. No facial weakness. No dysarthria. Gag preserved.",
       "gait": "Normal gait. No ataxia.",
       "mental_status": "Alert, oriented, anxious.",
       "motor": "Upper extremity strength 5/5 bilaterally. Lower extremity strength 5/5 bilaterally. Normal bulk and tone throughout.",
-      "reflexes": "Global areflexia \u2014 absent biceps, brachioradialis, triceps, patellar, Achilles bilaterally. Plantars downgoing.",
+      "reflexes": "Global areflexia: absent biceps, brachioradialis, triceps, patellar and Achilles reflexes bilaterally. Plantars downgoing.",
       "sensory": "Intact light touch, pinprick, vibration, proprioception in all extremities."
     },
     "patient_id": "NB-GBS-RM15",
+    "physical_exam": {
+      "general": "Weight 63 kg, height 168 cm."
+    },
     "vitals": {
       "bp_diastolic": 74,
       "bp_systolic": 118,

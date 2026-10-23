@@ -21,7 +21,7 @@
         "contraindications": [],
         "formulary_status": "on formulary",
         "interactions": [],
-        "proposed": "(agent not specified on this case's pathway)",
+        "proposed": "Medication list review",
         "warnings": [
           "Non-specific interaction check; verify against a current formulary or interaction reference before prescribing."
         ]
@@ -90,7 +90,7 @@
         },
         "glucose": "61 mg/dL",
         "glucose_ratio": "0.70",
-        "interpretation": "Opening pressure: 136 mmH2O (normal). Nucleated cell count: 3 cells/mm3. Protein: 72 mg/dL (elevated). Glucose: 61 mg/dL (CSF:serum ratio 0.70). Gram stain: No organisms. Elevated protein with near-normal cell count \u2014 a pattern of albuminocytologic dissociation",
+        "interpretation": "Opening pressure 136 mmH2O (normal). Nucleated cells 3/mm3. Protein 72 mg/dL (elevated). Glucose 61 mg/dL (CSF:serum ratio 0.70). Gram stain: no organisms; culture pending. Elevated protein with a normal cell count (albuminocytological dissociation). Clinical correlation recommended.",
         "opening_pressure": "136 mmH2O",
         "protein": "72 mg/dL (elevated)",
         "special_tests": {
@@ -103,31 +103,23 @@
     },
     {
       "output": {
-        "abnormal_values_summary": [
-          "Anti-GT1a IgG positive (titer 1:320) (H)"
-        ],
-        "interpretation": "Abnormal values: Anti-GT1a IgG Positive (titer 1:320) (H).",
+        "abnormal_values_summary": [],
+        "interpretation": "AChR binding and MuSK antibodies negative.",
         "panels": {
-          "Ganglioside_Antibodies": [
+          "Myasthenia_Antibodies": [
+            {
+              "clinical_significance": "AChR antibodies are found in most patients with generalised myasthenia gravis; a negative result does not exclude it. Clinical correlation recommended.",
+              "is_abnormal": false,
+              "reference_range": "<0.25",
+              "test": "Acetylcholine receptor binding antibody",
+              "unit": "nmol/L",
+              "value": 0.02
+            },
             {
               "clinical_significance": null,
-              "is_abnormal": true,
-              "reference_range": "negative",
-              "test": "Anti-GT1a IgG",
-              "unit": "",
-              "value": "Positive (titer 1:320)"
-            },
-            {
               "is_abnormal": false,
               "reference_range": "negative",
-              "test": "Anti-GQ1b IgG",
-              "unit": "",
-              "value": "Negative"
-            },
-            {
-              "is_abnormal": false,
-              "reference_range": "negative",
-              "test": "Anti-GM1 IgG",
+              "test": "MuSK antibody",
               "unit": "",
               "value": "Negative"
             }
@@ -135,28 +127,70 @@
         }
       },
       "tool_name": "interpret_labs",
-      "trigger_action": "request_anti_ganglioside_panel"
+      "trigger_action": "request_achr_musk_antibodies"
+    },
+    {
+      "output": {
+        "abnormal_values_summary": [
+          "Anti-GT1a IgG positive (titre 1:320)"
+        ],
+        "interpretation": "Anti-GT1a IgG positive (titre 1:320). Anti-GQ1b IgG negative.",
+        "panels": {
+          "Ganglioside_Antibodies": [
+            {
+              "clinical_significance": "IgG antibodies to GT1a are reported in a subset of patients with acute pharyngeal-cervical-brachial weakness; a positive result does not establish the diagnosis on its own. Clinical correlation recommended.",
+              "is_abnormal": true,
+              "reference_range": "negative",
+              "test": "Anti-GT1a IgG",
+              "unit": "",
+              "value": "Positive (titre 1:320)"
+            },
+            {
+              "clinical_significance": null,
+              "is_abnormal": false,
+              "reference_range": "negative",
+              "test": "Anti-GQ1b IgG",
+              "unit": "",
+              "value": "Negative"
+            }
+          ]
+        }
+      },
+      "tool_name": "interpret_labs",
+      "trigger_action": "request_anti_gq1b_gt1a_ganglioside_panel"
     },
     {
       "output": {
         "findings": [
           {
-            "panel": "Respiratory",
-            "reference_range": "67% predicted",
-            "result": "2.6 L",
+            "flag": "L",
+            "reference_range": ">=80% predicted",
+            "result": "2.8 L (67% predicted; 37 mL/kg at 75 kg)",
             "test": "FVC"
           },
           {
-            "panel": "Respiratory",
-            "reference_range": "Above threshold (-25)",
-            "result": "-30 cmH2O",
-            "test": "NIF"
+            "flag": "L",
+            "reference_range": "-80 cmH2O or more negative",
+            "result": "-34 cmH2O",
+            "test": "MIP"
+          },
+          {
+            "flag": "L",
+            "reference_range": ">=100 cmH2O",
+            "result": "46 cmH2O",
+            "test": "MEP"
           }
         ],
-        "impression": "All values within normal limits.",
+        "impression": "Bedside respiratory function on admission: FVC 2.8 L (67% predicted; 37 mL/kg at 75 kg) L. MIP -34 cmH2O L. MEP 46 cmH2O L. Cough weak.",
         "quantitative_data": {
-          "FVC": "2.6 L",
-          "NIF": "-30 cmH2O"
+          "FVC": "2.8 L",
+          "FVC_mL_per_kg": "37 mL/kg",
+          "FVC_percent_predicted": "67%",
+          "FVC_predicted": "4.2 L",
+          "MEP": "46 cmH2O",
+          "MIP": "-34 cmH2O",
+          "cough": "weak",
+          "weight": "75 kg"
         },
         "recommended_actions": [],
         "test_type": "respiratory_function"
@@ -166,102 +200,27 @@
     },
     {
       "output": {
-        "duration_hours": 72,
-        "events": [
-          {
-            "event": "Transient sinus tachycardia to 106 bpm during nasogastric tube placement \u2014 resolved",
-            "time": "Day 2"
-          }
-        ],
+        "duration_hours": 24,
+        "events": [],
         "findings": [
-          "Mild autonomic tachycardia"
+          "Sinus rhythm 68-104 bpm",
+          "Non-invasive blood pressure 118/72 to 142/88 mmHg"
         ],
         "heart_rate_range": {
-          "max": 106,
+          "max": 104,
           "min": 68
         },
-        "impression": "72-hour continuous telemetry. Mild sinus tachycardia throughout (range 68\u2013106 bpm). Transient rate increase to 106 bpm on one occasion. No sustained arrhythmia or significant conduction abnormality recorded",
-        "monitor_type": "Continuous telemetry \u2014 step-down unit",
+        "impression": "24-hour continuous telemetry. Sinus rhythm 68-104 bpm with brief sinus tachycardia. No pauses and no arrhythmia. Blood pressure 118/72 to 142/88 mmHg.",
+        "monitor_type": "Continuous telemetry",
         "recommended_actions": [],
-        "rhythm_summary": "Mild sinus tachycardia throughout. No clinically significant arrhythmias."
+        "rhythm_summary": "Sinus rhythm with brief sinus tachycardia to 104 bpm."
       },
       "tool_name": "order_cardiac_monitoring",
       "trigger_action": "request_cardiac_monitoring"
-    },
-    {
-      "output": {
-        "abnormal_values_summary": [
-          "Severe oropharyngeal dysphagia on modified barium swallow (H)"
-        ],
-        "interpretation": "Abnormal values: Modified Barium Swallow Study Severe oropharyngeal dysphagia (H).",
-        "panels": {
-          "Swallowing": [
-            {
-              "clinical_significance": null,
-              "is_abnormal": true,
-              "reference_range": "Normal oropharyngeal swallowing",
-              "test": "Modified Barium Swallow Study",
-              "unit": "",
-              "value": "Severe oropharyngeal dysphagia"
-            }
-          ]
-        }
-      },
-      "tool_name": "interpret_labs",
-      "trigger_action": "request_swallowing_eval"
-    },
-    {
-      "output": {
-        "query": "general",
-        "results": [],
-        "summary": ""
-      },
-      "tool_name": "search_medical_literature",
-      "trigger_action": "search_gbs_treatment"
-    },
-    {
-      "output": {
-        "alternatives": [],
-        "contraindications": [],
-        "formulary_status": "on formulary",
-        "interactions": [],
-        "proposed": "(agent not specified on this case's pathway)",
-        "summary": "",
-        "warnings": [
-          "Non-specific interaction check; verify against a current formulary or interaction reference before prescribing."
-        ]
-      },
-      "tool_name": "check_drug_interactions",
-      "trigger_action": "check_ivig_drug_interactions"
     }
   ],
   "ground_truth": {
     "action_criteria": [
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "panels": [
-                "CBC",
-                "CMP",
-                "HIV",
-                "inflammatory_markers",
-                "anti-GM1 IgM"
-              ]
-            },
-            "tool_name": "interpret_labs"
-          }
-        ],
-        "citations": [
-          "[Yuki_2012]",
-          "GBS criteria pack \u00a72"
-        ],
-        "criterion_id": "action-1-interpret-labs",
-        "expected_evidence": "Mild leukocytosis / elevated inflammatory markers reflecting antecedent infection; ganglioside antibodies for variant typing; trigger identification (Campylobacter, CMV, EBV, Mycoplasma, HIV)",
-        "importance": "required",
-        "label": "Obtain CBC, CMP, HIV, anti-GM1/anti-GQ1b ganglioside antibodies, and stool culture / Campylobacter serology if recent diarrhea",
-        "rationale": "Obtain CBC, CMP, HIV, anti-GM1/anti-GQ1b ganglioside antibodies, and stool culture / Campylobacter serology if recent diarrhea"
-      },
       {
         "alternatives": [
           {
@@ -272,14 +231,13 @@
           }
         ],
         "citations": [
-          "[Hadden_1998]",
-          "GBS criteria pack \u00a72"
+          "[EAN_PNS_2023]"
         ],
         "criterion_id": "action-2-order-specialized-test",
-        "expected_evidence": "Demyelinating pattern (prolonged DML, conduction block, reduced CV, absent F-waves) consistent with AIDP, or reduced CMAP amplitudes in axonal variants (AMAN/AMSAN)",
+        "expected_evidence": "Polyradiculoneuropathy pattern (demyelinating or axonal features, absent F-waves, sural sparing where present); may be normal in the first week",
         "importance": "required",
-        "label": "Order nerve conduction studies and needle EMG (EMG/NCS)",
-        "rationale": "Order nerve conduction studies and needle EMG (EMG/NCS)"
+        "label": "Nerve conduction studies and needle EMG",
+        "rationale": "Nerve conduction studies support the diagnosis and show where the polyradiculoneuropathy lies; in the PCB variant the upper limb nerves carry the abnormalities [EAN_PNS_2023, Wakerley_2014]."
       },
       {
         "alternatives": [
@@ -289,14 +247,72 @@
           }
         ],
         "citations": [
-          "[Asbury_1990]",
-          "GBS criteria pack \u00a72"
+          "[EAN_PNS_2023]"
         ],
         "criterion_id": "action-3-analyze-csf",
-        "expected_evidence": "Albuminocytologic dissociation \u2014 elevated protein with cell count <10/\u03bcL; may be normal in the first week of illness",
+        "expected_evidence": "Albuminocytological dissociation: raised protein with cells <5/mm3 (5-50/mm3 compatible but prompts an alternative; >50/mm3 suggests another diagnosis); protein may be normal in the first week",
         "importance": "required",
-        "label": "Perform lumbar puncture for CSF analysis",
-        "rationale": "Perform lumbar puncture for CSF analysis"
+        "label": "Lumbar puncture for CSF cell count, protein and glucose",
+        "rationale": "CSF supports the diagnosis and excludes the infectious and malignant causes of polyradiculopathy that raise the cell count [EAN_PNS_2023]."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "panels": [
+                "anti_AChR"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          }
+        ],
+        "citations": [
+          "[Wakerley_2014]",
+          "[EAN_PNS_2023]"
+        ],
+        "criterion_id": "action-10-interpret-labs-anti-achr-musk",
+        "expected_evidence": "AChR and MuSK antibodies negative, together with no decrement on repetitive stimulation, against bulbar myasthenia gravis",
+        "importance": "recommended",
+        "label": "Acetylcholine receptor and MuSK antibodies to exclude bulbar myasthenia gravis",
+        "rationale": "Bulbar and neck-arm weakness without sensory loss is the presentation of bulbar myasthenia gravis, the main mimic of the PCB variant [Wakerley_2014]."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_brain_mri"
+          }
+        ],
+        "citations": [
+          "[EAN_PNS_2023]"
+        ],
+        "criterion_id": "action-11-analyze-brain-mri",
+        "expected_evidence": "No brainstem lesion",
+        "importance": "recommended",
+        "label": "Brain MRI to exclude a brainstem lesion",
+        "rationale": "Bulbar-predominant weakness raises a brainstem lesion; a normal brain MRI removes it [EAN_PNS_2023]."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "panels": [
+                "CBC",
+                "CMP",
+                "CK"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          }
+        ],
+        "citations": [
+          "[EAN_PNS_2023]"
+        ],
+        "criterion_id": "action-1-interpret-labs",
+        "expected_evidence": "Baseline values before treatment; abnormal liver tests or low albumin mark a higher risk of a severe course; no metabolic or toxic alternative",
+        "importance": "required",
+        "label": "Baseline blood tests: full blood count, renal function and electrolytes, liver tests, albumin, glucose and CK",
+        "rationale": "Routine blood tests exclude metabolic mimics (potassium, magnesium, CK) and give the baseline before IVIg [EAN_PNS_2023]."
       },
       {
         "alternatives": [
@@ -308,65 +324,15 @@
           }
         ],
         "citations": [
-          "[Sharshar_2003]",
-          "GBS criteria pack \u00a72"
+          "[Lawn_2001]",
+          "[EAN_PNS_2023]",
+          "[Leonhard_2019]"
         ],
         "criterion_id": "action-4-order-specialized-test",
-        "expected_evidence": "Baseline and serial FVC, MIP/MEP, NIF; deterioration to FVC <20 mL/kg, MIP worse than -30 cmH2O, or VC <40% predicted triggers ICU transfer / intubation",
+        "expected_evidence": "FVC in L, % predicted and mL/kg, MIP and MEP, with the trend; ICU-level monitoring if FVC <20 mL/kg or <60% predicted, MIP weaker than -30 cmH2O, MEP <40 cmH2O, a fall of more than 30%, or bulbar weakness with weak cough",
         "importance": "required",
-        "label": "Order bedside respiratory function testing (FVC, MIP/MEP, NIF) and repeat every 4\u20136 hours",
-        "rationale": "Order bedside respiratory function testing (FVC, MIP/MEP, NIF) and repeat every 4\u20136 hours"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[van_den_Berg_2014]",
-          "GBS criteria pack \u00a72"
-        ],
-        "criterion_id": "action-5-search-medical-literature",
-        "expected_evidence": "IVIG (0.4 g/kg/day x 5 days) and plasma exchange are equivalently effective first-line therapies; combination not superior",
-        "importance": "required",
-        "label": "Search the medical literature for IVIG vs plasma exchange evidence to guide disease-modifying therapy",
-        "rationale": "Search the medical literature for IVIG vs plasma exchange evidence to guide disease-modifying therapy"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "check_drug_interactions"
-          }
-        ],
-        "citations": [
-          "[van_den_Berg_2014]",
-          "GBS criteria pack \u00a72"
-        ],
-        "criterion_id": "action-6-check-drug-interactions",
-        "expected_evidence": "Confirmation that IVIG can be given safely (no severe renal impairment, no IgA deficiency) or that plasma exchange is appropriate (adequate vascular access, stable coagulation)",
-        "importance": "required",
-        "label": "Check drug interactions / contraindications for IVIG (renal function, IgA deficiency screen) and/or plasma exchange (coagulation, calcium, hemodynamics)",
-        "rationale": "Check drug interactions / contraindications for IVIG (renal function, IgA deficiency screen) and/or plasma exchange (coagulation, calcium, hemodynamics)"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "analyze_ecg"
-          }
-        ],
-        "citations": [
-          "[Asbury_1990]",
-          "GBS criteria pack \u00a72"
-        ],
-        "criterion_id": "action-7-analyze-ecg",
-        "expected_evidence": "Sinus tachycardia or bradycardia; conduction or repolarisation abnormalities reflecting autonomic involvement",
-        "importance": "recommended",
-        "label": "Obtain a 12-lead ECG to screen for autonomic dysrhythmias and baseline QTc",
-        "rationale": "Obtain a 12-lead ECG to screen for autonomic dysrhythmias and baseline QTc"
+        "label": "Bedside respiratory function (FVC, MIP, MEP), repeated serially while weakness progresses",
+        "rationale": "Bulbar weakness with a weak cough is the main risk in the PCB variant; serial FVC, MIP and MEP guide ICU-level care and intubation planning [Lawn_2001, EAN_PNS_2023]."
       },
       {
         "alternatives": [
@@ -378,27 +344,75 @@
           }
         ],
         "citations": [
-          "[Asbury_1990]",
-          "GBS criteria pack \u00a72"
+          "[EAN_PNS_2023]"
         ],
         "criterion_id": "action-8-order-cardiac-monitoring",
-        "expected_evidence": "Mild sinus tachycardia throughout. No clinically significant arrhythmias \u2014 the recording is read for the bradyarrhythmias, pauses beyond 3 seconds and blood-pressure lability that trigger ICU escalation",
+        "expected_evidence": "Continuous telemetry with blood pressure monitoring: sinus rhythm 68-104 bpm with no pauses or arrhythmia and blood pressure 118/72 to 142/88 mmHg in the first 24 hours; autonomic instability (rate and blood pressure lability, bradyarrhythmia) requires continued monitoring while weakness progresses",
         "importance": "required",
-        "label": "Start continuous inpatient cardiac telemetry for the period of maximal weakness and keep it running alongside serial respiratory function. Autonomic instability affects about two thirds of patients and is a leading cause of in-hospital death: bradyarrhythmias, pauses beyond 3 seconds and blood-pressure lability are what trigger ICU escalation",
-        "rationale": "Start continuous inpatient cardiac telemetry for the period of maximal weakness and keep it running alongside serial respiratory function. Autonomic instability affects about two thirds of patients and is a leading cause of in-hospital death: bradyarrhythmias, pauses beyond 3 seconds and blood-pressure lability are what trigger ICU escalation"
+        "label": "Continuous inpatient cardiac telemetry with blood pressure monitoring while weakness progresses",
+        "rationale": "Autonomic dysfunction is common in GBS and can cause bradyarrhythmias, pauses and blood-pressure lability; monitoring continues while weakness progresses [EAN_PNS_2023]."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_ecg"
+          }
+        ],
+        "citations": [
+          "[EAN_PNS_2023]"
+        ],
+        "criterion_id": "action-7-analyze-ecg",
+        "expected_evidence": "Normal sinus rhythm 96 bpm with normal intervals (QTc 438 ms) and no conduction or ST-T abnormality: a baseline while autonomic involvement can still develop",
+        "importance": "recommended",
+        "label": "Obtain a 12-lead ECG to screen for autonomic dysrhythmias and baseline QTc",
+        "rationale": "A baseline 12-lead ECG screens for autonomic dysrhythmia and conduction abnormality and gives the QTc before treatment [EAN_PNS_2023]."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "check_drug_interactions"
+          }
+        ],
+        "citations": [
+          "[EAN_PNS_2023]"
+        ],
+        "criterion_id": "action-6-check-drug-interactions",
+        "expected_evidence": "No current medications, so no interaction with IVIg or plasma exchange",
+        "importance": "optional",
+        "label": "Optional interaction check before IVIg or plasma exchange (no current medications)",
+        "rationale": "He takes no medicines, so the check cannot change management (ROUND_POLICY ruling 6)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "search_medical_literature"
+          }
+        ],
+        "citations": [
+          "[EAN_PNS_2023]"
+        ],
+        "criterion_id": "action-5-search-medical-literature",
+        "expected_evidence": "General evidence on immunotherapy in GBS; not needed for the diagnosis or the treatment decision",
+        "importance": "optional",
+        "label": "Optional literature search on immunotherapy in the pharyngeal-cervical-brachial variant",
+        "rationale": "Background evidence only; not a clinical step of the work-up."
       }
     ],
     "assessment": {
       "prohibited_recommendations": [
-        "Do not give corticosteroids as monotherapy.",
-        "Do not assume MG without serological confirmation if RNS or single-fibre EMG is unavailable."
+        "Do not treat with corticosteroids: oral corticosteroids are strongly advised against and IV methylprednisolone is not recommended [EAN_PNS_2023].",
+        "Do not start IVIg without checking renal function."
       ],
       "required_recommendations": [
-        "Admit to a monitored unit given bulbar and respiratory risk.",
-        "Initiate IVIG 0.4 g/kg/day for 5 days (PLEX alternative).",
-        "Send anti-GT1a / anti-GQ1b IgG; CMV serology and PCR.",
-        "Continuous cardiac telemetry.",
-        "Nil per os until safe swallow confirmed; speech / swallow consult."
+        "Admit to ICU-level monitoring: bulbar weakness with a weak cough and aspiration on thin liquids, FVC 2.8 L (67% predicted, 37 mL/kg), MIP -34 and MEP 46 cmH2O; repeat FVC, MIP and MEP every 4-6 hours [EAN_PNS_2023, Lawn_2001].",
+        "Plan elective intubation if FVC falls below 20 mL/kg (1.5 L at 75 kg), MIP becomes weaker than -30 cmH2O, MEP falls below 40 cmH2O, or bulbar function, cough or secretions worsen; intubate at once for respiratory distress, hypoxaemia or hypercapnia.",
+        "Start IVIg 0.4 g/kg/day for 5 days (2 g/kg total, 30 g/day at 75 kg) for progressive bulbar weakness with aspiration risk, although he still walks unaided; plasma exchange is an equivalent alternative [EAN_PNS_2023].",
+        "Nil by mouth until a formal swallow assessment confirms a safe swallow; nasogastric feeding in the meantime.",
+        "Continuous cardiac telemetry with blood pressure monitoring while weakness progresses.",
+        "Send anti-GT1a and anti-GQ1b IgG antibodies: a positive anti-GT1a supports the PCB variant, a negative result does not exclude it."
       ]
     },
     "avoided_actions": [
@@ -410,7 +424,7 @@
           }
         ],
         "citations": [
-          "[van_den_Berg_2014]"
+          "[EAN_PNS_2023]"
         ],
         "criterion_id": "avoid-waste-1-analyze-eeg",
         "rationale": "GBS is a peripheral nerve / nerve-root disorder; EEG has no role in diagnosis unless atypical CNS features (encephalopathy, seizures) are present.",
@@ -424,7 +438,7 @@
           }
         ],
         "citations": [
-          "[van_den_Berg_2014]"
+          "[EAN_PNS_2023]"
         ],
         "criterion_id": "avoid-waste-2-order-echocardiogram",
         "rationale": "Echocardiography is not indicated in typical GBS; reserve for pre-existing cardiac disease or unexplained hemodynamic instability after autonomic causes are excluded.",
@@ -438,30 +452,16 @@
           }
         ],
         "citations": [
-          "[van_den_Berg_2014]"
+          "[EAN_PNS_2023]"
         ],
         "criterion_id": "avoid-waste-3-order-ct-scan",
         "rationale": "Head CT contributes no diagnostic information in GBS; the disease is peripheral and CT does not visualise nerve roots reliably.",
-        "severity": "waste"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "analyze_brain_mri"
-          }
-        ],
-        "citations": [
-          "[van_den_Berg_2014]"
-        ],
-        "criterion_id": "avoid-waste-4-analyze-brain-mri",
-        "rationale": "Brain MRI is reserved for atypical features (encephalopathy, CNS signs, transverse myelitis on differential). In classic GBS it does not aid diagnosis.",
         "severity": "waste"
       }
     ],
     "diagnosis": {
       "accepted": [
-        "Guillain-Barr\u00e9 syndrome, pharyngeal-cervical-brachial (PCB) variant (post-CMV, probable)",
+        "Guillain-Barr\u00e9 syndrome, pharyngeal-cervical-brachial variant",
         "guillain barre syndrome",
         "guillain-barre syndrome",
         "guillain-barr\u00e9 syndrome",
@@ -481,26 +481,26 @@
       {
         "diagnosis": "Myasthenia gravis (bulbar)",
         "icd_code": "G70.0",
-        "key_features": "Bulbar weakness and arm weakness possible in MG, but reflexes preserved and fatigability pattern; AChR or MuSK antibodies and RNS / single-fibre EMG distinguish.",
-        "likelihood": "moderate"
+        "key_features": "Bulbar and neck-arm weakness fit, but there is no fatigability or ptosis, the weak arms are areflexic, NCS is demyelinating with no decrement on repetitive stimulation, and AChR and MuSK antibodies are negative.",
+        "likelihood": "low"
       },
       {
         "diagnosis": "Botulism",
         "icd_code": "A05.1",
-        "key_features": "Descending bulbar + cervical pattern fits; but sensory symptoms or paresthesias are not classic for botulism; food / wound history negative.",
-        "likelihood": "moderate"
+        "key_features": "Descending bulbar and arm weakness fits, but pupils and eye movements are normal, the NCS is demyelinating (botulism gives low CMAPs with normal velocities), CSF protein is raised, and there is no wound, food or honey exposure.",
+        "likelihood": "low"
       },
       {
         "diagnosis": "Brainstem stroke / lesion",
         "icd_code": "I63.9",
-        "key_features": "Symmetric bilateral pattern with no crossed signs and preserved consciousness argues against brainstem stroke; MRI excludes.",
-        "likelihood": "low"
+        "key_features": "Symmetric lower motor neuron pattern with areflexia, no long-tract or crossed signs, and a normal brain MRI.",
+        "likelihood": "very_low"
       },
       {
         "diagnosis": "Diphtheritic polyneuropathy",
         "icd_code": "A36.83",
-        "key_features": "Pharyngeal involvement possible; vaccination status and pharyngeal exam, plus rarity in vaccinated populations, make this unlikely.",
-        "likelihood": "low"
+        "key_features": "Palatal weakness can occur, but there was no pharyngitis or membrane, and the disease is rare where vaccination is routine.",
+        "likelihood": "very_low"
       },
       {
         "diagnosis": "Tetanus",
@@ -510,50 +510,29 @@
       }
     ],
     "key_clinical_evidence": [
-      "PCB variant of GBS presents with bulbar, cervical, and proximal upper-limb weakness, often without leg involvement at onset.",
-      "Anti-GT1a (and sometimes anti-GQ1b) IgG is the serological marker.",
-      "Bulbar dysphagia and respiratory monitoring drive disposition decisions even when limb strength is relatively preserved.",
-      "Brainstem MRI is appropriate in this presentation to exclude brainstem stroke given the cranial-nerve predominance."
+      "The pharyngeal-cervical-brachial variant is oropharyngeal, neck and arm weakness with arm areflexia and spared legs [Wakerley_2014]: here nasal dysarthria, dysphagia, neck flexion 3+/5, shoulder abduction 3/5, absent arm reflexes and 5/5 legs.",
+      "Anti-GT1a IgG (positive here at 1:320) supports the PCB variant but does not establish the diagnosis on its own; the CSF dissociation (protein 72 mg/dL, 3 cells/mm3) and the upper limb predominant demyelinating NCS do [EAN_PNS_2023].",
+      "Bulbar weakness with a weak cough calls for ICU-level monitoring even while limb strength and gait are preserved [EAN_PNS_2023, Leonhard_2019].",
+      "Normal repetitive stimulation and negative AChR and MuSK antibodies with areflexic weak arms separate the PCB variant from bulbar myasthenia gravis."
     ],
     "red_herrings": [
       {
-        "correct_interpretation": "Pharyngeal-cervical-brachial variant of GBS classically spares legs; areflexia plus albuminocytologic dissociation place the diagnosis squarely within the GBS spectrum.",
+        "correct_interpretation": "The pharyngeal-cervical-brachial variant spares the legs; areflexia in the weak arms, the CSF albuminocytological dissociation and the upper limb demyelinating NCS place the diagnosis within the GBS spectrum, and normal repetitive stimulation with negative AChR and MuSK antibodies argues against myasthenia gravis.",
         "data_point": "Absence of leg weakness with bulbar predominance",
         "field_path": "patient.neurological_exam.motor",
         "intended_effect": "Suggest myasthenia gravis or brainstem disease rather than a regional GBS variant.",
-        "location": "patient.neurological_exam"
+        "location": "Neurological examination, motor"
       }
     ],
     "review_status": "draft",
-    "sequence_constraints": [
-      {
-        "after_criterion_id": "action-6-check-drug-interactions",
-        "before_criterion_id": "action-2-order-specialized-test",
-        "citations": [
-          "[Sharshar_2003]"
-        ],
-        "reason": "Document respiratory status (FVC/NIF) before committing to IVIG vs plasma exchange \u2014 severe respiratory compromise mandates ICU triage and may influence treatment choice and timing.",
-        "severity": "soft"
-      },
-      {
-        "after_criterion_id": "action-6-check-drug-interactions",
-        "before_criterion_id": "action-1-interpret-labs",
-        "citations": [
-          "[van_den_Berg_2014]"
-        ],
-        "reason": "Renal function, IgA screen, and CBC must be reviewed before IVIG to mitigate renal failure, anaphylaxis (IgA-deficient patients), and aseptic meningitis risk.",
-        "severity": "soft"
-      }
-    ],
+    "sequence_constraints": [],
     "stop_rule": {
-      "max_additional_actions": 0,
+      "max_additional_actions": 3,
       "required_before_assessment": [
-        "action-1-interpret-labs",
         "action-2-order-specialized-test",
         "action-3-analyze-csf",
+        "action-1-interpret-labs",
         "action-4-order-specialized-test",
-        "action-5-search-medical-literature",
-        "action-6-check-drug-interactions",
         "action-8-order-cardiac-monitoring"
       ]
     }
@@ -569,7 +548,7 @@
         "proposed": "",
         "summary": "No current medications are recorded for this patient, so there is nothing to review for interactions.",
         "warnings": [
-          "Interaction review performed against the current medication list above. Clinical relevance \u2014 which agents to taper, and in what order \u2014 is a prescribing decision, not an output of this check."
+          "Interaction review performed against the recorded medication list (none)."
         ]
       }
     },
@@ -577,58 +556,28 @@
       "axis": "Normal",
       "clinical_correlation": "",
       "findings": [
-        "Mild sinus tachycardia",
+        "Normal sinus rhythm",
         "Normal QTc"
       ],
-      "interpretation": "Sinus tachycardia, rate 96. Normal QTc (438 ms). No acute ST-T wave changes.",
+      "interpretation": "Normal sinus rhythm, rate 96. Normal intervals (QTc 438 ms). No acute ST-T wave changes.",
       "intervals": {
         "PR": "158 ms",
         "QRS": "84 ms",
         "QTc": "438 ms"
       },
       "rate": 96,
-      "rhythm": "Sinus tachycardia"
+      "rhythm": "Normal sinus rhythm"
     },
     "labs": {
       "abnormal_values_summary": [
-        "CRP 8.4 mg/L (mildly elevated)",
-        "ESR 28 mm/hr",
-        "CMV IgM positive low titer"
+        "CRP 8.4 mg/L (H)",
+        "ESR 28 mm/hr (H)"
       ],
-      "interpretation": "Abnormal values: CRP 8.4 mg/L (H), ESR 28 mm/hr (H), CMV IgM Positive (low titer) (H).",
+      "interpretation": "CRP 8.4 mg/L and ESR 28 mm/hr (mildly elevated). Remaining values within reference ranges.",
       "panels": {
-        "BMP": [
-          {
-            "is_abnormal": false,
-            "reference_range": "136-145",
-            "test": "Sodium",
-            "unit": "mEq/L",
-            "value": 139
-          },
-          {
-            "is_abnormal": false,
-            "reference_range": "3.5-5.1",
-            "test": "Potassium",
-            "unit": "mEq/L",
-            "value": 4.1
-          },
-          {
-            "is_abnormal": false,
-            "reference_range": "0.7-1.2",
-            "test": "Creatinine",
-            "unit": "mg/dL",
-            "value": 0.9
-          },
-          {
-            "is_abnormal": false,
-            "reference_range": "70-100",
-            "test": "Glucose",
-            "unit": "mg/dL",
-            "value": 94
-          }
-        ],
         "CBC": [
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "4.5-11.0",
             "test": "WBC",
@@ -636,6 +585,7 @@
             "value": 9.2
           },
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "13.5-17.5",
             "test": "Hemoglobin",
@@ -643,6 +593,7 @@
             "value": 15.1
           },
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "150-400",
             "test": "Platelets",
@@ -650,18 +601,117 @@
             "value": 228
           }
         ],
-        "Exclusion studies": [
+        "CK": [
           {
-            "clinical_significance": "Ordered to exclude an alternative cause; the result does not support one, which is what this case's diagnosis rests on",
+            "clinical_significance": null,
             "is_abnormal": false,
-            "reference_range": "",
-            "test": "HIV",
-            "unit": "",
-            "value": "Non-reactive"
+            "reference_range": "39-308",
+            "test": "Creatine kinase",
+            "unit": "U/L",
+            "value": 164
+          }
+        ],
+        "CMP": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "136-145",
+            "test": "Sodium",
+            "unit": "mEq/L",
+            "value": 139
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "3.5-5.1",
+            "test": "Potassium",
+            "unit": "mEq/L",
+            "value": 4.1
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.7-1.2",
+            "test": "Creatinine",
+            "unit": "mg/dL",
+            "value": 0.9
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "7-20",
+            "test": "BUN",
+            "unit": "mg/dL",
+            "value": 13
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "70-100",
+            "test": "Glucose",
+            "unit": "mg/dL",
+            "value": 94
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "8.6-10.2",
+            "test": "Calcium",
+            "unit": "mg/dL",
+            "value": 9.4
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "1.7-2.2",
+            "test": "Magnesium",
+            "unit": "mg/dL",
+            "value": 2.0
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "7-55",
+            "test": "ALT",
+            "unit": "U/L",
+            "value": 28
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "8-48",
+            "test": "AST",
+            "unit": "U/L",
+            "value": 25
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "40-129",
+            "test": "Alkaline phosphatase",
+            "unit": "U/L",
+            "value": 76
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.2-1.2",
+            "test": "Total bilirubin",
+            "unit": "mg/dL",
+            "value": 0.7
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "3.5-5.0",
+            "test": "Albumin",
+            "unit": "g/dL",
+            "value": 4.4
           }
         ],
         "Inflammatory": [
           {
+            "clinical_significance": null,
             "is_abnormal": true,
             "reference_range": "<5.0",
             "test": "CRP",
@@ -669,51 +719,40 @@
             "value": 8.4
           },
           {
+            "clinical_significance": null,
             "is_abnormal": true,
             "reference_range": "0-22",
             "test": "ESR",
             "unit": "mm/hr",
             "value": 28
           }
-        ],
-        "Serology": [
-          {
-            "is_abnormal": false,
-            "reference_range": "negative",
-            "test": "Campylobacter jejuni IgM",
-            "unit": "",
-            "value": "Negative"
-          },
-          {
-            "is_abnormal": false,
-            "reference_range": "negative",
-            "test": "EBV VCA IgM",
-            "unit": "",
-            "value": "Negative"
-          },
-          {
-            "clinical_significance": null,
-            "is_abnormal": true,
-            "reference_range": "negative",
-            "test": "CMV IgM",
-            "unit": "",
-            "value": "Positive (low titer)"
-          }
         ]
       }
     },
     "literature_search": {
       "general": {
-        "query": "the medical literature for IVIG vs plasma exchange evidence to guide disease-modifying therapy",
+        "query": "first-line immunotherapy in Guillain-Barre syndrome",
         "results": [
           {
-            "evidence_level": "guideline recommendation",
-            "finding": "IVIG (0.4 g/kg/day x 5 days) and plasma exchange are equivalently effective first-line therapies; combination not superior",
-            "source": "van_den_Berg_2014"
+            "evidence_level": "guideline",
+            "finding": "Guidelines for adults with GBS who cannot walk unaided advise IVIg 2 g/kg over 5 days within 2 weeks of onset or plasma exchange within 4 weeks, with no preference between them; corticosteroids are not advised.",
+            "source": "[EAN_PNS_2023]"
+          },
+          {
+            "evidence_level": "randomised controlled trial",
+            "finding": "A second IVIg course in patients with a poor predicted prognosis did not improve outcome and caused more serious adverse events.",
+            "source": "[Walgaard_2021]"
           }
         ],
-        "summary": "IVIG (0.4 g/kg/day x 5 days) and plasma exchange are equivalently effective first-line therapies; combination not superior"
+        "summary": "IVIg or plasma exchange is advised for adults with GBS unable to walk unaided; neither is preferred, and a second IVIg course is not advised [EAN_PNS_2023, Walgaard_2021]."
       }
+    },
+    "mri": {
+      "additional_observations": [],
+      "findings": [],
+      "impression": "No brainstem or other intracranial abnormality. No mass, haemorrhage, restricted diffusion or abnormal enhancement.",
+      "recommended_actions": [],
+      "volumetrics": null
     },
     "specialized_test": {
       "findings": [
@@ -730,7 +769,7 @@
           "nerve": "Bilateral peroneal motor"
         },
         {
-          "finding": "DML 4.6 ms; CV 50 m/s; CMAP 6.1 mV \u2014 all within normal limits",
+          "finding": "DML 4.6 ms; CV 50 m/s; CMAP 6.1 mV (all within normal limits)",
           "nerve": "Bilateral tibial motor"
         },
         {
@@ -748,14 +787,22 @@
         {
           "finding": "Absent bilateral upper extremity; present bilateral lower extremity",
           "nerve": "H-reflex"
+        },
+        {
+          "finding": "3 Hz stimulation, right ulnar (abductor digiti minimi) and right spinal accessory (trapezius): no decrement",
+          "nerve": "Repetitive nerve stimulation"
+        },
+        {
+          "finding": "Deltoid, biceps and cervical paraspinal muscles bilaterally: reduced recruitment of normal-morphology motor units, no fibrillation potentials. Tibialis anterior and vastus lateralis: normal",
+          "nerve": "Needle EMG"
         }
       ],
-      "impression": "This is an ABNORMAL nerve conduction study. 1. Prolonged distal motor latencies and mildly reduced conduction velocities in bilateral median and ulnar motor nerves, with reduced CMAP amplitudes; lower extremity motor NCS (peroneal, tibial) within normal limits. 2. Mildly reduced median sensory SNAP amplitudes; sural SNAPs normal. 3. Absent F-waves bilaterally in upper extremity nerves (median, ulnar); lower extremity F-waves normal. 4. H-reflex absent in upper extremities; present in lower extremities. Predominantly upper extremity demyelinating pattern with relative lower extremity sparing",
+      "impression": "This is an ABNORMAL study. 1. Prolonged distal motor latencies and mildly reduced conduction velocities in bilateral median and ulnar motor nerves, with reduced median CMAP amplitudes; lower extremity motor studies (peroneal, tibial) within normal limits. 2. Mildly reduced median sensory amplitudes; sural responses normal. 3. Absent F-waves in median and ulnar nerves; lower extremity F-waves normal. 4. H-reflex absent in the upper extremities, present in the lower extremities. 5. No decrement on repetitive nerve stimulation. 6. Reduced recruitment without denervation in cervical and upper limb muscles. Demyelinating pattern predominantly affecting the upper limbs.",
       "quantitative_data": {
-        "pattern": "Predominantly upper extremity and axial/bulbar demyelinating pattern with relative lower extremity sparing"
+        "pattern": "Demyelinating, upper limb predominant, lower limbs spared"
       },
       "recommended_actions": [],
-      "test_type": "Nerve Conduction Studies and EMG"
+      "test_type": "emg_ncs"
     }
   },
   "metadata": {
@@ -763,8 +810,8 @@
     "citation_gap": [],
     "condition_full_name": "Guillain-Barr\u00e9 syndrome (AIDP)",
     "criteria_pack_version": "1.0",
-    "difficulty_description": "Atypical PCB variant with descending pattern and leg sparing \u2014 requires recognizing GBS without classic ascending paralysis",
-    "difficulty_rationale": "6 required tools, 1 red herring(s); classic or near-classic GBS workup with one or more plausible mimics that need active exclusion.",
+    "difficulty_description": "Atypical PCB variant with descending pattern and leg sparing: requires recognizing GBS without classic ascending paralysis",
+    "difficulty_rationale": "5 required actions (NCS/EMG, CSF, baseline labs, respiratory function, telemetry), 2 recommended mimic exclusions (AChR/MuSK antibodies, brain MRI), 1 red herring (leg sparing).",
     "expected_agent_confidence": 0.58,
     "fallback_tool_kinds": {
       "ct": "normal",
@@ -786,7 +833,7 @@
     "vocab_gap": []
   },
   "patient": {
-    "chief_complaint": "Five-day progressive dysphagia and arm weakness with nasal speech, no preceding infection recalled, gait preserved.",
+    "chief_complaint": "Five-day progressive dysphagia and arm weakness with nasal speech; gait preserved.",
     "clinical_history": {
       "allergies": [
         "No known drug allergies"
@@ -813,18 +860,21 @@
       "handedness": "right",
       "sex": "male"
     },
-    "history_present_illness": "Mr. D. is a 32-year-old graphic designer presenting with a 5-day history of progressive oropharyngeal and upper extremity weakness. He initially noticed mild difficulty swallowing solid food approximately 5 days ago, which has progressed to coughing on thin liquids. Two days ago, he developed bilateral arm weakness making it difficult to lift objects overhead or type at his workstation. He recalls a low-grade fever with mild malaise approximately 10 days prior that he attributed to fatigue and resolved spontaneously without medical attention. He denies any bloody diarrhea or respiratory illness. He has no diplopia, no ptosis, and no lower extremity weakness \u2014 notably, he was able to walk into the emergency department unassisted and his gait appears normal. His speech has a nasal quality and he cannot clear his throat effectively. He has no sensory deficits. His partner noted that he had been having trouble buttoning his shirt for the past 3 days. He denies any prior neurological symptoms, and there is no family history of neuromuscular disease. There is no honey exposure, no wound, no tick exposure, and no canned food ingestion that would suggest botulism. The descending pattern with predominant bulbar and arm involvement \u2014 with preserved leg strength and absent upper extremity reflexes \u2014 is an atypical distribution.",
+    "history_present_illness": "Mr. D. is a 32-year-old graphic designer presenting with a 5-day history of progressive oropharyngeal and upper extremity weakness. He initially noticed mild difficulty swallowing solid food approximately 5 days ago, which has progressed to coughing on thin liquids. Two days ago, he developed bilateral arm weakness making it difficult to lift objects overhead or type at his workstation, and he has difficulty holding his head up. He recalls a low-grade fever with mild malaise approximately 10 days prior that he attributed to fatigue and resolved spontaneously without medical attention. He denies any bloody diarrhea or respiratory illness. He has no diplopia, no ptosis, and no leg weakness; he walked into the emergency department unassisted. His speech has a nasal quality and he cannot clear his throat effectively. He has no sensory symptoms. His partner noted that he had been having trouble buttoning his shirt for the past 3 days. He denies any prior neurological symptoms, and there is no family history of neuromuscular disease. He reports no wound, tick bite, home-canned food or honey ingestion.",
     "neurological_exam": {
-      "additional": "FVC: 2.8 L (predicted 4.2 L \u2014 67%). NIF: -34 cmH2O. Low-grade fever 37.7\u00b0C on admission two days ago, now resolved. Bulbar involvement predominant with relative leg sparing \u2014 atypical distribution.",
+      "additional": null,
       "coordination": "Finger-nose intact. Heel-shin intact. No cerebellar signs.",
-      "cranial_nerves": "Dysarthria \u2014 nasal quality speech. Dysphagia to solids and liquids; coughing on thin liquids. Bilateral palatal weakness. No facial weakness. No ophthalmoplegia.",
+      "cranial_nerves": "Nasal dysarthria. Dysphagia to solids and liquids; coughing on thin liquids. Bilateral palatal weakness; weak cough. No facial weakness. Pupils equal and reactive. No ptosis. Eye movements full, no ophthalmoplegia.",
       "gait": "Normal gait. No ataxia.",
       "mental_status": "Alert, oriented, anxious.",
-      "motor": "Bilateral upper extremity weakness: shoulder abduction 3/5, elbow flexion 3+/5, grip 4/5. Lower extremity strength 4+/5 bilaterally. Able to walk.",
+      "motor": "Neck flexion 3+/5, neck extension 4/5. Bilateral upper extremity weakness: shoulder abduction 3/5, elbow flexion 3+/5, grip 4/5. Lower extremity strength 5/5 bilaterally. Able to walk.",
       "reflexes": "Absent bilateral biceps and brachioradialis. Trace patellar and Achilles bilaterally.",
       "sensory": "Sensation intact to light touch, pinprick, vibration in all extremities."
     },
     "patient_id": "NB-GBS-RM12",
+    "physical_exam": {
+      "general": "Weight 75 kg, height 180 cm."
+    },
     "vitals": {
       "bp_diastolic": 82,
       "bp_systolic": 132,

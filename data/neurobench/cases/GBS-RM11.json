@@ -21,7 +21,7 @@
         "contraindications": [],
         "formulary_status": "on formulary",
         "interactions": [],
-        "proposed": "(agent not specified on this case's pathway)",
+        "proposed": "Medication list review",
         "warnings": [
           "Non-specific interaction check; verify against a current formulary or interaction reference before prescribing."
         ]
@@ -89,7 +89,7 @@
         },
         "glucose": "62 mg/dL",
         "glucose_ratio": "0.69",
-        "interpretation": "Opening pressure: 142 mmH2O (normal). Nucleated cell count: 4 cells/mm3. Protein: 58 mg/dL (elevated). Glucose: 62 mg/dL (CSF:serum ratio 0.69). Gram stain: No organisms. Elevated protein with near-normal cell count \u2014 a pattern of albuminocytologic dissociation",
+        "interpretation": "Opening pressure 142 mmH2O (normal). Nucleated cells 4/mm3. Protein 58 mg/dL (elevated). Glucose 62 mg/dL (CSF:serum ratio 0.69). Gram stain: no organisms. Elevated protein with a normal cell count (albuminocytological dissociation). Clinical correlation recommended.",
         "opening_pressure": "142 mmH2O",
         "protein": "58 mg/dL (elevated)",
         "special_tests": {
@@ -101,52 +101,35 @@
     },
     {
       "output": {
-        "abnormal_values_summary": [
-          "Anti-GM1 IgG positive (1: 80) (H)"
-        ],
-        "interpretation": "Abnormal values: Anti-GM1 IgG Positive (titer 1:80) (H).",
-        "panels": {
-          "Ganglioside_Antibodies": [
-            {
-              "is_abnormal": true,
-              "reference_range": "negative",
-              "test": "Anti-GM1 IgG",
-              "unit": "",
-              "value": "Positive (titer 1:80)"
-            },
-            {
-              "is_abnormal": false,
-              "reference_range": "negative",
-              "test": "Anti-GQ1b IgG",
-              "unit": "",
-              "value": "Negative"
-            }
-          ]
-        }
-      },
-      "tool_name": "interpret_labs",
-      "trigger_action": "request_anti_ganglioside_panel"
-    },
-    {
-      "output": {
         "findings": [
           {
-            "panel": "Respiratory",
-            "reference_range": "65% predicted",
-            "result": "2.2 L",
+            "flag": "L",
+            "reference_range": ">=80% predicted",
+            "result": "2.2 L (65% predicted; 33 mL/kg at 67 kg)",
             "test": "FVC"
           },
           {
-            "panel": "Respiratory",
-            "reference_range": "Above threshold",
+            "flag": "L",
+            "reference_range": "-60 cmH2O or more negative",
             "result": "-36 cmH2O",
-            "test": "NIF"
+            "test": "MIP"
+          },
+          {
+            "flag": "L",
+            "reference_range": ">=80 cmH2O",
+            "result": "52 cmH2O",
+            "test": "MEP"
           }
         ],
-        "impression": "All values within normal limits.",
+        "impression": "Bedside respiratory function on admission: FVC 2.2 L (65% predicted; 33 mL/kg at 67 kg) L. MIP -36 cmH2O L. MEP 52 cmH2O L. Cough effective.",
         "quantitative_data": {
           "FVC": "2.2 L",
-          "NIF": "-36 cmH2O"
+          "FVC_mL_per_kg": "33 mL/kg",
+          "FVC_percent_predicted": "65%",
+          "MEP": "52 cmH2O",
+          "MIP": "-36 cmH2O",
+          "cough": "effective",
+          "weight": "67 kg"
         },
         "recommended_actions": [],
         "test_type": "respiratory_function"
@@ -156,80 +139,32 @@
     },
     {
       "output": {
-        "duration_hours": 72,
+        "duration_hours": 24,
         "events": [
           {
-            "event": "Sinus bradycardia 52 bpm \u2014 self-limited",
-            "time": "Night 1"
+            "event": "Sinus bradycardia to 52 bpm during sleep, self-limited, no pause",
+            "time": "Night 1, 02:40"
           }
         ],
         "findings": [
-          "Mild autonomic lability"
+          "Sinus tachycardia 98-118 bpm while awake",
+          "Non-invasive blood pressure 122/76 to 156/94 mmHg"
         ],
         "heart_rate_range": {
           "max": 118,
           "min": 52
         },
-        "impression": "72-hour continuous telemetry. Predominantly sinus tachycardia. Nocturnal sinus bradycardia (minimum 52 bpm, self-limited). No sustained arrhythmia recorded",
+        "impression": "24-hour continuous telemetry. Sinus tachycardia while awake (maximum 118 bpm) and a self-limited sinus bradycardia during sleep (minimum 52 bpm). No pauses and no sustained arrhythmia. Blood pressure 122/76 to 156/94 mmHg.",
         "monitor_type": "Continuous telemetry",
         "recommended_actions": [],
-        "rhythm_summary": "Predominantly sinus tachycardia. Mild nocturnal bradycardia."
+        "rhythm_summary": "Sinus rhythm: sinus tachycardia while awake, self-limited sinus bradycardia during sleep."
       },
       "tool_name": "order_cardiac_monitoring",
       "trigger_action": "request_cardiac_monitoring"
-    },
-    {
-      "output": {
-        "query": "general",
-        "results": [],
-        "summary": ""
-      },
-      "tool_name": "search_medical_literature",
-      "trigger_action": "search_gbs_treatment"
-    },
-    {
-      "output": {
-        "alternatives": [],
-        "contraindications": [],
-        "formulary_status": "on formulary",
-        "interactions": [],
-        "proposed": "(agent not specified on this case's pathway)",
-        "summary": "",
-        "warnings": [
-          "Non-specific interaction check; verify against a current formulary or interaction reference before prescribing."
-        ]
-      },
-      "tool_name": "check_drug_interactions",
-      "trigger_action": "check_ivig_drug_interactions"
     }
   ],
   "ground_truth": {
     "action_criteria": [
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "panels": [
-                "CBC",
-                "CMP",
-                "HIV",
-                "inflammatory_markers",
-                "anti-GM1 IgM"
-              ]
-            },
-            "tool_name": "interpret_labs"
-          }
-        ],
-        "citations": [
-          "[Yuki_2012]",
-          "GBS criteria pack \u00a72"
-        ],
-        "criterion_id": "action-1-interpret-labs",
-        "expected_evidence": "Mild leukocytosis / elevated inflammatory markers reflecting antecedent infection; ganglioside antibodies for variant typing; trigger identification (Campylobacter, CMV, EBV, Mycoplasma, HIV)",
-        "importance": "required",
-        "label": "Obtain CBC, CMP, HIV, anti-GM1/anti-GQ1b ganglioside antibodies, and stool culture / Campylobacter serology if recent diarrhea",
-        "rationale": "Obtain CBC, CMP, HIV, anti-GM1/anti-GQ1b ganglioside antibodies, and stool culture / Campylobacter serology if recent diarrhea"
-      },
       {
         "alternatives": [
           {
@@ -240,14 +175,13 @@
           }
         ],
         "citations": [
-          "[Hadden_1998]",
-          "GBS criteria pack \u00a72"
+          "[EAN_PNS_2023]"
         ],
         "criterion_id": "action-2-order-specialized-test",
-        "expected_evidence": "Demyelinating pattern (prolonged DML, conduction block, reduced CV, absent F-waves) consistent with AIDP, or reduced CMAP amplitudes in axonal variants (AMAN/AMSAN)",
+        "expected_evidence": "Polyradiculoneuropathy pattern (demyelinating or axonal features, absent F-waves, sural sparing where present); may be normal in the first week",
         "importance": "required",
-        "label": "Order nerve conduction studies and needle EMG (EMG/NCS)",
-        "rationale": "Order nerve conduction studies and needle EMG (EMG/NCS)"
+        "label": "Nerve conduction studies and needle EMG",
+        "rationale": "Nerve conduction studies support the diagnosis and show the demyelinating or axonal pattern; a normal study in the first week does not exclude GBS [EAN_PNS_2023]."
       },
       {
         "alternatives": [
@@ -257,14 +191,35 @@
           }
         ],
         "citations": [
-          "[Asbury_1990]",
-          "GBS criteria pack \u00a72"
+          "[EAN_PNS_2023]"
         ],
         "criterion_id": "action-3-analyze-csf",
-        "expected_evidence": "Albuminocytologic dissociation \u2014 elevated protein with cell count <10/\u03bcL; may be normal in the first week of illness",
+        "expected_evidence": "Albuminocytological dissociation: raised protein with cells <5/mm3 (5-50/mm3 compatible but prompts an alternative; >50/mm3 suggests another diagnosis); protein may be normal in the first week",
         "importance": "required",
-        "label": "Perform lumbar puncture for CSF analysis",
-        "rationale": "Perform lumbar puncture for CSF analysis"
+        "label": "Lumbar puncture for CSF cell count, protein and glucose",
+        "rationale": "CSF supports the diagnosis and excludes the infectious and malignant causes of polyradiculopathy that raise the cell count [EAN_PNS_2023]."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "panels": [
+                "CBC",
+                "CMP",
+                "CK"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          }
+        ],
+        "citations": [
+          "[EAN_PNS_2023]"
+        ],
+        "criterion_id": "action-1-interpret-labs",
+        "expected_evidence": "Baseline values before treatment; abnormal liver tests or low albumin mark a higher risk of a severe course; no metabolic or toxic alternative",
+        "importance": "required",
+        "label": "Baseline blood tests: full blood count, renal function and electrolytes, liver tests, albumin, glucose and CK",
+        "rationale": "Routine blood tests exclude metabolic mimics (potassium, glucose, CK) and give the baseline before IVIg; liver tests and albumin carry prognostic weight [EAN_PNS_2023]."
       },
       {
         "alternatives": [
@@ -276,65 +231,15 @@
           }
         ],
         "citations": [
-          "[Sharshar_2003]",
-          "GBS criteria pack \u00a72"
+          "[Lawn_2001]",
+          "[EAN_PNS_2023]",
+          "[Leonhard_2019]"
         ],
         "criterion_id": "action-4-order-specialized-test",
-        "expected_evidence": "Baseline and serial FVC, MIP/MEP, NIF; deterioration to FVC <20 mL/kg, MIP worse than -30 cmH2O, or VC <40% predicted triggers ICU transfer / intubation",
+        "expected_evidence": "FVC in L, % predicted and mL/kg, MIP and MEP, with the trend; ICU-level monitoring if FVC <20 mL/kg or <60% predicted, MIP weaker than -30 cmH2O, MEP <40 cmH2O, a fall of more than 30%, or bulbar weakness with weak cough",
         "importance": "required",
-        "label": "Order bedside respiratory function testing (FVC, MIP/MEP, NIF) and repeat every 4\u20136 hours",
-        "rationale": "Order bedside respiratory function testing (FVC, MIP/MEP, NIF) and repeat every 4\u20136 hours"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[van_den_Berg_2014]",
-          "GBS criteria pack \u00a72"
-        ],
-        "criterion_id": "action-5-search-medical-literature",
-        "expected_evidence": "IVIG (0.4 g/kg/day x 5 days) and plasma exchange are equivalently effective first-line therapies; combination not superior",
-        "importance": "required",
-        "label": "Search the medical literature for IVIG vs plasma exchange evidence to guide disease-modifying therapy",
-        "rationale": "Search the medical literature for IVIG vs plasma exchange evidence to guide disease-modifying therapy"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "check_drug_interactions"
-          }
-        ],
-        "citations": [
-          "[van_den_Berg_2014]",
-          "GBS criteria pack \u00a72"
-        ],
-        "criterion_id": "action-6-check-drug-interactions",
-        "expected_evidence": "Confirmation that IVIG can be given safely (no severe renal impairment, no IgA deficiency) or that plasma exchange is appropriate (adequate vascular access, stable coagulation)",
-        "importance": "required",
-        "label": "Check drug interactions / contraindications for IVIG (renal function, IgA deficiency screen) and/or plasma exchange (coagulation, calcium, hemodynamics)",
-        "rationale": "Check drug interactions / contraindications for IVIG (renal function, IgA deficiency screen) and/or plasma exchange (coagulation, calcium, hemodynamics)"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "analyze_ecg"
-          }
-        ],
-        "citations": [
-          "[Asbury_1990]",
-          "GBS criteria pack \u00a72"
-        ],
-        "criterion_id": "action-7-analyze-ecg",
-        "expected_evidence": "Sinus tachycardia or bradycardia; conduction or repolarisation abnormalities reflecting autonomic involvement",
-        "importance": "recommended",
-        "label": "Obtain a 12-lead ECG to screen for autonomic dysrhythmias and baseline QTc",
-        "rationale": "Obtain a 12-lead ECG to screen for autonomic dysrhythmias and baseline QTc"
+        "label": "Bedside respiratory function (FVC, MIP, MEP), repeated serially while weakness progresses",
+        "rationale": "She is still progressing with facial and bulbar involvement; serial FVC, MIP and MEP decide when ICU-level monitoring is needed [Lawn_2001, EAN_PNS_2023]."
       },
       {
         "alternatives": [
@@ -346,26 +251,73 @@
           }
         ],
         "citations": [
-          "[Asbury_1990]",
-          "GBS criteria pack \u00a72"
+          "[EAN_PNS_2023]"
         ],
         "criterion_id": "action-8-order-cardiac-monitoring",
-        "expected_evidence": "Predominantly sinus tachycardia. Mild nocturnal bradycardia \u2014 the recording is read for the bradyarrhythmias, pauses beyond 3 seconds and blood-pressure lability that trigger ICU escalation",
+        "expected_evidence": "Continuous telemetry with blood pressure monitoring: sinus tachycardia while awake, a self-limited sinus bradycardia to 52 bpm during sleep and blood pressure 122/76 to 156/94 mmHg in the first 24 hours; autonomic instability (rate and blood pressure lability, bradyarrhythmia) requires continued monitoring while weakness progresses",
         "importance": "required",
-        "label": "Start continuous inpatient cardiac telemetry for the period of maximal weakness and keep it running alongside serial respiratory function. Autonomic instability affects about two thirds of patients and is a leading cause of in-hospital death: bradyarrhythmias, pauses beyond 3 seconds and blood-pressure lability are what trigger ICU escalation",
-        "rationale": "Start continuous inpatient cardiac telemetry for the period of maximal weakness and keep it running alongside serial respiratory function. Autonomic instability affects about two thirds of patients and is a leading cause of in-hospital death: bradyarrhythmias, pauses beyond 3 seconds and blood-pressure lability are what trigger ICU escalation"
+        "label": "Continuous inpatient cardiac telemetry with blood pressure monitoring while weakness progresses",
+        "rationale": "Autonomic dysfunction is common in GBS and can cause bradyarrhythmias, pauses and blood-pressure lability; monitoring continues while weakness progresses [EAN_PNS_2023]."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_ecg"
+          }
+        ],
+        "citations": [
+          "[EAN_PNS_2023]"
+        ],
+        "criterion_id": "action-7-analyze-ecg",
+        "expected_evidence": "Sinus tachycardia 102 bpm with normal intervals (QTc 448 ms) and no conduction or ST-T abnormality: a baseline while autonomic involvement can still develop",
+        "importance": "recommended",
+        "label": "Obtain a 12-lead ECG to screen for autonomic dysrhythmias and baseline QTc",
+        "rationale": "A baseline 12-lead ECG screens for autonomic dysrhythmia and conduction abnormality and gives the QTc before treatment [EAN_PNS_2023]."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "check_drug_interactions"
+          }
+        ],
+        "citations": [
+          "[EAN_PNS_2023]"
+        ],
+        "criterion_id": "action-6-check-drug-interactions",
+        "expected_evidence": "No current medications, so no interaction with IVIg or plasma exchange",
+        "importance": "optional",
+        "label": "Optional interaction check before IVIg or plasma exchange (no current medications)",
+        "rationale": "She takes no medicines, so the check cannot change management (ROUND_POLICY ruling 6)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "search_medical_literature"
+          }
+        ],
+        "citations": [
+          "[EAN_PNS_2023]"
+        ],
+        "criterion_id": "action-5-search-medical-literature",
+        "expected_evidence": "General evidence on immunotherapy in GBS; not needed for the diagnosis or the treatment decision",
+        "importance": "optional",
+        "label": "Optional literature search on IVIg versus plasma exchange in GBS",
+        "rationale": "Background evidence only; not a clinical step of the work-up."
       }
     ],
     "assessment": {
       "prohibited_recommendations": [
-        "Do not give corticosteroids as monotherapy.",
-        "Do not start IVIG without renal function and IgA screen."
+        "Do not treat with corticosteroids: oral corticosteroids are strongly advised against and IV methylprednisolone is not recommended [EAN_PNS_2023].",
+        "Do not start IVIg without checking renal function."
       ],
       "required_recommendations": [
-        "Admit to a monitored unit for serial respiratory checks.",
-        "Initiate IVIG 0.4 g/kg/day for 5 days or plasma exchange.",
-        "Continuous cardiac telemetry.",
-        "DVT prophylaxis."
+        "Admit to a monitored bed with serial FVC, MIP and MEP every 4-6 hours and bedside swallow and cough assessment (she has dysarthria); move to ICU-level monitoring if FVC falls below 60% predicted or 20 mL/kg (about 1.3 L at 67 kg), MIP becomes weaker than -30 cmH2O, MEP falls below 40 cmH2O, FVC falls by more than 30%, or bulbar weakness with weak cough or pooled secretions develops [EAN_PNS_2023, Lawn_2001].",
+        "Start IVIg 0.4 g/kg/day for 5 days (2 g/kg total, about 27 g/day at 67 kg) now, within 2 weeks of onset, because she cannot walk unaided (GBS disability score 3); plasma exchange (200-250 mL/kg over 5 sessions) is an equivalent alternative [EAN_PNS_2023].",
+        "Continuous cardiac telemetry with blood pressure monitoring while weakness progresses.",
+        "Pharmacological DVT prophylaxis (subcutaneous low-molecular-weight heparin) while she cannot walk unaided [Leonhard_2019]."
       ]
     },
     "avoided_actions": [
@@ -377,7 +329,7 @@
           }
         ],
         "citations": [
-          "[van_den_Berg_2014]"
+          "[EAN_PNS_2023]"
         ],
         "criterion_id": "avoid-waste-1-analyze-eeg",
         "rationale": "GBS is a peripheral nerve / nerve-root disorder; EEG has no role in diagnosis unless atypical CNS features (encephalopathy, seizures) are present.",
@@ -391,7 +343,7 @@
           }
         ],
         "citations": [
-          "[van_den_Berg_2014]"
+          "[EAN_PNS_2023]"
         ],
         "criterion_id": "avoid-waste-2-order-echocardiogram",
         "rationale": "Echocardiography is not indicated in typical GBS; reserve for pre-existing cardiac disease or unexplained hemodynamic instability after autonomic causes are excluded.",
@@ -405,7 +357,7 @@
           }
         ],
         "citations": [
-          "[van_den_Berg_2014]"
+          "[EAN_PNS_2023]"
         ],
         "criterion_id": "avoid-waste-3-order-ct-scan",
         "rationale": "Head CT contributes no diagnostic information in GBS; the disease is peripheral and CT does not visualise nerve roots reliably.",
@@ -419,16 +371,16 @@
           }
         ],
         "citations": [
-          "[van_den_Berg_2014]"
+          "[EAN_PNS_2023]"
         ],
         "criterion_id": "avoid-waste-4-analyze-brain-mri",
-        "rationale": "Brain MRI is reserved for atypical features (encephalopathy, CNS signs, transverse myelitis on differential). In classic GBS it does not aid diagnosis.",
+        "rationale": "Brain MRI is reserved for atypical features (encephalopathy, long-tract signs, a brainstem syndrome). A lower motor neuron facial palsy with an areflexic polyradiculoneuropathy does not call for it.",
         "severity": "waste"
       }
     ],
     "diagnosis": {
       "accepted": [
-        "Guillain-Barr\u00e9 syndrome, moderate AIDP (post-Campylobacter)",
+        "Guillain-Barr\u00e9 syndrome (acute inflammatory demyelinating polyradiculoneuropathy) after a diarrheal illness",
         "guillain barre syndrome",
         "guillain-barre syndrome",
         "guillain-barr\u00e9 syndrome",
@@ -448,70 +400,58 @@
       {
         "diagnosis": "Acute-onset CIDP",
         "icd_code": "G61.81",
-        "key_features": "Cannot distinguish at <8 weeks; reassess longitudinally.",
-        "likelihood": "moderate"
+        "key_features": "Cannot be excluded at presentation; progression beyond 8 weeks or 3 or more treatment-related fluctuations would point to it. Reassess at 8 weeks.",
+        "likelihood": "low"
       },
       {
         "diagnosis": "Lyme polyradiculitis",
         "icd_code": "A69.22",
-        "key_features": "Possible mimic in endemic areas; serology supports Campylobacter rather than Lyme.",
+        "key_features": "Facial palsy with radicular symptoms occurs in neuroborreliosis, but the CSF has 4 cells/mm3 (neuroborreliosis gives a lymphocytic pleocytosis), and no tick bite or erythema migrans is reported.",
         "likelihood": "low"
       },
       {
         "diagnosis": "Spinal cord compression",
         "icd_code": "G95.20",
-        "key_features": "No UMN signs, no sensory level, no sphincter dysfunction; MRI excludes if needed.",
-        "likelihood": "low"
+        "key_features": "Areflexia, no sensory level, no sphincter dysfunction and facial involvement are not explained by a cord lesion.",
+        "likelihood": "very_low"
       },
       {
         "diagnosis": "Critical illness polyneuropathy",
         "icd_code": "G62.81",
-        "key_features": "Community-onset, no ICU stay; pattern fits inflammatory not ICU-acquired.",
+        "key_features": "No ICU course before onset.",
         "likelihood": "very_low"
       },
       {
         "diagnosis": "Vasculitic neuropathy",
         "icd_code": "M31.7",
-        "key_features": "Symmetric not asymmetric / multifocal; no systemic vasculitis features.",
+        "key_features": "Symmetric rather than multifocal deficits, demyelinating NCS, no systemic vasculitic features.",
         "likelihood": "very_low"
       }
     ],
     "key_clinical_evidence": [
-      "Brighton level 1 case: progressive bilateral weakness + areflexia + albuminocytologic dissociation + demyelinating EMG.",
-      "Antecedent Campylobacter is the commonest trigger (~30%) and worsens prognosis only marginally if not associated with axonal features.",
-      "Standard workup hygiene includes ganglioside antibodies and Campylobacter serology even if the clinical picture is unambiguous."
+      "Bilateral limb weakness with areflexia, CSF albuminocytological dissociation (protein 58 mg/dL, 4 cells/mm3) and a demyelinating NCS: Brighton level 1 once the course plateaus within 4 weeks [Brighton_2011].",
+      "The diarrheal illness 2 weeks before onset is a history finding and counts in the mEGOS prognostic score; serology is not needed for the diagnosis, and a positive IgM does not prove the trigger [Walgaard_2011].",
+      "Anti-ganglioside antibodies are not needed to diagnose typical GBS; anti-GQ1b is tested when Miller Fisher syndrome or an overlap is suspected [EAN_PNS_2023].",
+      "She cannot walk unaided (GBS disability score 3) at day 8, so IVIg or plasma exchange is indicated now [EAN_PNS_2023]."
     ],
-    "red_herrings": [],
-    "review_status": "draft",
-    "sequence_constraints": [
+    "red_herrings": [
       {
-        "after_criterion_id": "action-6-check-drug-interactions",
-        "before_criterion_id": "action-2-order-specialized-test",
-        "citations": [
-          "[Sharshar_2003]"
-        ],
-        "reason": "Document respiratory status (FVC/NIF) before committing to IVIG vs plasma exchange \u2014 severe respiratory compromise mandates ICU triage and may influence treatment choice and timing.",
-        "severity": "soft"
-      },
-      {
-        "after_criterion_id": "action-6-check-drug-interactions",
-        "before_criterion_id": "action-1-interpret-labs",
-        "citations": [
-          "[van_den_Berg_2014]"
-        ],
-        "reason": "Renal function, IgA screen, and CBC must be reviewed before IVIG to mitigate renal failure, anaphylaxis (IgA-deficient patients), and aseptic meningitis risk.",
-        "severity": "soft"
+        "correct_interpretation": "Facial involvement in GBS can be unilateral or asymmetric. The palsy is lower motor neuron with no long-tract signs, and the bilateral limb weakness, areflexia, CSF albuminocytological dissociation with 4 cells/mm3 and demyelinating NCS place it within the polyradiculoneuropathy.",
+        "data_point": "Unilateral left lower motor neuron facial palsy",
+        "field_path": "patient.neurological_exam.cranial_nerves",
+        "intended_effect": "Suggests Bell's palsy, a brainstem lesion or Lyme disease, and marked asymmetry counts against GBS",
+        "location": "Neurological examination, cranial nerves"
       }
     ],
+    "review_status": "draft",
+    "sequence_constraints": [],
     "stop_rule": {
-      "max_additional_actions": 0,
+      "max_additional_actions": 3,
       "required_before_assessment": [
-        "action-1-interpret-labs",
         "action-2-order-specialized-test",
         "action-3-analyze-csf",
+        "action-1-interpret-labs",
         "action-4-order-specialized-test",
-        "action-5-search-medical-literature",
-        "action-6-check-drug-interactions",
         "action-8-order-cardiac-monitoring"
       ]
     }
@@ -527,7 +467,7 @@
         "proposed": "",
         "summary": "No current medications are recorded for this patient, so there is nothing to review for interactions.",
         "warnings": [
-          "Interaction review performed against the current medication list above. Clinical relevance \u2014 which agents to taper, and in what order \u2014 is a prescribing decision, not an output of this check."
+          "Interaction review performed against the recorded medication list (none)."
         ]
       }
     },
@@ -535,10 +475,9 @@
       "axis": "Normal",
       "clinical_correlation": "",
       "findings": [
-        "Sinus tachycardia",
-        "Borderline QTc"
+        "Sinus tachycardia"
       ],
-      "interpretation": "Sinus tachycardia, rate 102. Borderline QTc prolongation (448 ms). No acute ST-T wave changes.",
+      "interpretation": "Sinus tachycardia, rate 102. Normal intervals (QTc 448 ms). No acute ST-T wave changes.",
       "intervals": {
         "PR": "166 ms",
         "QRS": "88 ms",
@@ -549,29 +488,13 @@
     },
     "labs": {
       "abnormal_values_summary": [
-        "Campylobacter IgM positive",
-        "CRP 14.2"
+        "CRP 14.2 mg/L (H)"
       ],
-      "interpretation": "Abnormal values: CRP 14.2 mg/L (H), Campylobacter jejuni IgM Positive (H).",
+      "interpretation": "CRP 14.2 mg/L (elevated). Remaining values within reference ranges.",
       "panels": {
-        "BMP": [
-          {
-            "is_abnormal": false,
-            "reference_range": "136-145",
-            "test": "Sodium",
-            "unit": "mEq/L",
-            "value": 137
-          },
-          {
-            "is_abnormal": false,
-            "reference_range": "0.5-1.1",
-            "test": "Creatinine",
-            "unit": "mg/dL",
-            "value": 0.8
-          }
-        ],
         "CBC": [
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "4.5-11.0",
             "test": "WBC",
@@ -579,54 +502,150 @@
             "value": 10.8
           },
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "12.0-16.0",
             "test": "Hemoglobin",
             "unit": "g/dL",
             "value": 13.6
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "150-400",
+            "test": "Platelets",
+            "unit": "x10^9/L",
+            "value": 248
           }
         ],
-        "Exclusion studies": [
+        "CK": [
           {
-            "clinical_significance": "Ordered to exclude an alternative cause; the result does not support one, which is what this case's diagnosis rests on",
+            "clinical_significance": null,
             "is_abnormal": false,
-            "reference_range": "",
-            "test": "HIV",
-            "unit": "",
-            "value": "Non-reactive"
+            "reference_range": "26-192",
+            "test": "Creatine kinase",
+            "unit": "U/L",
+            "value": 118
+          }
+        ],
+        "CMP": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "136-145",
+            "test": "Sodium",
+            "unit": "mEq/L",
+            "value": 137
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "3.5-5.1",
+            "test": "Potassium",
+            "unit": "mEq/L",
+            "value": 4.1
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.5-1.1",
+            "test": "Creatinine",
+            "unit": "mg/dL",
+            "value": 0.8
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "7-20",
+            "test": "BUN",
+            "unit": "mg/dL",
+            "value": 14
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "70-99",
+            "test": "Glucose",
+            "unit": "mg/dL",
+            "value": 98
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "8.6-10.2",
+            "test": "Calcium",
+            "unit": "mg/dL",
+            "value": 9.3
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "7-35",
+            "test": "ALT",
+            "unit": "U/L",
+            "value": 24
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "10-35",
+            "test": "AST",
+            "unit": "U/L",
+            "value": 22
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "35-104",
+            "test": "Alkaline phosphatase",
+            "unit": "U/L",
+            "value": 71
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.2-1.2",
+            "test": "Total bilirubin",
+            "unit": "mg/dL",
+            "value": 0.6
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "3.5-5.0",
+            "test": "Albumin",
+            "unit": "g/dL",
+            "value": 4.1
           }
         ],
         "Inflammatory": [
           {
+            "clinical_significance": null,
             "is_abnormal": true,
             "reference_range": "<5.0",
             "test": "CRP",
             "unit": "mg/L",
             "value": 14.2
           }
-        ],
-        "Serology": [
-          {
-            "is_abnormal": true,
-            "reference_range": "negative",
-            "test": "Campylobacter jejuni IgM",
-            "unit": "",
-            "value": "Positive"
-          }
         ]
       }
     },
     "literature_search": {
       "general": {
-        "query": "the medical literature for IVIG vs plasma exchange evidence to guide disease-modifying therapy",
+        "query": "first-line immunotherapy in Guillain-Barre syndrome",
         "results": [
           {
-            "evidence_level": "guideline recommendation",
-            "finding": "IVIG (0.4 g/kg/day x 5 days) and plasma exchange are equivalently effective first-line therapies; combination not superior",
-            "source": "van_den_Berg_2014"
+            "evidence_level": "guideline",
+            "finding": "Guidelines for adults with GBS who cannot walk unaided advise IVIg 2 g/kg over 5 days within 2 weeks of onset or plasma exchange within 4 weeks, with no preference between them; corticosteroids are not advised.",
+            "source": "[EAN_PNS_2023]"
+          },
+          {
+            "evidence_level": "randomised controlled trial",
+            "finding": "A second IVIg course in patients with a poor predicted prognosis did not improve outcome and caused more serious adverse events.",
+            "source": "[Walgaard_2021]"
           }
         ],
-        "summary": "IVIG (0.4 g/kg/day x 5 days) and plasma exchange are equivalently effective first-line therapies; combination not superior"
+        "summary": "IVIg or plasma exchange is advised for adults with GBS unable to walk unaided; neither is preferred, and a second IVIg course is not advised [EAN_PNS_2023, Walgaard_2021]."
       }
     },
     "specialized_test": {
@@ -654,15 +673,19 @@
         {
           "finding": "Absent bilaterally",
           "nerve": "H-reflex"
+        },
+        {
+          "finding": "Tibialis anterior, vastus lateralis and first dorsal interosseous bilaterally: reduced recruitment of normal-morphology motor units; no fibrillation potentials or positive sharp waves",
+          "nerve": "Needle EMG"
         }
       ],
-      "impression": "This is an ABNORMAL nerve conduction study. 1. Prolonged distal motor latencies and reduced conduction velocities in bilateral median and peroneal motor nerves. 2. Absent sural sensory nerve action potentials bilaterally; reduced median sensory amplitudes. 3. Absent F-waves bilaterally (peroneal); prolonged F-wave latency (58 ms) in bilateral median nerves. 4. Absent H-reflex bilaterally. Pattern consistent with a demyelinating polyradiculoneuropathy",
+      "impression": "This is an ABNORMAL study. 1. Prolonged distal motor latencies and reduced conduction velocities in bilateral median and peroneal motor nerves. 2. Absent sural sensory nerve action potentials bilaterally; reduced median sensory amplitudes. 3. Absent F-waves bilaterally (peroneal); prolonged F-wave latency (58 ms) in bilateral median nerves. 4. Absent H-reflex bilaterally. 5. Reduced recruitment without denervation on needle EMG. Pattern consistent with a demyelinating polyradiculoneuropathy.",
       "quantitative_data": {
-        "pattern": "Moderate AIDP",
+        "pattern": "Demyelinating polyradiculoneuropathy",
         "severity": "Moderate"
       },
       "recommended_actions": [],
-      "test_type": "Nerve Conduction Studies and EMG"
+      "test_type": "emg_ncs"
     }
   },
   "metadata": {
@@ -670,7 +693,7 @@
     "citation_gap": [],
     "condition_full_name": "Guillain-Barr\u00e9 syndrome (AIDP)",
     "criteria_pack_version": "1.0",
-    "difficulty_rationale": "6 required tools, 0 red herring(s); classic or near-classic GBS workup with one or more plausible mimics that need active exclusion.",
+    "difficulty_rationale": "5 required actions (NCS/EMG, CSF, baseline labs, respiratory function, telemetry), 1 red herring (unilateral facial palsy) that must be placed within the polyradiculoneuropathy.",
     "fallback_tool_kinds": {
       "ct": "normal",
       "drug_interactions": "normal",
@@ -714,11 +737,11 @@
       "handedness": "right",
       "sex": "female"
     },
-    "history_present_illness": "Ms. K. is a 45-year-old woman with an 8-day history of progressive bilateral leg weakness following a diarrheal illness 2 weeks prior. She can still walk with support but weakness has progressed daily. She notes LEFT facial drooping (unilateral) and mild slurred speech. She has not noted bilateral facial symptoms. Distal paresthesias are present. FVC 65%.",
+    "history_present_illness": "Ms. K. is a 45-year-old woman with an 8-day history of progressive bilateral leg weakness following a diarrheal illness 2 weeks prior. She can still walk with support but weakness has progressed daily. She has noticed drooping of the left side of her face and mildly slurred speech. Distal paresthesias are present.",
     "neurological_exam": {
-      "additional": "FVC: 2.2 L (predicted 3.4 L \u2014 65%). NIF: -36 cmH2O. Precautionary admission warranted.",
+      "additional": null,
       "coordination": "Limited by weakness.",
-      "cranial_nerves": "Left facial weakness (LMN pattern, unilateral). No bilateral facial involvement. Mild dysarthria.",
+      "cranial_nerves": "Left lower motor neuron facial weakness involving forehead and lower face; right face normal. Mild dysarthria. Eye movements full, no ptosis. Palate elevates symmetrically.",
       "gait": "Can walk 15 feet with single-hand support.",
       "mental_status": "Alert, oriented, anxious.",
       "motor": "Bilateral lower extremity weakness: hip flexion 3+/5, knee extension 4/5, ankle dorsiflexion 4/5. Upper extremity: 4/5 bilateral.",
@@ -726,6 +749,9 @@
       "sensory": "Bilateral distal paresthesias. Reduced vibration at ankles."
     },
     "patient_id": "NB-GBS-RM11",
+    "physical_exam": {
+      "general": "Weight 67 kg, height 165 cm."
+    },
     "vitals": {
       "bp_diastolic": 88,
       "bp_systolic": 140,

@@ -36,7 +36,7 @@
         "contraindications": [],
         "formulary_status": "on formulary",
         "interactions": [],
-        "proposed": "(agent not specified on this case's pathway)",
+        "proposed": "Medication list review",
         "warnings": [
           "Non-specific interaction check; verify against a current formulary or interaction reference before prescribing."
         ]
@@ -92,19 +92,20 @@
   "followup_outputs": [
     {
       "output": {
-        "appearance": "Clear, slightly xanthochromic",
+        "appearance": "Clear, colourless",
         "cell_count": {
-          "RBC": "0",
-          "WBC": "22 cells/mm3 (mononuclear cells, 18 lymphocytes + 4 monocytes)"
+          "RBC": "0 cells/mm3",
+          "WBC": "22 cells/mm3 (mononuclear: 18 lymphocytes, 4 monocytes; no neutrophils)"
         },
         "glucose": "60 mg/dL",
         "glucose_ratio": "0.65",
-        "interpretation": "Opening pressure: 148 mmH2O (normal). Nucleated cell count: 22 cells/mm3 (predominantly mononuclear: 18 lymphocytes, 4 monocytes). Protein: 88 mg/dL (elevated). Glucose: 60 mg/dL (CSF:serum ratio 0.65). Gram stain: No organisms. Cryptococcal antigen: Negative. VDRL: Non-reactive. HSV PCR: Negative. Mononuclear pleocytosis with elevated protein",
-        "opening_pressure": "148 mmH2O",
-        "protein": "88 mg/dL (elevated)",
+        "interpretation": "Opening pressure 148 mmH2O (normal). Nucleated cell count 22 cells/mm3 (lymphocytic: 18 lymphocytes, 4 monocytes). Protein 88 mg/dL (elevated). Glucose 60 mg/dL (CSF:serum ratio 0.65). Gram stain: no organisms. Cryptococcal antigen negative. VDRL non-reactive. HSV PCR negative. Cytology: no malignant cells. Mild lymphocytic pleocytosis with elevated protein and normal glucose. Clinical correlation recommended.",
+        "opening_pressure": "148 mmH2O (normal)",
+        "protein": "88 mg/dL (elevated; reference 15-45 mg/dL)",
         "special_tests": {
           "Cryptococcal antigen": "Negative",
           "Culture": "Pending",
+          "Cytology": "No malignant cells; reactive lymphocytes",
           "Gram stain": "No organisms",
           "HSV PCR": "Negative",
           "VDRL": "Non-reactive"
@@ -116,58 +117,66 @@
     {
       "output": {
         "abnormal_values_summary": [
-          "Anti-GM1 IgG positive"
+          "CD4 count 368 cells/mm3 (L)"
         ],
-        "interpretation": "Abnormal values: Anti-GM1 IgG Positive (titer 1:160) (H).",
+        "interpretation": "CD4 count 368 cells/mm3 (low). HIV-1 RNA below the limit of quantification (<20 copies/mL).",
         "panels": {
-          "Ganglioside_Antibodies": [
+          "HIV_monitoring": [
             {
+              "clinical_significance": null,
               "is_abnormal": true,
-              "reference_range": "negative",
-              "test": "Anti-GM1 IgG",
-              "unit": "",
-              "value": "Positive (titer 1:160)"
+              "reference_range": "500-1500",
+              "test": "CD4 count",
+              "unit": "cells/mm3",
+              "value": 368
             },
             {
+              "clinical_significance": null,
               "is_abnormal": false,
-              "reference_range": "negative",
-              "test": "Anti-GD1a IgG",
-              "unit": "",
-              "value": "Negative"
-            },
-            {
-              "is_abnormal": false,
-              "reference_range": "negative",
-              "test": "Anti-GQ1b IgG",
-              "unit": "",
-              "value": "Negative"
+              "reference_range": "<20",
+              "test": "HIV-1 RNA (viral load)",
+              "unit": "copies/mL",
+              "value": "<20 (undetectable)"
             }
           ]
         }
       },
       "tool_name": "interpret_labs",
-      "trigger_action": "request_anti_ganglioside_panel"
+      "trigger_action": "request_hiv_viral_load_cd4_count"
     },
     {
       "output": {
         "findings": [
           {
-            "panel": "Respiratory",
-            "reference_range": "predicted 3.4 L (53%)",
-            "result": "1.8 L",
+            "panel": "Bedside_Respiratory_Function",
+            "reference_range": ">=80% predicted (predicted 3.4 L)",
+            "result": "1.8 L (53% predicted; 33.5 mL/kg) L",
             "test": "FVC"
           },
           {
-            "panel": "Respiratory",
-            "reference_range": "-25 threshold",
-            "result": "-26 cmH2O",
-            "test": "NIF"
+            "panel": "Bedside_Respiratory_Function",
+            "reference_range": "more negative than -45 cmH2O",
+            "result": "-26 cmH2O L",
+            "test": "MIP (NIF)"
+          },
+          {
+            "panel": "Bedside_Respiratory_Function",
+            "reference_range": ">75 cmH2O",
+            "result": "48 cmH2O L",
+            "test": "MEP"
+          },
+          {
+            "panel": "Bedside_Respiratory_Function",
+            "reference_range": "",
+            "result": "Effective",
+            "test": "Cough"
           }
         ],
-        "impression": "Abnormal values: FVC 1.8 L (H), NIF -26 cmH2O (H).",
+        "impression": "Bedside respiratory function at admission: FVC 1.8 L (53% predicted; 33.5 mL/kg at 53.8 kg) L. MIP -26 cmH2O L. MEP 48 cmH2O L. Cough effective.",
         "quantitative_data": {
-          "FVC": "1.8 L",
-          "NIF": "-26 cmH2O"
+          "FVC": "1.8 L (53% predicted; 33.5 mL/kg at 53.8 kg)",
+          "MEP": "48 cmH2O",
+          "MIP (NIF)": "-26 cmH2O"
         },
         "recommended_actions": [],
         "test_type": "respiratory_function"
@@ -177,15 +186,15 @@
     },
     {
       "output": {
-        "duration_hours": 96,
+        "duration_hours": 24,
         "events": [
           {
-            "event": "Sinus bradycardia 44 bpm \u2014 vagal",
-            "time": "Night 1"
+            "event": "Sinus bradycardia 44 bpm, vagal, self-limited",
+            "time": "Night 1, 01:30"
           },
           {
-            "event": "Hypertensive episode 178/100 \u2014 IV labetalol given",
-            "time": "Day 2"
+            "event": "Hypertensive episode 178/100 mmHg",
+            "time": "Hour 20"
           }
         ],
         "findings": [
@@ -197,75 +206,17 @@
           "max": 128,
           "min": 44
         },
-        "impression": "96-hour continuous telemetry. 1. Sinus tachycardia/bradycardia lability (range 44\u2013128 bpm). 2. Nocturnal sinus bradycardia (minimum 44 bpm). 3. Hypertensive episodes (peak BP 178/100 mmHg). Significant cardiovascular autonomic instability",
+        "impression": "24-hour continuous telemetry. 1. Sinus tachycardia/bradycardia lability (range 44-128 bpm). 2. Nocturnal sinus bradycardia (minimum 44 bpm). 3. Hypertensive episode (peak BP 178/100 mmHg). Cardiovascular autonomic instability.",
         "monitor_type": "Continuous telemetry",
         "recommended_actions": [],
         "rhythm_summary": "Sinus tachycardia with intermittent bradycardia. Labile BP."
       },
       "tool_name": "order_cardiac_monitoring",
       "trigger_action": "request_cardiac_monitoring"
-    },
-    {
-      "output": {
-        "query": "HIV-associated Guillain-Barre syndrome CSF pleocytosis IVIG treatment",
-        "results": [
-          {
-            "finding": "Acute inflammatory demyelinating polyneuropathy has been reported in HIV-infected individuals across a range of CD4 counts. CSF pleocytosis (up to 50 mononuclear cells) has been documented in this population and may differ from the typical albuminocytologic dissociation pattern seen in HIV-negative patients.",
-            "title": "Acute inflammatory demyelinating polyneuropathy in HIV-infected patients: clinical characteristics"
-          },
-          {
-            "finding": "Published case series and guidelines indicate IVIG and plasmapheresis are used for treatment of acute inflammatory demyelinating polyneuropathy in HIV-infected patients; dosing is generally consistent with standard regimens. Concurrent antiretroviral therapy is typically continued.",
-            "title": "Treatment of acute inflammatory demyelinating polyneuropathy in HIV-infected patients"
-          }
-        ],
-        "summary": ""
-      },
-      "tool_name": "search_medical_literature",
-      "trigger_action": "request_literature_hiv_gbs"
-    },
-    {
-      "output": {
-        "alternatives": [],
-        "contraindications": [],
-        "formulary_status": "on formulary",
-        "interactions": [],
-        "proposed": "(agent not specified on this case's pathway)",
-        "summary": "",
-        "warnings": [
-          "Non-specific interaction check; verify against a current formulary or interaction reference before prescribing."
-        ]
-      },
-      "tool_name": "check_drug_interactions",
-      "trigger_action": "check_ivig_drug_interactions"
     }
   ],
   "ground_truth": {
     "action_criteria": [
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "panels": [
-                "CBC",
-                "CMP",
-                "HIV",
-                "inflammatory_markers",
-                "anti-GM1 IgM"
-              ]
-            },
-            "tool_name": "interpret_labs"
-          }
-        ],
-        "citations": [
-          "[Yuki_2012]",
-          "GBS criteria pack \u00a72"
-        ],
-        "criterion_id": "action-1-interpret-labs",
-        "expected_evidence": "Mild leukocytosis / elevated inflammatory markers reflecting antecedent infection; ganglioside antibodies for variant typing; trigger identification (Campylobacter, CMV, EBV, Mycoplasma, HIV)",
-        "importance": "required",
-        "label": "Obtain CBC, CMP, HIV, anti-GM1/anti-GQ1b ganglioside antibodies, and stool culture / Campylobacter serology if recent diarrhea",
-        "rationale": "Obtain CBC, CMP, HIV, anti-GM1/anti-GQ1b ganglioside antibodies, and stool culture / Campylobacter serology if recent diarrhea"
-      },
       {
         "alternatives": [
           {
@@ -276,31 +227,76 @@
           }
         ],
         "citations": [
-          "[Hadden_1998]",
-          "GBS criteria pack \u00a72"
+          "[EAN_PNS_2023]"
         ],
         "criterion_id": "action-2-order-specialized-test",
-        "expected_evidence": "Demyelinating pattern (prolonged DML, conduction block, reduced CV, absent F-waves) consistent with AIDP, or reduced CMAP amplitudes in axonal variants (AMAN/AMSAN)",
+        "expected_evidence": "Polyradiculoneuropathy pattern (demyelinating or axonal features, absent F-waves, sural sparing where present); may be normal in the first week",
         "importance": "required",
-        "label": "Order nerve conduction studies and needle EMG (EMG/NCS)",
-        "rationale": "Order nerve conduction studies and needle EMG (EMG/NCS)"
+        "label": "Nerve conduction studies and needle EMG",
+        "rationale": "Nerve conduction studies and needle EMG"
       },
       {
         "alternatives": [
           {
-            "required_arguments": {},
+            "required_arguments": {
+              "special_tests": [
+                "cytology"
+              ]
+            },
             "tool_name": "analyze_csf"
           }
         ],
         "citations": [
-          "[Asbury_1990]",
-          "GBS criteria pack \u00a72"
+          "[EAN_PNS_2023]"
         ],
         "criterion_id": "action-3-analyze-csf",
-        "expected_evidence": "Albuminocytologic dissociation \u2014 elevated protein with cell count <10/\u03bcL; may be normal in the first week of illness",
+        "expected_evidence": "Raised protein with 10-50 cells/mm3, compatible with HIV-associated GBS but prompting exclusion of CMV polyradiculitis and lymphoma",
         "importance": "required",
-        "label": "Perform lumbar puncture for CSF analysis",
-        "rationale": "Perform lumbar puncture for CSF analysis"
+        "label": "Lumbar puncture for CSF cell count, protein, glucose and cytology",
+        "rationale": "CSF confirms raised protein; with HIV, the cell count, cytology and infection studies address CMV polyradiculitis, syphilis, cryptococcus and lymphomatous infiltration."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "panels": [
+                "HIV_viral_load",
+                "CD4_count"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          }
+        ],
+        "citations": [
+          "[EAN_PNS_2023]"
+        ],
+        "criterion_id": "action-10-interpret-labs-hiv-control",
+        "expected_evidence": "HIV-1 RNA undetectable and CD4 368 cells/mm3: controlled HIV without the advanced immunosuppression of CMV polyradiculitis",
+        "importance": "recommended",
+        "label": "Current HIV viral load and CD4 count",
+        "rationale": "The current viral load and CD4 count set the risk of opportunistic polyradiculitis (CMV) against HIV-associated GBS."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "panels": [
+                "CBC",
+                "CMP",
+                "CK"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          }
+        ],
+        "citations": [
+          "[EAN_PNS_2023]"
+        ],
+        "criterion_id": "action-1-interpret-labs",
+        "expected_evidence": "Baseline values before treatment; abnormal liver tests or low albumin mark a higher risk of a severe course; no metabolic or toxic alternative",
+        "importance": "required",
+        "label": "Baseline blood tests: full blood count, renal function and electrolytes, liver tests, albumin, glucose and CK",
+        "rationale": "Baseline blood tests: full blood count, renal function and electrolytes, liver tests, albumin, glucose and CK"
       },
       {
         "alternatives": [
@@ -312,65 +308,14 @@
           }
         ],
         "citations": [
-          "[Sharshar_2003]",
-          "GBS criteria pack \u00a72"
+          "[Lawn_2001]",
+          "[EAN_PNS_2023]"
         ],
         "criterion_id": "action-4-order-specialized-test",
-        "expected_evidence": "Baseline and serial FVC, MIP/MEP, NIF; deterioration to FVC <20 mL/kg, MIP worse than -30 cmH2O, or VC <40% predicted triggers ICU transfer / intubation",
+        "expected_evidence": "FVC in L, % predicted and mL/kg, MIP and MEP, with the trend; ICU-level monitoring if FVC <20 mL/kg or <60% predicted, MIP weaker than -30 cmH2O, MEP <40 cmH2O, a fall of more than 30%, or bulbar weakness with weak cough",
         "importance": "required",
-        "label": "Order bedside respiratory function testing (FVC, MIP/MEP, NIF) and repeat every 4\u20136 hours",
-        "rationale": "Order bedside respiratory function testing (FVC, MIP/MEP, NIF) and repeat every 4\u20136 hours"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[van_den_Berg_2014]",
-          "GBS criteria pack \u00a72"
-        ],
-        "criterion_id": "action-5-search-medical-literature",
-        "expected_evidence": "IVIG (0.4 g/kg/day x 5 days) and plasma exchange are equivalently effective first-line therapies; combination not superior",
-        "importance": "required",
-        "label": "Search the medical literature for IVIG vs plasma exchange evidence to guide disease-modifying therapy",
-        "rationale": "Search the medical literature for IVIG vs plasma exchange evidence to guide disease-modifying therapy"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "check_drug_interactions"
-          }
-        ],
-        "citations": [
-          "[van_den_Berg_2014]",
-          "GBS criteria pack \u00a72"
-        ],
-        "criterion_id": "action-6-check-drug-interactions",
-        "expected_evidence": "Confirmation that IVIG can be given safely (no severe renal impairment, no IgA deficiency) or that plasma exchange is appropriate (adequate vascular access, stable coagulation)",
-        "importance": "required",
-        "label": "Check drug interactions / contraindications for IVIG (renal function, IgA deficiency screen) and/or plasma exchange (coagulation, calcium, hemodynamics)",
-        "rationale": "Check drug interactions / contraindications for IVIG (renal function, IgA deficiency screen) and/or plasma exchange (coagulation, calcium, hemodynamics)"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "analyze_ecg"
-          }
-        ],
-        "citations": [
-          "[Asbury_1990]",
-          "GBS criteria pack \u00a72"
-        ],
-        "criterion_id": "action-7-analyze-ecg",
-        "expected_evidence": "Sinus tachycardia or bradycardia; conduction or repolarisation abnormalities reflecting autonomic involvement",
-        "importance": "recommended",
-        "label": "Obtain a 12-lead ECG to screen for autonomic dysrhythmias and baseline QTc",
-        "rationale": "Obtain a 12-lead ECG to screen for autonomic dysrhythmias and baseline QTc"
+        "label": "Bedside respiratory function (FVC, MIP, MEP), repeated serially while weakness progresses",
+        "rationale": "Bedside respiratory function (FVC, MIP, MEP), repeated serially while weakness progresses"
       },
       {
         "alternatives": [
@@ -382,28 +327,81 @@
           }
         ],
         "citations": [
-          "[Asbury_1990]",
-          "GBS criteria pack \u00a72"
+          "[EAN_PNS_2023]",
+          "[Leonhard_2019]"
         ],
         "criterion_id": "action-8-order-cardiac-monitoring",
-        "expected_evidence": "Sinus tachycardia with intermittent bradycardia. Labile BP \u2014 the recording is read for the bradyarrhythmias, pauses beyond 3 seconds and blood-pressure lability that trigger ICU escalation",
+        "expected_evidence": "Continuous telemetry with blood pressure monitoring: sinus rate 44-128 bpm with nocturnal bradycardia to 44 bpm and a hypertensive episode to 178/100 mmHg in the first 24 hours; autonomic instability (rate and blood pressure lability, bradyarrhythmia) requires continued monitoring while weakness progresses",
         "importance": "required",
-        "label": "Start continuous inpatient cardiac telemetry for the period of maximal weakness and keep it running alongside serial respiratory function. Autonomic instability affects about two thirds of patients and is a leading cause of in-hospital death: bradyarrhythmias, pauses beyond 3 seconds and blood-pressure lability are what trigger ICU escalation",
-        "rationale": "Start continuous inpatient cardiac telemetry for the period of maximal weakness and keep it running alongside serial respiratory function. Autonomic instability affects about two thirds of patients and is a leading cause of in-hospital death: bradyarrhythmias, pauses beyond 3 seconds and blood-pressure lability are what trigger ICU escalation"
+        "label": "Continuous inpatient cardiac telemetry with blood pressure monitoring while weakness progresses",
+        "rationale": "Autonomic dysfunction is common in GBS and can cause bradyarrhythmias and blood pressure lability; continuous monitoring is kept while weakness progresses."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_ecg"
+          }
+        ],
+        "citations": [
+          "[EAN_PNS_2023]"
+        ],
+        "criterion_id": "action-7-analyze-ecg",
+        "expected_evidence": "Sinus tachycardia 106 bpm with normal intervals (QTc 452 ms) and no conduction or ST-T abnormality: a baseline while autonomic involvement can still develop",
+        "importance": "recommended",
+        "label": "Obtain a 12-lead ECG to screen for autonomic dysrhythmias and baseline QTc",
+        "rationale": "A baseline 12-lead ECG screens for autonomic dysrhythmia and conduction abnormality and gives the QTc before treatment [EAN_PNS_2023]."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "check_drug_interactions"
+          }
+        ],
+        "citations": [
+          "[EAN_PNS_2023]"
+        ],
+        "criterion_id": "action-6-check-drug-interactions",
+        "expected_evidence": "No interaction with IVIg; protein-bound bictegravir is dosed after plasma exchange sessions so antiretroviral therapy is not interrupted",
+        "importance": "recommended",
+        "label": "Check the medication list for interactions with bictegravir/tenofovir alafenamide/emtricitabine before IVIg or plasma exchange",
+        "rationale": "Check the medication list for interactions with bictegravir/tenofovir alafenamide/emtricitabine before IVIg or plasma exchange"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "search_medical_literature"
+          }
+        ],
+        "citations": [
+          "[EAN_PNS_2023]"
+        ],
+        "criterion_id": "action-5-search-medical-literature",
+        "expected_evidence": "General evidence on immunotherapy in GBS; not needed for the diagnosis or the treatment decision",
+        "importance": "optional",
+        "label": "Optional literature search on GBS with CSF pleocytosis and its immunotherapy",
+        "rationale": "Optional literature search on GBS with CSF pleocytosis and its immunotherapy"
       }
     ],
     "assessment": {
       "prohibited_recommendations": [
         "Do not stop antiretrovirals during the acute phase.",
-        "Do not give corticosteroids as monotherapy.",
-        "Do not assume pleocytosis excludes GBS \u2014 HIV-associated GBS classically shows CSF pleocytosis."
+        "Do not treat with corticosteroids: oral corticosteroids are strongly advised against and IV methylprednisolone is not recommended [EAN_PNS_2023].",
+        "Do not take the CSF pleocytosis as excluding GBS: 5-50 cells/mm3 is compatible, but it requires exclusion of CMV polyradiculitis and lymphoma.",
+        "Do not give IVIg directly after plasma exchange, and do not give a second IVIg course [EAN_PNS_2023, Walgaard_2021].",
+        "Do not use succinylcholine if intubation is needed: denervated muscle risks severe hyperkalaemia."
       ],
       "required_recommendations": [
-        "Continue antiretroviral therapy; consult ID for HIV comanagement.",
-        "Initiate IVIG 0.4 g/kg/day for 5 days (preferred over PLEX in HIV given immune considerations).",
-        "Monitor respiratory function and autonomic status closely.",
-        "CSF CMV PCR, VDRL, and cytology to rule out opportunistic / coinfection polyradiculitis given pleocytosis.",
-        "Continuous cardiac telemetry."
+        "Admit to ICU-level monitoring: FVC 53% predicted (below 60%) and MIP -26 cmH2O (weaker than -30 cmH2O), with dysphagia for thin liquids.",
+        "Repeat FVC, MIP and MEP every 4 to 6 hours with checks of bulbar function, cough and secretions; plan elective intubation if FVC falls below 20 mL/kg (about 1.1 L at 53.8 kg) or by more than 30%, MEP falls below 40 cmH2O, or bulbar function, cough or secretions worsen [Lawn_2001, EAN_PNS_2023].",
+        "Start IVIg 0.4 g/kg/day for 5 days (2 g/kg total, about 21.5 g/day at 53.8 kg) or plasma exchange 200-250 mL/kg over 5 sessions: she cannot walk unaided and is 9 days from onset [EAN_PNS_2023].",
+        "Exclude CMV polyradiculitis: unlikely with CD4 368 and an undetectable viral load and a lymphocytic, not neutrophilic, CSF with normal glucose; send CSF CMV PCR.",
+        "Continue antiretroviral therapy without interruption and involve the HIV/infectious diseases team.",
+        "Continuous cardiac telemetry with blood pressure monitoring for autonomic instability while weakness progresses.",
+        "Formal swallow assessment before oral intake (dysphagia for thin liquids).",
+        "DVT prophylaxis appropriate for an immobilised inpatient."
       ]
     },
     "avoided_actions": [
@@ -415,7 +413,7 @@
           }
         ],
         "citations": [
-          "[van_den_Berg_2014]"
+          "[EAN_PNS_2023]"
         ],
         "criterion_id": "avoid-waste-1-analyze-eeg",
         "rationale": "GBS is a peripheral nerve / nerve-root disorder; EEG has no role in diagnosis unless atypical CNS features (encephalopathy, seizures) are present.",
@@ -429,7 +427,7 @@
           }
         ],
         "citations": [
-          "[van_den_Berg_2014]"
+          "[EAN_PNS_2023]"
         ],
         "criterion_id": "avoid-waste-2-order-echocardiogram",
         "rationale": "Echocardiography is not indicated in typical GBS; reserve for pre-existing cardiac disease or unexplained hemodynamic instability after autonomic causes are excluded.",
@@ -443,7 +441,7 @@
           }
         ],
         "citations": [
-          "[van_den_Berg_2014]"
+          "[EAN_PNS_2023]"
         ],
         "criterion_id": "avoid-waste-3-order-ct-scan",
         "rationale": "Head CT contributes no diagnostic information in GBS; the disease is peripheral and CT does not visualise nerve roots reliably.",
@@ -459,7 +457,7 @@
           }
         ],
         "citations": [
-          "[van_den_Berg_2014]"
+          "[EAN_PNS_2023]"
         ],
         "criterion_id": "avoid-waste-4-order-advanced-imaging",
         "rationale": "Functional / metabolic brain imaging adds no value in a peripheral demyelinating syndrome.",
@@ -475,7 +473,7 @@
           }
         ],
         "citations": [
-          "[van_den_Berg_2014]"
+          "[EAN_PNS_2023]"
         ],
         "criterion_id": "avoid-waste-5-order-advanced-imaging",
         "rationale": "Cerebrovascular imaging is not indicated in a peripheral neuropathy without focal cerebral signs.",
@@ -489,7 +487,7 @@
           }
         ],
         "citations": [
-          "[van_den_Berg_2014]"
+          "[EAN_PNS_2023]"
         ],
         "criterion_id": "avoid-waste-6-analyze-brain-mri",
         "rationale": "Brain MRI is reserved for atypical features (encephalopathy, CNS signs, transverse myelitis on differential). In classic GBS it does not aid diagnosis.",
@@ -516,81 +514,73 @@
     },
     "differential": [
       {
-        "diagnosis": "HIV-related acute inflammatory neuropathy / CIDP (HIV-CIDP)",
-        "icd_code": "G61.81",
-        "key_features": "HIV is associated with both acute (GBS-like) and chronic inflammatory demyelinating polyneuropathies; differentiation depends on course (<4 weeks vs >8 weeks).",
-        "likelihood": "high"
-      },
-      {
         "diagnosis": "Opportunistic CMV polyradiculitis",
         "icd_code": "B25.8",
-        "key_features": "CD4 380 makes severe opportunistic disease less likely, but CMV testing and CSF PCR are warranted given pleocytosis; CMV polyradiculitis typically shows marked CSF neutrophilic pleocytosis and lower CD4.",
-        "likelihood": "moderate"
+        "key_features": "Usually at CD4 below 50-100 cells/mm3 with a neutrophilic pleocytosis and low CSF glucose; here CD4 is 368 with an undetectable viral load and the CSF is lymphocytic with normal glucose. CSF CMV PCR is still sent.",
+        "likelihood": "low"
+      },
+      {
+        "diagnosis": "Lymphomatous polyradiculopathy",
+        "icd_code": "C85.90",
+        "key_features": "Pleocytosis with polyradiculopathy in HIV raises it, but CSF cytology shows reactive lymphocytes only and there are no systemic B symptoms.",
+        "likelihood": "low"
+      },
+      {
+        "diagnosis": "Acute-onset CIDP (HIV-associated)",
+        "icd_code": "G61.81",
+        "key_features": "HIV is associated with both acute and chronic inflammatory demyelinating neuropathies; a 9-day course fits GBS; reassess if progression continues beyond 8 weeks.",
+        "likelihood": "low"
       },
       {
         "diagnosis": "Neurosyphilis / luetic polyradiculitis",
         "icd_code": "A52.10",
-        "key_features": "Possible HIV coinfection; RPR / FTA-ABS and CSF VDRL warranted but not the primary picture without other features.",
-        "likelihood": "low"
+        "key_features": "CSF VDRL non-reactive; no rash or other features of secondary syphilis.",
+        "likelihood": "very_low"
       },
       {
         "diagnosis": "Antiretroviral-induced toxic neuropathy",
         "icd_code": "G62.0",
-        "key_features": "Biktarvy regimen has low neuropathy risk; areflexia and acute progression do not fit a chronic toxic axonal pattern.",
-        "likelihood": "low"
+        "key_features": "Biktarvy has low neuropathy risk; areflexia and acute progression with demyelinating NCS do not fit a chronic toxic axonal pattern.",
+        "likelihood": "very_low"
       },
       {
         "diagnosis": "Lyme polyradiculitis",
         "icd_code": "A69.22",
-        "key_features": "No endemic exposure or erythema migrans; serology unsupported.",
+        "key_features": "No endemic exposure or erythema migrans.",
         "likelihood": "very_low"
       }
     ],
     "key_clinical_evidence": [
-      "HIV-associated GBS is a well-described entity; CSF pleocytosis (10\u201350 WBC/\u03bcL) is expected and does NOT rule out GBS.",
-      "Distinguishing HIV-related acute polyneuropathy from opportunistic CMV polyradiculitis is critical \u2014 CMV typically has lower CD4 and marked neutrophilic pleocytosis.",
-      "Ganglioside antibody panel and antecedent infection workup remain important even in HIV-positive patients.",
-      "Treatment with IVIG is preferred over PLEX in HIV to avoid removing circulating antiretroviral medication."
+      "Ascending symmetric limb weakness with areflexia over 9 days, CSF raised protein with 22 cells/mm3 (below 50) and a demyelinating NCS meet Brighton level 1 [Brighton_2011].",
+      "A CSF count of 5-50/mm3 is compatible with GBS, including HIV-associated GBS, but prompts exclusion of CMV polyradiculitis, syphilis and lymphoma before it is accepted [EAN_PNS_2023].",
+      "Distinguishing HIV-associated GBS from CMV polyradiculitis rests on the CD4 count, the viral load and the CSF pattern: CMV gives a neutrophilic pleocytosis at low CD4 counts.",
+      "The antecedent infection is a history finding; serology is not needed for the diagnosis, and a positive IgM does not prove the trigger."
     ],
     "red_herrings": [
       {
-        "correct_interpretation": "Mild-moderate CSF pleocytosis is well-recognised in HIV-associated GBS at preserved CD4 counts; in the absence of CMV PCR positivity it does not redirect the diagnosis.",
-        "data_point": "CSF pleocytosis above the classic GBS expectation",
+        "correct_interpretation": "Mild lymphocytic pleocytosis (5-50/mm3) is compatible with GBS and is recognised in HIV-associated GBS at preserved CD4 counts; with CD4 368, undetectable viral load, normal CSF glucose, negative cytology, VDRL and cryptococcal antigen it does not redirect the diagnosis, and the CSF CMV PCR is sent to close the question.",
+        "data_point": "CSF pleocytosis (22 cells/mm3) above the classic GBS expectation",
         "field_path": "followup_outputs",
         "intended_effect": "Suggest opportunistic / infectious polyradiculitis rather than HIV-associated GBS.",
         "location": "followup_outputs.csf"
+      },
+      {
+        "correct_interpretation": "Cranial nerve involvement in GBS is often asymmetric; the left facial palsy and mild ptosis (pupils equal, eye movements full) sit with the ascending areflexic weakness, CSF and NCS in the polyradiculoneuropathy rather than pointing to a separate brainstem or Horner lesion.",
+        "data_point": "Left facial weakness with mild left ptosis",
+        "field_path": "patient.neurological_exam.cranial_nerves",
+        "intended_effect": "Suggest a focal brainstem lesion, Bell palsy or Horner syndrome instead of GBS.",
+        "location": "patient.neurological_exam"
       }
     ],
     "review_status": "draft",
-    "sequence_constraints": [
-      {
-        "after_criterion_id": "action-6-check-drug-interactions",
-        "before_criterion_id": "action-2-order-specialized-test",
-        "citations": [
-          "[Sharshar_2003]"
-        ],
-        "reason": "Document respiratory status (FVC/NIF) before committing to IVIG vs plasma exchange \u2014 severe respiratory compromise mandates ICU triage and may influence treatment choice and timing.",
-        "severity": "soft"
-      },
-      {
-        "after_criterion_id": "action-6-check-drug-interactions",
-        "before_criterion_id": "action-1-interpret-labs",
-        "citations": [
-          "[van_den_Berg_2014]"
-        ],
-        "reason": "Renal function, IgA screen, and CBC must be reviewed before IVIG to mitigate renal failure, anaphylaxis (IgA-deficient patients), and aseptic meningitis risk.",
-        "severity": "soft"
-      }
-    ],
+    "sequence_constraints": [],
     "stop_rule": {
-      "max_additional_actions": 0,
+      "max_additional_actions": 3,
       "required_before_assessment": [
-        "action-1-interpret-labs",
         "action-2-order-specialized-test",
         "action-3-analyze-csf",
+        "action-1-interpret-labs",
         "action-4-order-specialized-test",
-        "action-5-search-medical-literature",
-        "action-6-check-drug-interactions",
         "action-8-order-cardiac-monitoring"
       ]
     }
@@ -601,12 +591,15 @@
       "general": {
         "alternatives": [],
         "contraindications": [],
-        "formulary_status": "",
-        "interactions": [],
+        "formulary_status": "on formulary",
+        "interactions": [
+          "Bictegravir/tenofovir alafenamide/emtricitabine with intravenous immunoglobulin: no clinically significant interaction.",
+          "Bictegravir/tenofovir alafenamide/emtricitabine with plasma exchange: bictegravir is highly protein bound and may be partly removed; give the daily dose after the exchange session (relative caution)."
+        ],
         "proposed": "Bictegravir/tenofovir alafenamide/emtricitabine (Biktarvy) 50/25/200 mg once daily",
-        "summary": "Current medications reviewed for interactions: Bictegravir/tenofovir alafenamide/emtricitabine (Biktarvy) 50/25/200 mg once daily.",
+        "summary": "Current medication reviewed: Biktarvy 50/25/200 mg once daily.",
         "warnings": [
-          "Interaction review performed against the current medication list above. Clinical relevance \u2014 which agents to taper, and in what order \u2014 is a prescribing decision, not an output of this check."
+          "Avoid interrupting antiretroviral therapy; missed doses risk viral rebound and resistance."
         ]
       }
     },
@@ -615,9 +608,9 @@
       "clinical_correlation": "",
       "findings": [
         "Sinus tachycardia",
-        "Borderline QTc"
+        "Normal intervals (QTc 452 ms)"
       ],
-      "interpretation": "Sinus tachycardia, rate 106. Borderline QTc prolongation (452 ms). No acute ST-T wave changes.",
+      "interpretation": "Sinus tachycardia, rate 106. Normal intervals (QTc 452 ms). No acute ST-T wave changes.",
       "intervals": {
         "PR": "168 ms",
         "QRS": "88 ms",
@@ -628,29 +621,10 @@
     },
     "labs": {
       "abnormal_values_summary": [
-        "CD4 368 cells/mm3 (L)",
-        "Sodium 133 mEq/L (L)",
-        "Campylobacter jejuni IgM positive (H)"
+        "Sodium 133 mEq/L (L)"
       ],
-      "interpretation": "Abnormal values: Sodium 133 mEq/L (L), CD4 count 368 cells/mm3 (L), Campylobacter jejuni IgM Positive (H).",
+      "interpretation": "Sodium 133 mEq/L (low). Blood count, renal function, other electrolytes, glucose, liver tests, albumin and CK within normal limits.",
       "panels": {
-        "BMP": [
-          {
-            "clinical_significance": null,
-            "is_abnormal": true,
-            "reference_range": "136-145",
-            "test": "Sodium",
-            "unit": "mEq/L",
-            "value": 133
-          },
-          {
-            "is_abnormal": false,
-            "reference_range": "0.5-1.1",
-            "test": "Creatinine",
-            "unit": "mg/dL",
-            "value": 0.8
-          }
-        ],
         "CBC": [
           {
             "is_abnormal": false,
@@ -665,55 +639,146 @@
             "test": "Hemoglobin",
             "unit": "g/dL",
             "value": 12.8
-          }
-        ],
-        "Exclusion studies": [
-          {
-            "clinical_significance": "Ordered to exclude an alternative cause; the result does not support one, which is what this case's diagnosis rests on",
-            "is_abnormal": false,
-            "reference_range": "",
-            "test": "HIV",
-            "unit": "",
-            "value": "Non-reactive"
-          }
-        ],
-        "HIV": [
-          {
-            "clinical_significance": null,
-            "is_abnormal": true,
-            "reference_range": ">500",
-            "test": "CD4 count",
-            "unit": "cells/mm3",
-            "value": "368 cells/mm3"
           },
           {
             "is_abnormal": false,
-            "reference_range": "<20",
-            "test": "HIV viral load",
-            "unit": "copies/mL",
-            "value": "<20 copies/mL (undetectable)"
+            "reference_range": "150-400",
+            "test": "Platelets",
+            "unit": "x10^9/L",
+            "value": 233
           }
         ],
-        "Serology": [
+        "CMP": [
           {
             "clinical_significance": null,
             "is_abnormal": true,
-            "reference_range": "negative",
-            "test": "Campylobacter jejuni IgM",
-            "unit": "",
-            "value": "Positive"
+            "reference_range": "136-145",
+            "test": "Sodium",
+            "unit": "mEq/L",
+            "value": 133
+          },
+          {
+            "is_abnormal": false,
+            "reference_range": "3.5-5.1",
+            "test": "Potassium",
+            "unit": "mEq/L",
+            "value": 3.9
+          },
+          {
+            "is_abnormal": false,
+            "reference_range": "98-107",
+            "test": "Chloride",
+            "unit": "mEq/L",
+            "value": 100
+          },
+          {
+            "is_abnormal": false,
+            "reference_range": "22-29",
+            "test": "Bicarbonate",
+            "unit": "mEq/L",
+            "value": 24
+          },
+          {
+            "is_abnormal": false,
+            "reference_range": "7-20",
+            "test": "BUN",
+            "unit": "mg/dL",
+            "value": 10
+          },
+          {
+            "is_abnormal": false,
+            "reference_range": "0.5-1.1",
+            "test": "Creatinine",
+            "unit": "mg/dL",
+            "value": 0.8
+          },
+          {
+            "is_abnormal": false,
+            "reference_range": "70-100",
+            "test": "Glucose",
+            "unit": "mg/dL",
+            "value": 92
+          },
+          {
+            "is_abnormal": false,
+            "reference_range": "8.6-10.2",
+            "test": "Calcium",
+            "unit": "mg/dL",
+            "value": 9.2
+          },
+          {
+            "is_abnormal": false,
+            "reference_range": "7-56",
+            "test": "ALT",
+            "unit": "U/L",
+            "value": 24
+          },
+          {
+            "is_abnormal": false,
+            "reference_range": "10-40",
+            "test": "AST",
+            "unit": "U/L",
+            "value": 23
+          },
+          {
+            "is_abnormal": false,
+            "reference_range": "44-147",
+            "test": "Alkaline phosphatase",
+            "unit": "U/L",
+            "value": 77
+          },
+          {
+            "is_abnormal": false,
+            "reference_range": "0.1-1.2",
+            "test": "Total bilirubin",
+            "unit": "mg/dL",
+            "value": 0.4
+          },
+          {
+            "is_abnormal": false,
+            "reference_range": "3.5-5.0",
+            "test": "Albumin",
+            "unit": "g/dL",
+            "value": 4.0
+          }
+        ],
+        "Muscle": [
+          {
+            "is_abnormal": false,
+            "reference_range": "26-192",
+            "test": "CK",
+            "unit": "U/L",
+            "value": 96
           }
         ]
+      }
+    },
+    "literature_search": {
+      "general": {
+        "query": "Guillain-Barre syndrome with CSF pleocytosis; first-line immunotherapy",
+        "results": [
+          {
+            "evidence_level": "guideline",
+            "finding": "A CSF cell count of 5-50/mm3 is compatible with GBS but should prompt consideration of other diagnoses, such as infectious polyradiculitis or leptomeningeal malignancy; more than 50/mm3 suggests another diagnosis.",
+            "source": "[EAN_PNS_2023]"
+          },
+          {
+            "evidence_level": "guideline",
+            "finding": "Guidelines for adults with GBS who cannot walk unaided advise IVIg 2 g/kg over 5 days within 2 weeks of onset or plasma exchange within 4 weeks, with no preference between them; corticosteroids are not advised.",
+            "source": "[EAN_PNS_2023]"
+          }
+        ],
+        "summary": "Mild CSF pleocytosis is compatible with GBS but prompts a search for infectious or malignant polyradiculopathy; IVIg or plasma exchange is advised for patients unable to walk unaided [EAN_PNS_2023]."
       }
     },
     "specialized_test": {
       "findings": [
         {
-          "finding": "DML 6.6 ms (prolonged); CV 38 m/s (reduced)",
+          "finding": "DML 6.6 ms (prolonged; normal <4.2 ms); CV 38 m/s (reduced; normal >49 m/s); CMAP 4.6 mV (normal >4.0 mV)",
           "nerve": "Bilateral median motor"
         },
         {
-          "finding": "DML 8.4 ms (prolonged); CV 28 m/s (severely reduced); CMAP 2.2 mV (reduced)",
+          "finding": "DML 8.4 ms (prolonged; normal <6.0 ms); CV 28 m/s (severely reduced; normal >41 m/s); CMAP 2.2 mV (reduced; normal >2.5 mV)",
           "nerve": "Bilateral peroneal motor"
         },
         {
@@ -727,12 +792,16 @@
         {
           "finding": "Absent bilaterally",
           "nerve": "H-reflex"
+        },
+        {
+          "finding": "Reduced recruitment of normal-morphology motor unit potentials in tibialis anterior and vastus lateralis bilaterally; no fibrillation potentials",
+          "nerve": "Needle EMG"
         }
       ],
-      "impression": "This is an ABNORMAL nerve conduction study. 1. Prolonged distal motor latencies and severely reduced conduction velocities in bilateral median and peroneal motor nerves; reduced peroneal CMAP amplitudes. 2. Absent sural sensory nerve action potentials bilaterally. 3. Absent F-waves bilaterally (median and peroneal). 4. Absent H-reflex bilaterally. Findings indicate a severe demyelinating polyradiculoneuropathy",
+      "impression": "This is an ABNORMAL nerve conduction study and needle EMG. 1. Prolonged distal motor latencies and severely reduced conduction velocities in bilateral median and peroneal motor nerves; reduced peroneal CMAP amplitudes. 2. Absent sural sensory nerve action potentials bilaterally. 3. Absent F-waves bilaterally (median and peroneal). 4. Absent H-reflex bilaterally. 5. Reduced recruitment without active denervation. Findings indicate a severe demyelinating polyradiculoneuropathy.",
       "quantitative_data": {
-        "pattern": "Severe AIDP",
-        "severity": "Moderate-severe"
+        "pattern": "Severe demyelinating polyradiculoneuropathy",
+        "severity": "Severe"
       },
       "recommended_actions": [],
       "test_type": "Nerve Conduction Studies and EMG"
@@ -743,7 +812,7 @@
     "citation_gap": [],
     "condition_full_name": "Guillain-Barr\u00e9 syndrome (AIDP) \u2014 HIV-associated",
     "criteria_pack_version": "1.0",
-    "difficulty_rationale": "6 required tools, 1 red herring(s); atypical or multi-comorbidity presentation requires substantial cross-modality synthesis and active rule-out of strong mimics.",
+    "difficulty_rationale": "5 required and 3 recommended actions, 2 red herrings; HIV-associated GBS with CSF pleocytosis that must be separated from CMV polyradiculitis and lymphoma.",
     "fallback_tool_kinds": {
       "advanced_imaging": "normal",
       "ct": "incidental",
@@ -760,7 +829,7 @@
     "vocab_gap": []
   },
   "patient": {
-    "chief_complaint": "Progressive ascending weakness with areflexia in an HIV-positive woman with CD4 380 and undetectable viral load.",
+    "chief_complaint": "Progressive ascending weakness with areflexia in a woman with HIV on antiretroviral therapy.",
     "clinical_history": {
       "allergies": [
         "No known drug allergies"
@@ -777,7 +846,7 @@
         }
       ],
       "past_medical_history": [
-        "HIV infection, on antiretroviral therapy, CD4 count 380 cells/mm3, viral load undetectable",
+        "HIV infection on antiretroviral therapy; CD4 count 380 cells/mm3 and viral load undetectable at her clinic review 6 months ago",
         "No prior neurological disease"
       ],
       "social_history": {
@@ -795,18 +864,21 @@
       "handedness": "right",
       "sex": "female"
     },
-    "history_present_illness": "Ms. L. is a 35-year-old HIV-positive woman on antiretroviral therapy presenting with a 9-day history of ascending weakness. Her HIV is well-controlled (CD4 380, VL undetectable) on Biktarvy. She had a gastrointestinal illness 3 weeks ago lasting 4 days. Nine days ago, she developed bilateral foot paresthesias that rapidly ascended. She has progressive bilateral leg weakness and cannot walk without support. She notes left facial weakness and mild left ptosis. She has mild dysphagia for thin liquids. She has been adherent to her antiretrovirals. She denies any opportunistic infections, night sweats, weight loss, or rashes. Emergency providers raised concern about HIV-associated neuromuscular disease.",
+    "history_present_illness": "Ms. L. is a 35-year-old HIV-positive woman on antiretroviral therapy presenting with a 9-day history of ascending weakness. Her HIV has been well controlled on Biktarvy (CD4 380 and viral load undetectable at her clinic review 6 months ago). She had a gastrointestinal illness 3 weeks ago lasting 4 days. Nine days ago, she developed bilateral foot paresthesias that rapidly ascended. She has progressive bilateral leg weakness and cannot walk without support. She notes left facial weakness and mild left ptosis. She has mild dysphagia for thin liquids. She has been adherent to her antiretrovirals. She denies any opportunistic infections, night sweats, weight loss, or rashes. Emergency providers raised concern about HIV-associated neuromuscular disease.",
     "neurological_exam": {
-      "additional": "FVC: 2.1 L (predicted 3.4 L \u2014 62%). NIF: -30 cmH2O.",
+      "additional": "Respiratory: speaks in full sentences; no accessory muscle use at rest. Cough effective.",
       "coordination": "Limited by weakness.",
-      "cranial_nerves": "LEFT facial weakness \u2014 forehead involved (LMN pattern). Mild left-sided ptosis. No diplopia. Gag intact. Voice normal.",
+      "cranial_nerves": "Left facial weakness, forehead involved (LMN pattern). Mild left-sided ptosis. Pupils equal and reactive to light. Full eye movements, no diplopia. Gag intact. Voice normal.",
       "gait": "Cannot walk without bilateral support.",
       "mental_status": "Alert and oriented x4. Anxious.",
       "motor": "Bilateral lower extremity proximal weakness: hip flexion 3+/5 bilaterally, knee extension 4/5. Ankle dorsiflexion 4/5. Upper extremity: shoulder abduction 4/5, grip 4+/5.",
-      "reflexes": "Areflexia throughout \u2014 absent bilateral patellar, Achilles, biceps, triceps.",
+      "reflexes": "Areflexia throughout: absent bilateral patellar, Achilles, biceps, triceps.",
       "sensory": "Bilateral distal glove-and-stocking paresthesias. Pinprick reduced to mid-calf bilaterally."
     },
     "patient_id": "NB-GBS-P02",
+    "physical_exam": {
+      "general": "Weight 53.8 kg, height 155 cm."
+    },
     "vitals": {
       "bp_diastolic": 86,
       "bp_systolic": 138,

@@ -1,0 +1,46 @@
+# GBS-S04
+Reviewer status: R1 not reviewed, R2 approved (with one note) | Approved before this round: yes
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| e48d42bd-8ab5-4cc3-a053-396b3ef2bc40 | FIXED | I took the reviewer's first option (date the swab to the earlier illness), per plan S04. `patient.history_present_illness` now says the influenza A swab was taken at his GP practice during the upper respiratory illness 2 weeks ago, and that the fever and cough settled within a week. The nasopharyngeal PCR is deleted from `initial_tool_outputs.labs` (and from its summary and interpretation). `physical_exam.general` records no cough, crackles or pharyngitis. A red herring now carries the resolution: T 37.4 C is not a fever, WBC 12.2 fits stress, the CSF is acellular, and the influenza is the antecedent, not an active infection. That is why no antiviral or isolation must is needed. The label "post-influenza A" stays (plan). KCE 4 explains the swab timing. |
+
+## Own findings
+| dim (A schema, B consistency, C clinical, D leakage, E language) | severity (blocker/major/minor) | field path | finding | action (FIXED/FLAGGED) |
+| --- | --- | --- | --- | --- |
+| D | major | `patient.neurological_exam.additional` | It gave FVC 1.6 L (42%) and NIF -22 "at threshold" (C1/C7). | FIXED: clinical signs only (short sentences, weak cough, accessory muscle use). The chart note on diabetic neuropathy is kept. |
+| C | major | respiratory follow-up `request_respiratory_monitoring` | FVC 1.4 L had the reference "42% predicted", but 1.4/3.8 is 37%, and 42% was the triage value. NIF was flagged H. There was no weight, mL/kg or MEP (C1). | FIXED: weight 76.7 kg and height 167 cm in `physical_exam.general` (BMI 27.5; a predicted 3.8 L fits a 68-year-old man of 167 cm). FVC 1.6 L (42%, 20.9 mL/kg) falls to 1.4 L (37%, 18.3 mL/kg) over 3 h, MIP -22 to -20, MEP 32, weak cough, all L. |
+| B | major | CSF follow-up | CSF glucose 64 mg/dL with a ratio of 0.72 implies a serum glucose near 89, but the serum glucose is 148. | FIXED: CSF glucose 92 mg/dL, ratio 0.62. Text in report voice, with reference ranges and an RBC unit. |
+| B | minor | `initial_tool_outputs.labs.panels.HbA1c` | The reference range was "<7.0%", which is a treatment target, not a reference interval, and the value was a string. | FIXED: reference 4.0-5.6, numeric 7.4 with unit %. |
+| C | major | `initial_tool_outputs.labs` | The HIV leaky clinical_significance sentence (C10), and no liver tests, albumin or CK. | FIXED: HIV with null significance; CMP and CK added. |
+| D | minor | `initial_tool_outputs.specialized_test` | The sural finding said "proximal demyelinating features are clearly acute", and the pattern cited the clinical history as a diagnosis. There was no needle EMG although titled NCS and EMG. | FIXED: hedged within modality ("pre-existing neuropathy on the requisition may contribute"). Needle EMG line added (reduced recruitment, no denervation). The values are unchanged. |
+| A/D | major | ganglioside follow-up `request_anti_ganglioside_panel` | A typical sensorimotor case (C2). | FIXED: deleted. |
+| C | major | telemetry follow-up `request_cardiac_monitoring` | 168 h with an IV labetalol treatment on day 2 (C12, ruling 4). | FIXED: the first 24 h only. Sinus tachycardia 98-136, the night-1 bradycardia to 48 (self-limited), BP 124/76 to 176/104, QTc 462-476. a8 expected_evidence is canonical. |
+| C/D | major | DDI follow-up `request_drug_interactions` | The only DDI content sat in a follow-up (no initial output). It proposed management ("Plasmapheresis as alternative to IVIG if contraindication develops", "hold") and wrote "CONTRAINDICATED" in capitals (C8). | FIXED: moved to `initial_tool_outputs.drug_interactions` at category level: metoprolol with autonomic bradycardia, metformin with IVIg renal risk, tamsulosin and metoprolol with PE hypotension (relative caution). The succinylcholine contraindication is kept as a well-established class warning (plan S04). The alternatives line is removed and the follow-up deleted. |
+| C | major | `action-6-check-drug-interactions` | It was required with template text. | FIXED: kept required with a case label and evidence. The medication list has concrete interactions that change management: a beta-blocker with documented autonomic bradycardia, metformin before IVIg, an alpha-blocker before PE, and imminent intubation. A soft constraint a1 before a6 (creatinine) replaces the template constraints. |
+| A/D | major | literature follow-up `search_gbs_treatment`, `initial_tool_outputs.literature_search` | An empty placeholder follow-up, and an initial output repeating a5's expected_evidence (C9, C11). | FIXED: follow-up deleted; canonical population-keyed summary. a5 optional and last. |
+| C | major | `ground_truth.action_criteria`, `stop_rule` | The template criteria; the stop rule listed literature, with `max_additional_actions` 0. | FIXED per plan 3.1. Order a2, a3, a1, a4, a8, a7, a6, a5. The stop rule lists the six required criteria, `max_additional_actions` 3. |
+| C | major | `ground_truth.assessment` | "Intubate" gave no reason, IVIg had no dose, there was no swallow must despite coughing on water, and nothing handled the beta-blocker, alpha-blocker or metformin. The steroid prohibition was the template. | FIXED: elective intubation in the ICU with the triggers; IVIg 2 g/kg (about 30.5 g/day) or PE with the indication; telemetry; withhold metoprolol, tamsulosin and metformin as appropriate, with insulin for glucose; nil by mouth until a swallow assessment; DVT prophylaxis; therapy. Canonical C8 prohibitions plus succinylcholine. |
+| C | major | `ground_truth.differential` | CIDP and AMAN/AMSAN were "moderate" (AMAN on antibody positivity that the case did not have). CIP and cord compression had false reasons. The diabetic-neuropathy mimic the HPI raises was missing (ruling 7). | FIXED: CIDP low; progression of diabetic polyneuropathy added at very_low; AMAN/AMSAN, CIP, botulism and cord compression very_low, with reasons. |
+| C | minor | `ground_truth.key_clinical_evidence` | Pearl 3 (repeat EMG for subtyping) is against EAN/PNS 2023. | FIXED: five pearls: Brighton level 1, the multi-factor intubation decision, DPN versus acute features, the canonical C3 pearl with the swab timing, and autonomic monitoring with the beta-blocker. |
+| A | minor | `avoided_actions[*].citations`, `metadata.difficulty_rationale` | `van_den_Berg_2014`; counts now wrong. | FIXED. |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+GBS-S04 stays a severe post-influenza A AIDP in a 68-year-old man with diabetes and mild diabetic neuropathy, and the label is unchanged. The influenza swab is now history: taken by his GP during the illness 2 weeks ago, which has resolved. A red herring explains why 37.4 C and WBC 12.2 are not an active infection, and the PCR is gone from the current labs. The patient block no longer gives spirometry. The respiratory step shows FVC 1.6 falling to 1.4 L in 3 h (18.3 mL/kg at 76.7 kg, 37% predicted), MIP -20, MEP 32 and a weak cough. The musts make elective intubation in the ICU explicit, with IVIg 2 g/kg or PE. They also cover handling metoprolol (autonomic bradycardia to 48 on telemetry), tamsulosin and metformin, nil by mouth until a swallow assessment, DVT prophylaxis and therapy, and succinylcholine is prohibited. The interaction check stays required, with real category-level content. Telemetry covers 24 h without treatment. The CSF glucose now fits the serum glucose. Diabetic neuropathy is now in the differential at very_low, and CIDP and AMAN are lowered with reasons.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+- Plan CENTRAL 5: weight is in `patient.physical_exam.general`.
+- Plan CENTRAL 6: the appended synonyms accept "miller fisher syndrome" and "AMAN" for this AIDP case.
+
+## Open questions for Andrea (judgment calls you could not settle)
+None. I decided these myself:
+- a6 stays required (ROUND_POLICY ruling 6): metoprolol with documented autonomic bradycardia and metformin before IVIg change management.
+- The succinylcholine prohibition has no citation, as in M01.
+
+## Verification
+Adversarial check, 24 Oct 2026 (approved case). Read the log, the diff and the final case content.
+- Note e48d42bd: confirmed fixed (swab dated to the GP visit 2 weeks ago in the HPI, PCR gone from the labs, no respiratory signs in `physical_exam.general`, red herring resolves 37.4 C and WBC 12.2; label keeps "post-influenza A").
+- Arithmetic checked: BMI 27.5; FVC 1.6 L = 20.9 mL/kg and 42% of 3.8 L, 1.4 L = 18.3 mL/kg and 37%, fall 13%; predicted 3.8 L matches reference equations for a 68-year-old man of 167 cm; MIP and MEP lower limits (-52, 61 cmH2O) match Evans and Whitelaw; CSF:serum glucose 92/148 = 0.62; IVIg 30.5 g/day at 76.7 kg.
+- a6 required is justified (metoprolol with autonomic bradycardia on telemetry, metformin before IVIg, tamsulosin before PE); the soft a1 before a6 constraint names existing ids. The DDI output's short cautions are category-level, and the leak guard passes. Nothing changed.
+- `perfect_agent.py GBS-S04 -v` passes; `case_io.py check` and `test_case_guards.py -k GBS-S04` clean for the case.
