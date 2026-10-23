@@ -170,12 +170,7 @@ export function CaseDetail({ caseId }: { caseId: string }) {
           <PatientSection patient={caseDetail.data.patient} />
           <NeuroExamSection patient={caseDetail.data.patient} />
           <PhysicalExamSection patient={caseDetail.data.patient} />
-          <InitialWorkupSection
-            toolOutputs={
-              caseDetail.data.initial_tool_outputs as Record<string, unknown> | null
-            }
-          />
-          <PathwaySection followups={caseDetail.data.followup_outputs} />
+          <PathwaySection caseData={caseDetail.data} />
           <GroundTruthSection groundTruth={caseDetail.data.ground_truth} />
           <MetadataSection metadata={caseDetail.data.metadata} />
         </div>
@@ -567,45 +562,6 @@ function PhysicalExamSection({ patient }: { patient: PatientProfile }) {
   )
 }
 
-function ToolOutputCard({
-  toolName,
-  output,
-  path,
-}: {
-  toolName: string
-  output: unknown
-  path: string
-}) {
-  const [open, setOpen] = useState(false)
-  if (output === null || output === undefined) return null
-  const label = toolName.replace(/_/g, " ")
-  return (
-    <AnnotatableField path={path} attachRight>
-      <div className="border border-border rounded-lg overflow-hidden">
-        <button
-          type="button"
-          onClick={() => setOpen((o) => !o)}
-          className="w-full flex items-center justify-between gap-2 px-4 py-2.5 bg-secondary/30 hover:bg-secondary/60 transition-colors"
-        >
-          <span className="flex items-center gap-2">
-            {open ? (
-              <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
-            ) : (
-              <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />
-            )}
-            <span className="font-medium text-sm capitalize">{label}</span>
-          </span>
-        </button>
-        {open && (
-          <div className="px-4 py-3 bg-background/40 text-xs">
-            <RenderValue value={output} />
-          </div>
-        )}
-      </div>
-    </AnnotatableField>
-  )
-}
-
 function RenderValue({
   value,
   depth = 0,
@@ -665,58 +621,91 @@ function RenderValue({
   return <span>{String(value)}</span>
 }
 
-function InitialWorkupSection({
-  toolOutputs,
-}: {
-  toolOutputs: Record<string, unknown> | null
-}) {
-  const present = useMemo(() => {
-    if (!toolOutputs) return [] as Array<[string, unknown]>
-    return Object.entries(toolOutputs).filter(
-      ([, v]) => v !== null && v !== undefined,
-    )
-  }, [toolOutputs])
-  if (present.length === 0) return null
-  return (
-    <Section title={`Initial workup (${present.length})`} defaultOpen={false}>
-      <div className="space-y-2">
-        {present.map(([name, output]) => (
-          <ToolOutputCard
-            key={name}
-            toolName={name}
-            output={output}
-            path={`initial_tool_outputs.${name}`}
-          />
-        ))}
-      </div>
-    </Section>
-  )
+// Where each initial output comes from: the tool whose first order returns it.
+const INITIAL_OUTPUT_TOOL: Record<string, string> = {
+  eeg: "analyze_eeg",
+  mri: "analyze_brain_mri",
+  ecg: "analyze_ecg",
+  labs: "interpret_labs",
+  csf: "analyze_csf",
+  ct: "order_ct_scan",
+  echo: "order_echocardiogram",
+  cardiac_monitoring: "order_cardiac_monitoring",
+  advanced_imaging: "order_advanced_imaging",
+  specialized_test: "order_specialized_test",
+  body_imaging: "order_body_imaging",
+  microbiology: "order_microbiology",
+  tissue_diagnosis: "obtain_tissue_diagnosis",
+  clinical_assessment: "perform_clinical_assessment",
+  literature_search: "search_medical_literature",
+  drug_interactions: "check_drug_interactions",
 }
 
-function PathwaySection({
-  followups,
-}: {
-  followups: NeuroBenchCase["followup_outputs"]
-}) {
-  if (!followups || followups.length === 0) return null
+type PathwayStep = {
+  path: string
+  toolName: string
+  title: string
+  output: unknown
+  snippet: string
+}
+
+// One pathway, as the harness serves it. Reviewers used to see the initial outputs in a collapsed
+// "Initial workup" box and the follow-ups alone as "Diagnostic pathway", and read the follow-ups as
+// the whole work-up: in ALS the pathway then appeared to start with a riluzole interaction check while
+// the EMG sat in the box (79 notes). Nothing in either list is given to the agent upfront. An initial
+// output answers the first order of its tool, so it is placed where the ground truth's first action
+// with that tool sits; the follow-ups (later or more specific orders) follow in their stored order.
+function PathwaySection({ caseData }: { caseData: NeuroBenchCase }) {
+  const steps = useMemo(() => {
+    const criteria = caseData.ground_truth.action_criteria
+    const firstUse = (tool: string) => {
+      const index = criteria.findIndex((criterion) =>
+        criterion.alternatives.some((item) => item.tool_name === tool),
+      )
+      return index === -1 ? criteria.length : index
+    }
+    const initial = Object.entries(
+      (caseData.initial_tool_outputs ?? {}) as Record<string, unknown>,
+    )
+      .filter(([, output]) => output !== null && output !== undefined)
+      .map(([name, output]) => {
+        const toolName = INITIAL_OUTPUT_TOOL[name] ?? name
+        return { name, output, toolName, rank: firstUse(toolName) }
+      })
+      .sort((a, b) => a.rank - b.rank)
+      .map<PathwayStep>(({ name, output, toolName }) => ({
+        path: `initial_tool_outputs.${name}`,
+        toolName,
+        title: "First order of this tool",
+        output,
+        snippet: `${toolName}: first order`,
+      }))
+    const followups = (caseData.followup_outputs ?? []).map<PathwayStep>((step, i) => ({
+      path: `followup_outputs[${i}]`,
+      toolName: step.tool_name,
+      title: step.trigger_action,
+      output: step.output,
+      snippet: `${step.tool_name}: ${step.trigger_action}`,
+    }))
+    return [...initial, ...followups]
+  }, [caseData])
+  if (steps.length === 0) return null
   return (
-    <Section
-      title={`Diagnostic pathway (${followups.length})`}
-      defaultOpen={false}
-    >
+    <Section title={`Diagnostic pathway (${steps.length})`} defaultOpen={false}>
+      <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
+        Nothing here is shown to the agent upfront: each result is returned only when the agent
+        orders the study. "First order" results answer the first call of a tool and are listed in
+        the order of the Optimal actions; the others answer a later or more specific order.
+      </p>
       <ol className="relative border-l-2 border-primary/30 ml-2 space-y-4 pl-5">
-        {followups.map((step, i) => (
-          <AnnotatableField
-            key={i}
-            path={`followup_outputs[${i}]`}
-            snippet={`${step.tool_name}: ${step.trigger_action}`}
-          >
+        {steps.map((step, i) => (
+          <AnnotatableField key={step.path} path={step.path} snippet={step.snippet}>
             <li className="relative pr-6">
               <span className="absolute -left-[27px] top-1 w-3 h-3 rounded-full bg-primary border-2 border-background" />
               <div className="text-xs text-muted-foreground uppercase tracking-wider">
-                Step {i + 1} · {step.tool_name}
+                Step {i + 1} · {step.toolName}
               </div>
-              <div className="text-sm font-medium">{step.trigger_action}</div>
+              <div className="text-sm font-medium">{step.title}</div>
               <details className="mt-1 group">
                 <summary className="text-xs text-primary cursor-pointer select-none">
                   Show output
