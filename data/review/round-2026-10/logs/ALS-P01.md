@@ -1,0 +1,49 @@
+# ALS-P01
+Reviewer status: R1 needs_changes, R2 not reviewed | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| dd04fa1d-5520-44cf-b473-44d5d6bc5d40 | FIXED | `ground_truth.diagnosis.accepted[0]` "... initially possible, confirmed definite on 3-month repeat EMG" -> "Amyotrophic lateral sclerosis (ALS), early limb-onset, possible ALS by Awaji criteria" (`icd_codes[0]` G12.21 and appended synonyms untouched); musts now frame early suspected ALS needing follow-up and repeat EMG (C7) |
+| 92755ec0-38eb-48e7-8b12-979108e33695 | FIXED | Criteria reordered (EMG, brain MRI, spine MRI, labs first); literature follow-up `search_benign_fasciculation_als_distinction` and `action-1-search-medical-literature` deleted; follow-ups now respiratory, genetics, riluzole; repeat EMG/NCS in about 3 months is `required_recommendations[1]` (C1, C2, C7) |
+| d92369d6-0b68-4c28-b664-06c3b36e07eb | FIXED | Literature step deleted; clinical and electrodiagnostic reassessment carried by the EMG criterion (first), the repeat-EMG must and the prohibition "Do not reassure him on the basis of the earlier benign fasciculation syndrome diagnosis ..." |
+| 8ad11950-ddca-4e21-af5a-3f5f73180f0d | FIXED | The statement was in the deleted literature output. The same overstatement in the EMG report ("characteristic of pathological, not benign, fasciculations") removed from `initial_tool_outputs.specialized_test.findings[0]`; the softened wording is `key_clinical_evidence[2]` ("Complex fasciculations raise concern ... are not diagnostic alone; progression on repeat EMG confirms the diagnosis."); `metadata.notes` reworded the same way |
+| 0f3c6f3c-3d94-4219-bb84-3d86c9b183c8 | FIXED | Riluzole check moved last, made `optional` (plan: riluzole discussed now, started on confirmation); soft constraint EMG before riluzole check |
+| ba745e79-d2d0-4ca1-ae6c-21ae45c57129 | FIXED | Old must list (EMG/MRI/lab actions, "Initiate riluzole") replaced by the plan's P01 set: explain concern for early ALS, repeat EMG/NCS in about 3 months with clinical review, respiratory monitoring, discuss riluzole to start on confirmation, specialist ALS clinic, genetic counselling |
+| c2c49db5-2f22-4b15-8bb1-5ce40d23048f | FIXED | Respiratory function moved after the diagnostic core and relabelled as staging (`recommended`); output reference ranges and impression per C4 (normal) |
+| 3b92882f-d181-4b84-8463-4cdb4d254fdc | FIXED | AMX0035 removed (`alternatives` = []); non-riluzole warning "Monitor for psychiatric symptoms" removed; canonical summary |
+| 3e9a616b-5243-400a-8b3c-b5a823a67ee8 | FIXED | Same as dd04fa1d and 92755ec0: label "possible ALS", musts and pearls state suspected early ALS needing follow-up and repeat EMG; core work-up leads the pathway |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| D | major | `patient.history_present_illness` | "A repeat EMG has been ordered." and the reasoning sentence about subtle UMN signs and one-region LMN signs (synthesis of the scored EMG) | FIXED: both sentences deleted (C11); the prior normal EMG 2 years ago stays as history |
+| B | major | `initial_tool_outputs.mri` | Brain report impression was the spine impression (C5-C6 foraminal narrowing) and claimed "no enhancing lesion" without contrast | FIXED: brain-only normal report |
+| B | major | `initial_tool_outputs.body_imaging` | Spine impression held brain statements (corticospinal tract, infarct, demyelinating disease); JSON dump in `description` | FIXED: plain cervical and cord findings, numbered impression |
+| D | minor | `initial_tool_outputs.specialized_test.findings` | Interpretive "characteristic of pathological, not benign, fasciculations"; caps "NO clear fibrillations" without stating chronic change | FIXED: morphology kept, interpretation removed; lumbosacral line states no fibrillations and no chronic change |
+| B | minor | `initial_tool_outputs.specialized_test.findings` (Motor NCS) | Only one motor nerve reported, which cannot exclude conduction block in a man with right foot dragging | FIXED: right ulnar, peroneal and tibial motor CMAPs normal, normal latencies and velocities, no block or dispersion added |
+| A/B | major | `initial_tool_outputs.labs` | No blood count, renal or liver results although the old criterion required CBC and CMP; Free T4 as a string; template panel names; interpretation names ALS | FIXED: panels per C13 (stored values kept; normal CBC, CMP and free T4 1.3 ng/dL added); CK 312 U/L stated as 1.8x ULN |
+| C | major | `ground_truth.action_criteria` | MRI `contrast/protocol`, spine `contrast: false`, nine exact lab panels; label = rationale; mixed citations | FIXED: C16 arguments and canonical texts; EMG expected evidence states that denervation is confined to the right cervical region |
+| C | major | `ground_truth.differential` | MMN and "flail arm variant" moderate; anti-GM1 cited though never tested | FIXED: flail arm entry deleted (an ALS phenotype, not a competing diagnosis; C8); BFS, MMN, cervical radiculopathy low; IBM very_low |
+| C | minor | `ground_truth.assessment.prohibited_recommendations[1]` | Plan template for cervical surgery says the changes "do not explain denervation in other regions", but here denervation is only in the cervical region | FIXED with case wording: the C5-C6 foraminal narrowing does not explain C8-T1 hand denervation, UMN signs or widespread fasciculations |
+| C | minor | `ground_truth.key_clinical_evidence` | Template pearls (engineering text, "2-5x" CK, El Escorial EMG, generic spondylosis) | FIXED: 7 pearls (Gold Coast/Awaji status, K-EMG, complex fasciculations, prior BFS label, K-NCS, K-CK 1.8x, K-RESP) |
+| E | minor | `metadata.notes`, `metadata.difficulty_rationale` | "complex fasciculation morphology on EMG is pathological"; "5 required tools" | FIXED: softened wording; "4 required tools" |
+| B | minor | `initial_tool_outputs.labs` | B12 420, folate 10, ESR 8, CRP 2 identical across many ALS cases (template) | FLAGGED, not changed (plan: keep stored values) |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+The case is now framed as early limb-onset ALS that is "possible" by Awaji: upper motor neuron signs (right Hoffman sign, brisk reflexes) with active and chronic denervation confined to the right cervical region and complex fasciculations elsewhere. The HPI no longer says a repeat EMG has been ordered or reasons about the criteria. The pathway is EMG/NCS, brain MRI, spine MRI and labs, then respiratory baseline, optional genetics and an optional riluzole check; the literature step is gone. The brain and spine MRI reports are separated (brain normal; mild C3-C6 degeneration with right C5-C6 foraminal narrowing, normal cord). The EMG now reports four motor nerves without conduction block and no longer calls the fasciculations "pathological, not benign". The labs are complete and CK is 1.8x ULN. Musts: explain the strong concern and the need for confirmation, repeat EMG/NCS in about 3 months, respiratory monitoring, discuss riluzole now to start on confirmation, specialist ALS clinic, genetic counselling. Prohibitions: no reassurance from the old BFS label, no cervical surgery for the foraminal narrowing, no attribution to anxiety, no immunotherapy.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+- Label change of `accepted[0]` within G12.21 (plan section 5 item 3: no synonym change needed).
+- Citation keys `[EFNS_ALS_2012]`, `[EAN_ALS_2024]`, `[NICE_NG42]`, `[ALS_genetics_2023]`, `[Riluzole_SmPC]`.
+- UI: initial work-up in criterion order.
+
+## Open questions for Andrea (judgment calls you could not settle)
+- Plan Q9: Gold Coast 2020 is already met (UMN and LMN dysfunction in the right arm), so a neurologist could offer riluzole now. Following the reviewer's call for caution, the case defers starting riluzole to confirmation at the 3-month review and keeps the interaction check optional. Confirm.
+- The repeat EMG is a must, not an orderable criterion (the case has no repeat-EMG output, and a 3-month repeat cannot happen within the encounter). Agree?
+
+## Verification
+Adversarial verifier, 23 October 2026. Checked: all 9 note ids present; label "possible ALS by Awaji" with G12.21 and synonyms untouched; musts and prohibitions are exactly the plan's P01 set (repeat EMG in about 3 months, riluzole discussed now and started on confirmation, no BFS reassurance, cervical surgery, functional and immunotherapy prohibitions); DI optional and last; literature gone; HPI no longer says a repeat EMG was ordered and has no criteria reasoning (prior normal EMG kept as history); EMG impression vs findings (active plus chronic change only in the right cervical region, complex fasciculations elsewhere, thoracic and bulbar fasciculations only, four motor nerves without block); the "pathological, not benign" claim is gone from the report and the softened wording is in key evidence (note 8ad11950); brain and spine reports region-pure; the C5-C6 surgery prohibition and the cervical radiculopathy entry correctly cite C8-T1 hand denervation; CK 312/174 = 1.8x ULN; forbidden strings: none. Perfect-agent and case_io check clean. Found nothing that needed a change.
+
+## Condition audit (ALS lead, 23 Oct 2026)
+- `followup_outputs[0].output.findings[*].is_abnormal` added (rows carried no abnormality marker), set from each row's reference range as plan C4 prescribes, so all 30 respiratory reports mark abnormal values the same way (values and impression unchanged).
