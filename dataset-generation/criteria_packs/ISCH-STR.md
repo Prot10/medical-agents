@@ -85,7 +85,7 @@ Secondary prevention by mechanism (musts) [AHA_ASA_2021_secondary]:
 - **Infective endocarditis:** no anticoagulation or antiplatelet started for the stroke; exclude mycotic aneurysm; endocarditis prophylaxis is one pre-procedure dose, not a course, and a bicuspid aortic valve is not an indication [ESC_endocarditis_2023] [AHA_IE_prophylaxis_2021]
 - **PFO:** antiplatelet; closure discussion with the RoPE score [AAN_PFO_2020]
 - **Antiphospholipid syndrome:** warfarin INR 2 to 3 once confirmed at 12 weeks; no DOAC
-- **Pregnancy:** LMWH or low-dose aspirin; no warfarin; no statin; MRI without gadolinium preferred; CT and iodinated contrast are not withheld when they decide reperfusion [ESO_women_2022]
+- **Pregnancy:** LMWH or low-dose aspirin; no warfarin; no statin; MRI without gadolinium preferred; CT and iodinated contrast are not withheld when they decide reperfusion, and pregnancy does not delay thrombolysis or thrombectomy [ESO_women_2022] [AHA_maternal_stroke_2026]
 - Sumatriptan is contraindicated after ischaemic stroke and in antiphospholipid syndrome [Sumatriptan_SmPC]; ACE inhibitor with alteplase: watch for orolingual angioedema
 - Stroke unit: "Admit to a stroke unit with continuous cardiac monitoring (telemetry) for at least the first 24 hours."; sinus rhythm with an embolic or cryptogenic pattern: prolonged ambulatory rhythm monitoring after discharge
 
@@ -150,8 +150,9 @@ Stop rule: `required_before_assessment` = every required criterion; `max_additio
 - `[Sumatriptan_SmPC]`: Sumatriptan Summary of Product Characteristics (contraindication after stroke or TIA; used in RP05)
 - `[Chabriat_2009]`: Chabriat H et al. CADASIL. Lancet Neurol 2009;8:643-653 (RP05 literature output)
 - `[OSullivan_2001]`: O'Sullivan M et al. MRI hyperintensities of the temporal lobe and external capsule in patients with CADASIL. Neurology 2001;56:628-634 (RP05 literature output)
-- `[EULAR_APS_2019]`: EULAR recommendations for the management of antiphospholipid syndrome in adults, 2019 (proposed key, RP04; reference to confirm)
-- `[ISTH_TTP_2020]`: ISTH 2020 guideline on TTP (proposed key, RP02; key name and reference to confirm)
+- `[EULAR_APS_2019]`: Tektonidou MG, Andreoli L, Limper M, et al. EULAR recommendations for the management of antiphospholipid syndrome in adults. Ann Rheum Dis 2019;78:1296-1304, doi 10.1136/annrheumdis-2019-215213 (RP04: vitamin K antagonist after arterial thrombosis in APS; no rivaroxaban in triple positivity; verified 24 Oct 2026)
+- `[ISTH_TTP_2020]`: Zheng XL, Vesely SK, Cataland SR, et al. ISTH guidelines for the diagnosis of thrombotic thrombocytopenic purpura. J Thromb Haemost 2020;18:2486-2495, doi 10.1111/jth.15006; with the companion ISTH guidelines for treatment of TTP, J Thromb Haemost 2020;18:2496-2502 (RP02: low ADAMTS13 activity in remission is a relapse risk, active TTP needs thrombocytopenia and microangiopathic haemolysis; verified 24 Oct 2026)
+- `[AHA_maternal_stroke_2026]`: Miller EC, et al. Prevention and treatment of maternal stroke in pregnancy and postpartum: a scientific statement from the American Heart Association. Stroke 2026, doi 10.1161/STR.0000000000000514 (RP02, RS04: pregnancy does not delay evaluation, thrombolysis or thrombectomy; CT, CTA and non-contrast MRI are used promptly; verified 24 Oct 2026). Cited beside `[ESO_women_2022]`, which stays the guideline for antithrombotic choice in pregnancy
 
 **Superseded (do not cite; kept for traceability):**
 - `[AHA_ASA_2019]`: Powers WJ et al. Guidelines for the early management of patients with acute ischemic stroke: 2019 update. Stroke 2019;50:e344-e418. Superseded by `[AHA_ASA_Stroke_2026]`

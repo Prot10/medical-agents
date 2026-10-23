@@ -53,3 +53,11 @@ The I63 category no longer appends mechanism labels ("embolic", "cardioembolic",
 - codes removed: I63.4, I63.5, I63.3, I63.2, I63.1, I63.8, I63.81, I63.89
 - codes added: I63.01
 - `case_io.py validate` OK; `perfect_agent.py` passes.
+
+## Open questions resolved (24 Oct 2026)
+
+Decisions: `plans/ISCH-STR-decisions.md`.
+
+- Echo output: added `echo_type` "TTE" to the stored echocardiogram report (the schema now keeps the field and the MockServer routes TTE/TEE/bubble orders by it; the value was only in `tool_parameters`).
+- Leak fix: literature criterion `action-7-search-medical-literature` expected_evidence reworded to a general-evidence description.
+- Must added: atorvastatin 80 mg for LDL 117 mg/dL after non-cardioembolic stroke (AHA/ASA 2021 COR 1, SPARCL) (decision OQ4g).

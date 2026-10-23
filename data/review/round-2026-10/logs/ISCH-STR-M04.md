@@ -57,3 +57,12 @@ The I63 category no longer appends mechanism labels ("embolic", "cardioembolic",
 - codes removed: I63.4, I63.5, I63.3, I63.2, I63.1, I63.8, I63.81, I63.89
 - codes added: I63.01
 - `case_io.py validate` OK; `perfect_agent.py` passes.
+
+## Open questions resolved (24 Oct 2026)
+
+Decisions: `plans/ISCH-STR-decisions.md`.
+
+- Echo output: added `echo_type` "TTE" to the stored echocardiogram report (the schema now keeps the field and the MockServer routes TTE/TEE/bubble orders by it; the value was only in `tool_parameters`).
+- Leak fix: literature criterion `action-6-search-medical-literature` expected_evidence reworded to a general-evidence description so the stored literature output no longer repeats it.
+- IVT decision must: states why NIHSS 4 is disabling (dysphagia to saliva, marked right-arm dysmetria, unsafe gait) (decision OQ2).
+- Auditor flag: template values made distinct: echo EF 60% to 63% (structured field, finding, impression, echo criterion evidence), Holter PACs 11 to 8 (finding, impression).

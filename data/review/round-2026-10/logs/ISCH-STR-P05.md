@@ -68,3 +68,9 @@ Paradoxical-embolism labels scoped to this case.
 - labels added: "paradoxical embolism", "paradoxical embolic stroke"
 - codes removed: I63.4, I63.5, I63.3, I63.2, I63.0, I63.1, I63.8, I63.81, I63.89
 - `case_io.py validate` OK; `perfect_agent.py` passes.
+
+## Open questions resolved (24 Oct 2026)
+
+Decisions: `plans/ISCH-STR-decisions.md`.
+
+- Must added: atorvastatin 80 mg for LDL 108 mg/dL after non-cardioembolic stroke (AHA/ASA 2021 COR 1, SPARCL) (decision OQ4g).

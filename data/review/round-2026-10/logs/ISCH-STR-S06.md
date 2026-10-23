@@ -74,3 +74,9 @@ I63.81 no longer grants CADASIL (scoped to RP05) and the case no longer gets emb
 - labels added: "small vessel stroke"
 - codes removed: I63.4, I63.5, I63.3, I63.2, I63.0, I63.1, I63.89
 - `case_io.py validate` OK; `perfect_agent.py` passes.
+
+## Open questions resolved (24 Oct 2026)
+
+Decisions: `plans/ISCH-STR-decisions.md`.
+
+- Echo output: added `echo_type` "TTE" to the stored echocardiogram report (the schema now keeps the field and the MockServer routes TTE/TEE/bubble orders by it; the value was only in `tool_parameters`).

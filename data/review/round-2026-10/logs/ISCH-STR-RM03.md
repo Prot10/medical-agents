@@ -67,3 +67,9 @@ Synonym table scoped (October 2026, `diagnosis_synonyms.yaml`, applied with `app
 I77.71 no longer appends I63.231 (an infarct, on the other side) to a dissection without infarct.
 - codes removed: I63.231
 - `case_io.py validate` OK; `perfect_agent.py` passes.
+
+## Open questions resolved (24 Oct 2026)
+
+Decisions: `plans/ISCH-STR-decisions.md`.
+
+- Echo output: added `echo_type` "TTE" to the stored echocardiogram report (the schema now keeps the field and the MockServer routes TTE/TEE/bubble orders by it; the value was only in `tool_parameters`).

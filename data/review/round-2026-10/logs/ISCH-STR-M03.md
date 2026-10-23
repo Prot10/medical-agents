@@ -61,3 +61,10 @@ The I63 category no longer appends mechanism labels ("embolic", "cardioembolic",
 - codes removed: I63.5, I63.3, I63.2, I63.0, I63.1, I63.8, I63.81, I63.89
 - codes added: I63.41
 - `case_io.py validate` OK; `perfect_agent.py` passes.
+
+## Open questions resolved (24 Oct 2026)
+
+Decisions: `plans/ISCH-STR-decisions.md`.
+
+- Echo output: added `echo_type` "TTE" to the stored echocardiogram report (the schema now keeps the field and the MockServer routes TTE/TEE/bubble orders by it; the value was only in `tool_parameters`).
+- Carotid must rewritten: the ipsilateral symptomatic 55-60% stenosis is a competing mechanism referred for vascular surgical review within 2 weeks (endarterectomy for 50-69% decided on patient factors, perioperative risk below 6%, AHA/ASA 2021); key evidence aligned. The ELAN major category (multi-branch superior-division cortical infarct, about 18 mL) is kept (decision OQ4b, OQ4h).

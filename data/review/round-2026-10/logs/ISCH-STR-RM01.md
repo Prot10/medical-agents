@@ -66,3 +66,9 @@ The I63 category no longer appends mechanism labels ("embolic", "cardioembolic",
 - codes removed: I63.4, I63.5, I63.3, I63.0, I63.1, I63.8, I63.81, I63.89
 - codes added: I63.23
 - `case_io.py validate` OK; `perfect_agent.py` passes.
+
+## Open questions resolved (24 Oct 2026)
+
+Decisions: `plans/ISCH-STR-decisions.md`.
+
+- Must added: atorvastatin 80 mg for LDL 108 mg/dL (AHA/ASA 2021 COR 1, SPARCL), paired with non-oestrogen contraception (decision OQ4g). The no-IVT decision for the ischaemic stroke 2 weeks earlier is kept (decision OQ2).

@@ -58,3 +58,10 @@ The I63 category no longer appends mechanism labels ("embolic", "cardioembolic",
 - labels removed: "embolic stroke", "cardioembolic stroke", "lacunar stroke", "lacunar infarct", "stroke"
 - codes removed: I63.4, I63.5, I63.3, I63.2, I63.0, I63.1, I63.8, I63.81, I63.89
 - `case_io.py validate` OK; `perfect_agent.py` passes.
+
+## Open questions resolved (24 Oct 2026)
+
+Decisions: `plans/ISCH-STR-decisions.md`.
+
+- Echo output: added `echo_type` "TTE" to the stored echocardiogram report (the schema now keeps the field and the MockServer routes TTE/TEE/bubble orders by it; the value was only in `tool_parameters`).
+- Citations: `[EULAR_APS_2019]` added to the antiphospholipid criterion and named in the warfarin must (verified reference, decision X1). The interim aspirin and the IVT decision are kept (decisions OQ3b, OQ4e).

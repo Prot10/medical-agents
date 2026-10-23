@@ -57,3 +57,10 @@ The I63 category no longer appends mechanism labels ("embolic", "cardioembolic",
 - codes removed: I63.5, I63.3, I63.2, I63.0, I63.1, I63.8, I63.81, I63.89
 - codes added: I63.41
 - `case_io.py validate` OK; `perfect_agent.py` passes.
+
+## Open questions resolved (24 Oct 2026)
+
+Decisions: `plans/ISCH-STR-decisions.md`.
+
+- Echo output: added `echo_type` "TTE" to the stored echocardiogram report (the schema now keeps the field and the MockServer routes TTE/TEE/bubble orders by it; the value was only in `tool_parameters`).
+- NIHSS recounted by the official item 3 rule: 13 to 14 in the exam, key evidence and both musts; R2's count (note 9802d420) is DECLINED on this point with the NINDS NIHSS item 3 instruction; no decision changes (decision OQ1).

@@ -66,3 +66,10 @@ Regenerated for the cervical ICA dissection: I63.231 no longer grants carotid st
 - codes removed: I63.4, I63.5, I63.3, I63.0, I63.1, I63.8, I63.81, I63.89
 - codes added: I63.23
 - `case_io.py validate` OK; `perfect_agent.py` passes.
+
+## Open questions resolved (24 Oct 2026)
+
+Decisions: `plans/ISCH-STR-decisions.md`.
+
+- Echo output: added `echo_type` "TTE" to the stored echocardiogram report (the schema now keeps the field and the MockServer routes TTE/TEE/bubble orders by it; the value was only in `tool_parameters`).
+- Citations: `[AHA_maternal_stroke_2026]` added to the MRI criterion and `[ISTH_TTP_2020]` to the TTP/antiphospholipid lab criterion (both references verified, decisions X1, OQ7a).

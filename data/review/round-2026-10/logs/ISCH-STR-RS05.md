@@ -57,3 +57,10 @@ The I63 category no longer appends mechanism labels ("embolic", "cardioembolic",
 - codes removed: I63.4, I63.3, I63.2, I63.0, I63.1, I63.8, I63.81, I63.89
 - codes added: I63.51
 - `case_io.py validate` OK; `perfect_agent.py` passes.
+
+## Open questions resolved (24 Oct 2026)
+
+Decisions: `plans/ISCH-STR-decisions.md`.
+
+- Echo output: added `echo_type` "TTE" to the stored echocardiogram report (the schema now keeps the field and the MockServer routes TTE/TEE/bubble orders by it; the value was only in `tool_parameters`).
+- MRI: the 5.4 x 3.9 cm confluent lesion at 38 minutes made patchy (largest focus 2.6 x 1.8 cm) and T2 set to no definite abnormality, consistent with ASPECTS 9 on NCCT (decision OQ8c).

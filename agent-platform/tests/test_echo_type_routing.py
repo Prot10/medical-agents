@@ -35,16 +35,9 @@ def test_echo_report_keeps_echo_type():
     assert {echo.echo_type for echo in _stored_echoes(case)} == {"bubble_study", "TEE"}
 
 
-# RP03 and RS02 store their echo reports without `echo_type` (the case files, not the schema,
-# are missing it), so the guard cannot tell their TTE, TEE and bubble outputs apart yet. Strict:
-# once the case files carry the field, these must start passing and the marker must go.
-_UNTYPED = pytest.mark.xfail(strict=True, reason="stored echo outputs carry no echo_type yet")
-
-
 @pytest.mark.parametrize(
     "case_id",
-    ["ISCH-STR-P05", "ISCH-STR-P02",
-     pytest.param("ISCH-STR-RP03", marks=_UNTYPED), pytest.param("ISCH-STR-RS02", marks=_UNTYPED)],
+    ["ISCH-STR-P05", "ISCH-STR-P02", "ISCH-STR-RP03", "ISCH-STR-RS02"],
 )
 @pytest.mark.parametrize("ordered", ECHO_TYPES)
 def test_echo_order_is_answered_by_the_matching_stored_study(case_id, ordered):
