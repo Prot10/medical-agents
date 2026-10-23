@@ -47,7 +47,9 @@ sample. The October 2026 review added `mycobacterial_panel` (AFB smear, Xpert MT
 mycobacterial culture), `fungal_culture`, `india_ink` and `ADA` to `special_tests`, and
 `HIV_viral_load`, `CD4_count`, `beta2_transferrin`, `serum_cryptococcal_antigen` and `AFP` to the
 laboratory panels (serum CrAg stays apart from the CSF `cryptococcal_antigen`: one specimen, one
-tool).
+tool). Its batch-2 conditions added `CMV_PCR` to `special_tests`, and `anti_GQ1b_IgG`,
+`anti_GT1a_IgG` (two terms, not a ganglioside panel, which would price `anti-GM1 IgM` again),
+`botulinum_toxin_assay` and `plasma_free_metanephrines` to the laboratory panels.
 
 A policy pattern's `required_arguments` is the minimum executable subset needed to match a
 call. A missing optional runtime argument is expected; an unknown key is not.
@@ -80,6 +82,7 @@ call. A missing optional runtime argument is expected; an unknown key is not.
 | `respiratory_function` | FVC, MIP/MEP, NIF | ALS respiratory monitoring, MG crisis risk |
 | `minor_salivary_gland_biopsy` | Lip biopsy, focus score | Sjögren's confirmation |
 | `audiometry` | Pure-tone and speech audiometry, tympanometry | Hearing loss after bacterial meningitis (WHO 2025, NICE NG240) |
+| `speech_language_evaluation` | Speech-language pathology assessment: motor speech, grammar, naming, repetition, comprehension | Primary progressive aphasia variant (Gorno-Tempini 2011); not a second `neuropsych_battery` |
 | `genetic_panel:<panel>` | Targeted gene panel | See panel list below |
 
 **Allowed genetic panels** (only these `<panel>` suffix values are valid):
@@ -173,13 +176,16 @@ studies at different prices.
 | `sputum` | Gram stain and culture (AFB smear, mycobacterial culture on request) | Pneumonia as an infective precipitant; pulmonary TB with tuberculous meningitis |
 | `stool` | C. difficile toxin PCR | Diarrhoea in the infection screen (hepatic encephalopathy on lactulose) |
 | `wound_swab` | Culture of a wound or ulcer | A skin portal of entry (bacterial meningitis) |
+| `brain_aspirate` | Gram stain, aerobic and anaerobic culture of aspirated brain-lesion material | Brain abscess on the differential of a ring-enhancing lesion. The aspiration is ordered through `obtain_tissue_diagnosis` and billed there |
 
 `before_antimicrobials` is a boolean: yield collapses once treatment has started, and the
 report must state it rather than leave it inferred.
 
 ### `obtain_tissue_diagnosis`
 
-`procedure` is `resection`, `stereotactic_biopsy`, `temporal_artery_biopsy` (giant cell
+`procedure` is `resection`, `stereotactic_biopsy`, `open_biopsy` (through a laminectomy or
+craniotomy, for a lesion a needle cannot reach safely and that is not to be resected, e.g. an
+intramedullary spinal cord tumour), `temporal_artery_biopsy` (giant cell
 arteritis) or `lymph_node_biopsy` (endobronchial needle
 aspiration or surgical nodal sampling — the low-risk route to histological confirmation of a
 systemic disease when the accessible node is not the symptomatic organ, e.g. hilar nodes in
@@ -188,8 +194,11 @@ no molecular assay. `molecular_assays` is a list drawn from
 `IDH1_IHC`, `IDH1_IDH2_sequencing`, `ATRX_IHC`, `1p_19q_codeletion`, `CDKN2A_B_deletion`,
 `TERT_promoter`, `EGFR_amplification`, `chr7_gain_chr10_loss`, `H3K27_status`,
 `MGMT_methylation`, `BRAF_V600`, and for the mimics of a glioma `CD20_IHC` and `EBER_ISH`
-(primary CNS or EBV-associated lymphoma) and `SOX10_IHC` and `Melan_A_HMB45_IHC` (metastatic
-melanoma). Each assay is in the list because it changes management, not
+(primary CNS or EBV-associated lymphoma), `SOX10_IHC` and `Melan_A_HMB45_IHC` (metastatic
+melanoma), `chromogranin_A_synaptophysin_IHC` (paraganglioma), `PAX8_IHC`, `TTF1_IHC` and
+`thyroglobulin_IHC` (primary site of a metastatic carcinoma), and `H3G34_status` (diffuse
+hemispheric glioma, H3 G34-mutant) and `DNA_methylation_profiling` (tumour class left open by
+histology and targeted assays). Each assay is in the list because it changes management, not
 to complete a taxonomy. MGMT must not be assessed by immunocytochemistry.
 
 ### `perform_clinical_assessment.assessment_type`

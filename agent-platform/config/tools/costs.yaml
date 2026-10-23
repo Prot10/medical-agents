@@ -255,6 +255,24 @@ tools:
       # Moved from the general_medicine pack on 2026-10-24: alpha-fetoprotein, the hepatocellular
       # carcinoma surveillance assay in cirrhosis (October 2026 review, HEP-ENC-M08). CPT 82105.
       AFP: 21
+      # Requested by the October 2026 case review of Guillain-Barré syndrome: the Miller Fisher,
+      # pharyngeal-cervical-brachial and ophthalmoplegic cases (GBS P01, RM12, RM15, RS15) state
+      # an anti-GQ1b or anti-GT1a result that no assay could order (only `anti-GM1 IgM`, the
+      # AMAN / multifocal motor neuropathy antibody, was priced). Two terms, not one ganglioside
+      # panel, because a panel would price anti-GM1 a second time. CPT 83516 per antibody,
+      # send-out ELISA, priced as `anti-GM1 IgM`.
+      anti_GQ1b_IgG: 100
+      anti_GT1a_IgG: 100
+      # Botulinum neurotoxin in serum (and stool or gastric aspirate) by mouse bioassay or mass
+      # spectrometry, the confirmatory test of botulism, the descending-paralysis mimic of GBS
+      # (October 2026 review, GBS RM12, RS15). Done by public-health reference laboratories with
+      # no CMS rate (CPT 87798 at most covers a toxin-gene PCR); reference estimate, priced as a
+      # single-target PCR.
+      botulinum_toxin_assay: 184
+      # Plasma free metanephrines (metanephrine and normetanephrine), the screening test for a
+      # catecholamine-secreting paraganglioma before any anaesthesia (October 2026 review,
+      # GLIO-HG-RS01). CPT 83835.
+      plasma_free_metanephrines: 22
     default_panel: 23
 
   analyze_csf:
@@ -299,6 +317,10 @@ tools:
       fungal_culture: 28        # CPT 87102, fungal culture with identification
       india_ink: 9              # CPT 87210, wet mount with India ink
       ADA: 37                   # CSF adenosine deaminase, CPT 82657 (enzyme activity)
+      # CSF cytomegalovirus PCR, requested by the October 2026 review of Guillain-Barré syndrome
+      # (GBS-P02: CMV polyradiculitis in advanced HIV; RM16, RP15 and RS18 stored a CMV PCR
+      # result that no order could name). CPT 87496, priced as HSV_PCR.
+      CMV_PCR: 184
     # Where the CSF comes from. Billing does not change (`base` prices the sampling with the
     # basic studies), as for the MRI `protocols` block; the block is the source of the
     # `source` enum. Requested by the October 2026 review (BACT-MEN RS02: a shunt tap could not
@@ -437,6 +459,13 @@ tools:
       # October 2026 review of bacterial meningitis requires a hearing test before discharge or
       # within four weeks (WHO 2025, NICE NG240), and the cases could only state it as a must.
       audiometry: 55
+      # Formal speech and language evaluation by a speech-language pathologist: motor speech
+      # (apraxia of speech, dysarthria), grammar, repetition, single-word comprehension and
+      # connected-speech analysis, which classify primary progressive aphasia into its variants
+      # (Gorno-Tempini 2011). Requested by the October 2026 review of early Alzheimer's disease
+      # (ALZ-EARLY-P02, logopenic PPA). Not a second `neuropsych_battery`: the battery screens
+      # language as one cognitive domain and does not assess motor speech. CPT 92523.
+      speech_language_evaluation: 175
     genetic_panels:
       ALS: 1840
       FTD: 1840
@@ -531,6 +560,12 @@ tools:
       sputum: 18                    # CPT 87070 culture + 87205 Gram stain
       stool: 46                     # CPT 87493 C. difficile toxin PCR
       wound_swab: 12                # CPT 87070
+      # Gram stain and aerobic and anaerobic culture of material aspirated from a brain lesion
+      # (October 2026 review, GLIO-HG-P04: an abscess on the differential of a ring-enhancing
+      # mass). The laboratory work only: the aspiration is ordered and billed through
+      # obtain_tissue_diagnosis (stereotactic_biopsy, resection), so one procedure is priced
+      # once. CPT 87205 + 87070 + 87075.
+      brain_aspirate: 30
 
   obtain_tissue_diagnosis:
     # Two-part, like analyze_csf: the procedure, then the assays run on the specimen.
@@ -549,6 +584,12 @@ tools:
       # Temporal artery biopsy for giant cell arteritis (October 2026 review, BACT-MEN-RS03).
       # CPT 37609 + 88305 histology.
       temporal_artery_biopsy: 644
+      # Open surgical biopsy, through a laminectomy and myelotomy or a craniotomy, of a lesion a
+      # stereotactic needle cannot reach safely and that is not to be resected (October 2026
+      # review, GLIO-HG-RM02: a cervical intramedullary tumour modelled as `resection`). CPT 63285
+      # (intramedullary, cervical) or 61140 (craniotomy for biopsy) + 88307 histology; reference
+      # estimate between the stereotactic biopsy and the resection.
+      open_biopsy: 5520
     by_molecular_assay:
       IDH1_IHC: 138
       IDH1_IDH2_sequencing: 552
@@ -570,6 +611,24 @@ tools:
       EBER_ISH: 184
       SOX10_IHC: 92
       Melan_A_HMB45_IHC: 138    # two antibodies, one melanocytic panel
+      # Requested by the October 2026 case review of high-grade glioma. Neuroendocrine markers of
+      # a paraganglioma (GLIO-HG-RS01, a jugular foramen mass): two antibodies, one panel, as for
+      # the melanocytic one. CPT 88342 + 88341.
+      chromogranin_A_synaptophysin_IHC: 138
+      # The metastasis work-up of a brain lesion (GLIO-HG-RP01): PAX8 (renal, thyroid, Mullerian),
+      # TTF-1 (lung, thyroid) and thyroglobulin (thyroid). Three terms, because each answers a
+      # different primary. CPT 88342 / 88341 per antibody.
+      PAX8_IHC: 92
+      TTF1_IHC: 92
+      thyroglobulin_IHC: 92
+      # H3 G34R/V, the defining alteration of the diffuse hemispheric glioma, H3 G34-mutant (WHO
+      # CNS5; GLIO-HG RS01, RS03). Immunohistochemistry or sequencing; priced as H3K27_status.
+      H3G34_status: 276
+      # Genome-wide DNA methylation profiling (EPIC array with the brain-tumour classifier), for
+      # a tumour whose class histology and the targeted assays leave open (WHO CNS5 essential or
+      # desirable criterion in several entities; GLIO-HG RM02, RM03). No CMS rate (CPT 81479,
+      # unlisted); reference estimate in the band of the gene panels.
+      DNA_methylation_profiling: 1840
     # Rate for an assay with no row above (warned at execute time and here).
 
   perform_clinical_assessment:

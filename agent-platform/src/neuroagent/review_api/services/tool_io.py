@@ -399,7 +399,10 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
                     "'vep'/'ssep'/'baep': evoked potentials. 'tilt_table': syncope. "
                     "'optical_coherence_tomography': retinal RNFL (MS, optic neuritis). "
                     "'audiometry': pure-tone and speech audiometry with tympanometry "
-                    "(hearing loss after bacterial meningitis)."
+                    "(hearing loss after bacterial meningitis). 'speech_language_evaluation': "
+                    "speech-language pathology assessment of motor speech, grammar, naming, "
+                    "repetition and comprehension, which classifies a primary progressive aphasia "
+                    "(a full cognitive battery is 'neuropsych_battery')."
                 ),
             },
         },
@@ -472,7 +475,9 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
                     "patient with ascites and altered mental status. 'sputum': Gram stain and "
                     "culture (acid-fast smear and mycobacterial culture on request). 'stool': "
                     "C. difficile toxin PCR. 'wound_swab': culture of a wound or ulcer, a "
-                    "possible portal of entry."
+                    "possible portal of entry. 'brain_aspirate': Gram stain and aerobic and "
+                    "anaerobic culture of material aspirated from a brain lesion; the aspiration "
+                    "itself is ordered through obtain_tissue_diagnosis."
                 ),
             },
             "tests": {
@@ -513,7 +518,10 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
                     "sampling — the low-risk route to histological confirmation of a systemic "
                     "disease when the accessible node is not the symptomatic organ. "
                     "'temporal_artery_biopsy': a segment of the superficial temporal artery, "
-                    "the histological test for giant cell arteritis."
+                    "the histological test for giant cell arteritis. 'open_biopsy': open "
+                    "surgical biopsy through a laminectomy or craniotomy, for a lesion a "
+                    "stereotactic needle cannot reach safely and that is not to be resected "
+                    "(an intramedullary spinal cord tumour)."
                 ),
             },
             "site": {
@@ -535,7 +543,13 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
                     "tumours. "
                     "'CD20_IHC' and 'EBER_ISH': B-cell lineage and Epstein-Barr virus in a suspected "
                     "primary CNS or EBV-associated lymphoma. 'SOX10_IHC' and 'Melan_A_HMB45_IHC': "
-                    "melanocytic markers, to exclude a metastatic melanoma."
+                    "melanocytic markers, to exclude a metastatic melanoma. "
+                    "'chromogranin_A_synaptophysin_IHC': neuroendocrine markers (paraganglioma). "
+                    "'PAX8_IHC', 'TTF1_IHC', 'thyroglobulin_IHC': the primary site of a metastatic "
+                    "carcinoma (renal or Mullerian, lung, thyroid). 'H3G34_status': diffuse "
+                    "hemispheric glioma, H3 G34-mutant. 'DNA_methylation_profiling': genome-wide "
+                    "methylation classification when histology and targeted assays leave the "
+                    "tumour class open."
                 ),
             },
         },

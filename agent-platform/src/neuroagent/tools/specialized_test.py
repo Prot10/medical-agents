@@ -20,6 +20,7 @@ class SpecializedTestTool(BaseTool):
         "cardiac workup (tilt_table, autonomic_testing, exercise_stress_test), "
         "ophthalmic tests (optical_coherence_tomography, visual_field_perimetry), "
         "respiratory_function (FVC/MIP/MEP, for ALS and MG), ice_pack_test, audiometry, "
+        "speech_language_evaluation (primary progressive aphasia), "
         # `mslt` and `pure_tone_audiometry` were retired 2026-08-05: priced and orderable
         # but referenced by zero cases and never requested in the clinical tool review, so
         # they were unreviewed action-space surface. Audiometry came back on 2026-10-24 as
@@ -48,7 +49,10 @@ class SpecializedTestTool(BaseTool):
                     "'vep'/'ssep'/'baep': evoked potentials. 'tilt_table': syncope. "
                     "'optical_coherence_tomography': retinal RNFL (MS, optic neuritis). "
                     "'audiometry': pure-tone and speech audiometry with tympanometry "
-                    "(hearing loss after bacterial meningitis)."
+                    "(hearing loss after bacterial meningitis). 'speech_language_evaluation': "
+                    "speech-language pathology assessment of motor speech, grammar, naming, "
+                    "repetition and comprehension, which classifies a primary progressive aphasia "
+                    "(a full cognitive battery is 'neuropsych_battery')."
                 ),
             },
         },

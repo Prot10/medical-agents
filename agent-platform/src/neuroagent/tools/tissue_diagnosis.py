@@ -61,7 +61,10 @@ class TissueDiagnosisTool(BaseTool):
                     "sampling — the low-risk route to histological confirmation of a systemic "
                     "disease when the accessible node is not the symptomatic organ. "
                     "'temporal_artery_biopsy': a segment of the superficial temporal artery, "
-                    "the histological test for giant cell arteritis."
+                    "the histological test for giant cell arteritis. 'open_biopsy': open "
+                    "surgical biopsy through a laminectomy or craniotomy, for a lesion a "
+                    "stereotactic needle cannot reach safely and that is not to be resected "
+                    "(an intramedullary spinal cord tumour)."
                 ),
             },
             "site": {
@@ -83,7 +86,13 @@ class TissueDiagnosisTool(BaseTool):
                     "array — NOT immunocytochemistry); 'BRAF_V600' in IDH-wildtype tumours. "
                     "'CD20_IHC' and 'EBER_ISH': B-cell lineage and Epstein-Barr virus in a suspected "
                     "primary CNS or EBV-associated lymphoma. 'SOX10_IHC' and 'Melan_A_HMB45_IHC': "
-                    "melanocytic markers, to exclude a metastatic melanoma."
+                    "melanocytic markers, to exclude a metastatic melanoma. "
+                    "'chromogranin_A_synaptophysin_IHC': neuroendocrine markers (paraganglioma). "
+                    "'PAX8_IHC', 'TTF1_IHC', 'thyroglobulin_IHC': the primary site of a metastatic "
+                    "carcinoma (renal or Mullerian, lung, thyroid). 'H3G34_status': diffuse "
+                    "hemispheric glioma, H3 G34-mutant. 'DNA_methylation_profiling': genome-wide "
+                    "methylation classification when histology and targeted assays leave the "
+                    "tumour class open."
                 ),
             },
         },

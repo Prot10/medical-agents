@@ -10,6 +10,20 @@ lands.
 - `analyze_csf.source`: an EVD sample is billed as a lumbar puncture; only shunt/EVD criteria may
   name `source`. (vocabulary agent, 24 Oct)
 
+## Prices to verify
+- The October 2026 terms' Medicare rates were recalled, not looked up in the fee schedule; four
+  have no CMS rate and are estimates (botulinum_toxin_assay, open_biopsy,
+  DNA_methylation_profiling, and one more marked in costs.yaml). Check them against the 2024 MPFS
+  / CLFS before any cost result is reported.
+
+## Batch-2 cases waiting on vocabulary (terms added 24 Oct)
+- GBS: anti_GQ1b_IgG (P01, RM15, RS15, RS11/RS18 optional), anti_GT1a_IgG (RM12, RS15),
+  botulinum_toxin_assay (RM12, RS15), CSF CMV_PCR (P02, RM16, RP15, RS18).
+- GLIO-HG: plasma_free_metanephrines and chromogranin_A_synaptophysin_IHC, H3G34_status (RS01),
+  PAX8/TTF1/thyroglobulin IHC (RP01), brain_aspirate (P04), open_biopsy and
+  DNA_methylation_profiling (RM02; methylation also RM03), H3G34_status (RS03).
+- ALZ-EARLY: speech_language_evaluation (P02).
+
 ## Guidance claims
 - `test_guidance_claims`: the ALZ-EARLY (CSF, amyloid PET, FDG) and GBS (brain MRI) claims fail
   until those conditions finish; update the response in
