@@ -51,3 +51,11 @@ No other defect found. Checks run after the edits: `perfect_agent.py -v` passes 
 ## Condition audit (NPH auditor, 24 Oct 2026)
 - `action-post-tap-gait-reassessment.rationale` was the template sentence shared verbatim by P03 to P07; now case-specific (tap volume and what the reassessment separates).
 - Checks after the edits: `perfect_agent.py` passes for all 30 NPH cases, `case_io.py check` clean.
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (`plans/NPH-decisions.md`); no clinical data the agent receives changed.
+- Synonyms (`diagnosis_synonyms.yaml`, applied with `--prune --conditions nph`): code G91.2 and the bare labels "normal pressure hydrocephalus" and "NPH" removed, because with token matching they credited "idiopathic NPH", the wrong answer for a case with an antecedent; now credits "secondary NPH" / "secondary normal pressure hydrocephalus", "communicating hydrocephalus", G91.0, G91.9 and labels naming the SAH antecedent (`SAH NPH`, `haemorrhagic NPH`, `subarachnoid NPH` and long forms).
+- Aspirin must (and key evidence): `[ASRA_2018]` -> `[ASRA_2025]` (statement unchanged: aspirin and NSAIDs need no interruption).
+- `key_clinical_evidence`: the 10% TUG threshold is no longer attributed to `[Nakajima_2021]`, which sets no numeric tap-test cut-off; it is stated as a commonly used threshold that no guideline fixes (the tap protocol keeps its Nakajima citation where the sentence states it).
+- Checks: `perfect_agent.py -v` pass, `case_io.py check` clean, `test_case_guards -k NPH-` pass. Not yet in `DISCRIMINATOR_CONDITIONS`: the post-tap follow-up's prose `assessment_type` is deliberate until the timing discriminator lands (CENTRAL C2 in the decisions file).

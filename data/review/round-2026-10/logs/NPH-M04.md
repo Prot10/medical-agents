@@ -49,3 +49,9 @@ Adversarial verifier, 24 Oct 2026. Read the log, the whole final case and its di
 - Found and fixed (B, minor): the cognitive-screen attention item read "4/6: one letter-tapping error, serial sevens 2/3"; under MoCA rules one tapping error still scores 1, which makes 5/6 and a total of 23, not 22. Now "two letter-tapping errors", so the items sum to 22.
 - Found and fixed (B, minor): the spine MRI gave a C5-C6 canal AP diameter of 11 mm (relative stenosis range) beside "canal patent ... no canal stenosis". Now 13 mm.
 - perfect_agent -v ok, case_io check clean for the case, test_case_guards pass.
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (`plans/NPH-decisions.md`); no clinical data the agent receives changed.
+- Synonyms (`diagnosis_synonyms.yaml`, applied with `--prune --conditions nph`): code G91.0 removed (ICD-10-CM communicating hydrocephalus, which covers secondary NPH, a different entity from iNPH); labels unchanged, G91.2 and G91.9 accepted.
+- Checks: `perfect_agent.py -v` pass, `case_io.py check` clean, `test_case_guards -k NPH-` pass. Not yet in `DISCRIMINATOR_CONDITIONS`: the post-tap follow-up's prose `assessment_type` is deliberate until the timing discriminator lands (CENTRAL C2 in the decisions file).

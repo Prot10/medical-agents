@@ -54,3 +54,10 @@ Adversarial verifier, 24 Oct 2026. Read the log, the whole final case and its di
 - Found and fixed (B, minor): the exam calls the reduced toe vibration "age-appropriate", while `ground_truth.red_herrings[0].correct_interpretation` and `key_clinical_evidence[6]` asserted a diabetic neuropathy. Both now say the signs "may reflect age or a mild diabetic neuropathy"; the red herring stays (ankle reflexes 1+, plan C20).
 - Not changed: one pre-existing em dash in an unedited HPI sentence (not new text); a unilateral left heel-shin finding in the original exam (pre-existing, does not affect the diagnosis).
 - perfect_agent -v ok, case_io check clean for the case, test_case_guards pass.
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (`plans/NPH-decisions.md`); no clinical data the agent receives changed.
+- Synonyms (`diagnosis_synonyms.yaml`, applied with `--prune --conditions nph`): code G91.0 removed (ICD-10-CM communicating hydrocephalus, which covers secondary NPH, a different entity from iNPH); labels unchanged, G91.2 and G91.9 accepted.
+- `key_clinical_evidence`: the 10% TUG threshold is no longer attributed to `[Nakajima_2021]`, which sets no numeric tap-test cut-off; it is stated as a commonly used threshold that no guideline fixes (the tap protocol keeps its Nakajima citation where the sentence states it).
+- Checks: `perfect_agent.py -v` pass, `case_io.py check` clean, `test_case_guards -k NPH-` pass. Not yet in `DISCRIMINATOR_CONDITIONS`: the post-tap follow-up's prose `assessment_type` is deliberate until the timing discriminator lands (CENTRAL C2 in the decisions file).

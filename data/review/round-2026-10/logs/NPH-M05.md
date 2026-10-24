@@ -47,3 +47,9 @@ Adversarial verifier, 24 Oct 2026. Read the log, the whole final case and its di
 - Checked: the MRI names no disease (SWI swallow-tail finding only, plan C8); DESH stated incomplete and no DESH argument remains in the differential, key evidence or musts; the authored DaTscan (left-predominant putaminal loss, contralateral to the right-hand tremor) is served for a DaTscan order (probe) while staying waste; the levodopa must, copathology counselling and "do not withhold referral because of PD" prohibition are present; medication state is stated as ON for baseline and both post-tap measures in every report. Figures identical (TUG 38 to 34 s = 11%, to 31 s = 18%; 10-metre walk 29 to 25 s = 14%); MoCA items sum to 20 (attention 1+0+0+2 = 3). Atypical-parkinsonism entry agrees with the MRI (normal midbrain, pons, putamina) and cranial nerves. MockServer probe: no leak.
 - Found: nothing that needed a change. Noted only: the labs omit platelets and glucose (optional criterion, nothing in the case quotes them).
 - No edits. perfect_agent -v ok, case_io check clean for the case, test_case_guards pass.
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (`plans/NPH-decisions.md`); no clinical data the agent receives changed.
+- Synonyms (`diagnosis_synonyms.yaml`, applied with `--prune --conditions nph`): code G91.0 removed (ICD-10-CM communicating hydrocephalus, which covers secondary NPH, a different entity from iNPH); labels unchanged, G91.2 and G91.9 accepted.
+- Checks: `perfect_agent.py -v` pass, `case_io.py check` clean, `test_case_guards -k NPH-` pass. Not yet in `DISCRIMINATOR_CONDITIONS`: the post-tap follow-up's prose `assessment_type` is deliberate until the timing discriminator lands (CENTRAL C2 in the decisions file).

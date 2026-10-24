@@ -46,3 +46,10 @@ Adversarial verifier, 24 Oct 2026. Read the log, the pre-round diff of the patie
 - MoCA attention finding "Serial subtraction slow with one error; digit span backward 3." -> "Serial subtraction slow with two errors; digits backward failed." so the finding scores to the stored Attention subscore (4/6); totals unchanged.
 - `[Tisell_2011]` removed from `action-4-analyze-csf.citations`: the pack entry is Tisell 2011, shunt surgery in hydrocephalus with white matter changes, and this rationale is about the tap response only; `[Marmarou_2005]` (tap test) stays.
 - Checks after the edits: `perfect_agent.py` passes for all 30 NPH cases, `case_io.py check` clean.
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (`plans/NPH-decisions.md`); no clinical data the agent receives changed.
+- Synonyms (`diagnosis_synonyms.yaml`, applied with `--prune --conditions nph`): code G91.2 and the bare labels "normal pressure hydrocephalus" and "NPH" removed, because with token matching they credited "idiopathic NPH", the wrong answer for a case with an antecedent; now credits "secondary NPH" / "secondary normal pressure hydrocephalus", "communicating hydrocephalus", G91.0, G91.9 and labels naming the meningitic antecedent (`post-meningitic NPH`, `meningitis NPH` and their long forms).
+- `key_clinical_evidence`: "(Marmarou 2005)" written as the key `[Marmarou_2005]`.
+- Checks: `perfect_agent.py -v` pass, `case_io.py check` clean, `test_case_guards -k NPH-` pass. Not yet in `DISCRIMINATOR_CONDITIONS`: the post-tap follow-up's prose `assessment_type` is deliberate until the timing discriminator lands (CENTRAL C2 in the decisions file).
