@@ -38,3 +38,14 @@ Adversarial check (24 Oct 2026), approved case: diff, full final case, perfect-a
 - Confirmed each change corrects a real error: EVD must removed (CT: no hydrocephalus); LP `harm` (no IVH or hydrocephalus); TCD day 0; DSA 5.9 x 4.6 mm vs CTA 5.8 x 4.6 mm, ratio 5.9/2.9 = 2.0; troponin red herring matches the normal echo (LVEF 56%); contraceptive must supported by the drug check (CDC/WHO MEC category 4 for SBP 160+ or DBP 100+, category 3 for a smoker 35+ under 15 cigarettes a day); MUST-BP-A fits 188/112.
 - Found and FIXED: the drug-check criterion's `expected_evidence` called the combined contraceptive "contraindicated with ... smoking over 35", which overstates MEC category 3: now "Combined estrogen contraception contraindicated with BP 188/112 (and inadvisable in a smoker over 35); ibuprofen to be avoided before securing".
 - Both checks clean after the edit.
+
+## Close-out (24 Oct 2026)
+
+Condition close-out after Andrea's ruling of 24 Oct 2026 (open questions decided for dataset quality); decisions and sources in `plans/SAH-decisions.md`.
+
+- `patient.neurological_exam.additional (Hunt-Hess grade removed)`: the Hunt-Hess grade is a SAH grading scale, so stating it in the patient block presupposes the diagnosis and does the agent's grading (decision Q8).
+- fallback_tool_outputs.mri: SAH-consistent brain MRI instead of the library normal report: an off-pathway brain MRI was answered by the library normal report (no blood on SWI), contradicting the CT; the case fallback now reports the CT's blood on FLAIR and SWI (CENTRAL 10).
+- fallback_tool_outputs.cardiac_monitoring: 24 h Holter replaced by the case's own telemetry report: a 24-hour Holter cannot exist at assessment time; an off-pathway monitoring order now returns the case's own telemetry (CENTRAL 9).
+- followup_outputs: MR angiography report added before the literature output (aneurysm site and size from the DSA, 0.2 mm smaller as TOF reads it; P02 negative): an MRA order was answered by a fallback reporting no abnormality, contradicting the CTA and DSA (CENTRAL 10). MRA stays a waste action after the CTA.
+- `ground_truth.diagnosis` (synonyms re-expanded with `--prune`): diagnosis_synonyms.yaml: the I60 category no longer grants I60.8 (non-aneurysmal SAH), so the code was pruned from this aneurysmal case.
+- Checks after the close-out: `perfect_agent.py` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, `test_case_guards -k SAH-` pass.

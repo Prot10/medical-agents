@@ -43,3 +43,17 @@ A 47-year-old woman with migraine on propranolol, valsartan for hypertension, an
 Adversarial check (24 Oct 2026). Read the log, the diff and the whole final case. Both note ids present and verified FIXED: MUST-SECURE with the Hoh window and joint review, DSA criterion and diagnostic-only report (5.8 x 4.8 mm vs CTA 5.6 x 4.8 mm), TCD day 0; MUST-BP-B for 154/92, MUST-HOME continuing propranolol and withholding valsartan, the drug check says the same (no "hold propranolol"). Also verified: HPI no longer says a CT was done; CT without the sensitivity remark, no IVH, LP `harm`; CTA states no dissection; both red herrings match this patient (migraine on propranolol; troponin 0.14, BNP 156, LVEF 50%); aspirin allergy does not conflict with any must; family-screening must is consistent with the case (patient and brother affected, two first-degree relatives); stop rule equals the four required criteria; guards pass.
 Nothing found that needed a change.
 perfect_agent.py SAH-RM11 -v: pass; case_io.py check: clean for SAH-RM11.
+
+## Close-out (24 Oct 2026)
+
+Condition close-out after Andrea's ruling of 24 Oct 2026 (open questions decided for dataset quality); decisions and sources in `plans/SAH-decisions.md`.
+
+- `patient.neurological_exam.additional (Hunt-Hess grade removed)`: the Hunt-Hess grade is a SAH grading scale, so stating it in the patient block presupposes the diagnosis and does the agent's grading (decision Q8).
+- `required_recommendations (family screening must cites [Thompson_2015])`: citation key added for the cited evidence (CENTRAL 5, keys allow-listed in the pack).
+- `echo.findings[0]`: an echo reports the wall-motion pattern; a mild apical hypokinesis with preserved EF is not Takotsubo, grading labels such as 'classic' or 'severe Takotsubo' are diagnoses, and cardiology consultation is management (Q10).
+- `echo.wall_motion`: an echo reports the wall-motion pattern; a mild apical hypokinesis with preserved EF is not Takotsubo, grading labels such as 'classic' or 'severe Takotsubo' are diagnoses, and cardiology consultation is management (Q10).
+- fallback_tool_outputs.mri: SAH-consistent brain MRI instead of the library normal report: an off-pathway brain MRI was answered by the library normal report (no blood on SWI), contradicting the CT; the case fallback now reports the CT's blood on FLAIR and SWI (CENTRAL 10).
+- fallback_tool_outputs.cardiac_monitoring: 24 h Holter replaced by the case's own telemetry report: a 24-hour Holter cannot exist at assessment time; an off-pathway monitoring order now returns the case's own telemetry (CENTRAL 9).
+- followup_outputs: MR angiography report added before the literature output (aneurysm site and size from the DSA, 0.2 mm smaller as TOF reads it; P02 negative): an MRA order was answered by a fallback reporting no abnormality, contradicting the CTA and DSA (CENTRAL 10). MRA stays a waste action after the CTA.
+- `ground_truth.diagnosis` (synonyms re-expanded with `--prune`): diagnosis_synonyms.yaml: the I60 category no longer grants I60.8 (non-aneurysmal SAH), so the code was pruned from this aneurysmal case.
+- Checks after the close-out: `perfect_agent.py` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, `test_case_guards -k SAH-` pass.

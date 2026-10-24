@@ -47,3 +47,13 @@ Found: no error. No change made.
 
 - New follow-up `order_advanced_imaging` (modality `MR_angiography`, trigger `request_mr_angiography`), placed after the DSA follow-up: 3D time-of-flight MRA without gadolinium; saccular right paraclinoid ICA aneurysm 5.3 x 4.7 mm with an irregular dome; no other aneurysm larger than 2 mm; no segmental narrowing. The worker removed the MRA waste entry because MRA is the reasonable alternative with a prior contrast rash, but an MRA order was then answered by the fallback "No abnormality identified", which contradicts the CTA and DSA (confirmed by MockServer simulation). The simulation now serves the new report. No criterion added; MRA stays unscored.
 - Checks after the audit: `perfect_agent.py` 30/30 pass; `case_io.py check` schema and synonym guard OK, no test failure names an SAH case; `test_case_guards -k SAH` 60 passed.
+
+## Close-out (24 Oct 2026)
+
+Condition close-out after Andrea's ruling of 24 Oct 2026 (open questions decided for dataset quality); decisions and sources in `plans/SAH-decisions.md`.
+
+- `patient.neurological_exam.additional (Hunt-Hess grade removed)`: the Hunt-Hess grade is a SAH grading scale, so stating it in the patient block presupposes the diagnosis and does the agent's grading (decision Q8).
+- fallback_tool_outputs.mri: SAH-consistent brain MRI instead of the library normal report: an off-pathway brain MRI was answered by the library normal report (no blood on SWI), contradicting the CT; the case fallback now reports the CT's blood on FLAIR and SWI (CENTRAL 10).
+- fallback_tool_outputs.cardiac_monitoring: 24 h Holter replaced by the case's own telemetry report: a 24-hour Holter cannot exist at assessment time; an off-pathway monitoring order now returns the case's own telemetry (CENTRAL 9).
+- `ground_truth.diagnosis` (synonyms re-expanded with `--prune`): diagnosis_synonyms.yaml: the I60 category no longer grants I60.8 (non-aneurysmal SAH), so the code was pruned from this aneurysmal case.
+- Checks after the close-out: `perfect_agent.py` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, `test_case_guards -k SAH-` pass.

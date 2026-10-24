@@ -39,3 +39,15 @@ Adversarial check (24 Oct 2026): diff, full final case, perfect-agent `-v`, `cas
 - Note 6b4234fb: confirmed FIXED (the misstated Ottawa text is gone with its literature follow-up; red herring "Five-year migraine history and brief confusion" carries the plan's interpretation; the confusion is the new deficit that makes the rule inapplicable). Note 6a4a8415: confirmed FIXED (reversed LP statement deleted; canonical LP pearl present).
 - Confirmed: mental status now confused with GCS 14, consistent with the HH 2-3 label (left as plan question 5); DSA diagnostic only, 3.9 x 3.2 mm against CTA 3.8 x 3.2 (within 0.3 mm), ratio 3.9/2.6 = 1.5; TCD day 0; telemetry 3 h without a QTc line (QTc 468 < 480); drug check covers nimodipine, triptan contraindication, sertraline-sumatriptan and propranolol, matching MUST-HOME; penicillin allergy has no conflict; troponin red herring matches the normal echo; RCVS key feature (sertraline as precipitant) correct and `low`.
 - No error found; no change made.
+
+## Close-out (24 Oct 2026)
+
+Condition close-out after Andrea's ruling of 24 Oct 2026 (open questions decided for dataset quality); decisions and sources in `plans/SAH-decisions.md`.
+
+- `patient.neurological_exam.additional (Hunt-Hess grade removed)`: the Hunt-Hess grade is a SAH grading scale, so stating it in the patient block presupposes the diagnosis and does the agent's grading (decision Q8).
+- `ground_truth.diagnosis.accepted[0] (Hunt-Hess 3)`: M03's exam is confused with GCS 14 (E4V4M6), which is grade 3; a label names one grade (Q5).
+- fallback_tool_outputs.mri: SAH-consistent brain MRI instead of the library normal report: an off-pathway brain MRI was answered by the library normal report (no blood on SWI), contradicting the CT; the case fallback now reports the CT's blood on FLAIR and SWI (CENTRAL 10).
+- fallback_tool_outputs.cardiac_monitoring: 24 h Holter replaced by the case's own telemetry report: a 24-hour Holter cannot exist at assessment time; an off-pathway monitoring order now returns the case's own telemetry (CENTRAL 9).
+- followup_outputs: MR angiography report added before the literature output (aneurysm site and size from the DSA, 0.2 mm smaller as TOF reads it; P02 negative): an MRA order was answered by a fallback reporting no abnormality, contradicting the CTA and DSA (CENTRAL 10). MRA stays a waste action after the CTA.
+- `ground_truth.diagnosis` (synonyms re-expanded with `--prune`): diagnosis_synonyms.yaml: the I60 category no longer grants I60.8 (non-aneurysmal SAH), so the code was pruned from this aneurysmal case.
+- Checks after the close-out: `perfect_agent.py` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, `test_case_guards -k SAH-` pass.

@@ -43,3 +43,13 @@ A 40-year-old woman with relapsing MS on natalizumab (JCV index 3.2), on lisinop
 Adversarial check (24 Oct 2026). Read the log, the diff and the whole final case. Note 9b8af8ad present and verified FIXED (MUST-SECURE, DSA 4.9 x 4.2 mm vs CTA 4.8 x 4.2 mm, diagnostic only; TCD day 0). Also verified: the "JC virus PCR in CSF was negative" claim is gone (no LP in the case); lymphocytes 4.4 flagged high against 1.0-4.0, in step with summary and interpretation (natalizumab-induced lymphocytosis is correct physiology); baclofen continued, lisinopril withheld, natalizumab timing deferred to the MS neurologist in both the must and the check; MS relapse and PML in the differential, very low, with the MRI findings that exclude them; CT white matter lesions described neutrally; MUST-BP-B for 146/86; stop rule equals the four required criteria; guards pass.
 Found and fixed: the `mri-brain-ms-natalizumab` rationale stated a rule that does not exist ("A high JC virus antibody index on natalizumab calls for MRI before the next infusion is given"). Rewritten as "On natalizumab with a high JC virus antibody index, MRI is the surveillance test for PML; an MRI during the admission documents the MS lesion burden and screens for a new lesion before the next infusion is planned."
 perfect_agent.py SAH-RP11 -v: pass; case_io.py check: clean for SAH-RP11.
+
+## Close-out (24 Oct 2026)
+
+Condition close-out after Andrea's ruling of 24 Oct 2026 (open questions decided for dataset quality); decisions and sources in `plans/SAH-decisions.md`.
+
+- `patient.neurological_exam.additional (Hunt-Hess grade removed)`: the Hunt-Hess grade is a SAH grading scale, so stating it in the patient block presupposes the diagnosis and does the agent's grading (decision Q8).
+- fallback_tool_outputs.cardiac_monitoring: 24 h Holter replaced by the case's own telemetry report: a 24-hour Holter cannot exist at assessment time; an off-pathway monitoring order now returns the case's own telemetry (CENTRAL 9).
+- followup_outputs: MR angiography report added before the literature output (aneurysm site and size from the DSA, 0.2 mm smaller as TOF reads it; P02 negative): an MRA order was answered by a fallback reporting no abnormality, contradicting the CTA and DSA (CENTRAL 10). MRA stays a waste action after the CTA.
+- `ground_truth.diagnosis` (synonyms re-expanded with `--prune`): diagnosis_synonyms.yaml: the I60 category no longer grants I60.8 (non-aneurysmal SAH), so the code was pruned from this aneurysmal case.
+- Checks after the close-out: `perfect_agent.py` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, `test_case_guards -k SAH-` pass.

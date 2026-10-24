@@ -48,3 +48,15 @@ Found and fixed: MUST-BP-B said "until the aneurysm is secured" in a case where 
 Left for Andrea (already in the log): DSA tier and nimodipine duration after a negative DSA (plan section 6 questions 2 and 3). The generic prohibitions still say "before the aneurysm is secured"; they read as "until an aneurysm is excluded" here and were not churned.
 
 Re-ran `perfect_agent.py SAH-P02 -v` (pass) and `case_io.py check` (no failure names the case).
+
+## Close-out (24 Oct 2026)
+
+Condition close-out after Andrea's ruling of 24 Oct 2026 (open questions decided for dataset quality); decisions and sources in `plans/SAH-decisions.md`.
+
+- `action_criteria[action-4-order-advanced-imaging] recommended -> required; stop_rule.required_before_assessment`: with a negative CTA, catheter DSA with 3D rotational angiography is the study that excludes an aneurysm (Connolly 2012, Class I, indicated except when a noninvasive angiogram has shown the aneurysm), and the non-aneurysmal label rests on it (Q2).
+- `required_recommendations (nimodipine after a negative DSA)`: nimodipine's benefit is established in aneurysmal SAH; after a negative DSA with a perimesencephalic pattern it can be stopped (Q3).
+- fallback_tool_outputs.mri: SAH-consistent brain MRI instead of the library normal report: an off-pathway brain MRI was answered by the library normal report (no blood on SWI), contradicting the CT; the case fallback now reports the CT's blood on FLAIR and SWI (CENTRAL 10).
+- fallback_tool_outputs.cardiac_monitoring: 24 h Holter replaced by the case's own telemetry report: a 24-hour Holter cannot exist at assessment time; an off-pathway monitoring order now returns the case's own telemetry (CENTRAL 9).
+- followup_outputs: MR angiography report added before the literature output (aneurysm site and size from the DSA, 0.2 mm smaller as TOF reads it; P02 negative): an MRA order was answered by a fallback reporting no abnormality, contradicting the CTA and DSA (CENTRAL 10). MRA stays a waste action after the CTA.
+- `ground_truth.diagnosis` (synonyms re-expanded with `--prune`): diagnosis_synonyms.yaml: the I60 category (generic and aneurysmal labels, I60.9 and the location codes) no longer applies to this case, so an answer of aneurysmal rupture no longer scores; perimesencephalic and non-aneurysmal labels added (CENTRAL 3).
+- Checks after the close-out: `perfect_agent.py` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, `test_case_guards -k SAH-` pass.

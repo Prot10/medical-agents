@@ -40,3 +40,15 @@ The presentation is unchanged (38-year-old man, thunderclap headache 30 to 45 mi
 Adversarial verifier, 24 Oct 2026. Checked: the git diff (patient block changed only in the HPI alcohol sentence, which now matches the social history); the three notes against the file (cocaine literature gone; no text anywhere calls labetalol preferred; BP must in the plan's S08 wording; ICU must without the SBP 160 limit; beta-blocker prohibition added; one MUST-SECURE; DSA criterion and output with no segmental vasoconstriction; day-0 TCD); drug check `optional` (no medicines, plan C10); RCVS `low` with the cocaine trigger named and DSA excluding segmental vasoconstriction; echo report no longer attributes the cardiomyopathy to cocaine; telemetry QTc 496 against ECG 498 (no MUST-QT, below 500); DSA arithmetic (6.6 / 3.6 = 1.8); lab flags; LP avoided action `harm`; leak guard passes.
 Considered and left: the drug check says "labetalol is not first line" while the must and prohibition exclude beta-blockers; this is the plan's wording and no longer gives opposite instructions, which was the note's point. The CTA calls the dome multilobulated and the DSA adds a daughter sac; acceptable gain in detail from 3D rotational angiography.
 Found: no error. No change made.
+
+## Close-out (24 Oct 2026)
+
+Condition close-out after Andrea's ruling of 24 Oct 2026 (open questions decided for dataset quality); decisions and sources in `plans/SAH-decisions.md`.
+
+- `patient.neurological_exam.additional (Hunt-Hess grade removed)`: the Hunt-Hess grade is a SAH grading scale, so stating it in the patient block presupposes the diagnosis and does the agent's grading (decision Q8).
+- `red_herrings[0].correct_interpretation (echo does not confirm etiology)`: an echocardiogram does not confirm the etiology of neurogenic myocardial injury; the interpretation now states the case's own echo (audit class, Q10).
+- fallback_tool_outputs.mri: SAH-consistent brain MRI instead of the library normal report: an off-pathway brain MRI was answered by the library normal report (no blood on SWI), contradicting the CT; the case fallback now reports the CT's blood on FLAIR and SWI (CENTRAL 10).
+- fallback_tool_outputs.cardiac_monitoring: 24 h Holter replaced by the case's own telemetry report: a 24-hour Holter cannot exist at assessment time; an off-pathway monitoring order now returns the case's own telemetry (CENTRAL 9).
+- followup_outputs: MR angiography report added before the literature output (aneurysm site and size from the DSA, 0.2 mm smaller as TOF reads it; P02 negative): an MRA order was answered by a fallback reporting no abnormality, contradicting the CTA and DSA (CENTRAL 10). MRA stays a waste action after the CTA.
+- `ground_truth.diagnosis` (synonyms re-expanded with `--prune`): diagnosis_synonyms.yaml: the I60 category no longer grants I60.8 (non-aneurysmal SAH), so the code was pruned from this aneurysmal case.
+- Checks after the close-out: `perfect_agent.py` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, `test_case_guards -k SAH-` pass.

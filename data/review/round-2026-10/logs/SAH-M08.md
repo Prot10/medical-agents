@@ -47,3 +47,20 @@ Checked: both note ids present. 5d5b5879: nimodipine must present (canonical wor
 Found: nothing requiring a change. The label's "Fisher 2-3" range stays (plan section 6 question 5).
 
 Re-ran `perfect_agent.py SAH-M08 -v` (pass) and `case_io.py check` (no failure names the case).
+
+## Close-out (24 Oct 2026)
+
+Condition close-out after Andrea's ruling of 24 Oct 2026 (open questions decided for dataset quality); decisions and sources in `plans/SAH-decisions.md`.
+
+- `patient.neurological_exam.additional (Hunt-Hess grade removed)`: the Hunt-Hess grade is a SAH grading scale, so stating it in the patient block presupposes the diagnosis and does the agent's grading (decision Q8).
+- `ground_truth.diagnosis.accepted[0] (Fisher 3)`: moderate suprasellar blood is a layer of 1 mm or more, Fisher 3; the CT now states the thickness and the label, CT and criterion evidence name one grade (Q5).
+- `initial_tool_outputs.ct.additional_observations[0]`: moderate suprasellar blood is a layer of 1 mm or more, Fisher 3; the CT now states the thickness and the label, CT and criterion evidence name one grade (Q5).
+- `initial_tool_outputs.ct.impression`: moderate suprasellar blood is a layer of 1 mm or more, Fisher 3; the CT now states the thickness and the label, CT and criterion evidence name one grade (Q5).
+- `initial_tool_outputs.ct.findings[0].description`: moderate suprasellar blood is a layer of 1 mm or more, Fisher 3; the CT now states the thickness and the label, CT and criterion evidence name one grade (Q5).
+- `action_criteria[NCCT].expected_evidence`: moderate suprasellar blood is a layer of 1 mm or more, Fisher 3; the CT now states the thickness and the label, CT and criterion evidence name one grade (Q5).
+- fallback_tool_outputs.mri: SAH-consistent brain MRI instead of the library normal report: an off-pathway brain MRI was answered by the library normal report (no blood on SWI), contradicting the CT; the case fallback now reports the CT's blood on FLAIR and SWI (CENTRAL 10).
+- `ground_truth.key_clinical_evidence` (late-presentation pearl removed): the 'Late presentation (>24 h) ... xanthochromia persists for weeks' pearl misstated the 6-hour threshold and the two-week persistence and duplicated the canonical CT and LP pearls (Q11).
+- fallback_tool_outputs.cardiac_monitoring: 24 h Holter replaced by the case's own telemetry report: a 24-hour Holter cannot exist at assessment time; an off-pathway monitoring order now returns the case's own telemetry (CENTRAL 9).
+- followup_outputs: MR angiography report added before the literature output (aneurysm site and size from the DSA, 0.2 mm smaller as TOF reads it; P02 negative): an MRA order was answered by a fallback reporting no abnormality, contradicting the CTA and DSA (CENTRAL 10). MRA stays a waste action after the CTA.
+- `ground_truth.diagnosis` (synonyms re-expanded with `--prune`): diagnosis_synonyms.yaml: the I60 category no longer grants I60.8 (non-aneurysmal SAH), so the code was pruned from this aneurysmal case.
+- Checks after the close-out: `perfect_agent.py` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, `test_case_guards -k SAH-` pass.
