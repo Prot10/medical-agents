@@ -44,3 +44,10 @@ Adversarial verifier, 24 Oct 2026. Read the log, the checkpoint diff (b8be2153) 
 Found and fixed:
 - B minor, `ground_truth.differential[1].key_features` (wearing-off): "the episodes are not tied to the timing of her doses" asserted a history the HPI does not give. Now "No dose-related pattern is described, and the motor signs worsened steadily on an unchanged low dose".
 No other defect found. After the edit: perfect_agent ok; case_io check clean for PD-RM01; test_case_guards pass; discriminator_defects empty.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/PD-decisions.md`.
+
+- Accepted codes are now G20.A1 (PD without dyskinesia, without mention of fluctuations; also PD NOS) and G20; G20.A2, G20.B1, G20.B2 (motor complications the case does not have) and G20.C ("Parkinsonism, unspecified", not PD) are no longer accepted. Labels unchanged.
+- `metadata.citation_gap` cleared: `[NICE_NG71]` is in the PD pack now.

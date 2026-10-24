@@ -55,3 +55,9 @@ This 71-year-old woman has a 2.5-year left-sided tremor-onset parkinsonism (pill
 - `followup_outputs[0].trigger_action`: `request_optional_datscan_for_live_degenerative_differential` carried a tier word; renamed `request_datscan`. Routing by `modality` `DaTscan`, unchanged.
 
 After the edits: `perfect_agent.py` 30/30 PD pass; every stored follow-up of the 30 cases is served for its own discriminator (MockServer probe); `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k PD-` 60 passed.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/PD-decisions.md`.
+
+- Accepted codes are now G20.A1 (PD without dyskinesia, without mention of fluctuations; also PD NOS) and G20; G20.A2, G20.B1, G20.B2 (motor complications the case does not have) and G20.C ("Parkinsonism, unspecified", not PD) are no longer accepted. Labels unchanged.

@@ -56,3 +56,9 @@ Found and fixed one timeline error repeated in four fields: the case stated that
 - `ground_truth.red_herrings[0].correct_interpretation`: "Hallucinations and fluctuations preceded the parkinsonism by more than a year, the dementia preceded it, and there is no rest tremor".
 - `metadata.key_teaching_point`: the one-year rule stated correctly (dementia before or within a year of the parkinsonism).
 After the edit: perfect_agent ok; case_io check clean for PD-P02; test_case_guards pass; discriminator_defects empty.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/PD-decisions.md`.
+
+- Stays in condition parkinsons as a PD-mimic case (ruling 3); `metadata.case_body_concerns` and `citation_gap` cleared (`[DLB_2017]` is in the PD pack). Labels and code unchanged (G31.83; "lewy body dementia" kept: it is an ICD-10-CM inclusion term of G31.83, and PD dementia is coded G20 + F02.8x). No PD label or G20 code is accepted.

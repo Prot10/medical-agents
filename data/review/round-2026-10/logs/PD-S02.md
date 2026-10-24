@@ -43,3 +43,9 @@ This 62-year-old woman has an 18-month right-predominant tremor-onset parkinsoni
 - Confirmed every row: literature removed; drug output names oxybutynin (C2 sentence) and amlodipine, no metformin-levodopa claim; MRA line gone; evidence restates the MRI; allergy edit is the only patient change and resolves the NSAID-versus-aspirin contradiction; ECG 72/min, QRS 92 ms, echo `TTE`; DaTscan stored, left putamen worse; stop rule and waste guards as the plan says.
 - Checked the oxybutynin must against the drug output and the prohibitions (no contradiction: the anticholinergic prohibition targets trihexyphenidyl and benztropine); MSA entry addresses the 5-year overactive bladder (PMH) without incontinence (HPI). `red_herrings` is empty, as it was before the round; `difficulty_rationale` names the father's ET and the shoulder stiffness as distractors in prose, which is not a contradiction, so no red herring was invented.
 - Found nothing to correct. No change made.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/PD-decisions.md`.
+
+- Accepted codes are now G20.A1 (PD without dyskinesia, without mention of fluctuations; also PD NOS) and G20; G20.A2, G20.B1, G20.B2 (motor complications the case does not have) and G20.C ("Parkinsonism, unspecified", not PD) are no longer accepted. Labels unchanged.

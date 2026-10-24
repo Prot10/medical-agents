@@ -810,24 +810,38 @@ SPEC += [
     dict(cond="parkinsons", filed="interpret_labs", tool="interpret_labs",
          reviewer=1, tier="optional", status="applied",
          response="Applied case by case: the fixed routine panel was removed. Nine of 30 cases "
-                  "retain targeted optional studies for a live thyroid/tremor, Wilson, medication-"
-                  "toxicity, metabolic or pretreatment question; the other 21 have no laboratory "
-                  "action or authored laboratory report."),
+                  "keep a targeted laboratory study for a question the case raises: required only "
+                  "in P04 (Wilson screen with ceruloplasmin and serum and 24-hour urinary copper in "
+                  "young-onset parkinsonism), recommended in RM02 (valproate level and ammonia), "
+                  "RM05 (thyroid function on levothyroxine) and RS01 (lithium level), and optional "
+                  "in the other 5. The other 21 have no laboratory action or authored laboratory "
+                  "report. Counselled genetics is under specialised tests."),
     dict(cond="parkinsons", filed="analyze_eeg", tool="analyze_eeg",
          reviewer=1, tier="remove", status="applied",
-         response="Removed: no Parkinson case orders an EEG."),
+         response="Removed: no Parkinson case orders an EEG, and it is listed as waste in 28; the "
+                  "DLB and PSP mimic cases (P02, P03) do not penalise it, since posterior slowing "
+                  "is a supportive DLB biomarker."),
     dict(cond="parkinsons", filed="analyze_ecg", tool="analyze_ecg",
-         reviewer=1, tier="remove", status="applied",
-         response="Removed: no Parkinson case orders an ECG."),
+         reviewer=1, tier="remove", status="confirm",
+         response="Applied with one departure we ask you to rule on. 29 cases have no ECG "
+                  "criterion, and 18 list the ECG as waste. In RP01, a man with recurrent syncope "
+                  "and known Wolff-Parkinson-White, the ECG and a 24-hour Holter are recommended "
+                  "(echocardiography optional): the 2018 ESC syncope guideline asks for a 12-lead "
+                  "ECG in every syncope, and the case is built on attributing the syncope to "
+                  "neurogenic orthostatic hypotension rather than to the accessory pathway. If you "
+                  "would rather remove it there too, tell us."),
     dict(cond="parkinsons", filed="order_specialized_test", tool="order_specialized_test",
          reviewer=1, tier="optional", status="applied",
-         response="Applied end to end: EMG/NCS, repetitive stimulation, biopsies, evoked potentials, "
-                  "formal autonomic testing and tilt-table testing are absent from actions and authored "
-                  "reports. Neuropsychology remains in 11 cognitively relevant cases and is optional in "
-                  "10; PD-RP04 is the documented strong exception because formal neuropsychology is a "
-                  "required pre-DBS safety assessment rather than routine PD diagnosis. Polysomnography "
-                  "is optional in 11 cases with reported dream enactment. Counselled PD genetics is "
-                  "optional only in the 42-year-old young-onset case and one case with an affected "
+         response="Applied end to end: EMG/NCS, repetitive stimulation, biopsies and evoked "
+                  "potentials are absent from every action and authored report; formal autonomic "
+                  "and tilt-table testing are never a criterion and are listed as waste in all 30 "
+                  "(P01 and RP03 store their reports only so that an order is answered "
+                  "consistently with the case). Neuropsychology is selected in 11 cases: optional "
+                  "in 10 where cognition is clinically relevant, and required in RP04 as the "
+                  "pre-DBS assessment. Polysomnography is optional in 14 cases with reported dream "
+                  "enactment not yet confirmed and recommended in one (M05, violent episodes with "
+                  "obstructive sleep apnoea as the RBD mimic). Counselled PD genetics is optional "
+                  "only in the 42-year-old young-onset case and one case with an affected "
                   "first-degree relative."),
     dict(cond="parkinsons", filed="analyze_brain_mri", tool="analyze_brain_mri",
          reviewer=1, tier="required", status="applied",

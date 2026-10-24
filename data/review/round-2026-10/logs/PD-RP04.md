@@ -60,3 +60,9 @@ Checks after the verification: `perfect_agent.py -v` ok, `case_io.py check` no f
 - `fallback_tool_outputs.csf.glucose_ratio`: 0.69 against CSF 64 / stored serum 92 mg/dL (0.696); now 0.70.
 
 After the edits: `perfect_agent.py` 30/30 PD pass; every stored follow-up of the 30 cases is served for its own discriminator (MockServer probe); `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k PD-` 60 passed.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/PD-decisions.md`.
+
+- Accepted codes are now G20.B2 (primary), G20 and G20.B1 (dyskinesia without mention of fluctuations); G20.A1 and G20.A2 ("without dyskinesia", contradicted by the peak-dose dyskinesia) and G20.C (parkinsonism, unspecified) are no longer accepted.

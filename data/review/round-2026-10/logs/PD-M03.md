@@ -44,3 +44,9 @@ Adversarial verifier, 24 Oct 2026. No PD notes file. Read the whole final case a
 Found and changed:
 - `avoid-waste-5-analyze-ecg` contradicted the must "domperidone where available after an ECG for the QTc" (same class as M01). Removed.
 - `differential[Essential tremor].key_features` and `red_herrings[1].correct_interpretation` asserted "no postural or action tremor", which the examination never tests or records (it records only the absence of rest tremor and an endorsed occasional hand tremor). Rewritten as "No postural or action tremor is described in the history or on examination; ...". Checks after the verification edits: `perfect_agent.py -v` passes, `case_io.py check` names no failure for this case, `test_case_guards` pass.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/PD-decisions.md`.
+
+- Accepted codes are now G20.A1 (PD without dyskinesia, without mention of fluctuations; also PD NOS) and G20; G20.A2, G20.B1, G20.B2 (motor complications the case does not have) and G20.C ("Parkinsonism, unspecified", not PD) are no longer accepted. Labels unchanged.

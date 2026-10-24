@@ -47,3 +47,9 @@ A 56-year-old woman with 14 months of right-sided parkinsonism (pill-rolling res
 - Checked: handedness correction to right is supported (all writing complaints and micrographia in the right hand); smell-loss onset (18 months) matches HPI and exam; TSH 5.8 with free T4 1.1 identical in PMH, HPI, stored labs, criterion, must and red herring; lab panel names `TSH` and `thyroid` in the vocabulary; red herring points to `past_medical_history[0]` rather than the optional labs (plan asked for the thyroid panel; the PMH entry carries the same value and is what the agent sees, so the deviation is sound); drug output names only her medicines and the codeine intolerance; DaTscan waste with a left-putamen report opposite the right-sided signs; no genetics criterion (father onset 74, hers 55); removal of the anticholinergic prohibition is defensible at 56 with MoCA 28; probable PD.
 - No error found that needs a change. Nothing edited.
 - Checks re-run after verification: `perfect_agent.py -v` pass; `case_io.py check` schema OK, no failure names the case; `test_case_guards -k` pass; MockServer routing: DaTscan, MIBG and amyloid return their own modality (case or library), PSG and battery return the case report where stored, `check_drug_interactions` with `drug: levodopa` and `drug: rasagiline` return the case output, labs route to the stored panel where one exists; grep for established / gadolinium / "Abnormal values:" / Lewy / serotonin syndrome / Tier per / July 2026 / dashes: only allowed hits.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/PD-decisions.md`.
+
+- Accepted codes are now G20.A1 (PD without dyskinesia, without mention of fluctuations; also PD NOS) and G20; G20.A2, G20.B1, G20.B2 (motor complications the case does not have) and G20.C ("Parkinsonism, unspecified", not PD) are no longer accepted. Labels unchanged.

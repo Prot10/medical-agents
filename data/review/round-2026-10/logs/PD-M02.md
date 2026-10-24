@@ -47,3 +47,9 @@ Found and changed:
 - `avoid-waste-5-analyze-ecg` contradicted the must "domperidone where available after an ECG for the QTc" (same class as M01). Removed.
 
 Noted, not changed: the MRI keeps a pre-existing "Normal substantia nigra signal on susceptibility-weighted imaging". A preserved nigrosome-1 is a recognised false negative in early PD, no field relies on it, and the DaTscan carries the diagnosis; changing it would be churn. Checks after the verification edits: `perfect_agent.py -v` passes, `case_io.py check` names no failure for this case, `test_case_guards` pass.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/PD-decisions.md`.
+
+- Accepted codes are now G20.A1 (PD without dyskinesia, without mention of fluctuations; also PD NOS) and G20; G20.A2, G20.B1, G20.B2 (motor complications the case does not have) and G20.C ("Parkinsonism, unspecified", not PD) are no longer accepted. Labels unchanged.

@@ -49,3 +49,9 @@ Found and fixed:
 - C major, `ground_truth.assessment.required_recommendations[0]` and `ground_truth.key_clinical_evidence[2]`: "levodopa resistance" was counted as a supportive feature after 600 mg/day for 4 weeks, while MDS 2017 [Hoglinger_2017] defines levodopa resistance only after at least 1000 mg/day (if tolerated) for at least a month, and must [3] of the same case asks to complete that trial. Rewritten: dysarthria and dysphagia are the supportive clinical clues; levodopa resistance cannot yet be stated.
 - B minor, `ground_truth.differential` (DLB) `key_features`: claimed "no dream enactment", which the case never documents (no sleep history). Now "No visual hallucinations or cognitive fluctuations; the vertical supranuclear gaze palsy and early unprovoked backward falls are not DLB features".
 After the edit: perfect_agent ok; case_io check clean for PD-P03; test_case_guards pass; discriminator_defects empty.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/PD-decisions.md`.
+
+- Stays in condition parkinsons as a PD-mimic case (ruling 3); `metadata.case_body_concerns` and `citation_gap` cleared (`[Hoglinger_2017]` is in the PD pack). Labels and code unchanged (G23.1). No PD label or G20 code is accepted.

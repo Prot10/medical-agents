@@ -49,3 +49,9 @@ Found and fixed:
 - `assessment.required_recommendations[2]`: "shorten the interval to less than the 2.5 hours ... (for example ... about every 2.5 hours)" contradicted itself. Now "shorten the levodopa dosing interval to the 2.5 hours each dose lasts (for example 25/100 mg every 2.5 hours while awake, five or six doses a day)".
 - `avoided_actions[avoid-waste-5-analyze-ecg]` deleted: its own rationale ("an ECG is needed only if domperidone is chosen") and must [1] (domperidone "after an ECG for the QTc") make the ECG a conditional pre-treatment check of a recommended option, so scoring it as waste contradicted the must (PATTERNS: an avoided action the policy itself calls for). The ECG stays unscored; the case fallback answers it (sinus rhythm 76/min).
 Checks after the verification: `perfect_agent.py -v` ok, `case_io.py check` no failure names the case (the one suite failure is elsewhere), `test_case_guards` pass; MockServer routing re-checked by hand for the stored outputs named above.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/PD-decisions.md`.
+
+- Accepted codes are now G20.A2 (primary), G20 and G20.A1 ("without mention of fluctuations", the PD NOS code); G20.B1, G20.B2 (dyskinesia, which the case denies) and G20.C (parkinsonism, unspecified) are no longer accepted.

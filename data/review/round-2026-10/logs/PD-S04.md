@@ -44,3 +44,9 @@ This 67-year-old man has a 2.5-year right-predominant tremor-onset parkinsonism 
 - Confirmed every row: literature removed; drug output names tamsulosin and amlodipine; gadolinium and "history of hypertension" lines gone; battery MoCA 27/30 matches the exam (TMT-B low-average for the visuospatial/executive point); DaTscan left putamen worse; ECG 69/min matches vitals; red herring path `family_history[1]` and text match the patient block.
 - Verified the data the musts and evidence cite: driving concern (`social_history.driving`), constipation and self-reported smell loss (HPI paragraph 3), no falls, no dream enactment, manages finances. No supportive-criterion overcall.
 - Found nothing to correct. No change made.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/PD-decisions.md`.
+
+- Accepted codes are now G20.A1 (PD without dyskinesia, without mention of fluctuations; also PD NOS) and G20; G20.A2, G20.B1, G20.B2 (motor complications the case does not have) and G20.C ("Parkinsonism, unspecified", not PD) are no longer accepted. Labels unchanged.

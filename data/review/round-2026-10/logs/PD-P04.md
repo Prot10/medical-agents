@@ -55,3 +55,10 @@ After the edit: perfect_agent ok; case_io check clean for PD-P04; test_case_guar
 - `followup_outputs[2].trigger_action`: `request_optional_counselled_young_onset_pd_genetics` carried a tier word; renamed `request_counselled_pd_gene_panel`. Routing is by `test_type` (`genetic_panel:PD`), unchanged; the probe serves the stored panel.
 
 After the edits: `perfect_agent.py` 30/30 PD pass; every stored follow-up of the 30 cases is served for its own discriminator (MockServer probe); `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k PD-` 60 passed.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/PD-decisions.md`.
+
+- Accepted codes are now G20.A1 (PD without dyskinesia, without mention of fluctuations; also PD NOS) and G20; G20.A2, G20.B1, G20.B2 (motor complications the case does not have) and G20.C ("Parkinsonism, unspecified", not PD) are no longer accepted. Labels unchanged.
+- Wilson guideline recited from `[EASL_Wilson_2012]` (superseded) to `[EASL_ERN_Wilson_2025]` (EASL-ERN Clinical Practice Guidelines on Wilson's disease, J Hepatol 2025;82:690-728) in the labs criterion, the must and the key evidence; the labs rationale drops the 2012 age window "from age 3 to 55" and names the first-line tests (ceruloplasmin, 24-hour urinary copper, slit-lamp search for Kayser-Fleischer rings). `metadata.citation_gap` cleared (both keys are in the pack now).

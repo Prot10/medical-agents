@@ -703,26 +703,30 @@ parkinsons:
     age_range: [55, 80]
     sex_bias: "slight_male"
   encounter_type: "outpatient"
-  # Independent application of the July 2026 clinical review: there is no fixed routine lab
-  # panel (only nine cases retain targeted optional studies); EEG, ECG, autonomic and tilt
-  # testing are removed. Neuropsychology is optional only when cognition is active, except the
-  # required pre-DBS safety assessment. CT is exercised once as the MRI alternative.
+  # July 2026 clinical review and October 2026 round (criteria_packs/PD.md, plans/PD.md): MRI
+  # (CT only when MRI is impossible) is the one routine study; no fixed lab panel (labs only for a
+  # case-specific Wilson, drug-level, thyroid or pre-treatment question); no literature criterion;
+  # medication review required only with a dopamine blocker on the list or a pre-DBS review; EEG,
+  # CSF, autonomic and tilt testing never criteria (ECG only for syncope). Neuropsychology optional
+  # when cognition is active, required before DBS. Labels follow MDS 2015: a first visit before
+  # levodopa is "clinically probable PD", never "established".
   required_modalities: [MRI]
   optional_modalities: [LABS, specialized_test, advanced_imaging, CT]
   key_findings:
     mri:
       straightforward:
-        - "Normal brain MRI for age (supports PD — no structural cause for parkinsonism)"
+        - "Normal brain MRI for age (consistent with PD; no structural or vascular cause of the parkinsonism)"
         - "No vascular parkinsonism (no basal ganglia infarcts)"
         - "No NPH features (no ventriculomegaly out of proportion to sulcal atrophy)"
         - "Possible mild age-appropriate atrophy"
       moderate:
         - "Normal MRI but with some periventricular white matter changes"
-        - "Subtle ventricular enlargement (raises NPH differential)"
+        - "Ventricles proportionate to sulci (Evans index below 0.30; above 0.30 is abnormal, never 'upper limit of normal')"
       diagnostic_puzzle:
-        - "Cerebellar or pontine atrophy (suggesting MSA-C)"
-        - "OR: symmetric putaminal atrophy (suggesting MSA-P)"
-        - "OR: midbrain atrophy with hummingbird sign (suggesting PSP)"
+        - "PD-labelled puzzle: MRI normal for age (atypical markers would contradict the label)"
+        - "MSA-labelled case only: putaminal atrophy with iron-sensitive signal decrease, middle cerebellar peduncle or pontine atrophy, hot cross bun sign (MDS 2022 markers)"
+        - "PSP-labelled case only: midbrain atrophy (hummingbird sign), supportive and not required"
+        - "Standard parkinsonism MRI is non-contrast: no gadolinium or MRA lines unless the case gives a reason (e.g. prior TIA)"
     labs:
       selected_cases_only:
         - "Target a metabolic, toxic, young-onset or pretreatment question; do not order a fixed PD panel"
@@ -732,9 +736,13 @@ parkinsons:
     - diagnosis: "Essential tremor"
       key_distinguishing: "Action/postural tremor (not resting), bilateral, no rigidity/bradykinesia, FH positive"
     - diagnosis: "Drug-induced parkinsonism"
-      key_distinguishing: "Symmetric, exposure to dopamine blockers (metoclopramide, antipsychotics)"
+      key_distinguishing: "Often symmetric, exposure to dopamine blockers (metoclopramide, prochlorperazine, antipsychotics); normal DaTscan; resolves over weeks to months after withdrawal"
     - diagnosis: "Multiple system atrophy (MSA)"
-      key_distinguishing: "Early autonomic failure, cerebellar signs, poor levodopa response, rapid progression"
+      key_distinguishing: "Early autonomic failure, cerebellar signs, rapid progression; poor levodopa response only after a documented trial of up to 1000 mg/day for at least a month (MDS 2022)"
+    - diagnosis: "Dementia with Lewy bodies (DLB)"
+      key_distinguishing: "Dementia before or within a year of parkinsonism, fluctuations, visual hallucinations, RBD, neuroleptic sensitivity (McKeith 2017)"
+    - diagnosis: "Vascular parkinsonism"
+      key_distinguishing: "Lower-body predominant, gait onset, vascular lesions on MRI, usually normal DaTscan"
     - diagnosis: "Progressive supranuclear palsy (PSP)"
       key_distinguishing: "Vertical gaze palsy, early falls, axial rigidity > limb, poor levodopa response"
     - diagnosis: "Normal pressure hydrocephalus (NPH)"
@@ -747,21 +755,27 @@ parkinsons:
       presentation: "70-year-old man with 1-year gait instability and bilateral mild bradykinesia. No clear resting tremor. On metoclopramide for gastroparesis (confounding)."
       expected_agent_confidence: 0.55
     diagnostic_puzzle:
-      presentation: "60-year-old with symmetric parkinsonism, early postural instability, and orthostatic hypotension. Poor response to levodopa trial. Could be MSA or PSP."
+      presentation: "60-year-old with parkinsonism, orthostatic light-headedness and urinary urgency, raising MSA. The data must fit the label: a PD-labelled case has asymmetric onset, a rest tremor on examination and at most the red flags its supportive criteria counterbalance (MDS 2015); an MSA case meets MDS 2022 and states a poor levodopa response only after a documented trial."
       expected_agent_confidence: 0.35
   common_followups:
     - trigger_action: "request_datscan"
       tool_name: "order_advanced_imaging"
-      description: "Optional DaTscan only for a live degenerative-vs-nondegenerative differential; it does not distinguish PD from MSA/PSP"
-    - trigger_action: "request_neuropsych_testing"
-      tool_name: "order_specialized_test"
-      description: "Optional neuropsychological testing when cognitive impairment is clinically relevant; required for pre-DBS selection"
+      description: "DaTscan (modality DaTscan), stored as a binary abnormal report in every case because the library default is normal (an MDS absolute exclusion); required only where the label rests on it (dopamine-blocker or valproate confounder), optional for a live degenerative-vs-nondegenerative differential, waste when the diagnosis is clinically clear; it does not distinguish PD from MSA, PSP or DLB"
+    - trigger_action: "request_mibg"
+      tool_name: "order_advanced_imaging"
+      description: "Cardiac MIBG (modality MIBG_scan) only where a supportive criterion or a DLB indicative biomarker is in question; binary report, no disease name"
     - trigger_action: "request_sleep_study"
       tool_name: "order_specialized_test"
-      description: "Optional polysomnography only when reported dream enactment leaves an active RBD question"
-    - trigger_action: "request_counselled_pd_genetics"
+      description: "Polysomnography (test_type polysomnography), stored wherever dream enactment or RBD is reported; optional criterion only when dream enactment is not yet PSG-confirmed"
+    - trigger_action: "request_neuropsych_testing"
       tool_name: "order_specialized_test"
-      description: "Optional genetic_panel:PD in selected young-onset/familial disease after counselling"
+      description: "Neuropsychological battery (test_type neuropsych_battery), stored wherever the exam MoCA is below 28 and consistent with it; optional when cognition is clinically relevant, required before DBS"
+    - trigger_action: "request_counselled_pd_gene_panel"
+      tool_name: "order_specialized_test"
+      description: "Optional genetic_panel:PD after counselling, only for onset before 50 or a first-degree relative"
+    - trigger_action: "request_orthostatic_bp"
+      tool_name: "perform_clinical_assessment"
+      description: "Lying and standing blood pressure (assessment_type orthostatic_blood_pressure) where orthostatic symptoms are reported and the exam gives no figures"
 
 brain_tumor_glioma:
   name: "Brain tumor — high-grade glioma (GBM)"

@@ -285,7 +285,7 @@ def test_banned_table_rows_fire():
 DISCRIMINATOR_CONDITIONS = frozenset({
     "ALS", "BACT-MEN", "ISCH-STR", "HEP-ENC", "GLIO-HG", "GBS", "ALZ-EARLY", "SAH", "SE",
     "VASC-DEM", "NMDAR-ENC", "MIG-AURA", "SYNC-CARD", "FTD", "MG", "NPH", "FND", "MS-RR",
-    "FEPI-TEMP",
+    "FEPI-TEMP", "PD",
 })
 
 # initial_tool_outputs / fallback_tool_outputs slot of each routed tool.

@@ -43,3 +43,9 @@ This 65-year-old man has a 2-year right-predominant tremor-onset parkinsonism (p
 - Every row of the Own findings table was confirmed in the file: literature criterion, follow-ups and outputs gone; drug criterion `{}` optional with one stored output naming tamsulosin and lisinopril; MRI `{}` with evidence restating the report (Evans 0.28, no swallow-tail claim); FLAIR contradiction and hot cross bun placement fixed; ET `low`; red herring path `family_history[3]` correct; stored DaTscan left putamen worse (contralateral to the right-sided signs); DaTscan, autonomic and tilt waste; ECG fallback 71/min matches vitals; stop rule MRI only, 2 extra actions.
 - Hunted for introduced errors: no claim of established PD, levodopa response, constipation or hyposmia (the HPI denies constipation and none is claimed); no red flag in the data; musts consistent with allergy (latex only) and medicines; library defaults that the agent can reach (PSG normal, battery MoCA 28, orthostatic BP normal, MIBG normal) agree with the patient block (no dream enactment, MMSE 28/30, no orthostatic symptoms). Patient block unchanged.
 - Found nothing to correct. No change made.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/PD-decisions.md`.
+
+- Accepted codes are now G20.A1 (PD without dyskinesia, without mention of fluctuations; also PD NOS) and G20; G20.A2, G20.B1, G20.B2 (motor complications the case does not have) and G20.C ("Parkinsonism, unspecified", not PD) are no longer accepted. Labels unchanged.

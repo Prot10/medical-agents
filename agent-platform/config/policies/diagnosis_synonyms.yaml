@@ -376,13 +376,38 @@ G35:
   labels: [multiple sclerosis, MS, relapsing remitting multiple sclerosis, relapsing-remitting multiple sclerosis, RRMS]
   codes: [G35, G35.A, G35.D]
 
+# PD close-out (24 Oct 2026, plans/PD-decisions.md). FY2024+ ICD-10-CM splits G20 by motor
+# complication: G20.A1 PD without dyskinesia, without mention of fluctuations (also PD NOS), G20.A2
+# without dyskinesia with fluctuations, G20.B1 with dyskinesia without mention of fluctuations,
+# G20.B2 with dyskinesia and fluctuations. G20.C is "Parkinsonism, unspecified", not PD: it is not
+# granted (it would credit a nonspecific or drug-induced parkinsonism answer by its code alone). The
+# complication codes are granted only where the case has the complication: G20.A1 in every case
+# without dyskinesia, G20.A2 only in the fluctuating case (PD-RM05), G20.B1/B2 only in the case with
+# dyskinesia and fluctuations (PD-RP04, which does not take G20.A1 "without dyskinesia").
 G20:
   labels: [parkinson disease, parkinson's disease, parkinsons disease, idiopathic parkinson disease, idiopathic parkinson's disease, PD]
-  codes: [G20, G20.A1, G20.A2, G20.B1, G20.B2, G20.C]
+  codes: [G20]
+G20.A2:
+  codes: [G20.A1]
+G20.B2:
+  codes: [G20.B1]
 G23.1:
   labels: [progressive supranuclear palsy, PSP, richardson syndrome]
+# MSA (PD-P01 MSA-P, PD-RP03 mixed parkinsonian and cerebellar MSA; both stay in condition
+# parkinsons). ICD-10-CM FY2026 still codes MSA to G90.3 (multi-system degeneration of the
+# autonomic nervous system), the primary code. WHO ICD-10 (2016 update onward) and ICD-10-GM code
+# MSA-P G23.2 and MSA-C G23.3; in ICD-10-CM G23.2 is striatonigral degeneration (the MSA-P
+# pathology) and G23.3 does not exist. Both are accepted as codes of the subtype the case has.
 G90.3:
-  labels: [multiple system atrophy, MSA, MSA-P, multiple system atrophy parkinsonian type]
+  labels: [multiple system atrophy, MSA]
+G90.3+p:
+  cases: [PD-P01, PD-RP03]
+  labels: [MSA-P, multiple system atrophy parkinsonian type, striatonigral degeneration]
+  codes: [G23.2]
+G90.3+c:
+  cases: [PD-RP03]
+  labels: [MSA-C, multiple system atrophy cerebellar type]
+  codes: [G23.3]
 
 G61.0:
   labels: [guillain barre syndrome, guillain-barre syndrome, guillain-barré syndrome, GBS]

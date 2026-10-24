@@ -56,3 +56,10 @@ No defect found; no change made. perfect_agent ok; case_io check clean for PD-RM
 - `ground_truth.differential` "Cervical spondylotic radiculopathy or myelopathy": M47.2 is a non-billable category without the region; now M47.12 (cervical spondylosis with myelopathy), the code RM04 uses for the same entry.
 
 After the edits: `perfect_agent.py` 30/30 PD pass; every stored follow-up of the 30 cases is served for its own discriminator (MockServer probe); `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k PD-` 60 passed.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/PD-decisions.md`.
+
+- Accepted codes are now G20.A1 (PD without dyskinesia, without mention of fluctuations; also PD NOS) and G20; G20.A2, G20.B1, G20.B2 (motor complications the case does not have) and G20.C ("Parkinsonism, unspecified", not PD) are no longer accepted. Labels unchanged.
+- `metadata.citation_gap` cleared: `[NICE_NG71]` is in the PD pack now.

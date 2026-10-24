@@ -55,3 +55,9 @@ Found and fixed:
 - `neurological_exam.mental_status`: "verbal fluency (9 animals in 60 seconds)" is not a MoCA item (MoCA fluency is words beginning with F), and the stated losses summed to 5, not 6 (same class the worker fixed in RM04 and RM05). Now "losing points on the trail-making item (1), serial subtraction (1), letter fluency (9 F-words in 60 seconds, 1) and delayed recall (2/5 words, retrieved 1 with cue, 3)", consistent with the MMSE serial-sevens errors; MoCA 24 unchanged.
 - `neurological_exam.motor` and `.additional` described the postural tremor as "re-emergent" ("re-emerges after about 15 seconds"): re-emergent tremor is the postural continuation of a parkinsonian rest tremor, which contradicts "no rest tremor" and the MSA label. Now an intermittent, low-amplitude, irregular postural tremor present from the onset of the posture.
 Checks after the verification: `perfect_agent.py -v` ok, `case_io.py check` no failure names the case (the one suite failure is elsewhere), `test_case_guards` pass; MockServer routing re-checked by hand for the stored outputs named above.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/PD-decisions.md`.
+
+- Stays in condition parkinsons with its case id as a PD-mimic case (ruling 3); `metadata.case_body_concerns` and `citation_gap` cleared. Primary code stays G90.3. Synonyms: G23.2 and G23.3 added (WHO ICD-10 / ICD-10-GM MSA-P and MSA-C; the case has both parkinsonian and cerebellar features), labels "striatonigral degeneration", "MSA-C" and "multiple system atrophy cerebellar type" added. No PD label or G20 code is accepted.
