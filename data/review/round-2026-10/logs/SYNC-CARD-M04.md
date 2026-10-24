@@ -59,3 +59,13 @@ Changed:
 - red herring 0 `data_point` now quotes the HPI verbatim (the 15 to 20 second shaking likened to a seizure).
 
 Re-run after the change: perfect_agent 30/30 clean, case_io check clean for SYNC-CARD, test_case_guards for SYNC-CARD 60 passed, discriminator and hijack guards clean.
+
+## Close-out (24 Oct 2026)
+
+Close-out of the condition (plans/SYNC-CARD-decisions.md). Not a re-review: every change below is cross-case.
+
+- Diagnosis synonyms (`diagnosis_synonyms.yaml` SYNC-CARD block, applied with `apply_diagnosis_synonyms.py --prune --conditions syncope_cardiac`): the generic labels "cardiac syncope", "arrhythmic syncope", "bradyarrhythmia", "tachyarrhythmia" and "conduction disease syncope" are retired (29 of 30 cases accepted "cardiac syncope", so any cardiac answer scored), and R55 is no longer an accepted code.
+- Code: `icd_codes[0]` T46.2X5A (adverse effect of other antidysrhythmic drugs, wrong for these drugs) recoded to I45.81 (long QT syndrome), with I47.21 (torsades de pointes) and the adverse-effect codes of the three drugs, T36.3X5A (macrolides), T45.0X5A (antiallergic and antiemetic drugs: ondansetron) and T43.225A (SSRIs), all checked against the ICD-10-CM tabular list (summary Q3 / plan Q2, ruling 3). Labels: drug-induced and acquired long QT labels only; bare "torsades de pointes" retired, since "congenital long QT syndrome with torsades de pointes", the case's first mimic, contains its tokens.
+- Citations now follow the guideline each rationale or reason names (ruling 8; new keys in the criteria pack allow-list): action-3-check-drug-interactions citations ['[ESC_2018]'] -> ['[ESC_2022_VA_SCD]', '[Drew_2010]']; action-2-interpret-labs citations ['[ESC_2018]'] -> ['[Drew_2010]']; action-5-order-echocardiogram citations ['[ESC_2018]'] -> ['[ESC_2018]', '[ESC_2022_VA_SCD]']; avoid-waste-4-order-ct-scan citations ['[ESC_2018]'] -> ['[NICE_NG232]']; avoid-harm-5-exercise-stress-test citations [] -> ['[Fletcher_2013]'].
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; `test_case_guards.py -k SYNC-CARD-M04` pass (SYNC-CARD now in `DISCRIMINATOR_CONDITIONS`); synonym `--check` clean.

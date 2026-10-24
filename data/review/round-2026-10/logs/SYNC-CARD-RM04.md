@@ -75,3 +75,13 @@ Changed:
 - red herring 0 `data_point` now quotes the HPI verbatim ("like the room was closing in" and collapse within seconds).
 
 Re-run after the change: perfect_agent 30/30 clean, case_io check clean for SYNC-CARD, test_case_guards for SYNC-CARD 60 passed, discriminator and hijack guards clean.
+
+## Close-out (24 Oct 2026)
+
+Close-out of the condition (plans/SYNC-CARD-decisions.md). Not a re-review: every change below is cross-case.
+
+- Diagnosis synonyms (`diagnosis_synonyms.yaml` SYNC-CARD block, applied with `apply_diagnosis_synonyms.py --prune --conditions syncope_cardiac`): the generic labels "cardiac syncope", "arrhythmic syncope", "bradyarrhythmia", "tachyarrhythmia" and "conduction disease syncope" are retired (29 of 30 cases accepted "cardiac syncope", so any cardiac answer scored), and R55 is no longer an accepted code.
+- Labels: PE labels; I26.9 (PE without acute cor pulmonale) dropped, the case has RV strain. `metadata.citation_gap` cleared: `[ESC_2019_PE]` is now in the pack.
+- Citations now follow the guideline each rationale or reason names (ruling 8; new keys in the criteria pack allow-list): action-2-interpret-labs citations ['[ESC_2018]'] -> ['[ESC_2019_PE]']; action-3-order-echocardiogram citations ['[ESC_2018]'] -> ['[ESC_2018]', '[ESC_2019_PE]']; action-5-order-cardiac-monitoring citations ['[ESC_2018]'] -> ['[ESC_2018]', '[ESC_2019_PE]']; action-4-order-body-imaging citations ['[ESC_2018]'] -> ['[ESC_2019_PE]']; action-6-check-drug-interactions citations ['[ESC_2018]'] -> ['[ESC_2019_PE]']; action-8-lower-extremity-venous-duplex citations [] -> ['[ESC_2019_PE]']; avoid-waste-5-order-ct-scan citations [] -> ['[NICE_NG232]']; avoid-waste-6-d-dimer citations [] -> ['[ESC_2019_PE]']; avoid-harm-7-exercise-stress-test citations [] -> ['[Fletcher_2013]']; action-2-interpret-labs->action-4-order-body-imaging citations [] -> ['[ESC_2019_PE]'].
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; `test_case_guards.py -k SYNC-CARD-RM04` pass (SYNC-CARD now in `DISCRIMINATOR_CONDITIONS`); synonym `--check` clean.

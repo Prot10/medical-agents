@@ -50,3 +50,13 @@ Adversarial verifier, 24 Oct 2026. Read the whole final case against the plan (P
   1. A (discriminator), minor: `fallback_tool_outputs.echo` had no `echo_type` and said "Normal transthoracic echocardiogram", so it answered any TEE, bubble or exercise-echo order with a TTE text (PATTERNS 5; P03 was the only SYNC-CARD case with such a fallback). Set to null (the TTE follow-up answers TTE orders, the library answers the others) and removed `echo` from `metadata.fallback_tool_kinds`.
   2. K, minor: the LQTS differential cited "no QT prolongation or torsades on telemetry", which the telemetry report does not state. Rewritten to cite the 12-lead QTc 408 ms and the fever-dependent ectopy with coved ST elevation that the telemetry does report.
 - Re-ran `perfect_agent.py SYNC-CARD-P03 -v` (ok), `case_io.py check` (clean for this case) and the case guards (pass).
+
+## Close-out (24 Oct 2026)
+
+Close-out of the condition (plans/SYNC-CARD-decisions.md). Not a re-review: every change below is cross-case.
+
+- Diagnosis synonyms (`diagnosis_synonyms.yaml` SYNC-CARD block, applied with `apply_diagnosis_synonyms.py --prune --conditions syncope_cardiac`): the generic labels "cardiac syncope", "arrhythmic syncope", "bradyarrhythmia", "tachyarrhythmia" and "conduction disease syncope" are retired (29 of 30 cases accepted "cardiac syncope", so any cardiac answer scored), and R55 is no longer an accepted code.
+- Labels: "brugada syndrome" only; bare "brugada" retired (it credits "Brugada phenocopy").
+- Citations now follow the guideline each rationale or reason names (ruling 8; new keys in the criteria pack allow-list): action-1-analyze-ecg citations ['[ESC_2018]'] -> ['[ESC_2018]', '[ESC_2022_VA_SCD]']; action-5-order-advanced-imaging citations ['[ESC_2018]'] -> ['[ESC_2022_VA_SCD]']; action-6-check-drug-interactions citations ['[ESC_2018]'] -> ['[ESC_2022_VA_SCD]', '[Postema_2009]']; avoid-waste-1-order-ct-scan citations ['[ESC_2018]'] -> ['[NICE_NG232]'].
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; `test_case_guards.py -k SYNC-CARD-P03` pass (SYNC-CARD now in `DISCRIMINATOR_CONDITIONS`); synonym `--check` clean.

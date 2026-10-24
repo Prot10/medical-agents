@@ -72,3 +72,13 @@ Changed:
 - Literature follow-up trigger `search_cardiac_sarcoidosis_av_block_device_guideline` renamed to `search_cardiac_sarcoidosis_av_block_device`. Why: the old trigger's meaningful tokens were generic (management, guidelines, diagnosis, syncope, literature), so a generic query hit the disease-specific report; the new tokens are the condition names, so only a query naming the condition reaches it.
 
 Re-run after the change: perfect_agent 30/30 clean, case_io check clean for SYNC-CARD, test_case_guards for SYNC-CARD 60 passed, discriminator and hijack guards clean.
+
+## Close-out (24 Oct 2026)
+
+Close-out of the condition (plans/SYNC-CARD-decisions.md). Not a re-review: every change below is cross-case.
+
+- Diagnosis synonyms (`diagnosis_synonyms.yaml` SYNC-CARD block, applied with `apply_diagnosis_synonyms.py --prune --conditions syncope_cardiac`): the generic labels "cardiac syncope", "arrhythmic syncope", "bradyarrhythmia", "tachyarrhythmia" and "conduction disease syncope" are retired (29 of 30 cases accepted "cardiac syncope", so any cardiac answer scored), and R55 is no longer an accepted code.
+- Labels: sarcoid labels only; "complete heart block" removed so the sarcoid cause must be named (summary C1); "sarcoid myocarditis" retired (tokens in "non-sarcoid myocarditis", a mimic).
+- Citations now follow the guideline each rationale or reason names (ruling 8; new keys in the criteria pack allow-list): action-2-interpret-labs citations ['[ESC_2018]'] -> ['[ESC_2021_Pacing]', '[ATS_2020_Sarcoid]']; action-4-order-echocardiogram citations ['[ESC_2018]'] -> ['[ESC_2018]', '[ESC_2021_Pacing]']; action-chest-imaging citations [] -> ['[HRS_2014_Sarcoid]', '[ATS_2020_Sarcoid]']; action-cardiac-mri citations [] -> ['[ESC_2021_Pacing]', '[HRS_2014_Sarcoid]']; action-5-order-advanced-imaging citations [] -> ['[ESC_2021_Pacing]', '[HRS_2014_Sarcoid]']; action-9-obtain-tissue-diagnosis citations [] -> ['[HRS_2014_Sarcoid]']; avoid-waste-1-analyze-brain-mri citations ['[ACC_AHA_HRS_2017]'] -> ['[ESC_2018]', '[ACC_AHA_HRS_2017]']; avoid-waste-3-order-ct-scan citations ['[ACC_AHA_HRS_2017]'] -> ['[ACC_AHA_HRS_2017]', '[NICE_NG232]']; action-5-order-advanced-imaging->action-9-obtain-tissue-diagnosis citations [] -> ['[HRS_2014_Sarcoid]'].
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; `test_case_guards.py -k SYNC-CARD-RP05` pass (SYNC-CARD now in `DISCRIMINATOR_CONDITIONS`); synonym `--check` clean.

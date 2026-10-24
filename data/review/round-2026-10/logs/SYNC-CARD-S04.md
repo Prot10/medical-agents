@@ -64,3 +64,16 @@ Changed:
 - Added "not performed" follow-ups for `tilt_table` and `exercise_stress_test` (RM04/RP02 format, "Deferred by the clinical team"). Why: otherwise the library returned a normal tilt (HR 68) or a normal exercise test (10.4 METs) in a patient with high-grade AV block, contradicting the case; both orders stay penalised as in the plan.
 
 Re-run after the change: perfect_agent 30/30 clean, case_io check clean for SYNC-CARD, test_case_guards for SYNC-CARD 60 passed, discriminator and hijack guards clean.
+
+## Close-out (24 Oct 2026)
+
+Close-out of the condition (plans/SYNC-CARD-decisions.md). Not a re-review: every change below is cross-case.
+
+- Diagnosis synonyms (`diagnosis_synonyms.yaml` SYNC-CARD block, applied with `apply_diagnosis_synonyms.py --prune --conditions syncope_cardiac`): the generic labels "cardiac syncope", "arrhythmic syncope", "bradyarrhythmia", "tachyarrhythmia" and "conduction disease syncope" are retired (29 of 30 cases accepted "cardiac syncope", so any cardiac answer scored), and R55 is no longer an accepted code.
+- Valve guideline: ESC/EACTS 2025 replaces 2021 (TAVI threshold 70 years) in the literature result, rationales, must and pearl.
+- Labels: complete heart block labels only (Mobitz II and second-degree labels removed: a different grade); I44.30 kept, I44.1, I44.39, I45.9 and R55 dropped.
+- "ESC/EACTS 2021" renamed "ESC/EACTS 2025" (2025 ESC/EACTS valvular guideline, Praz 2025, supersedes 2021): `.ground_truth.action_criteria[3].rationale`, `.ground_truth.assessment.required_recommendations[3]`, `.ground_truth.avoided_actions[2].rationale`, `.metadata.clinical_pearls[3]`.
+- Literature follow-up: Vahanian 2021 source replaced by Praz 2025 and the TAVI age threshold 75 by 70 years (tricuspid AS, transfemoral access feasible); evidence level written as "Class I" only.
+- Citations now follow the guideline each rationale or reason names (ruling 8; new keys in the criteria pack allow-list): action-8-order-ct-scan citations [] -> ['[NICE_NG232]']; action-3-order-echocardiogram citations ['[ESC_2018]'] -> ['[ESC_2018]', '[ESC_EACTS_2025_VHD]']; action-7-order-advanced-imaging citations ['[ESC_2018]'] -> ['[ESC_2021_Pacing]']; avoid-harm-2-exercise-stress-test citations ['[ESC_2018]'] -> ['[ESC_EACTS_2025_VHD]'].
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; `test_case_guards.py -k SYNC-CARD-S04` pass (SYNC-CARD now in `DISCRIMINATOR_CONDITIONS`); synonym `--check` clean.

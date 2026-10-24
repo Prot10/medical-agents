@@ -50,3 +50,13 @@ Adversarial verifier, 24 Oct 2026. Read the whole final case against the plan (R
   2. C, minor (resolves the worker's first open question): the permanent-pacing must now adds that an ICD-capable device replaces a pacemaker if genetic testing shows a laminopathy (ESC 2021 pacing IIa; ESC 2022), since the case keeps the father's sudden death and the brother's syncope and screens relatives.
 - Worker's second open question, resolved without a change: infranodal (Mobitz II) and complete block are uncommon in rheumatic carditis, where first-degree block is typical, but are reported, and the case is seeded from a published case (PMC10507219). Inflammatory markers, CMR oedema and the valve morphology support active carditis, so the plan's temporary-then-permanent pacing logic stands.
 - Re-ran `perfect_agent.py SYNC-CARD-RM02 -v` (ok), `case_io.py check` (clean for this case) and the case guards (pass).
+
+## Close-out (24 Oct 2026)
+
+Close-out of the condition (plans/SYNC-CARD-decisions.md). Not a re-review: every change below is cross-case.
+
+- Diagnosis synonyms (`diagnosis_synonyms.yaml` SYNC-CARD block, applied with `apply_diagnosis_synonyms.py --prune --conditions syncope_cardiac`): the generic labels "cardiac syncope", "arrhythmic syncope", "bradyarrhythmia", "tachyarrhythmia" and "conduction disease syncope" are retired (29 of 30 cases accepted "cardiac syncope", so any cardiac answer scored), and R55 is no longer an accepted code.
+- Labels: generic complete heart block and Mobitz labels no longer granted here (chloroquine toxicity and familial conduction disease are its mimics); rheumatic carditis / rheumatic heart block labels and I01.8, I01.9 added (summary C1). Residual: primary code I44.2 still credits a CHB answer coded I44.2 (code-alone scorer item, CENTRAL).
+- Citations now follow the guideline each rationale or reason names (ruling 8; new keys in the criteria pack allow-list): action-2-interpret-labs citations ['[ESC_2018]'] -> ['[ESC_2021_Pacing]', '[Gewitz_2015]']; action-8-order-advanced-imaging citations ['[ESC_2018]'] -> ['[ESC_2021_Pacing]']; action-5-check-drug-interactions citations ['[ESC_2018]'] -> ['[ESC_2021_Pacing]']; avoid-waste-2-order-ct-scan citations ['[ESC_2018]'] -> ['[NICE_NG232]'].
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; `test_case_guards.py -k SYNC-CARD-RM02` pass (SYNC-CARD now in `DISCRIMINATOR_CONDITIONS`); synonym `--check` clean.

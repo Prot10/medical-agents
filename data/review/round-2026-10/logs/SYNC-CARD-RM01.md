@@ -56,3 +56,13 @@ Adversarial verifier, 24 Oct 2026. Read the whole final case (patient block, eve
   6. C, minor: the TTE criterion rationale cited "ESC 2018 Class I when structural disease is suspected after an apparent cardiac arrest", a wording the guideline does not have and a framing the edited HPI no longer supports. Rewritten.
 - Open questions: Q1 (whether the case belongs in SYNC-CARD) stays for Andrea, as the plan says. Source fidelity stays as well: only Andrea can say whether departures from the PMC11623976 seed matter.
 - Re-ran `perfect_agent.py SYNC-CARD-RM01 -v` (each criterion receives its own report), `case_io.py check` (clean for this case) and the case guards (pass).
+
+## Close-out (24 Oct 2026)
+
+Close-out of the condition (plans/SYNC-CARD-decisions.md). Not a re-review: every change below is cross-case.
+
+- Diagnosis synonyms (`diagnosis_synonyms.yaml` SYNC-CARD block, applied with `apply_diagnosis_synonyms.py --prune --conditions syncope_cardiac`): the generic labels "cardiac syncope", "arrhythmic syncope", "bradyarrhythmia", "tachyarrhythmia" and "conduction disease syncope" are retired (29 of 30 cases accepted "cardiac syncope", so any cardiac answer scored), and R55 is no longer an accepted code.
+- Labels: the case now scores the paraneoplastic cause: anti-Hu or paraneoplastic brainstem encephalitis labels; "central sleep apnoea/apnea", "sleep apnea syncope", "nocturnal asystole" and "sleep related bradyarrhythmia" retired (they credit heart-failure CSA, OSA or intrinsic sinus node disease, all in the differential); G47.31 (idiopathic CSA) and G47.37 dropped. Q1 (placement) and Q2 (source fidelity) decided in plans/SYNC-CARD-decisions.md: stays in SYNC-CARD as the neurological mimic; the seed is adapted, not reproduced.
+- Citations now follow the guideline each rationale or reason names (ruling 8; new keys in the criteria pack allow-list): action-2-interpret-labs citations ['[ESC_2018]'] -> ['[Graus_2021]']; action-11-tumour-search-chest-ct citations ['[ESC_2018]'] -> ['[Graus_2021]']; action-12-analyze-csf citations ['[ESC_2018]'] -> ['[Graus_2021]']; avoid-waste-2-order-ct-scan citations ['[ESC_2018]'] -> ['[NICE_NG232]'].
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; `test_case_guards.py -k SYNC-CARD-RM01` pass (SYNC-CARD now in `DISCRIMINATOR_CONDITIONS`); synonym `--check` clean.

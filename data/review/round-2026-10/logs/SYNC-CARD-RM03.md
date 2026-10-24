@@ -52,3 +52,13 @@ Adversarial verifier, 24 Oct 2026. Read the whole final case against the plan (R
 - Worker's second open question, resolved without a change: the family history (father's sudden death at 52, brother paced at 55) is part of the seed record and is kept; relative screening stays a must and familial conduction disease stays moderate.
 - Left as is: "remote history of rheumatic fever in childhood" in the PMH predates the round and contradicts nothing (normal mitral leaflets); it may be carry-over from RM02 but could equally come from the seed, which I could not check.
 - Re-ran `perfect_agent.py SYNC-CARD-RM03 -v` (ok), `case_io.py check` (clean for this case) and the case guards (pass).
+
+## Close-out (24 Oct 2026)
+
+Close-out of the condition (plans/SYNC-CARD-decisions.md). Not a re-review: every change below is cross-case.
+
+- Diagnosis synonyms (`diagnosis_synonyms.yaml` SYNC-CARD block, applied with `apply_diagnosis_synonyms.py --prune --conditions syncope_cardiac`): the generic labels "cardiac syncope", "arrhythmic syncope", "bradyarrhythmia", "tachyarrhythmia" and "conduction disease syncope" are retired (29 of 30 cases accepted "cardiac syncope", so any cardiac answer scored), and R55 is no longer an accepted code.
+- Labels: Mobitz II and high-grade AV block labels only (complete heart block labels and I44.2 removed: monitoring shows no complete block); bare "second degree av block" retired (it credits Mobitz I); I44.30 kept, I44.39, I45.9 and R55 dropped.
+- Citations now follow the guideline each rationale or reason names (ruling 8; new keys in the criteria pack allow-list): action-2-interpret-labs citations ['[ESC_2018]'] -> ['[ESC_2021_Pacing]']; action-3-order-echocardiogram citations ['[ESC_2018]'] -> ['[ESC_2018]', '[ESC_2021_Pacing]']; action-8-order-advanced-imaging citations ['[ESC_2018]'] -> ['[ESC_2021_Pacing]']; action-5-check-drug-interactions citations ['[ESC_2018]'] -> ['[ESC_2021_Pacing]']; avoid-waste-3-order-ct-scan citations ['[ESC_2018]'] -> ['[NICE_NG232]'].
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; `test_case_guards.py -k SYNC-CARD-RM03` pass (SYNC-CARD now in `DISCRIMINATOR_CONDITIONS`); synonym `--check` clean.

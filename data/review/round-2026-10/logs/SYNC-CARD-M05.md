@@ -52,3 +52,13 @@ Changed:
 - red herring 0 moved to `patient.history_present_illness`: the old data_point cited a PCP attribution absent from PMH[0]; it now quotes the HPI's anxiety and panic-attack attribution verbatim.
 
 Re-run after the change: perfect_agent 30/30 clean, case_io check clean for SYNC-CARD, test_case_guards for SYNC-CARD 60 passed, discriminator and hijack guards clean.
+
+## Close-out (24 Oct 2026)
+
+Close-out of the condition (plans/SYNC-CARD-decisions.md). Not a re-review: every change below is cross-case.
+
+- Diagnosis synonyms (`diagnosis_synonyms.yaml` SYNC-CARD block, applied with `apply_diagnosis_synonyms.py --prune --conditions syncope_cardiac`): the generic labels "cardiac syncope", "arrhythmic syncope", "bradyarrhythmia", "tachyarrhythmia" and "conduction disease syncope" are retired (29 of 30 cases accepted "cardiac syncope", so any cardiac answer scored), and R55 is no longer an accepted code.
+- Labels: SVT and AVNRT labels with I47.10 and I47.19; "ventricular tachycardia" and "VT" (a mimic in this case) and I47.2/I47.20 no longer accepted. Citation `[Locati_2014]` replaced by `[Locati_2016]` (SYNARR-Flash, Europace 2016;18:1265-1272; the old key's Heart 2016 reference could not be verified).
+- Citations now follow the guideline each rationale or reason names (ruling 8; new keys in the criteria pack allow-list): action-1-analyze-ecg citations ['[ESC_2018]'] -> ['[ESC_2018]', '[ESC_2019_SVT]']; action-4-order-cardiac-monitoring citations ['[ESC_2018]', '[Locati_2014]'] -> ['[ESC_2018]', '[Locati_2016]']; action-6-check-drug-interactions citations ['[ESC_2018]'] -> ['[ESC_2019_SVT]']; avoid-waste-4-order-ct-scan citations ['[ESC_2018]'] -> ['[NICE_NG232]'].
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; `test_case_guards.py -k SYNC-CARD-M05` pass (SYNC-CARD now in `DISCRIMINATOR_CONDITIONS`); synonym `--check` clean.

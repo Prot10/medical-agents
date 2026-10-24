@@ -55,3 +55,14 @@ Adversarial verifier, 24 Oct 2026. Read the whole final case against the plan (P
   5. B, minor: the lab criterion's expected_evidence said "Normal ... magnesium" while the panel flags magnesium 2.3 mg/dL high. Rewritten to "Potassium 4.0 and troponin I normal, magnesium not low".
   6. C, minor: metadata.clinical_pearls[4] said the risk profile "warrants ICD implantation"; ESC 2023 makes it IIa (should be considered). Reworded.
 - Re-ran `perfect_agent.py SYNC-CARD-P02 -v` (ok) and `case_io.py check` (clean for this case).
+
+## Close-out (24 Oct 2026)
+
+Close-out of the condition (plans/SYNC-CARD-decisions.md). Not a re-review: every change below is cross-case.
+
+- Diagnosis synonyms (`diagnosis_synonyms.yaml` SYNC-CARD block, applied with `apply_diagnosis_synonyms.py --prune --conditions syncope_cardiac`): the generic labels "cardiac syncope", "arrhythmic syncope", "bradyarrhythmia", "tachyarrhythmia" and "conduction disease syncope" are retired (29 of 30 cases accepted "cardiac syncope", so any cardiac answer scored), and R55 is no longer an accepted code.
+- Labels: HCM labels kept (the disease is named; obstruction is scored by the required exercise echo), plus "obstructive hypertrophic cardiomyopathy".
+- "ESC/EACTS 2021" renamed "ESC/EACTS 2025" (2025 ESC/EACTS valvular guideline, Praz 2025, supersedes 2021): `.ground_truth.sequence_constraints[2].reason`.
+- Citations now follow the guideline each rationale or reason names (ruling 8; new keys in the criteria pack allow-list): action-3-order-echocardiogram citations ['[ESC_2018]'] -> ['[ESC_2018]', '[ESC_2023_Cardiomyopathy]']; action-5-order-advanced-imaging citations ['[ESC_2018]'] -> ['[ESC_2023_Cardiomyopathy]']; action-6-order-echocardiogram citations ['[ESC_2018]'] -> ['[ESC_2023_Cardiomyopathy]']; action-7-check-drug-interactions citations ['[ESC_2018]'] -> ['[ESC_2023_Cardiomyopathy]']; avoid-waste-1-order-ct-scan citations ['[ESC_2018]'] -> ['[ESC_2018]', '[NICE_NG232]']; action-3-order-echocardiogram->action-6-order-echocardiogram citations ['[ESC_2018]'] -> ['[ESC_2018]', '[ESC_2023_Cardiomyopathy]', '[ESC_EACTS_2025_VHD]'].
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; `test_case_guards.py -k SYNC-CARD-P02` pass (SYNC-CARD now in `DISCRIMINATOR_CONDITIONS`); synonym `--check` clean.
