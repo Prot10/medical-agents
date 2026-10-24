@@ -48,6 +48,13 @@ def n_actions(cond, tool, cats=None, param=None):
             )
     return n
 
+def avoided_with(cond, tool, severity=None):
+    """case ids with an avoided action on `tool`, optionally of one severity."""
+    return {d['case_id'] for d in CASES[cond]
+            for avoided in d['ground_truth'].get('avoided_actions', [])
+            if (severity is None or avoided['severity'] == severity)
+            and any(pattern['tool_name'] == tool for pattern in avoided['alternatives'])}
+
 R = 'required'; C = 'recommended'; O = 'optional'
 CLAIMS = [
     # (label, actual, expected)
@@ -212,15 +219,23 @@ CLAIMS = [
     ('mig/echo required in exactly 3',           len(cases_with('migraine_with_aura','order_echocardiogram',[R])), 3),
     ('mig/monitor required in exactly 3',        len(cases_with('migraine_with_aura','order_cardiac_monitoring',[R])), 3),
     ('ms/MRI required all 30',                   len(cases_with('multiple_sclerosis','analyze_brain_mri',[R])), 30),
-    ('ms/CSF optional 19 recommended 11',       (len(cases_with('multiple_sclerosis','analyze_csf',[O])),
-                                                 len(cases_with('multiple_sclerosis','analyze_csf',[C]))), (19,11)),
+    ('ms/CSF optional 20 recommended 8, required in none',
+        (len(cases_with('multiple_sclerosis','analyze_csf',[O])), len(cases_with('multiple_sclerosis','analyze_csf',[C])),
+         len(cases_with('multiple_sclerosis','analyze_csf',[R]))), (20,8,0)),
+    ('ms/LP contraindicated in the two mass-effect cases', len(avoided_with('multiple_sclerosis','analyze_csf','contraindicated')), 2),
     ('ms/spine_MRI required all 30',             len(cases_with('multiple_sclerosis','order_body_imaging',[R],'spine_MRI')), 30),
-    ('ms/OCT 8 and VEP 14, optional and targeted',(len(cases_with('multiple_sclerosis','order_specialized_test',[O],'optical_coherence_tomography')),
-                                                   len(cases_with('multiple_sclerosis','order_specialized_test',[O],'vep'))), (8,14)),
-    ('ms/targeted AQP4/MOG in 13',               (len(cases_with('multiple_sclerosis','interpret_labs',None,'AQP4_IgG_cell_based')),
-                                                 len(cases_with('multiple_sclerosis','interpret_labs',None,'MOG_IgG_cell_based'))), (13,13)),
-    ('ms/no EEG, no ECG',                       (len(cases_with('multiple_sclerosis','analyze_eeg')),
-                                                 len(cases_with('multiple_sclerosis','analyze_ecg'))), (0,0)),
+    ('ms/OCT 14 and VEP 18, optional only',      (len(cases_with('multiple_sclerosis','order_specialized_test',[O],'optical_coherence_tomography')),
+                                                  len(cases_with('multiple_sclerosis','order_specialized_test',[O],'vep')),
+                                                  len(cases_with('multiple_sclerosis','order_specialized_test',[R,C]))), (14,18,0)),
+    ('ms/AQP4/MOG CBA in 25: required 8, recommended 17',
+        (len(cases_with('multiple_sclerosis','interpret_labs',None,'AQP4_IgG_cell_based')),
+         len(cases_with('multiple_sclerosis','interpret_labs',[R],'MOG_IgG_cell_based')),
+         len(cases_with('multiple_sclerosis','interpret_labs',[C],'MOG_IgG_cell_based'))), (25,8,17)),
+    ('ms/AQP4/MOG results never in the initial labs',
+        sum('AQP4' in json.dumps(d['initial_tool_outputs'].get('labs') or {}) for d in CASES['multiple_sclerosis']), 0),
+    ('ms/no EEG or ECG criterion; EEG waste in 28, ECG waste in 1',
+        (len(cases_with('multiple_sclerosis','analyze_eeg')), len(cases_with('multiple_sclerosis','analyze_ecg')),
+         len(avoided_with('multiple_sclerosis','analyze_eeg','waste')), len(avoided_with('multiple_sclerosis','analyze_ecg','waste'))), (0,0,28,1)),
     ('mg/brain MRI in 3 cases, required in 1',  (len(cases_with('myasthenia_gravis','analyze_brain_mri')),
                                                  len(cases_with('myasthenia_gravis','analyze_brain_mri',[R]))), (3,1)),
     ('mg/no CSF anywhere',                       len(cases_with('myasthenia_gravis','analyze_csf')), 0),

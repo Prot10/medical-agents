@@ -591,27 +591,41 @@ SPEC += [
                   "study."),
     dict(cond="multiple_sclerosis", filed="analyze_csf", tool="analyze_csf",
          reviewer=1, tier="optional", status="applied",
-         response="Applied case by case: CSF is optional in 19 cases and recommended in 11 "
-                  "equivocal or atypical cases; it is required in none. The panel now includes "
-                  "the kappa free-light-chain index accepted by the 2024 criteria, and mass-effect "
-                  "cases explicitly defer LP until imaging safety has been assessed."),
+         response="Applied case by case: CSF (oligoclonal bands or the kappa free-light-chain "
+                  "index accepted by the 2024 criteria, with paired serum) is optional in 20 cases "
+                  "and recommended in 8 (the three migraine-lesion puzzles, three tumefactive "
+                  "cases for cytology and flow cytometry, and the two patients over 50 with "
+                  "vascular risk); it is required in none. In the two tumefactive cases with "
+                  "midline shift or a posterior fossa mass, lumbar puncture is a contraindicated "
+                  "action, and every CSF criterion follows the brain MRI."),
     dict(cond="multiple_sclerosis", filed="order_specialized_test", tool="order_specialized_test",
          reviewer=1, tier="optional", status="applied",
          response="Applied after correcting the first mechanical implementation: OCT is optional "
-                  "in 8 optic-neuritis cases and VEP in 14 optic or genuinely equivocal cases, "
-                  "rather than both being attached to all 30. No EMG/NCS, RNS, biopsy, autonomic "
-                  "test or unrelated evoked-potential action remains."),
+                  "in 14 cases with current or earlier optic neuritis and VEP in 18 cases where "
+                  "the optic nerve counts as a region or a documented optic neuropathy needs a "
+                  "result, rather than both being attached to all 30; neither is required or "
+                  "recommended. Acute optic neuritis shows no OCT thinning in the first weeks. No "
+                  "EMG/NCS, RNS, autonomic test or unrelated evoked-potential action remains."),
     dict(cond="multiple_sclerosis", filed="interpret_labs", tool="interpret_labs",
          reviewer=1, tier="required", status="applied",
-         response="Applied: all 30 retain the required baseline mimic-exclusion panel. AQP4-IgG "
-                  "and MOG-IgG are targeted to 13 optic-neuritis or atypical/tumefactive cases, "
-                  "not used as a fixed universal screen."),
+         response="Applied: all 30 retain the required baseline mimic-exclusion panel (CBC, B12, "
+                  "thyroid, HIV). AQP4-IgG and MOG-IgG by cell-based assay are a separate order "
+                  "in 25 cases, not a universal screen: required in 8 with a red flag (severe "
+                  "optic neuritis, tumefactive lesion, onset at 50 or later) and recommended in "
+                  "17 with optic neuritis or myelitis. Their results are returned only to an "
+                  "order that names the assay, not to the first-line panel."),
     dict(cond="multiple_sclerosis", filed="analyze_eeg", tool="analyze_eeg",
          reviewer=1, tier="remove", status="applied",
-         response="Removed end to end: no case orders EEG and no authored EEG result remains."),
+         response="Removed as a diagnostic step: no case has an EEG criterion, and EEG is a "
+                  "wasteful action in 28 cases. In the two cases where an EEG is clinically "
+                  "reasonable (a first seizure with a tumefactive lesion, and post-operative "
+                  "coma) it is neither scored nor penalised, and their EEG report fits the case."),
     dict(cond="multiple_sclerosis", filed="analyze_ecg", tool="analyze_ecg",
          reviewer=1, tier="remove", status="applied",
-         response="Removed end to end: no case orders ECG and no authored ECG result remains."),
+         response="Removed as a diagnostic step: no case has an ECG criterion. An agent that "
+                  "orders one receives a baseline tracing consistent with the patient (normal, or "
+                  "borderline voltage LVH in the hypertensive patient); it is penalised as waste "
+                  "in one case."),
 
     # === migraine with aura (reviewer 1) ===
     dict(cond="migraine_with_aura", filed="analyze_brain_mri", tool="analyze_brain_mri",

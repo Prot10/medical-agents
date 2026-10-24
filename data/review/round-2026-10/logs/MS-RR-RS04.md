@@ -61,3 +61,12 @@ Condition auditor, 24 Oct 2026 (uniformity scripts over all 30 MS-RR cases; edit
 - `action-3-search-medical-literature.label` "Literature search (background evidence only)" -> "Literature search on the current MS diagnostic criteria": engineering text replaced by the topic of the stored output.
 - `assessment.prohibited_recommendations[2]` chronic-steroid prohibition set to the condition's canonical text (was "Do not use chronic oral corticosteroids as a maintenance treatment for MS [em dash] they are ineffective long-term and carry significant harm").
 - `assessment.prohibited_recommendations[4]` spinal-cord prohibition set to the condition's canonical text (was "Do not omit spinal-cord MRI in a patient with myelopathic signs even if the brain MRI alone meets DIS criteria [em dash] cord lesions change relapse counting and management").
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (`plans/MS-RR-decisions.md`). What changed and why:
+
+- Diagnosis synonyms (`diagnosis_synonyms.yaml` G35 entry, re-applied with `apply_diagnosis_synonyms.py --prune --conditions multiple_sclerosis`): removed the label "demyelinating disease" (G37.9 is an Excludes1 of G35.A, and its tokens occur in an NMOSD, MOGAD or ADEM answer, which would have scored as correct) and the codes G35.B and G35.C (primary and secondary progressive MS in FY2026 ICD-10-CM, a different course from this relapsing-remitting case). Accepted now: the label, multiple sclerosis, MS, relapsing(-)remitting multiple sclerosis, RRMS; codes G35.A, G35, G35.D.
+- `followup_outputs`: added the negative AQP4-IgG / MOG-IgG cell-based-assay follow-up (`interpret_labs`, trigger `request_aqp4_mog_cell_based_assay`, panel `Neuroimmunology`, after the spine MRI), as in the other 25 cases. The case has no AQP4/MOG criterion (no red flag, no optic neuritis or myelitis), so scoring is unchanged; before, an agent that ordered the assay received the first-line labs again with no antibody result (summary CENTRAL 5, open question 3). MockServer probe: all three alternatives, alone or with the mimic panel and in either order, receive the rows; the mimic panel alone does not.
+- `ground_truth.differential` NMOSD and MOGAD `key_features`: "AQP4-IgG was not tested (no red flag)" and "MOG-IgG was not tested" -> "... testing is not indicated without a red flag", since a result is now stored.
+- Checks: `perfect_agent.py` pass, `case_io.py check` clean for the case, `test_case_guards.py -k MS-RR-` passes with MS-RR now in `DISCRIMINATOR_CONDITIONS`.

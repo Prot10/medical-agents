@@ -501,60 +501,57 @@ multiple_sclerosis:
     age_range: [20, 45]
     sex_bias: "female_predominant"
   encounter_type: "inpatient"
-  # Clinical tool review, July 2026: CSF required->optional (2024 McDonald: LP not universally
-  # required if criteria are otherwise met); EEG and ECG removed (no diagnostic role);
-  # specialized_test narrowed to optional, case-targeted optic-nerve testing (OCT, VEP), and
-  # AQP4/MOG serology restricted to optic-neuritis or atypical/tumefactive presentations.
-  # body_imaging is required because the reviewers asked for brain *and* cord imaging by name and
-  # the cord counts toward dissemination in space. All 30 cases already required it — as a second
-  # `analyze_brain_mri` carrying a `region: cervical_thoracic_spine` annotation the brain tool
-  # drops, which gave it the same action identity as the brain study, so the two collapsed into one
-  # and imaging only the brain scored full required coverage.
+  # Clinical tool review, July 2026, and the October 2026 round (criteria_packs/MS-RR.md,
+  # plans/MS-RR-decisions.md): brain MRI and cervical-thoracic cord MRI (order_body_imaging
+  # spine_MRI, never a second analyze_brain_mri) with gadolinium and the mimic labs are required;
+  # CSF (OCB or kFLC index) is optional, recommended in puzzles, tumefactive and late-onset cases,
+  # and contraindicated with mass effect; OCT and VEP are optional optic-nerve tests; AQP4/MOG by
+  # cell-based assay is a separate interpret_labs order (required with a red flag, recommended with
+  # optic neuritis or myelitis) whose results are a follow-up, never rows of the initial labs. EEG
+  # and ECG have no diagnostic role. The diagnosis follows the 2024 McDonald revision (five regions
+  # with the optic nerve; 4-5 regions need no DIT). No future-data or treatment-response follow-up.
   required_modalities: [MRI, body_imaging, LABS]
   optional_modalities: [CSF, specialized_test]
   key_findings:
     mri:
       straightforward:
-        - "Multiple periventricular ovoid T2/FLAIR hyperintense lesions (Dawson fingers)"
-        - "At least one gadolinium-enhancing lesion (active inflammation)"
-        - "Juxtacortical and infratentorial lesions present"
-        - "Spinal cord lesion on sagittal imaging"
-        - "Meets the 2024 revised McDonald diagnostic framework"
+        - "Multiple periventricular ovoid T2/FLAIR hyperintense lesions perpendicular to the ventricles (Dawson fingers)"
+        - "At least one gadolinium-enhancing lesion alongside non-enhancing lesions"
+        - "Juxtacortical or cortical and infratentorial lesions"
+        - "The report names lesion sites and enhancement only; it never states whether McDonald criteria are met"
       moderate:
-        - "Several non-specific white matter lesions, some periventricular"
-        - "No definite Dawson fingers morphology"
-        - "Single enhancing lesion, borderline size"
-        - "No clear spinal cord involvement on initial imaging"
+        - "A few typical ovoid periventricular lesions among non-specific subcortical foci"
+        - "Single enhancing lesion"
+        - "Spinal cord not assessed on a brain study: cord findings belong only to the spine MRI report"
       diagnostic_puzzle:
-        - "Few scattered white matter lesions that could be vascular"
-        - "No enhancement (monophasic presentation)"
+        - "Small subcortical foci that could be migraine-related or vascular, plus at least one typical lesion (ovoid periventricular, infratentorial or with incomplete-ring enhancement) that the agent must recognise"
+        - "Tumefactive variant: a large lesion with open-ring enhancement open toward the cortex and less mass effect than its size predicts"
     body_imaging:
       all_difficulties:
-        - "spine_MRI: short-segment (<2 vertebral bodies) peripheral cord lesions — favour MS over the longitudinally extensive lesion of NMOSD"
-        - "Cord involvement counts toward dissemination in space even when the brain study is equivocal"
-        - "Findings overlap with migraine-related white matter changes"
-        - "Lesion distribution atypical (mostly subcortical)"
+        - "spine_MRI: short-segment (under 2 vertebral segments) peripheral or dorsolateral cord lesions, less than half the cross-section, with level, length, position and enhancement stated"
+        - "A cervical lesion wherever the patient has a Lhermitte sign"
+        - "No longitudinally extensive lesion"
     labs:
       all_difficulties:
         - "CBC: normal"
         - "BMP: normal"
         - "ANA: negative or low-titer positive (nonspecific)"
         - "Vitamin B12: normal"
-        - "Targeted AQP4-IgG/MOG-IgG: negative when optic-neuritis or atypical features justify testing"
         - "ESR/CRP: usually normal"
+        - "Normal rows carry no clinical_significance text; AQP4-IgG/MOG-IgG are never in the initial labs"
     csf:
       straightforward:
         - "Oligoclonal bands present (>=2 unique to CSF)"
-        - "Kappa free-light-chain index elevated as an accepted alternative positive-CSF marker"
-        - "Elevated IgG index (>0.7)"
-        - "Mild lymphocytic pleocytosis (5-25 cells)"
-        - "Normal glucose, mildly elevated protein"
+        - "Kappa free-light-chain index above the laboratory's stated cutoff"
+        - "Elevated IgG index (>0.7), supportive only"
+        - "Mild lymphocytic pleocytosis (5-15 cells)"
+        - "Normal glucose, normal or mildly elevated protein"
       moderate:
         - "Oligoclonal bands present but only 2 bands"
         - "IgG index borderline (0.6-0.7)"
         - "Normal cell count"
       diagnostic_puzzle:
-        - "No oligoclonal bands (occurs in ~5-10% of MS)"
+        - "No oligoclonal bands and kFLC index below the cutoff (occurs in ~5-10% of MS)"
         - "Normal IgG index"
         - "CSF entirely normal"
   differential_diagnoses:
@@ -570,30 +567,29 @@ multiple_sclerosis:
       key_distinguishing: "Leptomeningeal enhancement, elevated ACE, pulmonary findings"
   difficulty_variants:
     straightforward:
-      presentation: "28-year-old woman with acute optic neuritis (painful vision loss) and prior episode of limb numbness 6 months ago. Classic MRI and CSF."
+      presentation: "28-year-old woman with acute painful monocular vision loss and a prior episode of limb numbness 6 months ago."
       expected_agent_confidence: 0.85
     moderate:
-      presentation: "33-year-old woman with subacute bilateral leg weakness and urinary urgency. First clinical event but MRI suggests prior subclinical lesions."
+      presentation: "33-year-old woman with subacute leg weakness, worse on one side, and urinary urgency; she recalls a transient sensory episode two years ago that was never investigated."
       expected_agent_confidence: 0.60
     diagnostic_puzzle:
-      presentation: "25-year-old woman with episodic vertigo and fatigue. Non-specific white matter lesions on MRI. Symptoms attributed to anxiety and migraine."
+      presentation: "25-year-old woman with migraine, episodic vertigo and fatigue; an outside MRI was reported as non-specific white matter changes and her symptoms were attributed to anxiety and migraine."
       expected_agent_confidence: 0.35
   common_followups:
-    - trigger_action: "request_vep"
-      tool_name: "interpret_labs"
-      description: "Visual evoked potentials showing prolonged P100 latency"
+    # No repeat MRI at 3 months or after steroids (future data and treatment response, ruling 4),
+    # and VEP and OCT are specialized tests, not labs (24 Oct 2026 close-out).
     - trigger_action: "request_spine_mri"
-      tool_name: "analyze_brain_mri"
-      description: "MRI cervical and thoracic spine with contrast"
-    - trigger_action: "request_oct"
+      tool_name: "order_body_imaging"
+      description: "Cervical and thoracic spinal cord MRI with gadolinium (study spine_MRI): short peripheral lesions with levels"
+    - trigger_action: "request_aqp4_mog_cell_based_assay"
       tool_name: "interpret_labs"
-      description: "Optical coherence tomography showing RNFL thinning"
-    - trigger_action: "request_nmo_antibodies"
-      tool_name: "interpret_labs"
-      description: "Aquaporin-4 and MOG antibody testing"
-    - trigger_action: "request_repeat_mri_3months"
-      tool_name: "analyze_brain_mri"
-      description: "Follow-up MRI at 3 months to assess new lesion activity"
+      description: "Serum AQP4-IgG and MOG-IgG by cell-based assay (panel Neuroimmunology), served only to an order that names the assay"
+    - trigger_action: "request_visual_evoked_potentials"
+      tool_name: "order_specialized_test"
+      description: "VEP (test_type vep), optional: P100 latency of both eyes, prolonged in an affected optic nerve"
+    - trigger_action: "request_optical_coherence_tomography"
+      tool_name: "order_specialized_test"
+      description: "OCT (test_type optical_coherence_tomography), optional: both eyes; swelling or normal in acute optic neuritis, thinning only after an earlier episode"
 
 bacterial_meningitis:
   name: "Acute bacterial meningitis"
