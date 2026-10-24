@@ -49,3 +49,15 @@ Found and changed:
 - `initial_tool_outputs.clinical_assessment.impression` said a 5-hour aura fulfils the clinical criteria of migrainous infarction "or persistent aura"; persistent aura without infarction (1.4.2) needs one week or more. Rewritten: the attack fulfils the clinical part of 1.4.3, an infarct in the corresponding area must be shown on imaging and other mechanisms excluded, and 5 hours is too short for 1.4.2.
 - `assessment.required_recommendations` prevention must offered candesartan to a woman of reproductive age without the pregnancy caution. Added "(fetotoxic: only with reliable contraception)".
 Re-ran `perfect_agent.py MIG-AURA-P03 -v`, `case_io.py check` and the case guards: clean. CENTRAL item on the I63 synonym group (cardioembolic, lacunar, plain "stroke" credited here) stands and matters for this case.
+
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (plans/MIG-AURA-decisions.md). Changes and reasons:
+
+- citations [AAN_2000] -> [AHS_neuroimaging_2020] x1, [ICHD_3] x2.
+- UKMEC 2016 -> UKMEC 2025 citation text x1.
+- icd_codes[0]: I63.9 -> G43.609 (ICD-10-CM codes migrainous infarction under G43.6, I63 as the additional code).
+- synonyms: the I63 group no longer applies; stroke labels (acute ischaemic stroke, cardioembolic, embolic, lacunar, plain stroke) and I63 codes removed, because a stroke answer of the wrong or unstated mechanism is the error the case tests; new G43.609 entry grants migrainous infarction labels and G43.6, G43.601, G43.611, G43.619.
+- Citation [AAN_2000] retired: Silberstein 2000 covers treatment, not neuroimaging; imaging statements now cite Evans 2020 [AHS_neuroimaging_2020], test-waste statements [ICHD_3] (diagnosis is clinical).
+Checks after the change: `perfect_agent.py` pass, `case_io.py check` clean for the case, `test_case_guards.py -k MIG-AURA-` 60/60.

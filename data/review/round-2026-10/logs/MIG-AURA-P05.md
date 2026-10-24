@@ -47,3 +47,13 @@ The case is a 46-year-old woman with four stereotyped attacks of expressive lang
 Adversarial verifier, 24 Oct 2026. Read the log, the diff and the whole final case. No reviewer notes exist for MIG-AURA, so there is no note table to reconcile. Checked: ICHD-3 count (gradual development, duration, unilateral aphasia, headache = 4 of 6; positive symptom correctly false for an aphasic aura) and `criteria_met` agree; CHA2DS2-VA 0 under ESC 2024 (sex no longer scored) supports stopping warfarin; the Tran 2013 thresholds, Hylek 1998, Mahe 2005 and Nadarajan 2014 citations are real and say what they are cited for; triptans do not interact with warfarin; the 14-day monitor (336 h) agrees with its criterion, red herrings, differential and key evidence; the HRT must is conditional and consistent with menopause at 44 in `social_history`; prohibitions do not contradict the musts; stop rule and the soft history-before-MRI constraint are consistent.
 Found and fixed: `patient.clinical_history.medications[0].indication` read "Presumed TIA, REQUIRES URGENT REVIEW", an authoring hint in the patient block that points the agent at the management answer (stop warfarin). Now "Presumed TIA (started by the regional hospital team 8 months ago)".
 Left as is: the "supratherapeutic" note on the warfarin frequency (it restates the INR 3.8 that the HPI gives) and the pre-existing em dashes in patient text (not new text). perfect_agent and case_io check clean; leak guard passes.
+
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (plans/MIG-AURA-decisions.md). Changes and reasons:
+
+- citations [AAN_2000] -> [AHS_neuroimaging_2020] x3, [ICHD_3] x2.
+- synonyms re-derived (`apply_diagnosis_synonyms.py --prune`): "migraine aura" removed (its tokens are a subset of "migraine without aura", a wrong answer); "migraine with aura", "migraine with typical aura", "classic migraine" and G43.1, G43.119, G43.909 kept.
+- Citation [AAN_2000] retired: Silberstein 2000 covers treatment, not neuroimaging; imaging statements now cite Evans 2020 [AHS_neuroimaging_2020], test-waste statements [ICHD_3] (diagnosis is clinical).
+Checks after the change: `perfect_agent.py` pass, `case_io.py check` clean for the case, `test_case_guards.py -k MIG-AURA-` 60/60.

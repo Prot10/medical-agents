@@ -41,3 +41,13 @@ The ICHD-3 assessment is written for her (8 years, 1-2 attacks a month, 5 of 6 C
 Adversarial verifier, 24 Oct 2026. Read the log, the diff and the final case. Checked: Bates 1994 (Neurology 44:1587) and Olesen 2004 (Eur J Neurol 11:671) exist and say what they are cited for; sumatriptan repeat-dose rule (2 hours) matches the SmPC; the drug check is correctly optional; stop rule only the assessment; differential consistent with the history.
 Found and fixed: the red herring's correct interpretation called the aura "a homonymous arc", a finding the case never establishes (she describes peripheral lights on either side; no monocular testing is recorded). Reworded to "an arc of flickering light in one hemifield" (`ground_truth.red_herrings[0].correct_interpretation`).
 Checks run after my edits: `perfect_agent.py -v` passes (the clinical assessment shows `<- ?` as in every MIG-AURA case: the initial output is served, the source lookup only fails on null fields), `case_io.py check` clean for the case, `test_case_guards.py -k` 2 passed.
+
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (plans/MIG-AURA-decisions.md). Changes and reasons:
+
+- citations [AAN_2000] -> [AHS_neuroimaging_2020] x1, [ICHD_3] x3.
+- synonyms re-derived (`apply_diagnosis_synonyms.py --prune`): "migraine aura" removed (its tokens are a subset of "migraine without aura", a wrong answer); "migraine with aura", "migraine with typical aura", "classic migraine" and G43.1, G43.119, G43.909 kept.
+- Citation [AAN_2000] retired: Silberstein 2000 covers treatment, not neuroimaging; imaging statements now cite Evans 2020 [AHS_neuroimaging_2020], test-waste statements [ICHD_3] (diagnosis is clinical).
+Checks after the change: `perfect_agent.py` pass, `case_io.py check` clean for the case, `test_case_guards.py -k MIG-AURA-` 60/60.

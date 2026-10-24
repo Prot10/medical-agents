@@ -53,3 +53,15 @@ Condition auditor, 24 Oct 2026 (uniformity pass over all 30 MIG-AURA cases).
 - `followup_outputs[1].output.warnings` (triptan check) was empty (class C asks for filled structured fields). Added two warnings: AHS 2021 notes emerging observational data on triptan safety in brainstem aura while the label restriction stands (plan 1.2), and no triptan within 24 hours of an ergot. Summary and contraindications unchanged.
 
 After the edit: `perfect_agent.py` 30/30, `case_io.py check` clean for the condition, `test_case_guards.py -k MIG-AURA` 60 passed.
+
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (plans/MIG-AURA-decisions.md). Changes and reasons:
+
+- citations [AAN_2000] -> [AHS_neuroimaging_2020] x2, [ICHD_3] x3.
+- UKMEC 2016 -> UKMEC 2025 citation text x1.
+- UKMEC 2016 -> UKMEC 2025 citation text x1.
+- synonyms: generic and typical-aura labels removed (brainstem aura is ICHD-3 1.2.2, not typical aura, and the triptan decision depends on it); "migraine with brainstem aura", "basilar migraine", "basilar type migraine" added. The primary code G43.109 still credits a code-only generic answer (ICD-10-CM has no brainstem-aura code).
+- Citation [AAN_2000] retired: Silberstein 2000 covers treatment, not neuroimaging; imaging statements now cite Evans 2020 [AHS_neuroimaging_2020], test-waste statements [ICHD_3] (diagnosis is clinical).
+Checks after the change: `perfect_agent.py` pass, `case_io.py check` clean for the case, `test_case_guards.py -k MIG-AURA-` 60/60.

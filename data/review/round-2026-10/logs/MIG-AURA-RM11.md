@@ -60,3 +60,14 @@ Still open (already in this log): `accepted[0]` says "single seizure" while the 
 ## Condition audit
 Condition auditor, 24 Oct 2026 (uniformity pass over all 30 MIG-AURA cases).
 - No case edit. Decision on the open label question: `accepted[0]` says "single seizure during aura" while ten fields of the case, consistently, record two focal seizures within the hour (HPI, structured history, EEG limitation, red herring, musts, key evidence). The data stay as they are: two aura-triggered seizures are still ICHD-3 1.4.4, the source story has two, and rewriting ten fields to one seizure would be churn to fit a descriptive clause. The label clause is a wording error in a field this round may not edit (ROUND_POLICY 3), so it stays under CENTRAL: reword to "migraine aura-triggered seizures (ICHD-3 1.4.4)". It is no longer an open question for Andrea: nothing in it needs information only Andrea has.
+
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (plans/MIG-AURA-decisions.md). Changes and reasons:
+
+- UKMEC 2016 -> UKMEC 2025 citation text x1.
+- UKMEC 2016 -> UKMEC 2025 citation text x1.
+- accepted[0]: 'single seizure during aura' -> 'migraine aura-triggered seizures' (the case records two aura-triggered seizures).
+- synonyms re-derived: the generic migraine-with-aura labels ("migraine with aura", "migraine with typical aura", "classic migraine", "migraine aura") and codes G43.1, G43.109, G43.119, G43.909 removed, because hemiplegic migraine is the subtype the case scores (triptan avoidance, genetics) and typical aura excludes motor aura; hemiplegic labels and G43.4, G43.419 kept.
+Checks after the change: `perfect_agent.py` pass, `case_io.py check` clean for the case, `test_case_guards.py -k MIG-AURA-` 60/60.

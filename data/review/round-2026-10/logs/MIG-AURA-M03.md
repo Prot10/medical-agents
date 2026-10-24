@@ -52,3 +52,13 @@ Found and fixed:
 - `assessment.prohibited_recommendations[1]`: the canonical class G text claimed "previous identical attacks"; the motor attack is his first (his earlier attacks were visual only). Rewritten to the features this attack has (sensory march over 20-25 minutes, motor and speech symptoms in succession, migrainous headache, background of typical visual aura).
 
 `perfect_agent.py -v` ok, `case_io.py check` clean for the case, guard tests pass.
+
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (plans/MIG-AURA-decisions.md). Changes and reasons:
+
+- citations [AAN_2000] -> [AHS_neuroimaging_2020] x2, [ICHD_3] x1.
+- synonyms re-derived: the generic migraine-with-aura labels ("migraine with aura", "migraine with typical aura", "classic migraine", "migraine aura") and codes G43.1, G43.109, G43.119, G43.909 removed, because hemiplegic migraine is the subtype the case scores (triptan avoidance, genetics) and typical aura excludes motor aura; hemiplegic labels and G43.4, G43.419 kept.
+- Citation [AAN_2000] retired: Silberstein 2000 covers treatment, not neuroimaging; imaging statements now cite Evans 2020 [AHS_neuroimaging_2020], test-waste statements [ICHD_3] (diagnosis is clinical).
+Checks after the change: `perfect_agent.py` pass, `case_io.py check` clean for the case, `test_case_guards.py -k MIG-AURA-` 60/60.

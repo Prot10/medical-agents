@@ -46,3 +46,15 @@ A 58-year-old man with three attacks of language aura followed by migrainous hea
 
 Adversarial verifier, 24 Oct 2026. Read the log, the diff and the whole final case. No reviewer notes exist for MIG-AURA. Checked: the HPI no longer leaks the MRI pattern and the MRI output carries it with technique and comparison; NOTCH3 c.544C>T is p.(Arg182Cys) in exon 4 (correct); `test_type` values agree between criteria and outputs (`genetic_panel:CADASIL`, `neuropsych_battery`); criterion D false agrees with the impression and the label; the drug check stored under `sumatriptan` covers his own medicines and does not echo the expected evidence; musts and prohibitions agree (aspirin or NSAID acute treatment, no triptans or ergots, no anticoagulation without indication, BP towards below 130/80); the differential matches the final evidence (TIA low, sporadic SVD, early-onset AD and MS very low with the excluding data); red herrings point at real fields; avoided actions match the kept normal fallbacks; constraints and stop rule are consistent with the plan (MRI before NOTCH3).
 Found: no error requiring a change. The EAN 2020 triptan wording is already hedged as expert consensus, which matches that guideline's evidence level. No edit made. perfect_agent and case_io check clean; leak guard passes.
+
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (plans/MIG-AURA-decisions.md). Changes and reasons:
+
+- citations [AAN_2000] -> [AHS_neuroimaging_2020] x3, [ICHD_3] x2.
+- triptan prohibition and drug-check text: reason restated (old lacunar infarct = label contraindication; CADASIL: not first line, VASCERN 2023), no longer attributed to an EAN 2020 recommendation that could not be verified.
+- literature result on triptans in CADASIL and the drug-check rationale rewritten to what VASCERN 2023 says (no evidence contraindicates triptans; not first-line, second or third choice only), source swapped from Mancuso 2020 (its migraine wording could not be checked).
+- synonyms unchanged (I67.850, shared with VASC-DEM-P05).
+- Citation [AAN_2000] retired: Silberstein 2000 covers treatment, not neuroimaging; imaging statements now cite Evans 2020 [AHS_neuroimaging_2020], test-waste statements [ICHD_3] (diagnosis is clinical).
+Checks after the change: `perfect_agent.py` pass, `case_io.py check` clean for the case, `test_case_guards.py -k MIG-AURA-` 60/60.

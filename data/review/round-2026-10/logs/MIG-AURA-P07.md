@@ -55,3 +55,13 @@ Condition auditor, 24 Oct 2026 (uniformity pass over all 30 MIG-AURA cases).
 - `ground_truth.assessment.required_recommendations[3]`: candesartan was offered to a woman who can become pregnant without the pregnancy caution that M06, P03 and S04 carry (candesartan is fetotoxic). Added "(only with reliable contraception, as it is contraindicated in pregnancy)", so the class Q cautions read the same across the condition.
 
 After the edit: `perfect_agent.py` 30/30, `case_io.py check` clean for the condition, `test_case_guards.py -k MIG-AURA` 60 passed.
+
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (plans/MIG-AURA-decisions.md). Changes and reasons:
+
+- citations [AAN_2000] -> [AHS_neuroimaging_2020] x1, [ICHD_3] x2.
+- synonyms: generic stroke labels, "embolic stroke" (would credit paradoxical embolism through the small PFO), "lacunar stroke", "lacunar infarct", plain "stroke" and "PCA territory infarct" (would credit migrainous infarction) removed; mechanism labels kept or added (cardioembolic stroke/infarct/infarction, atrial fibrillation stroke/infarct); codes now I63.4, I63.43, I63.431 (I63.432 is the left PCA; I63.5, I63.3, I63.2, I63.0, I63.1, I63.8, I63.81, I63.89 and I63.9 name other or unspecified mechanisms).
+- Citation [AAN_2000] retired: Silberstein 2000 covers treatment, not neuroimaging; imaging statements now cite Evans 2020 [AHS_neuroimaging_2020], test-waste statements [ICHD_3] (diagnosis is clinical).
+Checks after the change: `perfect_agent.py` pass, `case_io.py check` clean for the case, `test_case_guards.py -k MIG-AURA-` 60/60.

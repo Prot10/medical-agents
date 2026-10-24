@@ -45,3 +45,13 @@ Adversarial verifier, 24 Oct 2026. Read the final case and the original HPI, red
 - Checked: each own finding against the file (aura side varies in both HPI fields, succession false and C 5 of 6, onset at 29, PFO and WMH red herrings gone, empty diary search gone, `{"drug": ...}` alternatives, optional tiers, stop rule history only with max 0, perimenstrual frovatriptan 2.5 mg twice daily or zolmitriptan 2.5 mg two or three times daily as in NICE CG150, naproxen sodium 550 mg twice daily correctly attributed to `[Holland_2012]`, ICHD-3 menstrual window day -2 to +3). All hold.
 - Found and changed: (1) the worker's new red herring and the structured history state "heaviness without weakness", but the HPI never said she had no weakness, so the claim the red herring rests on was not in the patient data. Added to both HPI fields: "but she has never had weakness of the face, arm or leg, speech difficulty or visual symptoms during an episode"; the structured history aura line now says "no weakness of the face, arm or leg in any attack". (2) The red herring raises hemiplegic migraine, which was not in the differential (ROUND_POLICY 7): added "Hemiplegic migraine (motor aura)", G43.409, very_low, with the excluding features. (3) `metadata.fallback_tool_kinds.specialized_test` removed (fallback is null).
 - Checks after the edits: `perfect_agent.py -v` ok; `case_io.py check` clean for this case; guard tests pass.
+
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (plans/MIG-AURA-decisions.md). Changes and reasons:
+
+- citations [AAN_2000] -> [AHS_neuroimaging_2020] x1, [ICHD_3] x3.
+- synonyms re-derived (`apply_diagnosis_synonyms.py --prune`): "migraine aura" removed (its tokens are a subset of "migraine without aura", a wrong answer); "migraine with aura", "migraine with typical aura", "classic migraine" and G43.1, G43.119, G43.909 kept.
+- Citation [AAN_2000] retired: Silberstein 2000 covers treatment, not neuroimaging; imaging statements now cite Evans 2020 [AHS_neuroimaging_2020], test-waste statements [ICHD_3] (diagnosis is clinical).
+Checks after the change: `perfect_agent.py` pass, `case_io.py check` clean for the case, `test_case_guards.py -k MIG-AURA-` 60/60.

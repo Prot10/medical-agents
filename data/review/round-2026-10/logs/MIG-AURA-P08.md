@@ -50,3 +50,13 @@ Found and fixed:
 - `initial_tool_outputs.mri.additional_observations`: the CT fallback reports bilateral pallidal calcification but the MRI with SWI was silent on it. Added "Symmetric susceptibility signal in both globi pallidi, consistent with mineralisation" to the SWI line so the two reports agree.
 - `metadata.difficulty_description` said "triptans must be stopped" although she takes no triptan; now "triptans and valproate are avoided".
 perfect_agent and case_io check clean; leak guard passes.
+
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (plans/MIG-AURA-decisions.md). Changes and reasons:
+
+- citations [AAN_2000] -> [AHS_neuroimaging_2020] x1, [ICHD_3] x2.
+- synonyms unchanged (E88.41).
+- Citation [AAN_2000] retired: Silberstein 2000 covers treatment, not neuroimaging; imaging statements now cite Evans 2020 [AHS_neuroimaging_2020], test-waste statements [ICHD_3] (diagnosis is clinical).
+Checks after the change: `perfect_agent.py` pass, `case_io.py check` clean for the case, `test_case_guards.py -k MIG-AURA-` 60/60.

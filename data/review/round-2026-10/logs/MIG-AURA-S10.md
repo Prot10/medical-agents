@@ -46,3 +46,14 @@ Condition auditor, 24 Oct 2026 (uniformity pass over all 30 MIG-AURA cases).
 - `ground_truth.assessment.required_recommendations[1]`: candesartan was offered to a woman who can become pregnant without the pregnancy caution that M06, P03 and S04 carry (candesartan is fetotoxic). Added "(only with reliable contraception, as it is contraindicated in pregnancy)", so the class Q cautions read the same across the condition.
 
 After the edit: `perfect_agent.py` 30/30, `case_io.py check` clean for the condition, `test_case_guards.py -k MIG-AURA` 60 passed.
+
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (plans/MIG-AURA-decisions.md). Changes and reasons:
+
+- citations [AAN_2000] -> [AHS_neuroimaging_2020] x1, [ICHD_3] x3.
+- CGRP must: EHF 2022 lists CGRP antibodies as a first-line option (the 'after two failed oral preventives' rule was the 2019 EHF guideline); the NICE threshold is no longer cited to [Sacco_2022].
+- synonyms re-derived (`apply_diagnosis_synonyms.py --prune`): "migraine aura" removed (its tokens are a subset of "migraine without aura", a wrong answer); "migraine with aura", "migraine with typical aura", "classic migraine" and G43.1, G43.119, G43.909 kept.
+- Citation [AAN_2000] retired: Silberstein 2000 covers treatment, not neuroimaging; imaging statements now cite Evans 2020 [AHS_neuroimaging_2020], test-waste statements [ICHD_3] (diagnosis is clinical).
+Checks after the change: `perfect_agent.py` pass, `case_io.py check` clean for the case, `test_case_guards.py -k MIG-AURA-` 60/60.

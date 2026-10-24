@@ -43,3 +43,13 @@ A 36-year-old man with five stereotyped attacks of right arm weakness and then w
 
 Adversarial verifier, 24 Oct 2026. Read the log, the diff and the whole final case. No reviewer notes exist for MIG-AURA. Checked: the sister's aneurysm is added consistently to the chief complaint, HPI, family history, clinical assessment, MRA criterion and key evidence, so "familial" and the AHA/ASA 2015 screening indication (two or more affected relatives) now hold; the aneurysm appears only in the MRA report, not in the brain MRI; PHASES 3 is right (hypertension 1, MCA site 2, size under 7 mm, age under 70, non-Finnish/Japanese 0); ICHD-3 1.2.3 B (motor plus speech) and the 5 of 6 count agree with the history; laterality (right arm, left hemisphere aneurysm-unrelated, left headache) is consistent; the propranolol-rizatriptan (5 mg) and propranolol-verapamil statements are correct and agree with the musts and prohibitions; Thompson 2015 and Greving 2014 citations are real; the differential matches the final evidence.
 Found: no error requiring a change. No edit made. perfect_agent and case_io check clean; leak guard passes.
+
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (plans/MIG-AURA-decisions.md). Changes and reasons:
+
+- citations [AAN_2000] -> [AHS_neuroimaging_2020] x1, [ICHD_3] x2.
+- synonyms re-derived: the generic migraine-with-aura labels ("migraine with aura", "migraine with typical aura", "classic migraine", "migraine aura") and codes G43.1, G43.109, G43.119, G43.909 removed, because hemiplegic migraine is the subtype the case scores (triptan avoidance, genetics) and typical aura excludes motor aura; hemiplegic labels and G43.4, G43.419 kept.
+- Citation [AAN_2000] retired: Silberstein 2000 covers treatment, not neuroimaging; imaging statements now cite Evans 2020 [AHS_neuroimaging_2020], test-waste statements [ICHD_3] (diagnosis is clinical).
+Checks after the change: `perfect_agent.py` pass, `case_io.py check` clean for the case, `test_case_guards.py -k MIG-AURA-` 60/60.

@@ -57,3 +57,13 @@ Adversarial verifier, 24 Oct 2026. Read the whole final case, the original patie
 - Found and changed: (1) the structured history said the headache was "relieved by an NSAID" for both attacks; the HPI records relief only for attack 1 (meloxicam): now "the first relieved by meloxicam". (2) `metadata.case_body_concerns` still listed `order_advanced_imaging` as a dropped useless tool although it is now the `action-mra` criterion: removed from the list. (3) `metadata.fallback_tool_kinds.specialized_test` described the fallback the worker set to null: key removed.
 - Not changed: the must "Do not use a triptan or ergot derivative..." overlaps the prohibition but does not contradict it. The worker's removal of the residual left frontal hypoaesthesia is sound (it contradicted "fully neurologically intact" and is ipsilateral to the affected hemisphere).
 - Checks after the edits: `perfect_agent.py -v` ok; `case_io.py check` schema and synonym guard ok, no failure names this case; `test_case_guards.py -k MIG-AURA-RS11` passes.
+
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (plans/MIG-AURA-decisions.md). Changes and reasons:
+
+- citations [AAN_2000] -> [AHS_neuroimaging_2020] x1, [ICHD_3] x1.
+- synonyms re-derived: the generic migraine-with-aura labels ("migraine with aura", "migraine with typical aura", "classic migraine", "migraine aura") and codes G43.1, G43.109, G43.119, G43.909 removed, because hemiplegic migraine is the subtype the case scores (triptan avoidance, genetics) and typical aura excludes motor aura; hemiplegic labels and G43.4, G43.419 kept.
+- Citation [AAN_2000] retired: Silberstein 2000 covers treatment, not neuroimaging; imaging statements now cite Evans 2020 [AHS_neuroimaging_2020], test-waste statements [ICHD_3] (diagnosis is clinical).
+Checks after the change: `perfect_agent.py` pass, `case_io.py check` clean for the case, `test_case_guards.py -k MIG-AURA-` 60/60.

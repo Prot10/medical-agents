@@ -42,3 +42,13 @@ The HPI now counts his days: headache on about 8-10 days a month, co-codamol on 
 Adversarial verifier, 24 Oct 2026. Read the log, the diff and the final case. Checked: rizatriptan 5 mg with propranolol (label), Bigal and Lipton 2008 (Neurology 71:1821) and the NICE CG150 opioid and MOH-withdrawal statements are correct; ICHD-3 8.2 thresholds stated correctly; prohibitions consistent with musts; no WMH or lipid residue.
 Found and fixed: the worker's new day counts were impossible: headache on "8-10 days a month" while acute medication was taken on "10-12 days" (rizatriptan up to 4 plus co-codamol 6-8, on separate days), i.e. more treatment days than headache days. Headache days are now "about 10-12" (attacks of 8-24 h running into a second day plus the residual day after), still below the 15 days ICHD-3 8.2 requires, so the label and the MOH "low" grading stand. Changed in `patient.history_present_illness`, `patient.hpi`, `initial_tool_outputs.clinical_assessment.findings[Headache days]` and `.scores`, `action-3` expected evidence, `differential[0]` and `[1]` key features, `key_clinical_evidence[1]`. The 8-10 figure in this log's tables above should be read as 10-12.
 Checks run after my edits: `perfect_agent.py -v` passes (the clinical assessment shows `<- ?` as in every MIG-AURA case: the initial output is served, the source lookup only fails on null fields), `case_io.py check` clean for the case, `test_case_guards.py -k` 2 passed.
+
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (plans/MIG-AURA-decisions.md). Changes and reasons:
+
+- citations [AAN_2000] -> [AHS_neuroimaging_2020] x1, [ICHD_3] x4.
+- synonyms re-derived (`apply_diagnosis_synonyms.py --prune`): "migraine aura" removed (its tokens are a subset of "migraine without aura", a wrong answer); "migraine with aura", "migraine with typical aura", "classic migraine" and G43.1, G43.119, G43.909 kept.
+- Citation [AAN_2000] retired: Silberstein 2000 covers treatment, not neuroimaging; imaging statements now cite Evans 2020 [AHS_neuroimaging_2020], test-waste statements [ICHD_3] (diagnosis is clinical).
+Checks after the change: `perfect_agent.py` pass, `case_io.py check` clean for the case, `test_case_guards.py -k MIG-AURA-` 60/60.

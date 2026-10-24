@@ -42,3 +42,13 @@ The HPI timeline now holds together: amitriptyline 10 mg was used about 18 month
 ## Verification
 Adversarial verifier, 24 Oct 2026. Read the log, the full diff and the final case. Checked: the HPI timeline (amitriptyline 18 months ago for 3 months, stopped at conception about 15 months ago, delivery 6 months ago, menses back 3 months after delivery) holds and is identical in both HPI fields; the assessment's criteria_met agrees with the 5-of-6 count; UKMEC facts (combined methods 4 for aura; postpartum breastfeeding category for combined methods 2 from 6 weeks to 6 months, so the old "doubly contraindicated" was wrong; progestogen-only methods 2, copper IUD 1) are right; the lactation content agrees with LactMed and with the cited Hutchinson 2013 review (Headache 2013;53:614-627 exists); the prohibitions do not contradict any must; no red herring or differential entry cites data missing from the case; drug-check and literature outputs do not repeat any expected evidence (guard passes). No error found; no change made.
 Checks run after my edits: `perfect_agent.py -v` passes (the clinical assessment shows `<- ?` as in every MIG-AURA case: the initial output is served, the source lookup only fails on null fields), `case_io.py check` clean for the case, `test_case_guards.py -k` 2 passed.
+
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (plans/MIG-AURA-decisions.md). Changes and reasons:
+
+- citations [AAN_2000] -> [AHS_neuroimaging_2020] x1, [ICHD_3] x3.
+- synonyms re-derived (`apply_diagnosis_synonyms.py --prune`): "migraine aura" removed (its tokens are a subset of "migraine without aura", a wrong answer); "migraine with aura", "migraine with typical aura", "classic migraine" and G43.1, G43.119, G43.909 kept.
+- Citation [AAN_2000] retired: Silberstein 2000 covers treatment, not neuroimaging; imaging statements now cite Evans 2020 [AHS_neuroimaging_2020], test-waste statements [ICHD_3] (diagnosis is clinical).
+Checks after the change: `perfect_agent.py` pass, `case_io.py check` clean for the case, `test_case_guards.py -k MIG-AURA-` 60/60.

@@ -43,3 +43,13 @@ Adversarial verifier, 24 Oct 2026. Read the final case.
 - Checked: each own finding against the file (aura left three times and right once, with the side and contralateral headache consistent across the HPI, structured history and AVM differential; C 5 of 6; four attacks in 3 months meet criterion A; every "cautious MRI" statement gone; template and empty literature blocks gone; `{"drug": ...}` alternatives; optional tiers; stop rule history only with max 0; no preventive at 1-2 moderate days a month; canonical UKMEC 4 prohibition). All hold. Nothing clinically wrong found.
 - Found and changed: `metadata.fallback_tool_kinds.specialized_test` described the fallback that is now null: key removed.
 - Checks after the edit: `perfect_agent.py -v` ok; `case_io.py check` clean for this case; guard tests pass.
+
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (plans/MIG-AURA-decisions.md). Changes and reasons:
+
+- citations [AAN_2000] -> [AHS_neuroimaging_2020] x1, [ICHD_3] x2.
+- synonyms re-derived (`apply_diagnosis_synonyms.py --prune`): "migraine aura" removed (its tokens are a subset of "migraine without aura", a wrong answer); "migraine with aura", "migraine with typical aura", "classic migraine" and G43.1, G43.119, G43.909 kept.
+- Citation [AAN_2000] retired: Silberstein 2000 covers treatment, not neuroimaging; imaging statements now cite Evans 2020 [AHS_neuroimaging_2020], test-waste statements [ICHD_3] (diagnosis is clinical).
+Checks after the change: `perfect_agent.py` pass, `case_io.py check` clean for the case, `test_case_guards.py -k MIG-AURA-` 60/60.
