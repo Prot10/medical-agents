@@ -43,3 +43,10 @@ None open. Decisions taken and their reasons:
 - Mild right L3-L4 pinprick loss and radicular thigh aching were added so the radiculopathy the plan asks for is clinically complete; no criterion depends on them.
 - Pseudoprogression added to the differential as `low`: growth of a metastasis during checkpoint inhibitor therapy raises it, and leaving it out would let the case imply that MRI alone proves progression.
 - FDG-PET report kept as the case fallback (consistent with the lesion) so a PET order, scored as waste, does not receive the library's normal PET.
+
+## Verification
+Adversarial verifier, 24 Oct 2026. Read the log, the diff against master and the whole final case. Checked: spine findings gone from the brain MRI and placed in the HPI; exam now a right L3-L4 radiculopathy (hip flexion, dorsiflexion, patellar 1+, anterior thigh and medial shin pinprick, flexor plantars, normal tone) consistent with the differential and red herring; CSF (WBC 3, protein 52, ratio 0.62, all panels negative) matches the evidence; hard MRI -> CSF; PET criterion and follow-up removed, FDG_PET waste with the plan's rationale, fallback PET with its own SUVmax (9.6, unique in the dataset); ECG wording; TSH 6.8 with free T4 0.9 interpreted as primary thyroid dysfunction (consistent with a normal pituitary on MRI) and the ASCO thyroid must; ipilimumab 3 mg/kg with nivolumab 1 mg/kg every 3 weeks is the standard melanoma regimen; tiers and stop rule per plan; red-herring paths exist.
+Found and fixed:
+- Pseudoprogression `key_features` claimed the lesion grew "mostly before immunotherapy", which no data supports (only the 4-month-old and current measurements exist): reworded to tripling over 4 months with symptomatic edema in a non-irradiated metastasis, managed as progression with follow-up imaging.
+- Drug output named trametinib among the drugs whose exposure inducers lower; trametinib is not CYP-metabolized. Now "CYP3A4-metabolized BRAF and MEK inhibitors (for example dabrafenib, encorafenib and cobimetinib)".
+perfect_agent, case_io check and the case guards are clean.

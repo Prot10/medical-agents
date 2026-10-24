@@ -46,3 +46,10 @@ None open. Decisions taken and their reasons:
 - Post-contrast MRI line kept (plan class E, malformation cases): with cortical calcification and hemiatrophy, enhancement is what separates Sturge-Weber and tumor from ECCL; the criterion requires only `{protocol: epilepsy}`.
 - No HLA-B*15:02 must (plan: the switch is to levetiracetam or lamotrigine, and he has tolerated phenytoin long term); the drug output carries the screening warning against its oxcarbazepine alternative.
 - CT cited `[ILAE_MRI_2019]` (fact 3: CT in an emergency such as head injury or failure to return to baseline); a NICE head-injury key would be more specific but is not in the plan's source list.
+
+## Verification
+Adversarial verifier, 24 Oct 2026. Read the log, the diff against master and the whole final case. Checked every log claim against the file: CT criterion and stored CT, soft CT -> MRI and MRI -> drug check constraints (ids exist, direction correct), labs required `{panels: [AED_levels]}` against the `AED Levels` panel, volumes 2.3 / 3.6 cm3 (index 0.22 and 36% both correct), prolactin absent, ECG "Normal sinus rhythm, 98/min", EEG limitations, FDG-PET waste, literature sources (NICE NG217, SANAD II, Kwan 2010, Engel 2003: authors, titles, pages correct), red-herring paths (`Additional Labs[2]` is the TSH; `ct.impression` exists), plantar laterality now fits the right hemispheric syndrome, tiers and stop rule per plan section 4.
+Found and fixed:
+- `avoid-waste-2-order-echocardiogram.rationale` cited "no murmur", but the case has no physical examination: reworded to rest on the seizure features and the normal ECG.
+- `action-6-analyze-eeg.rationale` said the EEG was done "after recovery" while the stored report is a post-ictal recording: now "in the post-ictal period".
+Nothing left for close-out beyond the log's CENTRAL items. perfect_agent, case_io check and the case guards are clean.

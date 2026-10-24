@@ -46,3 +46,10 @@ None open. Decisions taken and their reasons:
 - CTPA placed third in the criteria and first in the follow-ups (after labs and ECG, before the MRI), not after the EEGs as the plan's generic emergency order would put body imaging: hemoptysis with suspected PE is the urgent study in this presentation.
 - One optional literature criterion kept, not two: both stored literature outputs answer `search_medical_literature` with no discriminating argument, so a second criterion would duplicate the first.
 - No lower-extremity venous duplex criterion: PE is confirmed on CTPA and anticoagulation does not depend on the duplex.
+
+## Verification
+Adversarial verifier, 24 Oct 2026. Read the log, the diff against master and the whole final case. Checked: body-imaging follow-up routes as chest CTA (`region: chest`, `modality: CTA`, tool parameter `study: chest_CTA`); lung nodule gone from the brain MRI and literature; sleep-deprived and ambulatory EEGs internally consistent (72 h, three seizures, sharp wave duration); ECG wording; drug output and EHRA statements; ESC 2019 duration and antiphospholipid statements accurate; tiers (ambulatory EEG, CTA, drug check required; labs, ECG, sleep-deprived recommended; literature optional) and stop rule; red-herring paths exist; echo fallback matches the documented mitral valve prolapse.
+Found and fixed (timeline):
+- `assessment.required_recommendations[0]` called the long car trip "the only risk factor, a minor transient one", but the HPI puts the left calf pain two months ago, the day before the first seizure and six weeks before the trip two weeks ago, and his father had a DVT at 55. The must now says the event is not clearly explained by a transient risk factor, which per ESC 2019 favors considering extended anticoagulation.
+- `key_clinical_evidence` (CTPA line) and `action-11-order-body-imaging.rationale` placed the calf pain "after" the car trip: now "two months of left calf pain and a recent 20-hour car trip".
+perfect_agent, case_io check and the case guards are clean.
