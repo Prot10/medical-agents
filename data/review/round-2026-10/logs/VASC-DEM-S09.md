@@ -43,3 +43,13 @@ The MRI criterion now matches any MRI order. The exam no longer gives the MoCA; 
 Adversarial verifier, 24 Oct 2026. No notes file for VASC-DEM. Read the final case and the diff. Checked: MoCA arithmetic (only recall 0/5 and orientation 4/6 lost: 23/30), with the bedside orientation in the exam agreeing (wrong date and day); lesion volume (pi/6 x 1.1 x 0.9 x 0.8 cm = 0.41 mL) everywhere it appears; Friedewald LDL (184 - 58 - 23.6 = 102); female ranges; the three new C10 criteria (ECG recommended, TTE and 14-day monitor optional) each served by a case-authored normal output, echo and monitoring waste removed, ECG-before-monitoring soft constraint; MRA wording per plan; musts (aspirin, BP, high-intensity statin without an LDL-70 target for a perforator infarct) consistent with the prohibition against anticoagulation; CT fallback consistent with a lesion now visible at eight months; neuropsychology required as before the round.
 Found and fixed: the Wernicke-Korsakoff differential said "No alcohol history" while the social history records two glasses of wine weekly. Now "No alcohol misuse (two glasses of wine weekly)".
 perfect_agent.py and case_io.py check clean for this case.
+
+## Close-out (24 Oct 2026)
+
+Condition close-out per `plans/VASC-DEM-decisions.md`.
+
+- Synonyms (diagnosis_synonyms.yaml, applied with `--prune --conditions vascular_dementia`): F06.7, I67.3 and the umbrella "vascular cognitive impairment" no longer accepted (mild-VCI answers must not score in a dementia case); subtype labels scoped by mechanism, here "strategic infarct dementia". Generic labels "vascular dementia", "major vascular neurocognitive disorder", "major neurocognitive disorder due to vascular disease", "VaD"; codes F01.50, F01.51, F01.5, F01.9, F01.A0-C0.
+- `ground_truth.diagnosis.accepted[0]`: em dash replaced by a colon or semicolon; wording and entity unchanged (no scoring effect: matching ignores punctuation).
+- `action-3-interpret-labs`: RPR and HIV removed from `required_arguments.panels` and the label; `[AAN_dementia_2001]` added. AAN 2001: syphilis screening "is not justified unless clinical suspicion for neurosyphilis is present"; NICE NG97 does not test routinely; this case has no risk factor. The stored labs output keeps its RPR and HIV results, so an agent that orders them still receives them (decision Q1).
+
+Checks after the close-out: `perfect_agent.py` and `case_io.py check` clean for this case; `test_case_guards -k VASC-DEM-` clean; `apply_diagnosis_synonyms.py --check --conditions vascular_dementia` clean.

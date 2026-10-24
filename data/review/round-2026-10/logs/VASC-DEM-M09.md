@@ -50,3 +50,16 @@ Adversarial check (24 Oct 2026). No reviewer notes. Checked: MoCA items give 18 
 Found and fixed: the worker changed the MoCA fluency item from "8 animals" to "letter fluency" and wrote "FAS" into the neuropsychology impression, but the screen and battery were administered in Mandarin, where a letter (FAS) task does not exist; Mandarin MoCA versions use animal naming for this item. Changed `initial_tool_outputs.clinical_assessment.findings[0].performance` to "verbal fluency 8 animals in 60 s (0/1, Mandarin version)", `.scores.verbal_fluency` to "8 animals in 60 s (Mandarin version)", the battery test "Letter fluency (FAS)" to "Category fluency (animals, Mandarin norms)" (4th percentile kept), and the battery impression to "Impaired verbal fluency ... (category fluency 4th, ...)". Point totals unchanged.
 
 Checks re-run after my edits: `perfect_agent.py -v` passes (every required and recommended criterion answered by case data); `case_io.py check` clean for this case (schema, synonym guard, no test failure naming it). Note for the lead, not changed: `metadata.fallback_tool_kinds` still labels case-specific fallbacks (CT with this patient's lesions, AF Holter where present) as "normal"; the field is read by no code or test, so I left it rather than churn it.
+
+## Close-out (24 Oct 2026)
+
+Condition close-out per `plans/VASC-DEM-decisions.md`.
+
+- Synonyms (diagnosis_synonyms.yaml, applied with `--prune --conditions vascular_dementia`): F06.7, I67.3 and the umbrella "vascular cognitive impairment" no longer accepted (mild-VCI answers must not score in a dementia case); subtype labels scoped by mechanism, here "post-stroke dementia". Generic labels "vascular dementia", "major vascular neurocognitive disorder", "major neurocognitive disorder due to vascular disease", "VaD"; codes F01.50, F01.51, F01.5, F01.9, F01.A0-C0.
+- `ground_truth.diagnosis.accepted[0]`: em dash replaced by a colon or semicolon; wording and entity unchanged (no scoring effect: matching ignores punctuation).
+- `action-3-interpret-labs`: RPR and HIV removed from `required_arguments.panels` and the label; `[AAN_dementia_2001]` added. AAN 2001: syphilis screening "is not justified unless clinical suspicion for neurosyphilis is present"; NICE NG97 does not test routinely; this case has no risk factor. The stored labs output keeps its RPR and HIV results, so an agent that orders them still receives them (decision Q1).
+- `[ADA_2025_older_adults]` -> `[ADA_older_adults_2026]` in the HbA1c must (same target below about 8.0%; superseded edition, as in ALZ-EARLY).
+- `metadata.revision_reason`: the stale August literature/interaction audit text replaced by the round's (summary CENTRAL 9; not read by the harness).
+- `metadata.fallback_tool_kinds`: ct normal->case, echo normal->case (the fallback describes this patient, not a library normal; summary CENTRAL 9).
+
+Checks after the close-out: `perfect_agent.py` and `case_io.py check` clean for this case; `test_case_guards -k VASC-DEM-` clean; `apply_diagnosis_synonyms.py --check --conditions vascular_dementia` clean.

@@ -68,3 +68,15 @@ Condition auditor, 24 Oct 2026. Scripted checks over all 30 VASC-DEM cases (plan
 | D | minor | `initial_tool_outputs.specialized_test.quantitative_data.functional_status` | Plan C17: "independent by informant report" verbalised the severity in the neuropsychology report. | FIXED: "informant FAQ 2/30" (the instrument score). |
 
 perfect_agent.py, case_io.py check and test_case_guards re-run on all 30 VASC-DEM ids: clean.
+
+## Close-out (24 Oct 2026)
+
+Condition close-out per `plans/VASC-DEM-decisions.md`.
+
+- Synonyms (diagnosis_synonyms.yaml F06.7 entry, applied with `--prune --conditions vascular_dementia`): the umbrella "vascular cognitive impairment" (it also matches a dementia answer) and the codes F01.50 (vascular dementia) and G31.84 (MCI of any cause, including Alzheimer) are no longer accepted; "mild vascular neurocognitive disorder", "vascular cognitive impairment no dementia" and F06.70 (FY2023 code) added. A dementia overcall no longer scores.
+- `ground_truth.diagnosis.accepted[0]`: em dash replaced by a colon or semicolon; wording and entity unchanged (no scoring effect: matching ignores punctuation).
+- `action-3-interpret-labs`: RPR and HIV removed from `required_arguments.panels` and the label; `[AAN_dementia_2001]` added. AAN 2001: syphilis screening "is not justified unless clinical suspicion for neurosyphilis is present"; NICE NG97 does not test routinely; this case has no risk factor. The stored labs output keeps its RPR and HIV results, so an agent that orders them still receives them (decision Q1).
+- `metadata.revision_reason`: the stale August literature/interaction audit text replaced by the round's (summary CENTRAL 9; not read by the harness).
+- `metadata.fallback_tool_kinds`: ct normal->case (the fallback describes this patient, not a library normal; summary CENTRAL 9).
+
+Checks after the close-out: `perfect_agent.py` and `case_io.py check` clean for this case; `test_case_guards -k VASC-DEM-` clean; `apply_diagnosis_synonyms.py --check --conditions vascular_dementia` clean.
