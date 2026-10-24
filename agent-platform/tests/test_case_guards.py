@@ -397,3 +397,39 @@ def test_leak_detector_fires():
     assert leaks(case)
     case["initial_tool_outputs"]["literature_search"]["q"]["summary"] = "Unrelated guideline summary."
     assert not leaks(case)
+
+
+# ---------------------------------------------------------------------------------------
+# 5. A routine EEG order in a case recorded on continuous ICU EEG (25 Oct 2026).
+#
+# `analyze_eeg` routes by `eeg_type`, and an order without it is a routine EEG. A case whose stored
+# recording is a continuous ICU EEG (SE) answered a routine order with the library's normal report,
+# which contradicts a patient in status: a 30-minute recording during ongoing seizures records them.
+# Such a case must also store a routine recording of its own (initial, follow-up or fallback).
+
+
+def routine_eeg_defects(case: dict[str, Any]) -> list[str]:
+    from neuroagent.tools.mock_server import MockServer
+
+    fold = MockServer._fold
+    stored = [(case.get("initial_tool_outputs") or {}).get("eeg"),
+              (case.get("fallback_tool_outputs") or {}).get("eeg"),
+              *(fu.get("output") for fu in case.get("followup_outputs") or []
+                if fu.get("tool_name") == "analyze_eeg")]
+    types = {fold(output.get("eeg_type") or "") for output in stored if output}
+    if fold("continuous_icu") in types and fold("routine") not in types:
+        return ["stores a continuous_icu EEG but no routine EEG: a routine order gets the library normal"]
+    return []
+
+
+@pytest.mark.parametrize("case_id", CASE_IDS)
+def test_continuous_eeg_case_answers_a_routine_order(case_id):
+    assert not routine_eeg_defects(_raw(case_id))
+
+
+def test_routine_eeg_guard_fires():
+    case = {"initial_tool_outputs": {"eeg": {"eeg_type": "continuous_icu", "impression": "Seizures."}},
+            "fallback_tool_outputs": {"eeg": None}}
+    assert routine_eeg_defects(case)
+    case["fallback_tool_outputs"]["eeg"] = {"eeg_type": "routine", "impression": "Seizures."}
+    assert not routine_eeg_defects(case)

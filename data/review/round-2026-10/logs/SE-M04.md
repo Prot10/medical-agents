@@ -74,3 +74,13 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `initial_tool_outputs.eeg`: `eeg_type` set to `continuous_icu`, decided by reading the report.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## EEG and labs after routing (25 Oct 2026)
+
+Commit 317e46db routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG) and serves an `interpret_labs` order only the stored panels it names. Decisions for the condition in `plans/SE-routing-decisions.md`.
+
+- EEG: a routine order received the library's normal routine EEG, which contradicts the case. Added `fallback_tool_outputs.eeg` with `eeg_type` `routine` (the stored continuous_icu recording cut to a 30-minute portable recording without video, technologist notes for the clinical events, activation not performed): continuous left temporal-parietal evolving discharge (electrographic SE), intermittent triphasic GPDs, left hemisphere attenuation. No criterion, tiers and the reward-relevant policy unchanged; the clinically correct test stays the continuous EEG of `action-1-analyze-eeg`. A `continuous_icu` or `video` order still receives `initial_tool_outputs.eeg`.
+- Labs `action-2-interpret-labs`: unserved result cited in `expected_evidence`: lactate 3.6, CK 580 (Other), procalcitonin 0.18 (Inflammatory Markers). TRIM: incidental post-convulsive markers and a negative infection marker; the served urinalysis stays. Scoring change: no.
+- Labs `action-6-interpret-labs`: unserved result cited in `expected_evidence`: none (the probe's sodium 123 is a core-labs value the evidence does not cite). NO CHANGE. Scoring change: no.
+  - action-2-interpret-labs expected_evidence: 'Sodium 123 and chloride 88; carbamazepine 14.2 (high); creatinine 1.6 with BUN 28 (CKD 3); lactate 3.6 and CK 580; WBC 12.4; INR 1.2; procalcitonin and urinalysis normal' -> 'Sodium 123 and chloride 88; carbamazepine 14.2 (high); creatinine 1.6 with BUN 28 (CKD 3); WBC 12.4; INR 1.2; urinalysis normal'
+- Checks: `perfect_agent.py -v` pass; `case_io.py check` schema and synonym guard OK, no test failure names the case; probe: routine (omitted and explicit) order -> the new case fallback, `continuous_icu` and `video` -> the stored index recording; every number in each lab criterion's evidence is in what its order returns.

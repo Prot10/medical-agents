@@ -75,3 +75,12 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `initial_tool_outputs.eeg`: `eeg_type` set to `continuous_icu`, decided by reading the report.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## EEG and labs after routing (25 Oct 2026)
+
+Commit 317e46db routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG) and serves an `interpret_labs` order only the stored panels it names. Decisions for the condition in `plans/SE-routing-decisions.md`.
+
+- EEG: a routine order received the library's normal routine EEG, which contradicts the case. Added `fallback_tool_outputs.eeg` with `eeg_type` `routine` (the stored continuous_icu recording cut to a 30-minute portable recording without video, technologist notes for the clinical events, activation not performed): continuous generalized triphasic periodic sharp wave complexes with seven superimposed left temporal seizures of 15-30 s. No criterion, tiers and the reward-relevant policy unchanged; the clinically correct test stays the continuous EEG of `action-1-analyze-eeg`. A `continuous_icu` or `video` order still receives `initial_tool_outputs.eeg`.
+- Labs `action-2-interpret-labs`: unserved result cited in `expected_evidence`: venous lactate 3.4, CK 412 (Post-ictal markers). TRIM: post-ictal markers, incidental. Scoring change: no.
+  - action-2-interpret-labs expected_evidence: 'Glucose 102 mg/dL, venous lactate 3.4 mmol/L and CK 412 U/L after a convulsion; electrolytes, magnesium, renal and hepatic function normal; toxicology negative: no reversible metabolic or toxic cause' -> 'Glucose 102 mg/dL; electrolytes, magnesium, renal and hepatic function normal; toxicology negative: no reversible metabolic or toxic cause'
+- Checks: `perfect_agent.py -v` pass; `case_io.py check` schema and synonym guard OK, no test failure names the case; probe: routine (omitted and explicit) order -> the new case fallback, `continuous_icu` and `video` -> the stored index recording; every number in each lab criterion's evidence is in what its order returns.

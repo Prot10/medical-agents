@@ -69,3 +69,14 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - Initial EEG recommended action 'Continuous cEEG monitoring recommended' -> 'Continued' (the recording is the cEEG).
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## EEG and labs after routing (25 Oct 2026)
+
+Commit 317e46db routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG) and serves an `interpret_labs` order only the stored panels it names. Decisions for the condition in `plans/SE-routing-decisions.md`.
+
+- EEG: a routine order received the library's normal routine EEG, which contradicts the case. Added `fallback_tool_outputs.eeg` with `eeg_type` `routine` (the stored continuous_icu recording cut to a 30-minute portable recording without video, technologist notes for the clinical events, activation not performed): quasi-continuous right temporal-occipital LPDs+F without definite evolution (ictal-interictal continuum), no benzodiazepine trial. No criterion, tiers and the reward-relevant policy unchanged; the clinically correct test stays the continuous EEG of `action-1-analyze-eeg`. A `continuous_icu` or `video` order still receives `initial_tool_outputs.eeg`, and a repeat order the follow-up `benzodiazepine_trial`.
+- Labs `action-3-interpret-labs`: unserved result cited in `expected_evidence`: thiamine 42 (Thiamine). EXTEND with thiamine_B1: the key clinical evidence, differential and a prohibition rely on the level (treatment doses, not 100 mg daily), and EFNS 2010 draws thiamine before giving it in a heavy drinker with encephalopathy. Scoring change: yes.
+  - action-3-interpret-labs required_arguments.panels ['CBC', 'CMP', 'magnesium', 'tox_screen', 'ammonia', 'coagulation'] -> ['CBC', 'CMP', 'magnesium', 'tox_screen', 'ammonia', 'coagulation', 'thiamine_B1']
+  - action-3-interpret-labs label -> 'Emergency laboratory work-up: glucose, CBC, electrolytes, magnesium, renal and hepatic function, toxicology, ammonia, coagulation, thiamine level'
+  - action-3-interpret-labs rationale + 'A whole-blood thiamine level is drawn before further thiamine in a heavy drinker with encephalopathy [EFNS_Wernicke_2010].'
+- Checks: `perfect_agent.py -v` pass; `case_io.py check` schema and synonym guard OK, no test failure names the case; probe: routine (omitted and explicit) order -> the new case fallback, `continuous_icu` and `video` -> the stored index recording, repeat `continuous_icu` -> the follow-up; every number in each lab criterion's evidence is in what its order returns.

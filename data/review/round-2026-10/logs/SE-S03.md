@@ -67,3 +67,13 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `initial_tool_outputs.eeg`: `eeg_type` set to `continuous_icu`, decided by reading the report.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## EEG and labs after routing (25 Oct 2026)
+
+Commit 317e46db routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG) and serves an `interpret_labs` order only the stored panels it names. Decisions for the condition in `plans/SE-routing-decisions.md`.
+
+- EEG: a routine order received the library's normal routine EEG, which contradicts the case. Added `fallback_tool_outputs.eeg` with `eeg_type` `routine` (the stored continuous_icu recording cut to a 30-minute portable recording without video, technologist notes for the clinical events, activation not performed): continuous right-hemisphere-predominant evolving discharges with bilateral spread during convulsions (electrographic SE), right delta. No criterion, tiers and the reward-relevant policy unchanged; the clinically correct test stays the continuous EEG of `action-1-analyze-eeg`. A `continuous_icu` or `video` order still receives `initial_tool_outputs.eeg`.
+- Labs `action-2-interpret-labs`: unserved result cited in `expected_evidence`: lactate 7.8 (Other), CRP 96, procalcitonin 1.8 (Inflammatory markers), serum osmolality 262 (Osmolality). MOVE lactate into the served Arterial blood gas panel (a must cites it for holding metformin); TRIM CRP and procalcitonin (the served pyuria and nitrite carry the urinary source) and serum osmolality (the served sodium and urine studies carry the hyponatremia). Scoring change: no.
+  - action-2-interpret-labs expected_evidence: 'Sodium 121 with serum osmolality 262, urine osmolality 420 and urine sodium 22 (hypovolemic hyponatremia); potassium 3.4; BUN 34 and creatinine 1.6; WBC 18.4, CRP 96, procalcitonin 1.8 and pyuria with positive nitrite; lactate 7.8 after the convulsion; levetiracetam 18 within range' -> 'Sodium 121 with urine osmolality 420 and urine sodium 22 (hypovolemic hyponatremia); potassium 3.4; BUN 34 and creatinine 1.6; WBC 18.4 and pyuria with positive nitrite; lactate 7.8 after the convulsion; levetiracetam 18 within range'
+  - initial_tool_outputs.labs: Lactate 7.8 moved from panel 'Other' to 'Arterial blood gas'
+- Checks: `perfect_agent.py -v` pass; `case_io.py check` schema and synonym guard OK, no test failure names the case; probe: routine (omitted and explicit) order -> the new case fallback, `continuous_icu` and `video` -> the stored index recording; every number in each lab criterion's evidence is in what its order returns.

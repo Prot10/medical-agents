@@ -64,3 +64,13 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `initial_tool_outputs.eeg`: `eeg_type` set to `continuous_icu`, decided by reading the report.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## EEG and labs after routing (25 Oct 2026)
+
+Commit 317e46db routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG) and serves an `interpret_labs` order only the stored panels it names. Decisions for the condition in `plans/SE-routing-decisions.md`.
+
+- EEG: a routine order received the library's normal routine EEG, which contradicts the case. Added `fallback_tool_outputs.eeg` with `eeg_type` `routine` (the stored continuous_icu recording cut to a 30-minute portable recording without video, technologist notes for the clinical events, activation not performed): recurrent left temporal-parietal seizures over more than half the record (focal NCSE), LPDs, left hemisphere slowing. No criterion, tiers and the reward-relevant policy unchanged; the clinically correct test stays the continuous EEG of `action-1-analyze-eeg`. A `continuous_icu` or `video` order still receives `initial_tool_outputs.eeg`.
+- `initial_tool_outputs.eeg.limitations`: "Left scalp laceration" -> "Right temporal scalp laceration" (the HPI and exam place the laceration over the right temporal scalp; laterality error, own finding, dim B minor).
+- Labs `action-2-interpret-labs`: unserved result cited in `expected_evidence`: lactate 2.4 (Lactate), INR 1.0 (Coagulation, not ordered). TRIM: incidental. Scoring change: no.
+  - action-2-interpret-labs expected_evidence: 'Sodium 138, potassium 4.0, calcium 9.4, magnesium 2.0, creatinine 1.0 and liver tests normal; glucose 112 and lactate 2.4; WBC 7.8, platelets 168, INR 1.0; drug screen and alcohol negative' -> 'Sodium 138, potassium 4.0, calcium 9.4, magnesium 2.0, creatinine 1.0 and liver tests normal; glucose 112; WBC 7.8, platelets 168; drug screen and alcohol negative'
+- Checks: `perfect_agent.py -v` pass; `case_io.py check` schema and synonym guard OK, no test failure names the case; probe: routine (omitted and explicit) order -> the new case fallback, `continuous_icu` and `video` -> the stored index recording; every number in each lab criterion's evidence is in what its order returns.

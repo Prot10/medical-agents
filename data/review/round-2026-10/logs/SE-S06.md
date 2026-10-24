@@ -62,3 +62,14 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `initial_tool_outputs.eeg`: `eeg_type` set to `continuous_icu`, decided by reading the report.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## EEG and labs after routing (25 Oct 2026)
+
+Commit 317e46db routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG) and serves an `interpret_labs` order only the stored panels it names. Decisions for the condition in `plans/SE-routing-decisions.md`.
+
+- EEG: a routine order received the library's normal routine EEG, which contradicts the case. Added `fallback_tool_outputs.eeg` with `eeg_type` `routine` (the stored continuous_icu recording cut to a 30-minute portable recording without video, technologist notes for the clinical events, activation not performed): continuous generalized 2-4 Hz spike-and-wave during convulsions (electrographic SE), excess beta, heavy artifact. No criterion, tiers and the reward-relevant policy unchanged; the clinically correct test stays the continuous EEG of `action-1-analyze-eeg`. A `continuous_icu` or `video` order still receives `initial_tool_outputs.eeg`.
+- Labs `action-2-interpret-labs`: unserved result cited in `expected_evidence`: CK 8640, lactate 11.4, uric acid (Other), serum osmolality 270 (Osmolality), phosphate 5.2 (Phosphate). EXTEND with CK: a must and the criterion's own rationale use CK 8640 for the rhabdomyolysis; the CK order also returns the lactate stored with it. TRIM serum osmolality and phosphate (incidental; the sodium and the served urine studies carry the hyponatremia). Scoring change: yes.
+  - action-2-interpret-labs required_arguments.panels ['CBC', 'CMP', 'magnesium', 'tox_screen'] -> ['CBC', 'CMP', 'magnesium', 'tox_screen', 'CK']
+  - action-2-interpret-labs label -> 'Emergency laboratory work-up: glucose, CBC, electrolytes, magnesium, renal and hepatic function, toxicology, CK'
+  - action-2-interpret-labs expected_evidence: 'Sodium 124 with serum osmolality 270, urine osmolality 480 and urine sodium 58; potassium 5.6, phosphate 5.2, creatinine 2.2; CK 8640 with dipstick blood and no RBC; lactate 11.4 with pH 7.13; urine amphetamines positive, other drugs negative' -> 'Sodium 124 with urine osmolality 480 and urine sodium 58; potassium 5.6 and creatinine 2.2; CK 8640 with dipstick blood and no RBC; lactate 11.4 with pH 7.13; urine amphetamines positive, other drugs negative'
+- Checks: `perfect_agent.py -v` pass; `case_io.py check` schema and synonym guard OK, no test failure names the case; probe: routine (omitted and explicit) order -> the new case fallback, `continuous_icu` and `video` -> the stored index recording; every number in each lab criterion's evidence is in what its order returns.

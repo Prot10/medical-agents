@@ -65,3 +65,12 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - follow-up EEG `sedation_wean`: `eeg_type` set to `continuous_icu`, decided by reading the report.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## EEG and labs after routing (25 Oct 2026)
+
+Commit 317e46db routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG) and serves an `interpret_labs` order only the stored panels it names. Decisions for the condition in `plans/SE-routing-decisions.md`.
+
+- EEG: a routine order received the library's normal routine EEG, which contradicts the case. Added `fallback_tool_outputs.eeg` with `eeg_type` `routine` (the stored continuous_icu recording cut to a 30-minute portable recording without video, technologist notes for the clinical events, activation not performed): burst-suppression with near-identical left-predominant epileptiform bursts, right arm and face myoclonus with bursts, no reactivity, on propofol. No criterion, tiers and the reward-relevant policy unchanged; the clinically correct test stays the continuous EEG of `action-1-analyze-eeg`. A `continuous_icu` or `video` order still receives `initial_tool_outputs.eeg`, and a repeat order the follow-up `sedation_wean`.
+- Labs `action-2-interpret-labs`: unserved result cited in `expected_evidence`: troponin I 12.8, BNP 2840 (Cardiac markers), lactate 2.6 (Arterial blood gas and lactate). TRIM: post-arrest markers, incidental to the seizure work-up. Scoring change: no.
+  - action-2-interpret-labs expected_evidence: 'Sodium, potassium, calcium and magnesium normal; glucose 168 mg/dL; ALT 98 and AST 142 U/L; creatinine 1.2 mg/dL; troponin I 12.8 ng/mL; lactate 2.6 mmol/L' -> 'Sodium, potassium, calcium and magnesium normal; glucose 168 mg/dL; ALT 98 and AST 142 U/L; creatinine 1.2 mg/dL'
+- Checks: `perfect_agent.py -v` pass; `case_io.py check` schema and synonym guard OK, no test failure names the case; probe: routine (omitted and explicit) order -> the new case fallback, `continuous_icu` and `video` -> the stored index recording, repeat `continuous_icu` -> the follow-up; every number in each lab criterion's evidence is in what its order returns.
