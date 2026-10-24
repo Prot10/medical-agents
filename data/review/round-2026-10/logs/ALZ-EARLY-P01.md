@@ -55,3 +55,8 @@ Cross-case consistency pass by the ALZ-EARLY condition auditor, through case_io.
 - `BMP` completed to `CMP` with normal liver tests (total protein 6.9, albumin 4.0, AST 18, ALT 15, ALP 77, bilirubin 0.4): the labs criterion orders a CMP, so the authored report has to carry the hepatic part; no field_path points into the panel.
 - 'lasting power of attorney' (UK instrument) changed to 'durable power of attorney' in this US-setting case (1 place).
 After the change: perfect_agent.py and case_io.py check clean on all 30 cases; test_case_guards (ALZ-EARLY) pass.
+
+## Close-out (24 Oct 2026)
+
+- Synonyms re-expanded (`--prune --conditions alzheimers_early`): removed code G30.1 (onset before 65). Now: codes ['G30.0', 'G30.9', 'F00', 'G30.8']; labels after accepted[0]: ['alzheimer disease', "alzheimer's disease", 'alzheimers disease', 'alzheimer dementia', 'dementia due to alzheimer', 'early onset alzheimer', 'posterior cortical atrophy', 'benson syndrome'].
+- Checks: `perfect_agent.py -v` pass; `case_io.py check` no failure names this case; case guards pass; synonym `--check` clean. Decisions in `plans/ALZ-EARLY-decisions.md`.

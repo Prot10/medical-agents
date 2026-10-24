@@ -61,3 +61,9 @@ Cross-case consistency pass by the ALZ-EARLY condition auditor, through case_io.
 After the change: perfect_agent.py and case_io.py check clean on all 30 cases; test_case_guards (ALZ-EARLY) pass.
 - Normal values in `Magnesium, Homocysteine, ESR and CRP` varied (Magnesium 2.0 to 1.9, Homocysteine 10.2 to 8.9, ESR 12 to 14, CRP 1.8 to 1.3), all still within the case's reference ranges: the same numbers (magnesium 2.0, homocysteine 10.2, ESR 12, CRP 1.8) had been copied into up to 13 cases, a template artefact raised by the S01 worker; no text cites the changed values.
 - Checks re-run after these additions: perfect_agent.py, case_io.py check and test_case_guards clean.
+
+## Close-out (24 Oct 2026)
+
+- Synonyms re-expanded (`apply_diagnosis_synonyms.py --prune --conditions alzheimers_early`): MCI labels only. Removed "alzheimer disease", "alzheimer's disease", "alzheimers disease", "alzheimer dementia", "dementia due to alzheimer", "posterior cortical atrophy", "benson syndrome", "early onset alzheimer" and the codes G30.0, G30.1, G30.8, G30.9, F00, because every "dementia due to Alzheimer disease" answer contains those tokens and would have scored an overcall of this MCI case as correct.
+- `ground_truth.diagnosis.accepted[0]`: "... (amnestic, predominantly amnestic single-domain with naming involvement)" -> "Mild cognitive impairment due to Alzheimer's disease (amnestic multi-domain, with naming involvement)"; G31.84 unchanged. The battery shows memory plus naming and semantic fluency impairment, which is amnestic multi-domain MCI (Albert 2011); the old label contradicted the case's own neuropsychology impression (ROUND_POLICY ruling 3, decided under Andrea's 24 Oct 2026 ruling).
+- Checks: `perfect_agent.py -v` pass; `case_io.py check` no failure names this case; case guards pass; synonym `--check` clean. Decisions in `plans/ALZ-EARLY-decisions.md`.

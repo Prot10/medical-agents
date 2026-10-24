@@ -57,3 +57,11 @@ Cross-case consistency pass by the ALZ-EARLY condition auditor, through case_io.
 - 'the reviewed cognitive laboratory panel' reworded 'the cognitive laboratory panel' (the labs criterion label), the wording the other six cases already use.
 - 'lasting power of attorney' (UK instrument) changed to 'durable power of attorney' in this US-setting case (1 place).
 After the change: perfect_agent.py and case_io.py check clean on all 30 cases; test_case_guards (ALZ-EARLY) pass.
+
+## Close-out (24 Oct 2026)
+
+- Synonyms re-expanded (`--prune --conditions alzheimers_early`): removed "posterior cortical atrophy" and "benson syndrome"; "early onset alzheimer" and code G30.0 (onset at 65 or later); code G30.8 (atypical presentations only). Added "late onset alzheimer". Now: codes ['G30.1', 'G30.9', 'F00']; labels after accepted[0]: ['alzheimer disease', "alzheimer's disease", 'alzheimers disease', 'alzheimer dementia', 'dementia due to alzheimer', 'late onset alzheimer'].
+- Added follow-up `order_advanced_imaging` FDG_PET (trigger `order_fdg_pet`, no criterion), after the amyloid-status follow-ups: a case-specific Alzheimer-type metabolic report concordant with the MRI and stage. Before, an FDG order returned the library's normal scan, contradicting the case (summary Q4). Probed: FDG and amyloid PET orders each return their own report, in either order.
+- Dataset diversity (auditor flag, near-duplicate of RS03: both "Mrs. Tanaka", retired seamstress from a garment factory, Japanese, with a daughter): surname Tanaka -> Mori, occupation seamstress -> florist who ran a neighbourhood flower shop for 35 years, and the failed complex task now an ikebana arrangement for a neighbour's memorial instead of mending a dress. No clinical content changed.
+- Flagged finding settled (hip flexors 4+/5, reflexes 1+ with trace ankle jerks, BMI 19.8): no change. Symmetric mild proximal weakness with reduced bulk and low weight, without sensory signs, at 79 with reduced ankle reflexes (common after 75) and normal B12, homocysteine, TSH and electrolytes, is consistent with sarcopenia; the nutrition and activity must already addresses it.
+- Checks: `perfect_agent.py -v` pass; `case_io.py check` no failure names this case; case guards pass; synonym `--check` clean. Decisions in `plans/ALZ-EARLY-decisions.md`.

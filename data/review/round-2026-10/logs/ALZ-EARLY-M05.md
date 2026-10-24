@@ -64,3 +64,10 @@ Cross-case consistency pass by the ALZ-EARLY condition auditor, through case_io.
 - MMSE item arithmetic: the 3 orientation points named only 2 errors (month, day of the week); now orientation 2 plus the three-stage command 1 (the exam already records difficulty with three-step commands), still 22/30; MoCA list gains orientation 2 so its items sum to 18/30 (exam and clinical assessment findings[1], [2]).
 - MRI additional observation 'Posterior fossa and brainstem morphologically normal' contradicted the cerebellar lacune in the next line; now 'Brainstem morphologically normal'.
 After the change: perfect_agent.py and case_io.py check clean on all 30 cases; test_case_guards (ALZ-EARLY) pass.
+
+## Close-out (24 Oct 2026)
+
+- Synonyms re-expanded (`--prune --conditions alzheimers_early`): removed "posterior cortical atrophy" and "benson syndrome"; "early onset alzheimer" and code G30.0 (onset at 65 or later); code G30.8 (atypical presentations only). Added "late onset alzheimer". Now: codes ['G30.1', 'G30.9', 'F00']; labels after accepted[0]: ['alzheimer disease', "alzheimer's disease", 'alzheimers disease', 'alzheimer dementia', 'dementia due to alzheimer', 'late onset alzheimer'].
+- Added follow-up `order_advanced_imaging` FDG_PET (trigger `order_fdg_pet`, no criterion), after the amyloid-status follow-ups: a case-specific Alzheimer-type metabolic report concordant with the MRI and stage. Before, an FDG order returned the library's normal scan, contradicting the case (summary Q4). Probed: FDG and amyloid PET orders each return their own report, in either order.
+- Citation `[ADA_older_adults_2025]` -> `[ADA_older_adults_2026]` in the diabetes must: the 2026 Standards supersede the 2025 edition with the same A1C goal (below 8.0% for complex/intermediate health, Table 13.2).
+- Checks: `perfect_agent.py -v` pass; `case_io.py check` no failure names this case; case guards pass; synonym `--check` clean. Decisions in `plans/ALZ-EARLY-decisions.md`.
