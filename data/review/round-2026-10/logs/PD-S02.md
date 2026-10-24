@@ -37,3 +37,9 @@ This 62-year-old woman has an 18-month right-predominant tremor-onset parkinsoni
 ## Open questions for Andrea (judgment calls you could not settle)
 
 - None specific to this case (plan Q1 to Q6 apply).
+
+## Verification
+- Checked against the committed rewrite (diff from b8be2153^, field by field), plans/PD.md section 4 entry and classes C1 to C23. No notes file exists for PD, so there is no note id to account for. Tools re-run 24 Oct 2026: perfect_agent ok, case_io check (no failure names the case), test_case_guards pass (leak, followup, banned strings), and a MockServer routing script (MRI or CT, DaTscan, MIBG, amyloid, FDG, PSG, battery, orthostatic BP, labs, ECG, drug check for levodopa and for rasagiline).
+- Confirmed every row: literature removed; drug output names oxybutynin (C2 sentence) and amlodipine, no metformin-levodopa claim; MRA line gone; evidence restates the MRI; allergy edit is the only patient change and resolves the NSAID-versus-aspirin contradiction; ECG 72/min, QRS 92 ms, echo `TTE`; DaTscan stored, left putamen worse; stop rule and waste guards as the plan says.
+- Checked the oxybutynin must against the drug output and the prohibitions (no contradiction: the anticholinergic prohibition targets trihexyphenidyl and benztropine); MSA entry addresses the 5-year overactive bladder (PMH) without incontinence (HPI). `red_herrings` is empty, as it was before the round; `difficulty_rationale` names the father's ET and the shoulder stiffness as distractors in prose, which is not a contradiction, so no red herring was invented.
+- Found nothing to correct. No change made.

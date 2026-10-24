@@ -38,3 +38,9 @@ The HPI now gives clonazepam's real indication, RBD diagnosed on a sleep study 5
 ## Open questions for Andrea (judgment calls you could not settle)
 
 - None specific to this case.
+
+## Verification
+Adversarial verifier, 24 Oct 2026. Read the log, the checkpoint diff (b8be2153) and the whole final case. Checked: HPI clonazepam indication now RBD, matching the medication list; MoCA 27 in exam and stored battery; DaTscan deficit left-predominant for right-predominant signs; PSG on clonazepam coherent (RSWA persists, behaviours suppressed); MRI impression lists its own Fazekas 1 finding, Evans 0.28; levodopa increase must uses real tablet strengths; differential all `low` with the oculomotor exam as excluding evidence; routing serves the case DaTscan, PSG, battery and drug output.
+Found and fixed:
+- B minor, `ground_truth.differential[1].key_features` (wearing-off): "the episodes are not tied to the timing of her doses" asserted a history the HPI does not give. Now "No dose-related pattern is described, and the motor signs worsened steadily on an unchanged low dose".
+No other defect found. After the edit: perfect_agent ok; case_io check clean for PD-RM01; test_case_guards pass; discriminator_defects empty.

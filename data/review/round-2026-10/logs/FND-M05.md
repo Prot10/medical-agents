@@ -40,3 +40,8 @@ Sudden right-sided weakness in a woman with quiescent SLE now has one named ques
 ## Open questions for Andrea (judgment calls you could not settle)
 
 None. Two additions beyond the plan's M05 entry, both decided for dataset quality: the M-PSY must (she has depression treated with sertraline, which plan 2D names as a qualifying comorbidity target), and a prohibition of corticosteroids or immunosuppression for presumed neuropsychiatric lupus (the case's main management trap, parallel to the plan's M09 relapse-steroid prohibition).
+
+## Verification
+Checked the log against the file (worker edits are in commit b8be2153; diffed against its parent): read the whole final case, the patient-block diff, criteria tiers and order against plan 3.2 and the case entry in plan 4, sequence constraints and stop rule, musts and prohibitions against avoided actions, differential against the returned results, lab arithmetic and ranges, laterality, leak guard. No reviewer notes exist for FND, so there is no note id to account for. perfect_agent.py -v, case_io.py check and test_case_guards pass after my changes.
+The targeted panel holds the assays the recommended criterion orders (anticardiolipin, anti-beta-2 glycoprotein I, lupus anticoagulant, C3, C4, anti-dsDNA), all normal; CBC consistent (4.38 x 88.8 / 10 = 38.9, MCHC 32.9); MRI non-contrast without enhancement statements; the HPI no longer gives the prior complement and anti-dsDNA results; the drug output no longer recommends the ECG that the case marks as waste; the rheumatology consult is a must. The two additions beyond the plan (M-PSY for treated depression, the prohibition of steroids or immunosuppression for presumed NPSLE) are clinically sound.
+No error found; no change.

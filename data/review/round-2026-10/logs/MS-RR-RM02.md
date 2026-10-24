@@ -47,3 +47,15 @@ A 29-year-old woman with five days of left homonymous hemianopia and a new heada
 
 - The plan names no CT change for RM02, but the CT fallback contradicted the HPI's outside CT, so it now shows the lesion; the CT avoided action stays because a CT was already done before admission. Please confirm.
 - I added a driving must (left homonymous hemianopia in a woman who drives). If you consider it outside the scope of the assessment, it can be dropped without affecting the rest.
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. Read the whole final case. Confirmed: acuity and colour vision normal in both eyes with a macula-sparing left homonymous hemianopia (retrochiasmal, consistent with the right parieto-occipital lesion); floaters gone; normal discs and no shift, so LP recommended is safe; the left parietal juxtacortical lesion beneath the postcentral gyrus explains the earlier right face/arm episode; repeat 3-month MRI deleted; MRS under `order_advanced_imaging`; spine lesion has a level and side; CSF glucose ratio 58/92 = 0.63 matches the BMP; ANA red herring backed by dsDNA, ENA and C3 rows; drug output corrected (no contraceptive-efficacy claim; F11); differential lowered with case results; CT fallback agrees with the outside CT in the HPI.
+
+Found and changed:
+- `ground_truth.action_criteria[1].rationale` (spine MRI): "With three brain regions uncertain against a tumour, a cord lesion adds a third region" contradicted itself and the DIS count (the brain gives two regions, periventricular and juxtacortical). Rewritten: "Besides the tumefactive lesion the brain shows only periventricular and juxtacortical lesions; a cord lesion adds a third region of dissemination in space."
+- `initial_tool_outputs.labs.panels.CBC`: WBC 7.2 and Hb 13.1 were identical to MS-RR-P04 (and WBC to P05) in the same batch (plan E). Now WBC 6.4, Hb 12.8, Hct 38.4, RBC 4.42, MCV 86.9 (Hct/RBC arithmetic consistent); all normal, no other field cites them.
+
+Open questions in this log, resolved by the verifier: (1) the CT fallback correction is right (it must match the outside CT) and the CT avoided action stays, since a CT has already been done; (2) the driving must stays: a homonymous hemianopia in a woman who was driving when the deficit began is a standard safety counselling point a physician can check. Neither needs information only Andrea has.
+
+perfect_agent.py -v: pass. case_io.py check: clean for this case. Guards: pass.

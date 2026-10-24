@@ -43,3 +43,9 @@ The case is a 34-year-old man with months of stereotyped deja vu and rising epig
 
 ## Open questions for Andrea (judgment calls you could not settle)
 - None.
+
+## Verification
+Adversarial check (24 Oct 2026) of the whole final case against this log, plan section 4 (S01) and classes A-V; diff read against fa1d22e6 (the case was checkpointed in b8be2153).
+- Confirmed: prolactin gone everywhere; volumetrics 2.1 vs 3.4 cm3 give 38% and index 0.24; no gadolinium line; sharp-wave duration and "frequent" at 1-2/min agree with ACNS 2021; tongue-bite contradiction resolved; HPI no longer denies the auras; KCE two-seizure criterion and first-line ASM per facts 1 and 6; tiers, criteria order, stop rule (MRI, EEG, max 1), no constraint with an optional drug check; FDG_PET waste and PET as fallback; echo_type; literature sources real and summaries correct (SANAD II, Wiebe 2001, ERSET 2012, Kwan 2010), no leakage (case guards pass); differential matches the results; musts and prohibitions consistent with the omeprazole-only medication list and the ACE-inhibitor allergy.
+- Found: the fallback FDG-PET ratio the worker chose (0.83) duplicates P01's ratio. Changed: `fallback_tool_outputs.advanced_imaging.findings[0].signal` and `.impression` to 0.77 (unused in the condition, consistent with "markedly reduced").
+- `perfect_agent.py -v` and `case_io.py check` clean for the case.

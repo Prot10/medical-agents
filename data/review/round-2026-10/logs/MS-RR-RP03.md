@@ -42,3 +42,10 @@ The case no longer depends on a steroid response the agent could only see in the
 ## Open questions for Andrea (judgment calls you could not settle)
 
 - None needing Andrea's information. Decided: the prodrome omits hiccups and nausea (the plan's example) because together with a dorsal medullary lesion they would describe an area postrema syndrome and make seronegative NMOSD a serious contender; unsteadiness, dysarthria and dysphagia fit the peduncular and lateral medullary lesion without that. The lesion was extended to the pons and medullary midline so the quadriparesis and reduced consciousness have an anatomical basis; GCS 8 was kept.
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. Read the log, the diff against `b8be2153^` and the whole final case. Checked: post-steroid MRI and steroid-trial literature deleted; CSF criterion gone, LP contraindicated and prohibited consistently; biopsy follow-up of the right temporal lesion (cortical/juxtacortical, matches the MRI) with CD20, IDH1 and EBER and histology-only impression; CT and EEG fallbacks fit the case and are no longer avoided; "globally aphasic" removed; prodrome added without area postrema features (sound reasoning); lesion extension to the pontine/medullary midline explains quadriparesis; drug check covers metformin, glibenclamide, levothyroxine, pantoprazole and the sulfonamide allergy correctly and is recommended (tier table); musts (ICU airway, biopsy before steroids, IVMP then early PLEX, insulin plan) do not contradict prohibitions; literature sources exist; differential all low with reasons.
+Found and fixed:
+- B minor, `fallback_tool_outputs.csf.glucose`, `.glucose_ratio`, `.interpretation`: the CSF fallback gave "serum glucose 110 mg/dL at time of LP" (CSF 72) while the stored blood glucose is 188 mg/dL in this diabetic, postoperative patient; with the real serum value the ratio would read as low. Now CSF glucose 118 mg/dL, ratio 0.63 with serum glucose 186 mg/dL, interpretation "normal protein and CSF/serum glucose ratio".
+Re-ran `perfect_agent.py MS-RR-RP03 -v` (pass), `case_io.py check` (clean for the case) and `test_case_guards -k MS-RR-RP03` (pass).

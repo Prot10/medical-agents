@@ -44,3 +44,10 @@ The scored MRI is now the dedicated 3T epilepsy-protocol study and shows definit
 ## Open questions for Andrea (judgment calls you could not settle)
 
 None. Decisions taken: the outside standard MRI was placed three months before presentation (the plan suggests "two years ago"; the HPI timeline of 8-10 months of spells and a PCP visit four months ago makes a recent outside study more coherent). The valproate prohibition was added although the plan's M01 line does not list it, because she is a 41-year-old woman of childbearing potential.
+
+## Verification
+
+Adversarial check, 24 Oct 2026 (case committed in b8be2153; read in full against the pre-round version fa1d22e6 and plan section 4).
+- Checked: every own-finding row against the file (MRI rewrite, volumetry 2.5/3.5 cm3 = 29% smaller and (L-R)/(L+R) = 0.17; Hct 42.6 with Hb 14.4 = MCHC 33.8; prolactin absent everywhere; PET only as `FDG_PET` fallback plus waste avoided action; literature sources and titles real (Fisher 2017, Peltola 2023, Bernasconi 2019); tiers, order and stop rule per plan; no constraints; red-herring paths hold their data points; canonical valproate, driving and SUDEP texts; echo `echo_type`). Volumetric numbers and the PET ratio are not shared with another FEPI case. Musts do not contradict prohibitions or avoided actions; the differential matches the final evidence.
+- Found: the log's last C row is wrong in substance. Left-hand manual automatisms with a right temporal focus are ipsilateral, which is the usual pattern (plan fact 12), so the sign is concordant, not discordant; no case change was needed and none was made.
+- Changed: nothing in the case. `perfect_agent.py -v` and `case_io.py check` clean for this case; case guards pass.

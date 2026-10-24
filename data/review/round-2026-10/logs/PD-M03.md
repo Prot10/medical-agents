@@ -36,3 +36,11 @@ A 75-year-old man with bilateral, slightly left-predominant bradykinesia and rig
 ## Open questions for Andrea (judgment calls you could not settle)
 
 - None specific to this case (plan Q1 to Q6 apply).
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. No PD notes file. Read the whole final case and the diff. The only HPI change is the deleted timeline clause, as logged. Checked: no RBD, PSG or hyposmia claim remains in musts, evidence, red herrings or metadata; laterality (worse left, right putaminal SBR 1.02); MRI Evans 0.29 proportionate everywhere; drug output covers all six drugs and the aspirin allergy; differential low; tiers and stop rule per plan. All logged FIXED rows hold.
+
+Found and changed:
+- `avoid-waste-5-analyze-ecg` contradicted the must "domperidone where available after an ECG for the QTc" (same class as M01). Removed.
+- `differential[Essential tremor].key_features` and `red_herrings[1].correct_interpretation` asserted "no postural or action tremor", which the examination never tests or records (it records only the absence of rest tremor and an endorsed occasional hand tremor). Rewritten as "No postural or action tremor is described in the history or on examination; ...". Checks after the verification edits: `perfect_agent.py -v` passes, `case_io.py check` names no failure for this case, `test_case_guards` pass.

@@ -39,3 +39,11 @@ This 71-year-old woman has a 2.5-year left-sided tremor-onset parkinsonism (pill
 ## Open questions for Andrea (judgment calls you could not settle)
 
 - None specific to this case (plan Q1 to Q6 apply). The "MRI not performed" case fallback is a small addition outside the plan, made so that the agent is not told a declined MRI was normal.
+
+## Verification
+- Checked against the committed rewrite (diff from b8be2153^, field by field), plans/PD.md section 4 entry and classes C1 to C23. No notes file exists for PD, so there is no note id to account for. Tools re-run 24 Oct 2026: perfect_agent ok, case_io check (no failure names the case), test_case_guards pass (leak, followup, banned strings), and a MockServer routing script (MRI or CT, DaTscan, MIBG, amyloid, FDG, PSG, battery, orthostatic BP, labs, ECG, drug check for levodopa and for rasagiline).
+- Confirmed every row: CT `{}` first and required with its `panel_required_exemptions.analyze_brain_mri`; the CT report no longer narrates history; MRI fallback "not performed" is served for `analyze_brain_mri` and agrees with the HPI; DaTscan optional, right putamen worse (contralateral to the left-sided signs), soft CT-before-DaTscan constraint; amyloid fallback null (library negative, and amyloid is waste with a MoCA 28/30 rationale); ET `low`; dash changes in the patient block alter no wording.
+- Found and fixed three small errors:
+  - `initial_tool_outputs.drug_interactions.general.warnings[1]` read "Iron salts (not calcium) chelate levodopa": the parenthesis answered the deleted calcium claim and is not report voice. Now "Iron salts chelate levodopa and reduce its absorption; give iron at least 2 hours apart from levodopa if it is ever added."
+  - `ground_truth.avoided_actions[avoid-waste-4-order-cardiac-monitoring].rationale` said "No syncope, falls or palpitations", but PMH records a fall with wrist fracture 12 years ago (cited by the physiotherapy must). Now "No syncope or palpitations, and no fall since the remote wrist fracture 12 years ago: rhythm monitoring is not indicated".
+  - `ground_truth.differential[Progressive supranuclear palsy].key_features` "no falls" became "no falls since onset" for the same reason.

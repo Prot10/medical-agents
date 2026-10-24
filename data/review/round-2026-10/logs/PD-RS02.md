@@ -41,3 +41,9 @@ This 62-year-old man with a VP shunt placed 10 years ago for aqueductal stenosis
 ## Open questions for Andrea (judgment calls you could not settle)
 
 - None specific to this case (plan Q1 to Q6 apply). Genetics was not added although his father had PD at 68: onset after 60 with one late-onset affected parent is not the young-onset or strong family history that Reviewer 1's tool review asks for; the library panel answer (negative) would not contradict the case if an agent ordered it.
+
+## Verification (adversarial verifier, 24 Oct 2026)
+- Read the log, the diff and the whole final case. No PD notes file exists.
+- Checked: HPI no longer gives the result of the prior surveillance scan; MRI has no enhancement wording and states catheter position and Evans 0.27, matching the criterion, differential, red herring and the new prohibition; MoCA 27 point count (three single points) consistent with the stored battery; DaTscan waste with a stored left-putamen report opposite the right-sided signs; drug output names only his medicines (sertraline, amlodipine, metformin, aspirin); sleep talking only, so the library normal PSG fits; programmable-valve must present; probable PD; no sequence constraint (DaTscan waste); ECG fallback rate 68 equals the vital signs.
+- No error found that needs a change. Nothing edited.
+- Checks re-run after verification: `perfect_agent.py -v` pass; `case_io.py check` schema OK, no failure names the case; `test_case_guards -k` pass; MockServer routing: DaTscan, MIBG and amyloid return their own modality (case or library), PSG and battery return the case report where stored, `check_drug_interactions` with `drug: levodopa` and `drug: rasagiline` return the case output, labs route to the stored panel where one exists; grep for established / gadolinium / "Abnormal values:" / Lewy / serotonin syndrome / Tier per / July 2026 / dashes: only allowed hits.

@@ -38,3 +38,10 @@ The policy now requires the epilepsy-protocol MRI and the routine EEG; labs, ECG
 ## Open questions for Andrea (judgment calls you could not settle)
 
 None. Decision: the low-grade tumor stays `moderate` in the differential because the MRI report itself says it cannot be excluded and histology is pending; the dysplasia is the labelled diagnosis.
+
+## Verification
+
+Adversarial check, 24 Oct 2026 (case committed in b8be2153; read in full).
+- Checked: KCE lateralization rewritten per fact 12 (no "contralateral" claim; left-handed, probable dominance only); MRI is non-contrast with the lesion in the posterior superior temporal gyrus, index 0.02 matches 3.1/3.0 cm3; prolactin absent; ECG values match the criterion; PET follow-up optional with within-modality wording; literature uses Bernasconi A 2019, Blumcke 2011 and Glauser 2013 with the correct Level A statement; HLA-B*15:02 must (South Asian); MRI-negative and MTS differentials `low`; tiers and stop rule per plan.
+- Found: no error. The low-grade tumor stays `moderate`; the MRI itself leaves it open and only histology settles it, so this is consistent with ruling 7. Em dashes in the HPI, the PMH and the red herring are original text, not new text.
+- Changed: nothing. Checks clean for this case.

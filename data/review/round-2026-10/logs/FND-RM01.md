@@ -40,3 +40,14 @@ None open. Decisions taken and their reasons:
 - M-PHYSIO added (the plan lists DX, COMM, PSY, RESCUE): he has functional leg weakness needing help to walk, which is the plan's own condition for M-PHYSIO.
 - ECG made optional rather than waste: risperidone can prolong QT and the events were first reported as loss of consciousness, so an ECG is defensible; it carries no diagnostic credit.
 - The stored labs are a basic electrolyte panel with osmolality rather than the two named analytes alone, because the stored report answers any lab order and a sodium is reported with its electrolytes.
+
+## Verification
+
+Adversarial check (24 Oct 2026) of the log against the case and against the pre-round version (`b8be2153^`). What I checked: the patient diff (only "Importantly," removed and the Hoover sign rewritten correctly); the new lab panel (calculated osmolality 2 x 134 + 94/18 + 12/2.8 = 277.5, stored 278; Na 134 flagged low, the only abnormal value in `abnormal_values_summary`); the sodium -> video-EEG constraint and the stop rule; the EEG (four events with times, event 3 state now consistent with a waking background); the drug output against the medication list and the haloperidol allergy; the musts (continue risperidone, fluid and sodium monitoring) against the prohibitions (no haloperidol, no ASM, no benzodiazepines): consistent; the differential (epileptic and hyponatremia-provoked seizures low with this case's results); every log claim marked FIXED.
+
+Found and changed:
+- `initial_tool_outputs.eeg.impression`: event 2 was summarised as "side-to-side head shaking", which is the examiner-witnessed event, while the EEG finding for event 2 says only "rhythmic head shaking"; the impression now says "head shaking", matching its own finding.
+- `fallback_tool_outputs.ecg.intervals.QRS`: 92 ms with an incomplete right bundle branch block in findings and interpretation; incomplete RBBB in adults has a QRS of 110-119 ms (AHA/ACCF/HRS 2009 recommendations). QRS set to 112 ms. This fallback answers the optional `action-ecg`.
+- `metadata.clinical_pearls[0]`: described the Hoover sign the same backwards way the worker fixed in the motor exam (contralateral hip extension on testing hip flexion is the normal response). Rewritten as weak hip extension on direct testing that returns to full strength during flexion of the opposite hip against resistance.
+
+Checks re-run after the changes: `perfect_agent.py -v` ok, `case_io.py check` clean for this case (schema, synonym guard, no failing test names it), `test_case_guards.py -k` passed. The diagnosis label, `icd_codes` and synonyms are unchanged from before the round; no new em dashes or `Stone_2018` strings.

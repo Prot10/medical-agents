@@ -45,3 +45,10 @@ The patient is now Mr. Barlow. The scored MRI is a dedicated 3T epilepsy-protoco
 ## Open questions for Andrea (judgment calls you could not settle)
 
 None. Decision: the ambulatory study is 72 hours (the plan asked only that duration and findings agree; 72 hours fits the day-3 seizure).
+
+## Verification
+
+Adversarial check, 24 Oct 2026 (case committed in b8be2153; read in full).
+- Checked: rename (Barlow) consistent across the HPI; MRI volumetry (2.7/3.4 cm3 = 21%, index 0.11); sleep-deprived EEG `classification: normal` matches its impression and red herring; ambulatory EEG is 72 h with the seizure on day 3, onset and spread consistent across findings, impression and criterion evidence; lab arithmetic (anion gap 11, male CBC ranges, MCHC 33.6) and abnormal summary match the flags; zonisamide prohibition agrees with the sulfonamide allergy and the drug output; OSA differential and red herring hold; tiers, order and stop rule per plan.
+- Found: the FDG-PET fallback ratio 0.84 is now unique again (P01, which also used 0.84, was changed to 0.83 in this pass). Right-hand automatisms with a right temporal focus are contralateral (a weak sign) and "slightly slurred" postictal speech is dysarthria, not aphasia; no field uses either for localization, so nothing was changed.
+- Changed: nothing in the case. Checks clean for this case.

@@ -49,3 +49,14 @@ None. The anaemia must (gastrointestinal investigation of iron deficiency in an 
 ## Verification
 
 `perfect_agent.py MS-RR-S04 -v`: ok (brain MRI <- initial mri; spine <- followup[0]; labs/AQP4-MOG <- initial labs). Probe: CSF (OCB or kFLC), VEP, OCT, drug check and literature served from the case; CT and FDG-PET from fallbacks. `test_case_guards.py -k MS-RR-S04`: pass. `case_io.py check MS-RR-S04`: schema and synonym guard OK, no failure names S04.
+
+## Verification (adversarial check, 24 Oct 2026)
+
+Adversarial check: read the log, the full diff against the pre-round file (HEAD~1) and the whole final case; checked laterality (exam vs brain and cord lesions vs VEP/OCT), the acute optic neuritis timeline (disc, OCT), lab arithmetic (Hct = RBC x MCV, MCHC), CSF glucose ratio against the serum glucose, red-herring field paths (all resolve), musts against allergies, medications and prohibitions, the differential against the served results, and the any-query literature and drug outputs for leakage. No reviewer notes exist for MS-RR, so the reviewer-note table is complete.
+
+Found and fixed:
+- C minor: the MOGAD differential entry cites "no perineural enhancement", which the brain MRI report never stated (a differential may cite only served results). Added ", without perineural (optic nerve sheath) enhancement" to the post-contrast description of the optic nerve finding in `initial_tool_outputs.mri` (a Kind 2 observation the orbit sequences make). Same class seen outside this batch in the MS-RR-RS03 differential: for the condition lead.
+- C minor: `patient.neurological_exam.reflexes` said "Sustained ankle clonus (4-5 beats)": clonus of 4-5 beats is by definition unsustained. Now "Unsustained ankle clonus (4-5 beats) bilaterally" (wording carried over from the pre-round file).
+Checked and accepted: microcytic anaemia (Hb 10.9, Hct 35.6, MCV 77.6, RBC 4.59; male reference ranges, flags true) is consistent and supports the GI-source must; no pregnancy clause or teriflunomide prohibition in a man; cephalosporin allergy not contradicted; brain volumetrics (3 enhancing brain lesions plus optic nerve) match the findings.
+
+perfect_agent.py: ok (labs/AQP4-MOG same-report warning by design of plan A8). case_io.py check: schema and synonym guard OK, no test failure names the case. test_case_guards.py -k MS-RR-S0: 12 passed.

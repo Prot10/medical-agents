@@ -39,3 +39,14 @@ A 24-year-old woman with a third attack in 18 months (right optic neuritis with 
 ## Open questions for Andrea (judgment calls you could not settle)
 
 None. Decided: the middle cerebellar peduncle lesion was made non-enhancing (rather than raising the count to five) so the impression, the KCE and the plan's "4 enhancing" agree; this changes no region count.
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. Read the whole final case. Confirmed: lesion count 14 = 9 periventricular + 2 juxtacortical + 2 callosal + 1 MCP (13 supratentorial + 1 infratentorial); four enhancing lesions in findings, impression, KCE and must; optic nerve region by MRI T2 signal; three attacks in 18 months consistent across HPI, PMH, KCE and musts; CSF boilerplate and MBP gone, glucose ratio 61/82 = 0.74 matches the CMP; AQP4/MOG rows present and neutral; JCV index 2.84 drives the anti-CD20 preference and the natalizumab prohibition; pre-treatment serology rows exist for the must that uses them; cladribine contraception lines match the SmPC (barrier method during treatment and 4 weeks after the last dose in each treatment year; effective contraception 6 months); ECTRIMS/EAN 2018 and Ho 2017 citations exist as cited; NEDA/DMT lines gone from the KCE.
+
+Found and changed:
+- `followup_outputs[0].output.findings[0].location` and `.impression`: the enhancing, swollen C3-C4 lesion (the active lesion of a right-predominant myelopathy with right Babinski and right vibration loss) had no side. Now "right dorsolateral", matching the ipsilateral pyramidal and dorsal-column signs. No count, region or criterion changes.
+
+Not changed: the patchy right thigh/shin pinprick reduction is a multifocal sensory finding, not a hemicord level, and does not contradict the report.
+
+perfect_agent.py -v: pass. case_io.py check: clean for this case. Guards: pass.

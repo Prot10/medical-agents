@@ -42,3 +42,10 @@ The levodopa trial now reads two tablets of 25/100 three times daily (600 mg/day
 ## Open questions for Andrea (judgment calls you could not settle)
 
 - None specific to this case (plan Q1 applies: PSP kept under the PD prefix). The must to complete the levodopa trial up to 1000 mg/day is a clinical judgment (many movement-disorder services give PSP-RS such a trial before stopping levodopa); it is phrased "up to 1000 mg/day as tolerated" so that the dose ceiling is checkable without forcing a dose the patient cannot tolerate.
+
+## Verification
+Adversarial verifier, 24 Oct 2026. Read the log, the checkpoint diff (b8be2153) and the whole final case. Checked: levodopa 600 mg/day consistent in HPI and medication list; MMSE 25 and MoCA 20 (3+3+5+2+0+2+5) sum, FAS 8 consistent with 3 F-words; MRI figures (midbrain 0.62 cm2, pons 4.8 cm2, diameter ratio 0.47) coherent with PSP; symmetric DaTscan stored and waste; FDG fallback `FDG_PET` with pattern only; drug output (amlodipine with levodopa, calcium with levothyroxine) correct; routing serves the case DaTscan, battery and FDG, and library MIBG, PSG and orthostatic reports that fit the case.
+Found and fixed:
+- C major, `ground_truth.assessment.required_recommendations[0]` and `ground_truth.key_clinical_evidence[2]`: "levodopa resistance" was counted as a supportive feature after 600 mg/day for 4 weeks, while MDS 2017 [Hoglinger_2017] defines levodopa resistance only after at least 1000 mg/day (if tolerated) for at least a month, and must [3] of the same case asks to complete that trial. Rewritten: dysarthria and dysphagia are the supportive clinical clues; levodopa resistance cannot yet be stated.
+- B minor, `ground_truth.differential` (DLB) `key_features`: claimed "no dream enactment", which the case never documents (no sleep history). Now "No visual hallucinations or cognitive fluctuations; the vertical supranuclear gaze palsy and early unprovoked backward falls are not DLB features".
+After the edit: perfect_agent ok; case_io check clean for PD-P03; test_case_guards pass; discriminator_defects empty.

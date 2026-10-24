@@ -42,3 +42,10 @@ The case now rests on the 2024 McDonald criteria. Lesions are in five regions: p
 ## Open questions for Andrea (judgment calls you could not settle)
 
 - None needing Andrea's information. Decided: the exam keeps "No relative afferent pupillary defect" despite a 24 um inter-eye pRNFL difference, since a mild asymmetry can leave the swinging-flashlight test equivocal; change it to "subtle right RAPD" if you prefer. The left leg numbness 8 years ago is treated as a possible but undocumented earlier event, not as a counted attack.
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. Read the log, the diff against `b8be2153^` and the whole final case. Checked: OCT and VEP follow-ups exist with both eyes and match the KCE and expected evidence; the leg-episode/optic-finding mix-up is gone; brain MRI impression has no criteria statements; five-region DIS is correctly stated and the negative CSF (OCB negative, kFLC 1.9) is framed per F3/F6; INO side, diplopia direction (worse on left gaze) and the right dorsal pontine lesion agree; right facial numbness contradiction fixed; smoking dates consistent (quit at 40 = 7 years ago); no T10 in a man; ocrelizumab drug output (antihypertensive withholding before infusion, premedication, HBV, immunoglobulins, live vaccines) correct per label; Dobson 2013 JNNP and other sources exist; differential all low with reasons.
+Found and fixed:
+- B minor, `patient.neurological_exam.cranial_nerves`, `ground_truth.key_clinical_evidence[2]`: the worker left as an open question "No relative afferent pupillary defect" despite right temporal pallor, 20/25 acuity, an inter-eye pRNFL difference of 24 um and GCIPL difference of 16 um. An asymmetry of that size from a prior optic neuropathy normally gives a detectable RAPD, so the exam now reads "Subtle right relative afferent pupillary defect" and the KCE line on the prior subclinical optic neuropathy names it. The open question is resolved; nothing is left for Andrea.
+Re-ran `perfect_agent.py MS-RR-RP04 -v` (pass), `case_io.py check` (clean for the case) and `test_case_guards -k MS-RR-RP04` (pass).

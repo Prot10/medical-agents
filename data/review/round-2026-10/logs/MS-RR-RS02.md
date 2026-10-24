@@ -46,3 +46,9 @@ None. One deviation from the plan's per-case line, decided on the criteria: the 
 ## Verification
 
 `perfect_agent.py MS-RR-RS02 -v`: pass; brain MRI <- `initial_tool_outputs.mri`, spine <- `followup[0] request_spine_mri`, labs and AQP4/MOG <- `initial_tool_outputs.labs` (expected shared-report warning). Brain MRI output contains no T9, C2 or cord lesion text. `case_io.py check`: schema and synonym guard OK, no failure naming MS-RR-RS02. `test_case_guards.py -k MS-RR-RS02`: 2 passed.
+
+## Verification (adversarial verifier, 24 Oct 2026)
+
+Checked against the committed worker version (b8be2153): every own-finding row against the case file (field by field read of the whole final case), the plan tier table (section 3.5), the stop rule, the sequence constraint, laterality and lesion-to-exam fit, timeline, allergies against drug outputs, leakage in the brain MRI (no cord text) and the literature/drug outputs (guards pass), PATTERNS classes (template numbers across RS01-RS06, 2017 facts, test-as-must, F2/F5 wrong facts), and the differential against the final results. No reviewer notes exist for MS-RR, so no note id can be missing. Re-run after the changes below: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, `test_case_guards.py -k` pass.
+
+Found: no error. The DIS count of 4 (not the plan's 5) is correct: the case serves no VEP, OCT or orbital MRI, and the 2024 criteria count the optic nerve on paraclinical evidence; the prior optic neuritis still counts as an attack. Sensory exam now fits a left dorsal column lesion; vitamin D 24 and CSF values are case-specific. Changed: nothing.

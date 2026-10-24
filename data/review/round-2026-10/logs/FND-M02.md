@@ -43,3 +43,8 @@ Levetiracetam, started at an outside ED for presumed seizures, is now on the med
 ## Open questions for Andrea (judgment calls you could not settle)
 
 None. The tremor examination was added because the chief complaint names the tremor and the plan counts entrainment for this case; the new sentence adds no new symptom.
+
+## Verification
+Checked the log against the file (worker edits are in commit b8be2153; diffed against its parent): read the whole final case, the patient-block diff, criteria tiers and order against plan 3.2 and the case entry in plan 4, sequence constraints and stop rule, musts and prohibitions against avoided actions, differential against the returned results, lab arithmetic and ranges, laterality, leak guard. No reviewer notes exist for FND, so there is no note id to account for. perfect_agent.py -v, case_io.py check and test_case_guards pass after my changes.
+Levetiracetam is now on the medication list and in the drug output; the soft constraint video-EEG before drug check has the right direction; P5 carries "or stop it abruptly"; the drug output names the serotonergic, bleeding and sedation pairs and the SSRI hyponatremia that explains Na 132; Hb 12.6 / Hct 38.8 gives MCHC 32.5.
+Found and fixed (E, minor): `patient.neurological_exam.additional` read "Bilateral arms could be gently repositioned and showed resistance to eye opening" (arms cannot resist eye opening). Now: "Her arms could be gently repositioned, and she resisted passive eye opening." Same fact, corrected grammar.

@@ -47,3 +47,13 @@ None. The drug check now addresses the acute steroid course rather than a DMT; t
 ## Verification
 
 `perfect_agent.py MS-RR-S02 -v`: ok (spine <- followup[0]; brain MRI and labs/AQP4-MOG <- initial outputs, probe-confirmed). Probe: CSF (OCB or kFLC), VEP, OCT, drug check, literature served from the case; CT and FDG-PET from case fallbacks. `case_io.py check MS-RR-S02`: schema and synonym guard OK, no failure names S02. `test_case_guards.py -k MS-RR-S02`: pass.
+
+## Verification (adversarial check, 24 Oct 2026)
+
+Adversarial check: read the log, the full diff against the pre-round file (HEAD~1) and the whole final case; checked laterality (exam vs brain and cord lesions vs VEP/OCT), the acute optic neuritis timeline (disc, OCT), lab arithmetic (Hct = RBC x MCV, MCHC), CSF glucose ratio against the serum glucose, red-herring field paths (all resolve), musts against allergies, medications and prohibitions, the differential against the served results, and the any-query literature and drug outputs for leakage. No reviewer notes exist for MS-RR, so the reviewer-note table is complete.
+
+Found and fixed:
+- C minor: the MOGAD differential entry cites "no perineural enhancement", which the brain MRI report never stated (a differential may cite only served results). Added ", without perineural (optic nerve sheath) enhancement" to the post-contrast description of the optic nerve finding in `initial_tool_outputs.mri` (a Kind 2 observation the orbit sequences make). Same class seen outside this batch in the MS-RR-RS03 differential: for the condition lead.
+Checked and accepted: right dorsolateral C3-C4 lesion with the right-predominant paraparesis and right Babinski; right MCP lesion with right heel-to-shin dysmetria; ACE 27 U/L (8-52) cited by the neurosarcoidosis entry exists; ibuprofen GI risk in the steroid check matches the must; iodinated-contrast allergy does not bar gadolinium. The bilateral T10 pinprick level is broader than the two dorsal/dorsolateral cord lesions strictly explain; accepted as usual in MS (clinical level below the lesion, under-detection on MRI), not changed to avoid churn.
+
+perfect_agent.py: ok (labs/AQP4-MOG same-report warning by design of plan A8). case_io.py check: schema and synonym guard OK, no test failure names the case. test_case_guards.py -k MS-RR-S0: 12 passed.

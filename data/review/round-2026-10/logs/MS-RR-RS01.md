@@ -53,3 +53,9 @@ None. Decisions taken: CSF recommended, not required: with four regions DIS is m
 ## Verification
 
 `perfect_agent.py MS-RR-RS01 -v`: pass; brain MRI <- `initial_tool_outputs.mri`, spine <- `followup[0] request_spine_mri`, labs and AQP4/MOG <- `initial_tool_outputs.labs` (expected warning: both criteria answered by the one stored panel, which holds the CBC/B12/TSH/HIV rows and the two CBA rows), CSF <- `initial_tool_outputs.csf`. `case_io.py check`: schema and synonym guard OK, no failure naming MS-RR-RS01 (condition-wide leak failures name P02, S03 and RS05, the last one mine and fixed in its own pass). `test_case_guards.py -k MS-RR-RS01`: 2 passed.
+
+## Verification (adversarial verifier, 24 Oct 2026)
+
+Checked against the committed worker version (b8be2153): every own-finding row against the case file (field by field read of the whole final case), the plan tier table (section 3.5), the stop rule, the sequence constraint, laterality and lesion-to-exam fit, timeline, allergies against drug outputs, leakage in the brain MRI (no cord text) and the literature/drug outputs (guards pass), PATTERNS classes (template numbers across RS01-RS06, 2017 facts, test-as-must, F2/F5 wrong facts), and the differential against the final results. No reviewer notes exist for MS-RR, so no note id can be missing. Re-run after the changes below: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, `test_case_guards.py -k` pass.
+
+Found: no error. Gaze palsy plus LMN facial palsy now localise to the facial colliculus lesion; enhancing lesion count (3) matches the DMT must; vitamin D 21 consistent in labs, summary, red herring and must; ocrelizumab dosing and premedication correct; Polliack, Barak, Achiron 2001 J Am Geriatr Soc is a real paper. Changed: nothing.

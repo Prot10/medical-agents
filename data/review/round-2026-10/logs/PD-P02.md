@@ -47,3 +47,12 @@ The HPI now documents functional decline (his wife manages his finances and medi
 ## Open questions for Andrea (judgment calls you could not settle)
 
 - None specific to this case (plan Q1 applies: DLB kept under the PD prefix). The drug output's `proposed` is "Rivastigmine (proposed)" rather than the plan's generic "Carbidopa-levodopa (proposed)", because a cholinesterase inhibitor, not levodopa, is the next drug in DLB.
+
+## Verification
+Adversarial verifier, 24 Oct 2026. Read the log, the checkpoint diff (b8be2153) and the whole final case. Checked: MMSE 23 (2+3+1+1 lost) and MoCA 19 (2+3+4+2+1+2+5) sum; orthostatic report equals the exam (22/10 mmHg, HR +6); DaTscan, MIBG, FDG and PSG reports state findings only; drug output names only the patient's own medicines; every alternative `low`; musts consistent with the prohibitions and the haloperidol reaction; no literature or ECG criterion; routing (DaTscan, MIBG, FDG, PSG, battery, orthostatic, drug for levodopa and rasagiline) serves the case outputs.
+Found and fixed one timeline error repeated in four fields: the case stated that the dementia preceded the parkinsonism "by more than a year", but the functional decline began about 12 months ago and the parkinsonism about 8 months ago; only the hallucinations and fluctuations (about 24 months) precede it by more than a year. The one-year rule needs dementia before or within a year of the parkinsonism, which the case meets.
+- `ground_truth.assessment.required_recommendations[0]`: "with the hallucinations and fluctuations beginning about 16 months and the functional decline about 4 months before the parkinsonism (dementia before parkinsonism: DLB, not PDD)".
+- `ground_truth.differential[0].key_features` (PDD): same timeline correction.
+- `ground_truth.red_herrings[0].correct_interpretation`: "Hallucinations and fluctuations preceded the parkinsonism by more than a year, the dementia preceded it, and there is no rest tremor".
+- `metadata.key_teaching_point`: the one-year rule stated correctly (dementia before or within a year of the parkinsonism).
+After the edit: perfect_agent ok; case_io check clean for PD-P02; test_case_guards pass; discriminator_defects empty.

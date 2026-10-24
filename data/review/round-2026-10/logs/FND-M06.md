@@ -40,3 +40,8 @@ This is a dual-diagnosis case: established right temporal lobe epilepsy with mes
 ## Open questions for Andrea (judgment calls you could not settle)
 
 None. M-PSY reads "assess and treat any comorbid anxiety or depression" because the case documents distress but no named psychiatric diagnosis. The added prohibition on stopping levetiracetam mirrors M-EPI and closes the obvious wrong turn after a functional diagnosis.
+
+## Verification
+Checked the log against the file (worker edits are in commit b8be2153; diffed against its parent): read the whole final case, the patient-block diff, criteria tiers and order against plan 3.2 and the case entry in plan 4, sequence constraints and stop rule, musts and prohibitions against avoided actions, differential against the returned results, lab arithmetic and ranges, laterality, leak guard. No reviewer notes exist for FND, so there is no note id to account for. perfect_agent.py -v, case_io.py check and test_case_guards pass after my changes.
+Dual diagnosis handled consistently: M-EPI, the M06 wording of P5, P6 and M-RESCUE, the added prohibition of stopping levetiracetam, the abnormal EEG with the new-type event without ictal change, the case MRI fallback showing the known right MTS, malingering low with the disability claim named. The removal of the labs criterion matches the plan (level already in the HPI).
+Found and fixed (C, minor): M-COMM (`ground_truth.assessment.required_recommendations[2]`) said "show the positive signs", but he has no functional sign and no event was observed at the bedside. Now "explain how the recorded new event differs from his epileptic seizures".

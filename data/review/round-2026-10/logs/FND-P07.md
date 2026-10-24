@@ -43,3 +43,13 @@ None open. Decisions taken and their reasons:
 - MRI criterion `{}` instead of the plan's `{contrast: false}`: the tool has no schema default for `contrast`, so `{contrast: false}` fails an agent that orders an MRI without naming contrast, which is a correct order. Gadolinium without indication stays prohibited (P7).
 - M-PSY added (the plan lists DX, COMM, PHYSIO): her treated depression and acute grief are a treatment target, which is the plan's own condition for M-PSY.
 - `avoid-waste-datscan` and its DaTscan fallback are not in the plan; added because a DaTscan is the over-investigation this case invites.
+
+## Verification
+
+Adversarial check (24 Oct 2026) of the log against the case and against the pre-round version (`b8be2153^`). What I checked: the corrected timeline (husband diagnosed 3 months ago in the social history, onset about 2 months later, a 4-week history: consistent); MoCA 26/30 no longer called impaired; the DaTscan fallback laterality (right-predominant PD, so the left putamen is the more affected: correct) and that the MockServer serves it only for a `DaTscan` order (the discriminator guard applies, so FDG-PET and other modalities are not answered with it); `monitor_type` and `echo_type` values; "continue the dopaminergic regimen unchanged" against the prohibition on increasing it (consistent); the MRI criterion `{}` against P7 (gadolinium still prohibited); the exam -> MRI constraint; every log claim marked FIXED.
+
+Found and changed:
+- `patient.neurological_exam.coordination`, `initial_tool_outputs.clinical_assessment.findings[Distractibility]`, `ground_truth.key_clinical_evidence[0]`: the left arm ataxia "resolves with attention" contradicted the sign it was filed under (distractibility means the deficit improves when attention is drawn away). Changed to "resolves with distraction" in all three places.
+- `initial_tool_outputs.literature_search...summary`: same mismatch as in M09 (summary claims video-EEG and antiseizure-taper evidence that none of the four motor rows carries); replaced with a summary of the rows returned.
+
+Left as is: the left arm weakness (3/5) has no arm-specific rule-in sign; the functional diagnosis rests on the entraining, distractible tremor and the dragging monoplegic gait on the same side, which the M-DX must states. Checks re-run after the changes: `perfect_agent.py -v` ok, `case_io.py check` clean for this case (schema, synonym guard, no failing test names it), `test_case_guards.py -k` passed. The diagnosis label, `icd_codes` and synonyms are unchanged from before the round; no new em dashes or `Stone_2018` strings.

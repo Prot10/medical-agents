@@ -36,3 +36,10 @@ A 26-year-old woman with five days of severe painful left optic neuritis (hand m
 ## Open questions for Andrea (judgment calls you could not settle)
 
 - None.
+
+## Verification
+Adversarial verifier, 24 Oct 2026. Read the log, the diff and the whole final case. No reviewer notes exist for MS-RR; the table correctly says so.
+Checked: reframing from "CIS by 2017 OCB substitution" to two attacks with 5 of 5 regions is correct under the 2024 criteria and matches the reports (four PV, left parietal JC, dorsal pons, right dorsolateral C5-C6 fitting the earlier right arm and trunk episode, left optic nerve on MRI and VEP); normal OCT at day 5 is correct (F7); AQP4/MOG required and in the stop rule (hand-motion acuity); musts and prohibitions consistent (COC contraception discussion, ONTT low-dose prednisolone prohibition, teriflunomide/cladribine contraception); drug check facts match F11; literature general and correctly cited; differential all low with reasons.
+Found and fixed:
+- The CNS vasculitis entry of the differential cites "ESR/CRP normal", but the stored labs contained no ESR or CRP (the pre-round criterion had required them while the report never carried them). Added an "Inflammatory markers" panel (ESR 10 mm/hr, CRP 0.2 mg/dL, both normal) to `initial_tool_outputs.labs.panels` and named ESR and CRP in the labs criterion's expected evidence.
+Checks re-run after the changes: `perfect_agent.py -v` pass, `case_io.py check` clean for the case, `test_case_guards.py -k` (leak, follow-up, banned strings) pass.

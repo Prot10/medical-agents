@@ -39,3 +39,9 @@ A 31-year-old paralegal with migraine, anxiety and a past BPPV episode, 8 months
 
 - None needing Andrea. As in P01, plan F4's statement that the 2024 criteria list migraine among conditions needing extra evidence was not verified, so the case calls the cord lesion "valuable supporting evidence" as clinical prudence, not a criteria requirement.
 - The exam's "Lhermitte sign not tested as there is no clinical suspicion of cervical spine pathology" is kept as realistic examiner bias despite the bilateral hand paresthesias; a reviewer may prefer it tested and negative.
+
+## Verification
+Adversarial verifier, 24 Oct 2026. Read the log, the diff and the whole final case. No reviewer notes exist for MS-RR; the table correctly says so.
+Checked: HPI aligned with the paralegal occupation; future MRI and SSEP stub gone; the index MRI carries an enhancing ovoid left periventricular and an enhancing right dorsal pontine lesion (fits the vertigo and end-gaze nystagmus) beside the original foci, and the impression counts them correctly; dorsal C3-C4 lesion fits the bilateral fingertip tingling; VEP right P100 118 ms; DIS 4 of 5 and DIT by enhancement match the reports; the leaking empty drug block was replaced by a real check against all three medicines and the allergy; literature output general (Dobson 2013, McDonald 2024) with no patient-specific conclusion; labs indices consistent (4.2 x 88.6 = 37.2); CSF negative with kFLC 2.1; tiers, order, stop rule per plan; musts (no steroids now, fatigue, driving) appropriate; differential all low with the case's own reasons.
+Found: nothing requiring a change. The kept "Lhermitte sign not tested" is a defensible realism choice, as the worker logged.
+Checks re-run after the changes: `perfect_agent.py -v` pass, `case_io.py check` clean for the case, `test_case_guards.py -k` (leak, follow-up, banned strings) pass.

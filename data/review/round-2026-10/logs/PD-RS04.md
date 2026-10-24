@@ -42,3 +42,11 @@ This case was a copy of RS03 (same surname, history, medicines and a subacute co
 ## Open questions for Andrea (judgment calls you could not settle)
 
 - Plan Q3 applies (RS03 and RS04 rewritten to typical PD rather than dropped). The seed (`metadata.source_pmcid` PMC8271262) no longer describes the case content; the provenance field was kept as the seed record.
+
+## Verification (adversarial verifier, 24 Oct 2026)
+- Read the log, the diff and the whole final case (C21 and C22 rewrite: high risk). No PD notes file exists.
+- Checked: surname Ortega (not Delgado), no bypass or cholecystectomy anywhere (PMH, drug output, differential, metadata); doses differ from RS03; 20-month history, no falls, no vertigo, narrow-based gait, right-predominant signs; orthostatic figures consistent across exam, differential and evidence; MoCA 24 with six points listed, matching the stored battery; labs criterion panel names (`vitamin_B12`, `TSH`, `thyroid`) in the vocabulary and the stored values match its expected evidence; metoclopramide red herring and duplicate DIP entry gone; probable PD.
+- Found and FIXED:
+  - `ground_truth.differential` (DLB) `key_features` claimed "parkinsonism for 20 months before any cognitive complaint"; the HPI does not date the memory complaint, so the timing was unsupported. Reduced to what the case shows: no dementia (manages finances and medications), no fluctuations, hallucinations or dream enactment.
+  - `initial_tool_outputs.mri.findings[0].signal_characteristics.T2` read "No focal or confluent signal abnormalities" while `findings[1]` reports punctate white matter hyperintensities (internal inconsistency). Now limited to the deep grey nuclei, brainstem and cerebellum.
+- Checks re-run after verification: `perfect_agent.py -v` pass; `case_io.py check` schema OK, no failure names the case; `test_case_guards -k` pass; MockServer routing: DaTscan, MIBG and amyloid return their own modality (case or library), PSG and battery return the case report where stored, `check_drug_interactions` with `drug: levodopa` and `drug: rasagiline` return the case output, labs route to the stored panel where one exists; grep for established / gadolinium / "Abnormal values:" / Lewy / serotonin syndrome / Tier per / July 2026 / dashes: only allowed hits.

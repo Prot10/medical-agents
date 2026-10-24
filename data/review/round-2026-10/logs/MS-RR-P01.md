@@ -36,3 +36,11 @@ A 25-year-old woman with migraine, 18 months of vertigo episodes labelled vestib
 ## Open questions for Andrea (judgment calls you could not settle)
 
 - None needing Andrea. Decision recorded: plan F4 lists migraine among the conditions for which the 2024 criteria recommend additional evidence. I could verify only the age over 50 and vascular risk factor wording, so the case states it as clinical prudence ("migraine-type foci call for supporting evidence") and the literature output keeps to the verified wording. The lead may want to recheck the Montalban 2025 text and align P02/P03.
+
+## Verification
+Adversarial verifier, 24 Oct 2026. Read the log, the diff and the whole final case. No reviewer notes exist for MS-RR; the table correctly says so.
+Checked: the future MRI is gone and the index MS-protocol MRI now carries the typical lesions (enhancing ovoid right periventricular, left MCP for the vertigo) beside the original foci; impression neutral; right dorsolateral C3-C4 lesion fits the right hand clumsiness; VEP now has a prolonged absolute latency; DIS 4 of 5 and DIT by enhancement match the reports; OCB negative and kFLC below cutoff kept as the trap with a prohibition against excluding MS on negative CSF; no AQP4/MOG criterion or stored result (plan 3.2); false topiramate-lymphopenia line gone; no-steroids must correct for a mild resolving relapse (NICE NG220); the worker's handling of the unverified migraine wording in F4 is prudent.
+Found and fixed:
+- `initial_tool_outputs.mri.impression` item 3 counted "five small foci" and then added the left periventricular focus as a sixth, while the findings list five: reworded to "Five small foci: four subcortical/deep ... and a 3 mm left periventricular focus"; the brain MRI criterion's expected evidence follows.
+- `patient.clinical_history.social_history.occupation` "marketing analyst" contradicted the HPI (graduate programme, typing her dissertation, graduate school stress, lives near campus): "Graduate student writing her dissertation" (pre-existing inconsistency the worker missed; P02 had the same class and was fixed).
+Checks re-run after the changes: `perfect_agent.py -v` pass, `case_io.py check` clean for the case, `test_case_guards.py -k` (leak, follow-up, banned strings) pass.

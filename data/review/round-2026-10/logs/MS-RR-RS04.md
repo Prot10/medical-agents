@@ -45,3 +45,9 @@ None. The plan's "DIT by the enhancing pontine lesion" is applied; CSF stays opt
 ## Verification
 
 `perfect_agent.py MS-RR-RS04 -v`: pass; brain MRI <- initial MRI, spine <- `followup[0]`, labs <- initial labs. Brain MRI output has no C5 or cord lesion text. `case_io.py check`: schema and synonym guard OK, no failure naming MS-RR-RS04. `test_case_guards.py -k MS-RR-RS04`: 2 passed.
+
+## Verification (adversarial verifier, 24 Oct 2026)
+
+Checked against the committed worker version (b8be2153): every own-finding row against the case file (field by field read of the whole final case), the plan tier table (section 3.5), the stop rule, the sequence constraint, laterality and lesion-to-exam fit, timeline, allergies against drug outputs, leakage in the brain MRI (no cord text) and the literature/drug outputs (guards pass), PATTERNS classes (template numbers across RS01-RS06, 2017 facts, test-as-must, F2/F5 wrong facts), and the differential against the final results. No reviewer notes exist for MS-RR, so no note id can be missing. Re-run after the changes below: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, `test_case_guards.py -k` pass.
+
+Found: (1) vitamin B12 512 pg/mL copied from RS02/RS03: now 538 pg/mL (no other field repeats it). (2) The IIH differential said "no headache" although the patient takes acetaminophen for occasional headaches: now "no new or positional headache (only his usual occasional headaches), no transient visual obscurations". Contralateral spinothalamic loss below a left lateral C5-C6 lesion, the fascicular sixth nerve lesion and the 3-region DIS with MRI DIT are correct; no AQP4/MOG per plan. Changed: the two fields above.

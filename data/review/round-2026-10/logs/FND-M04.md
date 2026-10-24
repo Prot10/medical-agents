@@ -37,3 +37,11 @@ This is a purely paroxysmal case (eyelid flutter with brief unresponsiveness, so
 ## Open questions for Andrea (judgment calls you could not settle)
 
 None. `metadata.notes` (an authoring note from generation) was left as it is.
+
+## Verification
+Checked the log against the file (worker edits are in commit b8be2153; diffed against its parent): read the whole final case, the patient-block diff, criteria tiers and order against plan 3.2 and the case entry in plan 4, sequence constraints and stop rule, musts and prohibitions against avoided actions, differential against the returned results, lab arithmetic and ranges, laterality, leak guard. No reviewer notes exist for FND, so there is no note id to account for. perfect_agent.py -v, case_io.py check and test_case_guards pass after my changes.
+Purely paroxysmal case with no limb sign: the structured exam counts 0 signs, the EEG carries hyperventilation, photic stimulation and eye closure, no PHYSIO must, no MRI or lab criterion, absence epilepsy or eyelid myoclonia added low. The CT fallback granuloma removal is justified (an unscored epileptogenic lesion).
+Found and fixed:
+- (C, minor) M-COMM (`ground_truth.assessment.required_recommendations[1]`) said "show the positive signs", but this patient has none. Now "show how the recorded event and the normal EEG support it".
+- (B, minor) `ground_truth.red_herrings[1].correct_interpretation` said "Diagnosis requires positive rule-in signs on examination", contradicting the case (diagnosis rests on the recorded event). Now: "The diagnosis rests on the habitual event recorded on video-EEG without ictal change; the anxiety is a treatment target."
+Left as is: `red_herrings[0]` combines the febrile convulsions (past medical history) and the aunt (family history) under the family-history field path; the schema allows one path, and the content is correct.

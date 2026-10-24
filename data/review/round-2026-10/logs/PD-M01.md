@@ -43,3 +43,12 @@ This 70-year-old man has mildly left-predominant akinetic-rigid parkinsonism wit
 ## Open questions for Andrea (judgment calls you could not settle)
 
 - None specific to this case (plan Q1 to Q6 apply).
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. No notes file exists for PD, so there is no note id to account for. Read the whole final case, the diff against the pre-round version (`b8be2153^`) and every own-finding row. Checked: the HPI edit (only the gastroparesis clause changed); timeline (gastroparesis 2 years, metoclopramide 18 months, motor history 12 months); laterality (worse left side, right putaminal SBR 1.08 against left 1.32); the orthostatic report (supine values equal the vitals, fall 12/6 mmHg, no OH); the PSG figures against their flags and the C10 impression; the battery against the exam MoCA losses; drug output against the medication list (all six drugs addressed, no copy of the expected evidence, leak guard passes); differential all low after the work-up; stop rule, sequence constraint and tiers against plan section 3 and the M01 entry. All logged FIXED rows hold in the file.
+
+Found and changed:
+- `ground_truth.avoided_actions` `avoid-waste-5-analyze-ecg` (ECG as waste) contradicted the must "domperidone where available after an ECG for the QTc", and its own rationale ("an ECG is needed only if domperidone is chosen") admitted it: an agent ordering the baseline ECG for the recommended prokinetic would be penalised. Removed the entry (ECG is neither a criterion nor waste; the normal fallback ECG answers it). Same change in M02 and M03.
+
+Not changed: the diagnostic must keeps the plan's canonical "RBD is not a drug effect" although the PSG is optional; the dream enactment in the history is clinical probable RBD and the evidence lines describe it as such. Checks after the verification edits: `perfect_agent.py -v` passes, `case_io.py check` names no failure for this case, `test_case_guards` pass.

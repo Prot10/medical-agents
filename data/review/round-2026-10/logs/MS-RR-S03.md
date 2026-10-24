@@ -47,3 +47,14 @@ None.
 ## Verification
 
 `perfect_agent.py MS-RR-S03 -v`: ok. Probe: every criterion's tool served from the case (CSF by OCB or kFLC, VEP, OCT, drug check, literature); CT and FDG-PET from fallbacks. `test_case_guards.py -k MS-RR-S03`: pass (the leak failure is gone). `case_io.py check MS-RR-S03`: schema and synonym guard OK, no failure names S03.
+
+## Verification (adversarial check, 24 Oct 2026)
+
+Adversarial check: read the log, the full diff against the pre-round file (HEAD~1) and the whole final case; checked laterality (exam vs brain and cord lesions vs VEP/OCT), the acute optic neuritis timeline (disc, OCT), lab arithmetic (Hct = RBC x MCV, MCHC), CSF glucose ratio against the serum glucose, red-herring field paths (all resolve), musts against allergies, medications and prohibitions, the differential against the served results, and the any-query literature and drug outputs for leakage. No reviewer notes exist for MS-RR, so the reviewer-note table is complete.
+
+Found and fixed:
+- C minor: the MOGAD differential entry cites "no perineural enhancement", which the brain MRI report never stated (a differential may cite only served results). Added ", without perineural (optic nerve sheath) enhancement" to the post-contrast description of the optic nerve finding in `initial_tool_outputs.mri` (a Kind 2 observation the orbit sequences make). Same class seen outside this batch in the MS-RR-RS03 differential: for the condition lead.
+- B minor (pathway order, ruling 5): the general literature output still sat in `initial_tool_outputs.literature_search`, so the review app showed a literature search as part of the initial work-up, unlike S01, S02 and S04-S06. Moved unchanged to a last follow-up (`search_medical_literature`, trigger `search_mcdonald_criteria`) and set the initial entry to null; a direct environment probe confirms any literature query still returns that output (not the generic fallback), and the leak guard passes.
+Checked and accepted: left C3-C4 dorsal/lateral lesion with left leg pyramidal signs; left MCP with left heel-to-shin ataxia; no NSAID in any must (NSAID allergy); ocrelizumab check content correct (HBV, immunoglobulins, live vaccines, premedication); vitamin D herring path resolves to the 16 ng/mL row.
+
+perfect_agent.py: ok (labs/AQP4-MOG same-report warning by design of plan A8). case_io.py check: schema and synonym guard OK, no test failure names the case. test_case_guards.py -k MS-RR-S0: 12 passed.

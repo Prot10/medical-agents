@@ -42,3 +42,14 @@ A 29-year-old Turkish man with two weeks of binocular horizontal diplopia from a
 
 - The plan does not ask for a relapse-treatment must here. I added methylprednisolone because constant binocular diplopia affects function (NICE NG220). If you consider an isolated sixth nerve palsy mild enough to observe, change it to "offer or discuss".
 - No AQP4/MOG result is stored (plan: no criterion). An agent that orders the antibodies gets no stored value; NMOSD and MOGAD are kept low on clinical and imaging grounds.
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. Read the whole final case. Confirmed: future repeat MRI and the MG stub deleted; no T10 (male); spine lesion right dorsal column C5-C6 explains the transient right hand tingling; DIS 4 of 5 (PV, JC, IT, cord) identical in must, KCE, criteria and metadata; CSF IgG index 0.64 within 0.28-0.66 and called normal; kFLC 14.8 added; glucose ratio 61/92 = 0.66 matches the BMP; keratoconus timeline (age 22, seven years ago at 29) and left acuity 20/20 fixed; differential carries MG, microvascular palsy and neuro-Behcet with case features; literature sources (Thomke 1997 JNNP, Peters 2002 Ophthalmology, Montalban 2025) exist as cited; drug output lists real lines.
+
+Found and changed:
+- Lesion location wording in `initial_tool_outputs.mri.findings[2].location`, `.impression`, `.additional_observations[0]`, `ground_truth.action_criteria[0].expected_evidence`, `key_clinical_evidence[1]` and `[2]`: "left dorsal paramedian pons" places the lesion at the abducens nucleus, which gives an ipsilateral horizontal gaze palsy (usually with a facial palsy), not the isolated abduction deficit in the exam. Now "left paramedian pons, in the region of the left abducens fascicle" everywhere (fascicular lesion, consistent with the isolated sixth nerve palsy and the normal face).
+
+Open questions in this log, resolved by the verifier: (1) the methylprednisolone must stays: constant binocular diplopia that stops him driving and working affects function, which is the NICE NG220 threshold; (2) no AQP4/MOG result is stored, per plan A8 (no optic neuritis, myelitis attack or other red flag); NMOSD and MOGAD are low on imaging and CSF grounds. Note for CENTRAL: an AQP4/MOG order in this case returns the stored panel without those analytes (the lab merge does not answer analytes absent from the case); that is a library/harness behaviour, not a case edit.
+
+perfect_agent.py -v: pass. case_io.py check: clean for this case. Guards: pass.

@@ -40,3 +40,9 @@ This 71-year-old man has a 2.5-year right-sided tremor-onset parkinsonism (pill-
 ## Open questions for Andrea (judgment calls you could not settle)
 
 - None specific to this case (plan Q1 to Q6 apply).
+
+## Verification
+- Checked against the committed rewrite (diff from b8be2153^, field by field), plans/PD.md section 4 entry and classes C1 to C23. No notes file exists for PD, so there is no note id to account for. Tools re-run 24 Oct 2026: perfect_agent ok, case_io check (no failure names the case), test_case_guards pass (leak, followup, banned strings), and a MockServer routing script (MRI or CT, DaTscan, MIBG, amyloid, FDG, PSG, battery, orthostatic BP, labs, ECG, drug check for levodopa and for rasagiline).
+- Confirmed every row: literature removed; drug output names tamsulosin, amlodipine and naproxen with aspirin; MRA line gone; PSG rewritten in full with correct flag directions (efficiency 79% and TST 342 min abnormal, RSWA 36% above the SINBAR threshold, AHI 3.9 and PLMI 13 normal) and served for `polysomnography`; battery MoCA 27/30 matches the exam (letter-fluency point lost, phonemic fluency low-average); DaTscan left putamen worse; DLB added `very_low` on exam data only; key_educational_points[0] corrected.
+- Found and fixed one consistency error the worker left when editing the same field: `patient.neurological_exam.sensory` still began "Intact to ... vibration ... in all extremities" and then reported reduced vibration at both great toes. Now: "Intact to light touch, pinprick, temperature and proprioception in all extremities. Vibratory sense intact except mildly reduced at both great toes." No other field depends on it.
+- Musts do not depend on the optional PSG result (the RBD-safety must rests on the witnessed dream enactment in the HPI); melatonin-before-clonazepam at 71 is consistent with the AASM 2023 RBD guideline, where both are conditional and clonazepam carries sedation and fall risk.

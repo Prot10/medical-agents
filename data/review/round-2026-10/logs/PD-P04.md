@@ -40,3 +40,10 @@ The policy now requires MRI and copper studies (ceruloplasmin, serum copper or 2
 ## Open questions for Andrea (judgment calls you could not settle)
 
 - None specific to this case. Deviation from the plan's canonical DaTscan sentence: "(contralateral to the clinically worse side)" was left out of the report text, because TOOL_REPORT_STYLE_GUIDE forbids a report citing the exam; the side is consistent with the right-sided signs.
+
+## Verification
+Adversarial verifier, 24 Oct 2026. Read the log, the checkpoint diff (b8be2153) and the whole final case. Checked: copper studies required with one-item alternatives and each copper order routes to the case labs (MockServer probe); values within range (ceruloplasmin 28 mg/dL, serum copper 88, urine 28 microg/24h) and repeated identically in criterion, musts, differential and evidence; slit-lamp in the exam; DaTscan deficit in the left putamen for right-sided signs, asymmetry index 42% arithmetically correct; PSG matches the two witnessed episodes; diagnostic must is clinically probable PD with rest tremor as the only supportive criterion and no red flag; no prohibition or evidence depends on the optional DaTscan.
+Found and fixed:
+- B minor, `ground_truth.differential[1].key_features` (dopa-responsive dystonia): "without diurnal fluctuation" asserted a history the case does not contain. Now "Onset at 41 with no dystonic posturing on examination (dopa-responsive dystonia usually begins in childhood with foot dystonia); ...".
+- B minor, `metadata.key_educational_points[2]`: said a degenerative-versus-functional differential "is active", contradicting the DaTscan criterion rationale (parkinsonism clinically clear, scan optional). Reworded to match the rationale.
+After the edit: perfect_agent ok; case_io check clean for PD-P04; test_case_guards pass; discriminator_defects empty.

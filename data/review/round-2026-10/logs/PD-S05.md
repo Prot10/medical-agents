@@ -40,3 +40,9 @@ This 67-year-old man has an 18-month right-predominant tremor-onset parkinsonism
 ## Open questions for Andrea (judgment calls you could not settle)
 
 - None specific to this case (plan Q1 to Q6 apply).
+
+## Verification
+- Checked against the committed rewrite (diff from b8be2153^, field by field), plans/PD.md section 4 entry and classes C1 to C23. No notes file exists for PD, so there is no note id to account for. Tools re-run 24 Oct 2026: perfect_agent ok, case_io check (no failure names the case), test_case_guards pass (leak, followup, banned strings), and a MockServer routing script (MRI or CT, DaTscan, MIBG, amyloid, FDG, PSG, battery, orthostatic BP, labs, ECG, drug check for levodopa and for rasagiline).
+- Confirmed every row: all claims of a levodopa response and of validated hyposmia removed (grep for "established", "dramatic", "supportive" in clinical fields finds only the probable-PD wording); SWI nigrosome remark now on the left, contralateral to the right-sided signs, and restated in the MRI evidence with `[Schwarz_2014]`; DaTscan optional, binary report, left putamen 0.98, routed by modality despite its long trigger; soft MRI-before-DaTscan constraint with both ids present; ET `low`; both red herrings point to real fields; the only patient change is the em dash and the "though" wording in the HPI.
+- Key evidence and musts cite no optional result (the DaTscan laterality line is gone). Library battery (MoCA 28) agrees with the exam MMSE 29/30; library PSG agrees with the denial of dream enactment.
+- Found nothing to correct. No change made.

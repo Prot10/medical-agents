@@ -37,3 +37,9 @@ This 65-year-old man has a 2-year right-predominant tremor-onset parkinsonism (p
 ## Open questions for Andrea (judgment calls you could not settle)
 
 - None specific to this case (plan Q1 to Q6 apply).
+
+## Verification
+- Checked against the committed rewrite (diff from b8be2153^, field by field), plans/PD.md section 4 entry and classes C1 to C23. No notes file exists for PD, so there is no note id to account for. Tools re-run 24 Oct 2026: perfect_agent ok, case_io check (no failure names the case), test_case_guards pass (leak, followup, banned strings), and a MockServer routing script (MRI or CT, DaTscan, MIBG, amyloid, FDG, PSG, battery, orthostatic BP, labs, ECG, drug check for levodopa and for rasagiline).
+- Every row of the Own findings table was confirmed in the file: literature criterion, follow-ups and outputs gone; drug criterion `{}` optional with one stored output naming tamsulosin and lisinopril; MRI `{}` with evidence restating the report (Evans 0.28, no swallow-tail claim); FLAIR contradiction and hot cross bun placement fixed; ET `low`; red herring path `family_history[3]` correct; stored DaTscan left putamen worse (contralateral to the right-sided signs); DaTscan, autonomic and tilt waste; ECG fallback 71/min matches vitals; stop rule MRI only, 2 extra actions.
+- Hunted for introduced errors: no claim of established PD, levodopa response, constipation or hyposmia (the HPI denies constipation and none is claimed); no red flag in the data; musts consistent with allergy (latex only) and medicines; library defaults that the agent can reach (PSG normal, battery MoCA 28, orthostatic BP normal, MIBG normal) agree with the patient block (no dream enactment, MMSE 28/30, no orthostatic symptoms). Patient block unchanged.
+- Found nothing to correct. No change made.

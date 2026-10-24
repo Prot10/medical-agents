@@ -38,3 +38,9 @@ This 67-year-old man has a 2.5-year right-predominant tremor-onset parkinsonism 
 ## Open questions for Andrea (judgment calls you could not settle)
 
 - None specific to this case (plan Q1 to Q6 apply).
+
+## Verification
+- Checked against the committed rewrite (diff from b8be2153^, field by field), plans/PD.md section 4 entry and classes C1 to C23. No notes file exists for PD, so there is no note id to account for. Tools re-run 24 Oct 2026: perfect_agent ok, case_io check (no failure names the case), test_case_guards pass (leak, followup, banned strings), and a MockServer routing script (MRI or CT, DaTscan, MIBG, amyloid, FDG, PSG, battery, orthostatic BP, labs, ECG, drug check for levodopa and for rasagiline).
+- Confirmed every row: literature removed; drug output names tamsulosin and amlodipine; gadolinium and "history of hypertension" lines gone; battery MoCA 27/30 matches the exam (TMT-B low-average for the visuospatial/executive point); DaTscan left putamen worse; ECG 69/min matches vitals; red herring path `family_history[1]` and text match the patient block.
+- Verified the data the musts and evidence cite: driving concern (`social_history.driving`), constipation and self-reported smell loss (HPI paragraph 3), no falls, no dream enactment, manages finances. No supportive-criterion overcall.
+- Found nothing to correct. No change made.

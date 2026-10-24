@@ -1,0 +1,43 @@
+# FEPI-TEMP-RS05
+Reviewer status: no reviewer notes for FEPI-TEMP (R1 and R2 never reviewed this condition in a notes round) | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| (none) | n/a | No reviewer notes for this case. Physician input applied: the July 2026 tool guidance for focal_epilepsy_temporal via plans/FEPI-TEMP.md. |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| B | major | `initial_tool_outputs.mri` (classes E, U) | "Reduced by approximately 28%" with 1.9 vs 3.2 cm3 (41%); asymmetry index +0.25 for a smaller left hippocampus although the condition's definition is (L - R)/(L + R) (gives -0.25); gadolinium lines in an HS case; threshold teaching. | FIXED: size "41% smaller"; index -0.25 ((L - R)/(L + R)); technique line, no gadolinium; numbered impression. Volumes kept (RS04 moved to 1.7 and S04 to 1.8, so 1.9 is now unique to this case). |
+| C | major | `initial_tool_outputs.labs` (class M) | Prolactin 42.6 about 7 h after the seizure, flagged abnormal (fact 11); commentary inside `abnormal_values_summary`. | FIXED: prolactin row and mentions deleted; summary and interpretation in panel voice. Red herring path `initial_tool_outputs.labs.panels.BMP[6]` verified (glucose 138). |
+| B | minor | `initial_tool_outputs.eeg` (class K) | Limitations "Prolonged monitoring recommended if clinical evaluation warrants"; sharp waves "every 2-3 minutes" called frequent (ACNS: occasional). | FIXED: recording's own limits; frequency 1-2 per minute. |
+| D | minor | `initial_tool_outputs.ecg` | Template `clinical_correlation` ("does not diagnose epilepsy") and an interpretation about loss of consciousness (cross-modality). | FIXED: empty correlation; categorical interpretation with rate. |
+| B | minor | `fallback_tool_outputs.ecg` | A second, different ECG (rate 84) stored as fallback while the initial ECG exists. | FIXED: fallback set to null; `metadata.fallback_tool_kinds.ecg` removed. |
+| D | major | `followup_outputs` literature (classes A, O) | "Glauser ... updated Epilepsia 2017;58:1235-1268" (does not exist); "lamotrigine and levetiracetam Level A, oxcarbazepine Level A" (wrong, fact 6); Engel 2003 with an invented title. | FIXED: Glauser 2013 with correct levels, SANAD II 2021, Fisher 2014 definition, Fisher 2017 classification, all with real titles; general summary; query reworded; trigger `search_literature_initial_monotherapy_focal_seizures`; last in the pathway. |
+| C | minor | `followup_outputs` drug check | Quoted the patient's creatinine; mood warning tied to "diabetes-related stressors"; no sulfonamide-zonisamide or HLA content. | FIXED: interactions with metformin and amlodipine; zonisamide contraindicated with sulfonamide allergy; HLA-B*15:02 and sodium for carbamazepine and oxcarbazepine; renal threshold stated generally. |
+| A | major | `ground_truth.action_criteria` (classes A, B, D, E, H, T) | MRI `{contrast: true, protocol: epilepsy}`; literature and drug check required; ECG required with template evidence; labs optional with the template; doubled citations; rationales equal labels. | FIXED: order labs, ECG, MRI, EEG, drug check, literature. Labs recommended (glucose, sodium, calcium) [NICE_NG217_2025]; ECG optional; MRI `{protocol: epilepsy}` required [ILAE_MRI_2019]; routine EEG required [IFCN_ILAE_EEG_2023]; drug check optional [CPIC_2018]; literature optional [SANAD2_2021]; case-specific text. |
+| A | minor | `ground_truth.sequence_constraints`, `.stop_rule` (classes C, D) | Template MRI -> drug check constraint with the drug check now optional; stop rule with literature, drug check and ECG, max 0. | FIXED: constraint deleted; stop rule MRI, EEG, max 2. |
+| C | major | `ground_truth.assessment` (class L) | Musts were insight or work-up steps (recognize aura, 3T MRI, confirm concordance, verify glucose); oxcarbazepine prohibition; generic LP prohibition; duplicated driving lines; no HLA, SUDEP or valproate line. | FIXED: musts: first-line lamotrigine or levetiracetam, HLA-B*15:02 before carbamazepine or oxcarbazepine, sodium monitoring if they are used, driving, SUDEP. Prohibitions: reflux attribution (kept), valproate (canonical, he is 52), zonisamide (sulfonamide allergy). |
+| C | minor | `ground_truth.differential` (class P) | "First unprovoked seizure of unknown etiology" is not an alternative once the auras are recognized; panic attacks (raised by "work stress" and fear) absent; hypoglycemia ICD with coma. | FIXED: panic attacks and convulsive syncope `low`; hypoglycemia (E11.649), PNES, genetic generalized epilepsy `very_low`; each names the excluding finding. |
+| C | major | `ground_truth.key_clinical_evidence` (classes G, plan RS05) | "ILAE 2017 criteria ... even after a single convulsion" (the recurrent auras already meet the two-seizure definition); overstated amlodipine interaction; engineering lines. | FIXED: five statements; definition per [ILAE_def_2014]; amlodipine line replaced by the HLA and interaction choice. |
+| C | minor | `ground_truth.avoided_actions` (class I) | Template rationales. | FIXED: case-specific rationales; CT waste kept (back to baseline, no head injury or anticoagulation, MRI available). |
+| E | minor | `ground_truth.red_herrings[0]` | `location` contained an em dash; intended effect named hypoglycemia for a high glucose. | FIXED: location `labs`; effect and interpretation reworded. |
+| E | minor | `patient.history_present_illness` (class R) | Duplicate surname Sharma (M04). | FIXED: Mr. Deshpande (used nowhere else in the dataset). |
+| A | minor | `fallback_tool_outputs.echo` (class I) | No `echo_type`. | FIXED: `TTE`. |
+| B | minor | `metadata.difficulty_rationale` | "Five required tools (... literature search, drug interactions)". | FIXED: reflects the new tiers. |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+
+Mr. Deshpande (renamed), 52, South Asian, with diabetes on metformin, hypertension on amlodipine and a sulfonamide allergy, had a first focal to bilateral convulsion after 12-14 months of deja vu and epigastric auras attributed to reflux. Those recurrent focal seizures already meet the definition of epilepsy. The required epilepsy-protocol MRI shows left hippocampal sclerosis (volumes and asymmetry index now consistent, no gadolinium) and the required routine EEG shows left anterior temporal sharp waves with TIRDA. Glucose and electrolytes are recommended (glucose 138, the red herring); ECG, the drug review and literature are optional; prolactin is gone and the literature now cites real sources with correct evidence levels. Management: lamotrigine or levetiracetam first line, HLA-B*15:02 before carbamazepine or oxcarbazepine with sodium monitoring if they are used, driving and SUDEP counselling; no valproate (under 55), no zonisamide (sulfonamide allergy), and no attribution of the auras to reflux.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+
+- Citation keys not yet in the pack allow-list: `[ILAE_MRI_2019]`, `[IFCN_ILAE_EEG_2023]`, `[NICE_NG217_2025]`, `[CPIC_2018]`, `[SANAD2_2021]`, `[ILAE_def_2014]` (plan request 2).
+- Synonyms (plan request 6): the inherited idiopathic codes G40.009/G40.019 do not fit structural epilepsy.
+- `perfect_agent.py` prints `<- ?` for the labs criterion (the `exclude_none` comparison in `_source`); the stored labs output is the one served.
+
+## Open questions for Andrea (judgment calls you could not settle)
+
+- Decided: the asymmetry index sign was corrected to -0.25 to follow the (L - R)/(L + R) definition the plan fixes for the condition (RS01 uses the same convention for a smaller left hippocampus).
+- Decided: a zonisamide prohibition was added (not in the plan) because zonisamide is a sulfonamide and its label contraindicates it in sulfonamide hypersensitivity; the drug check stays optional because no first-line choice is affected.

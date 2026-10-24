@@ -39,3 +39,10 @@ The case now stores the inpatient video-EEG he was admitted for (48 hours, two h
 ## Open questions for Andrea (judgment calls you could not settle)
 
 None. The recommended MRI criterion takes `{contrast: false}` without a protocol, so an epilepsy or stroke protocol order also counts (plan 3.2 names only the contrast argument).
+
+## Verification
+Checked the log against the file (worker edits are in commit b8be2153; diffed against its parent): read the whole final case, the patient-block diff, criteria tiers and order against plan 3.2 and the case entry in plan 4, sequence constraints and stop rule, musts and prohibitions against avoided actions, differential against the returned results, lab arithmetic and ranges, laterality, leak guard. No reviewer notes exist for FND, so there is no note id to account for. perfect_agent.py -v, case_io.py check and test_case_guards pass after my changes.
+The stored EEG is now the inpatient video-EEG with two events and no post-event slowing; the routine EEG stays in the HPI. Hoover is equivocal and not counted (3 signs remain); RBC 5.18 x 81.7 / 10 = 42.3, MCHC 33.3, male ranges; exam before MRI constraint correct; Todd paresis added low.
+Found and fixed:
+- (C, minor) `ground_truth.differential[0].key_features` did not address the case's own epileptic red flag: the prodrome of a rising chest sensation with fear resembles a mesial temporal aura. Added: in both recorded events it was followed by bilateral asynchronous shaking with forced eye closure and preserved responsiveness without ictal change, which argues against a focal seizure with bilateral motor spread.
+- (B, minor) `initial_tool_outputs.labs.panels.Other[0]` prolactin reference range 3.0-27.0 is a female range in a man; now 2.0-18.0 (value 13.2 stays normal).

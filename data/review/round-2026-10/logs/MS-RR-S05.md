@@ -46,3 +46,13 @@ None. Disc swelling is kept: it occurs in about a third of MS optic neuritis and
 ## Verification
 
 `perfect_agent.py MS-RR-S05 -v`: ok (brain MRI <- initial mri; spine <- followup[0]; labs and AQP4/MOG <- initial labs, same-report warning by design of plan A8). Probe: CSF (OCB or kFLC), VEP, OCT, drug check and literature served from the case; CT and FDG-PET from case fallbacks. `test_case_guards.py -k MS-RR-S05`: 2 passed. `case_io.py check MS-RR-S05`: schema and synonym guard OK; the only failure in the condition names MS-RR-P02 (another worker's case).
+
+## Verification (adversarial check, 24 Oct 2026)
+
+Adversarial check: read the log, the full diff against the pre-round file (HEAD~1) and the whole final case; checked laterality (exam vs brain and cord lesions vs VEP/OCT), the acute optic neuritis timeline (disc, OCT), lab arithmetic (Hct = RBC x MCV, MCHC), CSF glucose ratio against the serum glucose, red-herring field paths (all resolve), musts against allergies, medications and prohibitions, the differential against the served results, and the any-query literature and drug outputs for leakage. No reviewer notes exist for MS-RR, so the reviewer-note table is complete.
+
+Found and fixed:
+- C minor: the MOGAD differential entry cites "no perineural enhancement", which the brain MRI report never stated (a differential may cite only served results). Added ", without perineural (optic nerve sheath) enhancement" to the post-contrast description of the optic nerve finding in `initial_tool_outputs.mri` (a Kind 2 observation the orbit sequences make). Same class seen outside this batch in the MS-RR-RS03 differential: for the condition lead.
+Checked and accepted: right dorsolateral C4-C5 lesion with the residual right Babinski and right leg vibration/touch loss (ipsilateral tracts); acute OCT with left pRNFL swelling 121 micrometers fits the disc swelling at day 5; DMT must activity (enhancing optic nerve and periventricular lesions only) matches the reports; EDSS 2.5 derivable; naproxen GI risk in the steroid check matches the must; the "no DMT before NMOSD/MOGAD excluded" prohibition is consistent with the recommended serology criterion.
+
+perfect_agent.py: ok (labs/AQP4-MOG same-report warning by design of plan A8). case_io.py check: schema and synonym guard OK, no test failure names the case. test_case_guards.py -k MS-RR-S0: 12 passed.

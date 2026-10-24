@@ -45,3 +45,9 @@ This 77-year-old woman with hypertension, diabetes, a remote right hemispheric T
 ## Open questions for Andrea (judgment calls you could not settle)
 
 - None specific to this case (plan Q1 to Q6 apply).
+
+## Verification (adversarial verifier, 24 Oct 2026)
+- Read the log, the diff against the pre-round version and the whole final case. No PD notes file exists, so no note id can be missing.
+- Checked every own-finding claim against the file: literature criterion, follow-ups and outputs gone; drug check `{}`, optional, one stored output naming only her own medicines plus a forward-looking amantadine renal warning (plan entry asks for it; CKD 2 in a 77-year-old can sit near CrCl 50, so the warning is defensible); MRI `{}`; DaTscan recommended with a binary report; laterality coherent across exam (left worse), SWI (right nigrosome-1 absent) and DaTscan (right putamen 0.88); PSG and battery figures match their criteria's expected evidence; HPI and PMH durations (hypertension 22 years, diabetes 14, TIA 6) match; docusate on the list; probable PD, not established; vascular `low` with the excluding data; soft MRI-before-DaTscan constraint with valid ids; stop rule MRI only, 2 extra actions.
+- No error found that needs a change. Nothing edited.
+- Checks re-run after verification: `perfect_agent.py -v` pass; `case_io.py check` schema OK, no failure names the case; `test_case_guards -k` pass; MockServer routing: DaTscan, MIBG and amyloid return their own modality (case or library), PSG and battery return the case report where stored, `check_drug_interactions` with `drug: levodopa` and `drug: rasagiline` return the case output, labs route to the stored panel where one exists; grep for established / gadolinium / "Abnormal values:" / Lewy / serotonin syndrome / Tier per / July 2026 / dashes: only allowed hits.

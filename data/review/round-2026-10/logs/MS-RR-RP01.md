@@ -41,3 +41,11 @@ The case now holds together as tumefactive relapsing-remitting MS. The Lhermitte
 ## Open questions for Andrea (judgment calls you could not settle)
 
 - None needing Andrea's information. Decided: corticosteroids are a must after negative CSF cytology and flow cytometry rather than after biopsy, because the plan gives RP01 no biopsy and imaging, spectroscopy, CSF bands and four-region disease make demyelination the clear diagnosis; the repeat-MRI must with biopsy on an atypical course is the safety net (Hardy and Chataway 2013).
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. Read the log, the diff against `b8be2153^` and the whole final case. Checked each FIXED finding (C2-C3 dorsal lesion in the spine report and in KCE/expected evidence; CT CAP as `order_body_imaging` region chest_abdomen_pelvis / modality CT, which the body-imaging matcher resolves for `study: chest_abdomen_pelvis_CT`; MRS values arithmetic Cho/NAA 1.4/1.6 = 0.9; MBP and 8-week AFB culture gone; kFLC 42.0; no cord text in the brain MRI; literature sources Masdeu 2000, Lucchinetti 2008, Hardy and Chataway 2013 exist as cited). Musts and prohibitions are consistent (no steroids before CSF cytology/flow, IVMP after negative CSF with PPI for ibuprofen; T10 appropriate for a 37-year-old woman). Differential all low with the case's results.
+Found and fixed:
+- B major, `fallback_tool_outputs.ct`: the head-CT fallback read "No ... mass", contradicting the 2.1 cm right periventricular lesion with oedema that the MRI shows (a CT ordered despite the waste avoidance would have returned a normal brain). Replaced with a right periventricular hypodensity with mild oedema, no shift (same style as RM01/RP02/RP03); `metadata.fallback_tool_kinds.ct` set to "abnormal".
+- B minor, `ground_truth.differential[Brain abscess or tuberculoma].key_features`: "CSF AFB smear and culture negative" implied an AFB culture result the CSF no longer reports (the worker removed it); now "CSF AFB smear negative and CSF culture sterile".
+Re-ran `perfect_agent.py MS-RR-RP01 -v` (pass), `case_io.py check` (clean for the case) and `test_case_guards -k MS-RR-RP01` (pass).

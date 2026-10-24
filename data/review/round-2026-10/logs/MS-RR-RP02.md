@@ -43,3 +43,10 @@ Lumbar puncture is now contraindicated (4.1 cm left parietal lesion, 6 mm midlin
 ## Open questions for Andrea (judgment calls you could not settle)
 
 - None needing Andrea's information. Decided: the HPI timeline was lengthened (one week of headache, two days of weakness) because bilateral papilloedema with a 4 cm lesion after a one-day illness is not credible; the chief complaint changed with it.
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. Read the log, the diff against `b8be2153^` and the whole final case. Checked: CSF criterion and its hard constraint gone, contraindicated LP avoided action present and matching the LP prohibition; no criterion or must depends on CSF; perfusion and MRS moved to `order_advanced_imaging` with correct arithmetic (Cho/NAA 2.1/1.2 = 1.75); brain MRI no longer reports spectroscopy; biopsy is a real `obtain_tissue_diagnosis` report with a histology-only impression and recommended tier; head-CT fallback shows the mass and shift; steroids withheld until tissue with dexamethasone only for impending herniation (no contradiction between musts); the COC interaction now states the correct direction (F11); literature sources (Cha 2001 AJNR, Lucchinetti 2008, Hardy and Chataway 2013) exist; DIS 2 regions plus MRI DIT is a valid 2024 formulation; differential all low with the biopsy/CBA results. The HPI timeline change (one week of headache) is justified by bilateral papilloedema.
+Found and fixed:
+- B minor, `fallback_tool_outputs.csf.opening_pressure` and `.interpretation`: the CSF an agent would get from the contraindicated LP gave an opening pressure of 15 cmH2O in a patient with bilateral papilloedema and 6 mm midline shift. Set to 28 cmH2O (reference 10-20) and the interpretation now opens "Raised opening pressure (28 cm H2O); otherwise normal CSF".
+Re-ran `perfect_agent.py MS-RR-RP02 -v` (pass), `case_io.py check` (clean for the case) and `test_case_guards -k MS-RR-RP02` (pass).

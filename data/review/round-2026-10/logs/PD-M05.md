@@ -40,3 +40,9 @@ A 69-year-old man with left-predominant akinetic-rigid parkinsonism, a minimal r
 ## Open questions for Andrea (judgment calls you could not settle)
 
 - None specific to this case (plan Q1 to Q6 apply).
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. No PD notes file. Read the whole final case and the diff. The only patient change is the rest-tremor sentence (a rest tremor cannot be seen during sustained posture), which is a real error and now reads correctly. Checked: probable PD with RBD and self-reported smell loss as prodromal markers only; no "autonomic battery" or "neuropsych" evidence remains; PSG recommended and served by the case report (RSWA 46%, behaviours not linked to respiratory events, AHI 7.2); musts that rest on the PSG cite a recommended criterion; laterality (worse left, right putaminal SBR 0.98 on the stored waste DaTscan); red-herring paths point at the right PMH indices; MRA and enhancement lines gone; stop rule MRI only, no sequence constraint (no DaTscan criterion). All logged FIXED rows hold.
+
+Found: nothing that needed a change. Checks after the verification edits: `perfect_agent.py -v` passes, `case_io.py check` names no failure for this case, `test_case_guards` pass.

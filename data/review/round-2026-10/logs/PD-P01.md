@@ -42,3 +42,12 @@ A 60-year-old man has 18 months of symmetric bradykinesia and rigidity without r
 
 - Plan Q1: the case keeps its PD prefix with an MSA-P label (`metadata.case_body_concerns`); re-prefixing changes `case_id` and is outside this round.
 - Should the medication review be required rather than recommended? Tamsulosin, lisinopril and sildenafil each worsen the nOH that has already caused near-syncope. I followed the plan (recommended): no D2 blocker is involved, and the nOH must already asks for the same review.
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. No PD notes file. Read the whole final case and the diff. Patient changes ("retired", "when reading") match the social history and are logged. Checked against MDS 2022: autonomic dysfunction (34/26 mmHg at 1 minute), parkinsonism, supportive features (postural instability with falls within 3 years, erectile dysfunction at 57, jerky irregular postural tremor), no levodopa trial, so clinically probable MSA-P is the right category and "poor levodopa response" appears nowhere as a fact. Arithmetic of the stored orthostatic, tilt and autonomic reports (38/28 and 40/24 mmHg falls, heart-rate rises 6 and 7/min, ratio 0.16) agrees with the exam and vitals; QSART normal fits preganglionic failure; MIBG binary and normal; DaTscan stored in the symmetric MSA form; red herrings now real case data; PD red-flag count (three) correct. All logged FIXED rows hold.
+
+Found and changed:
+- `initial_tool_outputs.mri.findings[1].signal_characteristics.T1_sagittal` said the cerebellar vermis and hemispheres "appear mildly reduced in volume", while the volumetrics (15th percentile), the impression and the MRI expected evidence say low normal, and the exam has no cerebellar sign. Rewritten "at the low end of normal volume".
+
+Noted, not changed: the ECG stays waste (near-syncope 6 months ago was already evaluated, no palpitations or cardiac history); the worker's open question on the medication-review tier stands as logged. Checks after the verification edits: `perfect_agent.py -v` passes, `case_io.py check` names no failure for this case, `test_case_guards` pass.

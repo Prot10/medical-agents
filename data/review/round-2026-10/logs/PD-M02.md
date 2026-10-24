@@ -38,3 +38,12 @@ A 64-year-old woman with right-predominant bradykinesia and rigidity without res
 ## Open questions for Andrea (judgment calls you could not settle)
 
 - None specific to this case (plan Q1 to Q6 apply).
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. No PD notes file. Read the whole final case and the diff. Patient block unchanged. Checked: RBD (18 months) and smell loss (12 months) after metoclopramide (24 months) are never called "preceding"; laterality (worse right, left putaminal SBR 1.12); MRI Evans 0.28 in finding, volumetrics, impression and evidence; PSG flags and C10 impression (AHI 3.8, no OSA); battery against MoCA 25 losses and the reported low mood (GDS 7/15); drug output names her own glipizide, atorvastatin (with erythromycin), lisinopril, metformin, omeprazole, acetaminophen; differential low; tiers and stop rule per plan. All logged FIXED rows hold.
+
+Found and changed:
+- `avoid-waste-5-analyze-ecg` contradicted the must "domperidone where available after an ECG for the QTc" (same class as M01). Removed.
+
+Noted, not changed: the MRI keeps a pre-existing "Normal substantia nigra signal on susceptibility-weighted imaging". A preserved nigrosome-1 is a recognised false negative in early PD, no field relies on it, and the DaTscan carries the diagnosis; changing it would be churn. Checks after the verification edits: `perfect_agent.py -v` passes, `case_io.py check` names no failure for this case, `test_case_guards` pass.

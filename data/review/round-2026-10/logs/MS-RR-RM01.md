@@ -47,3 +47,13 @@ A 29-year-old man with six weeks of progressive left hemiparesis, left face and 
 
 - Brainstem lesion sides differ from the plan ("dorsal pons, right MCP"): I placed a left paramedian pontine lesion and a left MCP lesion because the exam has a left abducens paresis and left limb ataxia, both ipsilateral signs; a right MCP lesion would not explain the left dysmetria. Please confirm.
 - The spine lesion was put in the right posterior column so it can explain the earlier right-hand episode; if you prefer the earlier attack to stay unexplained by imaging, the side can be changed without affecting DIS.
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. Read the whole final case against the plan's RM01 rewrite list. Confirmed: thunderclap headache, weight loss, months of lethargy/personality change and the URI are gone from HPI, PMH and exam; an earlier attack (right-hand numbness two years ago) exists and the right posterior column C2-C3 lesion supports it; brainstem signal is now discrete ovoid lesions; the 4.2 cm lesion keeps open-ring enhancement, peripheral restricted diffusion, no shift and no papilloedema, so the recommended LP is consistent with F10 and the soft MRI-before-CSF constraint; CSF glucose ratio 72/118 = 0.61 matches the post-seizure serum glucose; biopsy moved to `obtain_tissue_diagnosis` (optional) with histology-only impression; MRS moved to `order_advanced_imaging`; CT and EEG fallbacks show the lesion and focal slowing, CT avoided action removed (the original case had no EEG avoided action); no female-only prohibition in this man; antiseizure must present; steroid musts and prohibitions agree (steroids only after cytology/flow or tissue). DIS 3 of 5 + DIT + positive CSF is stated identically in must, KCE and metadata.
+
+Open questions in this log, resolved by the verifier (decision, no data change): the left paramedian pontine lesion (left abducens paresis) and the left MCP lesion (left limb ataxia) are the anatomically correct sides for ipsilateral signs, so the plan's "right MCP" is superseded; the right posterior column C2-C3 lesion is kept because it gives the earlier right-hand attack an anatomical substrate. Neither needs information only Andrea has.
+
+Found: no error requiring a change.
+
+perfect_agent.py -v: pass. case_io.py check: clean for this case. Guards: pass.

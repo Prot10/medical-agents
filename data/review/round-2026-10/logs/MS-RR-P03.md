@@ -45,3 +45,15 @@ The case remains a 22-year-old man with six months of brief positional vertigo, 
 ## Open questions for Andrea (judgment calls you could not settle)
 
 None. Decided: no AQP4/MOG criterion and no result (plan 3.2: no optic neuritis or myelitis attack, short dorsal cord lesion); no steroid must, because the exam is normal and the only attack resolved (NICE NG220 treats relapses that affect function).
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. Checked against the committed diff (b8be2153) and the final file: every own-finding row is applied (future repeat MRI and SSEP stub gone; spine C5-C6 left dorsal lesion consistent with the left-hand paraesthesias across report, criterion, KCE and differential; male CBC ranges and arithmetic; HIV row neutral; no AQP4/MOG criterion or result, as plan 3.2 decides; stop rule, sequence constraint and tiers match plan 3.5; literature sources verified to exist with correct volume and pages; drug output free of the criterion text, guard passes). DIS count (PV, JC, IT, cord = 4 of 5) matches musts, KCE and metadata. MockServer probe: spine, repeat brain MRI and an off-pathway CT CAP order route correctly.
+
+Found and changed:
+- `followup_outputs[1].output.findings[0].value` (VEP stimulus): "60-minute checks" is a unit error (check size is in minutes of arc): now "60 arcmin checks".
+- `initial_tool_outputs.csf.glucose_ratio`: ratio 0.68 used a serum glucose of 88 mg/dL while the admission BMP reports 80 mg/dL; labelled as the paired serum glucose at the time of the lumbar puncture so the two values no longer read as a contradiction.
+
+Not changed (checked, sound): red_herrings[0] keeps its pre-existing wording (not new text, no clinical error). Note for CENTRAL: an agent that orders AQP4/MOG here receives the stored panel with no AQP4/MOG row (the lab merge does not answer analytes absent from the case); plan A8 deliberately stores none for this case, so this is a harness/library question, not a case edit.
+
+perfect_agent.py -v: pass. case_io.py check: clean for this case. test_case_guards -k MS-RR-P03: pass.

@@ -43,3 +43,8 @@ The policy now asks for the examination and a video-EEG (both required), a recom
 ## Open questions for Andrea (judgment calls you could not settle)
 
 None. Placement decision: optional labs and MRI sit after the drug check and before neuropsychology and literature in `action_criteria`, since plan 3.1 places only required or recommended red-flag tests second.
+
+## Verification
+Checked the log against the file (worker edits are in commit b8be2153; diffed against its parent): read the whole final case, the patient-block diff, criteria tiers and order against plan 3.2 and the case entry in plan 4, sequence constraints and stop rule, musts and prohibitions against avoided actions, differential against the returned results, lab arithmetic and ranges, laterality, leak guard. No reviewer notes exist for FND, so there is no note id to account for. perfect_agent.py -v, case_io.py check and test_case_guards pass after my changes.
+Every own finding marked FIXED is present in the file: Hoover sign now described correctly in both the exam and the structured output, CBC consistent (39.6 = 85.7 x 4.62 / 10, MCHC 33.6), Na 140, non-contrast MRI, canonical EEG impression naming the three events, no literature follow-up, tiers per plan (exam and video-EEG required, drug check recommended, labs and MRI optional).
+Found and fixed (C, minor): `ground_truth.differential[1].key_features` (MS) said the midline split "a demyelinating lesion does not produce", which contradicts the case's own pearl and plan fact 3 (midline splitting is of low specificity). Now: "the sensory loss is non-dermatomal and shifts location, with vibration and proprioception intact."

@@ -41,3 +41,10 @@ A 64-year-old man with 20 years of essential tremor on propranolol now has a new
 ## Open questions for Andrea (judgment calls you could not settle)
 
 - None specific to this case (plan Q1 to Q6 apply).
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. No PD notes file. Read the whole final case and the diff. The only patient change is the UPSIT wording (28/40 is moderate microsmia for a 64-year-old man on the UPSIT norms, so "clinically established PD" on rest tremor plus validated olfactory loss is supported). Checked: laterality (right signs, left SWI nigrosome loss, left putaminal SBR 0.92); no must, prohibition, evidence line or differential entry depends on the optional DaTscan or TSH; labs trimmed and interpretation neutral; PSG and battery consistent with the history and MoCA 27; ECG and Holter fallbacks at HR 62; tiers, stop rule and the single soft constraint per plan. All logged FIXED rows hold.
+
+Found and changed:
+- `avoid-waste-6-order-advanced-imaging` (FDG-PET) rationale said "DaTscan is the appropriate and indicated modality", contradicting the optional DaTscan and its rationale that the scan is not needed here. Rewritten: "FDG-PET has no role in separating PD from essential tremor; the examination already makes PD clinically clear". Checks after the verification edits: `perfect_agent.py -v` passes, `case_io.py check` names no failure for this case, `test_case_guards` pass.

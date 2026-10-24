@@ -42,3 +42,11 @@ A 31-year-old woman with right optic neuritis at day 16 (20/80, RAPD, mild disc 
 ## Open questions for Andrea (judgment calls you could not settle)
 
 None. Decided: the cord lesion side was changed in the report rather than the exam, because the exam (left weakness, left Babinski, left vibration loss, T10 band) is detailed and coherent and only the report and the pinprick side contradicted it.
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. Read the whole final case against the log and the plan. Confirmed: thoracic lesion moved to the left lateral cord (ipsilateral to the left pyramidal signs) with pinprick loss contralateral (right) and the T10 band below a T6-T7 lesion (a sensory level below the lesion is expected); C3-C4 dorsal lesion explains Lhermitte; brain MRI impression no longer counts the callososeptal interface as a region; DIS 5 of 5 (optic nerve by VEP and OCT) consistent in musts, KCE, criteria and differential; OCT reports both eyes, GCIPL range 70-90, inter-eye differences above the F1 thresholds, thinning attributed to the earlier episode (3 years ago, age 28, consistent with HPI and PMH); CSF WBC 4 now "normal cell count", MBP gone, kFLC 38.5, glucose ratio 63/88 = 0.72 matches the CMP glucose; AQP4/MOG rows in canonical form and recommended criterion; ESR/CRP rows exist for the ANA reasoning; teriflunomide prohibition matches the stated pregnancy plan; drug output real and allergy-consistent (sulfonamides). Tiers, order, stop rule and soft constraint match plan 3.5 and P.
+
+Found: nothing requiring a change. Minor, left as is: VEP right amplitude 4.1 uV is above the >3.0 uV cutoff (flag "no") while the impression calls it reduced relative to the left eye (8.2 uV); this is a relative statement and not a contradiction.
+
+perfect_agent.py -v: pass (the AQP4/MOG criterion shares the stored lab report by design, plan A8). case_io.py check: clean for this case. Guards: pass.

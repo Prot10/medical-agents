@@ -44,3 +44,13 @@ None open. Decisions taken and their reasons:
 - The exam change from upward drift to drift without pronation is a change of patient data, made because the plan rules upward drift is not a functional sign and the case otherwise had only a mild leg drag to rest on.
 - MRI alternative `{}` instead of `{contrast: false, protocol: stroke}`: the tool has no default for `contrast`, and a stroke MRI ordered as `standard` is still the right study. CT alternative `{contrast: false}` (the CT tool defaults it).
 - ECG removed from waste and CTA added as optional: both belong to the AHA/ASA acute stroke pathway, so ordering them is justified, but neither bears on the functional diagnosis.
+
+## Verification
+
+Adversarial check (24 Oct 2026) of the log against the case and against the pre-round version (`b8be2153^`). What I checked: the patient diff (upward drift replaced by drift without pronation in motor and additional; HPI exam finding and "Capillary glucose was checked" removed; onset 3 hours after the bolus matches the chief complaint); the pathway order (glucose, exam, imaging) and the glucose -> imaging constraint; the CT moved to `initial_tool_outputs.ct` and the CT waste removed; MockServer routing with a call script: `order_ct_scan {contrast: false}` and `{}` receive the non-contrast report, `{angiography: true, contrast: true}` receives the CTA follow-up, `interpret_labs ["glucose"]` receives the panel with the capillary glucose 92; the ECG (sinus tachycardia 106 against HR 108); the stroke-pathway must against the prohibitions (no contradiction); signs count 2 and the exam text; every log claim marked FIXED.
+
+Found and changed:
+- `initial_tool_outputs.labs.panels["Celiac serology"]`: values carried the unit inside the value ("<1 U/mL", "3.2 U/mL") with the unit also in `unit`; now "<1" and 3.2.
+- `initial_tool_outputs.literature_search...summary`: same mismatch as in M09; replaced with a summary of the four motor rows returned.
+
+Left as is (already in the log's CENTRAL): `accepted[0]` names "celiac neurological complications excluded"; the stored celiac serology supports it and any lab order returns it. Checks re-run after the changes: `perfect_agent.py -v` ok, `case_io.py check` clean for this case (schema, synonym guard, no failing test names it), `test_case_guards.py -k` passed. The diagnosis label, `icd_codes` and synonyms are unchanged from before the round; no new em dashes or `Stone_2018` strings.

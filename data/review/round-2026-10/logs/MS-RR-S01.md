@@ -50,3 +50,14 @@ None. The AQP4/MOG call is answered by the same initial labs report as the mimic
 ## Verification
 
 `perfect_agent.py MS-RR-S01 -v`: ok (brain MRI <- initial mri; spine <- followup[0] request_spine_mri; labs and AQP4/MOG <- initial labs, which carry the CBA rows). Direct probe: CSF (OCB or kFLC), VEP, OCT, drug check and literature all served from the case's own data; CT and FDG-PET from case fallbacks. `case_io.py check MS-RR-S01`: schema and synonym guard OK; no failure names S01 (condition-wide leak failures name P02, RS05 and S03, the last fixed with S03). `test_case_guards.py -k MS-RR-S01`: pass.
+
+## Verification (adversarial check, 24 Oct 2026)
+
+Adversarial check: read the log, the full diff against the pre-round file (HEAD~1) and the whole final case; checked laterality (exam vs brain and cord lesions vs VEP/OCT), the acute optic neuritis timeline (disc, OCT), lab arithmetic (Hct = RBC x MCV, MCHC), CSF glucose ratio against the serum glucose, red-herring field paths (all resolve), musts against allergies, medications and prohibitions, the differential against the served results, and the any-query literature and drug outputs for leakage. No reviewer notes exist for MS-RR, so the reviewer-note table is complete.
+
+Found and fixed:
+- C minor: the MOGAD differential entry cites "no perineural enhancement", which the brain MRI report never stated (a differential may cite only served results). Added ", without perineural (optic nerve sheath) enhancement" to the post-contrast description of the optic nerve finding in `initial_tool_outputs.mri` (a Kind 2 observation the orbit sequences make). Same class seen outside this batch in the MS-RR-RS03 differential: for the condition lead.
+- B minor: the DMT must gave the activity as "two enhancing lesions", but the case has three (left optic nerve, right periventricular on brain MRI, T6-T7 on the spine MRI). `required_recommendations[2]` now reads "enhancing optic nerve, periventricular and T6-T7 cord lesions".
+Checked and accepted: left lateral-column T6-T7 lesion with left pyramidal signs, right-predominant C3-C4 dorsal-column lesion with the right arm/trunk sensory attack and Lhermitte; Hct 38.4 fits RBC 4.28 x MCV 89.8; EDSS 3.0 (visual FS 3 converted to 2, pyramidal, cerebellar, sensory 2); OCT inter-eye 5 and 2 micrometers below the F1 thresholds.
+
+perfect_agent.py: ok (labs/AQP4-MOG same-report warning by design of plan A8). case_io.py check: schema and synonym guard OK, no test failure names the case. test_case_guards.py -k MS-RR-S0: 12 passed.

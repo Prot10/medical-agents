@@ -39,3 +39,13 @@ None open. Decisions taken and their reasons:
 - The 3 mm frontal focus is kept and declared a red herring rather than removed: a solitary punctate subcortical focus is common at 29 and tests whether the agent escalates to an MS work-up; it does not meet dissemination in space and cannot cause the diplopia.
 - Ocular myasthenia and posterior fossa or Chiari lesions added to the plan's two differential rows: both are standard alternatives for variable acquired esotropia, and the case data (pupil constriction, full ductions, normal MRI posterior fossa) answer them.
 - Drug check optional, as the plan says: the only pair is low risk and changes nothing in the plan.
+
+## Verification
+
+Adversarial check (24 Oct 2026) of the log against the case and against the pre-round version (`b8be2153^`). What I checked: the patient diff (epilepsy clause removed from the family history, the duplicated vibration splitting and the interpretive sentence removed, full abduction added, which matches the ophthalmology note of full ductions in the HPI); the MRI (non-contrast technique, no enhancement or perfusion statements, the 3 mm focus typed and named in the impression, posterior fossa and craniocervical junction normal) against the MRI criterion's expected evidence and the MS and posterior-fossa differential rows; the drug output against the medication list and the sulfonamide allergy; the musts (orthoptic assessment, no PHYSIO) against the prohibition on strabismus surgery; signs count 1 with `convergence_spasm_with_miosis`; every log claim marked FIXED.
+
+Found and changed:
+- `ground_truth.avoided_actions[avoid-waste-1-order-echocardiogram]` and `[avoid-waste-2-order-cardiac-monitoring]`: both said her palpitations and chest tightness "had a negative cardiac work-up"; the negative work-up was for a chest-pain episode 18 months ago, while the palpitations are of the past several months and were never investigated. Both rationales now say so without claiming the palpitations were worked up.
+- `initial_tool_outputs.literature_search...summary`: same mismatch as in M09; replaced with a summary of the four rows returned.
+
+Checks re-run after the changes: `perfect_agent.py -v` ok, `case_io.py check` clean for this case (schema, synonym guard, no failing test names it), `test_case_guards.py -k` passed. The diagnosis label, `icd_codes` and synonyms are unchanged from before the round; no new em dashes or `Stone_2018` strings.

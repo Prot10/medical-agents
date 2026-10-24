@@ -39,3 +39,9 @@ A 27-year-old left-handed teacher on a combined pill has 14 months of olfactory 
 
 ## Open questions for Andrea (judgment calls you could not settle)
 - None.
+
+## Verification
+Adversarial check (24 Oct 2026) of the whole final case against this log and plan section 4 (S02); diff read against fa1d22e6.
+- Confirmed: occupation teacher in both fields; HPI head turn and manual automatisms right-sided (early non-forced version and manual automatisms usually ipsilateral, fact 12), concordant with the right lesion and F8 focus; prolactin gone; "occasional" at 8-10/h fits ACNS 2021; MRI distinct from S03 (21 x 15 x 13 mm, ellipsoid volume about 2.1 cm3 as stated), canonical post-contrast line, FLAIR bright rim, no impossible scalloping; drug check required with correct fact 8 content (ethinylestradiol halves lamotrigine; inducers make the pill unreliable), soft MRI -> drug check with the canonical reason; stop rule MRI, EEG, drug check, max 1; Hb 11.9 with Hct 39.6 and MCV 79.1 plausible for iron deficiency, PMH now "maintenance"; folic acid and contraception must; differential (ganglioglioma moderate, GGE low) matches the evidence; Blumcke 2017 figures correct; case guards pass.
+- Found: nothing to change.
+- `perfect_agent.py -v` and `case_io.py check` clean for the case.

@@ -36,3 +36,7 @@ A 38-year-old woman with right mesial TLE from hippocampal sclerosis, free of ep
 ## Open questions for Andrea (judgment calls you could not settle)
 
 None. Departure from the plan: the deleted drug block was replaced by a short real lamotrigine-alprazolam check (see Own findings) instead of being left empty.
+
+## Verification
+
+Adversarial check, 24 Oct 2026. Read the log, the diff against master (edit committed in the batch-5 checkpoint) and the patient block. Checked: the sulfonamide statement in the new drug output matches `allergies` ("Sulfonamides (rash)"); the trauma history the CBT must cites is in the past medical history; lamotrigine 200 mg twice daily matches the medication list; volumetric arithmetic (index 0.9/5.7 = 0.16, 1 - 2.4/3.3 = 27%) is right; the video-EEG impression, finding fields and criterion evidence agree (seven events, no EEG change, F8 sharp waves); the differential is the post-video-EEG view; discriminator fallbacks removed (class Q), echo fallback typed; no sequence constraint involves an optional criterion; LaFrance 2013 and CODES (Goldstein 2020) are described correctly (CODES missed its primary outcome). Nothing wrong found; no change made.

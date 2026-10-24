@@ -41,3 +41,12 @@ A 28-year-old woman with three weeks of paraparesis worse on the right, a T10 se
 ## Open questions for Andrea (judgment calls you could not settle)
 
 - None needing Andrea. Decision recorded: OCT follow-up and optional `action-oct` added (not in the plan's tier table) because the library's normal OCT contradicted the documented left optic neuropathy.
+
+## Verification
+Adversarial verifier, 24 Oct 2026. Read the log, the diff and the whole final case. No reviewer notes exist for MS-RR; the table correctly says so.
+Checked: allergy now iodinated CT contrast with a matching red herring and prohibition; cord finding removed from the brain MRI; centrum semiovale lesion not counted as a region; right dorsolateral C3-C4 lesion matches the right-predominant signs; future MRI gone; OCT and VEP fit the 18-month-old left optic neuritis (pallor appropriate); DIS 4 of 5 with no infratentorial lesion matches the report and the exam (no nystagmus); CSF kFLC added, MBP gone; drug check lists all three medicines; literature output general and correctly cited; tiers, order and stop rule per plan; musts consistent with ibuprofen (PPI/stop) and the prior UTI.
+Found and fixed:
+- `initial_tool_outputs.labs.panels.CBC[2]` haematocrit 35.4% was flagged normal against the 36.0-46.0 range the worker had just set: `is_abnormal` true, added to `abnormal_values_summary` and the interpretation.
+- `initial_tool_outputs.csf.special_tests` IgG index 0.68 and synthesis rate 9.2 mg/day were identical to M03 (and M01): varied to 0.74 and 10.9 mg/day (still elevated; interpretation unchanged).
+- The Susac entry of the differential cites "no corpus callosum lesions", which the brain MRI did not state: observation "No corpus callosum lesions on sagittal FLAIR" added to `initial_tool_outputs.mri.additional_observations`.
+Checks re-run after the changes: `perfect_agent.py -v` pass, `case_io.py check` clean for the case, `test_case_guards.py -k` (leak, follow-up, banned strings) pass.

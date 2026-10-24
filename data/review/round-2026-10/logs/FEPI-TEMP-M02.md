@@ -43,3 +43,10 @@ The scored MRI is now a dedicated 3T epilepsy-protocol study with definite right
 ## Open questions for Andrea (judgment calls you could not settle)
 
 None.
+
+## Verification
+
+Adversarial check, 24 Oct 2026 (case committed in b8be2153; read in full).
+- Checked: MRI volumetry (2.2/3.0 cm3 = 27% smaller, index 0.15), CBC (Hct 36.4, MCHC 33.5), prolactin gone, PET only as fallback with the waste avoided action, both EEG reports internally consistent (no 48-hour or captured-event text), drug check content matches the medication list (sertraline, sumatriptan, ibuprofen) and the latex allergy is no longer a drug contraindication, HLA-B*15:02 must present (East Asian), new GGE differential and red herrings point at existing fields with matching data points, tiers and stop rule per plan, criteria evidence equals stored values (ECG 76/min, labs 83/138/9.2).
+- Found: as in M01, the last C row misreads the sign: left-hand automatisms with a right temporal focus are ipsilateral and therefore concordant (fact 12); the HPI needed no change. A stored `fallback_tool_outputs.ecg` differs from the initial ECG; it is never served while the initial ECG exists, so it was left.
+- Changed: nothing in the case. Checks clean for this case.

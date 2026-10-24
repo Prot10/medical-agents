@@ -39,3 +39,12 @@ A 38-year-old man with two weeks of paraparesis, a band at the navel, urgency wi
 ## Open questions for Andrea (judgment calls you could not settle)
 
 - None. OCT not added: the right optic nerve symptom is days old, so the library's normal OCT is what an acute optic neuritis shows (plan F7).
+
+## Verification
+Adversarial verifier, 24 Oct 2026. Read the log, the diff and the whole final case. No reviewer notes exist for MS-RR; the table correctly says so.
+Checked: the DECLINED chief-complaint change is sound (motor exam symmetric); the nystagmus change removes a deficit no lesion explained; cord finding gone from the brain MRI; male reference ranges with coherent indices (Hb raised from 13.1 to 14.2 to keep the panel normal with a male range, logged); ANA flagged; AQP4/MOG CBA rows; kFLC added, MBP gone; literature describes the 2024 criteria; T10 removed in a man and no pregnancy clause in the DMT must; DIS 4 of 5 (PV, JC, cord, optic nerve by VEP) matches the reports; OCT not added is correct for a days-old optic nerve symptom (F7).
+Found and fixed:
+- `initial_tool_outputs.csf.special_tests` IgG index 0.68 and synthesis rate 9.2 mg/day were identical to M02: varied to 0.71 and 8.7 mg/day (still elevated).
+- `ground_truth.red_herrings[2].correct_interpretation` said the episode "is not part of the scored DIS count" (benchmark wording): rewritten as clinical text (a plausible earlier attack explicable by a dorsal cervical lesion, making this a second attack).
+- `fallback_tool_outputs.drug_interactions.general.proposed` read "(agent not specified on this case's pathway)" (engineering wording served to the agent): "Requested agent". For the lead: the same string is in about 31 cases of other conditions.
+Checks re-run after the changes: `perfect_agent.py -v` pass, `case_io.py check` clean for the case, `test_case_guards.py -k` (leak, follow-up, banned strings) pass.

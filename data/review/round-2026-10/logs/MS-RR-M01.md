@@ -46,3 +46,11 @@ A 33-year-old woman with six weeks of left leg weakness, urinary urgency and a b
 ## Open questions for Andrea (judgment calls you could not settle)
 
 - None needing Andrea. Decision recorded: the plan's tier table gives M01 no OCT, but the library's normal OCT contradicted the prior left optic neuritis, so a stored OCT follow-up and an optional criterion (`action-oct`) were added; this changes no score for an agent that does not order OCT.
+
+## Verification
+Adversarial verifier, 24 Oct 2026. Read the log, the diff against the pre-round file and the whole final case (patient, every stored output, fallbacks, ground truth, metadata). No reviewer notes exist for MS-RR; the table correctly says so.
+Checked: every FIXED own finding is present in the file (chief complaint and HPI side, acute pallor removed and placed at today's fundoscopy, left dorsolateral T8-T9 lesion with right-sided pinprick loss below T10 as a hemicord pattern, future MRI gone, Hct = RBC x MCV, ANA flagged, AQP4/MOG CBA rows, kFLC added and MBP gone, OCT with chronic left optic neuropathy, drug lines, ECG/echo fallbacks). DIS 5 of 5 matches the reports (PV, JC, left MCP, C3-C4/T8-T9, optic nerve by VEP and OCT). Tiers, order, stop rule and the soft MRI-before-CSF constraint follow the plan; the added optional OCT is justified. Musts agree with the allergy (cephalosporin) and medications (dicyclomine caveat); differential all low with the case's own results; no leakage in the patient block; the brain MRI reports no cord.
+Found and fixed:
+- `metadata.clinical_pearls[3]` said that with two or three regions only CSF completes the criteria; corrected to DIT, positive CSF or the central vein sign (plan F3).
+- `initial_tool_outputs.csf.special_tests["IgG synthesis rate"]` 9.2 mg/day "elevated" beside a normal IgG index, and the same string copied into M02 and M03 (template carry-over): set to 6.9 mg/day (within reference), consistent with the normal IgG index.
+Checks re-run after the changes: `perfect_agent.py -v` pass, `case_io.py check` clean for the case, `test_case_guards.py -k` (leak, follow-up, banned strings) pass.

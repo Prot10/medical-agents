@@ -46,3 +46,13 @@ None. The plan counts the optic nerve as the fifth region; on MRI alone the case
 ## Verification
 
 `perfect_agent.py MS-RR-S06 -v`: ok (brain MRI <- initial mri; spine <- followup[0]; labs and AQP4/MOG <- initial labs, same-report warning by design of plan A8). Probe: CSF (OCB or kFLC), VEP, OCT, drug check and literature served from the case; CT and FDG-PET from case fallbacks. `test_case_guards.py -k MS-RR-S06`: 2 passed. `case_io.py check MS-RR-S06`: schema and synonym guard OK, no test failure names the case.
+
+## Verification (adversarial check, 24 Oct 2026)
+
+Adversarial check: read the log, the full diff against the pre-round file (HEAD~1) and the whole final case; checked laterality (exam vs brain and cord lesions vs VEP/OCT), the acute optic neuritis timeline (disc, OCT), lab arithmetic (Hct = RBC x MCV, MCHC), CSF glucose ratio against the serum glucose, red-herring field paths (all resolve), musts against allergies, medications and prohibitions, the differential against the served results, and the any-query literature and drug outputs for leakage. No reviewer notes exist for MS-RR, so the reviewer-note table is complete.
+
+Found and fixed:
+No error found; no change made.
+Checked and accepted: left MLF pontine lesion with the left INO; right C5-C6 lesion with right leg weakness and vibration loss and left leg pinprick loss (partial Brown-Sequard pattern); left chronic OCT thinning (inter-eye GCIPL 13 micrometers) and delayed left P100 fit the temporal pallor without an ON history, and the brain MRI states that orbit sequences were not acquired, so the optic region comes only from OCT/VEP as KCE[2] says; MOGAD entry makes no unsupported claim; male case without pregnancy clause; lesion counts in volumetrics match the findings.
+
+perfect_agent.py: ok (labs/AQP4-MOG same-report warning by design of plan A8). case_io.py check: schema and synonym guard OK, no test failure names the case. test_case_guards.py -k MS-RR-S0: 12 passed.

@@ -39,3 +39,9 @@ Mr. Mosley (renamed from a duplicated surname), a 42-year-old left-handed teache
 
 ## Open questions for Andrea (judgment calls you could not settle)
 - None.
+
+## Verification
+Adversarial check (24 Oct 2026) of the whole final case against this log and plan section 4 (S03); diff read against fa1d22e6.
+- Confirmed: rename (Mosley) and occupation; right-hand automatisms concordant; allergy "iodinated CT contrast" (gadolinium MRI unaffected); male reference ranges and creatinine 0.94; prolactin gone; HLA prohibition removed (African American); valproate prohibition added; tiers, stop rule (MRI, EEG, max 1), no constraint; FDG_PET waste; panic attacks raised by the HPI now in the differential; literature sources real; case guards pass.
+- Found: (1) the MRI put the DNET "bright rim sign" on T2 ("Bright ring sign" in T2, "bright T2 rim" in the impression); the sign is a FLAIR finding (S02 and S06 already report it on FLAIR). Changed `initial_tool_outputs.mri.findings[0].signal_characteristics.T2` (sentence removed), `.FLAIR` ("thin hyperintense peripheral rim (bright rim sign)") and `.impression` ("bright FLAIR rim"). (2) The fallback FDG-PET ratio 0.84 duplicated M03; changed to 0.86 in `fallback_tool_outputs.advanced_imaging.findings[0].signal` and `.impression` (consistent with "moderately reduced").
+- `perfect_agent.py -v` and `case_io.py check` clean for the case.
