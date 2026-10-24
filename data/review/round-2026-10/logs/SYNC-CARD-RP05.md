@@ -104,3 +104,13 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, named in the report's own text.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Lab evidence (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited results its own order (the first alternative) no longer returned; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-2-interpret-labs]`.expected_evidence: was "Potassium 4.7 mEq/L; calcium 10.4 mg/dL at the upper limit; ACE 29 U/L within range, which does not exclude sarcoidosis; TSH 6.4 mIU/L with normal free T4; troponin and BNP normal."; now "Potassium 4.7 mEq/L; calcium 10.4 mg/dL at the upper limit.".
+- Decision: trim evidence. The July 2026 tool review ruled that the sarcoid case's required panel names calcium only (condition_tool_guidance.yaml), and the rationale reads potassium and calcium. ACE, TSH, troponin and BNP are incidental to this order and are trimmed; their panels stay servable (the TSH red herring to a thyroid order).
+- Scoring: none.
+
+Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.

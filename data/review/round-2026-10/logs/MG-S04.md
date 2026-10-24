@@ -73,3 +73,13 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Lab evidence (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited results its own order (the first alternative) no longer returned; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-1-interpret-labs]`.alternatives: was [anti_AChR, TSH]; now [anti_AChR, TSH, HbA1c] | [anti_AChR, TSH].
+- Decision: serve: new first alternative (old order kept as an alternative). The anti-GAD65 titre (a must, the key evidence and the stiff-person differential rely on it) is stored with the HbA1c of her type 1 diabetes; the diabetes-monitoring panel is a fitting pre-steroid order.
+- Scoring: coverage unchanged (any call matching the old order still matches); the cost reference of the required work-up now uses the new first order.
+
+Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.

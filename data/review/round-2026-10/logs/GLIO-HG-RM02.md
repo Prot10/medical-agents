@@ -111,3 +111,14 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `initial_tool_outputs.eeg`: `eeg_type` set to `routine`, named in the report's own text.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Lab evidence (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited results its own order (the first alternative) no longer returned; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-3-interpret-labs]`.alternatives: was [CBC, BMP, coagulation, type_and_screen]; now [CBC, BMP, coagulation, type_and_screen, beta-hCG] | [CBC, BMP, coagulation, type_and_screen].
+- `ground_truth.action_criteria[action-3-interpret-labs]`.expected_evidence: was "Normal platelets (264) and coagulation (INR 1.0) for surgery; type and screen done; negative beta-hCG; TSH 5.8 with normal free T4"; now "Normal platelets (264) and coagulation (INR 1.0) for surgery; type and screen done; negative beta-hCG".
+- Decision: serve: new first alternative (old order kept as an alternative) + trim evidence. Woman of 34: the pre-operative pregnancy test the evidence reads was not returned. TSH 5.8 is a red herring incidental to the pre-operative order and is trimmed; it stays servable to a thyroid order.
+- Scoring: coverage unchanged (any call matching the old order still matches); the cost reference of the required work-up now uses the new first order.
+
+Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.

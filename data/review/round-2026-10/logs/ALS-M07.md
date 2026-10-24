@@ -76,3 +76,13 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Lab evidence (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited results its own order (the first alternative) no longer returned; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-5-interpret-labs]`.alternatives: was [CBC, CK, TSH, vitamin_B12]; now [CBC, CK, TSH, vitamin_B12, blood_lead, CMP, folate, inflammatory_markers] | [CBC, CK, TSH, vitamin_B12, blood_lead].
+- Decision: serve: assay added to every alternative + serve: new first alternative (old order kept as an alternative). The rationale makes the repeat blood lead the case-specific mimic test (occupational exposure) and a must follows the level; the condition adds such tests to the required order (anti-GM1, CAG repeat, HIV in other ALS cases). CMP and ESR/CRP as in the label.
+- Scoring: yes: `blood_lead` now required in every alternative (coverage stricter).
+
+Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.

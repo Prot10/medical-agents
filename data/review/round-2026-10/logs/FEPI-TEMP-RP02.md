@@ -73,3 +73,13 @@ Condition close-out (`plans/FEPI-TEMP-decisions.md`). What changed and why:
 - Soft MRI -> drug check constraint: citation `[ILAE_MRI_2019]` -> `[NICE_NG217_2025]`, as in the other cases (ASM choice is what the constraint is about; auditor flag).
 - Anticoagulant drug-check follow-up: empty `summary` filled in report voice (auditor flag); leak guard clean.
 - Checks: `perfect_agent.py -v` and `case_io.py check` clean; `test_case_guards.py -k FEPI-TEMP-` passes, now with the discriminator guard and the FEPI-TEMP banned strings.
+
+## Lab evidence (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited results its own order (the first alternative) no longer returned; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-9-interpret-labs]`.alternatives: was [AED_levels] | [D_dimer] | [coagulation]; now [AED_levels, D_dimer, coagulation, CBC, BMP, troponin, BNP] | [AED_levels] | [D_dimer] | [coagulation].
+- Decision: serve: new first alternative (old order kept as an alternative). The label and rationale ask for D-dimer, coagulation, platelets and renal values before anticoagulation for suspected PE; the first order named only the AED level.
+- Scoring: none (recommended criterion: coverage unchanged, not in the cost reference).
+
+Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.

@@ -89,3 +89,13 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, named in the report's own text.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Lab evidence (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited results its own order (the first alternative) no longer returned; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-2-interpret-labs]`.expected_evidence: was "Electrolytes and creatinine (1.1 mg/dL) normal; troponin I not elevated; BNP 312 pg/mL"; now "Electrolytes and creatinine (1.1 mg/dL) normal".
+- Decision: trim evidence. The rationale says no single assay changes the diagnosis, and the July 2026 tool review ruled that syncope panels name only the assay that changes management (BNP removed from 27 cases; condition_tool_guidance.yaml). Troponin and BNP are incidental to this BMP order and are trimmed; the cardiac-markers panel stays servable to an agent that orders it.
+- Scoring: none.
+
+Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.

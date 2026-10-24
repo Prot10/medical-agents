@@ -58,3 +58,14 @@ Discriminator fixes. The MockServer now routes stored reports by their discrimin
 - `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
 
 Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.
+
+## Lab evidence (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited results its own order (the first alternative) no longer returned; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-4-interpret-labs]`.alternatives: was [CBC, CMP, TSH, anti_TPO, HIV, NMDAR_IgG_cell_based] | [CBC, CMP, thyroid, anti_TPO, HIV, NMDAR_IgG_cell_based]; now [CBC, CMP, TSH, anti_TPO, HIV, NMDAR_IgG_cell_based, tox_screen] | [CBC, CMP, TSH, anti_TPO, HIV, NMDAR_IgG_cell_based] | [CBC, CMP, thyroid, anti_TPO, HIV, NMDAR_IgG_cell_based].
+- `ground_truth.action_criteria[action-4-interpret-labs]`.expected_evidence: was "Serum anti-GluN1 positive (1:64); post-ictal mixed acidosis (pH 7.25, lactate 8.1); sodium 134 mEq/L; thyroid and other neuronal antibodies negative; toxicology negative"; now "Serum anti-GluN1 positive (1:64); sodium 134 mEq/L; thyroid function and thyroid antibodies negative; toxicology negative".
+- Decision: serve: new first alternative (old order kept as an alternative) + trim evidence. The rationale excludes toxic causes of new seizures, so toxicology belongs in the order. The post-ictal blood gas is incidental and other neuronal antibodies are not part of this order; both trimmed.
+- Scoring: coverage unchanged (any call matching the old order still matches); the cost reference of the required work-up now uses the new first order.
+
+Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.

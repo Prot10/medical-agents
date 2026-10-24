@@ -72,3 +72,13 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Lab evidence (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited results its own order (the first alternative) no longer returned; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-3-interpret-labs]`.alternatives: was [glucose, CBC, coagulation, creatinine, troponin]; now [glucose, CBC, coagulation, creatinine, troponin, ESR, CRP].
+- Decision: serve: assay added to every alternative. 74-year-old woman with jaw and facial pain given empirical methylprednisolone: ESR and CRP are part of the first-line order when giant cell arteritis is suspected (EULAR 2023), the label already lists inflammatory markers, and a must, the key evidence and the GCA differential rely on them. No other criterion orders them.
+- Scoring: yes: `ESR` and `CRP` now required in every alternative (coverage stricter).
+
+Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.

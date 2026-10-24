@@ -69,3 +69,14 @@ Condition close-out (`plans/FEPI-TEMP-decisions.md`). What changed and why:
 - Diagnosis synonyms (`diagnosis_synonyms.yaml` G40 entries, re-applied with `--prune --conditions focal_epilepsy_temporal`): labels now focal epilepsy, temporal lobe epilepsy, TLE, epilepsy temporal lobe, mesial temporal lobe epilepsy, MTLE (added), mesial temporal sclerosis epilepsy; removed focal seizures; focal onset seizures; focal impaired awareness seizures (seizure-type labels, retired: their tokens occur in an acute symptomatic or functional-seizure answer). Codes: G40.2, G40.1, G40.9 plus G40.209, G40.109, G40.909 (not intractable); the idiopathic G40.009 and G40.019 removed and the intractable codes removed.
 - Phenytoin drug-check follow-up: empty `summary` filled in report voice (auditor flag); leak guard clean.
 - Checks: `perfect_agent.py -v` and `case_io.py check` clean; `test_case_guards.py -k FEPI-TEMP-` passes, now with the discriminator guard and the FEPI-TEMP banned strings.
+
+## Lab evidence (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited results its own order (the first alternative) no longer returned; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-7-interpret-labs]`.alternatives: was [AED_levels]; now [AED_levels, BMP, magnesium] | [AED_levels].
+- `ground_truth.action_criteria[action-7-interpret-labs]`.expected_evidence: was "Subtherapeutic phenytoin (total 4.2 mcg/mL, free 0.5 mcg/mL); normal sodium, calcium and magnesium; post-convulsive leukocytosis, hyperglycemia, raised CK and lactate."; now "Subtherapeutic phenytoin (total 4.2 mcg/mL, free 0.5 mcg/mL); normal sodium, calcium and magnesium; post-convulsive hyperglycemia, raised CK and lactate.".
+- Decision: serve: new first alternative (old order kept as an alternative) + trim evidence. The label and rationale ask for glucose and electrolytes to exclude a provoked seizure; the order named only the AED level. The new first order returns the metabolic panel and the magnesium panel (with CK and lactate). Leukocytosis trimmed: no blood count is ordered and it is incidental.
+- Scoring: coverage unchanged (any call matching the old order still matches); the cost reference of the required work-up now uses the new first order.
+
+Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.

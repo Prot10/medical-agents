@@ -71,3 +71,14 @@ Condition close-out (`plans/FEPI-TEMP-decisions.md`). What changed and why:
 - Synonyms: all epilepsy labels and G40 codes removed; new B00.4 entry scoped to this case: HSV encephalitis, HSV-1 encephalitis, herpes simplex encephalitis, herpes simplex virus encephalitis, HSE. Not granted: plain "nonconvulsive status epilepticus" and "acute symptomatic seizures" (they would credit "temporal lobe epilepsy with NCSE", the wrong answer the case tests), G40.901 (an epilepsy code that scores alone), "herpes encephalitis" and "herpesviral encephalitis" (tokens of a VZV answer).
 - `followup_outputs` acyclovir drug check: empty `summary` filled in report voice (auditor flag); leak guard clean.
 - Checks: `perfect_agent.py -v` and `case_io.py check` clean; `test_case_guards.py -k FEPI-TEMP-` passes, now with the discriminator guard and the FEPI-TEMP banned strings.
+
+## Lab evidence (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited results its own order (the first alternative) no longer returned; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-8-interpret-labs]`.alternatives: was [BMP] | [CMP] | [creatinine, glucose]; now [CMP] | [BMP] | [creatinine, glucose].
+- `ground_truth.action_criteria[action-8-interpret-labs]`.expected_evidence: was "Creatinine 1.0 mg/dL and BUN 18 mg/dL for acyclovir dosing; glucose 168 mg/dL on dexamethasone; sodium 138 mEq/L, calcium, liver tests and ammonia normal (no metabolic cause of the encephalopathy); WBC 12.4 and CRP 18.4."; now "Creatinine 1.0 mg/dL and BUN 18 mg/dL for acyclovir dosing; glucose 168 mg/dL on dexamethasone; sodium 138 mEq/L, calcium and liver tests normal (no metabolic cause of the encephalopathy).".
+- Decision: serve: existing alternative moved first + trim evidence. The rationale needs liver function with renal function and glucose, so the existing CMP alternative is the criterion's order. WBC, CRP and ammonia are incidental to this criterion and are trimmed.
+- Scoring: none (recommended criterion: coverage unchanged, not in the cost reference).
+
+Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.

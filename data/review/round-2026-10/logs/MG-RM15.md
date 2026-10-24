@@ -86,3 +86,13 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Lab evidence (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited results its own order (the first alternative) no longer returned; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-1-interpret-labs]`.alternatives: was [CBC, BMP] | [CBC, CMP]; now [CBC, BMP, magnesium, phosphate, CRP] | [CBC, BMP] | [CBC, CMP].
+- Decision: serve: new first alternative (old order kept as an alternative). The label and rationale ask for magnesium, phosphate and CRP as crisis precipitants; the aspiration differential relies on CRP 46. None was returned by CBC + BMP.
+- Scoring: coverage unchanged (any call matching the old order still matches); the cost reference of the required work-up now uses the new first order.
+
+Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.

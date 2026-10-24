@@ -70,3 +70,14 @@ Condition close-out (`plans/FEPI-TEMP-decisions.md`). What changed and why:
 - Label (summary CENTRAL 5): "dual pathology (left mesial temporal sclerosis and adjacent left temporal focal cortical dysplasia, FCD Type IIIa)" -> "left hippocampal sclerosis and an associated left temporopolar cortical abnormality (suspected FCD type IIIa)": HS with an associated cortical lesion is FCD IIIa, a histological diagnosis, not dual pathology (Blumcke 2011). Code unchanged (G40.219).
 - Soft MRI -> drug check constraint: citation `[ILAE_MRI_2019]` -> `[NICE_NG217_2025]`, as in the other cases (ASM choice is what the constraint is about; auditor flag).
 - Checks: `perfect_agent.py -v` and `case_io.py check` clean; `test_case_guards.py -k FEPI-TEMP-` passes, now with the discriminator guard and the FEPI-TEMP banned strings.
+
+## Lab evidence (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited results its own order (the first alternative) no longer returned; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-labs-aed-levels]`.alternatives: was [AED_levels] | [sodium] | [BMP]; now [AED_levels, BMP] | [AED_levels] | [sodium] | [BMP].
+- `ground_truth.action_criteria[action-labs-aed-levels]`.expected_evidence: was "Lamotrigine 3.2 and carbamazepine 9.8 mcg/mL within range; sodium 134 mEq/L on carbamazepine; GGT 88 U/L."; now "Lamotrigine 3.2 and carbamazepine 9.8 mcg/mL within range; sodium 134 mEq/L on carbamazepine.".
+- Decision: serve: new first alternative (old order kept as an alternative) + trim evidence. The label asks for ASM levels and sodium, and a must monitors sodium on carbamazepine. GGT (enzyme induction) is incidental to the criterion and is trimmed; it stays servable to a liver-panel order.
+- Scoring: none (recommended criterion: coverage unchanged, not in the cost reference).
+
+Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.

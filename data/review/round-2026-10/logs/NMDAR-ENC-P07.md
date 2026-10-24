@@ -67,3 +67,13 @@ Discriminator fixes. The MockServer now routes stored reports by their discrimin
 - `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
 
 Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.
+
+## Lab evidence (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited results its own order (the first alternative) no longer returned; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-4-interpret-labs]`.alternatives: was [CBC, CMP, TSH, anti_TPO, HIV, NMDAR_IgG_cell_based, beta-hCG] | [CBC, CMP, thyroid, anti_TPO, HIV, NMDAR_IgG_cell_based, beta-hCG]; now [CBC, CMP, TSH, anti_TPO, HIV, NMDAR_IgG_cell_based, beta-hCG, CK, ANA, tox_screen] | [CBC, CMP, TSH, anti_TPO, HIV, NMDAR_IgG_cell_based, beta-hCG] | [CBC, CMP, thyroid, anti_TPO, HIV, NMDAR_IgG_cell_based, beta-hCG].
+- Decision: serve: new first alternative (old order kept as an alternative). The rationale screens toxic and lupus-related causes: a must monitors CK, the NMS and lupus differentials and two red herrings rely on CK 198 and ANA 1:80, and the evidence reads the urine THC.
+- Scoring: coverage unchanged (any call matching the old order still matches); the cost reference of the required work-up now uses the new first order.
+
+Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.

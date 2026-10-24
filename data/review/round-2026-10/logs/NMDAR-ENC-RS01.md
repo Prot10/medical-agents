@@ -64,3 +64,13 @@ Discriminator fixes. The MockServer now routes stored reports by their discrimin
 - `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
 
 Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.
+
+## Lab evidence (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited results its own order (the first alternative) no longer returned; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-4-interpret-labs]`.expected_evidence: was "Serum anti-GluN1 positive (1:80); sodium 131 mEq/L with serum osmolality 268; thyroid function, thyroid antibodies and other neuronal antibodies negative; beta-hCG negative"; now "Serum anti-GluN1 positive (1:80); sodium 131 mEq/L; thyroid function and thyroid antibodies negative; beta-hCG negative".
+- Decision: trim evidence. Serum osmolality with a sodium of 131 is incidental (no hyponatraemia criterion in this case); other neuronal antibodies are not part of this order.
+- Scoring: none.
+
+Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.

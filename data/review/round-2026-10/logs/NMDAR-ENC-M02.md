@@ -65,3 +65,14 @@ Discriminator fixes. The MockServer now routes stored reports by their discrimin
 - `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
 
 Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.
+
+## Lab evidence (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited results its own order (the first alternative) no longer returned; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-4-interpret-labs]`.alternatives: was [CBC, CMP, TSH, anti_TPO, HIV, NMDAR_IgG_cell_based, beta-hCG] | [CBC, CMP, thyroid, anti_TPO, HIV, NMDAR_IgG_cell_based, beta-hCG]; now [CBC, CMP, TSH, anti_TPO, HIV, NMDAR_IgG_cell_based, beta-hCG, CK] | [CBC, CMP, TSH, anti_TPO, HIV, NMDAR_IgG_cell_based, beta-hCG] | [CBC, CMP, thyroid, anti_TPO, HIV, NMDAR_IgG_cell_based, beta-hCG].
+- `ground_truth.action_criteria[action-4-interpret-labs]`.expected_evidence: was "Serum anti-GluN1 IgG positive (titer 1:160), read with the CSF; sodium normal; CK 200 U/L; thyroid, neuronal-surface and onconeural antibodies negative"; now "Serum anti-GluN1 IgG positive (titer 1:160), read with the CSF; sodium normal; CK 200 U/L; thyroid function and thyroid antibodies negative".
+- Decision: serve: new first alternative (old order kept as an alternative) + trim evidence. The rationale gives the CK baseline after olanzapine; a must monitors CK and the NMS differential and red herring rely on it. Neuronal-surface and onconeural panels are not part of this order and are trimmed.
+- Scoring: coverage unchanged (any call matching the old order still matches); the cost reference of the required work-up now uses the new first order.
+
+Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.

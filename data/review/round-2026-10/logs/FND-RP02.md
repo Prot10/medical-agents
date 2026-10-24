@@ -63,3 +63,13 @@ Andrea's FND ruling of 24 Oct 2026 and the close-out decisions (`plans/FND-decis
 
 - Diagnosis synonyms scoped by phenotype (`diagnosis_synonyms.yaml` F44 entries; a label or code naming another presentation must not score): removed "functional movement disorder", "psychogenic non-epileptic seizures", "PNES", "functional seizures"; added "functional limb weakness", "functional motor disorder"; codes removed F44.5.
 - Checks: `perfect_agent.py -v` and `case_io.py check` clean; `test_case_guards.py -k FND-` passes, now including the discriminator guard.
+
+## Lab evidence (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited results its own order (the first alternative) no longer returned; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-4-interpret-labs]`.expected_evidence: was "Potassium 3.3, magnesium 1.5 and low-normal thiamine 74 nmol/L with normal phosphate and iron deficiency, from vomiting and starvation; none explains the weakness"; now "Potassium 3.3, magnesium 1.5 and low-normal thiamine 74 nmol/L with normal phosphate, from vomiting and starvation; none explains the weakness".
+- Decision: trim evidence. Iron deficiency is a haematinics result, incidental to the refeeding and thiamine question this order answers.
+- Scoring: none.
+
+Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.

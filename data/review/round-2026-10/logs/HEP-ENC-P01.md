@@ -100,3 +100,13 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `initial_tool_outputs.eeg`: `eeg_type` set to `routine`, decided by reading the report.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Lab evidence (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited results its own order (the first alternative) no longer returned; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-1-interpret-labs]`.alternatives: was [CBC, CMP, coagulation, ammonia] | [CBC, BMP, LFTs, coagulation, ammonia]; now [CBC, CMP, coagulation, ammonia, CRP, tox_screen] | [CBC, CMP, coagulation, ammonia] | [CBC, BMP, LFTs, coagulation, ammonia].
+- Decision: serve: new first alternative (old order kept as an alternative). Clonazepam accumulation is the precipitant: two musts, the key evidence and the differential rely on the clonazepam level; the label asks for toxicology where drugs are in question. CRP as in the label.
+- Scoring: coverage unchanged (any call matching the old order still matches); the cost reference of the required work-up now uses the new first order.
+
+Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.

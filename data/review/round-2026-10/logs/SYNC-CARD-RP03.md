@@ -94,3 +94,13 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `initial_tool_outputs.eeg`: `eeg_type` set to `routine`, named in the report's own text.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Lab evidence (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited results its own order (the first alternative) no longer returned; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-2-interpret-labs]`.alternatives: was [BMP]; now [BMP, CBC, iron_studies, magnesium] | [BMP].
+- Decision: serve: new first alternative (old order kept as an alternative). The rationale has the blood count and iron studies document the iron deficiency the primary care physician blamed; a must treats it, the differential and a red herring rely on it, and the evidence reads magnesium.
+- Scoring: none (recommended criterion: coverage unchanged, not in the cost reference).
+
+Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.

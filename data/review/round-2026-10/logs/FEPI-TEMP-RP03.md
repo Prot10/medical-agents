@@ -67,3 +67,13 @@ Condition close-out (`plans/FEPI-TEMP-decisions.md`). What changed and why:
 - Citation: `[ASCO_irAE_2018]` (4 places) -> `[ASCO_irAE_2021]`, the ASCO guideline update (Schneider 2021, J Clin Oncol 39:4073-4126) that supersedes it.
 - Soft MRI -> drug check constraint: citation `[ILAE_MRI_2019]` -> `[NICE_NG217_2025]`, as in the other cases (ASM choice is what the constraint is about; auditor flag).
 - Checks: `perfect_agent.py -v` and `case_io.py check` clean; `test_case_guards.py -k FEPI-TEMP-` passes, now with the discriminator guard and the FEPI-TEMP banned strings.
+
+## Lab evidence (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited results its own order (the first alternative) no longer returned; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-9-interpret-labs]`.alternatives: was [AED_levels] | [TSH] | [thyroid]; now [AED_levels, thyroid, BMP] | [AED_levels] | [TSH] | [thyroid].
+- Decision: serve: new first alternative (old order kept as an alternative). The label asks for thyroid function and electrolytes (checkpoint-inhibitor thyroiditis); a must and the hypophysitis differential rely on TSH 6.8 with free T4 0.9.
+- Scoring: none (recommended criterion: coverage unchanged, not in the cost reference).
+
+Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.

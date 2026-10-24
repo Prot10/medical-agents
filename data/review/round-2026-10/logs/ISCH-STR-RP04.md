@@ -82,3 +82,13 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Lab evidence (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited results its own order (the first alternative) no longer returned; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-5-interpret-labs]`.expected_evidence: was "Lupus anticoagulant positive (dRVVT ratios 1.92 and 1.97), anticardiolipin IgG 90.9 GPL and IgM 23.7 MPL, anti-beta-2-glycoprotein I IgG 21.0 and IgM 10.0 U/mL: triple positive, explaining the aPTT; ANA, anti-dsDNA and ANCA negative, complement normal; persistence must be confirmed at 12 weeks."; now "Lupus anticoagulant positive (dRVVT ratios 1.92 and 1.97), anticardiolipin IgG 90.9 GPL and IgM 23.7 MPL, anti-beta-2-glycoprotein I IgG 21.0 and IgM 10.0 U/mL: triple positive, explaining the prolonged clotting time on the admission screen; ANA, anti-dsDNA and ANCA negative, complement normal; persistence must be confirmed at 12 weeks.".
+- Decision: reword evidence (cited result comes from another criterion's order). The aPTT of 46 s comes from the admission coagulation screen (action-3), not from this order; reworded so the evidence points there.
+- Scoring: none.
+
+Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.

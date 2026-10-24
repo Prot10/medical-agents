@@ -82,3 +82,13 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Lab evidence (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited results its own order (the first alternative) no longer returned; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-11-interpret-labs-mma]`.expected_evidence: was "Methylmalonic acid 0.68 umol/L, raised: functional B12 deficiency confirmed"; now "Methylmalonic acid 0.68 umol/L and homocysteine 19.8 umol/L, both raised: the low serum level reflects a true tissue-level deficiency".
+- Decision: reword evidence (cited result comes from another criterion's order). The evidence named the vitamin, not a result; the serum level (180 pg/mL) comes from the cognitive panel (action-6). Reworded to cite what the MMA order returns (MMA and homocysteine).
+- Scoring: none.
+
+Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.

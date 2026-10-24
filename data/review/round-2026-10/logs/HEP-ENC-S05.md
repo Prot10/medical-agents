@@ -95,3 +95,14 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `initial_tool_outputs.eeg`: `eeg_type` set to `routine`, decided by reading the report.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Lab evidence (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited results its own order (the first alternative) no longer returned; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-1-interpret-labs]`.alternatives: was [CBC, CMP, coagulation, ammonia, urinalysis] | [CBC, BMP, LFTs, coagulation, ammonia, urinalysis]; now [CBC, CMP, coagulation, ammonia, urinalysis, CRP] | [CBC, CMP, coagulation, ammonia, urinalysis] | [CBC, BMP, LFTs, coagulation, ammonia, urinalysis].
+- `ground_truth.action_criteria[action-1-interpret-labs]`.expected_evidence: was "WBC 18.2 x10^9/L, CRP 186 mg/L, lactate 2.9 mmol/L; nitrite-positive urinalysis; creatinine 1.8 mg/dL, potassium 3.1 and sodium 131 mEq/L; bilirubin 9.8 mg/dL, albumin 2.2 g/dL, INR 2.4; HBV DNA 340 IU/mL on tenofovir; ammonia 156 µmol/L supportive only"; now "WBC 18.2 x10^9/L, CRP 186 mg/L, lactate 2.9 mmol/L; nitrite-positive urinalysis; creatinine 1.8 mg/dL, potassium 3.1 and sodium 131 mEq/L; bilirubin 9.8 mg/dL, albumin 2.2 g/dL, INR 2.4; ammonia 156 µmol/L supportive only".
+- Decision: serve: new first alternative (old order kept as an alternative) + trim evidence. The label names CRP and the work-up searches for an infective precipitant (EASL 2022 / ACG 2026); CRP was not in the order, so the CRP the evidence reads was not returned. HBV DNA is trimmed: no vocabulary assay orders an HBV viral load (CENTRAL), and it belongs to the antiviral follow-up, not the HE core work-up.
+- Scoring: coverage unchanged (any call matching the old order still matches); the cost reference of the required work-up now uses the new first order.
+
+Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.
