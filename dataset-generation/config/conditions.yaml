@@ -185,6 +185,11 @@ autoimmune_encephalitis_nmdar:
   # than blanket whole-body CT — pelvic/abdominal imaging in women >=12 years, selected
   # testicular imaging in younger men, and broader chest/body imaging only when context supports
   # it. Routine EEG is the baseline; continuous ICU monitoring is a selected escalation.
+  # October 2026 review round (criteria_packs/NMDAR-ENC.md): tumour screen by age and sex (women
+  # 12-44 pelvic ultrasound, men under 45 scrotal ultrasound, anyone 45 or older contrast CAP CT);
+  # the CSF report carries the final CSF anti-GluN1 titre (never "pending") and the labs report only
+  # the serum assay; every case stores a cEEG follow-up consistent with its routine EEG; probable
+  # criteria need an abnormal EEG or CSF pleocytosis/OCB, never the MRI.
   required_modalities: [EEG, MRI, LABS, CSF, body_imaging]
   optional_modalities: [ECG]
   key_findings:
@@ -209,14 +214,14 @@ autoimmune_encephalitis_nmdar:
         - "Subtle unilateral temporal FLAIR signal, could be artifact"
         - "No enhancement, no mass effect"
       diagnostic_puzzle:
-        - "Normal MRI (50% of anti-NMDAR encephalitis cases have normal MRI)"
+        - "Normal MRI (normal or non-specific in about two thirds of anti-NMDAR encephalitis)"
         - "Non-specific white matter changes only"
     labs:
       all_difficulties:
         - "CBC: normal or mild lymphocytosis"
         - "BMP: may show SIADH (hyponatremia)"
         - "Inflammatory markers: CRP mildly elevated or normal"
-        - "Thyroid function: normal (rules out Hashimoto encephalopathy)"
+        - "Thyroid function: usually normal; a raised anti-TPO is non-specific and does not establish Hashimoto encephalopathy"
     csf:
       straightforward:
         - "Lymphocytic pleocytosis (WBC 20-100, >90% lymphocytes)"
@@ -227,11 +232,11 @@ autoimmune_encephalitis_nmdar:
       moderate:
         - "Mild pleocytosis (WBC 5-20)"
         - "Protein borderline elevated"
-        - "Anti-NMDAR antibodies pending (takes days)"
+        - "Positive anti-NMDAR (GluN1) IgG on cell-based assay, final titre reported"
       diagnostic_puzzle:
-        - "Near-normal CSF initially (WBC <5, normal protein)"
-        - "Antibodies not yet resulted"
-        - "Could be mistaken for primary psychiatric disorder"
+        - "Near-normal CSF initially (WBC <5, normal protein, OCB absent or equivocal)"
+        - "Positive anti-NMDAR (GluN1) IgG on cell-based assay at low titre, final titre reported; serum may be negative"
+        - "Normal glucose (CSF/serum ratio above 0.5)"
   differential_diagnoses:
     - diagnosis: "Viral encephalitis (HSV)"
       key_distinguishing: "Temporal lobe predilection, fever, CSF HSV PCR positive, more acute"
@@ -241,8 +246,10 @@ autoimmune_encephalitis_nmdar:
       key_distinguishing: "Exposure to antipsychotics, rigidity, very high CK, high fever"
     - diagnosis: "CNS vasculitis"
       key_distinguishing: "Vessel irregularities on angiography, multifocal strokes"
-    - diagnosis: "Hashimoto encephalopathy"
-      key_distinguishing: "Anti-TPO antibodies, thyroid dysfunction, responds to steroids"
+    - diagnosis: "Hashimoto encephalopathy (SREAT)"
+      key_distinguishing: "Anti-TPO antibodies with no well-characterised neuronal antibody; a diagnosis of exclusion"
+    - diagnosis: "Other neuronal-surface antibody encephalitis (LGI1, CASPR2, GABA-B, AMPA)"
+      key_distinguishing: "Its own antibody in serum or CSF; LGI1 with faciobrachial dystonic seizures and hyponatraemia"
   difficulty_variants:
     straightforward:
       presentation: "24-year-old woman with subacute personality change, new-onset seizures, orofacial dyskinesias, and autonomic instability over 2 weeks. Viral prodrome."
@@ -254,9 +261,9 @@ autoimmune_encephalitis_nmdar:
       presentation: "22-year-old woman brought by family for 'bizarre behavior' — paranoia, social withdrawal, insomnia for 1 week. No seizures yet. Appears psychiatric."
       expected_agent_confidence: 0.30
   common_followups:
-    - trigger_action: "request_nmdar_antibodies"
-      tool_name: "interpret_labs"
-      description: "Serum IgG anti-GluN1 cell-based assay, interpreted only with the CSF assay"
+    - trigger_action: "request_continuous_eeg"
+      tool_name: "analyze_eeg"
+      description: "Continuous EEG (eeg_type continuous_icu), consistent with the routine EEG: same lateralisation and patterns"
     - trigger_action: "request_pelvic_ultrasound"
       tool_name: "order_body_imaging"
       description: "Pelvic and abdominal ultrasound to screen for ovarian teratoma"
@@ -265,13 +272,13 @@ autoimmune_encephalitis_nmdar:
       description: "Targeted germ-cell tumour screening in a selected younger male"
     - trigger_action: "request_autoimmune_panel"
       tool_name: "interpret_labs"
-      description: "Comprehensive autoimmune encephalitis antibody panel (LGI1, CASPR2, GABA-B, AMPA)"
+      description: "Neuronal-surface antibody panel (LGI1, CASPR2, GABA-B, AMPA); at 45 or older with the onconeural panel"
     - trigger_action: "request_ct_chest_abdomen_pelvis"
       tool_name: "order_body_imaging"
-      description: "Context-adapted broader occult-neoplasm workup in selected older patients"
-    - trigger_action: "request_repeat_lp"
-      tool_name: "analyze_csf"
-      description: "Repeat lumbar puncture if initial was early/equivocal"
+      description: "Contrast CT chest, abdomen and pelvis for a carcinoma search at age 45 or older (replaces the pelvic or scrotal ultrasound)"
+    - trigger_action: "request_pelvic_mri"
+      tool_name: "order_body_imaging"
+      description: "Pelvic MRI to characterise an equivocal adnexal lesion on ultrasound (fat-suppressed sequences)"
 
 alzheimers_early:
   name: "Alzheimer's disease"
@@ -1273,36 +1280,38 @@ migraine_with_aura:
   # documented red flags. ECG and CSF are removed. The sole EEG case has a witnessed seizure;
   # the three echo cases are two infarct mechanisms and MELAS cardiomyopathy screening, not
   # routine migraine investigations.
+  # October 2026 close-out (criteria_packs/MIG-AURA.md): MRI only for red flags and never in a
+  # typical-aura S case; vessel imaging (MRA, MRV) is its own order_advanced_imaging study and a
+  # brain MRI report never describes vessels; literature is optional and last; the drug check uses
+  # {"drug": ...} and is required only for a concrete interaction or contraindication; genetic
+  # counselling and hemiplegic migraine gene testing are musts, not tool calls. A single attack is
+  # ICHD-3 1.5.2 probable migraine with aura.
   required_modalities: [clinical_assessment]
   optional_modalities: [MRI, LABS, echo, cardiac_monitoring, EEG, advanced_imaging, specialized_test]
   key_findings:
     mri:
       straightforward:
-        - "Normal brain MRI (primary function: exclusion of secondary causes)"
-        - "No acute infarction on DWI"
-        - "No structural lesion (AVM, tumor, cavernoma)"
-        - "Possible incidental non-specific subcortical white matter lesions (migraine-related)"
-        - "No leptomeningeal enhancement"
+        - "Normal brain MRI (only when a red flag justified it)"
+        - "No acute infarct on DWI (DWI excludes infarction, not TIA)"
+        - "No structural lesion (AVM, tumour, cavernoma)"
+        - "Possible incidental non-specific subcortical white matter hyperintensities (common in migraine)"
       moderate:
-        - "Small non-specific subcortical white matter T2 hyperintensities"
-        - "No DWI restriction (excludes stroke)"
-        - "Normal vascular anatomy on MRA"
+        - "Small non-specific punctate frontal subcortical white matter T2 hyperintensities, no anterior temporal or external capsule involvement"
+        - "No restricted diffusion"
       diagnostic_puzzle:
-        - "DWI restriction in posterior territory (migrainous infarction vs TIA)"
-        - "Cerebellar T2 lesion — CADASIL pattern in young patient"
+        - "Cortical infarct in the territory of a prolonged aura (migrainous infarction only if the aura persisted beyond 60 min; otherwise an embolic or other cause)"
+        - "Confluent anterior temporal pole and external capsule white matter hyperintensities: CADASIL pattern"
+        - "Cortical stroke-like lesion crossing vascular territories with a lactate peak on spectroscopy: MELAS"
         - "Posterior fossa AVM or cavernoma presenting with aura-like episodes"
     labs:
+      # Labs are optional unless a red flag or a work-up calls for them; never a default panel.
       all_difficulties:
-        - "CBC: normal"
-        - "BMP: normal"
-        - "ESR/CRP: normal (rules out vasculitis)"
-        - "ANA, antiphospholipid antibodies: negative (rules out autoimmune/thrombophilic cause)"
-        - "Coagulation: normal (rules out thrombophilia)"
-        - "Fasting lipids: may show hyperlipidemia (vascular risk in complex migraine)"
-        - "TSH: normal"
+        - "ESR and CRP normal in a first aura after 50 (giant cell arteritis question)"
+        - "Antiphospholipid panel only in an infarct work-up: lupus anticoagulant (dRVVT) negative, anticardiolipin and anti-beta2-glycoprotein I IgG and IgM below 20 units"
+        - "Lactate and CK only when MELAS is in question"
   differential_diagnoses:
     - diagnosis: "Transient ischemic attack"
-      key_distinguishing: "Sudden onset, negative symptoms (visual field cut vs spreading scotoma), older age, vascular risk factors, DWI restriction"
+      key_distinguishing: "Sudden onset, negative symptoms (field loss rather than a spreading scotoma), no march or succession, older age, vascular risk factors; DWI is normal in TIA, so the distinction is clinical"
     - diagnosis: "Focal seizure with visual phenomena"
       key_distinguishing: "Stereotyped, brief (<1-2 min), structured hallucinations rather than spreading scotoma, EEG abnormality"
     - diagnosis: "AVM or cavernoma"
@@ -1313,13 +1322,13 @@ migraine_with_aura:
       key_distinguishing: "Progressive symptoms, mass on MRI with enhancement, no aura spreading pattern"
   difficulty_variants:
     straightforward:
-      presentation: "28-year-old woman with 5-year history of typical visual aura (fortification spectra spreading over 20-30 min) followed by unilateral throbbing headache with nausea. ICHD-3 criteria met."
+      presentation: "28-year-old woman with 5-year history of typical visual aura (fortification spectra spreading over 20-30 min) followed by unilateral throbbing headache with nausea; normal examination."
       expected_agent_confidence: 0.85
     moderate:
-      presentation: "35-year-old woman presenting with new-onset right arm tingling spreading to face over 10 minutes then severe headache. First episode — requires secondary cause exclusion. MRI normal."
+      presentation: "35-year-old woman presenting with right arm tingling spreading to the face over 10 minutes, then severe headache; a similar but milder episode a year ago; normal examination. Imaging not yet done."
       expected_agent_confidence: 0.62
     diagnostic_puzzle:
-      presentation: "42-year-old woman with episodic expressive language difficulty lasting 15-20 minutes with subsequent headache. TIA vs migraine with aphasic aura. DWI negative on MRI."
+      presentation: "42-year-old woman with episodic expressive language difficulty building over 5-10 minutes and lasting 15-20 minutes, followed by headache; questioned TIA. Imaging not yet done."
       expected_agent_confidence: 0.38
   common_followups:
     - trigger_action: "request_prolonged_eeg"
@@ -1327,10 +1336,16 @@ migraine_with_aura:
       description: "Video-EEG only when an actual seizure event requires classification; not for routine aura"
     - trigger_action: "request_thrombophilia_panel"
       tool_name: "interpret_labs"
-      description: "Targeted vascular testing only in a documented infarction workup"
+      description: "Antiphospholipid panel only in a documented infarction workup (not a coagulation screen, not routine)"
     - trigger_action: "request_mitochondrial_workup"
       tool_name: "interpret_labs"
-      description: "Lactate, pyruvate, mtDNA sequencing if MELAS suspected"
+      description: "Serum lactate and CK only if MELAS is suspected"
+    - trigger_action: "request_mtdna_m3243ag"
+      tool_name: "order_specialized_test"
+      description: "genetic_panel:mitochondrial, m.3243A>G heteroplasmy on urine or buccal cells, after the MRI shows a stroke-like lesion; report states sample and heteroplasmy level"
+    - trigger_action: "request_mr_angiography"
+      tool_name: "order_advanced_imaging"
+      description: "MR_angiography as its own study only for motor aura, exertional or thunderclap onset, an infarct or an aneurysm question; the brain MRI report never describes vessels"
 
 frontotemporal_dementia:
   name: "Frontotemporal dementia"
@@ -1450,9 +1465,9 @@ status_epilepticus:
         - "OR: Non-convulsive SE (NCSE) — continuous or near-continuous electrographic seizures"
         - "Ictal pattern: rhythmic spike-wave at 2-4 Hz, evolving frequency, amplitude, morphology"
         - "Postictal suppression between bursts in post-convulsive phase"
-        - "Dramatic improvement or normalization with benzodiazepine administration (therapeutic test)"
+        - "Equivocal NCSE only: a diagnostic benzodiazepine trial under EEG (Salzburg criteria), stored as its own follow-up; no EEG reports the response to treatment"
       moderate:
-        - "Periodic lateralized epileptiform discharges (PLEDs/LPDs) — on ictal-interictal continuum"
+        - "Lateralized periodic discharges (LPDs, ACNS 2021 terminology) on the ictal-interictal continuum"
         - "Generalized periodic discharges (GPDs) with fluctuating consciousness"
         - "Subtle NCSE pattern: rhythmic delta with embedded spikes"
       diagnostic_puzzle:
@@ -1461,16 +1476,18 @@ status_epilepticus:
         - "Normal EEG between seizures in PNES/psychogenic non-epileptic status"
     labs:
       all_difficulties:
-        - "BMP: hyponatremia, hypoglycemia, or hyperglycemia as precipitant or consequence"
-        - "CBC: leukocytosis (post-ictal stress or infectious trigger)"
-        - "Glucose: critical — immediate bedside glucose check mandatory"
-        - "Calcium, magnesium: hypomagnesemia or hypocalcemia as precipitant"
-        - "AED levels: subtherapeutic phenytoin, valproate, levetiracetam"
-        - "Toxicology screen: cocaine, amphetamines, TCA overdose, isoniazid"
-        - "Lactate: markedly elevated (post-ictal lactic acidosis)"
-        - "CK: elevated (rhabdomyolysis from prolonged tonic-clonic activity)"
-        - "Troponin: may be elevated (neurogenic cardiac stress)"
-        - "Ammonia: elevated in valproate toxicity or hepatic cause"
+        # Values, units, ranges and flags only; each analyte once, in its own panel. No "Exclusion
+        # studies" or "Mimic exclusion" block of unvalued "within reference range" analytes (October
+        # 2026 review, class C1), and no interpretation such as "stress response" in the report.
+        - "Point-of-care glucose, then BMP with sodium, calcium and magnesium, renal and hepatic function"
+        - "CBC"
+        - "ASM levels only in a patient already taking an ASM"
+        - "Toxicology screen when the cause is not evident from the history (routine screens do not detect isoniazid)"
+        - "Lactate and CK raised after convulsive SE, consistent with the duration of the convulsions"
+        - "Troponin only where cardiac injury is in question"
+        - "Ammonia only in liver disease or valproate use; coagulation only on anticoagulants, liver disease or HELLP"
+        - "beta-hCG only in women of reproductive age without a known pregnancy"
+        - "Blood cultures only where infection is suspected (fever with a source, leukocytosis, immunosuppression with sepsis); seizure-related hyperthermia within hours of convulsions is not an indication"
     ct:
       straightforward:
         - "CT head without contrast: exclude structural cause (hemorrhage, mass)"
@@ -1495,11 +1512,11 @@ status_epilepticus:
         - "DWI changes mimicking stroke (ictal DWI pseudostroke)"
     csf:
       straightforward:
-        - "Mild pleocytosis (5-30 cells) post-ictal (normal variant after SE)"
+        - "Mild pleocytosis after SE is usually under 10 cells/uL; a higher count needs another cause"
         - "Anti-NMDAR, anti-LGI1, anti-GABA-B antibodies — autoimmune SE workup"
         - "HSV PCR: positive in HSV encephalitis-associated SE"
       moderate:
-        - "Normal CSF (excludes CNS infection; autoimmune antibodies pending)"
+        - "Normal cell count, protein and glucose (does not exclude early HSV or LGI1 encephalitis; antibodies pending)"
         - "Mild protein elevation — post-ictal blood-brain barrier disruption"
       diagnostic_puzzle:
         - "CSF pleocytosis — infectious vs autoimmune vs post-ictal unclear"
@@ -1517,30 +1534,29 @@ status_epilepticus:
       key_distinguishing: "Preceding cardiac arrest or hypoxic event, burst-suppression EEG, DWI cortical/basal ganglia changes"
   difficulty_variants:
     straightforward:
-      presentation: "40-year-old with known epilepsy — missed medications — found convulsing continuously for 15 minutes. Subtherapeutic valproate level. EEG shows continuous generalized seizure activity."
+      presentation: "40-year-old with known epilepsy on valproate, who ran out of tablets 3 days ago, found convulsing continuously for 15 minutes."
       expected_agent_confidence: 0.88
     moderate:
-      presentation: "65-year-old found confused and minimally responsive after witnessed brief shaking. Now 'awake' but disoriented. EEG shows subtle NCSE with GPDs. CT negative."
+      presentation: "65-year-old found confused and minimally responsive after witnessed brief shaking. Now 'awake' but disoriented, with intermittent subtle eyelid twitching."
       expected_agent_confidence: 0.62
     diagnostic_puzzle:
-      presentation: "55-year-old with new-onset unresponsiveness, eye deviation, and subtle lip-smacking. EEG shows LPDs on ictal-interictal continuum — expert disagreement on whether to treat as NCSE."
+      presentation: "55-year-old with new-onset unresponsiveness, intermittent eye deviation and subtle lip-smacking, with no clear convulsion."
       expected_agent_confidence: 0.38
+  # October 2026 review: the initial EEG output is the continuous video-EEG (eeg_type continuous_icu),
+  # so there is no cEEG follow-up (its trigger shared the token "continuous" with continuous_icu and
+  # served post-treatment EEGs, class C4); no ASM-level follow-up after loading (a treatment effect,
+  # ruling 4); a follow-up exists only when a criterion orders it. Triggers must not share a token
+  # with the core EEG or lab orders.
   common_followups:
-    - trigger_action: "request_continuous_eeg_monitoring"
-      tool_name: "analyze_eeg"
-      description: "Continuous cEEG monitoring for 24-48h to detect NCSE and guide treatment"
     - trigger_action: "request_autoimmune_encephalitis_panel"
       tool_name: "interpret_labs"
-      description: "Serum and CSF autoimmune encephalitis antibody panel"
+      description: "Second-tier serum autoimmune or paraneoplastic antibody panel, only where autoimmune or paraneoplastic encephalitis is in the differential and a criterion orders it"
     - trigger_action: "request_mri_brain_contrast"
       tool_name: "analyze_brain_mri"
-      description: "MRI brain with gadolinium for encephalitis, structural, or tumoral cause"
-    - trigger_action: "request_aed_optimization"
-      tool_name: "interpret_labs"
-      description: "Therapeutic drug monitoring for levetiracetam, valproate, lacosamide levels"
-    - trigger_action: "request_lp_autoimmune"
+      description: "MRI brain with gadolinium when SE is new-onset, unexplained or refractory, or encephalitis, autoimmune disease or tumor is suspected; not required when the cause is already established"
+    - trigger_action: "request_lumbar_puncture"
       tool_name: "analyze_csf"
-      description: "Lumbar puncture for CSF autoimmune antibody panel and infectious workup"
+      description: "CSF (cells, protein, glucose, HSV PCR, antibodies as indicated) when the cause is unclear, without delay with fever or immunosuppression, after head CT; only where a CSF criterion exists. LP is an avoided action with mass effect or midline shift, platelets below 50 x10^9/L or uncorrected coagulopathy"
 
 vascular_dementia:
   name: "Vascular dementia (major vascular cognitive disorder)"
@@ -1564,12 +1580,19 @@ vascular_dementia:
   #   MRI — the vascular attribution IS the imaging: STRIVE-2 markers (confluent WMH, lacunes,
   #     microbleeds, cortical superficial siderosis, atrophy pattern). CT only where MRI is
   #     contraindicated, and then it cannot see microbleeds — that limitation is scored
-  #   LABS — reversible mimics (TSH, B12, folate, RPR, HIV) plus the vascular risk factors that
+  #   LABS — reversible mimics (TSH, B12, folate; RPR and HIV with a risk factor) plus the vascular risk factors that
   #     change management (HbA1c, lipid panel)
   # ECG, cardiac monitoring and echocardiography stay OPTIONAL at panel level and are required
   # per case only where the infarct pattern is embolic, because that is where an occult source
   # changes treatment from risk-factor control to anticoagulation. Same for carotid duplex/MRA:
   # required only where a large-artery source is in play.
+  # October 2026 review round (plans/VASC-DEM.md, VASC-DEM-decisions.md; the criteria pack is the
+  # authority): ECG after any ischaemic infarct (recommended at least); TTE is never waste after an
+  # ischaemic infarct; no literature step and no generic drug check; the MRI criterion has no
+  # `sequences`/`protocol` arguments; RPR and HIV only with a risk factor. Presentations give the
+  # clinical picture only: the screen score, imaging and lab results are what the agent orders.
+  # Findings below are written as what each modality reports, never the diagnosis, the severity
+  # verdict or management.
   required_modalities: [clinical_assessment, MRI, LABS]
   optional_modalities: [CT, ECG, advanced_imaging, specialized_test, cardiac_monitoring, echo, CSF]
   key_findings:
@@ -1578,13 +1601,13 @@ vascular_dementia:
         - "MoCA 19/30 with the loss concentrated in trail-making, digit span backwards and verbal fluency; delayed recall improves with cueing"
         - "Executive/processing-speed profile out of proportion to the memory deficit (opposite of the AD profile)"
         - "Stepwise history corroborated by an informant; abrupt worsening dated to a documented event"
-        - "Timed-up-and-go prolonged with short-stepped, wide-based gait and preserved arm swing (vascular gait apraxia)"
+        - "Timed-up-and-go prolonged with short-stepped, wide-based gait and preserved arm swing"
       moderate:
-        - "MoCA 24/30 — borderline, executive items disproportionately affected"
+        - "MoCA 24/30, borderline, executive items disproportionately affected"
         - "Mixed profile: both amnestic and executive deficits, attribution unclear on testing alone"
         - "Gradual rather than stepwise decline reported, which does not exclude small-vessel disease"
       diagnostic_puzzle:
-        - "MoCA 26/30 with severe functional complaint — testing underestimates the deficit"
+        - "MoCA 26/30 in a high-baseline patient whose informant reports loss of complex activities"
         - "Prominent apathy and slowed processing mistaken by the family for depression"
         - "Fluctuating attention on repeat testing (raises DLB) without visual hallucinations or parkinsonism"
     mri:
@@ -1597,54 +1620,54 @@ vascular_dementia:
         - "Deep cerebral microbleeds on SWI in a hypertensive distribution (thalamus, basal ganglia, pons)"
         - "Medial temporal lobes relatively preserved for age (Scheltens 0-1)"
       moderate:
-        - "Moderate white matter hyperintensity, Fazekas 2 — greater than expected for age but not confluent"
-        - "One or two lacunes plus mild global atrophy; both vascular and degenerative contributions plausible"
-        - "Hippocampal atrophy Scheltens 2 alongside Fazekas 2 — mixed pathology on imaging"
+        - "Moderate white matter hyperintensity, Fazekas 2, early confluence"
+        - "One or two lacunes plus mild global atrophy"
+        - "Hippocampal atrophy Scheltens 2 alongside Fazekas 2 white matter hyperintensity"
       diagnostic_puzzle:
-        - "Strictly lobar microbleeds with cortical superficial siderosis and posterior WMH — probable cerebral amyloid angiopathy (Boston criteria v2.0)"
-        - "Severe confluent WMH with anterior temporal pole and external capsule involvement in a patient under 60 — hereditary small-vessel disease (CADASIL) must be excluded"
-        - "Fazekas 3 burden with a near-normal cognitive profile — imaging severity dissociated from the clinical picture"
-        - "Bilateral watershed infarcts after a documented hypotensive episode rather than embolic disease"
+        - "Strictly lobar microbleeds with cortical superficial siderosis and posterior WMH; findings fulfil Boston criteria v2.0 for probable cerebral amyloid angiopathy"
+        - "Severe confluent WMH with anterior temporal pole and external capsule involvement in a patient under 60"
+        - "Fazekas 3 burden in a patient whose cognitive screen is near normal"
+        - "Bilateral cortical and internal border-zone infarcts in a patient with a documented hypotensive episode"
     labs:
       all_difficulties:
-        - "CBC: normal (excludes anaemia and polycythaemia as contributors)"
-        - "CMP: normal renal and hepatic function"
-        - "TSH: normal (excludes hypothyroid cognitive impairment)"
+        - "CBC: within sex-specific reference ranges (Hct about 3 x Hb)"
+        - "CMP: creatinine and eGFR (CKD-EPI 2021) consistent with age and sex; liver tests normal"
+        - "TSH: within range"
         - "Vitamin B12: normal or low-normal; folate normal"
-        - "RPR: non-reactive (excludes neurosyphilis)"
-        - "HIV: negative"
-        - "HbA1c: elevated (7-9%) — long-standing diabetes as the vascular driver"
-        - "Lipid panel: elevated LDL, low HDL"
+        - "RPR and HIV only where a risk factor makes them indicated: non-reactive, negative"
+        - "HbA1c: elevated (7-9%) in a patient with long-standing diabetes"
+        - "Lipid panel: elevated LDL, low HDL; total cholesterol = LDL + HDL + TG/5"
       moderate:
-        - "HbA1c borderline (5.9-6.4%); LDL at target on a statin already prescribed"
-        - "B12 low (180-250 pg/mL) with normal homocysteine — a contributor, not the explanation"
+        - "HbA1c borderline (5.9-6.4%); LDL 70-100 mg/dL on a statin already prescribed"
+        - "B12 low-normal (180-250 pg/mL), prompting methylmalonic acid"
       diagnostic_puzzle:
-        - "Every reversible-cause lab normal, with an untreated blood pressure of 178/98 at the visit"
-        - "ESR/CRP mildly elevated — vasculitis considered and not supported"
+        - "Every reversible-cause lab normal"
+        - "ESR/CRP mildly elevated without other inflammatory markers"
     advanced_imaging:
       straightforward:
         - "Carotid duplex: >50% stenosis of the internal carotid artery ipsilateral to the cortical infarcts"
         - "MR angiography: intracranial large-artery stenosis; no dissection"
       moderate:
-        - "Carotid duplex: 30-49% plaque, not flow-limiting — vascular disease confirmed, mechanism not established"
+        - "Carotid duplex: 30-49% plaque, not flow-limiting"
         - "FDG-PET: patchy multifocal hypometabolism following the white matter lesions rather than a temporoparietal pattern"
       diagnostic_puzzle:
-        - "Amyloid PET positive alongside a heavy vascular burden — mixed Alzheimer and vascular pathology, not either alone"
-        - "FDG-PET temporoparietal hypometabolism with a vascular burden — mixed disease; treating one and ignoring the other is the error"
+        - "Amyloid PET: positive visual read (cortical tracer uptake in two or more regions)"
+        - "FDG-PET: temporoparietal and posterior cingulate hypometabolism, consistent with an Alzheimer-type metabolic profile"
     csf:
       moderate:
-        - "Abeta42 borderline, phospho-tau normal — Alzheimer biology not supported"
+        - "Abeta42 borderline, Abeta42/40 ratio normal, phospho-tau normal"
       diagnostic_puzzle:
-        - "Abeta42 reduced with elevated phospho-tau on top of the vascular burden — mixed AD/vascular"
-        - "Normal cell count and protein; no inflammatory picture (excludes CNS vasculitis)"
+        - "Abeta42/40 ratio low with phospho-tau181 raised"
+        - "Normal cell count and protein"
+        - "Cerebral amyloid angiopathy: Abeta40 and Abeta42 both reduced"
     ecg:
       straightforward:
-        - "Atrial fibrillation, previously undocumented — an embolic source for the multi-territory infarcts"
+        - "Atrial fibrillation with controlled ventricular response"
         - "Left ventricular hypertrophy with a strain pattern (chronic hypertension)"
       moderate:
-        - "Sinus rhythm with frequent atrial ectopy — paroxysmal atrial fibrillation not excluded, prompting longer monitoring"
+        - "Sinus rhythm with frequent atrial ectopy"
       diagnostic_puzzle:
-        - "Sinus rhythm throughout; the mechanism remains small-vessel rather than embolic"
+        - "Sinus rhythm, normal intervals"
   differential_diagnoses:
     - diagnosis: "Alzheimer's disease"
       key_distinguishing: "Insidious amnestic-predominant decline, recall not helped by cueing, medial temporal atrophy out of proportion to vascular burden, amyloid biomarkers positive"
@@ -1657,20 +1680,20 @@ vascular_dementia:
     - diagnosis: "Normal pressure hydrocephalus"
       key_distinguishing: "Ventriculomegaly with Evans index >0.3 and a disproportionately enlarged subarachnoid space, gait-first triad, objective improvement after a tap test"
     - diagnosis: "Cerebral amyloid angiopathy"
-      key_distinguishing: "Strictly lobar microbleeds and cortical superficial siderosis on SWI, lobar haemorrhage history — a vascular cause, but one that contraindicates anticoagulation"
+      key_distinguishing: "Strictly lobar microbleeds and cortical superficial siderosis on SWI, lobar haemorrhage history; a vascular cause in which anticoagulation is avoided where possible"
     - diagnosis: "CADASIL"
       key_distinguishing: "Onset under 60, migraine with aura, family history of stroke or dementia, anterior temporal pole and external capsule white matter involvement, NOTCH3 variant"
     - diagnosis: "Depression (pseudodementia)"
       key_distinguishing: "Prominent low mood and effort-dependent performance, deficits improving with treatment, imaging burden not explaining the severity"
   difficulty_variants:
     straightforward:
-      presentation: "74-year-old with 30 years of hypertension and type 2 diabetes, brought by his daughter after a stepwise decline over 3 years dated to two episodes of transient weakness. Short-stepped gait, brisk reflexes. MoCA 19/30 with executive predominance."
+      presentation: "74-year-old with 30 years of hypertension and type 2 diabetes, brought by his daughter after a stepwise decline over 3 years dated to two episodes of transient weakness; she now manages his medicines and finances. Short-stepped gait, brisk reflexes, slow to initiate answers."
       expected_agent_confidence: 0.82
     moderate:
-      presentation: "69-year-old with 2 years of gradual slowing, apathy and word-finding difficulty. Treated hypertension. MoCA 24/30 with both amnestic and executive items affected. Imaging shows Fazekas 2 white matter change and Scheltens 2 hippocampal atrophy."
+      presentation: "69-year-old with 2 years of gradual slowing, apathy, forgetfulness and word-finding difficulty. Treated hypertension. Her husband reports missed appointments and that he has taken over the bills."
       expected_agent_confidence: 0.55
     diagnostic_puzzle:
-      presentation: "58-year-old with 18 months of executive decline, a long history of migraine with aura and a mother who developed dementia at 62. Blood pressure normal, no diabetes. Imaging shows severe confluent white matter change with anterior temporal pole involvement."
+      presentation: "58-year-old with 18 months of executive decline, a long history of migraine with aura and a mother who developed dementia at 62 after two strokes. Blood pressure normal, no diabetes."
       expected_agent_confidence: 0.35
   common_followups:
     - trigger_action: "request_carotid_duplex"
@@ -1687,10 +1710,10 @@ vascular_dementia:
       description: "Amyloid PET where mixed Alzheimer and vascular pathology is the question"
     - trigger_action: "request_csf_biomarkers"
       tool_name: "analyze_csf"
-      description: "CSF Abeta42, Abeta42/40 ratio and phospho-tau for coexisting Alzheimer biology"
+      description: "CSF Abeta42, Abeta42/40 ratio and phospho-tau for coexisting Alzheimer biology (not where LP is declined or anticoagulation would need interrupting; waste in CAA)"
     - trigger_action: "request_prolonged_cardiac_monitoring"
       tool_name: "order_cardiac_monitoring"
-      description: "Extended ambulatory monitoring for paroxysmal atrial fibrillation after multi-territory infarcts"
+      description: "Extended ambulatory monitoring for paroxysmal atrial fibrillation after embolic-pattern infarcts with a sinus-rhythm ECG (pacemaker interrogation where a device is present)"
     - trigger_action: "request_neuropsych_battery"
       tool_name: "order_specialized_test"
       description: "Formal neuropsychological battery to document the domain profile and track it"

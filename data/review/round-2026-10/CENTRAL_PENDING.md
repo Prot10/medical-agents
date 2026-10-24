@@ -51,7 +51,9 @@ batch's CENTRAL terms. 3. One agent per condition wires the new terms into the c
   Annex A.4).
 
 ## Synonym prune effects on later batches
-- `apply_diagnosis_synonyms --prune` would change MIG-AURA-P03, MIG-AURA-P07, SE-P04 (lose "stroke"
+- (MIG-AURA-P03 and P07 done 24 Oct: P03 recoded G43.609 with migrainous-infarction labels only,
+  P07 cardioembolic labels only, I63 category excepted; plans/MIG-AURA-decisions.md.)
+- `apply_diagnosis_synonyms --prune` would change SE-P04 (lose "stroke"
   and mechanism labels) and SE-P07 (loses "hepatic coma", K72.91); `--check` adds I63.5/I63.51 to
   SE-P04. Apply when those conditions run.
 
@@ -63,8 +65,15 @@ batch's CENTRAL terms. 3. One agent per condition wires the new terms into the c
   within 3 months (ISCH-STR-RM01) and aPTT > 40 s without anticoagulant (ISCH-STR-RP04).
 - Scoring changes: ALS-P08 rejects a plain "ALS" (Z15.89), ALS-P02 credits Graves, HEP-ENC-P04
   coded as Wilson disease.
+- Never physician-reviewed and now changed by the round: VASC-DEM, NMDAR-ENC, MIG-AURA (and the
+  batch-4/5 conditions). Schedule them into the next review round (Andrea). Point the reviewers at
+  the scoring changes in each `plans/<COND>-decisions.md`.
+- VASC-DEM: the 2026 ACC/AHA dyslipidemia goal (LDL < 55 mg/dL at very high risk) was read from
+  summaries; confirm with the full text whether lacunar and cardioembolic strokes count as major
+  ASCVD events (more cases would move to < 55).
+- SE: tell R2 about the recodes and that P04 and P06 now need the seizure component for credit.
 
 ## Guard failures left in later batches (24 Oct)
-- Leak guard: VASC-DEM 30, NMDAR-ENC 18, MIG-AURA 13, SE 10, SYNC-CARD 10, NPH 9, FTD 6, MG 6,
+- Leak guard: VASC-DEM 30, NMDAR-ENC 18, MIG-AURA 0 (clean 24 Oct), SE 10, SYNC-CARD 10, NPH 9, FTD 6, MG 6,
   FND 5, MS-RR 4, FEPI-TEMP 3, PD 2. Follow-up guard: FTD 1. (Batches 1-2 are clean.)
   Workers see the rule in PATTERNS.md section 5.

@@ -543,8 +543,11 @@ SPEC += [
                   "reach it."),
     dict(cond="status_epilepticus", filed="analyze_brain_mri", tool="analyze_brain_mri",
          reviewer=2, tier="unchanged", status="applied",
-         response="The epilepsy-oriented protocol and the indication list are applied, and MRI is "
-                  "required in 17 cases and absent where the cause is already established. "
+         response="The epilepsy-oriented protocol and the indication list are applied: MRI is "
+                  "required in 14 cases (new-onset, unexplained or refractory status, or "
+                  "suspected encephalitis, autoimmune disease or tumour), recommended in 6 and "
+                  "optional in 7, mostly where the cause is already established, and absent in the 3 "
+                  "toxic cases (organophosphate, isoniazid, tricyclic). "
                   "MR_venography is now optional in the single pregnancy/PRES-CVST differential "
                   "case, after stabilisation and brain MRI; it is not a blanket status test."),
     dict(cond="status_epilepticus", filed="order_ct_scan", tool="order_ct_scan",
@@ -595,10 +598,13 @@ SPEC += [
          reviewer=1, tier="optional", status="applied",
          seg=(None, "Migraine with aura is primarily a clinical diagnosis. The true required"),
          response="Applied case by case and corrected beyond the first pass: MRI is absent in 11 "
-                  "typical cases, optional in 3 and recommended in 11 red-flag presentations. It "
-                  "is required in 5 strong non-routine exceptions: two documented infarcts, "
-                  "MELAS with persistent deficit, familial aneurysm evaluation and a witnessed "
-                  "seizure. Those scans establish or exclude the complication/alternative, not migraine."),
+                  "typical cases, optional in 2 and recommended in 11 red-flag presentations. It "
+                  "is required in 6 non-routine exceptions: a first aphasic aura at 52, two "
+                  "documented infarcts, MELAS with persistent deficit, familial aneurysm evaluation "
+                  "and a witnessed seizure. Those scans establish or exclude the complication or "
+                  "alternative, not migraine. Vessel imaging is now its own study and no brain MRI "
+                  "report describes vessels: MR angiography in 8 cases (required in 3, recommended "
+                  "in 5) and MR venography in 1 (the seizure case, on a combined pill)."),
     dict(cond="migraine_with_aura", filed="analyze_brain_mri", tool="perform_clinical_assessment",
          reviewer=1, tier="required", status="applied",
          seg=("Migraine with aura is primarily a clinical diagnosis. The true required", None),
@@ -611,35 +617,41 @@ SPEC += [
          response="Applied end to end: 29 of 30 cases have neither an EEG action nor an authored "
                   "EEG result. The exception is MIG-AURA-RM11, "
                   "whose diagnosis is hemiplegic migraine *with migralepsy* — a seizure during "
-                  "aura, ICHD-3 1.4.4 — so the 24 h video EEG establishes half of the diagnosis "
+                  "aura, ICHD-3 1.4.4 — so the EEG (video preferred, routine accepted) establishes half of the diagnosis "
                   "rather than being routine headache evaluation, and it stays required there. "
                   "That case is the one place to argue with us, and the place to do it is the case "
                   "itself."),
     dict(cond="migraine_with_aura", filed="analyze_ecg", tool="analyze_ecg",
          reviewer=1, tier="remove", status="applied",
-         response="Removed end to end: no migraine case orders an ECG and no authored ECG result remains."),
+         response="Applied to migraine evaluation: 29 of 30 cases have no ECG action. The exception is "
+                  "MIG-AURA-P08, genetically confirmed MELAS, where an ECG is recommended (not "
+                  "required) to screen for pre-excitation and conduction disease, part of the "
+                  "Mitochondrial Medicine Society care standards rather than headache work-up."),
     dict(cond="migraine_with_aura", filed="order_echocardiogram", tool="order_echocardiogram",
          reviewer=1, tier="remove", status="applied",
          response="Applied to routine migraine evaluation. Three cases order an echocardiogram, "
-                  "not about the tier. Three cases order an echocardiogram at required and none is "
-                  "a routine migraine: MIG-AURA-P03 is a migrainous infarction whose diagnosis "
+                  "all at required, and none is a routine migraine: MIG-AURA-P03 is a migrainous infarction whose diagnosis "
                   "rests on secondary causes having been excluded, MIG-AURA-P07 is a cardioembolic "
                   "PCA infarct the case explicitly distinguishes from migrainous infarction, and "
                   "MIG-AURA-P08 is genetically confirmed MELAS, where cardiomyopathy screening is "
                   "standard. In each the echocardiogram is embolic-source or cardiomyopathy "
                   "work-up, so the routine migraine echo your comment targets does not exist in "
-                  "the cases. The question is one of composition, the same kind you settled for "
-                  "peripheral neuropathy: should a cardioembolic stroke and a confirmed MELAS sit "
-                  "under the label 'migraine with aura' at all? Nothing waits on your answer — the "
-                  "cases are reviewable as they stand."),
+                  "the cases. On composition we decided (24 October 2026) to keep the cardioembolic "
+                  "stroke, CADASIL and MELAS cases under this condition as mimic cases with their own "
+                  "labels and codes, as other conditions do: each tests not calling migraine with "
+                  "aura when the work-up shows another cause. Tell us if you would rather see them "
+                  "moved."),
     dict(cond="migraine_with_aura", filed="analyze_csf", tool="analyze_csf",
          reviewer=1, tier="remove", status="applied",
          response="Removed end to end: no migraine case orders CSF analysis and no authored CSF result remains. "
                   "The seizure exception retains EEG, but lacked a specific clinical indication for LP."),
     dict(cond="migraine_with_aura", filed="interpret_labs", tool="interpret_labs",
          reviewer=1, tier="optional", status="applied",
-         response="Applied: no case requires blood tests; 4 carry them as optional and 1 as "
-                  "recommended, on a secondary-headache suspicion."),
+         response="Applied: no case requires routine blood tests. Five carry a targeted panel as "
+                  "recommended (ESR and CRP in a first aura after 50, antiphospholipid antibodies "
+                  "in the two infarct cases, lactate in the hemiplegic migraine and MELAS cases). "
+                  "The one required laboratory order is MIG-AURA-P08's m.3243A>G test, which can "
+                  "be requested as a laboratory panel or as a genetic test and confirms MELAS."),
 
     # === early Alzheimer's disease (reviewer 1) ===
     dict(cond="alzheimers_early", filed="analyze_brain_mri", tool="analyze_brain_mri",
@@ -918,9 +930,10 @@ SPEC += [
          tool="order_body_imaging", reviewer=2, tier="required", status="applied",
          seg=(None, "Item:\nBrain MRI"),
          response="Applied after correcting the first over-broad implementation. Tumour screening "
-                  "is required in all 30 cases but not as blanket CAP CT: all 23 women receive "
-                  "pelvic/abdominal ultrasound, 4 younger men receive targeted testicular "
-                  "ultrasound, and 3 older men with an oncologic context receive CAP CT. Existing "
+                  "is required in all 30 cases but not as blanket CAP CT: the 21 women aged 12-44 "
+                  "receive pelvic/abdominal ultrasound, the 4 men under 45 receive targeted "
+                  "testicular ultrasound, and the 5 patients aged 45 or older (2 women, 3 men), "
+                  "whose tumours are mostly carcinomas, receive contrast CAP CT. Existing "
                   "pelvic/testicular reports were moved out of the laboratory payload."),
     dict(cond="autoimmune_encephalitis_nmdar", filed="analyze_brain_mri",
          tool="analyze_brain_mri", reviewer=2, tier="unchanged", status="applied",
@@ -937,15 +950,19 @@ SPEC += [
     dict(cond="autoimmune_encephalitis_nmdar", filed="analyze_csf", tool="analyze_csf",
          reviewer=2, tier="unchanged", status="applied",
          response="Applied in all 30 cases: basic CSF, OCB/IgG index, HSV PCR and the CSF "
-                  "anti-GluN1 assay are one reachable required order. Six initially unreachable "
-                  "or pending antibody results were reconciled with the authored confirmatory "
-                  "reports; the seronegative case remains negative rather than being forced positive."),
+                  "anti-GluN1 assay are one reachable required order, and the CSF report carries "
+                  "the final CSF titre (no result is left pending). The one case first written as "
+                  "seronegative sat in this condition with anti-NMDAR answers scored correct, so "
+                  "it was rewritten as CSF-positive and serum-negative, the pattern in which the "
+                  "serum assay must be read with the CSF."),
     dict(cond="autoimmune_encephalitis_nmdar", filed="analyze_eeg", tool="analyze_eeg",
          reviewer=2, tier="unchanged", status="applied",
          response="Applied: a routine EEG is required in all 30 cases and explicitly assesses "
                   "extreme delta brush without calling it pathognomonic. Continuous ICU EEG is a "
-                  "recommended escalation in the 13 cases with severe encephalopathy or "
-                  "electrographic seizures, rather than a blanket order in all 30."),
+                  "recommended escalation in 29 cases (fluctuating consciousness, seizures, "
+                  "behavioural arrests or rhythmic activity), never required; the one case "
+                  "without seizures or epileptiform activity on either EEG has no cEEG "
+                  "criterion."),
     dict(cond="autoimmune_encephalitis_nmdar", filed="analyze_ecg", tool="analyze_ecg",
          reviewer=2, tier="unchanged", status="no_change",
          response="No change requested and none made."),
