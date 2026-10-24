@@ -54,3 +54,14 @@ Found and fixed:
 - `metadata.clinical_pearls[3]` said that with two or three regions only CSF completes the criteria; corrected to DIT, positive CSF or the central vein sign (plan F3).
 - `initial_tool_outputs.csf.special_tests["IgG synthesis rate"]` 9.2 mg/day "elevated" beside a normal IgG index, and the same string copied into M02 and M03 (template carry-over): set to 6.9 mg/day (within reference), consistent with the normal IgG index.
 Checks re-run after the changes: `perfect_agent.py -v` pass, `case_io.py check` clean for the case, `test_case_guards.py -k` (leak, follow-up, banned strings) pass.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026 (uniformity scripts over all 30 MS-RR cases; edits through `case_io`; perfect agent, `case_io check` and the case guards clean afterwards).
+
+- `action-4-check-drug-interactions.expected_evidence` was empty; written from the stored drug output in policy voice: "Dimethyl fumarate with sertraline, vitamin D3 and dicyclomine: no relevant interaction; GI effects may aggravate her IBS; lymphocyte monitoring".
+- `assessment.prohibited_recommendations[2]` chronic-steroid prohibition set to the condition's canonical text (was "Do not use chronic oral corticosteroids as a maintenance treatment for MS [em dash] they are ineffective long-term and carry significant harm").
+- `assessment.prohibited_recommendations[4]` spinal-cord prohibition set to the condition's canonical text (was "Do not omit spinal-cord MRI in a patient with myelopathic signs even if the brain MRI alone meets DIS criteria [em dash] cord lesions change relapse counting and management").
+- `assessment.required_recommendations[0]` formulation must made case-specific by appending "(here periventricular, juxtacortical, infratentorial and spinal cord, with the left optic nerve a fifth region by VEP or OCT; four or more regions need no separate DIT)", from the KCE DIS line and the stored outputs, as in the other 18 cases.
+- `initial_tool_outputs.labs`: the AQP4-IgG and MOG-IgG rows moved to a new `followup_outputs` entry (`interpret_labs`, trigger `request_aqp4_mog_cell_based_assay`, panel `Neuroimmunology`, placed after the imaging follow-ups). Served in the initial labs payload, they answered the mimic-exclusion panel order as well, so an agent learned the result of `action-aqp4-mog-cba` without ordering it (perfect-agent warning "answered with the same stored report"); the MockServer now serves them only to an order that names the assays (checked for all three alternatives and both orders).
+- `assessment.required_recommendations[3]` pre-DMT screening: HIV removed from the tests to order and noted as already non-reactive, since the required mimic panel reports it (HIV-1/2 Ag/Ab combination assay: Non-reactive), as the RM, RP and RS cases do.

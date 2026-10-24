@@ -59,3 +59,13 @@ Found and fixed:
 - B minor, `initial_tool_outputs.csf.glucose`, `.glucose_ratio`, `.interpretation`: CSF glucose 68 with serum 138 gave a ratio of 0.49, a low ratio that reads as an infective or carcinomatous pattern and is not explained anywhere in a case whose CSF is otherwise inflammatory-demyelinating. Now CSF glucose 76 mg/dL, ratio 0.61 with serum glucose 124 mg/dL at the time of LP, interpretation "normal CSF/serum glucose ratio (0.61)". No criterion or KCE cited the old values.
 - E minor, `patient.history_present_illness`: the first sentence lost its verb when the patient's name was removed ("A 54-year-old ... man with ... who presents"); "who" deleted.
 Re-ran `perfect_agent.py MS-RR-RP05 -v` (pass), `case_io.py check` (clean for the case) and `test_case_guards -k MS-RR-RP05` (pass).
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026 (uniformity scripts over all 30 MS-RR cases; edits through `case_io`; perfect agent, `case_io check` and the case guards clean afterwards).
+
+- `ground_truth.differential[8].icd_code` D86.85 -> D86.89: D86.85 is sarcoid myocarditis; neurosarcoidosis is D86.89, as in the other 11 MS-RR cases.
+- `action-3-search-medical-literature.label` "Literature search (background only)" -> "Literature search on late-onset MS versus small-vessel disease": engineering text replaced by the topic of the stored output.
+- `assessment.prohibited_recommendations[4]` chronic-steroid prohibition set to the condition's canonical text (was "Do not use chronic oral corticosteroids as a maintenance treatment for MS").
+- `assessment.prohibited_recommendations[6]` spinal-cord prohibition set to the condition's canonical text (was "Do not omit spinal-cord MRI in a patient with myelopathic signs even if the brain MRI alone meets DIS criteria").
+- `initial_tool_outputs.labs`: the AQP4-IgG and MOG-IgG rows moved to a new `followup_outputs` entry (`interpret_labs`, trigger `request_aqp4_mog_cell_based_assay`, panel `Neuroimmunology`, placed after the imaging follow-ups). Served in the initial labs payload, they answered the mimic-exclusion panel order as well, so an agent learned the result of `action-aqp4-mog-cba` without ordering it (perfect-agent warning "answered with the same stored report"); the MockServer now serves them only to an order that names the assays (checked for all three alternatives and both orders). Initial labs interpretation edited to drop the antibody results: removed "AQP4-IgG and MOG-IgG negative by cell-based assay.".

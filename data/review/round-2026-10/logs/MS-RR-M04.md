@@ -43,3 +43,14 @@ Checked: reframing from "CIS by 2017 OCB substitution" to two attacks with 5 of 
 Found and fixed:
 - The CNS vasculitis entry of the differential cites "ESR/CRP normal", but the stored labs contained no ESR or CRP (the pre-round criterion had required them while the report never carried them). Added an "Inflammatory markers" panel (ESR 10 mm/hr, CRP 0.2 mg/dL, both normal) to `initial_tool_outputs.labs.panels` and named ESR and CRP in the labs criterion's expected evidence.
 Checks re-run after the changes: `perfect_agent.py -v` pass, `case_io.py check` clean for the case, `test_case_guards.py -k` (leak, follow-up, banned strings) pass.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026 (uniformity scripts over all 30 MS-RR cases; edits through `case_io`; perfect agent, `case_io check` and the case guards clean afterwards).
+
+- `action-4-check-drug-interactions.expected_evidence` was empty; written from the stored drug output in policy voice: "Ocrelizumab or dimethyl fumarate with her contraceptive, albuterol and vitamin D3: no relevant interaction; hepatitis B screening and vaccine timing before ocrelizumab, lymphocyte monitoring on dimethyl fumarate".
+- `assessment.prohibited_recommendations[5]` chronic-steroid prohibition set to the condition's canonical text (was "Do not use chronic oral corticosteroids as a maintenance treatment for MS [em dash] they are ineffective long-term and carry significant harm").
+- `assessment.required_recommendations[0]` formulation must made case-specific by appending "(here periventricular, juxtacortical, infratentorial, spinal cord and left optic nerve: five regions, so no separate DIT is required)", from the KCE DIS line and the stored outputs, as in the other 18 cases.
+- `assessment.prohibited_recommendations[4]` em dash replaced by a colon (house style), wording unchanged.
+- `initial_tool_outputs.labs`: the AQP4-IgG and MOG-IgG rows moved to a new `followup_outputs` entry (`interpret_labs`, trigger `request_aqp4_mog_cell_based_assay`, panel `Neuroimmunology`, placed after the imaging follow-ups). Served in the initial labs payload, they answered the mimic-exclusion panel order as well, so an agent learned the result of `action-aqp4-mog-cba` without ordering it (perfect-agent warning "answered with the same stored report"); the MockServer now serves them only to an order that names the assays (checked for all three alternatives and both orders).
+- `assessment.required_recommendations[4]` pre-DMT screening: HIV removed from the tests to order and noted as already non-reactive, since the required mimic panel reports it (HIV-1/2 Ag/Ab combination assay: Negative), as the RM, RP and RS cases do.

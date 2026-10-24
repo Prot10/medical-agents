@@ -51,3 +51,13 @@ None. The plan's "DIT by the enhancing pontine lesion" is applied; CSF stays opt
 Checked against the committed worker version (b8be2153): every own-finding row against the case file (field by field read of the whole final case), the plan tier table (section 3.5), the stop rule, the sequence constraint, laterality and lesion-to-exam fit, timeline, allergies against drug outputs, leakage in the brain MRI (no cord text) and the literature/drug outputs (guards pass), PATTERNS classes (template numbers across RS01-RS06, 2017 facts, test-as-must, F2/F5 wrong facts), and the differential against the final results. No reviewer notes exist for MS-RR, so no note id can be missing. Re-run after the changes below: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, `test_case_guards.py -k` pass.
 
 Found: (1) vitamin B12 512 pg/mL copied from RS02/RS03: now 538 pg/mL (no other field repeats it). (2) The IIH differential said "no headache" although the patient takes acetaminophen for occasional headaches: now "no new or positional headache (only his usual occasional headaches), no transient visual obscurations". Contralateral spinothalamic loss below a left lateral C5-C6 lesion, the fascicular sixth nerve lesion and the 3-region DIS with MRI DIT are correct; no AQP4/MOG per plan. Changed: the two fields above.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026 (uniformity scripts over all 30 MS-RR cases; edits through `case_io`; perfect agent, `case_io check` and the case guards clean afterwards).
+
+- `ground_truth.differential[4].icd_code` D86.85 -> D86.89: D86.85 is sarcoid myocarditis; neurosarcoidosis is D86.89, as in the other 11 MS-RR cases.
+- `ground_truth.differential[7].icd_code` G04.81 -> G04.00: G04.81 is other encephalitis; ADEM is G04.00, as in the other 8 MS-RR cases.
+- `action-3-search-medical-literature.label` "Literature search (background evidence only)" -> "Literature search on the current MS diagnostic criteria": engineering text replaced by the topic of the stored output.
+- `assessment.prohibited_recommendations[2]` chronic-steroid prohibition set to the condition's canonical text (was "Do not use chronic oral corticosteroids as a maintenance treatment for MS [em dash] they are ineffective long-term and carry significant harm").
+- `assessment.prohibited_recommendations[4]` spinal-cord prohibition set to the condition's canonical text (was "Do not omit spinal-cord MRI in a patient with myelopathic signs even if the brain MRI alone meets DIS criteria [em dash] cord lesions change relapse counting and management").

@@ -50,3 +50,11 @@ Adversarial verifier, 24 Oct 2026. Read the whole final case against the log and
 Found: nothing requiring a change. Minor, left as is: VEP right amplitude 4.1 uV is above the >3.0 uV cutoff (flag "no") while the impression calls it reduced relative to the left eye (8.2 uV); this is a relative statement and not a contradiction.
 
 perfect_agent.py -v: pass (the AQP4/MOG criterion shares the stored lab report by design, plan A8). case_io.py check: clean for this case. Guards: pass.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026 (uniformity scripts over all 30 MS-RR cases; edits through `case_io`; perfect agent, `case_io check` and the case guards clean afterwards).
+
+- `ground_truth.differential[3].icd_code` D86.85 -> D86.89: D86.85 is sarcoid myocarditis; neurosarcoidosis is D86.89, as in the other 11 MS-RR cases.
+- `ground_truth.red_herrings[0].intended_effect` "a naive agent" -> "the agent" (engineering voice).
+- `initial_tool_outputs.labs`: the AQP4-IgG and MOG-IgG rows moved to a new `followup_outputs` entry (`interpret_labs`, trigger `request_aqp4_mog_cell_based_assay`, panel `Neuroimmunology`, placed after the imaging follow-ups). Served in the initial labs payload, they answered the mimic-exclusion panel order as well, so an agent learned the result of `action-aqp4-mog-cba` without ordering it (perfect-agent warning "answered with the same stored report"); the MockServer now serves them only to an order that names the assays (checked for all three alternatives and both orders). Initial labs interpretation edited to drop the antibody results: removed "AQP4-IgG not detected by cell-based assay; a negative result does not entirely exclude NMOSD, and clinical correlation is recommended."; "MOG-IgG not detected by cell-based assay; a negative result does not entirely exclude MOGAD.".

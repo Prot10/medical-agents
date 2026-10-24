@@ -53,3 +53,9 @@ Found and changed:
 Open questions in this log, resolved by the verifier: (1) the methylprednisolone must stays: constant binocular diplopia that stops him driving and working affects function, which is the NICE NG220 threshold; (2) no AQP4/MOG result is stored, per plan A8 (no optic neuritis, myelitis attack or other red flag); NMOSD and MOGAD are low on imaging and CSF grounds. Note for CENTRAL: an AQP4/MOG order in this case returns the stored panel without those analytes (the lab merge does not answer analytes absent from the case); that is a library/harness behaviour, not a case edit.
 
 perfect_agent.py -v: pass. case_io.py check: clean for this case. Guards: pass.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026 (uniformity scripts over all 30 MS-RR cases; edits through `case_io`; perfect agent, `case_io check` and the case guards clean afterwards).
+
+- `ground_truth.differential[7].icd_code` G04.81 -> G04.00: G04.81 is other encephalitis; ADEM is G04.00, as in the other 8 MS-RR cases.

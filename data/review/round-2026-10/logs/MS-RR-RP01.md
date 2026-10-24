@@ -49,3 +49,14 @@ Found and fixed:
 - B major, `fallback_tool_outputs.ct`: the head-CT fallback read "No ... mass", contradicting the 2.1 cm right periventricular lesion with oedema that the MRI shows (a CT ordered despite the waste avoidance would have returned a normal brain). Replaced with a right periventricular hypodensity with mild oedema, no shift (same style as RM01/RP02/RP03); `metadata.fallback_tool_kinds.ct` set to "abnormal".
 - B minor, `ground_truth.differential[Brain abscess or tuberculoma].key_features`: "CSF AFB smear and culture negative" implied an AFB culture result the CSF no longer reports (the worker removed it); now "CSF AFB smear negative and CSF culture sterile".
 Re-ran `perfect_agent.py MS-RR-RP01 -v` (pass), `case_io.py check` (clean for the case) and `test_case_guards -k MS-RR-RP01` (pass).
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026 (uniformity scripts over all 30 MS-RR cases; edits through `case_io`; perfect agent, `case_io check` and the case guards clean afterwards).
+
+- `ground_truth.differential[6].icd_code` G04.81 -> G04.00: G04.81 is other encephalitis; ADEM is G04.00, as in the other 8 MS-RR cases.
+- `ground_truth.differential[7].icd_code` D86.85 -> D86.89: D86.85 is sarcoid myocarditis; neurosarcoidosis is D86.89, as in the other 11 MS-RR cases.
+- `action-3-search-medical-literature.label` "Literature search (background only)" -> "Literature search on tumefactive demyelination": engineering text replaced by the topic of the stored output.
+- `assessment.prohibited_recommendations[4]` chronic-steroid prohibition set to the condition's canonical text (was "Do not use chronic oral corticosteroids as a maintenance treatment for MS").
+- `assessment.prohibited_recommendations[6]` spinal-cord prohibition set to the condition's canonical text (was "Do not omit spinal-cord MRI in a patient with myelopathic signs even if the brain MRI alone meets DIS criteria").
+- `initial_tool_outputs.labs`: the AQP4-IgG and MOG-IgG rows moved to a new `followup_outputs` entry (`interpret_labs`, trigger `request_aqp4_mog_cell_based_assay`, panel `Neuroimmunology`, placed after the imaging follow-ups). Served in the initial labs payload, they answered the mimic-exclusion panel order as well, so an agent learned the result of `action-aqp4-mog-cba` without ordering it (perfect-agent warning "answered with the same stored report"); the MockServer now serves them only to an order that names the assays (checked for all three alternatives and both orders). Initial labs interpretation edited to drop the antibody results: removed "All results within reference ranges, including AQP4-IgG and MOG-IgG negative by cell-based assay.".

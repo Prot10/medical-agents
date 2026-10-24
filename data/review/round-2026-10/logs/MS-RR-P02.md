@@ -45,3 +45,13 @@ Adversarial verifier, 24 Oct 2026. Read the log, the diff and the whole final ca
 Checked: HPI aligned with the paralegal occupation; future MRI and SSEP stub gone; the index MRI carries an enhancing ovoid left periventricular and an enhancing right dorsal pontine lesion (fits the vertigo and end-gaze nystagmus) beside the original foci, and the impression counts them correctly; dorsal C3-C4 lesion fits the bilateral fingertip tingling; VEP right P100 118 ms; DIS 4 of 5 and DIT by enhancement match the reports; the leaking empty drug block was replaced by a real check against all three medicines and the allergy; literature output general (Dobson 2013, McDonald 2024) with no patient-specific conclusion; labs indices consistent (4.2 x 88.6 = 37.2); CSF negative with kFLC 2.1; tiers, order, stop rule per plan; musts (no steroids now, fatigue, driving) appropriate; differential all low with the case's own reasons.
 Found: nothing requiring a change. The kept "Lhermitte sign not tested" is a defensible realism choice, as the worker logged.
 Checks re-run after the changes: `perfect_agent.py -v` pass, `case_io.py check` clean for the case, `test_case_guards.py -k` (leak, follow-up, banned strings) pass.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026 (uniformity scripts over all 30 MS-RR cases; edits through `case_io`; perfect agent, `case_io check` and the case guards clean afterwards).
+
+- `fallback_tool_outputs.drug_interactions.general.proposed` "Requested agent" -> "Not specified": engineering wording, harmonised with the S cases.
+- `action-4-check-drug-interactions.expected_evidence` was empty; written from the stored drug output in policy voice: "Dimethyl fumarate with sumatriptan, escitalopram and meclizine: no relevant interaction; lymphocyte and liver monitoring".
+- `assessment.prohibited_recommendations[4]` chronic-steroid prohibition set to the condition's canonical text (was "Do not use chronic oral corticosteroids as a maintenance treatment for MS [em dash] they are ineffective long-term and carry significant harm").
+- `assessment.required_recommendations[0]` formulation must made case-specific by appending "(here periventricular, infratentorial and spinal cord, completed by DIT from the enhancing and non-enhancing lesions, with the right optic nerve a fourth region by VEP)", from the KCE DIS line and the stored outputs, as in the other 18 cases.
+- `assessment.required_recommendations[3]` pre-DMT screening: HIV removed from the tests to order and noted as already non-reactive, since the required mimic panel reports it (HIV-1/2 Ag/Ab combination assay: Non-reactive), as the RM, RP and RS cases do.

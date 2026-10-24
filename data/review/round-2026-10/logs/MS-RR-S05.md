@@ -56,3 +56,13 @@ Found and fixed:
 Checked and accepted: right dorsolateral C4-C5 lesion with the residual right Babinski and right leg vibration/touch loss (ipsilateral tracts); acute OCT with left pRNFL swelling 121 micrometers fits the disc swelling at day 5; DMT must activity (enhancing optic nerve and periventricular lesions only) matches the reports; EDSS 2.5 derivable; naproxen GI risk in the steroid check matches the must; the "no DMT before NMOSD/MOGAD excluded" prohibition is consistent with the recommended serology criterion.
 
 perfect_agent.py: ok (labs/AQP4-MOG same-report warning by design of plan A8). case_io.py check: schema and synonym guard OK, no test failure names the case. test_case_guards.py -k MS-RR-S0: 12 passed.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026 (uniformity scripts over all 30 MS-RR cases; edits through `case_io`; perfect agent, `case_io check` and the case guards clean afterwards).
+
+- `fallback_tool_outputs.echo.echo_type` added "TTE": the report is transthoracic and the discriminator guard requires the vocabulary term (every other MS-RR case has it).
+- `action-4-check-drug-interactions.expected_evidence` was empty; written from the stored drug output in policy voice: "Naproxen with high-dose methylprednisolone: gastrointestinal bleeding risk, so stop it or add a proton pump inhibitor".
+- `assessment.required_recommendations[0]` formulation must made case-specific by appending "(here periventricular, juxtacortical, infratentorial, spinal cord and left optic nerve: five regions, so no separate DIT is required)", from the KCE DIS line and the stored outputs, as in the other 18 cases.
+- `initial_tool_outputs.labs`: the AQP4-IgG and MOG-IgG rows moved to a new `followup_outputs` entry (`interpret_labs`, trigger `request_aqp4_mog_cell_based_assay`, panel `Neuroimmunology`, placed after the imaging follow-ups). Served in the initial labs payload, they answered the mimic-exclusion panel order as well, so an agent learned the result of `action-aqp4-mog-cba` without ordering it (perfect-agent warning "answered with the same stored report"); the MockServer now serves them only to an order that names the assays (checked for all three alternatives and both orders). Initial labs interpretation edited to drop the antibody results: removed "All other results, including AQP4-IgG and MOG-IgG by cell-based assay, are within reference ranges or negative.".
+- `assessment.required_recommendations[3]` pre-DMT screening: HIV removed from the tests to order and noted as already non-reactive, since the required mimic panel reports it (HIV-1/2 Ag/Ab combination assay: Negative), as the RM, RP and RS cases do.

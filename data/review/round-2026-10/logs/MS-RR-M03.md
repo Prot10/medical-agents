@@ -48,3 +48,15 @@ Found and fixed:
 - `ground_truth.red_herrings[2].correct_interpretation` said the episode "is not part of the scored DIS count" (benchmark wording): rewritten as clinical text (a plausible earlier attack explicable by a dorsal cervical lesion, making this a second attack).
 - `fallback_tool_outputs.drug_interactions.general.proposed` read "(agent not specified on this case's pathway)" (engineering wording served to the agent): "Requested agent". For the lead: the same string is in about 31 cases of other conditions.
 Checks re-run after the changes: `perfect_agent.py -v` pass, `case_io.py check` clean for the case, `test_case_guards.py -k` (leak, follow-up, banned strings) pass.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026 (uniformity scripts over all 30 MS-RR cases; edits through `case_io`; perfect agent, `case_io check` and the case guards clean afterwards).
+
+- `fallback_tool_outputs.drug_interactions.general.proposed` "Requested agent" -> "Not specified": engineering wording, harmonised with the S cases.
+- `action-4-check-drug-interactions.expected_evidence` was empty; written from the stored drug output in policy voice: "Dimethyl fumarate with sertraline, vitamin D3 and ibuprofen: no relevant interaction; blood count monitoring for lymphopenia".
+- `assessment.prohibited_recommendations[1]` chronic-steroid prohibition set to the condition's canonical text (was "Do not use chronic oral corticosteroids as a maintenance treatment for MS [em dash] they are ineffective long-term and carry significant harm").
+- `assessment.prohibited_recommendations[3]` spinal-cord prohibition set to the condition's canonical text (was "Do not omit spinal-cord MRI in a patient with myelopathic signs even if the brain MRI alone meets DIS criteria [em dash] cord lesions change relapse counting and management").
+- `assessment.required_recommendations[0]` formulation must made case-specific by appending "(here periventricular, juxtacortical and spinal cord, completed by DIT from the enhancing and non-enhancing lesions or by positive CSF, with the right optic nerve a fourth region by VEP)", from the KCE DIS line and the stored outputs, as in the other 18 cases.
+- `initial_tool_outputs.labs`: the AQP4-IgG and MOG-IgG rows moved to a new `followup_outputs` entry (`interpret_labs`, trigger `request_aqp4_mog_cell_based_assay`, panel `Neuroimmunology`, placed after the imaging follow-ups). Served in the initial labs payload, they answered the mimic-exclusion panel order as well, so an agent learned the result of `action-aqp4-mog-cba` without ordering it (perfect-agent warning "answered with the same stored report"); the MockServer now serves them only to an order that names the assays (checked for all three alternatives and both orders).
+- `assessment.required_recommendations[3]` pre-DMT screening: HIV removed from the tests to order and noted as already non-reactive, since the required mimic panel reports it (HIV-1/2 Ag/Ab combination assay: Non-reactive), as the RM, RP and RS cases do.

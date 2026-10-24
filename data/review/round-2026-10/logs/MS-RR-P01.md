@@ -44,3 +44,12 @@ Found and fixed:
 - `initial_tool_outputs.mri.impression` item 3 counted "five small foci" and then added the left periventricular focus as a sixth, while the findings list five: reworded to "Five small foci: four subcortical/deep ... and a 3 mm left periventricular focus"; the brain MRI criterion's expected evidence follows.
 - `patient.clinical_history.social_history.occupation` "marketing analyst" contradicted the HPI (graduate programme, typing her dissertation, graduate school stress, lives near campus): "Graduate student writing her dissertation" (pre-existing inconsistency the worker missed; P02 had the same class and was fixed).
 Checks re-run after the changes: `perfect_agent.py -v` pass, `case_io.py check` clean for the case, `test_case_guards.py -k` (leak, follow-up, banned strings) pass.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026 (uniformity scripts over all 30 MS-RR cases; edits through `case_io`; perfect agent, `case_io check` and the case guards clean afterwards).
+
+- `action-4-check-drug-interactions.expected_evidence` was empty; written from the stored drug output in policy voice: "Dimethyl fumarate with topiramate, escitalopram, sumatriptan and ibuprofen: no relevant interaction; lymphocyte monitoring for PML risk".
+- `assessment.prohibited_recommendations[4]` chronic-steroid prohibition set to the condition's canonical text (was "Do not use chronic oral corticosteroids as a maintenance treatment for MS [em dash] they are ineffective long-term and carry significant harm").
+- `assessment.required_recommendations[0]` formulation must made case-specific by appending "(here periventricular, infratentorial and spinal cord, completed by DIT from the enhancing and non-enhancing lesions, with the left optic nerve a fourth region by VEP)", from the KCE DIS line and the stored outputs, as in the other 18 cases.
+- `assessment.required_recommendations[3]` pre-DMT screening: HIV removed from the tests to order and noted as already non-reactive, since the required mimic panel reports it (HIV-1/2 Ag/Ab combination assay: Non-reactive), as the RM, RP and RS cases do.

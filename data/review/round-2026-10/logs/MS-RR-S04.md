@@ -60,3 +60,13 @@ Found and fixed:
 Checked and accepted: microcytic anaemia (Hb 10.9, Hct 35.6, MCV 77.6, RBC 4.59; male reference ranges, flags true) is consistent and supports the GI-source must; no pregnancy clause or teriflunomide prohibition in a man; cephalosporin allergy not contradicted; brain volumetrics (3 enhancing brain lesions plus optic nerve) match the findings.
 
 perfect_agent.py: ok (labs/AQP4-MOG same-report warning by design of plan A8). case_io.py check: schema and synonym guard OK, no test failure names the case. test_case_guards.py -k MS-RR-S0: 12 passed.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026 (uniformity scripts over all 30 MS-RR cases; edits through `case_io`; perfect agent, `case_io check` and the case guards clean afterwards).
+
+- `fallback_tool_outputs.echo.echo_type` added "TTE": the report is transthoracic and the discriminator guard requires the vocabulary term (every other MS-RR case has it).
+- `action-4-check-drug-interactions.expected_evidence` was empty; written from the stored drug output in policy voice: "Ocrelizumab with ferrous sulfate and loratadine: no relevant interaction; hepatitis B screening and vaccine timing first".
+- `assessment.required_recommendations[0]` formulation must made case-specific by appending "(here periventricular, juxtacortical, infratentorial, spinal cord and right optic nerve: five regions, so no separate DIT is required)", from the KCE DIS line and the stored outputs, as in the other 18 cases.
+- `initial_tool_outputs.labs`: the AQP4-IgG and MOG-IgG rows moved to a new `followup_outputs` entry (`interpret_labs`, trigger `request_aqp4_mog_cell_based_assay`, panel `Neuroimmunology`, placed after the imaging follow-ups). Served in the initial labs payload, they answered the mimic-exclusion panel order as well, so an agent learned the result of `action-aqp4-mog-cba` without ordering it (perfect-agent warning "answered with the same stored report"); the MockServer now serves them only to an order that names the assays (checked for all three alternatives and both orders).
+- `assessment.required_recommendations[3]` pre-DMT screening: HIV removed from the tests to order and noted as already non-reactive, since the required mimic panel reports it (HIV-1/2 antigen/antibody: Non-reactive), as the RM, RP and RS cases do.

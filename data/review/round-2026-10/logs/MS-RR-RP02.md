@@ -50,3 +50,13 @@ Adversarial verifier, 24 Oct 2026. Read the log, the diff against `b8be2153^` an
 Found and fixed:
 - B minor, `fallback_tool_outputs.csf.opening_pressure` and `.interpretation`: the CSF an agent would get from the contraindicated LP gave an opening pressure of 15 cmH2O in a patient with bilateral papilloedema and 6 mm midline shift. Set to 28 cmH2O (reference 10-20) and the interpretation now opens "Raised opening pressure (28 cm H2O); otherwise normal CSF".
 Re-ran `perfect_agent.py MS-RR-RP02 -v` (pass), `case_io.py check` (clean for the case) and `test_case_guards -k MS-RR-RP02` (pass).
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026 (uniformity scripts over all 30 MS-RR cases; edits through `case_io`; perfect agent, `case_io check` and the case guards clean afterwards).
+
+- `ground_truth.differential[6].icd_code` G04.81 -> G04.00: G04.81 is other encephalitis; ADEM is G04.00, as in the other 8 MS-RR cases.
+- `action-3-search-medical-literature.label` "Literature search (background only)" -> "Literature search on tumefactive demyelination versus glioma": engineering text replaced by the topic of the stored output.
+- `assessment.prohibited_recommendations[5]` chronic-steroid prohibition set to the condition's canonical text (was "Do not use chronic oral corticosteroids as a maintenance treatment for MS").
+- `initial_tool_outputs.labs`: the AQP4-IgG and MOG-IgG rows moved to a new `followup_outputs` entry (`interpret_labs`, trigger `request_aqp4_mog_cell_based_assay`, panel `Neuroimmunology`, placed after the imaging follow-ups). Served in the initial labs payload, they answered the mimic-exclusion panel order as well, so an agent learned the result of `action-aqp4-mog-cba` without ordering it (perfect-agent warning "answered with the same stored report"); the MockServer now serves them only to an order that names the assays (checked for all three alternatives and both orders). Initial labs interpretation edited to drop the antibody results: removed "All results within reference ranges, including AQP4-IgG and MOG-IgG negative by cell-based assay and serum beta-hCG negative.".
+- `action-biopsy.citations` was empty; set to `[McDonald_2024]` (the criteria require that no better explanation remains, which the biopsy settles), as on RM01's biopsy criterion. A tumefactive-specific key (Hardy and Chataway 2013) is requested under CENTRAL in the condition summary.

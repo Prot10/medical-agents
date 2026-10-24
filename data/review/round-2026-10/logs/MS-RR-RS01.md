@@ -59,3 +59,13 @@ None. Decisions taken: CSF recommended, not required: with four regions DIS is m
 Checked against the committed worker version (b8be2153): every own-finding row against the case file (field by field read of the whole final case), the plan tier table (section 3.5), the stop rule, the sequence constraint, laterality and lesion-to-exam fit, timeline, allergies against drug outputs, leakage in the brain MRI (no cord text) and the literature/drug outputs (guards pass), PATTERNS classes (template numbers across RS01-RS06, 2017 facts, test-as-must, F2/F5 wrong facts), and the differential against the final results. No reviewer notes exist for MS-RR, so no note id can be missing. Re-run after the changes below: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, `test_case_guards.py -k` pass.
 
 Found: no error. Gaze palsy plus LMN facial palsy now localise to the facial colliculus lesion; enhancing lesion count (3) matches the DMT must; vitamin D 21 consistent in labs, summary, red herring and must; ocrelizumab dosing and premedication correct; Polliack, Barak, Achiron 2001 J Am Geriatr Soc is a real paper. Changed: nothing.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026 (uniformity scripts over all 30 MS-RR cases; edits through `case_io`; perfect agent, `case_io check` and the case guards clean afterwards).
+
+- `ground_truth.differential[4].icd_code` D86.85 -> D86.89: D86.85 is sarcoid myocarditis; neurosarcoidosis is D86.89, as in the other 11 MS-RR cases.
+- `ground_truth.differential[7].icd_code` G04.81 -> G04.00: G04.81 is other encephalitis; ADEM is G04.00, as in the other 8 MS-RR cases.
+- `action-3-search-medical-literature.label` "Literature search (background evidence only)" -> "Literature search on the MS diagnostic criteria at late onset": engineering text replaced by the topic of the stored output.
+- `assessment.prohibited_recommendations[2]` chronic-steroid prohibition set to the condition's canonical text (was "Do not use chronic oral corticosteroids as a maintenance treatment for MS [em dash] they are ineffective long-term and carry significant harm").
+- `initial_tool_outputs.labs`: the AQP4-IgG and MOG-IgG rows moved to a new `followup_outputs` entry (`interpret_labs`, trigger `request_aqp4_mog_cell_based_assay`, panel `Neuroimmunology`, placed after the imaging follow-ups). Served in the initial labs payload, they answered the mimic-exclusion panel order as well, so an agent learned the result of `action-aqp4-mog-cba` without ordering it (perfect-agent warning "answered with the same stored report"); the MockServer now serves them only to an order that names the assays (checked for all three alternatives and both orders).

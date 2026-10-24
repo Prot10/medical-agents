@@ -57,3 +57,10 @@ Found and changed:
 Not changed (checked, sound): red_herrings[0] keeps its pre-existing wording (not new text, no clinical error). Note for CENTRAL: an agent that orders AQP4/MOG here receives the stored panel with no AQP4/MOG row (the lab merge does not answer analytes absent from the case); plan A8 deliberately stores none for this case, so this is a harness/library question, not a case edit.
 
 perfect_agent.py -v: pass. case_io.py check: clean for this case. test_case_guards -k MS-RR-P03: pass.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026 (uniformity scripts over all 30 MS-RR cases; edits through `case_io`; perfect agent, `case_io check` and the case guards clean afterwards).
+
+- `fallback_tool_outputs.drug_interactions.general.proposed` "(agent not specified on this case's pathway)" -> "Not specified": engineering wording, harmonised with the S cases.
+- `ground_truth.red_herrings[0].correct_interpretation` em dash and capitalised NOT removed (house style), meaning unchanged.
