@@ -60,3 +60,11 @@ Re-run: `perfect_agent.py SE-P04 -v` ok; case guards pass; `case_io.py check SE-
 Decisions in `plans/SE-decisions.md`.
 - `icd_codes[0]` I63.512 -> R56.9 with scoped labels (entry R56.9, cases [SE-P04]): "stroke lateralized periodic discharges", "stroke LPDs", "stroke ictal interictal continuum", "stroke seizures", "stroke seizure", "acute symptomatic seizures", "acute symptomatic seizure". Reason: the left MCA stroke is in the chief complaint and HPI, so the stroke labels and I63 codes gave full diagnosis credit for repeating the history; what the case scores is the post-stroke seizures with LPDs on the ictal-interictal continuum without NCSE (HEP-ENC-P04 precedent: code the missing diagnosis). The pending prune of "stroke", "embolic", "cardioembolic" and "lacunar" labels (CENTRAL_PENDING) is superseded: all stroke-only labels and I63 codes are gone. `accepted[0]` unchanged. Known residue (scorer, CENTRAL): "NCSE with LPDs after stroke" still contains the tokens of "stroke LPDs".
 - Checks: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, SE case guards pass, `apply_diagnosis_synonyms.py --check --conditions status_epilepticus` clean.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

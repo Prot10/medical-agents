@@ -59,3 +59,11 @@ Decisions in `plans/SE-decisions.md`.
 - `icd_codes[0]` A81.09 -> G41.2 with scoped labels naming both (entry G41.2+cjd): "CJD status epilepticus", "sCJD status epilepticus", "creutzfeldt jakob disease status epilepticus", "prion disease status epilepticus", "CJD NCSE", "sCJD NCSE", "creutzfeldt jakob disease NCSE", "prion disease NCSE"; the generic G41 and G41.2 entries exclude the case. Reason (verifier CENTRAL flag): probable sCJD is in the past medical history, so "CJD" or A81.09 scored without the superimposed NCSE the case tests (HEP-ENC-P04 precedent). `accepted[0]` unchanged.
 - serum autoimmune encephalitis panel moved out of the core labs into its own recommended criterion `action-autoimmune-panel` (interpret_labs `panels: [autoimmune_encephalitis_panel]`, after the MRI) with its own follow-up (trigger `request_autoimmune_encephalitis_panel`; the same LGI1, CASPR2, NMDAR, GABA-B and TPO values, unchanged). Core-lab criterion `action-2-interpret-labs`: argument, label, rationale, citation and expected evidence no longer include the antibodies; the initial labs no longer carry the panel or its sentence in the interpretation. Reason: a second-tier panel inside the required core labs forced the agent to bundle it into the first lab order, unlike every other SE case (plan 3.1 item 7; summary auditor note). `metadata.difficulty_rationale` now counts 3 recommended.
 - Checks: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, SE case guards pass, `apply_diagnosis_synonyms.py --check --conditions status_epilepticus` clean.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

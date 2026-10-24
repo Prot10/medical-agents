@@ -87,3 +87,13 @@ Re-run: `perfect_agent.py` ok; `case_io.py check` clean for the case; BACT-MEN c
 - `followup_outputs[request_lumbar_puncture].output.special_tests`: `AFB_smear`, `Xpert_MTB_RIF_Ultra` and `Mycobacterial_culture` merged into one `mycobacterial_panel` entry with the same three results (rare AFB; M. tuberculosis complex detected, rifampicin resistance not detected; culture pending, MGIT, up to 6 weeks); `Adenosine_deaminase` renamed `ADA` (18 U/L, reference <10); `India_ink` renamed `india_ink`. No value changed.
 - Sputum not wired: she denies cough, haemoptysis and any pulmonary symptom and the case has no chest image, so a scored sputum order has no clinical anchor; chest imaging with sputum stays the screening must.
 - Checks: `perfect_agent.py BACT-MEN-P02 -v` ok (CSF criterion served by `request_lumbar_puncture`); `case_io.py check` schema OK, synonym guard OK, no failure names the case; case guards pass.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+- `fallback_tool_outputs.specialized_test` set to null: a generic report (test_type '', impression 'Minor non-specific finding.') that names no one study and so answered every variant; the benchmark library now answers each study with its own normal report.
+- `fallback_tool_outputs.advanced_imaging` set to null: a generic report (modality 'not_applicable', impression 'No abnormality identified.') that names no one study and so answered every variant; the benchmark library now answers each study with its own normal report.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

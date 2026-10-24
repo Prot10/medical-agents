@@ -56,3 +56,11 @@ Synonym table scoped (October 2026, `diagnosis_synonyms.yaml`, applied with `app
 I77.71 no longer appends I63.231 (an infarct, on the other side) to a dissection without infarct; list regenerated after the relabel to I77.71.
 - codes removed: I63.231
 - `case_io.py validate` OK; `perfect_agent.py` passes.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.specialized_test` set to null: a generic report (test_type '', impression 'Study within normal limits.') that names no one study and so answered every variant; the benchmark library now answers each study with its own normal report.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

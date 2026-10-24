@@ -68,3 +68,11 @@ Decisions: `plans/ISCH-STR-decisions.md`.
 
 - Echo outputs: added `echo_type` "bubble_study" and "TEE" to the two stored echo reports; strict xfail removed from `test_echo_type_routing.py` (test passes).
 - Must added: atorvastatin 80 mg for LDL 112 mg/dL after non-cardioembolic stroke (AHA/ASA 2021 COR 1, SPARCL) (decision OQ4g).
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.specialized_test` set to null: a generic report (test_type '', impression 'Minor non-specific finding.') that names no one study and so answered every variant; the benchmark library now answers each study with its own normal report.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

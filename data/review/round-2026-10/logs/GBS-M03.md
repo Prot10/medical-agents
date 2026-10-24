@@ -56,3 +56,14 @@ Decisions in `plans/GBS-decisions.md` (Andrea, 24 Oct 2026: resolve open points 
 - Synonyms (`diagnosis_synonyms.yaml` G61.0 split into scoped entries, expanded with `--prune`): now accepts the generic GBS labels and the three AIDP labels (its NCS is demyelinating); "acute motor axonal neuropathy", "AMAN" and "miller fisher syndrome" are no longer accepted (wrong subtype or variant for this case).
 - Respiratory follow-up: MIP -35 -> -44 cmH2O (flagged L against -53), out of the band where EAN/PNS 2023 (MIP <40) and Lawn 2001 (MIP weaker than -30) disagree, since the case is a monitored-bed case; escalation must "MIP becomes weaker than -40 cmH2O".
 - Checks: `perfect_agent.py` pass; `case_io.py check` clean for this case; GBS guards pass; synonym `--check` clean.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+- follow-up `request_cardiac_monitoring`: `monitor_type` "Continuous telemetry" -> `telemetry`.
+- `initial_tool_outputs.specialized_test.test_type` "Nerve Conduction Studies (NCS) and EMG" -> `emg_ncs`.
+- `fallback_tool_outputs.advanced_imaging` set to null: a generic report (modality 'MRI brain without contrast', impression 'No intracranial lesion identified. No brainstem signal change. No meningeal enhancement. No mass, haemorrhage, or restricted diffusion.') that names no one study and so answered every variant; the benchmark library now answers each study with its own normal report.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

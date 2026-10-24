@@ -65,3 +65,11 @@ Synonym table scoped (October 2026, `diagnosis_synonyms.yaml`, applied with `app
 - `fallback_tool_outputs.mri` set to null: a normal template ("appropriate for age") that is never served, because `initial_tool_outputs.mri` always answers `analyze_brain_mri`; it contradicted the case's MRI.
 
 Checks: `perfect_agent.py` pass; `case_io.py check` schema and synonym guard OK, no test failure names this case; leak guard clean.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

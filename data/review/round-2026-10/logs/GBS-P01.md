@@ -64,3 +64,14 @@ Terms added in commit e19131d6 (`interpret_labs` `anti_GQ1b_IgG`, `anti_GT1a_IgG
 - New `action-11-interpret-labs-anti-gq1b` (recommended; `interpret_labs` `{panels: [anti_GQ1b_IgG]}`), placed after the CSF, answered by the existing follow-up `request_anti_gq1b_gt1a_ganglioside_panel` (GQ1b IgG 1:6400). Recommended, not required: MFS is defined by the clinical triad and EAN/PNS 2023 advises the antibody when MFS is suspected as support only.
 - Must "Send serum anti-GQ1b IgG (not a broad ganglioside panel) ..." deleted: the order is now a scored criterion and the prohibition "Do not delay admission and monitoring while waiting for the anti-GQ1b result" keeps the management point.
 - Resolves the BLOCKED part of note ee1e4f06 and CENTRAL 1.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+- follow-up `request_cardiac_monitoring`: `monitor_type` "Continuous telemetry" -> `telemetry`.
+- `initial_tool_outputs.specialized_test.test_type` "Nerve Conduction Studies and EMG" -> `emg_ncs`.
+- `fallback_tool_outputs.advanced_imaging` set to null: a generic report (modality 'MRI brain without contrast', impression 'No intracranial lesion identified. No brainstem signal change. No mass, haemorrhage, or restricted diffusion.') that names no one study and so answered every variant; the benchmark library now answers each study with its own normal report.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

@@ -58,3 +58,12 @@ Decisions in `plans/GBS-decisions.md` (Andrea, 24 Oct 2026: resolve open points 
 - Synonyms (`diagnosis_synonyms.yaml` G61.0 split into scoped entries, expanded with `--prune`): now accepts the generic GBS labels and the three AIDP labels (its NCS is demyelinating); "acute motor axonal neuropathy", "AMAN" and "miller fisher syndrome" are no longer accepted (wrong subtype or variant for this case).
 - `accepted[0]` "Guillain-Barré syndrome, immune checkpoint inhibitor-related (pembrolizumab-induced) — irAE" -> "Guillain-Barré syndrome related to an immune checkpoint inhibitor (pembrolizumab)" (summary CENTRAL 6 wording; em dash and redundant "irAE" removed). Methylprednisolone doses in the must confirmed against ASCO 2021 (2-4 mg/kg/day; pulse 1 g/day for 5 days may be considered in grade 3-4, with IVIg or PE): no change.
 - Checks: `perfect_agent.py` pass; `case_io.py check` clean for this case; GBS guards pass; synonym `--check` clean.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+- follow-up `request_cardiac_monitoring`: `monitor_type` "Continuous telemetry" -> `telemetry`.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

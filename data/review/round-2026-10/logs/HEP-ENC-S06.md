@@ -86,3 +86,12 @@ Checks: `perfect_agent.py` pass; `case_io.py check` schema and synonym guard OK,
 - New `followup_outputs[2]` `request_chest_xray`: low lung volumes, elevated hemidiaphragms (tense ascites), no consolidation, effusion, pneumothorax or displaced rib fracture (unwitnessed collapse); before the drug check.
 - `assessment.required_recommendations[1]`: adds "repeat the chest radiograph if fever or hypoxaemia develops after intubation"; the screen list is unchanged.
 - Re-run: `perfect_agent.py HEP-ENC-S06 -v` ok; `case_io.py check` schema OK, synonym guard OK, no test failure names the case.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+- `fallback_tool_outputs.advanced_imaging` set to null: a generic report (modality '', impression 'No abnormality identified.') that names no one study and so answered every variant; the benchmark library now answers each study with its own normal report.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

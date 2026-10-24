@@ -34,3 +34,11 @@ None.
 
 ## Verification
 Adversarial verification, 24 Oct 2026. Checked: CC and HPI free of EEG results; the merged video-EEG event capture (three events, preserved 9-10 Hz posterior rhythm, no correlate); labs and beta-hCG (woman of 38, value and unit plausible); lamotrigine level in range against the "therapeutic" label; deleted follow-ups (serial prolactin, MRI, second literature, autoimmune panel); tiers (labs, CT, EEG required; MRI, DDI, literature optional); soft EEG-before-DDI constraint; prohibition of anaesthetic escalation or intubation [LaFrance_2013]; valproate prohibition for a woman planning pregnancy; follow-up order; leak guard. Found and changed: CK was used as evidence 35 minutes into the event (KCE 3, differential entry 1, labs rationale), but CK rises only hours after a convulsion and is uninformative this early; the argument now rests on prolactin and lactate, and the rationale says CK rises later. The CK value itself stays in the report. perfect_agent ok; case guards pass; case_io check clean for this case.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

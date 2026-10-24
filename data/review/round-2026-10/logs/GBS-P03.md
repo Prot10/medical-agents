@@ -51,3 +51,13 @@ Decisions in `plans/GBS-decisions.md` (Andrea, 24 Oct 2026: resolve open points 
 - `accepted[0]` "... early AIDP (day 3, areflexia with early electrodiagnostic abnormalities)" -> "... early AIDP (day 3, mildly affected and ambulant, with early electrodiagnostic abnormalities)": the exam keeps trace patellar and brachioradialis reflexes, so "areflexia" was inaccurate (auditor flag).
 - Escalation must: "MIP becomes weaker than -30 cmH2O" -> "-40 cmH2O" (EAN/PNS 2023 states MIP <40 cmH2O as the point to consider elective ventilation; the earlier of the Lawn and EAN thresholds governs a monitored-bed patient).
 - Checks: `perfect_agent.py` pass; `case_io.py check` clean for this case; GBS guards pass; synonym `--check` clean.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+- follow-up `request_cardiac_monitoring`: `monitor_type` "Continuous telemetry" -> `telemetry`.
+- `initial_tool_outputs.specialized_test.test_type` "Nerve Conduction Studies and EMG" -> `emg_ncs`.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

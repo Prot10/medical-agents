@@ -71,3 +71,13 @@ Condition close-out (plans/MIG-AURA-decisions.md). Changes and reasons:
 - accepted[0]: 'single seizure during aura' -> 'migraine aura-triggered seizures' (the case records two aura-triggered seizures).
 - synonyms re-derived: the generic migraine-with-aura labels ("migraine with aura", "migraine with typical aura", "classic migraine", "migraine aura") and codes G43.1, G43.109, G43.119, G43.909 removed, because hemiplegic migraine is the subtype the case scores (triptan avoidance, genetics) and typical aura excludes motor aura; hemiplegic labels and G43.4, G43.419 kept.
 Checks after the change: `perfect_agent.py` pass, `case_io.py check` clean for the case, `test_case_guards.py -k MIG-AURA-` 60/60.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Wiring (`genetic_panel:hemiplegic_migraine`): new recommended criterion `action-hm-genetic-panel` after the blood tests, with the follow-up `request_hemiplegic_migraine_gene_panel` (no pathogenic variant in CACNA1A, ATP1A2, SCN1A or PRRT2; a negative panel does not exclude HM) and a soft constraint brain MRI before the panel. Tier: sporadic, but onset at 14 with seizure-complicated attacks is the highest-yield profile for a de novo CACNA1A/ATP1A2 variant (Di Stefano 2020, JNNP); the result informs counselling, not today's management, so recommended rather than required. The genetics referral must is now genetic counselling about the panel (the test itself is the criterion).
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

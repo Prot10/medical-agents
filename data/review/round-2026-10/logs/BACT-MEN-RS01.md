@@ -59,3 +59,12 @@ Re-run: `perfect_agent.py` ok; `case_io.py check` clean for the case; BACT-MEN c
 - Core term `order_microbiology` `wound_swab`: new recommended criterion `action-8-order-microbiology-ulcer-swab` (`specimen: wound_swab, tests: [culture]`) after the spine MRI; follow-up `request_ulcer_swab_culture` (`followup_outputs[3]`): deep swab of the cleaned right leg ulcer bed, heavy growth of Streptococcus agalactiae at 24 hours with the blood isolate's susceptibilities (penicillin 0.03, ampicillin 0.06, ceftriaxone <=0.5 mcg/mL), scanty coagulase-negative staphylococci; collected before antimicrobials.
 - Ulcer must (`required_recommendations[8]`) now "Treat the right lower-extremity venous stasis ulcer as the portal of entry: inspect it, culture the cleaned ulcer bed, and arrange wound care and debridement as needed for source control."
 - Re-run: `perfect_agent.py -v` ok; `case_io.py check`: schema OK, synonym guard OK, no test failure names the case.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+- `fallback_tool_outputs.advanced_imaging` set to null: a generic report (modality 'MRI', impression 'No abnormality identified.') that names no one study and so answered every variant; the benchmark library now answers each study with its own normal report.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

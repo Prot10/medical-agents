@@ -66,3 +66,11 @@ Decisions: `plans/ISCH-STR-decisions.md`.
 
 - Echo output: added `echo_type` "TTE" to the stored echocardiogram report (the schema now keeps the field and the MockServer routes TTE/TEE/bubble orders by it; the value was only in `tool_parameters`).
 - MRI: the left lateral medullary infarct removed from findings, DWI line, impression and the MRI criterion evidence (the medulla is not basilar territory; CTA shows patent vertebral arteries); PC-ASPECTS 6 unchanged. NCCT posterior fossa line now says no definite cerebellar hypodensity with cerebellum and brainstem limited by beam hardening (decision OQ8b).
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.specialized_test` set to null: a generic report (test_type '', impression 'Study within normal limits.') that names no one study and so answered every variant; the benchmark library now answers each study with its own normal report.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

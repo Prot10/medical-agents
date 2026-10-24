@@ -12,10 +12,21 @@ lands.
 - Scorer: C71 codes the site, not the entity, so "glioblastoma, C71.1" still scores in an
   IDH-mutant astrocytoma through the code. Needs a per-case label requirement or ICD-O-3
   morphology codes; same root as the ICD-code-alone item above. (GLIO-HG, 24 Oct)
-- MockServer: a case fallback now answers only its own study when it names it with a vocabulary
-  term (24 Oct). Fallbacks with an empty or prose discriminator still answer every variant:
-  `order_advanced_imaging` 102 empty and about 80 prose (`MRI`, `FDG-PET scan`,
-  `advanced imaging (off-pathway)`), `order_specialized_test` 116 empty. Write the term.
+- Discriminator data (24 Oct): the 12 closed conditions are fixed and guarded
+  (`test_case_guards.py::test_routed_outputs_name_their_study`, `DISCRIMINATOR_CONDITIONS`). Left,
+  per condition (cases / outputs): FEPI-TEMP 29/33, FND 30/84, FTD 30/36, MG 30/59, MS-RR 30/30,
+  NPH 30/32, PD 30/30, SYNC-CARD 22/24; mostly untyped `TTE` echo fallbacks and generic
+  advanced-imaging and specialized-test fallbacks (null them). Each worker adds its condition to
+  `DISCRIMINATOR_CONDITIONS` when clean.
+- Library: nulling generic fallbacks exposes library normals that some cases contradict, e.g. a
+  normal `neuropsych_battery` in overt hepatic encephalopathy (HEP-ENC, West Haven II-III). Same root
+  as the SAH library item below.
+- Matcher: one first lab order that bundles a second-tier assay with the first-line panels is
+  answered by the first-line labs (SE-P05 cholinesterase, SE-M08 HIV, CD4 and Toxoplasma IgG), so
+  the agent must re-order the assay alone. (SE CENTRAL 5)
+- MIG-AURA-P07 keeps its short-recording follow-up: its loop-recorder report stores
+  `duration_hours` 720 (the weeks tier), so without it a 14-day monitor order would receive the
+  day-17 AF.
 - MockServer: prose `test_type` follow-ups in a tool with no initial output are served for any
   test type (MG-RS15's `Neostigmine challenge` answers an `emg_ncs` or audiometry order). Write
   the vocabulary term in stored `test_type`.
@@ -50,15 +61,11 @@ lands.
   is an estimate (81479, unlisted).
 
 ## Batch-3 cases waiting on data (terms and routing landed 24 Oct)
-- SE: P05 plasma_cholinesterase + RBC_cholinesterase; M08 toxoplasma_PCR, EBV_PCR (CSF),
-  toxoplasma_IgG; M04 urine_sodium; NSE for P03 only if re-timed to 72 h.
-- VASC-DEM-P08: stored `monitor_type` "pacemaker interrogation, stored device diagnostics" should
-  be `device_interrogation` (until then a device_interrogation order gets the library normal).
-- MIG-AURA: genetic_panel:hemiplegic_migraine (M03, RM11, RS11, P09). P07's separate short
-  follow-up is no longer needed: a Holter order cannot receive the loop-recorder AF.
-- Stored monitoring reports with a prose `monitor_type` (routed on `duration_hours` only): GBS 30
-  cases ("Continuous telemetry"), NPH-S10 (empty), SYNC-CARD P03 ("Continuous telemetry" under
-  `request_holter`), P04, RP04 ("event_monitor").
+- Stored monitoring reports with a prose `monitor_type` (routed on `duration_hours` only): NPH-S10
+  (empty), SYNC-CARD P03 ("Continuous telemetry" under `request_holter`), P04, RP04
+  ("event_monitor"). (SE, VASC-DEM-P08, MIG-AURA and GBS wired 24 Oct; see their logs.)
+- Citation keys used by name in the wiring: Di Stefano 2020 (JNNP, hemiplegic migraine genetics)
+  for the MIG-AURA pack; the NIH/CDC/IDSA opportunistic-infection guideline for SE (SE-M08).
 
 ## Close-out recipe per batch (what batches 1 and 2 did)
 1. Workflow `bin/round-v2.js` (plan, fix, verify, audit; args `[{cond, cases}]`). 2. One close-out agent per condition
@@ -95,6 +102,6 @@ batch's CENTRAL terms. 3. One agent per condition wires the new terms into the c
 - SE: tell R2 about the recodes and that P04 and P06 now need the seizure component for credit.
 
 ## Guard failures left in later batches (24 Oct)
-- Leak guard: VASC-DEM 30, NMDAR-ENC 18, MIG-AURA 0 (clean 24 Oct), SE 10, SYNC-CARD 10, NPH 9, FTD 6, MG 6,
-  FND 5, MS-RR 4, FEPI-TEMP 3, PD 2. Follow-up guard: FTD 1. (Batches 1-2 are clean.)
+- Leak guard (recounted 24 Oct, after the discriminator pass): NPH 9, FND 5, MS-RR 4, SYNC-CARD 4,
+  FEPI-TEMP 3, PD 2; the 12 closed conditions, FTD and MG pass. Follow-up guard: clean.
   Workers see the rule in PATTERNS.md section 5.

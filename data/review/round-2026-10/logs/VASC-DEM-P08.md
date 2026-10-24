@@ -73,3 +73,13 @@ Condition close-out per `plans/VASC-DEM-decisions.md`.
 - `metadata.revision_reason`: the stale August literature/interaction audit text replaced by the round's (summary CENTRAL 9; not read by the harness).
 
 Checks after the close-out: `perfect_agent.py` and `case_io.py check` clean for this case; `test_case_guards -k VASC-DEM-` clean; `apply_diagnosis_synonyms.py --check --conditions vascular_dementia` clean.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Wiring (`device_interrogation`, plan C11): `initial_tool_outputs.cardiac_monitoring.monitor_type` "pacemaker interrogation, stored device diagnostics" -> `device_interrogation`, and `action-6-order-cardiac-monitoring` now requires `monitor_type: device_interrogation`. A Holter, event-monitor or loop-recorder order no longer receives the 12-month pacemaker data (library normal instead).
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

@@ -84,3 +84,12 @@ Re-run: `perfect_agent.py` ok; `case_io.py check` clean for the case; BACT-MEN c
 ## Central vocabulary wired (24 Oct 2026)
 - Index CSF (`request_lumbar_puncture`) `special_tests` keyed by the new core terms: `AFB_stain` and `Xpert_MTB_RIF_Ultra` merged into `mycobacterial_panel` ("Acid-fast bacilli smear: no acid-fast bacilli seen; Xpert MTB/RIF Ultra: Mycobacterium tuberculosis not detected; mycobacterial culture: pending (final at up to 6 weeks)"); `India_ink` -> `india_ink` ("No encapsulated yeasts seen"). Interpretation ends "Bacterial and mycobacterial cultures pending." No criterion change: the plan keeps these results answering the CSF must, not scored as separate steps.
 - Re-run: `perfect_agent.py -v` ok; `case_io.py check`: schema OK, synonym guard OK, no test failure names the case.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+- `fallback_tool_outputs.advanced_imaging` set to null: a generic report (modality 'MRI', impression 'No abnormality identified.') that names no one study and so answered every variant; the benchmark library now answers each study with its own normal report.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

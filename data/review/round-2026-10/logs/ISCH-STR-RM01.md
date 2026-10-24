@@ -72,3 +72,11 @@ The I63 category no longer appends mechanism labels ("embolic", "cardioembolic",
 Decisions: `plans/ISCH-STR-decisions.md`.
 
 - Must added: atorvastatin 80 mg for LDL 108 mg/dL (AHA/ASA 2021 COR 1, SPARCL), paired with non-oestrogen contraception (decision OQ4g). The no-IVT decision for the ischaemic stroke 2 weeks earlier is kept (decision OQ2).
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.specialized_test` set to null: a generic report (test_type '', impression 'Study within normal limits.') that names no one study and so answered every variant; the benchmark library now answers each study with its own normal report.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

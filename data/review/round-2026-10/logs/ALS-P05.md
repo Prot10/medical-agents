@@ -73,3 +73,12 @@ Decisions recorded in `data/review/round-2026-10/plans/ALS-decisions.md` (Andrea
 - `ground_truth.action_criteria[action-5-interpret-labs].alternatives[0].required_arguments.panels`: `HIV` replaced by `HIV_viral_load` and `CD4_count` (now CBC, CK, TSH, vitamin_B12, HIV_viral_load, CD4_count). She has known HIV, so the screen was never the question; the current viral load and CD4 are.
 - `initial_tool_outputs.labs.panels`: the `HIV` panel split into `HIV_viral_load` (plasma HIV-1 RNA <20, not detected) and `CD4_count` (520 cells/uL). Values, flags, summary and interpretation unchanged.
 - Checks: `perfect_agent.py ALS-P05 -v` ok; `case_io.py check` schema OK, synonym guard OK, no failure names the case; case guards pass.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+- `fallback_tool_outputs.advanced_imaging` set to null: a generic report (modality '', impression 'No abnormality identified.') that names no one study and so answered every variant; the benchmark library now answers each study with its own normal report.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

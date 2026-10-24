@@ -48,3 +48,11 @@ Decisions in `plans/SE-decisions.md`.
 - label: "..., requiring IV pyridoxine as specific antidote" removed (treatment clause, ruling 4; SE summary CENTRAL 3c). The pyridoxine must is unchanged.
 - synonym "pyridoxine deficiency seizures" retired: it names dietary or inherited pyridoxine deficiency (or pyridoxine-dependent epilepsy), a different cause.
 - Checks: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, SE case guards pass, `apply_diagnosis_synonyms.py --check --conditions status_epilepticus` clean.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

@@ -247,6 +247,89 @@ def test_banned_table_rows_fire():
     assert not banned_hits("ISCH-STR-S01", case("AMX0035"))
 
 
+# ---------------------------------------------------------------------------------------
+# 4. Discriminator fields (24 Oct 2026).
+#
+# The MockServer routes a stored report by its discriminating field (`MockServer._DISCRIMINATOR`):
+# a vocabulary value answers only its own study, while an empty or prose value is not adjudicated
+# and answers every variant of the tool (a fallback "normal study" served for any test type, a
+# 24-hour telemetry report for any monitor). So every stored output (initial and follow-up) and
+# every case fallback of a routed tool must carry an exact vocabulary term; a fallback that cannot
+# honestly name one study is null, and the library answers per study. Body imaging has no `study`
+# field: its report must carry a vocabulary modality and a region that some `<region>_<modality>`
+# study matches. Conditions are added to `DISCRIMINATOR_CONDITIONS` as their data is fixed.
+
+DISCRIMINATOR_CONDITIONS = frozenset({
+    "ALS", "BACT-MEN", "ISCH-STR", "HEP-ENC", "GLIO-HG", "GBS", "ALZ-EARLY", "SAH", "SE",
+    "VASC-DEM", "NMDAR-ENC", "MIG-AURA",
+})
+
+# initial_tool_outputs / fallback_tool_outputs slot of each routed tool.
+_ROUTED_SLOTS = {
+    "order_microbiology": "microbiology",
+    "order_body_imaging": "body_imaging",
+    "order_advanced_imaging": "advanced_imaging",
+    "order_echocardiogram": "echo",
+    "order_specialized_test": "specialized_test",
+    "obtain_tissue_diagnosis": "tissue_diagnosis",
+    "perform_clinical_assessment": "clinical_assessment",
+    "order_cardiac_monitoring": "cardiac_monitoring",
+}
+
+
+def discriminator_defects(case: dict[str, Any]) -> list[str]:
+    from neuroagent.tools.mock_server import MockServer
+    from neuroagent.tools.vocabulary import DOMAIN_PACKS, body_imaging_studies
+
+    assert set(_ROUTED_SLOTS) == set(MockServer._DISCRIMINATOR), "a routed tool has no slot here"
+    packs = DOMAIN_PACKS[case.get("domain") or "neurology"]
+    fold = MockServer._fold
+    reports: list[tuple[str, str, Any]] = []
+    for block in ("initial_tool_outputs", "fallback_tool_outputs"):
+        for tool, slot in _ROUTED_SLOTS.items():
+            output = (case.get(block) or {}).get(slot)
+            if output:
+                reports.append((f"{block}.{slot}", tool, output))
+    for index, followup in enumerate(case.get("followup_outputs") or []):
+        if followup.get("tool_name") in _ROUTED_SLOTS:
+            reports.append((f"followup_outputs[{index}] {followup.get('trigger_action')}",
+                            followup["tool_name"], followup.get("output") or {}))
+    found = []
+    for where, tool, output in reports:
+        if tool == "order_body_imaging":
+            modality = fold(output.get("modality") or "")
+            region = output.get("region") or ""
+            report = type("Report", (), {"modality": output.get("modality"), "region": region})()
+            if not (modality and modality <= MockServer._BODY_MODALITIES and region and any(
+                MockServer._body_study_matches(study, report) for study in body_imaging_studies(packs=packs)
+            )):
+                found.append(f"{where}: modality {output.get('modality')!r}, region {region!r}")
+            continue
+        key, vocabulary = MockServer._DISCRIMINATOR[tool]
+        value = output.get(key)
+        if not value or fold(value) not in {fold(term) for term in vocabulary(packs=packs)}:
+            found.append(f"{where}: {key} {value!r} is not a {tool} term")
+    return found
+
+
+@pytest.mark.parametrize("case_id", [c for c in CASE_IDS if condition_of(c) in DISCRIMINATOR_CONDITIONS])
+def test_routed_outputs_name_their_study(case_id):
+    assert not discriminator_defects(_raw(case_id))
+
+
+def test_discriminator_guard_fires():
+    case = {"fallback_tool_outputs": {"specialized_test": {"test_type": "", "impression": "Normal."}},
+            "followup_outputs": [{"tool_name": "order_cardiac_monitoring", "trigger_action": "t",
+                                  "output": {"monitor_type": "Continuous telemetry"}},
+                                 {"tool_name": "order_body_imaging", "trigger_action": "u",
+                                  "output": {"modality": "Doppler ultrasound", "region": "abdomen"}}]}
+    assert len(discriminator_defects(case)) == 3
+    case["fallback_tool_outputs"]["specialized_test"] = None
+    case["followup_outputs"][0]["output"]["monitor_type"] = "telemetry"
+    case["followup_outputs"][1]["output"]["modality"] = "ultrasound"
+    assert not discriminator_defects(case)
+
+
 def test_leak_detector_fires():
     evidence = "Gold Coast criteria are met with upper and lower motor neuron signs in two regions and progression."
     case = {

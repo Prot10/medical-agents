@@ -75,3 +75,13 @@ Synonym table scoped (October 2026, `diagnosis_synonyms.yaml`, applied with `app
 - `assessment.required_recommendations[1]`: the C. difficile clause removed (now an action); the must is the MUST-LACT-OVERUSE text. `[3]`: "no source on paracentesis (PMN 124), urinalysis, chest radiograph and stool C. difficile testing: start empirical antibiotic cover after cultures, and narrow or stop it according to the cultures at 48 hours (EASL 2018)".
 - `differential[1]` (other infection) moderate -> low, key features now give the negative radiograph and stool test; `red_herrings[0].correct_interpretation` names "stool C. difficile testing". Both results were chosen negative because the label rests on the rifaximin gap and diarrhoea-associated hypokalaemia.
 - Re-run: `perfect_agent.py HEP-ENC-S02 -v` ok; `case_io.py check` schema OK, synonym guard OK, no test failure names the case.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+- `fallback_tool_outputs.specialized_test` set to null: a generic report (test_type '', impression 'Study within normal limits.') that names no one study and so answered every variant; the benchmark library now answers each study with its own normal report.
+- `fallback_tool_outputs.advanced_imaging` set to null: a generic report (modality '', impression 'No abnormality identified.') that names no one study and so answered every variant; the benchmark library now answers each study with its own normal report.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

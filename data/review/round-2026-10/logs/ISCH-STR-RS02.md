@@ -56,3 +56,11 @@ Decisions: `plans/ISCH-STR-decisions.md`.
 - Echo output: added `echo_type` "TEE"; strict xfail removed from `test_echo_type_routing.py`.
 - ICD code I97.811 (intraoperative infarction) replaced by I63.232 (left carotid stenosis/occlusion, as the other carotid dissection cases); synonyms regenerated (I97.811 entry removed, RS02 added to I63.232+dissection, 'perioperative stroke' and 'postprocedural stroke' retired) (decision X2).
 - IVT decision reversed to give: the CTA itself excludes extension into the graft, anastomoses and native aorta, so the aortic arch dissection contraindication R2 invoked does not apply; extracranial dissection and surgery 42 days ago are not contraindications; disabling deficit at about 3 hours, BP 162/88. Changed: decision must, stroke-unit must, antithrombotic must (start after 24-hour imaging), BP must (post-IVT limits without further lowering), prohibitions (removed the no-IVT and the no-reperfusion BP prohibition; 14-day prohibition now forbids withholding IVT; added the 24-hour antithrombotic prohibition), key evidence 2 and 7, difficulty rationale, drug-check criterion evidence and a drug-check warning (decision OQ3a).
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.specialized_test` set to null: a generic report (test_type '', impression 'Study within normal limits.') that names no one study and so answered every variant; the benchmark library now answers each study with its own normal report.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

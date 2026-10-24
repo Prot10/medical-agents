@@ -32,6 +32,7 @@
         "RA": "normal size",
         "RV": "normal size and function"
       },
+      "echo_type": "TTE",
       "ejection_fraction": 59.0,
       "findings": [
         "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
@@ -59,6 +60,35 @@
     "specialized_test": null
   },
   "followup_outputs": [
+    {
+      "output": {
+        "abnormal_values_summary": [
+          "Plasma (butyryl) cholinesterase 0.18 U/mL (L)",
+          "RBC (acetyl) cholinesterase 0.8 U/mL (L)"
+        ],
+        "interpretation": "Plasma (butyryl) cholinesterase 0.18 U/mL (reference 3.5-8.0) and RBC (acetyl) cholinesterase 0.8 U/mL (reference 5.0-10.0): both activities markedly reduced.",
+        "panels": {
+          "Cholinesterase activity": [
+            {
+              "is_abnormal": true,
+              "reference_range": "3.5-8.0",
+              "test": "Plasma (butyryl) cholinesterase",
+              "unit": "U/mL",
+              "value": 0.18
+            },
+            {
+              "is_abnormal": true,
+              "reference_range": "5.0-10.0",
+              "test": "RBC (acetyl) cholinesterase",
+              "unit": "U/mL",
+              "value": 0.8
+            }
+          ]
+        }
+      },
+      "tool_name": "interpret_labs",
+      "trigger_action": "request_plasma_rbc_cholinesterase_activity"
+    },
     {
       "output": {
         "alternatives": [],
@@ -133,10 +163,38 @@
           "[Eddleston_2008]"
         ],
         "criterion_id": "action-2-interpret-labs",
-        "expected_evidence": "Plasma cholinesterase 0.18 and RBC cholinesterase 0.8 U/mL, markedly reduced; pH 7.18 with bicarbonate 14, anion gap 24, lactate 12.8 and pCO2 39; pO2 64 on high-flow oxygen; potassium 2.8; glucose 186; CK 8640 with creatinine 1.6; routine drug screen negative",
+        "expected_evidence": "PH 7.18 with bicarbonate 14, anion gap 24, lactate 12.8 and pCO2 39; pO2 64 on high-flow oxygen; potassium 2.8; glucose 186; CK 8640 with creatinine 1.6; routine drug screen negative",
         "importance": "required",
         "label": "Emergency laboratory work-up: glucose, CBC, electrolytes, magnesium, renal and hepatic function, toxicology screen",
         "rationale": "Glucose, electrolyte, renal and hepatic derangements are reversible causes of seizures and decide the ASM and its dose; the toxicology screen and blood gas look for co-ingestants and the respiratory and metabolic consequences of the poisoning in a comatose patient found after an unknown exposure [Brophy_2012; Eddleston_2008]."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "panels": [
+                "RBC_cholinesterase"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          },
+          {
+            "required_arguments": {
+              "panels": [
+                "plasma_cholinesterase"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          }
+        ],
+        "citations": [
+          "[Eddleston_2008]"
+        ],
+        "criterion_id": "action-cholinesterase-activity",
+        "expected_evidence": "Plasma cholinesterase 0.18 U/mL and RBC cholinesterase 0.8 U/mL, both markedly reduced",
+        "importance": "required",
+        "label": "Plasma and RBC cholinesterase activity to confirm organophosphate exposure",
+        "rationale": "A routine drug screen does not detect organophosphates. RBC acetylcholinesterase mirrors synaptic inhibition and confirms the exposure; plasma butyrylcholinesterase falls first and is more sensitive but less specific. Antidotes are given on the toxidrome and are not delayed for the result [Eddleston_2008]."
       },
       {
         "alternatives": [
@@ -409,6 +467,7 @@
       "max_additional_actions": 1,
       "required_before_assessment": [
         "action-2-interpret-labs",
+        "action-cholinesterase-activity",
         "action-3-order-ct-scan",
         "action-1-analyze-eeg"
       ]
@@ -499,10 +558,9 @@
         "Lactate 12.8 mmol/L (H)",
         "CK 8640 U/L (H)",
         "High-sensitivity troponin T 32 ng/L (H)",
-        "Plasma cholinesterase 0.18 U/mL (L); RBC cholinesterase 0.8 U/mL (L)",
         "Urine dipstick blood 3+ with 0-2 RBC/hpf"
       ],
-      "interpretation": "High anion gap metabolic acidosis (pH 7.18, bicarbonate 14, anion gap 24) with lactate 12.8 mmol/L and a pCO2 of 39 mmHg, which is higher than expected for the degree of metabolic acidosis; hypoxemia (pO2 64 mmHg) on high-flow oxygen. Plasma and RBC cholinesterase activities are markedly reduced. Hypokalemia 2.8, hyperglycemia 186, leukocytosis 16.4, creatinine 1.6, CK 8640 with AST 72 and dipstick blood without red cells, and troponin T 32 ng/L. Urine drug screen, ethanol, acetaminophen and salicylate negative. Sodium, calcium, magnesium and the remaining hepatic tests within reference ranges.",
+      "interpretation": "High anion gap metabolic acidosis (pH 7.18, bicarbonate 14, anion gap 24) with lactate 12.8 mmol/L and a pCO2 of 39 mmHg, which is higher than expected for the degree of metabolic acidosis; hypoxemia (pO2 64 mmHg) on high-flow oxygen. Hypokalemia 2.8, hyperglycemia 186, leukocytosis 16.4, creatinine 1.6, CK 8640 with AST 72 and dipstick blood without red cells, and troponin T 32 ng/L. Urine drug screen, ethanol, acetaminophen and salicylate negative. Sodium, calcium, magnesium and the remaining hepatic tests within reference ranges.",
       "panels": {
         "Arterial Blood Gas (15 L/min non-rebreather)": [
           {
@@ -539,22 +597,6 @@
             "test": "Lactate",
             "unit": "mmol/L",
             "value": 12.8
-          }
-        ],
-        "Cholinesterase": [
-          {
-            "is_abnormal": true,
-            "reference_range": "3.5-8.0",
-            "test": "Plasma (butyryl) cholinesterase",
-            "unit": "U/mL",
-            "value": 0.18
-          },
-          {
-            "is_abnormal": true,
-            "reference_range": "5.0-10.0",
-            "test": "RBC (acetyl) cholinesterase",
-            "unit": "U/mL",
-            "value": 0.8
           }
         ],
         "Complete Blood Count": [

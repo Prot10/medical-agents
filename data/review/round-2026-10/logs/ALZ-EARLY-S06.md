@@ -55,3 +55,11 @@ After the change: perfect_agent.py and case_io.py check clean on all 30 cases; t
 
 - Synonyms re-expanded (`apply_diagnosis_synonyms.py --prune --conditions alzheimers_early`): MCI labels only. Removed "alzheimer disease", "alzheimer's disease", "alzheimers disease", "alzheimer dementia", "dementia due to alzheimer", "posterior cortical atrophy", "benson syndrome", "early onset alzheimer" and the codes G30.0, G30.1, G30.8, G30.9, F00, because every "dementia due to Alzheimer disease" answer contains those tokens and would have scored an overcall of this MCI case as correct.
 - Checks: `perfect_agent.py -v` pass; `case_io.py check` no failure names this case; case guards pass; synonym `--check` clean. Decisions in `plans/ALZ-EARLY-decisions.md`.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

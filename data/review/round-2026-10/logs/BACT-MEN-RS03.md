@@ -58,3 +58,12 @@ Re-run: `perfect_agent.py` ok; `case_io.py check` clean for the case; BACT-MEN c
 
 ## Central vocabulary wired (24 Oct 2026)
 - DECLINED: no temporal artery ultrasound or biopsy criterion. Giant cell arteritis is not a competing explanation of the presentation (the neutrophilic CSF with S. pneumoniae in CSF and blood excludes it as the cause; `differential` GCA low), but a comorbid question the plan assigns to after the acute phase. A stored result would either add an unscored second diagnosis (a halo sign) or a negative that does not exclude GCA after two weeks of prednisolone 30 mg; the GCA must (ultrasound or biopsy with rheumatology review, glucocorticoid dose if confirmed) carries it. No case change.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+- `fallback_tool_outputs.advanced_imaging` set to null: a generic report (modality 'MRI', impression 'No abnormality identified.') that names no one study and so answered every variant; the benchmark library now answers each study with its own normal report.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

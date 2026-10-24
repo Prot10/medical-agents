@@ -60,3 +60,12 @@ Decisions in `plans/GBS-decisions.md` (Andrea, 24 Oct 2026: resolve open points 
 Terms added in commit e19131d6 (`interpret_labs` `anti_GQ1b_IgG`, `anti_GT1a_IgG`, `botulinum_toxin_assay`; `analyze_csf` `CMV_PCR`), wired per plan C2/C3/C9 and GBS-decisions CENTRAL 1-3. Checks after the change: `perfect_agent.py -v` pass, `case_io.py check` clean for this case, `test_case_guards -k GBS-` 60 passed; optional criteria probed against the MockServer (served the case's own report, not a fallback).
 
 - No case change. The stored CSF report (CMV and HSV PCR negative) is served to an `analyze_csf` call with `{special_tests: [CMV_PCR]}` (probed). No criterion added: antecedent-infection testing is not part of the work-up (plan C3; EAN/PNS 2023) and the CMV result only resolves the IgM red herring. Closes CENTRAL 4 for this case.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+- follow-up `request_cardiac_monitoring`: `monitor_type` "ICU-level continuous telemetry" -> `telemetry`.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

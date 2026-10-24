@@ -50,3 +50,11 @@ The worker's own check section above was a self-check, so the case was verified 
 Decisions in `plans/SE-decisions.md`.
 - `icd_codes[0]` G41.2 (complex partial SE) -> G41.0: the case is focal-onset SE evolving to bilateral convulsions (ILAE 2015 classifies it with convulsive SE), so the NCSE code and its labels named the wrong type (SE summary CENTRAL 3b). After `--prune --conditions status_epilepticus` the case accepts the generic labels plus "generalized convulsive status epilepticus", "convulsive status epilepticus", "GCSE", "tonic clonic status epilepticus" and codes G41.0, G41.9, G40.901, G40.911; the NCSE labels and G41.2/G41.8 are gone. `accepted[0]` unchanged.
 - Checks: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, SE case guards pass, `apply_diagnosis_synonyms.py --check --conditions status_epilepticus` clean.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

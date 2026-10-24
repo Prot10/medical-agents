@@ -71,3 +71,12 @@ Decisions recorded in `data/review/round-2026-10/plans/ALS-decisions.md` (Andrea
 - levothyroxine dose 100 -> 150 mcg (patient.clinical_history.medications) so the labelled over-replacement is supported; Graves differential key_features updated.
 - synonyms: E05.90 entry now also credits hyperthyroidism, graves disease, graves hyperthyroidism and codes E05.00, T38.1X5A (TSI positive: residual Graves activity cannot be excluded from the case data); applied by apply_diagnosis_synonyms.py.
 - Checks: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, ALS case guards pass.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+- `fallback_tool_outputs.advanced_imaging` set to null: a generic report (modality '', impression 'No abnormality identified.') that names no one study and so answered every variant; the benchmark library now answers each study with its own normal report.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

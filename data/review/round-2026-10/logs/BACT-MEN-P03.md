@@ -84,3 +84,13 @@ Re-run: `perfect_agent.py` ok; `case_io.py check` clean for the case; BACT-MEN c
 - New criterion `action-7-interpret-labs-hiv-viral-load` (recommended, before the drug check): `interpret_labs {panels: [HIV_viral_load]}`, the pre-ART baseline the must "obtain the HIV viral load" asks for. Serum CrAg has no criterion: once CSF CrAg is positive WHO 2022 needs no serum test, so it is answered but not scored.
 - `followup_outputs[request_lumbar_puncture].output.special_tests`: `Fungal_culture` renamed `fungal_culture`, `India_ink` renamed `india_ink`; values unchanged. The CSF criterion is unchanged (CSF CrAg establishes the diagnosis).
 - Checks: `perfect_agent.py BACT-MEN-P03 -v` ok (action-7 served by the new follow-up; the first full panel still gets the initial labs); `case_io.py check` schema OK, synonym guard OK, no failure names the case; case guards pass.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+- `fallback_tool_outputs.specialized_test` set to null: a generic report (test_type '', impression 'Study within normal limits.') that names no one study and so answered every variant; the benchmark library now answers each study with its own normal report.
+- `fallback_tool_outputs.advanced_imaging` set to null: a generic report (modality 'not_applicable', impression 'No abnormality identified.') that names no one study and so answered every variant; the benchmark library now answers each study with its own normal report.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

@@ -71,3 +71,12 @@ Re-run: `perfect_agent.py` ok; `case_io.py check` clean for the case; BACT-MEN c
 - `required_recommendations[5]` no longer stands in for the order: "Confirm the CSF leak with beta-2 transferrin on the left nasal secretion, collected while the rhinorrhea is active; it is a send-out assay reported in about 3 days, so antibiotics, dexamethasone and the skull-base imaging proceed without waiting for it."
 - `differential[0].key_features`: "beta-2 transferrin detected in the left nasal secretion confirms that the rhinorrhea is CSF" (was "confirms CSF when it returns"). `metadata.difficulty_rationale`: 6 required actions.
 - Re-run: `perfect_agent.py -v` ok; `case_io.py check`: schema OK, synonym guard OK, no test failure names the case.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+- `fallback_tool_outputs.advanced_imaging` set to null: a generic report (modality 'MRI', impression 'No abnormality identified.') that names no one study and so answered every variant; the benchmark library now answers each study with its own normal report.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

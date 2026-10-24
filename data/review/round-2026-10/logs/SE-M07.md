@@ -45,3 +45,13 @@ Adversarial verification, 24 Oct 2026. Checked: note e89c4880 (blood-culture cri
 Decisions in `plans/SE-decisions.md`.
 - `icd_codes[0]` G41.2 (complex partial, a focal code) -> G41.8: the EEG shows generalized post-anoxic NCSE (SE summary CENTRAL 3b). The NCSE labels stay through the scoped entry G41.8+ncse; G41.0 and G41.2 removed from the codes. `accepted[0]` unchanged.
 - Checks: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, SE case guards pass, `apply_diagnosis_synonyms.py --check --conditions status_epilepticus` clean.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+NSE decision: not wired. She woke, was extubated and discharged; ERC-ESICM 2021 prognostication (NSE at 48-72 h) applies only to patients still comatose at 72 h, so NSE has no indication here.
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

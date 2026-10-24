@@ -76,3 +76,13 @@ Checks: `perfect_agent.py` pass; `case_io.py check` schema and synonym guard OK,
 - `assessment.required_recommendations[5]`: the radiograph is no longer listed as a step inside the must; antibiotics are reviewed at 48 hours "with the culture and chest radiograph results".
 - `differential[3].key_features`: "a chest source is not yet excluded" replaced by the radiograph result; the entry stays moderate (occult infection on corticosteroids not excluded by early cultures).
 - Re-run: `perfect_agent.py HEP-ENC-M04 -v` ok (action-chest-xray <- followup[1]); `case_io.py check` schema OK, synonym guard OK, no test failure names the case.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+- `fallback_tool_outputs.specialized_test` set to null: a generic report (test_type '', impression 'Study within normal limits.') that names no one study and so answered every variant; the benchmark library now answers each study with its own normal report.
+- `fallback_tool_outputs.advanced_imaging` set to null: a generic report (modality '', impression 'No abnormality identified.') that names no one study and so answered every variant; the benchmark library now answers each study with its own normal report.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

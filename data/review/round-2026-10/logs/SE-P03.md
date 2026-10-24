@@ -45,3 +45,14 @@ Decisions in `plans/SE-decisions.md`.
 - label: "..., with concurrent propofol sedation and hypothermia confounding EEG interpretation" -> "..., on light propofol sedation during targeted temperature management at 36 C". The case runs TTM at 36 C, which does not meaningfully confound the EEG; propofol is at 10 mcg/kg/min (SE summary CENTRAL 3c).
 - synonyms: G41.8 no longer grants NCSE labels; myoclonic SE with prominent motor jerks is not NCSE (ILAE 2015). Now accepts the generic labels plus "myoclonic status epilepticus" (entry G41.8+myoclonic); codes G41.8, G41.9, G40.901, G40.911 (G41.0 and G41.2 removed).
 - Checks: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, SE case guards pass, `apply_diagnosis_synonyms.py --check --conditions status_epilepticus` clean.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+NSE decision: not wired. The encounter is at about 24 h after ROSC; ERC-ESICM 2021 uses NSE at 48 and 72 h, so a value now has no prognostic meaning, and the prognostication must already defers it [ERC_ESICM_2021]. Re-timing an approved case to 72 h would change every report for no diagnostic gain.
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+- follow-up `request_somatosensory_evoked_potentials`: `test_type` "Short-latency somatosensory evoked potentials (median nerve SSEP)" -> `ssep`.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

@@ -65,3 +65,11 @@ After the change: perfect_agent.py and case_io.py check clean on all 30 cases; t
 - Dataset diversity (auditor flag, near-duplicate of RS03: both "Mrs. Tanaka", retired seamstress from a garment factory, Japanese, with a daughter): surname Tanaka -> Mori, occupation seamstress -> florist who ran a neighbourhood flower shop for 35 years, and the failed complex task now an ikebana arrangement for a neighbour's memorial instead of mending a dress. No clinical content changed.
 - Flagged finding settled (hip flexors 4+/5, reflexes 1+ with trace ankle jerks, BMI 19.8): no change. Symmetric mild proximal weakness with reduced bulk and low weight, without sensory signs, at 79 with reduced ankle reflexes (common after 75) and normal B12, homocysteine, TSH and electrolytes, is consistent with sarcopenia; the nutrition and activity must already addresses it.
 - Checks: `perfect_agent.py -v` pass; `case_io.py check` no failure names this case; case guards pass; synonym `--check` clean. Decisions in `plans/ALZ-EARLY-decisions.md`.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

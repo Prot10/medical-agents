@@ -46,6 +46,7 @@
         "RA": "normal size",
         "RV": "normal size and function"
       },
+      "echo_type": "TTE",
       "ejection_fraction": 63.0,
       "findings": [
         "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
@@ -145,10 +146,9 @@
         "abnormal_values_summary": [
           "CD4 count 64 cells/mm3 (L)",
           "CD4 percentage 6% (L)",
-          "HIV-1 RNA 148,000 copies/mL (H)",
-          "Toxoplasma gondii IgG positive, 212 IU/mL (H)"
+          "HIV-1 RNA 148,000 copies/mL (H)"
         ],
-        "interpretation": "CD4 count 64 cells/mm3 (6%) and HIV-1 RNA 148,000 copies/mL. Toxoplasma IgG positive, IgM negative. A positive Toxoplasma IgG indicates prior infection; a negative IgM does not exclude reactivation. Clinical correlation recommended.",
+        "interpretation": "CD4 count 64 cells/mm3 (6%) and HIV-1 RNA 148,000 copies/mL.",
         "panels": {
           "HIV monitoring": [
             {
@@ -175,8 +175,20 @@
               "unit": "copies/mL",
               "value": "148,000"
             }
-          ],
-          "Toxoplasma Serology": [
+          ]
+        }
+      },
+      "tool_name": "interpret_labs",
+      "trigger_action": "request_hiv_cd4_viral_load"
+    },
+    {
+      "output": {
+        "abnormal_values_summary": [
+          "Toxoplasma gondii IgG positive, 212 IU/mL (H)"
+        ],
+        "interpretation": "Toxoplasma gondii IgG positive (212 IU/mL; negative below 7.2): prior infection.",
+        "panels": {
+          "Toxoplasma serology": [
             {
               "clinical_significance": null,
               "is_abnormal": true,
@@ -184,20 +196,12 @@
               "test": "Toxoplasma gondii IgG",
               "unit": "IU/mL",
               "value": 212
-            },
-            {
-              "clinical_significance": null,
-              "is_abnormal": false,
-              "reference_range": "Negative",
-              "test": "Toxoplasma gondii IgM",
-              "unit": "qualitative",
-              "value": "Negative"
             }
           ]
         }
       },
       "tool_name": "interpret_labs",
-      "trigger_action": "request_hiv_cd4_viral_load_toxoplasma_serology"
+      "trigger_action": "request_toxoplasma_igg_serology"
     },
     {
       "output": {
@@ -380,15 +384,45 @@
         ],
         "citations": [],
         "criterion_id": "action-5-interpret-labs",
-        "expected_evidence": "CD4 64 cells/mm3 and HIV-1 RNA 148,000 copies/mL; Toxoplasma IgG positive, IgM negative",
+        "expected_evidence": "CD4 64 cells/mm3 (6%) and HIV-1 RNA 148,000 copies/mL",
         "importance": "required",
-        "label": "CD4 count and HIV viral load, with Toxoplasma serology, after the brain lesion is found",
+        "label": "CD4 count and HIV viral load after the brain lesion is found",
         "rationale": "The opportunistic differential of a brain lesion depends on the current CD4 count; he stopped antiretrovirals 9 months ago, so the last recorded count is out of date."
       },
       {
         "alternatives": [
           {
-            "required_arguments": {},
+            "required_arguments": {
+              "panels": [
+                "toxoplasma_IgG"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "action-toxoplasma-igg",
+        "expected_evidence": "Toxoplasma gondii IgG positive (212 IU/mL)",
+        "importance": "required",
+        "label": "Serum Toxoplasma IgG: serostatus for toxoplasmic encephalitis",
+        "rationale": "Toxoplasmic encephalitis is reactivation of latent infection, so it occurs in seropositive patients; with CD4 below 100 and a typical lesion, a positive IgG supports empirical treatment, and a negative IgG moves lymphoma up the differential (NIH/CDC/IDSA guidelines for opportunistic infections in adults with HIV)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "special_tests": [
+                "toxoplasma_PCR"
+              ]
+            },
+            "tool_name": "analyze_csf"
+          },
+          {
+            "required_arguments": {
+              "special_tests": [
+                "EBV_PCR"
+              ]
+            },
             "tool_name": "analyze_csf"
           }
         ],
@@ -638,6 +672,7 @@
         "action-1-analyze-eeg",
         "action-4-analyze-brain-mri",
         "action-5-interpret-labs",
+        "action-toxoplasma-igg",
         "action-6-analyze-csf",
         "action-7-check-drug-interactions"
       ]

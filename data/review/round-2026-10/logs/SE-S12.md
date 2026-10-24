@@ -47,3 +47,11 @@ Adversarial verifier, 24 Oct 2026. Read the log, the diff and the whole final ca
 Decisions in `plans/SE-decisions.md`.
 - `icd_codes[0]` G41.2 -> G41.8 (other SE): faciobrachial dystonic seizure status is a motor SE, not complex partial NCSE (SE summary CENTRAL 3b). NCSE labels removed; new scoped synonym "faciobrachial dystonic seizures" (entry G41.8+fbds). "LGI1 encephalitis" alone is deliberately not a synonym: the relapsing anti-LGI1 encephalitis is in the history, so naming it does not show the status the case scores. `accepted[0]` unchanged.
 - Checks: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, SE case guards pass, `apply_diagnosis_synonyms.py --check --conditions status_epilepticus` clean.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

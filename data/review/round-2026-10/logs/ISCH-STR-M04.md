@@ -66,3 +66,11 @@ Decisions: `plans/ISCH-STR-decisions.md`.
 - Leak fix: literature criterion `action-6-search-medical-literature` expected_evidence reworded to a general-evidence description so the stored literature output no longer repeats it.
 - IVT decision must: states why NIHSS 4 is disabling (dysphagia to saliva, marked right-arm dysmetria, unsafe gait) (decision OQ2).
 - Auditor flag: template values made distinct: echo EF 60% to 63% (structured field, finding, impression, echo criterion evidence), Holter PACs 11 to 8 (finding, impression).
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.specialized_test` set to null: a generic report (test_type '', impression 'Study within normal limits.') that names no one study and so answered every variant; the benchmark library now answers each study with its own normal report.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

@@ -46,3 +46,11 @@ Decisions in `plans/SE-decisions.md`.
 - synonyms: the G41 category no longer grants the type codes G41.0, G41.2 and G41.8 (a type code is granted only by the case's own code, so an answer coded with the wrong SE type no longer scores by code); `apply_diagnosis_synonyms.py --prune --conditions status_epilepticus` removed G41.0 and G41.8 from `ground_truth.diagnosis.icd_codes`. Labels unchanged.
 - label (`ground_truth.diagnosis.accepted[0]`): "precipitated by supratherapeutic warfarin (INR 4.8) from ibuprofen-warfarin interaction" -> "on warfarin with a supratherapeutic INR (4.8) and added bleeding risk from concurrent ibuprofen". Ibuprofen raises bleeding risk mainly through platelet COX-1 inhibition and mucosal injury, with a variable and usually modest INR effect (the case's own drug-check output says so), so the label no longer attributes the INR to the NSAID (SE summary CENTRAL 3c).
 - Checks: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, SE case guards pass, `apply_diagnosis_synonyms.py --check --conditions status_epilepticus` clean.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

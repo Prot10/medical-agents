@@ -65,3 +65,14 @@ Terms added in commit e19131d6 (`interpret_labs` `anti_GQ1b_IgG`, `anti_GT1a_IgG
 - Differential 'Opportunistic CMV polyradiculitis': "CSF CMV PCR is still sent." -> "CSF CMV PCR is not detected.", likelihood low -> very_low (excluded by the work-up, ruling 7).
 - Must 4 -> "Exclude CMV polyradiculitis before attributing the pleocytosis to GBS: CSF CMV PCR not detected, with CD4 368, an undetectable viral load and a lymphocytic, not neutrophilic, CSF with normal glucose." Red herring 1 correct_interpretation: "the CSF CMV PCR is sent to close the question" -> "the CSF CMV PCR is not detected".
 - Resolves the BLOCKED part of note 24f4abe2 and CENTRAL 4.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+- follow-up `request_cardiac_monitoring`: `monitor_type` "Continuous telemetry" -> `telemetry`.
+- `initial_tool_outputs.specialized_test.test_type` "Nerve Conduction Studies and EMG" -> `emg_ncs`.
+- `fallback_tool_outputs.advanced_imaging` set to null: a generic report (modality 'MRI brain without contrast', impression 'No intracranial lesion identified. No cranial nerve enhancement. No leptomeningeal signal change. No mass, haemorrhage, or restricted diffusion.') that names no one study and so answered every variant; the benchmark library now answers each study with its own normal report.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

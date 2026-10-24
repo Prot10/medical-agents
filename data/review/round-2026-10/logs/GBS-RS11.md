@@ -68,3 +68,12 @@ Decisions in `plans/GBS-decisions.md` (Andrea, 24 Oct 2026: resolve open points 
 Terms added in commit e19131d6 (`interpret_labs` `anti_GQ1b_IgG`, `anti_GT1a_IgG`, `botulinum_toxin_assay`; `analyze_csf` `CMV_PCR`), wired per plan C2/C3/C9 and GBS-decisions CENTRAL 1-3. Checks after the change: `perfect_agent.py -v` pass, `case_io.py check` clean for this case, `test_case_guards -k GBS-` 60 passed; optional criteria probed against the MockServer (served the case's own report, not a fallback).
 
 - New `action-13-interpret-labs-anti-gq1b` (optional; `{panels: [anti_GQ1b_IgG]}`), after Lyme serology, answered by `request_anti_gq1b_gt1a_ganglioside_panel` (GQ1b negative). Optional: no ophthalmoplegia or ataxia, so EAN/PNS 2023 does not advise it; the criterion keeps the order from counting as unjustified. Closes CENTRAL 1 for this case.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+- follow-up `request_cardiac_monitoring`: `monitor_type` "Continuous telemetry" -> `telemetry`.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

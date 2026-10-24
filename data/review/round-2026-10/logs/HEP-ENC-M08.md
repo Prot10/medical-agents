@@ -84,3 +84,12 @@ Synonym table scoped (October 2026, `diagnosis_synonyms.yaml`, applied with `app
 - `differential[1].key_features`: "Chest and stool sources still to be checked" replaced by the negative results. `red_herrings[1].correct_interpretation` adds "(all negative here)".
 - AFP (plan CENTRAL 5, optional): not made a criterion. HCC surveillance is not part of the HE work-up, the AFP sits in its own panel of the core labs as a result (no leak of the HE diagnosis), and the AFP rise is handled by the oncology must. No change.
 - Re-run: `perfect_agent.py HEP-ENC-M08 -v` ok (both new criteria served by their follow-ups); `case_io.py check` schema OK, synonym guard OK, no test failure names the case.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+- `fallback_tool_outputs.specialized_test` set to null: a generic report (test_type '', impression 'Study within normal limits.') that names no one study and so answered every variant; the benchmark library now answers each study with its own normal report.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

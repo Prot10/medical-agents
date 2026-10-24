@@ -46,3 +46,13 @@ Adversarial verification, 24 Oct 2026. Checked: the clinical rewrite of the HIV 
 Decisions in `plans/SE-decisions.md`.
 - synonyms: the G41 category no longer grants the type codes G41.0, G41.2 and G41.8 (a type code is granted only by the case's own code, so an answer coded with the wrong SE type no longer scores by code); `apply_diagnosis_synonyms.py --prune --conditions status_epilepticus` removed G41.0 and G41.8 from `ground_truth.diagnosis.icd_codes`. Labels unchanged.
 - Checks: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, SE case guards pass, `apply_diagnosis_synonyms.py --check --conditions status_epilepticus` clean.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Wiring (`toxoplasma_IgG`, CSF `toxoplasma_PCR` and `EBV_PCR`, CENTRAL 1 of this log): the HIV follow-up is now `request_hiv_cd4_viral_load` (CD4, CD4%, HIV RNA) and a new follow-up `request_toxoplasma_igg_serology` reports Toxoplasma IgG 212 IU/mL; the IgM row and its sentence were dropped (not orderable; reactivation is IgM-negative, so the opportunistic-infection guideline does not use it). New required criterion `action-toxoplasma-igg` after `action-5-interpret-labs` (also in the stop rule); a5 label and expected evidence now name CD4 and viral load only. `action-6-analyze-csf` now requires `special_tests` `toxoplasma_PCR` or `EBV_PCR` (the decisive PCRs), where any LP counted before.
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

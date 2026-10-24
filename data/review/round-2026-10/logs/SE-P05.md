@@ -51,3 +51,13 @@ Decisions in `plans/SE-decisions.md`.
 - label: "Organophosphate poisoning with cholinergic toxidrome and nicotinic CNS seizures presenting as apparent non-convulsive status epilepticus, complicated by intermediate syndrome at 48 hours" -> "Organophosphate poisoning with cholinergic crisis and electrographic status epilepticus". The EEG records real electrographic SE (nine seizures in the first hour), the seizures are not a nicotinic mechanism, and the intermediate syndrome is a future event the case no longer reports (SE summary CENTRAL 3c).
 - synonym "cholinergic toxidrome" retired: it names a syndrome shared by carbamates, nerve agents, muscarinic mushrooms and cholinesterase-inhibitor drugs, so it credited a wrong agent.
 - Checks: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, SE case guards pass, `apply_diagnosis_synonyms.py --check --conditions status_epilepticus` clean.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Wiring (`plasma_cholinesterase`, `RBC_cholinesterase`, CENTRAL 2 of this log): the cholinesterase activities left the first-line labs (`initial_tool_outputs.labs.panels.Cholinesterase`, its abnormal-values line and interpretation sentence) and are now the follow-up `request_plasma_rbc_cholinesterase_activity` (first in the pathway, same values and ranges). New required criterion `action-cholinesterase-activity` (RBC or plasma cholinesterase; [Eddleston_2008]: the routine screen misses organophosphates, RBC AChE confirms the exposure, antidotes are not delayed for it), placed after the first-line labs and added to the stop rule; `action-2-interpret-labs` expected evidence no longer names the activities. Known matcher limit (SE CENTRAL 5): a single first lab order that bundles the cholinesterase with CBC and CMP is answered by the first-line panel, so the agent must order the activity on its own.
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

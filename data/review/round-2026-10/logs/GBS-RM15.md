@@ -61,3 +61,12 @@ Terms added in commit e19131d6 (`interpret_labs` `anti_GQ1b_IgG`, `anti_GT1a_IgG
 
 - New `action-13-interpret-labs-anti-gq1b` (REQUIRED; `{panels: [anti_GQ1b_IgG]}`), after the CSF, answered by `request_anti_gq1b_gt1a_ganglioside_panel` (GQ1b IgG 1:320, GT1a negative); added to `stop_rule.required_before_assessment`. Required because acute bilateral ptosis with areflexia is an incomplete MFS form only with the antibody (Wakerley 2014): the label 'anti-GQ1b antibody syndrome' cannot be reached responsibly without it, and it is the result that separates the case from ocular myasthenia.
 - Resolves the BLOCKED part of note e89ffe81 and CENTRAL 1. Musts unchanged (none asked for the test).
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+- follow-up `request_cardiac_monitoring`: `monitor_type` "Continuous telemetry" -> `telemetry`.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

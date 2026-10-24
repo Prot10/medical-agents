@@ -61,3 +61,11 @@ Decisions in `plans/SE-decisions.md`.
 - label: "...; EEG triphasic waves mimicking non-convulsive status epilepticus but resolving with ammonia correction" -> "...; EEG triphasic waves mimicking non-convulsive status epilepticus": the clause reported a treatment response (ruling 4; SE summary CENTRAL 3c).
 - synonyms: `--prune` removed "hepatic coma" and K72.91 (GCS 13, West Haven grade II, not coma; the K72 entries grant "hepatic coma" only to HEP-ENC-S06). Pending item in CENTRAL_PENDING settled.
 - Checks: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, SE case guards pass, `apply_diagnosis_synonyms.py --check --conditions status_epilepticus` clean.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

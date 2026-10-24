@@ -56,3 +56,13 @@ Checks re-run after my edits: `perfect_agent.py -v` pass, `case_io.py check` sch
 Decisions in `plans/SE-decisions.md`.
 - synonyms: the G41 category no longer grants the type codes G41.0, G41.2 and G41.8 (a type code is granted only by the case's own code, so an answer coded with the wrong SE type no longer scores by code); `apply_diagnosis_synonyms.py --prune --conditions status_epilepticus` removed G41.0 and G41.8 from `ground_truth.diagnosis.icd_codes`. Labels unchanged.
 - Checks: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, SE case guards pass, `apply_diagnosis_synonyms.py --check --conditions status_epilepticus` clean.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Wiring (`urine_sodium`, CENTRAL 3 of this log): `action-6-interpret-labs` alternatives are now serum osmolality + urine osmolality + urine sodium, or urine osmolality + urine sodium (the SIADH criteria need urine osmolality and urine sodium [Spasovski_2014]; the serum-osmolality-only alternative is gone). Follow-up trigger renamed `request_hyponatremia_osmolality_urine_sodium_workup` so a urine-sodium order reaches it.
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

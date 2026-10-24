@@ -66,3 +66,12 @@ Terms added in commit e19131d6 (`interpret_labs` `anti_GQ1b_IgG`, `anti_GT1a_IgG
 - New `action-15-interpret-labs-botulinum-toxin` (optional; `{panels: [botulinum_toxin_assay]}`) with a new follow-up `request_botulinum_toxin_assay` (not detected) after the ganglioside follow-up. Optional for the same clinical reasons as the differential (very_low). Differential 'Botulism' key_features add "the serum botulinum toxin assay, if sent, is negative".
 - Must 4 "Send serum anti-GT1a and anti-GQ1b IgG (send-out) without delaying treatment for the result." deleted (now scored); new prohibition "Do not delay IVIg while waiting for the send-out anti-GT1a and anti-GQ1b result."
 - Resolves the BLOCKED criterion of the ganglioside finding (CENTRAL 1) and CENTRAL 3.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+- follow-up `request_cardiac_monitoring`: `monitor_type` "Continuous telemetry" -> `telemetry`.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

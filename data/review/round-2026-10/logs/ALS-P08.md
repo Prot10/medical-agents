@@ -69,3 +69,11 @@ Decisions recorded in `data/review/round-2026-10/plans/ALS-decisions.md` (Andrea
 - action-8-order-specialized-test (genetic panel) importance recommended -> required; added to stop_rule.required_before_assessment (the label names the genotype).
 - icd_codes[0] G12.21 -> Z15.89 (accepted[0] unchanged: 'Suspected early ALS .. Gold Coast criteria not yet met'); new synonym entry Z15.89 scoped to ALS-P08 (suspected ALS, prodromal ALS, possible ALS, suspected motor neuron disease, mild motor impairment); G12.21 synonyms pruned with apply_diagnosis_synonyms.py --prune --conditions als, so a plain 'ALS' answer no longer scores as correct for a carrier who does not meet Gold Coast.
 - Checks: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, ALS case guards pass.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.

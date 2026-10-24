@@ -79,3 +79,12 @@ Re-run: `perfect_agent.py` ok; `case_io.py check` clean for the case; BACT-MEN c
 - `ground_truth.action_criteria[action-3-analyze-csf]`: `required_arguments.special_tests` now meningitis_panel, mycobacterial_panel, cryptococcal_antigen; label, rationale and expected evidence name the mycobacterial studies and the repeat CSF CrAg on the same specimen, which the must already required (recently treated tuberculous meningitis; antigenaemia at CD4 68).
 - `followup_outputs[request_lumbar_puncture].output.special_tests`: `CSF_AFB_stain`, `CSF_GeneXpert_MTB_RIF` and `CSF_mycobacterial_culture` merged into `mycobacterial_panel` ("AFB smear negative; Xpert MTB/RIF Ultra: M. tuberculosis not detected; mycobacterial culture pending, final at up to 6 weeks"); `CSF_cryptococcal_antigen` renamed `cryptococcal_antigen`. Interpretation and `differential[0].key_features` say "AFB smear negative ... Xpert MTB/RIF Ultra not detected", matching the must's assay.
 - Checks: `perfect_agent.py BACT-MEN-RS04 -v` ok; `case_io.py check` schema OK, synonym guard OK, no failure names the case; case guards pass.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+- `fallback_tool_outputs.advanced_imaging` set to null: a generic report (modality 'MRI', impression 'No abnormality identified.') that names no one study and so answered every variant; the benchmark library now answers each study with its own normal report.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.
