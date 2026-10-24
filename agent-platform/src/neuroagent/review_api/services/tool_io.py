@@ -425,7 +425,10 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
                     "12-lead ECG with high precordial leads, to unmask a type 1 Brugada pattern. "
                     "'genetic_panel:inherited_arrhythmia': long QT, Brugada and CPVT genes; "
                     "'genetic_panel:cardiomyopathy': arrhythmogenic, hypertrophic, dilated and "
-                    "laminopathy genes."
+                    "laminopathy genes. "
+                    "'olfactory_test': quantitative smell test (UPSIT or Sniffin' Sticks) scored "
+                    "against age and sex norms; hyposmia is a supportive criterion of Parkinson's "
+                    "disease."
                 ),
             },
         },
@@ -604,7 +607,10 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
                     "planning in a brain tumour depends. "
                     "'orthostatic_blood_pressure': blood pressure and heart rate supine and at 1 and "
                     "3 minutes of active standing — orthostatic hypotension in the initial evaluation "
-                    "of syncope."
+                    "of syncope. "
+                    "'levodopa_challenge': MDS-UPDRS part III in the OFF state and again at peak "
+                    "effect of a supra-threshold levodopa dose, with the percent improvement (30% or "
+                    "more supports DBS candidacy); one assessment that reports both states."
                 ),
             },
             "timing": {

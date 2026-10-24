@@ -21,6 +21,7 @@ class SpecializedTestTool(BaseTool):
         "ophthalmic tests (optical_coherence_tomography, visual_field_perimetry), "
         "respiratory_function (FVC/MIP/MEP, for ALS and MG), ice_pack_test, audiometry, "
         "speech_language_evaluation (primary progressive aphasia), "
+        "olfactory_test (UPSIT or Sniffin' Sticks), "
         # `mslt` and `pure_tone_audiometry` were retired 2026-08-05: priced and orderable
         # but referenced by zero cases and never requested in the clinical tool review, so
         # they were unreviewed action-space surface. Audiometry came back on 2026-10-24 as
@@ -59,7 +60,10 @@ class SpecializedTestTool(BaseTool):
                     "12-lead ECG with high precordial leads, to unmask a type 1 Brugada pattern. "
                     "'genetic_panel:inherited_arrhythmia': long QT, Brugada and CPVT genes; "
                     "'genetic_panel:cardiomyopathy': arrhythmogenic, hypertrophic, dilated and "
-                    "laminopathy genes."
+                    "laminopathy genes. "
+                    "'olfactory_test': quantitative smell test (UPSIT or Sniffin' Sticks) scored "
+                    "against age and sex norms; hyposmia is a supportive criterion of Parkinson's "
+                    "disease."
                 ),
             },
         },

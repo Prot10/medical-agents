@@ -34,11 +34,11 @@ list, which reported legal values as illegal:
 | Tool | Parameter | Values |
 | --- | --- | --- |
 | `order_advanced_imaging` | `modality` | 22 (`amyloid_PET`, `tau_PET`, `FDG_PET`, `perfusion_SPECT`, `amino_acid_PET`, `cardiac_FDG_PET`, `DaTscan`, `MIBG_scan`, `perfusion_MRI`, `CT_perfusion`, `cardiac_MRI`, `coronary_CTA`, `coronary_angiography`, `cerebral_angiography`, `MR_spectroscopy`, `MR_angiography`, `MR_venography`, `carotid_duplex`, `transcranial_doppler`, `functional_MRI`, `DTI_tractography`, `whole_body_FDG_PET`) |
-| `order_specialized_test` | `test_type` | 23, plus `genetic_panel:<panel>` for 19 panels |
+| `order_specialized_test` | `test_type` | 24, plus `genetic_panel:<panel>` for 19 panels |
 | `order_body_imaging` | `study` | 16 (`<region>_<modality>` over pelvis/abdomen, testis, chest, chest-abdomen-pelvis, mediastinum, spine, peripheral nerve, leg veins, temporal arteries) |
 | `order_microbiology` | `specimen` | 10 |
 | `obtain_tissue_diagnosis` | `procedure` | 5 (`resection`, `stereotactic_biopsy`, `open_biopsy`, `lymph_node_biopsy`, `temporal_artery_biopsy`), plus 21 molecular assays |
-| `perform_clinical_assessment` | `assessment_type` | 6, and `timing` (`baseline`, `post_intervention`) |
+| `perform_clinical_assessment` | `assessment_type` | 7, and `timing` (`baseline`, `post_intervention`) |
 
 `order_ct_scan` images the **head and neck only** and has no region parameter, so its
 discriminators (`contrast`, `angiography`) cannot distinguish a head-and-neck CTA from a

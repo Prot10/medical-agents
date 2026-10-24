@@ -57,7 +57,9 @@ and `RBC_cholinesterase` (two assays, read differently in organophosphate poison
 (post-arrest prognosis at 48 and 72 hours), `toxoplasma_IgG` and `urine_sodium` to the laboratory
 panels. `B12` and `vitamin_B12` are one assay: `vitamin_B12` is advertised and `B12` resolves to
 it through `_ANALYTE_SYNONYMS`. Batch 4 (24 Oct 2026) added `CDT` (carbohydrate-deficient
-transferrin, FTD-M07). One `panels` order that names assays stored in different payloads (the
+transferrin, FTD-M07). Batch 5 (25 Oct 2026) added `cysticercosis_serology` (serum Taenia
+solium IgG, EITB or ELISA) and `IGRA` (QuantiFERON-TB Gold Plus or T-SPOT.TB), both for
+FEPI-TEMP-RS02. Methylmalonic acid was already priced as `MMA`. One `panels` order that names assays stored in different payloads (the
 first-line panels and a second-tier assay) receives each of them (`MockServer._merge_lab_order`).
 
 `order_cardiac_monitoring.monitor_type` is `telemetry`, `holter_24h`, `holter_48h`,
@@ -100,6 +102,7 @@ call. A missing optional runtime argument is expected; an unknown key is not.
 | `speech_language_evaluation` | Speech-language pathology assessment: motor speech, grammar, naming, repetition, comprehension | Primary progressive aphasia variant (Gorno-Tempini 2011); not a second `neuropsych_battery` |
 | `electrophysiology_study` | Invasive EP study: HV interval, sinus node recovery, programmed stimulation, accessory-pathway refractory period | Syncope with bifascicular block or prior infarction (ESC 2018), WPW risk stratification (ESC 2019 SVT) |
 | `sodium_channel_blocker_challenge` | Ajmaline, flecainide or procainamide under 12-lead ECG with high precordial leads | Suspected Brugada syndrome with a non-diagnostic ECG (ESC 2022 VA/SCD) |
+| `olfactory_test` | UPSIT or Sniffin' Sticks against age and sex norms | Hyposmia, a supportive MDS criterion of Parkinson's disease (Postuma 2015) |
 | `genetic_panel:<panel>` | Targeted gene panel | See panel list below |
 
 **Allowed genetic panels** (only these `<panel>` suffix values are valid):
@@ -238,6 +241,7 @@ ground truth.
 | `functional_neuro_signs` | Hoover's sign, entrainment | Functional neurological disorder — a positive clinical diagnosis |
 | `performance_status` | Karnofsky and ECOG at the visit | Treatment planning in high-grade glioma (KPS < 70 unfavourable) |
 | `orthostatic_blood_pressure` | Supine BP and HR, then at 1 and 3 minutes of active standing | Initial evaluation of syncope (ESC 2018, Class I); antihypertensive or diuretic treatment |
+| `levodopa_challenge` | MDS-UPDRS III OFF, then ON at peak effect of a supra-threshold levodopa dose, percent improvement | DBS candidacy (30% or more), a "poor levodopa response" red flag (MSA). One report with both states, not two `timing` orders |
 
 `timing` (24 Oct 2026) is `baseline` (default) or `post_intervention`, from the `timings` block
 (priced at 0). A stored assessment that repeats another after an intervention (the NPH gait after

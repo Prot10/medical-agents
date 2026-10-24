@@ -105,6 +105,9 @@ lands.
   tracheal_aspirate 18 (87070 + 87205, priced as sputum). Estimates: electrophysiology_study 2300
   (93620, professional + facility), sodium_channel_blocker_challenge 368 (no CPT, priced as
   autonomic testing), orthostatic_blood_pressure 23 (no CPT; part of an E/M visit).
+- Batch 5 (25 Oct, recalled): interpret_labs cysticercosis_serology 15 (86682), IGRA 71 (86480).
+  Estimates: olfactory_test 46 (no CPT; unlisted 92700), levodopa_challenge 184 (no CPT; priced
+  as two scored motor examinations). Methylmalonic acid was already priced as `MMA` 28 (83921).
 
 ## Batch-3 cases waiting on data (terms and routing landed 24 Oct)
 - Stored monitoring reports with a prose `monitor_type` (routed on `duration_hours` only): none

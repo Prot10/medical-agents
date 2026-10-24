@@ -61,6 +61,8 @@ _PHRASES: tuple[tuple[str, str], ...] = (
     (r"procalcitonin|\bpct\b", "procalcitonin"), (r"lactic acid", "lactate"),
     (r"valproic acid", "valproate"), (r"(?:urine |serum )?(?:drug|toxicology) screen|\btoxicology\b", "tox"),
     (r"(?:blood|serum) alcohol|\balcohol level", "ethanol"), (r"ceruloplasmin|caeruloplasmin", "ceruloplasmin"),
+    # `IGRA` (25 Oct 2026): the two commercial assays are the one term.
+    (r"interferon[- ]gamma release assays?|quantiferon(?:[- ]tb)?(?: gold)?(?: plus)?|\bt[- ]?spot(?:[. ]?tb)?\b", "igra"),
 )
 
 _STOP = frozenset({

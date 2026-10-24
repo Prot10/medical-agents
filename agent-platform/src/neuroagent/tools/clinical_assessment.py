@@ -38,7 +38,8 @@ class ClinicalAssessmentTool(BaseTool):
         "Perform a structured bedside assessment and receive the findings and scores: a "
         "cognitive screen, an ICHD-3 headache and aura history, timed gait and balance "
         "testing, examination for positive functional neurological signs, a performance "
-        "status or orthostatic blood pressure by active standing. These are "
+        "status, orthostatic blood pressure by active standing or an acute levodopa "
+        "challenge. These are "
         "clinical acts, not instrumental tests — for several conditions they are the "
         "confirmatory step, and for a purely clinical diagnosis they are the whole pathway."
     )
@@ -67,7 +68,10 @@ class ClinicalAssessmentTool(BaseTool):
                     "planning in a brain tumour depends. "
                     "'orthostatic_blood_pressure': blood pressure and heart rate supine and at 1 and "
                     "3 minutes of active standing — orthostatic hypotension in the initial evaluation "
-                    "of syncope."
+                    "of syncope. "
+                    "'levodopa_challenge': MDS-UPDRS part III in the OFF state and again at peak "
+                    "effect of a supra-threshold levodopa dose, with the percent improvement (30% or "
+                    "more supports DBS candidacy); one assessment that reports both states."
                 ),
             },
             # Closed since 24 Oct 2026 (NPH): the MockServer serves the stored assessment of the
