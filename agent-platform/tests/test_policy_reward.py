@@ -13,6 +13,7 @@ from neuroagent_schemas import (
     ObservationReceived,
     PolicyReviewStatus,
     RunCompleted,
+    SequenceConstraint,
     SubmitAssessment,
     ToolAction,
 )
@@ -22,11 +23,26 @@ CASE_PATH = ROOT / "data/neurobench/cases/FEPI-TEMP-M01.json"
 
 
 def approved_case() -> NeuroBenchCase:
+    """The fixture case with the policy shape these tests rely on, whatever the case file holds.
+
+    Reviews change the case's tiers, stop rule and constraints; the tests below need no extra
+    action allowance and one constraint between two required criteria.
+    """
     case = NeuroBenchCase.model_validate_json(CASE_PATH.read_text())
+    policy = case.ground_truth
+    first, second = [c.criterion_id for c in policy.action_criteria if c.importance.value == "required"][:2]
     return case.model_copy(
         update={
-            "ground_truth": case.ground_truth.model_copy(
-                update={"review_status": PolicyReviewStatus.APPROVED}
+            "ground_truth": policy.model_copy(
+                update={
+                    "review_status": PolicyReviewStatus.APPROVED,
+                    "stop_rule": policy.stop_rule.model_copy(update={"max_additional_actions": 0}),
+                    "sequence_constraints": [
+                        SequenceConstraint(
+                            before_criterion_id=first, after_criterion_id=second, reason="test fixture"
+                        )
+                    ],
+                }
             )
         }
     )
