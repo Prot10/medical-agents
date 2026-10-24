@@ -104,7 +104,11 @@ class FallbackLibrary:
         output = self._entry(tool, parameters)
         if output is None:
             return None
+        if tool == "perform_clinical_assessment":
+            # The report says when it was made: the order's timing, else the schema default.
+            output["timing"] = str(parameters.get("timing") or "baseline")
         if tool == "analyze_csf":
+            output["source"] = str(parameters.get("source") or "lumbar_puncture")
             output["special_tests"] = {
                 self._csf_tests[normalize_analyte(name)][0]: self._csf_tests[normalize_analyte(name)][1]
                 for name in _as_names(parameters.get("special_tests"))

@@ -73,6 +73,11 @@ class CSFResults(BaseModel):
     glucose_ratio: str = ""
     special_tests: dict[str, str] = {}
     interpretation: str
+    # lumbar_puncture, shunt_tap, external_ventricular_drain, lumbar_drain: where the fluid was
+    # drawn (`analyze_csf.source`). Empty means not stated, which the MockServer does not
+    # adjudicate. Added on 24 Oct 2026 so NPH-P08's extended lumbar drainage is not served for the
+    # tap test, nor the tap for the drain.
+    source: str = ""
 
 
 class ECGReport(BaseModel):
@@ -246,6 +251,10 @@ class ClinicalAssessmentReport(BaseModel):
     """
 
     assessment_type: str = ""
+    # baseline / post_intervention (`perform_clinical_assessment.timing`): the MockServer serves
+    # the stored assessment of the timing ordered. Added on 24 Oct 2026 for NPH, whose baseline
+    # timed gait and post-tap reassessment are the same assessment twice; empty means not stated.
+    timing: str = ""
     scores: dict[str, str] | None = None  # MoCA 24/30, TUG 18.2 s, FVC 1.9 L, ...
     criteria_met: dict[str, bool] | None = None  # e.g. ICHD-3 aura criteria, per item
     pre_post_comparison: dict[str, str] | None = None  # NPH tap test: before vs after

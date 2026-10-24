@@ -67,3 +67,14 @@ Decisions in `plans/FTD-decisions.md`. Changes:
 - Synonyms (`G31.09` entry, applied with `--prune --conditions ftd`): "pick disease" and "pick's disease" (retired) and the code G31.01 are no longer accepted. Pick disease is one FTLD-tau pathology that no case establishes, and G31.01 is where ICD-10-CM codes primary progressive aphasia, so a PPA answer coded G31.01 scored as correct here.
 
 Checks: `perfect_agent.py` and `case_io.py check` clean; `test_case_guards.py -k FTD-` passes, including `test_routed_outputs_name_their_study`.
+
+## Vocabulary wiring (24 Oct 2026)
+
+New `interpret_labs` panel `CDT` (FTD decisions CENTRAL 1; summary item 8). The CDT value removed in the round for want of a term is restored as its own keyed result, not in the baseline panels.
+
+| field path | change |
+| --- | --- |
+| `followup_outputs[3]` | new `request_cdt_carbohydrate_deficient_transferrin`: %CDT 3.4% (reference < 1.7%, HPLC), flagged high, interpretation a plain recital |
+| `ground_truth.action_criteria[action-cdt-alcohol-biomarker]` | new optional criterion `interpret_labs {panels: [CDT]}`, placed after the baseline labs |
+
+The value is new (the removed value was not recorded in the log): 3.4% is consistent with 8 to 10 drinks a day by the wife's estimate, GGT 148 and MCV 101. Optional, so the score of a complete work-up does not change; a combined baseline order that names CDT now also receives it (MockServer lab-order merging).

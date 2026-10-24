@@ -423,6 +423,36 @@
       },
       "tool_name": "search_medical_literature",
       "trigger_action": "search_psvt_avnrt_supraventricular_tachycardia"
+    },
+    {
+      "output": {
+        "findings": [
+          {
+            "description": "Baseline: sinus rhythm, AH 82 ms, HV 44 ms; no pre-excitation"
+          },
+          {
+            "description": "Dual AV nodal physiology: AH jump of 64 ms with a 10 ms decrement of the atrial extrastimulus coupling interval"
+          },
+          {
+            "description": "Inducible sustained typical (slow-fast) AVNRT, cycle length 272 ms (about 220 bpm), septal VA interval 38 ms, reproducing the clinical tachycardia"
+          },
+          {
+            "description": "No accessory pathway during ventricular pacing (concentric, decremental retrograde conduction)"
+          }
+        ],
+        "impression": "Dual AV nodal physiology with inducible typical slow-fast AVNRT at cycle length 272 ms (about 220 bpm), reproducing the clinical tachycardia. No accessory pathway.",
+        "quantitative_data": {
+          "AH": "82 ms",
+          "AH_jump": "64 ms",
+          "HV": "44 ms",
+          "VA_interval": "38 ms",
+          "tachycardia_cycle_length": "272 ms"
+        },
+        "recommended_actions": [],
+        "test_type": "electrophysiology_study"
+      },
+      "tool_name": "order_specialized_test",
+      "trigger_action": "request_electrophysiology_study"
     }
   ],
   "ground_truth": {
@@ -443,6 +473,24 @@
         "importance": "required",
         "label": "Obtain a 12-lead ECG on arrival",
         "rationale": "The ECG is the first test in syncope; between episodes it must exclude pre-excitation, conduction disease and QT abnormalities before an SVT is managed with AV-nodal drugs (ESC 2018; ESC 2019 SVT)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "assessment_type": "orthostatic_blood_pressure"
+            },
+            "tool_name": "perform_clinical_assessment"
+          }
+        ],
+        "citations": [
+          "[ESC_2018]"
+        ],
+        "criterion_id": "action-orthostatic-blood-pressure",
+        "expected_evidence": "Supine 118/74 mmHg, HR 76; standing 3 min 114/77 mmHg, HR 82: no orthostatic hypotension",
+        "importance": "recommended",
+        "label": "Orthostatic blood pressure by active standing (supine, then 1 and 3 minutes standing)",
+        "rationale": "Orthostatic blood pressure on active standing is part of the initial evaluation of every transient loss of consciousness (ESC 2018 Class I); it tests orthostatic hypotension, the competing cause, before a cardiac cause is accepted."
       },
       {
         "alternatives": [
@@ -536,6 +584,24 @@
         "importance": "required",
         "label": "External event monitor (14 or 30 days)",
         "rationale": "Palpitations recur every few weeks: an external event recorder is indicated when the inter-symptom interval is 4 weeks or less, and gives the symptom-rhythm correlation (ESC 2018 IIa)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "electrophysiology_study"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[ESC_2019_SVT]"
+        ],
+        "criterion_id": "action-electrophysiology-study",
+        "expected_evidence": "Dual AV nodal physiology with inducible typical slow-fast AVNRT at cycle length 272 ms (about 220 bpm)",
+        "importance": "optional",
+        "label": "Electrophysiology study (with a view to slow-pathway ablation)",
+        "rationale": "The event monitor has already documented the tachycardia; the electrophysiology study confirms AVNRT as the first step of slow-pathway ablation (ESC 2019 SVT Class I) and is usually done at the expedited outpatient referral, so it is optional here."
       },
       {
         "alternatives": [
@@ -770,6 +836,30 @@
   "initial_tool_outputs": {
     "advanced_imaging": null,
     "cardiac_monitoring": null,
+    "clinical_assessment": {
+      "assessment_type": "orthostatic_blood_pressure",
+      "criteria_met": {
+        "diastolic_fall_10_mmHg_or_more": false,
+        "heart_rate_rise_30_bpm_or_more": false,
+        "systolic_below_90_mmHg_standing": false,
+        "systolic_fall_20_mmHg_or_more": false
+      },
+      "findings": [
+        {
+          "domain": "symptoms on standing",
+          "result": "no light-headedness, visual dimming or presyncope during 3 minutes of active standing"
+        }
+      ],
+      "impression": "No orthostatic fall in blood pressure and no excessive heart rate rise on active standing.",
+      "pre_post_comparison": null,
+      "recommended_actions": [],
+      "scores": {
+        "standing_1_min": "BP 112/76 mmHg, HR 84 bpm",
+        "standing_3_min": "BP 114/77 mmHg, HR 82 bpm",
+        "supine_after_5_min": "BP 118/74 mmHg, HR 76 bpm"
+      },
+      "timing": "baseline"
+    },
     "csf": null,
     "ct": null,
     "drug_interactions": {

@@ -33,12 +33,12 @@ list, which reported legal values as illegal:
 
 | Tool | Parameter | Values |
 | --- | --- | --- |
-| `order_advanced_imaging` | `modality` | 21 (`amyloid_PET`, `tau_PET`, `FDG_PET`, `perfusion_SPECT`, `amino_acid_PET`, `cardiac_FDG_PET`, `DaTscan`, `MIBG_scan`, `perfusion_MRI`, `CT_perfusion`, `cardiac_MRI`, `coronary_CTA`, `coronary_angiography`, `cerebral_angiography`, `MR_spectroscopy`, `MR_angiography`, `MR_venography`, `carotid_duplex`, `transcranial_doppler`, `functional_MRI`, `DTI_tractography`) |
-| `order_specialized_test` | `test_type` | 21, plus `genetic_panel:<panel>` for 17 panels |
+| `order_advanced_imaging` | `modality` | 22 (`amyloid_PET`, `tau_PET`, `FDG_PET`, `perfusion_SPECT`, `amino_acid_PET`, `cardiac_FDG_PET`, `DaTscan`, `MIBG_scan`, `perfusion_MRI`, `CT_perfusion`, `cardiac_MRI`, `coronary_CTA`, `coronary_angiography`, `cerebral_angiography`, `MR_spectroscopy`, `MR_angiography`, `MR_venography`, `carotid_duplex`, `transcranial_doppler`, `functional_MRI`, `DTI_tractography`, `whole_body_FDG_PET`) |
+| `order_specialized_test` | `test_type` | 23, plus `genetic_panel:<panel>` for 19 panels |
 | `order_body_imaging` | `study` | 16 (`<region>_<modality>` over pelvis/abdomen, testis, chest, chest-abdomen-pelvis, mediastinum, spine, peripheral nerve, leg veins, temporal arteries) |
-| `order_microbiology` | `specimen` | 9 |
+| `order_microbiology` | `specimen` | 10 |
 | `obtain_tissue_diagnosis` | `procedure` | 5 (`resection`, `stereotactic_biopsy`, `open_biopsy`, `lymph_node_biopsy`, `temporal_artery_biopsy`), plus 21 molecular assays |
-| `perform_clinical_assessment` | `assessment_type` | 5 |
+| `perform_clinical_assessment` | `assessment_type` | 6, and `timing` (`baseline`, `post_intervention`) |
 
 `order_ct_scan` images the **head and neck only** and has no region parameter, so its
 discriminators (`contrast`, `angiography`) cannot distinguish a head-and-neck CTA from a
@@ -103,6 +103,21 @@ should write the term.
   recorder, whose paroxysmal AF the short recording might miss. The tier is read from
   `duration_hours`, else from `monitor_type`. `device_interrogation` answers, and is answered by,
   only its own type.
+- Two tools have a second routed parameter, read with its schema default
+  (`MockServer._SECONDARY_DISCRIMINATOR`, 24 Oct 2026): `perform_clinical_assessment.timing`
+  (`baseline` unless stated) and `analyze_csf.source` (`lumbar_puncture` unless stated). A stored
+  report whose field names a term answers only an order of that term, and an order that leaves the
+  parameter out names the default: the NPH baseline gait order is not answered by the stored
+  post-tap reassessment, and a tap test is not answered by NPH-P08's lumbar drainage. An empty
+  field is not adjudicated.
+- A plain re-order follow-up escalates past the initial output only on a repeat order of the same
+  study (same routed parameters, defaults resolved). A first order of one study after another
+  study of the same tool is not a repeat (NPH R5).
+- One `interpret_labs` order naming assays stored in different payloads receives each of them:
+  the served payload, plus the panels of the initial output or of the follow-up whose trigger
+  names that assay alone, for every ordered assay the served payload does not name in its panel
+  names and row tests (`MockServer._merge_lab_order`; MG-P04, SE-P05, SE-M08, FTD-M05). A repeat
+  measurement of an assay the served payload already carries is not merged.
 
 A library normal answers a study the case does not store, and for an alternative study on the
 case's own pathway it can contradict the case (a normal FDG-PET where the case stores an abnormal
@@ -156,11 +171,12 @@ fallback rates: an unpriced value that reaches it is a configuration error.
 panel in the `basic` annotation and only billable assays in `special_tests`. Merging them
 charges the basics a second time.
 
-`source` says where the fluid was drawn: `lumbar_puncture` (the default), `shunt_tap` or
-`external_ventricular_drain`. It is an enum from the `analyze_csf.sources` block, priced at 0
-like the MRI protocols, so the bill is the same `base` for each. A criterion names it only when
-the sample is not a lumbar puncture: a criterion that requires `source: lumbar_puncture` would
-fail an agent that leaves the default implicit.
+`source` says where the fluid was drawn: `lumbar_puncture` (the default), `shunt_tap`,
+`external_ventricular_drain` or `lumbar_drain` (extended lumbar drainage, NPH-P08). It is an enum
+from the `analyze_csf.sources` block, priced at 0 like the MRI protocols except `lumbar_drain`,
+which adds the catheter procedure (CPT 62272) to `base`. A criterion names it only when the sample
+is not a lumbar puncture (shunt tap, EVD, lumbar drain). A stored CSF report carries `source` only
+when it is not a lumbar puncture, and the MockServer then serves it only for that source.
 
 ## Useless and harmful tools are parameter-scoped
 

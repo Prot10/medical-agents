@@ -429,6 +429,28 @@
       },
       "tool_name": "search_medical_literature",
       "trigger_action": "search_pacing_indications_mobitz_ii"
+    },
+    {
+      "output": {
+        "findings": [
+          {
+            "description": "Baseline: sinus rhythm with bifascicular block; AH 90 ms, HV 88 ms (normal 35-55 ms)"
+          },
+          {
+            "description": "Incremental atrial pacing: 2:1 infra-Hisian block (His deflection without ventricular activation) at a pacing cycle length of 550 ms"
+          }
+        ],
+        "impression": "Infra-Hisian conduction disease: HV interval 88 ms, with 2:1 infra-Hisian block during incremental atrial pacing at 550 ms.",
+        "quantitative_data": {
+          "AH": "90 ms",
+          "HV": "88 ms",
+          "infra_Hisian_block_pacing_cycle_length": "550 ms"
+        },
+        "recommended_actions": [],
+        "test_type": "electrophysiology_study"
+      },
+      "tool_name": "order_specialized_test",
+      "trigger_action": "request_electrophysiology_study"
     }
   ],
   "ground_truth": {
@@ -448,6 +470,24 @@
         "importance": "required",
         "label": "Obtain a 12-lead ECG on presentation",
         "rationale": "The ECG is the first test in transient loss of consciousness; Mobitz II with bifascicular block is diagnostic of a high-risk conduction disorder and calls for immediate monitoring (ESC 2018)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "assessment_type": "orthostatic_blood_pressure"
+            },
+            "tool_name": "perform_clinical_assessment"
+          }
+        ],
+        "citations": [
+          "[ESC_2018]"
+        ],
+        "criterion_id": "action-orthostatic-blood-pressure",
+        "expected_evidence": "Supine 143/85 mmHg, HR 56; standing 3 min 139/88 mmHg, HR 58: no orthostatic hypotension",
+        "importance": "recommended",
+        "label": "Orthostatic blood pressure by active standing (supine, then 1 and 3 minutes standing)",
+        "rationale": "Orthostatic blood pressure on active standing is part of the initial evaluation of every transient loss of consciousness (ESC 2018 Class I); it tests orthostatic hypotension, the competing cause, before a cardiac cause is accepted."
       },
       {
         "alternatives": [
@@ -791,6 +831,30 @@
     }
   },
   "initial_tool_outputs": {
+    "clinical_assessment": {
+      "assessment_type": "orthostatic_blood_pressure",
+      "criteria_met": {
+        "diastolic_fall_10_mmHg_or_more": false,
+        "heart_rate_rise_30_bpm_or_more": false,
+        "systolic_below_90_mmHg_standing": false,
+        "systolic_fall_20_mmHg_or_more": false
+      },
+      "findings": [
+        {
+          "domain": "symptoms on standing",
+          "result": "no light-headedness, visual dimming or presyncope during 3 minutes of active standing"
+        }
+      ],
+      "impression": "No orthostatic fall in blood pressure and no excessive heart rate rise on active standing.",
+      "pre_post_comparison": null,
+      "recommended_actions": [],
+      "scores": {
+        "standing_1_min": "BP 137/87 mmHg, HR 59 bpm",
+        "standing_3_min": "BP 139/88 mmHg, HR 58 bpm",
+        "supine_after_5_min": "BP 143/85 mmHg, HR 56 bpm"
+      },
+      "timing": "baseline"
+    },
     "csf": null,
     "drug_interactions": {
       "medication_list_review": {

@@ -66,3 +66,17 @@ Close-out of the condition (plans/SYNC-CARD-decisions.md). Not a re-review: ever
 - Citations now follow the guideline each rationale or reason names (ruling 8; new keys in the criteria pack allow-list): action-2-interpret-labs citations ['[ESC_2018]'] -> ['[Graus_2021]']; action-11-tumour-search-chest-ct citations ['[ESC_2018]'] -> ['[Graus_2021]']; action-12-analyze-csf citations ['[ESC_2018]'] -> ['[Graus_2021]']; avoid-waste-2-order-ct-scan citations ['[ESC_2018]'] -> ['[NICE_NG232]'].
 
 Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; `test_case_guards.py -k SYNC-CARD-RM01` pass (SYNC-CARD now in `DISCRIMINATOR_CONDITIONS`); synonym `--check` clean.
+
+## Vocabulary wiring (24 Oct 2026)
+
+Central vocabulary (batch 4: orthostatic_blood_pressure, electrophysiology_study, sodium_channel_blocker_challenge, genetic_panel:inherited_arrhythmia and :cardiomyopathy, whole_body_FDG_PET; SYNC-CARD decisions CENTRAL 1).
+
+| field path | change |
+| --- | --- |
+| `initial_tool_outputs.clinical_assessment` | added: orthostatic_blood_pressure report, supine values = the presenting vitals; No orthostatic fall in blood pressure and no excessive heart rate rise on active standing. |
+| `ground_truth.action_criteria[action-orthostatic-blood-pressure]` | added, recommended, after the ECG criterion [ESC_2018] (decisions CENTRAL 1: orthostatic BP in every initial evaluation) |
+| `followup_outputs[10] (`request_whole_body_fdg_pet_ct`)` | added: whole_body_FDG_PET report consistent with the stored chest CT |
+| `ground_truth.action_criteria[action-whole-body-fdg-pet]` | added, optional [Graus_2021] |
+| `ground_truth.assessment.required_recommendations[3]` | removed the clause "; whole-body FDG-PET for staging": staging is now an action criterion, not a must |
+
+Scoring change for re-review: new criteria are recommended or optional, so no required work-up changed.

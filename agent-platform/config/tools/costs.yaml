@@ -295,6 +295,11 @@ tools:
       # Spot urine sodium, with serum and urine osmolality the SIADH work-up of hyponatraemia
       # (October 2026 review, SE-M04 [Spasovski_2014]). CPT 84300, priced as serum sodium.
       urine_sodium: 7
+      # Carbohydrate-deficient transferrin (% of total transferrin), the biomarker of sustained
+      # heavy drinking over the preceding two to three weeks (October 2026 review, FTD-M07: an
+      # alcohol use disorder beside a behavioural-variant FTD, whose value was removed for want of
+      # a term). CPT 82373.
+      CDT: 21
     default_panel: 23
 
   analyze_csf:
@@ -355,10 +360,18 @@ tools:
     # be told apart from a lumbar puncture, so it could not be scored). A shunt tap (CPT 61070)
     # is priced like the LP it replaces; a sample drawn from an EVD has no procedure fee, so its
     # bill is over-stated by the LP share of `base`.
+    #
+    # `lumbar_drain` (24 Oct 2026, NPH-P08): extended lumbar drainage through an indwelling
+    # catheter, about 10 mL/h for 72 h, the drainage trial after a negative tap test (Marmarou
+    # 2005). The one source billed on top of `base`: CPT 62272 (therapeutic spinal puncture for
+    # drainage of CSF, by catheter), recalled rather than looked up; the inpatient stay the trial
+    # needs is not billed, as for every other order. A source is named in a criterion only for a
+    # shunt tap, an EVD sample or a lumbar drain.
     sources:
       lumbar_puncture: 0
       shunt_tap: 0
       external_ventricular_drain: 0
+      lumbar_drain: 184
 
   order_ct_scan:
     # CPT 70450 (without contrast), 70460 (with contrast), 70496 (CTA head)
@@ -466,6 +479,12 @@ tools:
       # extensive as safely possible), so the study the decision rests on must be orderable.
       functional_MRI: 552        # CPT 70555, BOLD fMRI with physician-administered paradigms
       DTI_tractography: 368      # diffusion acquisition + CPT 76377 tractography post-processing
+      # Whole-body 18F-FDG PET/CT, skull base to mid-thigh: the occult-malignancy search of a
+      # paraneoplastic syndrome when CT is negative (October 2026 review, SYNC-CARD-RM01, anti-Hu
+      # brainstem encephalitis; Graus 2021). `FDG_PET` is the cerebral study and
+      # `cardiac_FDG_PET` the myocardial one: same tracer, three different acquisitions and
+      # questions. CPT 78815, priced as the brain study.
+      whole_body_FDG_PET: 1840
 
   order_specialized_test:
     # Closed vocab defined in dataset-generation/TOOL_PARAMETER_VOCABULARY.md
@@ -501,6 +520,19 @@ tools:
       # (ALZ-EARLY-P02, logopenic PPA). Not a second `neuropsych_battery`: the battery screens
       # language as one cognitive domain and does not assess motor speech. CPT 92523.
       speech_language_evaluation: 175
+      # Requested by the batch-4 close-out of cardiac syncope (24 Oct 2026). Invasive
+      # electrophysiology study: HV interval, sinus node recovery, programmed stimulation for
+      # inducible VT, accessory-pathway refractory period (ESC 2018 syncope, Class IIa in
+      # bifascicular block and in syncope with prior infarction; ESC 2019 SVT for WPW risk
+      # stratification; SYNC-CARD RS04, M01, M02, RM03, P01). CPT 93620 (comprehensive EPS with
+      # induction), professional + facility; reference estimate, priced as cerebral angiography's
+      # catheter band.
+      electrophysiology_study: 2300
+      # Sodium-channel blocker challenge (ajmaline, flecainide or procainamide) under continuous
+      # 12-lead ECG with high precordial leads, to unmask a type 1 Brugada pattern (ESC 2022
+      # VA/SCD). No specific CPT code (an ECG-monitored drug infusion); reference estimate,
+      # priced as autonomic testing.
+      sodium_channel_blocker_challenge: 368
     genetic_panels:
       ALS: 1840
       FTD: 1840
@@ -526,6 +558,17 @@ tools:
       # M03, RM11, RS11, P09), where the test could only be written as a referral. CPT 81479
       # (unlisted) for a four-gene panel; reference estimate, priced as the CADASIL panel.
       hemiplegic_migraine: 1104
+      # Inherited arrhythmia syndromes: KCNQ1, KCNH2, SCN5A (long QT, Brugada), RYR2, CASQ2
+      # (CPVT) and the minor channelopathy genes. Requested by the batch-4 close-out of cardiac
+      # syncope (SYNC-CARD P03, P04, RP03; ESC 2022 VA/SCD, Class I in a proband with a clinical
+      # diagnosis). CPT 81413 (cardiac ion channelopathy panel, at least 10 genes); recalled,
+      # priced as the ALS panel.
+      inherited_arrhythmia: 1840
+      # Inherited cardiomyopathy: PKP2, DSP, DSG2, DSC2, TMEM43 (ARVC), LMNA, MYH7, MYBPC3, TNNT2,
+      # FLNC and the sarcomere genes (ESC 2023 cardiomyopathy, Class I in a patient with a
+      # diagnosed cardiomyopathy; SYNC-CARD P01, P02 and the conduction-disease cases). CPT 81439
+      # (inherited cardiomyopathy panel, at least 5 genes); recalled, priced as the ALS panel.
+      cardiomyopathy: 1840
 
   # --- Tools added after the July 2026 clinical tool review -------------------------------
   # The reviewers' structural finding: the action space could only image the brain and could
@@ -606,6 +649,11 @@ tools:
       # obtain_tissue_diagnosis (stereotactic_biopsy, resection), so one procedure is priced
       # once. CPT 87205 + 87070 + 87075.
       brain_aspirate: 30
+      # Lower respiratory tract secretions aspirated through the endotracheal tube of a ventilated
+      # patient: Gram stain and semi-quantitative culture (October 2026 review, MG-RM15, a
+      # ventilator-associated pneumonia in myasthenic crisis that could only be ordered as
+      # `sputum`). CPT 87070 + 87205, priced as sputum.
+      tracheal_aspirate: 18
 
   obtain_tissue_diagnosis:
     # Two-part, like analyze_csf: the procedure, then the assays run on the specimen.
@@ -686,6 +734,19 @@ tools:
       # (EANO 2021: KPS < 70 is the unfavourable threshold), and the October 2026 review found
       # it only as a pre-illness line in the social history (GLIO-HG-RP04).
       performance_status: 46
+      # Orthostatic blood pressure and heart rate by active standing: supine for 5 minutes, then
+      # readings at 1 and 3 minutes of standing (ESC 2018 syncope, Class I in the initial
+      # evaluation; SYNC-CARD, batch-4 close-out). Part of the visit, with no CPT code of its own;
+      # reference estimate for the nurse time.
+      orthostatic_blood_pressure: 23
+    # When the assessment is made, relative to an intervention whose effect it measures (24 Oct
+    # 2026, NPH: the baseline timed gait and the reassessment after the tap test are the same
+    # assessment twice, and the case must serve each one for its own order). Priced at 0 like the
+    # MRI `protocols` and the CSF `sources`: each assessment is billed once at its `by_type` rate.
+    # The block is the source of the `timing` enum; `baseline` is the schema default.
+    timings:
+      baseline: 0
+      post_intervention: 0
 
   search_medical_literature:
     base: 0

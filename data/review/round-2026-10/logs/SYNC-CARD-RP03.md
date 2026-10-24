@@ -71,3 +71,18 @@ Close-out of the condition (plans/SYNC-CARD-decisions.md). Not a re-review: ever
 - Citations now follow the guideline each rationale or reason names (ruling 8; new keys in the criteria pack allow-list): action-5-order-specialized-test citations ['[ESC_2018]'] -> ['[ESC_2022_VA_SCD]']; action-6-order-advanced-imaging citations ['[ESC_2018]'] -> ['[ESC_2022_VA_SCD]']; action-7-check-drug-interactions citations ['[ESC_2018]'] -> ['[ESC_2022_VA_SCD]']; avoid-waste-2-order-ct-scan citations [] -> ['[NICE_NG232]']; action-3-order-echocardiogram->action-5-order-specialized-test citations ['[ESC_2018]'] -> ['[ESC_2018]', '[ESC_2023_Cardiomyopathy]', '[ESC_EACTS_2025_VHD]'].
 
 Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; `test_case_guards.py -k SYNC-CARD-RP03` pass (SYNC-CARD now in `DISCRIMINATOR_CONDITIONS`); synonym `--check` clean.
+
+## Vocabulary wiring (24 Oct 2026)
+
+Central vocabulary (batch 4: orthostatic_blood_pressure, electrophysiology_study, sodium_channel_blocker_challenge, genetic_panel:inherited_arrhythmia and :cardiomyopathy, whole_body_FDG_PET; SYNC-CARD decisions CENTRAL 1).
+
+| field path | change |
+| --- | --- |
+| `initial_tool_outputs.clinical_assessment` | added: orthostatic_blood_pressure report, supine values = the presenting vitals; No orthostatic fall in blood pressure and no excessive heart rate rise on active standing. |
+| `ground_truth.action_criteria[action-orthostatic-blood-pressure]` | added, recommended, after the ECG criterion [ESC_2018] (decisions CENTRAL 1: orthostatic BP in every initial evaluation) |
+| `followup_outputs[6] (`request_genetic_testing_inherited_arrhythmia_panel`)` | moved from `interpret_labs` (the decisions-file placeholder until C2) to `order_specialized_test` `genetic_panel:inherited_arrhythmia`; same genes and results, rows as findings, the interpretation as the impression |
+| `ground_truth.action_criteria[action-genetic-panel]` | added, recommended [ESC_2022_VA_SCD]; the assessment must on genetic counselling and testing is unchanged |
+
+Scoring change for re-review: new criteria are recommended or optional, so no required work-up changed.
+
+Correction to the decisions file: it said no genetic result was stored in this case; one was, under `interpret_labs`. It is moved, not rewritten.

@@ -41,9 +41,11 @@ Two rules the whole laboratory vocabulary rests on:
 protein and glucose inside `analyze_csf.base`, and bills each entry of `special_tests`
 separately. Put the always-done panel in the `basic` annotation and only billable assays in
 `special_tests`, or the basics get charged a second time. Its optional `source` is
-`lumbar_puncture` (default), `shunt_tap` or `external_ventricular_drain`, from the
-`analyze_csf.sources` block (priced at 0); a criterion names it only for a shunt tap or an EVD
-sample. The October 2026 review added `mycobacterial_panel` (AFB smear, Xpert MTB/RIF Ultra,
+`lumbar_puncture` (default), `shunt_tap`, `external_ventricular_drain` or `lumbar_drain`
+(extended lumbar drainage through a catheter, the drainage trial after a negative tap test; added
+24 Oct 2026, NPH-P08), from the `analyze_csf.sources` block (priced at 0 except `lumbar_drain`,
+CPT 62272 on top of `base`); a criterion names it only for a shunt tap, an EVD sample or a lumbar
+drain. A stored CSF report states its `source` only when it is not a lumbar puncture. The October 2026 review added `mycobacterial_panel` (AFB smear, Xpert MTB/RIF Ultra,
 mycobacterial culture), `fungal_culture`, `india_ink` and `ADA` to `special_tests`, and
 `HIV_viral_load`, `CD4_count`, `beta2_transferrin`, `serum_cryptococcal_antigen` and `AFP` to the
 laboratory panels (serum CrAg stays apart from the CSF `cryptococcal_antigen`: one specimen, one
@@ -54,7 +56,9 @@ conditions added `toxoplasma_PCR` and `EBV_PCR` to `special_tests`, and `plasma_
 and `RBC_cholinesterase` (two assays, read differently in organophosphate poisoning), `NSE`
 (post-arrest prognosis at 48 and 72 hours), `toxoplasma_IgG` and `urine_sodium` to the laboratory
 panels. `B12` and `vitamin_B12` are one assay: `vitamin_B12` is advertised and `B12` resolves to
-it through `_ANALYTE_SYNONYMS`.
+it through `_ANALYTE_SYNONYMS`. Batch 4 (24 Oct 2026) added `CDT` (carbohydrate-deficient
+transferrin, FTD-M07). One `panels` order that names assays stored in different payloads (the
+first-line panels and a second-tier assay) receives each of them (`MockServer._merge_lab_order`).
 
 `order_cardiac_monitoring.monitor_type` is `telemetry`, `holter_24h`, `holter_48h`,
 `event_monitor_14d`, `event_monitor_30d`, `implantable_loop_recorder` or `device_interrogation`
@@ -94,6 +98,8 @@ call. A missing optional runtime argument is expected; an unknown key is not.
 | `minor_salivary_gland_biopsy` | Lip biopsy, focus score | Sjögren's confirmation |
 | `audiometry` | Pure-tone and speech audiometry, tympanometry | Hearing loss after bacterial meningitis (WHO 2025, NICE NG240) |
 | `speech_language_evaluation` | Speech-language pathology assessment: motor speech, grammar, naming, repetition, comprehension | Primary progressive aphasia variant (Gorno-Tempini 2011); not a second `neuropsych_battery` |
+| `electrophysiology_study` | Invasive EP study: HV interval, sinus node recovery, programmed stimulation, accessory-pathway refractory period | Syncope with bifascicular block or prior infarction (ESC 2018), WPW risk stratification (ESC 2019 SVT) |
+| `sodium_channel_blocker_challenge` | Ajmaline, flecainide or procainamide under 12-lead ECG with high precordial leads | Suspected Brugada syndrome with a non-diagnostic ECG (ESC 2022 VA/SCD) |
 | `genetic_panel:<panel>` | Targeted gene panel | See panel list below |
 
 **Allowed genetic panels** (only these `<panel>` suffix values are valid):
@@ -117,6 +123,8 @@ call. A missing optional runtime argument is expected; an unknown key is not.
 | `PD` | Young-onset / monogenic Parkinson's | PRKN, PINK1, DJ-1, LRRK2, GBA, SNCA |
 | `hereditary_paraganglioma` | Hereditary paraganglioma-phaeochromocytoma | SDHA/B/C/D, SDHAF2, VHL, RET, NF1, TMEM127, MAX, FH |
 | `hemiplegic_migraine` | Familial and sporadic hemiplegic migraine | CACNA1A, ATP1A2, SCN1A, PRRT2 |
+| `inherited_arrhythmia` | Long QT, Brugada, CPVT | KCNQ1, KCNH2, SCN5A, RYR2, CASQ2 and the minor channelopathy genes |
+| `cardiomyopathy` | Arrhythmogenic, hypertrophic, dilated cardiomyopathy, laminopathy | PKP2, DSP, DSG2, LMNA, FLNC, MYH7, MYBPC3 and the sarcomere genes |
 
 ---
 
@@ -145,6 +153,7 @@ call. A missing optional runtime argument is expected; an unknown key is not.
 | `coronary_angiography` | Invasive catheter coronary angiography | Suspected myocardial ischaemia or infarction (ESC 2018 Class IIa in syncope). An angiographic finding alone does not establish the cause of a symptom |
 | `functional_MRI` | BOLD fMRI, motor and language paradigms | Pre-surgical mapping and language lateralisation near eloquent cortex (high-grade glioma) |
 | `DTI_tractography` | Diffusion tensor tractography | Corticospinal tract, arcuate fasciculus, optic radiations before resection |
+| `whole_body_FDG_PET` | 18F-FDG PET/CT, skull base to mid-thigh | Occult-malignancy search in a paraneoplastic syndrome when CT is negative (Graus 2021). A different acquisition from the cerebral `FDG_PET` |
 
 ---
 
@@ -189,6 +198,7 @@ studies at different prices.
 | `stool` | C. difficile toxin PCR | Diarrhoea in the infection screen (hepatic encephalopathy on lactulose) |
 | `wound_swab` | Culture of a wound or ulcer | A skin portal of entry (bacterial meningitis) |
 | `brain_aspirate` | Gram stain, aerobic and anaerobic culture of aspirated brain-lesion material | Brain abscess on the differential of a ring-enhancing lesion. The aspiration is ordered through `obtain_tissue_diagnosis` and billed there |
+| `tracheal_aspirate` | Gram stain and culture of endotracheal aspirate | Ventilator-associated pneumonia in an intubated patient (e.g. myasthenic crisis) |
 
 `before_antimicrobials` is a boolean: yield collapses once treatment has started, and the
 report must state it rather than leave it inferred.
@@ -227,6 +237,14 @@ ground truth.
 | `gait_and_balance_timed` | Timed Up and Go, timed walk | NPH, before *and* after the CSF tap test (two assessments) |
 | `functional_neuro_signs` | Hoover's sign, entrainment | Functional neurological disorder — a positive clinical diagnosis |
 | `performance_status` | Karnofsky and ECOG at the visit | Treatment planning in high-grade glioma (KPS < 70 unfavourable) |
+| `orthostatic_blood_pressure` | Supine BP and HR, then at 1 and 3 minutes of active standing | Initial evaluation of syncope (ESC 2018, Class I); antihypertensive or diuretic treatment |
+
+`timing` (24 Oct 2026) is `baseline` (default) or `post_intervention`, from the `timings` block
+(priced at 0). A stored assessment that repeats another after an intervention (the NPH gait after
+the tap test) carries `timing: post_intervention`, the baseline report carries `timing: baseline`,
+and the MockServer serves each for its own order. A criterion for the reassessment names
+`timing: post_intervention`; one for the baseline may name `timing: baseline`, which the schema
+default satisfies when the call leaves it out.
 
 ---
 

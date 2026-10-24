@@ -2,15 +2,16 @@ from __future__ import annotations
 from neuroagent_schemas import (
     NeuroBenchCase, EEGReport, MRIReport, ECGReport, LabResults, CSFResults,
     LiteratureSearchResult, DrugInteractionResult,
-    CTReport, EchoReport, CardiacMonitoringReport,
+    CTReport, EchoReport, CardiacMonitoringReport, LabValue,
     AdvancedImagingReport, SpecializedTestReport,
 )
 from .base import ToolCall, ToolResult
 from .fallback_library import FallbackLibrary, default_library
-from .followup_matcher import resolve_followup
+from .followup_matcher import match_followup, resolve_followup
 from .vocabulary import (
     DOMAIN_PACKS,
     advanced_imaging_modalities,
+    assessment_timings,
     assessment_types,
     body_imaging_studies,
     by_type_values,
@@ -71,6 +72,63 @@ class MockServer:
             "monitor_type", lambda packs=(): by_type_values("order_cardiac_monitoring", packs=packs)
         ),
     }
+
+    # A second routed parameter, read with its schema default (24 Oct 2026). The stored report says
+    # which variant it is in the same field; a report that leaves the field empty is not
+    # adjudicated. Unlike `_DISCRIMINATOR`, an order that leaves the parameter out names the
+    # default, because here the default is the common study and the variant the exception: NPH
+    # stores the baseline timed gait and the post-tap reassessment as the same assessment type, and
+    # the baseline order received the post-tap result (NPH R4); a lumbar-drain report must not
+    # answer the tap test, nor the tap the drainage trial (NPH-P08, R3).
+    _SECONDARY_DISCRIMINATOR: dict[str, tuple[str, Any, str]] = {
+        "perform_clinical_assessment": ("timing", assessment_timings, "baseline"),
+        "analyze_csf": ("source", csf_sources, "lumbar_puncture"),
+    }
+
+    def _secondary_answers(self, tool_name: str, parameters: dict[str, Any], output: Any) -> bool:
+        spec = self._SECONDARY_DISCRIMINATOR.get(tool_name)
+        if spec is None or output is None:
+            return True
+        key, vocabulary, default = spec
+        got = getattr(output, key, None) if isinstance(output, BaseModel) else None
+        folded = self._fold(got) if got not in (None, "") else frozenset()
+        if not folded or folded not in {self._fold(term) for term in vocabulary(packs=self.packs)}:
+            return True  # not stated, or prose: not ours to adjudicate
+        return folded == self._fold(parameters.get(key) or default)
+
+    def _study_key(self, tool_name: str, parameters: dict[str, Any]) -> tuple:
+        """Which study a call orders, by its routed parameters, defaults resolved (`None`: unknown)."""
+        key: list[Any] = []
+        spec = self._DISCRIMINATOR.get(tool_name)
+        if spec is not None:
+            value = parameters.get(spec[0])
+            default = self._ENUM_DEFAULTS.get(tool_name)
+            if value is None and default is not None and default[0] == spec[0]:
+                value = default[1]
+            key.append(self._fold(value) if value is not None else None)
+        secondary = self._SECONDARY_DISCRIMINATOR.get(tool_name)
+        if secondary is not None:
+            key.append(self._fold(parameters.get(secondary[0]) or secondary[2]))
+        return tuple(key)
+
+    def _is_repeat_call(self, tool_name: str, parameters: dict[str, Any]) -> bool:
+        """Was the same study ordered before this call (NPH R5)?
+
+        A plain re-order follow-up escalates past the initial output only on a repeat order. Counting
+        every earlier call to the tool made a first order of one study a "repeat" because another
+        study of the same tool had been ordered (a timed gait after a cognitive screen, a lumbar drain
+        after the tap). Now an earlier call counts only when it ordered the same study by the tool's
+        routed parameters; when either call leaves a routed parameter unknown, it still counts, as
+        before.
+        """
+        mine = self._study_key(tool_name, parameters)
+        for call in self.call_log:
+            if call.tool_name != tool_name:
+                continue
+            theirs = self._study_key(tool_name, call.parameters or {})
+            if all(a is None or b is None or a == b for a, b in zip(mine, theirs)):
+                return True
+        return False
 
     # Every scalar enum a tool advertises, for the follow-up matcher: a trigger token that
     # belongs to one of the called tool's own terms identifies a study only with its whole
@@ -145,6 +203,8 @@ class MockServer:
         that tool's vocabulary. A prose value, a missing field, or a call that pins nothing is
         served exactly as before.
         """
+        if not self._secondary_answers(tool_name, parameters, output):
+            return False
         spec = self._DISCRIMINATOR.get(tool_name)
         if spec is None or output is None:
             return True
@@ -294,22 +354,36 @@ class MockServer:
         return self._assays_named(initial, requested) > self._assays_named(candidate, requested)
 
     def _match_by_discriminator(self, tool_name: str, parameters: dict[str, Any]) -> Any | None:
-        """The follow-up whose stored report IS the study this call names, if there is one."""
+        """The follow-up whose stored report IS the study this call names, if there is one.
+
+        A candidate must also pass the full guard (`_answers_the_question`, which includes the
+        secondary discriminator), and a refused one does not end the search: the NPH baseline gait
+        order skips the stored post-tap reassessment instead of stopping at it. A tool routed by a
+        secondary parameter alone (`analyze_csf.source`) matches here only when the call names a
+        non-default value that a stored report carries exactly (the lumbar drain).
+        """
         spec = self._DISCRIMINATOR.get(tool_name)
-        if spec is None or parameters.get(spec[0]) is None:
+        secondary = self._SECONDARY_DISCRIMINATOR.get(tool_name)
+        if spec is not None:
+            if parameters.get(spec[0]) is None:
+                return None
+            key, wanted = spec[0], parameters[spec[0]]
+        elif secondary is not None and parameters.get(secondary[0]) not in (None, secondary[2]):
+            key, wanted = secondary[0], parameters[secondary[0]]
+        else:
             return None
         for followup in self.case.followup_outputs or []:
             if followup.tool_name != tool_name:
                 continue
-            if self._fold(getattr(followup.output, spec[0], "")) == self._fold(
-                parameters[spec[0]]
-            ):
+            if self._fold(getattr(followup.output, key, "")) != self._fold(wanted):
+                continue
+            if self._answers_the_question(tool_name, parameters, followup.output):
                 return followup
         return None
 
     def get_output(self, tool_name: str, parameters: dict[str, Any]) -> ToolResult:
-        # Whether this tool was already called BEFORE this call (a re-order).
-        is_repeat_call = any(c.tool_name == tool_name for c in self.call_log)
+        # Whether this study was already ordered BEFORE this call (a re-order; see _is_repeat_call).
+        is_repeat_call = self._is_repeat_call(tool_name, parameters)
         self.call_log.append(ToolCall(tool_name=tool_name, parameters=parameters))
 
         initial = self._match_initial_output(tool_name, parameters)
@@ -356,7 +430,7 @@ class MockServer:
             followup = None
         if followup is not None:
             self._served_triggers.add(followup.trigger_action)
-            output = followup.output
+            output = self._merge_lab_order(tool_name, parameters, followup.output, followup, initial)
             return ToolResult(
                 tool_name=tool_name, success=True,
                 output=output.model_dump() if isinstance(output, BaseModel) else output,
@@ -364,6 +438,7 @@ class MockServer:
 
         # Initial tool output (first, parameter-light order on the pathway).
         if initial is not None:
+            initial = self._merge_lab_order(tool_name, parameters, initial, None, initial)
             return ToolResult(
                 tool_name=tool_name, success=True,
                 output=initial.model_dump() if isinstance(initial, BaseModel) else initial,
@@ -409,6 +484,85 @@ class MockServer:
         )
 
     _KNOWLEDGE_TOOLS = frozenset({"search_medical_literature", "check_drug_interactions"})
+
+    @classmethod
+    def _panel_names(cls, name: str, rows: list[LabValue], assay: Any) -> bool:
+        """Does this stored panel (its name and its row tests) name the assay, every token of it?
+
+        Stricter than `_assays_named`, which is generous on purpose and reads the whole report:
+        here a hit decides that the panel is the answer to that assay, so all of the assay's
+        informative tokens must appear in what the panel measures, never in its interpretation.
+        """
+        tokens = [t for t in re.split(r"[^a-z0-9]+", str(assay).lower())
+                  if len(t) >= 3 and t not in cls._UNINFORMATIVE]
+        blob = " ".join([name, *(row.test for row in rows)]).lower()
+        return bool(tokens) and all(t[:5] in blob for t in tokens)
+
+    def _merge_lab_order(
+        self, tool_name: str, parameters: dict[str, Any], served: Any, served_followup: Any, initial: Any
+    ) -> Any:
+        """One laboratory order naming several assays receives every stored result it names.
+
+        Each laboratory payload of a case was authored for one order: the first-line panels in
+        the initial output, a second-tier assay in a follow-up. An order that names assays from
+        several of them was answered by one payload only: MG-P04's single order for AChR, MuSK,
+        LRP4 and TSH antibodies got back the LRP4 follow-up alone, SE-P05's first order with
+        cholinesterase the first-line panels alone (SE CENTRAL 5, FTD CENTRAL 3). The served
+        payload stays the base; for each ordered assay none of its panels names, the panels that
+        do name it are added from the initial output, or from the follow-up whose trigger names
+        that assay on its own (the re-order it was written for). The assay is matched on the
+        panel names and row tests with every informative token (`_panel_names`), so a repeat
+        measurement of an assay the base already carries is never merged into the first order.
+        Merged follow-ups count as served. Laboratory orders only: CSF and tissue payloads are
+        single specimens and are not combined.
+        """
+        from neuroagent_schemas import LabResults
+
+        requested = parameters.get("panels")
+        if isinstance(requested, str):
+            requested = [requested]
+        if (tool_name != "interpret_labs" or not isinstance(requested, (list, tuple))
+                or len(requested) < 2 or not isinstance(served, LabResults)):
+            return served
+        panels = dict(served.panels)
+        interpretations = [served.interpretation] if served.interpretation else []
+        summary = list(served.abnormal_values_summary)
+        followups = [
+            fu for fu in self.case.followup_outputs or []
+            if fu.tool_name == tool_name and fu is not served_followup and isinstance(fu.output, LabResults)
+        ]
+        contributed: set[int] = set()
+        for assay in requested:
+            if any(self._panel_names(name, rows, assay) for name, rows in panels.items()):
+                continue
+            source = None
+            if isinstance(initial, LabResults) and initial is not served and any(
+                self._panel_names(name, rows, assay) for name, rows in initial.panels.items()
+            ):
+                source = initial
+            else:
+                hit = match_followup(tool_name, {"panels": [assay]}, followups, self._served_triggers)
+                if hit is not None:
+                    source = hit.output
+                    self._served_triggers.add(hit.trigger_action)
+            if source is None:
+                continue
+            added = {name: rows for name, rows in source.panels.items()
+                     if name not in panels and self._panel_names(name, rows, assay)}
+            if not added:
+                continue
+            panels.update(added)
+            if id(source) not in contributed:
+                contributed.add(id(source))
+                if source.interpretation:
+                    interpretations.append(source.interpretation)
+            tests = [row.test.lower() for rows in added.values() for row in rows]
+            summary += [line for line in source.abnormal_values_summary
+                        if line not in summary and any(test[:8] in line.lower() for test in tests)]
+        if panels.keys() == served.panels.keys():
+            return served
+        return LabResults(panels=panels, interpretation=" ".join(interpretations),
+                          abnormal_values_summary=summary)
 
     def _study_label(self, tool_name: str, parameters: dict[str, Any]) -> str:
         """`order_body_imaging (study=abdomen_xray)`: the tool, and the study the call names."""

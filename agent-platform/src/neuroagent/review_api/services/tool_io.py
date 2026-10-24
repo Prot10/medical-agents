@@ -79,6 +79,8 @@ _COSTS_DERIVED_ENUMS: dict[tuple[str, str], tuple[str, str]] = {
         "perform_clinical_assessment",
         "by_type",
     ),
+    # Scalar, priced at 0 (24 Oct 2026, NPH: baseline vs post-tap reassessment).
+    ("perform_clinical_assessment", "timing"): ("perform_clinical_assessment", "timings"),
 }
 
 # Array-valued parameters: the enum sits on `items`, and their vocabularies carry spelling
@@ -271,7 +273,9 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
                     "Where the CSF is drawn. 'lumbar_puncture' (default). 'shunt_tap': "
                     "aspiration from the reservoir of a ventricular shunt, for suspected "
                     "shunt infection or malfunction. 'external_ventricular_drain': a sample "
-                    "from the drain's sampling port in a patient with an EVD in place."
+                    "from the drain's sampling port in a patient with an EVD in place. "
+                    "'lumbar_drain': extended lumbar drainage through an indwelling catheter "
+                    "(about 10 mL/h over 72 hours), the drainage trial after a negative tap test."
                 ),
                 "default": "lumbar_puncture",
             },
@@ -378,7 +382,10 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
                     "'functional_MRI': BOLD motor and language mapping and hemispheric language "
                     "lateralisation, before surgery near eloquent cortex. 'DTI_tractography': "
                     "diffusion tractography of the corticospinal tract, arcuate fasciculus and optic "
-                    "radiations, for resection planning."
+                    "radiations, for resection planning. "
+                    "'whole_body_FDG_PET': whole-body 18F-FDG PET/CT, skull base to mid-thigh — the "
+                    "occult-malignancy search of a paraneoplastic syndrome when CT is negative (a "
+                    "different acquisition from the cerebral 'FDG_PET')."
                 ),
             },
         },
@@ -407,7 +414,14 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
                     "(hearing loss after bacterial meningitis). 'speech_language_evaluation': "
                     "speech-language pathology assessment of motor speech, grammar, naming, "
                     "repetition and comprehension, which classifies a primary progressive aphasia "
-                    "(a full cognitive battery is 'neuropsych_battery')."
+                    "(a full cognitive battery is 'neuropsych_battery'). "
+                    "'electrophysiology_study': invasive EP study — HV interval, sinus node recovery, "
+                    "programmed stimulation for inducible arrhythmia, accessory-pathway refractory period. "
+                    "'sodium_channel_blocker_challenge': ajmaline, flecainide or procainamide under "
+                    "12-lead ECG with high precordial leads, to unmask a type 1 Brugada pattern. "
+                    "'genetic_panel:inherited_arrhythmia': long QT, Brugada and CPVT genes; "
+                    "'genetic_panel:cardiomyopathy': arrhythmogenic, hypertrophic, dilated and "
+                    "laminopathy genes."
                 ),
             },
         },
@@ -482,7 +496,9 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
                     "C. difficile toxin PCR. 'wound_swab': culture of a wound or ulcer, a "
                     "possible portal of entry. 'brain_aspirate': Gram stain and aerobic and "
                     "anaerobic culture of material aspirated from a brain lesion; the aspiration "
-                    "itself is ordered through obtain_tissue_diagnosis."
+                    "itself is ordered through obtain_tissue_diagnosis. "
+                    "'tracheal_aspirate': Gram stain and culture of a lower-airway sample "
+                    "aspirated through the endotracheal tube of a ventilated patient."
                 ),
             },
             "tests": {
@@ -581,16 +597,21 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
                     "'functional_neuro_signs': Hoover's sign, entrainment and the other "
                     "positive signs of a functional disorder. "
                     "'performance_status': Karnofsky and ECOG scored at the visit, on which treatment "
-                    "planning in a brain tumour depends."
+                    "planning in a brain tumour depends. "
+                    "'orthostatic_blood_pressure': blood pressure and heart rate supine and at 1 and "
+                    "3 minutes of active standing — orthostatic hypotension in the initial evaluation "
+                    "of syncope."
                 ),
             },
             "timing": {
                 "type": "string",
                 "description": (
-                    "Optional label for when the assessment was performed, e.g. "
-                    "'baseline' or 'post_tap_test' — the NPH tap test is interpreted as a "
-                    "pair."
+                    "When the assessment is made relative to an intervention whose effect it "
+                    "measures. 'baseline' (default): before it. 'post_intervention': the same "
+                    "assessment repeated after it, e.g. the timed gait 2 to 24 hours after a "
+                    "CSF tap test, to be compared with the baseline."
                 ),
+                "default": "baseline",
             },
         },
         "required": ["clinical_context", "assessment_type"],

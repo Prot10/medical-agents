@@ -153,7 +153,7 @@
     },
     {
       "output": {
-        "assessment_type": "gait_and_balance_timed (post-tap reassessment)",
+        "assessment_type": "gait_and_balance_timed",
         "criteria_met": null,
         "findings": [
           {
@@ -177,7 +177,8 @@
           "MoCA, 24 hours": "18/30",
           "Timed Up and Go, 2 hours": "34 s",
           "Timed Up and Go, 24 hours": "31 s"
-        }
+        },
+        "timing": "post_intervention"
       },
       "tool_name": "perform_clinical_assessment",
       "trigger_action": "request_post_reassessment"
@@ -251,7 +252,8 @@
         "alternatives": [
           {
             "required_arguments": {
-              "assessment_type": "gait_and_balance_timed"
+              "assessment_type": "gait_and_balance_timed",
+              "timing": "baseline"
             },
             "tool_name": "perform_clinical_assessment"
           }
@@ -305,7 +307,8 @@
         "alternatives": [
           {
             "required_arguments": {
-              "assessment_type": "gait_and_balance_timed"
+              "assessment_type": "gait_and_balance_timed",
+              "timing": "post_intervention"
             },
             "tool_name": "perform_clinical_assessment"
           }
@@ -315,7 +318,7 @@
         ],
         "criterion_id": "action-post-tap-gait-reassessment",
         "expected_evidence": "TUG 34 s at 2 hours and 31 s at 24 hours (18%), 10-metre walk 25 s (17%), MoCA 18/30, behaviour unchanged",
-        "importance": "recommended",
+        "importance": "required",
         "label": "Post-tap timed gait reassessment",
         "rationale": "Repeating the timed measures at 2 and 24 hours after the 38 mL tap shows whether a shunt-responsive gait component exists beside the bvFTD, whose behavioural features should not change."
       }
@@ -563,6 +566,15 @@
         ],
         "reason": "The baseline gait must be measured before the tap, or the post-tap change cannot be interpreted [Nakajima_2021]",
         "severity": "soft"
+      },
+      {
+        "after_criterion_id": "action-post-tap-gait-reassessment",
+        "before_criterion_id": "action-4-analyze-csf",
+        "citations": [
+          "[Nakajima_2021]"
+        ],
+        "reason": "The timed gait is repeated after the tap, at 2 to 24 hours, so that its change from the baseline measures the response to CSF removal [Nakajima_2021]",
+        "severity": "soft"
       }
     ],
     "stop_rule": {
@@ -570,7 +582,8 @@
       "required_before_assessment": [
         "action-2-analyze-brain-mri",
         "action-6-perform-clinical-assessment",
-        "action-4-analyze-csf"
+        "action-4-analyze-csf",
+        "action-post-tap-gait-reassessment"
       ]
     }
   },
@@ -615,7 +628,8 @@
         "10-metre walk": "30 s",
         "MoCA (same session)": "17/30",
         "Timed Up and Go": "38 s"
-      }
+      },
+      "timing": "baseline"
     },
     "csf": {
       "appearance": "Clear, colorless",

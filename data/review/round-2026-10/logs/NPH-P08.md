@@ -50,3 +50,24 @@ Condition close-out (`plans/NPH-decisions.md`); no clinical data the agent recei
 - Synonyms (`diagnosis_synonyms.yaml`, applied with `--prune --conditions nph`): code G91.0 removed (ICD-10-CM communicating hydrocephalus, which covers secondary NPH, a different entity from iNPH); labels unchanged, G91.2 and G91.9 accepted.
 - `key_clinical_evidence`: the 10% TUG threshold is no longer attributed to `[Nakajima_2021]`, which sets no numeric tap-test cut-off; it is stated as a commonly used threshold that no guideline fixes (the tap protocol keeps its Nakajima citation where the sentence states it).
 - Checks: `perfect_agent.py -v` pass, `case_io.py check` clean, `test_case_guards -k NPH-` pass. Not yet in `DISCRIMINATOR_CONDITIONS`: the post-tap follow-up's prose `assessment_type` is deliberate until the timing discriminator lands (CENTRAL C2 in the decisions file).
+
+## Vocabulary wiring (24 Oct 2026)
+
+Central vocabulary (timing discriminator, NPH R4; decisions Q2 and CENTRAL C2). No clinical text changed.
+
+| field path | change |
+| --- | --- |
+| `initial_tool_outputs.clinical_assessment.timing` | added `baseline` |
+| `followup_outputs[1]` (`request_post_reassessment`) | `assessment_type` "gait_and_balance_timed (post-tap reassessment)" -> `gait_and_balance_timed`; `timing: post_intervention` added |
+| `ground_truth.action_criteria[action-7-perform-clinical-assessment]` | `required_arguments.timing: baseline` (the schema default, so a call that omits it still matches; a post-tap call no longer does) |
+| `ground_truth.action_criteria[action-post-tap-gait-reassessment]` | `required_arguments.timing: post_intervention`; importance recommended -> required (Reviewer 1: gait before and after the tap) |
+| `ground_truth.sequence_constraints` | soft: `action-4-analyze-csf` before `action-post-tap-gait-reassessment` [Nakajima_2021] |
+| `ground_truth.stop_rule.required_before_assessment` | `action-post-tap-gait-reassessment` added |
+| `followup_outputs[2]` (`repeat_csf_analysis`) | `source: lumbar_drain` (NPH R3): served only for a lumbar-drain order, never for the tap |
+| `ground_truth.action_criteria[action-extended-lumbar-drainage]` | `required_arguments {}` -> `{source: lumbar_drain}`; importance recommended -> required (the act the case tests, as the round log asked once R3 landed) |
+| `ground_truth.sequence_constraints` | soft: `action-4-analyze-csf` before `action-extended-lumbar-drainage` [Marmarou_2005] |
+| `ground_truth.stop_rule.required_before_assessment` | `action-extended-lumbar-drainage` added |
+
+Scoring change for re-review: the post-tap reassessment is now required and is credited only by a call with `timing: post_intervention`; the baseline order is answered by the baseline report and the reassessment order by the post-tap report (MockServer secondary discriminator).
+
+The drainage follow-up's trigger `repeat_csf_analysis` -> `request_extended_lumbar_drainage`: it answers its own order now (`source: lumbar_drain`), not a repeat CSF order. The rename of plan C16 is no longer needed: the source discriminator refuses it for a tap order, and "lumbar" no longer routes a lumbar-puncture order (it counts only with the whole `lumbar_puncture` term or an explicit `lumbar_drain`). Checked: a bare repeat CSF order gets the tap report again.

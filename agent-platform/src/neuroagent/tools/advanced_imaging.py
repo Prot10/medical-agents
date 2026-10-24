@@ -49,7 +49,10 @@ class AdvancedImagingTool(BaseTool):
                     "'functional_MRI': BOLD motor and language mapping and hemispheric language "
                     "lateralisation, before surgery near eloquent cortex. 'DTI_tractography': "
                     "diffusion tractography of the corticospinal tract, arcuate fasciculus and optic "
-                    "radiations, for resection planning."
+                    "radiations, for resection planning. "
+                    "'whole_body_FDG_PET': whole-body 18F-FDG PET/CT, skull base to mid-thigh — the "
+                    "occult-malignancy search of a paraneoplastic syndrome when CT is negative (a "
+                    "different acquisition from the cerebral 'FDG_PET')."
                 ),
             },
         },

@@ -409,6 +409,91 @@
       },
       "tool_name": "search_medical_literature",
       "trigger_action": "search_arvc_arrhythmogenic_right_ventricular_cardiomyopathy"
+    },
+    {
+      "output": {
+        "findings": [
+          {
+            "interpretation": "Pathogenic",
+            "panel": "Cardiomyopathy_Gene_Panel",
+            "reference_range": "No pathogenic variant",
+            "result": "Heterozygous pathogenic variant c.2013delC (p.Lys672Argfs*12), frameshift, predicted loss of function",
+            "test": "PKP2 gene sequencing"
+          },
+          {
+            "interpretation": "",
+            "panel": "Cardiomyopathy_Gene_Panel",
+            "reference_range": "No pathogenic variant",
+            "result": "No pathogenic variant identified",
+            "test": "DSP gene sequencing"
+          },
+          {
+            "interpretation": "",
+            "panel": "Cardiomyopathy_Gene_Panel",
+            "reference_range": "No pathogenic variant",
+            "result": "No pathogenic variant identified",
+            "test": "DSG2 gene sequencing"
+          },
+          {
+            "interpretation": "",
+            "panel": "Cardiomyopathy_Gene_Panel",
+            "reference_range": "No pathogenic variant",
+            "result": "No pathogenic variant identified",
+            "test": "DSC2 gene sequencing"
+          },
+          {
+            "interpretation": "",
+            "panel": "Cardiomyopathy_Gene_Panel",
+            "reference_range": "No pathogenic variant",
+            "result": "No pathogenic variant identified",
+            "test": "JUP gene sequencing"
+          },
+          {
+            "interpretation": "",
+            "panel": "Cardiomyopathy_Gene_Panel",
+            "reference_range": "No pathogenic variant",
+            "result": "No pathogenic variant identified",
+            "test": "TMEM43 gene sequencing"
+          },
+          {
+            "interpretation": "",
+            "panel": "Cardiomyopathy_Gene_Panel",
+            "reference_range": "No pathogenic variant",
+            "result": "No pathogenic variant identified",
+            "test": "LMNA gene sequencing"
+          },
+          {
+            "interpretation": "",
+            "panel": "Cardiomyopathy_Gene_Panel",
+            "reference_range": "No pathogenic variant",
+            "result": "No pathogenic variant identified",
+            "test": "MYH7 gene sequencing"
+          },
+          {
+            "interpretation": "",
+            "panel": "Cardiomyopathy_Gene_Panel",
+            "reference_range": "No pathogenic variant",
+            "result": "No pathogenic variant identified",
+            "test": "MYBPC3 gene sequencing"
+          }
+        ],
+        "impression": "Heterozygous pathogenic PKP2 variant c.2013delC (p.Lys672Argfs*12), frameshift with predicted loss of function. No pathogenic variant in DSP, DSG2, DSC2, JUP, TMEM43, LMNA, MYH7 or MYBPC3. Cascade testing of first-degree relatives is available; post-test genetic counselling recommended.",
+        "quantitative_data": {
+          "DSC2 gene sequencing": "No pathogenic variant identified",
+          "DSG2 gene sequencing": "No pathogenic variant identified",
+          "DSP gene sequencing": "No pathogenic variant identified",
+          "JUP gene sequencing": "No pathogenic variant identified",
+          "LMNA gene sequencing": "No pathogenic variant identified",
+          "MYBPC3 gene sequencing": "No pathogenic variant identified",
+          "MYH7 gene sequencing": "No pathogenic variant identified",
+          "PKP2 gene sequencing": "Heterozygous pathogenic variant c.2013delC (p.Lys672Argfs*12), frameshift, predicted loss of function",
+          "TMEM43 gene sequencing": "No pathogenic variant identified"
+        },
+        "recommended_actions": [],
+        "test_type": "genetic_panel:cardiomyopathy"
+      },
+      "tool_name": "order_specialized_test",
+      "trigger_action": "request_cardiomyopathy_gene_panel"
     }
   ],
   "ground_truth": {
@@ -428,6 +513,24 @@
         "importance": "required",
         "label": "12-lead ECG on arrival",
         "rationale": "Exertional syncope with palpitations and a father who died suddenly at 44 is high risk; the ECG looks for repolarisation and depolarisation abnormalities and ventricular ectopy (ESC 2018)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "assessment_type": "orthostatic_blood_pressure"
+            },
+            "tool_name": "perform_clinical_assessment"
+          }
+        ],
+        "citations": [
+          "[ESC_2018]"
+        ],
+        "criterion_id": "action-orthostatic-blood-pressure",
+        "expected_evidence": "Supine 118/72 mmHg, HR 88; standing 3 min 114/75 mmHg, HR 94: no orthostatic hypotension",
+        "importance": "recommended",
+        "label": "Orthostatic blood pressure by active standing (supine, then 1 and 3 minutes standing)",
+        "rationale": "Orthostatic blood pressure on active standing is part of the initial evaluation of every transient loss of consciousness (ESC 2018 Class I); it tests orthostatic hypotension, the competing cause, before a cardiac cause is accepted."
       },
       {
         "alternatives": [
@@ -536,6 +639,24 @@
         "importance": "optional",
         "label": "Exercise stress test (optional)",
         "rationale": "Exercise testing can show exercise-induced ventricular arrhythmia, but telemetry has already captured symptomatic NSVT and testing 10 days after a caesarean section can be deferred (ESC 2022)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "genetic_panel:cardiomyopathy"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[ESC_2023_Cardiomyopathy]"
+        ],
+        "criterion_id": "action-genetic-panel",
+        "expected_evidence": "Heterozygous pathogenic PKP2 variant c.2013delC (p.Lys672Argfs*12), frameshift with predicted loss of function",
+        "importance": "recommended",
+        "label": "Cardiomyopathy gene panel (desmosomal genes) with genetic counselling",
+        "rationale": "Genetic counselling and testing are recommended in ARVC (ESC 2023 Class I): a pathogenic desmosomal variant is a major 2010 Task Force criterion and enables cascade testing, starting with the sister; it does not change the ICD decision, hence recommended."
       },
       {
         "alternatives": [
@@ -795,6 +916,30 @@
     }
   },
   "initial_tool_outputs": {
+    "clinical_assessment": {
+      "assessment_type": "orthostatic_blood_pressure",
+      "criteria_met": {
+        "diastolic_fall_10_mmHg_or_more": false,
+        "heart_rate_rise_30_bpm_or_more": false,
+        "systolic_below_90_mmHg_standing": false,
+        "systolic_fall_20_mmHg_or_more": false
+      },
+      "findings": [
+        {
+          "domain": "symptoms on standing",
+          "result": "no light-headedness, visual dimming or presyncope during 3 minutes of active standing"
+        }
+      ],
+      "impression": "No orthostatic fall in blood pressure and no excessive heart rate rise on active standing.",
+      "pre_post_comparison": null,
+      "recommended_actions": [],
+      "scores": {
+        "standing_1_min": "BP 112/74 mmHg, HR 96 bpm",
+        "standing_3_min": "BP 114/75 mmHg, HR 94 bpm",
+        "supine_after_5_min": "BP 118/72 mmHg, HR 88 bpm"
+      },
+      "timing": "baseline"
+    },
     "csf": null,
     "drug_interactions": {
       "medication_list_review": {

@@ -59,7 +59,9 @@ class MicrobiologyTool(BaseTool):
                     "C. difficile toxin PCR. 'wound_swab': culture of a wound or ulcer, a "
                     "possible portal of entry. 'brain_aspirate': Gram stain and aerobic and "
                     "anaerobic culture of material aspirated from a brain lesion; the aspiration "
-                    "itself is ordered through obtain_tissue_diagnosis."
+                    "itself is ordered through obtain_tissue_diagnosis. "
+                    "'tracheal_aspirate': Gram stain and culture of a lower-airway sample "
+                    "aspirated through the endotracheal tube of a ventilated patient."
                 ),
             },
             "tests": {

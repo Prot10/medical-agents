@@ -261,7 +261,7 @@ def test_banned_table_rows_fire():
 
 DISCRIMINATOR_CONDITIONS = frozenset({
     "ALS", "BACT-MEN", "ISCH-STR", "HEP-ENC", "GLIO-HG", "GBS", "ALZ-EARLY", "SAH", "SE",
-    "VASC-DEM", "NMDAR-ENC", "MIG-AURA", "SYNC-CARD", "FTD", "MG",
+    "VASC-DEM", "NMDAR-ENC", "MIG-AURA", "SYNC-CARD", "FTD", "MG", "NPH",
 })
 
 # initial_tool_outputs / fallback_tool_outputs slot of each routed tool.
@@ -309,6 +309,27 @@ def discriminator_defects(case: dict[str, Any]) -> list[str]:
         value = output.get(key)
         if not value or fold(value) not in {fold(term) for term in vocabulary(packs=packs)}:
             found.append(f"{where}: {key} {value!r} is not a {tool} term")
+    # Two stored pathway reports of one study (the NPH baseline gait and its post-tap
+    # reassessment) are told apart only by the secondary discriminator: each must carry a
+    # distinct term of it, or the baseline order can receive the later report.
+    from collections import defaultdict
+
+    same_study: dict[tuple[str, Any], list[tuple[str, Any]]] = defaultdict(list)
+    for where, tool, output in reports:
+        secondary = MockServer._SECONDARY_DISCRIMINATOR.get(tool)
+        if secondary is None or where.startswith("fallback_tool_outputs"):
+            continue
+        primary = MockServer._DISCRIMINATOR[tool][0]
+        same_study[(tool, fold(output.get(primary) or ""))].append((where, output.get(secondary[0])))
+    for (tool, _), stored in same_study.items():
+        if len(stored) < 2:
+            continue
+        key, vocabulary, _default = MockServer._SECONDARY_DISCRIMINATOR[tool]
+        terms = {fold(term) for term in vocabulary(packs=packs)}
+        values = [fold(value or "") for _, value in stored]
+        if not all(value in terms for value in values) or len(set(values)) < len(values):
+            found += [f"{where}: {key} {value!r} does not tell apart two stored {tool} reports"
+                      for where, value in stored]
     return found
 
 
@@ -327,6 +348,18 @@ def test_discriminator_guard_fires():
     case["fallback_tool_outputs"]["specialized_test"] = None
     case["followup_outputs"][0]["output"]["monitor_type"] = "telemetry"
     case["followup_outputs"][1]["output"]["modality"] = "ultrasound"
+    assert not discriminator_defects(case)
+
+
+def test_secondary_discriminator_guard_fires():
+    gait = {"assessment_type": "gait_and_balance_timed", "impression": "TUG 18 s."}
+    case = {"initial_tool_outputs": {"clinical_assessment": {**gait, "timing": "baseline"}},
+            "followup_outputs": [{"tool_name": "perform_clinical_assessment", "trigger_action": "t",
+                                  "output": {**gait, "timing": "baseline"}}]}
+    assert len(discriminator_defects(case)) == 2
+    case["followup_outputs"][0]["output"]["timing"] = ""
+    assert len(discriminator_defects(case)) == 2
+    case["followup_outputs"][0]["output"]["timing"] = "post_intervention"
     assert not discriminator_defects(case)
 
 

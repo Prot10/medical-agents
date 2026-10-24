@@ -146,7 +146,7 @@
     },
     {
       "output": {
-        "assessment_type": "gait_and_balance_timed (post-tap reassessment)",
+        "assessment_type": "gait_and_balance_timed",
         "criteria_met": null,
         "findings": [
           {
@@ -171,7 +171,8 @@
           "Timed Up and Go, 2 hours": "30 s",
           "Timed Up and Go, 24 hours": "31 s",
           "Timed Up and Go, 4 hours": "31 s"
-        }
+        },
+        "timing": "post_intervention"
       },
       "tool_name": "perform_clinical_assessment",
       "trigger_action": "request_post_reassessment"
@@ -189,6 +190,7 @@
         "interpretation": "Extended lumbar drainage through an indwelling lumbar catheter, about 420 mL over 72 hours; normal CSF cell count, protein and glucose on daily samples. TUG 31 s at baseline, 28 s on day 1 (10%), 23 s on day 2 (26%) and 19 s on day 3 (39%); 10-m walk 26 s to 16 s on day 3 (38%); MoCA 21 to 24 on day 3. No incontinence during drainage. No procedural complications.",
         "opening_pressure": "13 cmH2O (day 1, through the drainage catheter)",
         "protein": "43 mg/dL",
+        "source": "lumbar_drain",
         "special_tests": {
           "Day_1_TUG": "28 seconds (10% faster than the 31-second baseline)",
           "Day_2_TUG": "23 seconds (26% faster than baseline)",
@@ -203,7 +205,7 @@
         }
       },
       "tool_name": "analyze_csf",
-      "trigger_action": "repeat_csf_analysis"
+      "trigger_action": "request_extended_lumbar_drainage"
     }
   ],
   "ground_truth": {
@@ -245,7 +247,8 @@
         "alternatives": [
           {
             "required_arguments": {
-              "assessment_type": "gait_and_balance_timed"
+              "assessment_type": "gait_and_balance_timed",
+              "timing": "baseline"
             },
             "tool_name": "perform_clinical_assessment"
           }
@@ -298,7 +301,8 @@
         "alternatives": [
           {
             "required_arguments": {
-              "assessment_type": "gait_and_balance_timed"
+              "assessment_type": "gait_and_balance_timed",
+              "timing": "post_intervention"
             },
             "tool_name": "perform_clinical_assessment"
           }
@@ -308,14 +312,16 @@
         ],
         "criterion_id": "action-post-tap-gait-reassessment",
         "expected_evidence": "TUG 30 s at 2 hours, 31 s at 4 and 24 hours (0%), 10-metre walk 26 s, MoCA 21/30, urgency unchanged",
-        "importance": "recommended",
+        "importance": "required",
         "label": "Post-tap timed gait reassessment",
         "rationale": "Repeating the same timed measures after CSF removal is what shows that this single tap produced no gait change."
       },
       {
         "alternatives": [
           {
-            "required_arguments": {},
+            "required_arguments": {
+              "source": "lumbar_drain"
+            },
             "tool_name": "analyze_csf"
           }
         ],
@@ -324,7 +330,7 @@
         ],
         "criterion_id": "action-extended-lumbar-drainage",
         "expected_evidence": "About 420 mL drained over 72 hours; TUG 31 s to 28 s on day 1, 23 s on day 2 and 19 s on day 3 (39%); 10-metre walk 26 to 16 s; MoCA 21 to 24; no incontinence",
-        "importance": "recommended",
+        "importance": "required",
         "label": "Extended lumbar drainage after the negative tap",
         "rationale": "With a full syndrome and DESH but no response to a single tap, a 72-hour drainage trial is the more sensitive test of CSF responsiveness."
       }
@@ -565,6 +571,24 @@
         ],
         "reason": "The baseline gait must be measured before the tap, or the post-tap change cannot be interpreted [Nakajima_2021]",
         "severity": "soft"
+      },
+      {
+        "after_criterion_id": "action-post-tap-gait-reassessment",
+        "before_criterion_id": "action-4-analyze-csf",
+        "citations": [
+          "[Nakajima_2021]"
+        ],
+        "reason": "The timed gait is repeated after the tap, at 2 to 24 hours, so that its change from the baseline measures the response to CSF removal [Nakajima_2021]",
+        "severity": "soft"
+      },
+      {
+        "after_criterion_id": "action-extended-lumbar-drainage",
+        "before_criterion_id": "action-4-analyze-csf",
+        "citations": [
+          "[Marmarou_2005]"
+        ],
+        "reason": "Extended lumbar drainage is the second, more sensitive test, offered after a single tap test has been negative [Marmarou_2005]",
+        "severity": "soft"
       }
     ],
     "stop_rule": {
@@ -572,7 +596,9 @@
       "required_before_assessment": [
         "action-2-analyze-brain-mri",
         "action-7-perform-clinical-assessment",
-        "action-4-analyze-csf"
+        "action-4-analyze-csf",
+        "action-post-tap-gait-reassessment",
+        "action-extended-lumbar-drainage"
       ]
     }
   },
@@ -622,7 +648,8 @@
         "180-degree turn": "13 steps",
         "MoCA (same session)": "21/30",
         "Timed Up and Go": "31 s"
-      }
+      },
+      "timing": "baseline"
     },
     "csf": {
       "appearance": "Clear, colorless",

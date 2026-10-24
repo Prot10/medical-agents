@@ -85,3 +85,13 @@ Close-out of the condition (plans/SYNC-CARD-decisions.md). Not a re-review: ever
 - Citations now follow the guideline each rationale or reason names (ruling 8; new keys in the criteria pack allow-list): action-2-interpret-labs citations ['[ESC_2018]'] -> ['[ESC_2019_PE]']; action-3-order-echocardiogram citations ['[ESC_2018]'] -> ['[ESC_2018]', '[ESC_2019_PE]']; action-5-order-cardiac-monitoring citations ['[ESC_2018]'] -> ['[ESC_2018]', '[ESC_2019_PE]']; action-4-order-body-imaging citations ['[ESC_2018]'] -> ['[ESC_2019_PE]']; action-6-check-drug-interactions citations ['[ESC_2018]'] -> ['[ESC_2019_PE]']; action-8-lower-extremity-venous-duplex citations [] -> ['[ESC_2019_PE]']; avoid-waste-5-order-ct-scan citations [] -> ['[NICE_NG232]']; avoid-waste-6-d-dimer citations [] -> ['[ESC_2019_PE]']; avoid-harm-7-exercise-stress-test citations [] -> ['[Fletcher_2013]']; action-2-interpret-labs->action-4-order-body-imaging citations [] -> ['[ESC_2019_PE]'].
 
 Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; `test_case_guards.py -k SYNC-CARD-RM04` pass (SYNC-CARD now in `DISCRIMINATOR_CONDITIONS`); synonym `--check` clean.
+
+## Vocabulary wiring (24 Oct 2026)
+
+Central vocabulary (batch 4: orthostatic_blood_pressure, electrophysiology_study, sodium_channel_blocker_challenge, genetic_panel:inherited_arrhythmia and :cardiomyopathy, whole_body_FDG_PET; SYNC-CARD decisions CENTRAL 1).
+
+| field path | change |
+| --- | --- |
+| `initial_tool_outputs.clinical_assessment` | added: orthostatic_blood_pressure 'Active stand test not performed. Deferred by the clinical team.' (haemodynamically unstable or high-grade AV block at presentation: standing is not safe); no criterion |
+
+Scoring change for re-review: new criteria are recommended or optional, so no required work-up changed.

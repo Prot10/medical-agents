@@ -296,6 +296,13 @@ class CostTracker:
         base = float(self._require(cfg, "base", tool_name))
         breakdown: dict[str, float] = {"base": base}
         total = base
+        # Where the fluid is drawn: priced at 0 except a lumbar drain, the one source with a
+        # procedure of its own on top of the LP in `base` (CPT 62272, NPH-P08).
+        source = params.get("source")
+        surcharge = float(cfg.get("sources", {}).get(source, 0) or 0) if isinstance(source, str) else 0.0
+        if surcharge:
+            breakdown[f"source:{source}"] = surcharge
+            total += surcharge
         by_test = self._priced_lookup(self._require(cfg, "by_special_test", tool_name))
         for test in _as_item_names(params.get("special_tests", [])):
             cost = float(self._require(by_test, normalize_analyte(test), tool_name))

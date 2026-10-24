@@ -300,6 +300,42 @@
       },
       "tool_name": "search_medical_literature",
       "trigger_action": "search_wpw_wolff_parkinson_white_accessory_pathway"
+    },
+    {
+      "output": {
+        "findings": [
+          {
+            "description": "Baseline: sinus rhythm with manifest pre-excitation; AH 64 ms, HV 10 ms"
+          },
+          {
+            "description": "Earliest ventricular activation during pre-excitation at the lateral mitral annulus (distal coronary sinus); earliest retrograde atrial activation at the same site during ventricular pacing and tachycardia"
+          },
+          {
+            "description": "Anterograde accessory pathway effective refractory period 240 ms"
+          },
+          {
+            "description": "Atrial fibrillation induced by burst pacing: shortest pre-excited RR interval 220 ms"
+          },
+          {
+            "description": "Inducible sustained orthodromic AVRT, cycle length 315 ms (about 190 bpm), reproducing the clinical tachycardia"
+          },
+          {
+            "description": "No dual AV nodal physiology; no second accessory pathway"
+          }
+        ],
+        "impression": "Single left lateral accessory pathway with anterograde effective refractory period 240 ms and shortest pre-excited RR interval 220 ms in induced atrial fibrillation (high-risk properties, 250 ms or less). Inducible orthodromic AVRT at about 190 bpm.",
+        "quantitative_data": {
+          "AH": "64 ms",
+          "AP_ERP": "240 ms",
+          "AVRT_cycle_length": "315 ms",
+          "HV": "10 ms (pre-excited)",
+          "SPERRI": "220 ms"
+        },
+        "recommended_actions": [],
+        "test_type": "electrophysiology_study"
+      },
+      "tool_name": "order_specialized_test",
+      "trigger_action": "request_electrophysiology_study"
     }
   ],
   "ground_truth": {
@@ -319,6 +355,24 @@
         "importance": "required",
         "label": "12-lead ECG on arrival",
         "rationale": "The ECG is the first test in syncope; pre-excitation is a high-risk ECG finding that calls for immediate monitoring and an electrophysiological work-up (ESC 2018)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "assessment_type": "orthostatic_blood_pressure"
+            },
+            "tool_name": "perform_clinical_assessment"
+          }
+        ],
+        "citations": [
+          "[ESC_2018]"
+        ],
+        "criterion_id": "action-orthostatic-blood-pressure",
+        "expected_evidence": "Supine 122/78 mmHg, HR 72; standing 3 min 118/81 mmHg, HR 78: no orthostatic hypotension",
+        "importance": "recommended",
+        "label": "Orthostatic blood pressure by active standing (supine, then 1 and 3 minutes standing)",
+        "rationale": "Orthostatic blood pressure on active standing is part of the initial evaluation of every transient loss of consciousness (ESC 2018 Class I); it tests orthostatic hypotension, the competing cause, before a cardiac cause is accepted."
       },
       {
         "alternatives": [
@@ -424,6 +478,24 @@
         "importance": "optional",
         "label": "Cardiac MRI (optional)",
         "rationale": "With a normal echocardiogram and an orthodromic tachycardia, CMR adds no decision before ablation."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "electrophysiology_study"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[ESC_2019_SVT]"
+        ],
+        "criterion_id": "action-electrophysiology-study",
+        "expected_evidence": "Left lateral accessory pathway, anterograde ERP 240 ms and SPERRI 220 ms in induced AF (high risk); inducible orthodromic AVRT at about 190 bpm",
+        "importance": "recommended",
+        "label": "Electrophysiology study for accessory-pathway risk stratification",
+        "rationale": "In syncope with pre-excitation an electrophysiology study measures the accessory pathway's refractory period and the shortest pre-excited RR interval in atrial fibrillation, and is the first step of catheter ablation (ESC 2019 SVT Class I); it is recommended, since referral for the study is itself the decision the must names."
       },
       {
         "alternatives": [
@@ -662,6 +734,30 @@
     }
   },
   "initial_tool_outputs": {
+    "clinical_assessment": {
+      "assessment_type": "orthostatic_blood_pressure",
+      "criteria_met": {
+        "diastolic_fall_10_mmHg_or_more": false,
+        "heart_rate_rise_30_bpm_or_more": false,
+        "systolic_below_90_mmHg_standing": false,
+        "systolic_fall_20_mmHg_or_more": false
+      },
+      "findings": [
+        {
+          "domain": "symptoms on standing",
+          "result": "no light-headedness, visual dimming or presyncope during 3 minutes of active standing"
+        }
+      ],
+      "impression": "No orthostatic fall in blood pressure and no excessive heart rate rise on active standing.",
+      "pre_post_comparison": null,
+      "recommended_actions": [],
+      "scores": {
+        "standing_1_min": "BP 116/80 mmHg, HR 80 bpm",
+        "standing_3_min": "BP 118/81 mmHg, HR 78 bpm",
+        "supine_after_5_min": "BP 122/78 mmHg, HR 72 bpm"
+      },
+      "timing": "baseline"
+    },
     "csf": null,
     "drug_interactions": {
       "medication_list_review": {

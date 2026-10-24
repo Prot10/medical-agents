@@ -52,7 +52,14 @@ class SpecializedTestTool(BaseTool):
                     "(hearing loss after bacterial meningitis). 'speech_language_evaluation': "
                     "speech-language pathology assessment of motor speech, grammar, naming, "
                     "repetition and comprehension, which classifies a primary progressive aphasia "
-                    "(a full cognitive battery is 'neuropsych_battery')."
+                    "(a full cognitive battery is 'neuropsych_battery'). "
+                    "'electrophysiology_study': invasive EP study — HV interval, sinus node recovery, "
+                    "programmed stimulation for inducible arrhythmia, accessory-pathway refractory period. "
+                    "'sodium_channel_blocker_challenge': ajmaline, flecainide or procainamide under "
+                    "12-lead ECG with high precordial leads, to unmask a type 1 Brugada pattern. "
+                    "'genetic_panel:inherited_arrhythmia': long QT, Brugada and CPVT genes; "
+                    "'genetic_panel:cardiomyopathy': arrhythmogenic, hypertrophic, dilated and "
+                    "laminopathy genes."
                 ),
             },
         },

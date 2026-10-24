@@ -337,6 +337,24 @@
       },
       "tool_name": "search_medical_literature",
       "trigger_action": "search_pacing_sinus_node_dysfunction"
+    },
+    {
+      "output": {
+        "findings": [
+          {
+            "abnormal": "not performed",
+            "reference_range": "N/A",
+            "test": "Electrophysiology study",
+            "value": "Test not performed; electrophysiology study deferred by the clinical team"
+          }
+        ],
+        "impression": "Electrophysiology study not performed. Deferred by the clinical team.",
+        "quantitative_data": {},
+        "recommended_actions": [],
+        "test_type": "electrophysiology_study"
+      },
+      "tool_name": "order_specialized_test",
+      "trigger_action": "request_electrophysiology_study"
     }
   ],
   "ground_truth": {
@@ -356,6 +374,24 @@
         "importance": "required",
         "label": "Obtain a 12-lead ECG on arrival",
         "rationale": "The ECG is the first test in syncope; sinus bradycardia at 48 bpm on two rate-slowing drugs, with normal conduction, points to the sinus node and selects monitoring (ESC 2018)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "assessment_type": "orthostatic_blood_pressure"
+            },
+            "tool_name": "perform_clinical_assessment"
+          }
+        ],
+        "citations": [
+          "[ESC_2018]"
+        ],
+        "criterion_id": "action-orthostatic-blood-pressure",
+        "expected_evidence": "Supine 118/72 mmHg, HR 48; standing 3 min 114/75 mmHg, HR 50: no orthostatic hypotension",
+        "importance": "recommended",
+        "label": "Orthostatic blood pressure by active standing (supine, then 1 and 3 minutes standing)",
+        "rationale": "Orthostatic blood pressure on active standing is part of the initial evaluation of every transient loss of consciousness (ESC 2018 Class I); it tests orthostatic hypotension, the competing cause, before a cardiac cause is accepted."
       },
       {
         "alternatives": [
@@ -657,6 +693,30 @@
   "initial_tool_outputs": {
     "advanced_imaging": null,
     "cardiac_monitoring": null,
+    "clinical_assessment": {
+      "assessment_type": "orthostatic_blood_pressure",
+      "criteria_met": {
+        "diastolic_fall_10_mmHg_or_more": false,
+        "heart_rate_rise_30_bpm_or_more": false,
+        "systolic_below_90_mmHg_standing": false,
+        "systolic_fall_20_mmHg_or_more": false
+      },
+      "findings": [
+        {
+          "domain": "symptoms on standing",
+          "result": "no light-headedness, visual dimming or presyncope during 3 minutes of active standing"
+        }
+      ],
+      "impression": "No orthostatic fall in blood pressure and no excessive heart rate rise on active standing.",
+      "pre_post_comparison": null,
+      "recommended_actions": [],
+      "scores": {
+        "standing_1_min": "BP 112/74 mmHg, HR 51 bpm",
+        "standing_3_min": "BP 114/75 mmHg, HR 50 bpm",
+        "supine_after_5_min": "BP 118/72 mmHg, HR 48 bpm"
+      },
+      "timing": "baseline"
+    },
     "csf": null,
     "ct": null,
     "drug_interactions": {

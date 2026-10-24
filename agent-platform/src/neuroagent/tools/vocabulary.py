@@ -313,3 +313,15 @@ def molecular_assays(costs_path: Path = DEFAULT_COSTS_PATH, packs: tuple[str, ..
 def assessment_types(costs_path: Path = DEFAULT_COSTS_PATH, packs: tuple[str, ...] = ()) -> list[str]:
     """The closed `perform_clinical_assessment.assessment_type` vocabulary."""
     return by_type_values("perform_clinical_assessment", costs_path, packs)
+
+
+def assessment_timings(costs_path: Path = DEFAULT_COSTS_PATH, packs: tuple[str, ...] = ()) -> list[str]:
+    """The closed `perform_clinical_assessment.timing` vocabulary: before or after an intervention.
+
+    Read from the `timings` block, priced at 0 like the MRI `protocols`. Added on 24 Oct 2026 so
+    that the NPH baseline gait assessment and its reassessment after the tap test, the same
+    assessment twice, are told apart by the MockServer and by the scorer.
+    """
+    return sorted(
+        _load_tools(costs_path, tuple(packs)).get("perform_clinical_assessment", {}).get("timings", {})
+    )

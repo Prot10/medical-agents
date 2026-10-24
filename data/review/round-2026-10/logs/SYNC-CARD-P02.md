@@ -66,3 +66,16 @@ Close-out of the condition (plans/SYNC-CARD-decisions.md). Not a re-review: ever
 - Citations now follow the guideline each rationale or reason names (ruling 8; new keys in the criteria pack allow-list): action-3-order-echocardiogram citations ['[ESC_2018]'] -> ['[ESC_2018]', '[ESC_2023_Cardiomyopathy]']; action-5-order-advanced-imaging citations ['[ESC_2018]'] -> ['[ESC_2023_Cardiomyopathy]']; action-6-order-echocardiogram citations ['[ESC_2018]'] -> ['[ESC_2023_Cardiomyopathy]']; action-7-check-drug-interactions citations ['[ESC_2018]'] -> ['[ESC_2023_Cardiomyopathy]']; avoid-waste-1-order-ct-scan citations ['[ESC_2018]'] -> ['[ESC_2018]', '[NICE_NG232]']; action-3-order-echocardiogram->action-6-order-echocardiogram citations ['[ESC_2018]'] -> ['[ESC_2018]', '[ESC_2023_Cardiomyopathy]', '[ESC_EACTS_2025_VHD]'].
 
 Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; `test_case_guards.py -k SYNC-CARD-P02` pass (SYNC-CARD now in `DISCRIMINATOR_CONDITIONS`); synonym `--check` clean.
+
+## Vocabulary wiring (24 Oct 2026)
+
+Central vocabulary (batch 4: orthostatic_blood_pressure, electrophysiology_study, sodium_channel_blocker_challenge, genetic_panel:inherited_arrhythmia and :cardiomyopathy, whole_body_FDG_PET; SYNC-CARD decisions CENTRAL 1).
+
+| field path | change |
+| --- | --- |
+| `initial_tool_outputs.clinical_assessment` | added: orthostatic_blood_pressure report, supine values = the presenting vitals; Systolic fall of 12 mmHg at 1 minute of active standing, below the threshold for orthostatic hypotension (20/10 mmHg); no excessive heart rate rise. |
+| `ground_truth.action_criteria[action-orthostatic-blood-pressure]` | added, recommended, after the ECG criterion [ESC_2018] (decisions CENTRAL 1: orthostatic BP in every initial evaluation) |
+| `followup_outputs[9] (`request_cardiomyopathy_gene_panel`)` | added: genetic_panel:cardiomyopathy report. Heterozygous pathogenic MYBPC3 variant c.1504C>T (p.Arg502Trp) |
+| `ground_truth.action_criteria[action-genetic-panel]` | added, recommended [ESC_2023_Cardiomyopathy]; the assessment must on genetic counselling and testing is unchanged |
+
+Scoring change for re-review: new criteria are recommended or optional, so no required work-up changed.

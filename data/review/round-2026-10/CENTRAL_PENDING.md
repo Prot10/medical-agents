@@ -14,16 +14,13 @@ lands.
   morphology codes; same root as the ICD-code-alone item above. (GLIO-HG, 24 Oct)
 - Discriminator data (24 Oct): the 12 closed conditions are fixed and guarded
   (`test_case_guards.py::test_routed_outputs_name_their_study`, `DISCRIMINATOR_CONDITIONS`). Left,
-  per condition (cases / outputs): FEPI-TEMP 29/33, FND 30/84, FTD 30/36, MG 30/59, MS-RR 30/30,
-  NPH 30/32, PD 30/30, SYNC-CARD 22/24; mostly untyped `TTE` echo fallbacks and generic
+  per condition (cases / outputs): FEPI-TEMP 29/33, FND 30/84, MS-RR 30/30, PD 30/30 (SYNC-CARD,
+  FTD, MG and NPH are now in `DISCRIMINATOR_CONDITIONS`); mostly untyped `TTE` echo fallbacks and generic
   advanced-imaging and specialized-test fallbacks (null them). Each worker adds its condition to
   `DISCRIMINATOR_CONDITIONS` when clean.
 - Library: nulling generic fallbacks exposes library normals that some cases contradict, e.g. a
   normal `neuropsych_battery` in overt hepatic encephalopathy (HEP-ENC, West Haven II-III). Same root
   as the SAH library item below.
-- Matcher: one first lab order that bundles a second-tier assay with the first-line panels is
-  answered by the first-line labs (SE-P05 cholinesterase, SE-M08 HIV, CD4 and Toxoplasma IgG), so
-  the agent must re-order the assay alone. (SE CENTRAL 5)
 - MIG-AURA-P07 keeps its short-recording follow-up: its loop-recorder report stores
   `duration_hours` 720 (the weeks tier), so without it a 14-day monitor order would receive the
   day-17 AF.
@@ -42,8 +39,19 @@ lands.
   (ALZ-EARLY, 24 Oct)
 - Library: normal amyloid PET, CSF AD-biomarker and FDG-PET defaults. (ALZ-EARLY, 24 Oct)
 - PD cases: `[McKeith_2017_DLB]` should become `[DLB_2017]` (batch 5).
-- `analyze_csf.source`: an EVD sample is billed as a lumbar puncture; only shunt/EVD criteria may
-  name `source`. (vocabulary agent, 24 Oct)
+- `analyze_csf.source`: an EVD sample is billed as a lumbar puncture (a lumbar drain is billed on
+  top, 184); only shunt-tap, EVD and lumbar-drain criteria may name `source`. (vocabulary agents,
+  24 Oct)
+- Library (batch 4, 24 Oct): the new terms' normal reports can contradict a case that does not
+  store them: a normal electrophysiology study (normal AV conduction, nothing inducible), a normal
+  orthostatic test, normal arrhythmia and cardiomyopathy gene panels, a normal whole-body PET.
+  SYNC-CARD stores a report or a "not performed" answer wherever the normal would contradict;
+  other conditions do not (e.g. a dysautonomia case outside SYNC-CARD ordering
+  `orthostatic_blood_pressure`).
+- NPH timing (24 Oct): an agent that orders the `post_intervention` gait before the tap still
+  receives the stored post-tap report; the soft sequence constraint (tap before reassessment)
+  penalises the order but does not hide the result. Consider serving the post-intervention report
+  only after the intervention's own criterion has been called.
 
 ## Schema
 - Demographics lack `weight_kg` and `height_cm` (GBS respiratory mL/kg thresholds, BACT-MEN-RS04
@@ -59,11 +67,16 @@ lands.
   NSE 23 (86316), toxoplasma_IgG 18 (86777), urine_sodium 7 (84300), CSF toxoplasma_PCR and
   EBV_PCR 184 (87798), device_interrogation 51 (93288); genetic_panel:hemiplegic_migraine 1104
   is an estimate (81479, unlisted).
+- Batch 4 (24 Oct, recalled): interpret_labs CDT 21 (82373); analyze_csf source lumbar_drain 184
+  (62272); whole_body_FDG_PET 1840 (78815, priced as the brain study);
+  genetic_panel:inherited_arrhythmia 1840 (81413), genetic_panel:cardiomyopathy 1840 (81439);
+  tracheal_aspirate 18 (87070 + 87205, priced as sputum). Estimates: electrophysiology_study 2300
+  (93620, professional + facility), sodium_channel_blocker_challenge 368 (no CPT, priced as
+  autonomic testing), orthostatic_blood_pressure 23 (no CPT; part of an E/M visit).
 
 ## Batch-3 cases waiting on data (terms and routing landed 24 Oct)
-- Stored monitoring reports with a prose `monitor_type` (routed on `duration_hours` only): NPH-S10
-  (empty), SYNC-CARD P03 ("Continuous telemetry" under `request_holter`), P04, RP04
-  ("event_monitor"). (SE, VASC-DEM-P08, MIG-AURA and GBS wired 24 Oct; see their logs.)
+- Stored monitoring reports with a prose `monitor_type` (routed on `duration_hours` only): none
+  left in NPH and SYNC-CARD (both pass the discriminator guard since their close-outs). (SE, VASC-DEM-P08, MIG-AURA and GBS wired 24 Oct; see their logs.)
 - Citation keys used by name in the wiring: Di Stefano 2020 (JNNP, hemiplegic migraine genetics)
   for the MIG-AURA pack; the NIH/CDC/IDSA opportunistic-infection guideline for SE (SE-M08).
 
@@ -102,6 +115,7 @@ batch's CENTRAL terms. 3. One agent per condition wires the new terms into the c
 - SE: tell R2 about the recodes and that P04 and P06 now need the seizure component for credit.
 
 ## Guard failures left in later batches (24 Oct)
-- Leak guard (recounted 24 Oct, after the discriminator pass): NPH 9, FND 5, MS-RR 4, SYNC-CARD 4,
-  FEPI-TEMP 3, PD 2; the 12 closed conditions, FTD and MG pass. Follow-up guard: clean.
+- Leak guard (recounted 24 Oct, after the batch-4 vocabulary wiring): FEPI-TEMP 3 (P02, P03,
+  RP05); every other condition passes at that moment (batch 5 is editing FND, MS-RR, FEPI-TEMP
+  and PD). `test_guidance_claims` then failed only on FND, MS-RR and PD claims (batch 5). Follow-up guard: clean.
   Workers see the rule in PATTERNS.md section 5.

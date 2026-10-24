@@ -493,6 +493,42 @@
       },
       "tool_name": "search_medical_literature",
       "trigger_action": "search_literature_anti_hu_paraneoplastic_brainstem"
+    },
+    {
+      "output": {
+        "findings": [
+          {
+            "interpretation": "3.4 cm hypermetabolic subcarinal mass",
+            "region": "Mediastinum, subcarinal",
+            "uptake": "Intense FDG uptake, SUVmax 14.2"
+          },
+          {
+            "interpretation": "Hypermetabolic subcarinal and right paratracheal nodes",
+            "region": "Mediastinal lymph nodes",
+            "uptake": "FDG uptake, SUVmax 9.6"
+          },
+          {
+            "interpretation": "No hypermetabolic pulmonary nodule",
+            "region": "Lungs",
+            "uptake": "No focal uptake"
+          },
+          {
+            "interpretation": "No extrathoracic hypermetabolic disease",
+            "region": "Liver, adrenal glands, bones",
+            "uptake": "Physiological"
+          }
+        ],
+        "impression": "Hypermetabolic 3.4 cm subcarinal mass with hypermetabolic subcarinal and right paratracheal lymph nodes. No extrathoracic hypermetabolic disease. Tissue diagnosis recommended.",
+        "modality": "whole_body_FDG_PET",
+        "quantitative_data": {
+          "SUVmax_right_paratracheal_node": "9.6",
+          "SUVmax_subcarinal_mass": "14.2"
+        },
+        "recommended_actions": [],
+        "tracer_or_protocol": "18F-FDG PET/CT, skull base to mid-thigh"
+      },
+      "tool_name": "order_advanced_imaging",
+      "trigger_action": "request_whole_body_fdg_pet_ct"
     }
   ],
   "ground_truth": {
@@ -512,6 +548,24 @@
         "importance": "required",
         "label": "12-lead ECG immediately",
         "rationale": "The 12-lead ECG is the first test after transient loss of consciousness (ESC 2018); a normal tracing with normal conduction argues against intrinsic conduction disease and points to an extrinsic cause of the sleep-related pauses."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "assessment_type": "orthostatic_blood_pressure"
+            },
+            "tool_name": "perform_clinical_assessment"
+          }
+        ],
+        "citations": [
+          "[ESC_2018]"
+        ],
+        "criterion_id": "action-orthostatic-blood-pressure",
+        "expected_evidence": "Supine 138/82 mmHg, HR 78; standing 3 min 134/85 mmHg, HR 84: no orthostatic hypotension",
+        "importance": "recommended",
+        "label": "Orthostatic blood pressure by active standing (supine, then 1 and 3 minutes standing)",
+        "rationale": "Orthostatic blood pressure on active standing is part of the initial evaluation of every transient loss of consciousness (ESC 2018 Class I); it tests orthostatic hypotension, the competing cause, before a cardiac cause is accepted."
       },
       {
         "alternatives": [
@@ -712,6 +766,24 @@
         "importance": "optional",
         "label": "Literature lookup on anti-Hu paraneoplastic brainstem encephalitis",
         "rationale": "Literature lookup is optional; the decision rests on the monitoring, polysomnography, MRI, antibody and CT results already obtained."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "modality": "whole_body_FDG_PET"
+            },
+            "tool_name": "order_advanced_imaging"
+          }
+        ],
+        "citations": [
+          "[Graus_2021]"
+        ],
+        "criterion_id": "action-whole-body-fdg-pet",
+        "expected_evidence": "Hypermetabolic 3.4 cm subcarinal mass with subcarinal and right paratracheal nodes; no extrathoracic hypermetabolic disease",
+        "importance": "optional",
+        "label": "Whole-body FDG-PET/CT for tumour staging",
+        "rationale": "FDG-PET/CT stages the tumour once the mediastinal mass is known and is the next step when CT is negative in a high-risk paraneoplastic syndrome (Graus 2021); here CT has found the mass and tissue diagnosis comes first, so staging is optional during this encounter."
       }
     ],
     "assessment": {
@@ -725,7 +797,7 @@
         "Admit to a monitored bed (high dependency) with continuous ECG, oximetry and capnography during sleep",
         "Nocturnal non-invasive ventilation with a backup rate for central apnoea (CPAP alone is inadequate); invasive ventilation if NIV fails",
         "Temporary, then permanent, pacing only if asystole persists despite effective ventilation: the pauses are secondary to apnoea",
-        "Tissue diagnosis of the mediastinal mass, preferably EBUS-TBNA of the subcarinal node, with oncology referral: tumour treatment is the main determinant of neurological outcome (Graus 2021); whole-body FDG-PET for staging",
+        "Tissue diagnosis of the mediastinal mass, preferably EBUS-TBNA of the subcarinal node, with oncology referral: tumour treatment is the main determinant of neurological outcome (Graus 2021)",
         "Immunotherapy alongside tumour treatment: IV methylprednisolone (for example 1 g daily for 5 days), then IVIG or plasma exchange",
         "Swallow assessment by speech and language therapy, with diet modification or nasogastric feeding to prevent aspiration",
         "Avoid opioids, benzodiazepines and other respiratory depressants",
@@ -954,6 +1026,30 @@
         "Tissue diagnosis recommended."
       ],
       "region": "chest"
+    },
+    "clinical_assessment": {
+      "assessment_type": "orthostatic_blood_pressure",
+      "criteria_met": {
+        "diastolic_fall_10_mmHg_or_more": false,
+        "heart_rate_rise_30_bpm_or_more": false,
+        "systolic_below_90_mmHg_standing": false,
+        "systolic_fall_20_mmHg_or_more": false
+      },
+      "findings": [
+        {
+          "domain": "symptoms on standing",
+          "result": "no light-headedness, visual dimming or presyncope during 3 minutes of active standing"
+        }
+      ],
+      "impression": "No orthostatic fall in blood pressure and no excessive heart rate rise on active standing.",
+      "pre_post_comparison": null,
+      "recommended_actions": [],
+      "scores": {
+        "standing_1_min": "BP 132/84 mmHg, HR 86 bpm",
+        "standing_3_min": "BP 134/85 mmHg, HR 84 bpm",
+        "supine_after_5_min": "BP 138/82 mmHg, HR 78 bpm"
+      },
+      "timing": "baseline"
     },
     "csf": {
       "appearance": "Clear and colourless",

@@ -69,3 +69,14 @@ Close-out of the condition (plans/SYNC-CARD-decisions.md). Not a re-review: ever
 - Citations now follow the guideline each rationale or reason names (ruling 8; new keys in the criteria pack allow-list): action-3-check-drug-interactions citations ['[ESC_2018]'] -> ['[ESC_2022_VA_SCD]', '[Drew_2010]']; action-2-interpret-labs citations ['[ESC_2018]'] -> ['[Drew_2010]']; action-5-order-echocardiogram citations ['[ESC_2018]'] -> ['[ESC_2018]', '[ESC_2022_VA_SCD]']; avoid-waste-4-order-ct-scan citations ['[ESC_2018]'] -> ['[NICE_NG232]']; avoid-harm-5-exercise-stress-test citations [] -> ['[Fletcher_2013]'].
 
 Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; `test_case_guards.py -k SYNC-CARD-M04` pass (SYNC-CARD now in `DISCRIMINATOR_CONDITIONS`); synonym `--check` clean.
+
+## Vocabulary wiring (24 Oct 2026)
+
+Central vocabulary (batch 4: orthostatic_blood_pressure, electrophysiology_study, sodium_channel_blocker_challenge, genetic_panel:inherited_arrhythmia and :cardiomyopathy, whole_body_FDG_PET; SYNC-CARD decisions CENTRAL 1).
+
+| field path | change |
+| --- | --- |
+| `initial_tool_outputs.clinical_assessment` | added: orthostatic_blood_pressure report, supine values = the presenting vitals; No orthostatic fall in blood pressure and no excessive heart rate rise on active standing. |
+| `ground_truth.action_criteria[action-orthostatic-blood-pressure]` | added, recommended, after the ECG criterion [ESC_2018] (decisions CENTRAL 1: orthostatic BP in every initial evaluation) |
+
+Scoring change for re-review: new criteria are recommended or optional, so no required work-up changed.
