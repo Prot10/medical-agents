@@ -389,14 +389,20 @@ syncope_cardiac:
     age_range: [50, 80]
     sex_bias: "slight_male"
   encounter_type: "emergency"
-  # EEG is used only to rule out seizure as the syncope mimic, not as first-line
-  # workup for cardiac syncope (3 cases legitimately skip EEG).
+  # EEG is not part of the cardiac syncope work-up (ESC 2018 Class III): it is waste unless a
+  # prior seizure label makes the epilepsy question explicit (optional in 2 of the 30 cases).
   # Clinical tool review, July 2026: cardiac_monitoring optional->REQUIRED (the only test
   # producing symptom-rhythm correlation; ESC 2018 Class I in high-risk patients); LABS
   # required->optional (low yield unless clinically suggested); advanced cardiac imaging added as
-  # optional. Applied to the 30 cases in a second pass: the untargeted thyroid and natriuretic
-  # peptide assays left the required panel (TSH 29 cases -> 4, BNP 27 -> 3) and the labs step
-  # is `required` only in the 11 cases where a named assay drives a decision.
+  # optional. October 2026 round (plans/SYNC-CARD.md, SYNC-CARD-decisions.md): a lab panel names
+  # only the assay that changes management (required in 10 cases); no hard "labs before
+  # monitoring" rule (immediate monitoring is Class I); soft ECG before echo and before
+  # monitoring; hard TTE before any exercise test; literature optional and last; a drug check is
+  # required only for a concrete interaction (QT drugs, AV-nodal blockers, vasodilators in
+  # obstructive HCM); tilt is waste once the mechanism is arrhythmic or structural and harm in
+  # severe AS, obstructive HCM or RV outflow obstruction; exercise testing is harm in
+  # symptomatic severe AS and waste once a pacing indication exists; head CT only on NICE NG232
+  # criteria. Treatment, devices and referrals are musts, never tool calls.
   # body_imaging and tissue_diagnosis are optional at panel level because they belong to
   # specific mechanisms, not to the condition: thoracic CT angiography when a pulmonary
   # embolism presents as syncope (SYNC-CARD-RM04, where it was previously requested through the
@@ -409,7 +415,7 @@ syncope_cardiac:
       straightforward:
         - "Complete heart block (third-degree AV block) with ventricular escape rhythm at 35 bpm"
         - "OR: Prolonged QTc >500ms"
-        - "OR: Brugada pattern (coved ST elevation V1-V3)"
+        - "OR: Spontaneous coved type 1 Brugada pattern (V1-V2)"
       moderate:
         - "Second-degree AV block (Mobitz type II)"
         - "OR: Bifascicular block (RBBB + left anterior fascicular block)"
@@ -422,20 +428,20 @@ syncope_cardiac:
       # Order on a specific suspicion, not as a routine battery (ESC 2018 section 4.1.1).
       # A natriuretic peptide may support the identification of structural heart disease but
       # does not establish the cause of the syncope, and untargeted thyroid, inflammatory,
-      # autoimmune and paraneoplastic panels have no established role here.
+      # autoimmune and paraneoplastic panels have no established role here. Author only the
+      # panels the case's mechanism calls for, with reference ranges for the patient's sex.
       all_difficulties:
-        - "CBC: normal — haemoglobin excludes haemorrhage"
-        - "BMP: electrolytes and glucose normal (rules out metabolic cause)"
-        - "Troponin: normal or mildly elevated"
-        - "Magnesium: low where a diuretic or a QT mechanism is in play"
+        - "Haemoglobin or haematocrit only when bleeding is suspected"
+        - "Potassium and magnesium when an arrhythmia or QT prolongation may be electrolyte driven (low on a diuretic, for example)"
+        - "Troponin and BNP only when ischaemia, pulmonary embolism or heart failure is in question"
+        - "D-dimer only when the clinical probability of pulmonary embolism is low or intermediate, never at high probability"
     eeg:
       all_difficulties:
-        - "Normal EEG — no epileptiform abnormalities"
+        - "Normal EEG — no epileptiform abnormalities (only where a prior seizure label is the question)"
         - "Normal background, normal posterior dominant rhythm"
-        - "No seizures captured during monitoring"
     mri:
       all_difficulties:
-        - "Normal brain MRI (if performed)"
+        - "Normal brain MRI (only when focal signs or a central cause make it indicated)"
         - "No acute intracranial pathology"
     body_imaging:
       all_difficulties:
@@ -446,41 +452,45 @@ syncope_cardiac:
         - "lymph_node_biopsy: non-necrotising granulomas with negative mycobacterial and fungal stains, when a granulomatous infiltration is the substrate"
   differential_diagnoses:
     - diagnosis: "Epileptic seizure"
-      key_distinguishing: "Epileptiform EEG, post-ictal confusion >5min, tongue bite, urinary incontinence"
+      key_distinguishing: "Prolonged post-ictal confusion, lateral tongue bite, head turning, prolonged automatisms; brief jerks with rapid recovery favour convulsive syncope; the interictal EEG is usually normal"
     - diagnosis: "Vasovagal syncope"
       key_distinguishing: "Clear trigger (pain, prolonged standing, emotional), prodrome, young patient"
     - diagnosis: "Orthostatic hypotension"
-      key_distinguishing: "Reproducible on tilt table, occurs on standing, medications (antihypertensives)"
+      key_distinguishing: "Sustained fall of 20 mmHg systolic or 10 mmHg diastolic within 3 min of active standing; occurs on standing; antihypertensives or diuretics"
     - diagnosis: "Transient ischemic attack"
       key_distinguishing: "Focal neurological symptoms, no LOC typically, vascular risk factors"
-    - diagnosis: "Psychogenic non-epileptic seizures"
-      key_distinguishing: "Eyes closed, prolonged, variable semiology, psychiatric comorbidity"
+    - diagnosis: "Psychogenic pseudosyncope"
+      key_distinguishing: "Eyes closed, prolonged apparent unconsciousness, frequent attacks, psychiatric comorbidity; normal ECG and BP during an attack"
   difficulty_variants:
+    # The presentation gives history and examination only: the ECG, monitoring and imaging are
+    # scored work-up and their results never appear here.
     straightforward:
-      presentation: "70-year-old man found on floor after witnessed syncopal episode. No seizure-like activity. No post-ictal confusion. History of palpitations. ECG shows complete heart block."
+      presentation: "70-year-old man found on floor after witnessed syncopal episode without warning. No seizure-like activity. No post-ictal confusion. Pulse 38 and regular."
       expected_agent_confidence: 0.85
     moderate:
-      presentation: "62-year-old with recurrent episodes of sudden LOC without warning. Brief convulsive movements witnessed (convulsive syncope). On antihypertensives. ECG shows bifascicular block."
+      presentation: "62-year-old with recurrent episodes of sudden LOC without warning. Brief convulsive movements witnessed (convulsive syncope). On antihypertensives."
       expected_agent_confidence: 0.60
     diagnostic_puzzle:
-      presentation: "55-year-old with two episodes of LOC with 'shaking' — referred as 'new-onset seizures.' Episodes triggered by exertion. Normal initial ECG. Family history of sudden cardiac death."
+      presentation: "55-year-old with two episodes of LOC with 'shaking' — referred as 'new-onset seizures.' Episodes triggered by exertion. Family history of sudden cardiac death."
       expected_agent_confidence: 0.40
   common_followups:
-    - trigger_action: "request_echocardiogram"
-      tool_name: "interpret_labs"
-      description: "Transthoracic echocardiogram for structural heart disease"
-    - trigger_action: "request_holter_monitor"
-      tool_name: "analyze_ecg"
-      description: "24-72h Holter or event monitor"
-    - trigger_action: "request_tilt_table"
-      tool_name: "interpret_labs"
-      description: "Tilt table testing for vasovagal mechanism"
+    # Each study under the tool that performs it, with the vocabulary term in its discriminating
+    # field. No tilt follow-up: tilt is waste once the mechanism is arrhythmic or structural and
+    # harm in severe AS, obstructive HCM and RV outflow obstruction; where a case keeps a tilt
+    # or exercise report it is the patient's own (no isoproterenol in ischaemic heart disease,
+    # AS or HCM) or "not performed".
+    - trigger_action: "request_transthoracic_echocardiogram"
+      tool_name: "order_echocardiogram"
+      description: "echo_type TTE: LVEF, wall thickness, valves with gradients, LVOT gradient at rest and on Valsalva, RV size and function, PASP, pericardium, masses; no diagnosis sentence, no bubble study"
+    - trigger_action: "request_telemetry_holter_monitoring"
+      tool_name: "order_cardiac_monitoring"
+      description: "monitor_type telemetry (inpatient, high-risk features) with holter_24h/holter_48h accepted; event_monitor_14d/30d for events within 4 weeks; implantable_loop_recorder for infrequent recurrent events. The case fallback is the same recording, consistent with the ECG"
     - trigger_action: "request_exercise_stress_test"
-      tool_name: "analyze_ecg"
-      description: "Exercise stress test if exertional syncope"
+      tool_name: "order_specialized_test"
+      description: "test_type exercise_stress_test only for exertional syncope after the TTE has excluded severe AS and obstructive HCM (hard sequence); never in symptomatic severe AS or with a pacing indication already established. An LVOT gradient needs echo_type exercise_echo instead"
     - trigger_action: "request_cardiac_mri"
-      tool_name: "analyze_brain_mri"
-      description: "Cardiac MRI for structural evaluation (ARVC, HCM)"
+      tool_name: "order_advanced_imaging"
+      description: "modality cardiac_MRI for a suspected cardiomyopathy, myocarditis or infiltration (ARVC, HCM, sarcoid, laminopathy; AV block before 60, ESC 2021 IIa)"
 
 multiple_sclerosis:
   name: "Multiple sclerosis — relapsing-remitting"
@@ -1052,7 +1062,7 @@ guillain_barre:
 myasthenia_gravis:
   name: "Myasthenia gravis"
   abbreviation: "MG"
-  icd_code: "G70.0"
+  icd_code: "G70.00"
   description: "Autoimmune disorder of the neuromuscular junction caused by antibodies against AChR or MuSK, presenting with fatigable weakness"
   typical_demographics:
     age_range: [15, 85]
@@ -1060,61 +1070,55 @@ myasthenia_gravis:
   encounter_type: "inpatient"
   # Clinical tool review, July 2026: mediastinal (thymic) imaging added as REQUIRED in every newly
   # diagnosed patient irrespective of serostatus (Jacob 2025); a chest radiograph does not satisfy
-  # it. CT demoted to optional rather than dropped, since existing cases use it for the thymus
+  # it. Thymic imaging is order_body_imaging (mediastinum_CT with contrast), never the head-CT tool.
+  # October 2026 review round (plans/MG.md, MG-decisions.md): ICD G70.00 for a new or stable
+  # presentation, G70.01 only for an exacerbation or crisis; LEMS mimic cases use G73.1.
   required_modalities: [LABS, specialized_test, body_imaging]
-  # CSF appears in 1 puzzle case (MG-RS14, MuSK+ bulbar-predominant) to rule
-  # out brainstem demyelination — the MS-mimic differential is the only
-  # legitimate clinical scenario in which CSF is ordered for an NMJ disorder.
-  optional_modalities: [MRI, ECG, CSF, advanced_imaging, CT]
+  # No CSF in any MG case (Reviewer 2). Brain/orbit MRI only after negative serology and
+  # neurophysiology or for a central or orbital mimic the case raises; advanced imaging is FDG-PET
+  # for the LEMS tumour search only; ECG before amifampridine in LEMS.
+  optional_modalities: [MRI, ECG, advanced_imaging, CT]
   key_findings:
     labs:
       straightforward:
-        - "Anti-AChR (acetylcholine receptor) antibodies: positive (present in ~85% generalized MG)"
-        - "Binding, blocking, and modulating antibody titers elevated"
-        - "Thyroid function: may show concurrent autoimmune thyroid disease"
-        - "CBC, BMP: normal"
-        - "Anti-striated muscle antibodies: positive (associated with thymoma)"
+        - "Anti-AChR binding antibodies (RIA or cell-based assay): positive in about 85% of generalized and about 50% of ocular MG; binding in nmol/L, blocking and modulating in %"
+        - "Thyroid function in every patient; anti-TPO or TRAb when thyroid disease is suspected or known"
+        - "CBC and BMP listed analyte by analyte with values (no 'All normal' panels)"
       moderate:
-        - "Anti-AChR antibodies: borderline positive or weakly positive"
-        - "Anti-MuSK antibodies: positive in ~40% of AChR-negative patients"
+        - "Anti-AChR binding antibody modestly raised: a value above the laboratory's reference range is positive, not borderline"
+        - "Anti-MuSK antibodies tested when AChR is negative; positive in a minority of AChR-negative patients (proportion varies by population)"
         - "Thyroid peroxidase antibodies: positive (concurrent autoimmunity)"
       diagnostic_puzzle:
-        - "Seronegative MG: anti-AChR and anti-MuSK both negative (~10% of generalized MG)"
-        - "Anti-LRP4 antibodies may be detectable in seronegative cases"
-        - "Paraneoplastic antibody panel to exclude thymoma-related seronegativity"
+        - "Seronegative MG: AChR and MuSK negative; diagnosed only after the high-sensitivity cell-based panel (clustered AChR, clustered MuSK, LRP4)"
+        - "Anti-LRP4 antibodies in a minority of double-seronegative patients (wide variation between cohorts)"
+        - "No paraneoplastic panel in MG; anti-titin, anti-RyR and striational antibodies are not orderable and not diagnostically helpful"
     specialized_test:
       straightforward:
-        - "Repetitive nerve stimulation (RNS) at 3 Hz: decremental CMAP response ≥10% (pathognomonic)"
-        - "Single-fiber EMG (SFEMG): increased jitter and blocking (most sensitive test, >95% sensitivity)"
-        - "Post-exercise facilitation then exhaustion pattern"
-        - "Tensilon (edrophonium) test: dramatic improvement of ptosis/ophthalmoplegia"
+        - "Repetitive nerve stimulation at 2-3 Hz: decrement above 10% in a facial and a proximal muscle, normal baseline CMAP amplitudes, no post-exercise facilitation"
+        - "Single-fiber EMG (when RNS is normal or serology negative): increased jitter and blocking; sensitive (over 90%) but not specific"
+        - "Ice-pack test only with ptosis: MRD1 improves by at least 2 mm after 2-5 minutes"
       moderate:
-        - "RNS at 3 Hz: borderline decrement 8-10%"
+        - "RNS at 3 Hz: decrement near the 10% threshold in one muscle only"
         - "SFEMG: mildly increased jitter without blocking"
-        - "Fatigable ptosis and diplopia on sustained upgaze (>60 seconds)"
+        - "Respiratory function (staging): FVC in L, % predicted and mL/kg at the stated weight, MIP and MEP in cmH2O, flagged L when below reference"
       diagnostic_puzzle:
-        - "Ocular MG: normal repetitive stimulation on limb muscles"
-        - "RNS negative, SFEMG not yet performed"
-        - "Lambert-Eaton-like facilitation pattern causing diagnostic confusion (rare MG variant)"
-    ct:
+        - "Ocular MG: normal limb RNS, abnormal SFEMG in a facial muscle"
+        - "RNS normal; SFEMG abnormal in a weak muscle"
+        - "LEMS mimic: low baseline CMAPs with an increment of at least 60% after 10 s of exercise (Oh 2005)"
+    body_imaging:
       straightforward:
-        - "Anterior mediastinal mass on CT chest: thymoma (well-encapsulated or invasive)"
-        - "Thymoma present in ~15% of MG patients"
-        - "Enhancing anterior mediastinal mass consistent with Type B2 thymoma"
+        - "Contrast CT of the anterior mediastinum: well-defined anterior mediastinal mass most consistent with thymoma (present in about 10-15% of MG)"
       moderate:
-        - "Thymic hyperplasia on CT chest (enlarged but not mass-like)"
-        - "Indeterminate anterior mediastinal density requiring PET or biopsy"
+        - "Thymic hyperplasia or a residual thymus for age, without a mass"
+        - "Indeterminate anterior mediastinal soft tissue reported with its features (the tissue diagnosis is not in the CT report)"
       diagnostic_puzzle:
-        - "Normal CT chest (no thymic pathology)"
-        - "Age-involuted thymus — no residual tissue identified"
+        - "Normal mediastinum (age-involuted thymus, no thymic pathology)"
     mri:
       all_difficulties:
-        - "Normal brain MRI (rules out brainstem lesion causing cranial nerve palsies)"
-        - "No enhancement of cranial nerves"
-        - "No structural cause for ophthalmoplegia (rules out cavernous sinus lesion)"
+        - "Only where the case raises a central or orbital mimic: normal brain and orbit MRI (no brainstem or cavernous sinus lesion, no extraocular muscle enlargement)"
   differential_diagnoses:
     - diagnosis: "Lambert-Eaton myasthenic syndrome (LEMS)"
-      key_distinguishing: "Proximal limb weakness > ocular symptoms, incremental CMAP on high-rate RNS, anti-VGCC antibodies, associated with SCLC"
+      key_distinguishing: "Proximal leg weakness, areflexia, autonomic symptoms, low CMAPs with post-exercise facilitation, P/Q-type VGCC antibodies, associated with SCLC"
     - diagnosis: "Botulism"
       key_distinguishing: "Descending paralysis, fixed dilated pupils, no fatigability pattern, toxin assay positive"
     - diagnosis: "Brainstem stroke"
@@ -1123,32 +1127,36 @@ myasthenia_gravis:
       key_distinguishing: "MRI white matter lesions, CSF oligoclonal bands, internuclear ophthalmoplegia"
     - diagnosis: "Thyroid ophthalmopathy (Graves)"
       key_distinguishing: "Proptosis, lid retraction, anti-thyroid antibodies, restricted EOM on MRI orbits"
+  # October 2026 review round: presentations describe the clinical picture only. Antibody, RNS,
+  # SFEMG, CT and spirometry results of scored studies belong in the tool outputs, never in the HPI.
   difficulty_variants:
     straightforward:
-      presentation: "35-year-old woman with 3-month progressive ptosis, diplopia worsening at end of day, and proximal arm fatigue. AChR antibodies markedly elevated. Chest CT shows anterior mediastinal mass."
+      presentation: "35-year-old woman with 3-month progressive ptosis, diplopia worsening at end of day, and proximal arm fatigue when lifting her arms overhead."
       expected_agent_confidence: 0.88
     moderate:
-      presentation: "52-year-old man with fatigable bilateral ptosis and dysphagia over 4 months. AChR antibody borderline positive. RNS shows 9% decrement."
+      presentation: "52-year-old man with fatigable bilateral ptosis and dysphagia over 4 months, worse in the evening and after prolonged chewing."
       expected_agent_confidence: 0.62
     diagnostic_puzzle:
-      presentation: "45-year-old woman with fluctuating dysarthria and dysphagia over 6 months, initially attributed to anxiety. AChR and MuSK antibodies negative. SFEMG not yet performed."
+      presentation: "45-year-old woman with fluctuating dysarthria and dysphagia over 6 months, worse at the end of the day and initially attributed to anxiety."
       expected_agent_confidence: 0.35
+  # October 2026 review round: management (IVIG, plasma exchange, thymectomy, pyridostigmine
+  # trials) is never a follow-up; serology of the first-line panel lives in the initial labs.
   common_followups:
-    - trigger_action: "request_sfemg"
+    - trigger_action: "request_repetitive_nerve_stimulation"
       tool_name: "order_specialized_test"
-      description: "Single-fiber EMG of orbicularis oculi or extensor digitorum communis"
-    - trigger_action: "request_repetitive_stimulation"
+      description: "2-3 Hz repetitive nerve stimulation of a facial and a proximal muscle (test_type repetitive_nerve_stimulation), with routine NCS"
+    - trigger_action: "request_emg_single_fiber"
       tool_name: "order_specialized_test"
-      description: "3 Hz repetitive nerve stimulation of multiple muscle groups"
+      description: "Single-fiber EMG of a weak facial or limb muscle (test_type emg_single_fiber), when RNS is normal or serology is negative"
     - trigger_action: "request_musk_antibodies"
       tool_name: "interpret_labs"
-      description: "Anti-MuSK and anti-LRP4 antibody testing for seronegative MG"
-    - trigger_action: "request_pulmonary_function"
-      tool_name: "interpret_labs"
-      description: "Spirometry and NIF for bulbar/respiratory involvement (myasthenic crisis risk)"
-    - trigger_action: "request_thymectomy_evaluation"
-      tool_name: "order_ct_scan"
-      description: "CT chest for thymoma staging and surgical planning"
+      description: "Anti-MuSK antibodies when AChR is negative; the cell-based panel or anti-LRP4 only when AChR and MuSK are both negative"
+    - trigger_action: "request_respiratory_function"
+      tool_name: "order_specialized_test"
+      description: "Respiratory function (test_type respiratory_function): FVC in L, % predicted and mL/kg, MIP and MEP; staging, first when bulbar or breathless"
+    - trigger_action: "request_mediastinal_ct"
+      tool_name: "order_body_imaging"
+      description: "Contrast CT of the mediastinum (study mediastinum_CT) for thymoma or thymic hyperplasia in every newly diagnosed patient"
 
 subarachnoid_hemorrhage:
   name: "Subarachnoid hemorrhage"
@@ -1364,6 +1372,14 @@ frontotemporal_dementia:
   # and needs haemorrhage/mass exclusion before the dementia work-up; FTD-S06 cannot tolerate
   # MRI because of severe claustrophobia and uses non-contrast CT as the reviewed alternative.
   optional_modalities: [advanced_imaging, CT]
+  # October 2026 review round (plans/FTD-decisions.md, criteria_packs/FTD.md): literature search
+  # is never a clinical step (optional, last, general text only); check_drug_interactions only for
+  # a concrete interaction, never as a toxicity test (lithium and valproate levels are
+  # interpret_labs); FDG-PET or perfusion SPECT is recommended when the MRI is normal or equivocal
+  # (the imaging support probable bvFTD needs), optional otherwise; bedside screen scores belong to
+  # the clinical-assessment output, not to the examination; PPA cases (G31.01) are scored against
+  # the Gorno-Tempini features, add a speech-language evaluation and are not labelled bvFTD;
+  # presentations carry no result of a scored study.
   key_findings:
     mri:
       straightforward:
@@ -1378,7 +1394,7 @@ frontotemporal_dementia:
         - "Some periventricular white matter changes"
       diagnostic_puzzle:
         - "Minimal structural atrophy — early FTD, especially in young-onset"
-        - "Asymmetric temporal atrophy mimicking early Alzheimer's (semantic dementia variant)"
+        - "Asymmetric anterior temporal atrophy (left in svPPA, right in the right temporal variant) that can be mistaken for Alzheimer-type medial temporal atrophy"
         - "Normal MRI in 10-15% of bvFTD (especially C9orf72 expansion carriers)"
     labs:
       all_difficulties:
@@ -1420,18 +1436,18 @@ frontotemporal_dementia:
     - diagnosis: "Normal pressure hydrocephalus (NPH)"
       key_distinguishing: "Gait apraxia, urinary incontinence, ventriculomegaly disproportionate to atrophy"
     - diagnosis: "Creutzfeldt-Jakob disease (CJD)"
-      key_distinguishing: "Rapid progression (<1 year), myoclonus, cortical ribboning on DWI, CSF 14-3-3 positive"
+      key_distinguishing: "Rapid progression (<1 year), myoclonus, cortical ribboning on DWI, CSF RT-QuIC positive"
     - diagnosis: "Primary progressive aphasia"
       key_distinguishing: "Language-predominant, asymmetric left perisylvian atrophy, preserved behavior early"
   difficulty_variants:
     straightforward:
-      presentation: "58-year-old accountant with 2-year personality change: disinhibition, compulsive eating, loss of empathy, poor hygiene. Frontal atrophy on MRI, severe frontal hypometabolism on FDG-PET."
+      presentation: "58-year-old accountant brought by his wife with a 2-year personality change: disinhibition, compulsive eating, loss of empathy, poor hygiene; he has left work. No imaging or test results in the presentation."
       expected_agent_confidence: 0.82
     moderate:
-      presentation: "64-year-old with 1-year progressive apathy, social withdrawal, and perseverative behavior. Mild frontal atrophy. Psychiatrist considers depression. Neuropsych shows executive impairment."
+      presentation: "64-year-old with 1-year progressive apathy, social withdrawal, and perseverative behavior; the psychiatrist considers depression and an antidepressant has not helped. Imaging and neuropsychology are pathway results, not history."
       expected_agent_confidence: 0.58
     diagnostic_puzzle:
-      presentation: "54-year-old with 18-month behavioral changes. Normal MRI. Referred as 'depression vs personality disorder.' FDG-PET shows subtle frontal hypometabolism. C9orf72 genetic testing pending."
+      presentation: "54-year-old with 18-month behavioral changes referred as 'depression vs personality disorder'; a father whose psychiatric illness began in his 50s. The MRI is normal or equivocal and FDG-PET (recommended) supplies the imaging support; C9orf72 is an optional counselled test, never pending in the history."
       expected_agent_confidence: 0.32
   common_followups:
     - trigger_action: "request_fdg_pet_or_perfusion_spect"
@@ -1439,7 +1455,13 @@ frontotemporal_dementia:
       description: "Optional FDG-PET, or brain perfusion SPECT when FDG-PET is unavailable, after the core assessment if subtype remains uncertain"
     - trigger_action: "request_genetic_panel"
       tool_name: "order_specialized_test"
-      description: "Optional counselled C9orf72/GRN/MAPT panel in young-onset or familial FTD; not required for the clinical syndrome diagnosis"
+      description: "Optional counselled C9orf72/GRN/MAPT panel (genetic_panel:FTD) in bvFTD with onset before 65; counselling is a must only with onset before 55, a suggestive family history or MND; a pathogenic C9orf72 result is also authored on genetic_panel:ALS; not required for the clinical syndrome diagnosis"
+    - trigger_action: "request_speech_language_evaluation"
+      tool_name: "order_specialized_test"
+      description: "PPA cases only: speech_language_evaluation of naming, single-word comprehension, object knowledge, irregular-word reading, repetition, grammar and motor speech, without naming the variant"
+    - trigger_action: "request_drug_level"
+      tool_name: "interpret_labs"
+      description: "Targeted level where the medication list makes toxicity a mimic: lithium_level (with creatinine and TSH from the baseline panel), or valproate_level and ammonia"
     - trigger_action: "request_comprehensive_neuropsych"
       tool_name: "order_specialized_test"
       description: "Comprehensive neuropsychological battery including social cognition measures"
@@ -1734,61 +1756,61 @@ normal_pressure_hydrocephalus:
   # required act is objective gait and cognition before and after the tap test, not the generic
   # test bucket. LABS required->optional. Advanced imaging and the standalone
   # neuropsychological battery were removed as requested; neither is a gold NPH study.
+  # October 2026 round (plans/NPH.md, NPH-decisions.md): no literature or drug-check step
+  # (anticoagulant handling is a must, ASRA 2025); the patient block gives no Evans index,
+  # callosal angle, DESH, TUG, MoCA or referral diagnosis; reports give their own modality's
+  # findings with no iNPH, shunt or tap verdict; the baseline gait report never contains the
+  # post-tap values, which come from the CSF tap report and a separate reassessment follow-up.
   required_modalities: [MRI, CSF, clinical_assessment]
   optional_modalities: [LABS]
   key_findings:
     mri:
       straightforward:
-        - "Ventriculomegaly disproportionate to degree of cortical atrophy (Evans index >0.3)"
-        - "Tight high-convexity sulci with ballooning of Sylvian fissures (disproportion pattern)"
+        - "Communicating ventriculomegaly with Evans index above 0.3, no obstructing lesion or aqueductal stenosis"
+        - "DESH: tight high-convexity and medial parietal sulci with enlarged Sylvian fissures"
         - "Corpus callosum thinning and upward bowing"
-        - "Periventricular T2/FLAIR signal (transependymal CSF seepage)"
-        - "CSF flow void at aqueduct of Sylvius (hyperdynamic pulsatile flow)"
-        - "Callosal angle <90 degrees on coronal images (diagnostic)"
+        - "Periventricular T2/FLAIR signal with its Fazekas grade"
+        - "Aqueductal flow void; fourth ventricle normal or mildly enlarged"
+        - "Acute callosal angle (below 90 degrees on the coronal plane through the posterior commissure), supportive, not diagnostic"
+        - "Temporal horns enlarged out of proportion to the hippocampi (MTA score stated)"
       moderate:
-        - "Evans index borderline (0.3-0.32)"
+        - "Evans index just above 0.3 (0.31 to 0.33); 0.30 exactly does not meet the criterion"
         - "Mild-to-moderate ventriculomegaly with some cortical atrophy"
-        - "No classic tight high-convexity sulci pattern"
-        - "Callosal angle 90-100 degrees — equivocal"
+        - "No DESH; at least one other supportive feature (acute callosal angle or temporal horn enlargement)"
+        - "Callosal angle 90 to 100 degrees"
       diagnostic_puzzle:
-        - "Ventriculomegaly with prominent cortical atrophy (true atrophy vs NPH)"
-        - "Post-traumatic or post-meningitic hydrocephalus mimicking iNPH"
-        - "Concurrent neurodegenerative disease (Alzheimer's or Parkinson's plus NPH)"
+        - "Ventriculomegaly with prominent cortical atrophy (atrophy ex vacuo vs iNPH)"
+        - "Secondary NPH after trauma, subarachnoid haemorrhage, meningitis or subdural haematoma (the antecedent is in the history; the MRI shows its residue)"
+        - "Concurrent neurodegenerative disease (Alzheimer's, Parkinson's, PSP or bvFTD with iNPH)"
     labs:
       all_difficulties:
-        - "CBC: normal"
-        - "BMP: normal"
-        - "Thyroid function: normal (rules out hypothyroid cognitive impairment)"
-        - "Vitamin B12: normal"
-        - "RPR: negative"
-        - "Glucose: normal (rules out diabetic contribution to neuropathy/gait)"
+        - "Targeted, optional panel: CBC, BMP, TSH, vitamin B12 (with MMA when B12 is low-normal), RPR where indicated"
+        - "Values, units, reference ranges and flags only; no interpretation of what a value rules out"
+        - "Coagulation and platelets where a bleeding risk affects the lumbar tap"
     csf:
       straightforward:
-        - "Opening pressure: normal (5-18 cmH2O) — required criterion"
-        - "WBC: normal (<5 cells)"
-        - "Protein: normal or mildly elevated"
-        - "Glucose: normal"
-        - "High-volume tap trial (30-50 mL CSF removed): significant gait improvement within 2-24 hours"
-        - ">10% TUG improvement is a commonly used positive criterion; absolute change and concordant gait/cognitive findings must also be interpreted"
+        - "Opening pressure 7 to 24.5 cmH2O (70 to 245 mmH2O, Relkin 2005; 20 cmH2O or less in the Japanese guideline)"
+        - "WBC below 5 cells/uL"
+        - "Protein and glucose normal"
+        - "Tap test figures: volume removed (30 to 50 mL), TUG and 10-m walk before the tap, at 2 to 4 hours and at 24 hours, with % change; no positive or negative verdict"
       moderate:
         - "Opening pressure normal"
-        - "Tap trial: modest improvement in gait (equivocal positive)"
-        - "Cognitive improvement less clear after tap"
+        - "Tap test: small objective change in TUG with a concordant 10-m walk change"
+        - "Cognitive screen change after the tap less clear than the gait change"
       diagnostic_puzzle:
-        - "Tap trial: no clear improvement (false negative ~40% of eventual shunt responders)"
-        - "Opening pressure borderline elevated (18-22 cmH2O)"
-        - "CSF shows mild pleocytosis — alternative etiology vs coincidental"
+        - "Single tap with no objective gait change (tap sensitivity 26 to 61%, so extended lumbar drainage is the next study)"
+        - "Opening pressure at the upper end of normal (18 to 22 cmH2O)"
     clinical_assessment:
       straightforward:
-        - "Gait analysis: magnetic or apraxic gait pattern — short steps, wide base, reduced step height"
-        - "Timed Up and Go (TUG): >20 seconds, improves >10% after high-volume tap"
-        - "10-meter walk test: significant improvement post-tap"
+        - "Baseline gait report: magnetic gait, short steps, wide base, reduced step height, en-bloc turns; TUG, 10-m walk time and steps, turn steps"
+        - "Baseline only: no post-tap value and no verdict in the baseline report"
+        - "Post-tap reassessment (separate follow-up): the same measures at 2 to 4 and 24 hours with % change, identical to the CSF report"
       moderate:
-        - "Gait analysis: mild magnetic gait component, borderline TUG improvement"
-        - "Cognitive testing: executive dysfunction predominant (MoCA 18-22)"
+        - "Gait analysis: mild magnetic gait component"
+        - "Cognitive screen (MoCA) with executive, attention and delayed-recall deficits and cueing benefit"
       diagnostic_puzzle:
-        - "Gait impairment minimal or attributed to orthopedic causes"
-        - "No clear tap trial response; continuous lumbar drainage trial may be required"
+        - "Gait impairment partly attributable to an orthopaedic or spinal cause documented in the history"
+        - "Post-tap reassessment with no objective change"
   differential_diagnoses:
     - diagnosis: "Alzheimer's disease"
       key_distinguishing: "Episodic-memory-predominant syndrome, hippocampal atrophy, and no early gait apraxia; use targeted AD biomarkers only when copathology remains a specific question"
@@ -1802,18 +1824,24 @@ normal_pressure_hydrocephalus:
       key_distinguishing: "Prominent white matter hyperintensities, hypertension, stepwise cognitive decline, no Evans index criterion"
   difficulty_variants:
     straightforward:
-      presentation: "73-year-old man with 2-year triad of shuffling gait, urinary urgency/incontinence, and progressive forgetfulness. Evans index 0.38 on MRI, callosal angle 75°. Tap trial shows significant gait improvement."
+      presentation: "73-year-old man with 2 years of shuffling gait, urinary urgency and progressive forgetfulness, referred by his GP for the gait difficulty. Outside imaging was reported as showing enlarged ventricles; the images are not available."
       expected_agent_confidence: 0.85
     moderate:
-      presentation: "68-year-old with 1-year gait deterioration and cognitive decline. Evans index 0.31, borderline callosal angle. Concurrent moderate white matter disease. Tap trial shows modest gait improvement."
+      presentation: "68-year-old with 1 year of gait deterioration and slowed thinking, hypertension and diabetes, no urinary symptoms; referred for progressive gait difficulty."
       expected_agent_confidence: 0.58
     diagnostic_puzzle:
-      presentation: "75-year-old with ventriculomegaly and cognitive impairment. Significant cortical atrophy present. Tap trial inconclusive. Cannot distinguish iNPH from atrophic hydrocephalus with concurrent Alzheimer's."
+      presentation: "75-year-old with gait decline and memory complaints that began first, a prior working diagnosis of Alzheimer's disease and a family history of dementia; the family asks whether anything treatable has been missed."
       expected_agent_confidence: 0.32
   common_followups:
-    - trigger_action: "request_continuous_lumbar_drainage"
+    - trigger_action: "request_moca_cognitive_screen"
+      tool_name: "perform_clinical_assessment"
+      description: "Baseline cognitive screen (MoCA with domain subscores), assessment_type cognitive_screen"
+    - trigger_action: "request_post_reassessment"
+      tool_name: "perform_clinical_assessment"
+      description: "Post-tap timed gait reassessment at 2 to 4 and 24 hours (never put 'tap' in the trigger: it captures the baseline call)"
+    - trigger_action: "repeat_csf_analysis"
       tool_name: "analyze_csf"
-      description: "Continuous external lumbar drainage trial (72h, 150-200 mL/day) for equivocal tap trial"
+      description: "Extended lumbar drainage after a negative tap (72 hours, about 10 mL/hour, 300 to 500 mL), with daily timed gait; a plain trigger so it is served only on the second CSF call"
 
 hepatic_encephalopathy:
   name: "Hepatic encephalopathy"

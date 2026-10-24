@@ -457,19 +457,32 @@ SPEC += [
     dict(cond="myasthenia_gravis", filed="order_specialized_test", tool="order_specialized_test",
          reviewer=2, tier="unchanged", status="applied",
          seg=(None, "Item\nMediastinal (thymic) imaging"),
-         response="Applied: repetitive nerve stimulation is required in 27 cases and single-fibre "
-                  "EMG is ordered in 24 (6 required, 17 recommended, 1 optional). emg_single_fiber "
-                  "already existed and was one of the values the stale catalog hid from you."),
+         response="Applied: repetitive nerve stimulation is required in 27 cases, every new "
+                  "diagnosis (the three known-myasthenia exacerbation or crisis cases list it as "
+                  "waste, since it delays treatment). Single-fibre EMG is ordered in 25: required "
+                  "in the 3 seronegative or LRP4 cases, an accepted alternative to RNS in the "
+                  "required neurophysiology action of the 2 ocular cases, recommended in 3 where "
+                  "RNS is normal or equivocal, and optional in 17 where RNS is already diagnostic. "
+                  "emg_single_fiber already existed and was one of the values the stale catalog "
+                  "hid from you."),
     dict(cond="myasthenia_gravis", filed="order_specialized_test", tool="order_body_imaging",
          reviewer=2, tier="required", status="applied",
          seg=("Item\nMediastinal (thymic) imaging", None),
-         response="Applied: mediastinum_CT is a required action in all 30 cases. Before "
+         response="Applied: thymic imaging (mediastinum_CT with contrast, chest CT or mediastinal "
+                  "MRI accepted) is a required action in every new diagnosis, 27 cases, including "
+                  "the two Lambert-Eaton cases, whose required tumour search is a chest CT that a "
+                  "mediastinal CT also satisfies. It is optional in the three known-myasthenia "
+                  "exacerbation or crisis cases, whose histories document earlier thymic imaging "
+                  "or a thymectomy and whose deterioration has an explained precipitant. Before "
                   "order_body_imaging existed the agent could image only the brain, so the thymus "
                   "was unreachable."),
     dict(cond="myasthenia_gravis", filed="analyze_brain_mri", tool="analyze_brain_mri",
          reviewer=2, tier="unchanged", status="applied",
-         response="Applied: exactly one case orders a brain MRI, and no case orders it as a "
-                  "first-line study."),
+         response="Applied: no case orders a brain MRI as a first-line study. It is an action "
+                  "in 3 cases, each for a question the case itself raises: required in one (new "
+                  "ptosis and diplopia in multiple sclerosis on natalizumab, to exclude a relapse "
+                  "and PML), optional in a MuSK-positive bulbar case against a brainstem lesion "
+                  "and as small-cell lung cancer staging in a Lambert-Eaton case."),
     dict(cond="myasthenia_gravis", filed="analyze_csf", tool="analyze_csf",
          reviewer=2, tier="unchanged", status="applied",
          response="Applied in the strongest form: no myasthenia case orders CSF studies."),
@@ -500,21 +513,28 @@ SPEC += [
     dict(cond="syncope_cardiac", filed="order_echocardiogram", tool="order_advanced_imaging",
          reviewer=2, tier="optional", status="applied",
          seg=("Item\nAdvanced cardiac imaging", None),
-         response="Applied. Half of this was already satisfied — cardiac MRI existed and 18 of 30 "
-                  "cases order it — and the rest was added and priced: coronary CTA, coronary "
-                  "angiography, cardiac FDG-PET, chest CT angiography. Your prediction that "
+         response="Applied. Half of this was already satisfied — cardiac MRI existed — and the "
+                  "rest was added and priced: coronary CTA, coronary angiography, cardiac FDG-PET, "
+                  "chest CT angiography. After the October 2026 round cardiac MRI is in 21 of 30 "
+                  "cases: required in 4 (the two arrhythmogenic cardiomyopathies, the hypertrophic "
+                  "cardiomyopathy and the right ventricular outflow mass), recommended in 8 (mostly "
+                  "AV block before 60 without a clear cause, ESC 2021 pacing IIa) and optional in 9; "
+                  "cardiac FDG-PET is required in the one sarcoid case. Your prediction that "
                   "offering brain MRI and no cardiac imaging is 'the arrangement most likely to "
                   "produce the wrong imaging choice' was already true in the data: one case was "
                   "requesting a CT pulmonary angiogram through the head-CT tool."),
     dict(cond="syncope_cardiac", filed="interpret_labs", tool="interpret_labs",
          reviewer=2, tier="optional", status="applied",
          response="Applied, and the numbers were worse than the comment assumed: TSH was in the "
-                  "required panel of 29 of 30 cases and BNP of 27. Thyroid now survives only in "
-                  "the 4 cases with a thyroid mechanism on the differential and BNP in the 3 where "
-                  "a guideline risk-stratifies with it; the step is required in 11 cases and "
-                  "recommended in 19. Mandated laboratory spend fell from 6108 to 4686 EUR. A "
-                  "hard sequence rule requiring labs before monitoring in 28 cases had to go with "
-                  "it, or an agent that correctly skipped the panel took a violation."),
+                  "required panel of 29 of 30 cases and BNP of 27. After the October 2026 round "
+                  "the step is required in 10 cases and recommended in 20, and a required panel "
+                  "names only the assay that changes management: electrolytes and magnesium where "
+                  "an arrhythmia or the QT may be electrolyte driven, ESR, CRP and ASO in the "
+                  "rheumatic case, troponin, BNP and beta-hCG in the pulmonary embolism, the "
+                  "paraneoplastic panel in the anti-Hu case, calcium in the sarcoid case. TSH is "
+                  "named in one case (sick sinus syndrome, recommended) and BNP in one. The hard "
+                  "sequence rule requiring labs before monitoring is gone from every case, or an "
+                  "agent that correctly skipped the panel took a violation."),
     dict(cond="syncope_cardiac", filed="analyze_eeg", tool="analyze_eeg",
          reviewer=2, tier="unchanged", status="applied",
          response="Applied: no case requires EEG; two carry it as optional for the "
@@ -727,30 +747,43 @@ SPEC += [
          response="Applied in all 30 cases: the required baseline names CBC, CMP, TSH, B12, "
                   "folate, ESR and CRP. Infectious, toxic, CK, progranulin and other studies are "
                   "added only where the presentation supplies a question; genetics is not hidden "
-                  "inside the blood panel."),
+                  "inside the blood panel. Lithium (M05) and valproate with ammonia (P01) are "
+                  "checked as blood levels, not as drug-interaction checks."),
     dict(cond="ftd", filed="order_advanced_imaging", tool="order_advanced_imaging",
-         reviewer=1, tier="optional", status="applied",
-         response="Applied across actions and authored reports: no FTD case requires or recommends "
-                  "advanced imaging. Twenty-nine offer optional FDG-PET and one the requested "
-                  "perfusion-SPECT substitute. Amyloid PET remains optional in only 3 cases with "
-                  "an active AD differential. P04 has one explicit optional DaTscan exception for "
-                  "co-existing Parkinson's disease; it is not presented as an FTD test. Tau PET "
-                  "and all vascular imaging modalities are absent."),
+         reviewer=1, tier="optional", status="confirm",
+         response="Applied with one departure we ask you to rule on. No FTD case requires advanced "
+                  "imaging. FDG-PET, with perfusion SPECT accepted as the alternative, is optional "
+                  "in 26 cases and recommended in 4 (P01, P02, P05, P07): their MRI is normal or "
+                  "equivocal, so without functional imaging they meet only possible bvFTD although "
+                  "the clinical picture is probable. Recommended is credited, never required. If "
+                  "you would rather keep it optional there, tell us and those cases will be "
+                  "relabelled possible bvFTD. Every case authors concordant FDG-PET and SPECT "
+                  "results. Amyloid PET, with CSF AD markers as the alternative, is optional in 4 "
+                  "cases with an active AD differential. P04 has one explicit optional DaTscan "
+                  "exception for co-existing Parkinson's disease; it is not presented as an FTD "
+                  "test. Tau PET and all vascular imaging modalities are absent."),
     dict(cond="ftd", filed="order_specialized_test", tool="order_specialized_test",
          reviewer=1, tier="required", status="applied",
          response="Applied: the validated neuropsychological battery is required in all 30 cases. "
-                  "Genetic testing is optional in 17 young-onset or familial cases and is never "
-                  "required or recommended. EMG/NCS and respiratory testing remain required only "
-                  "in P08, whose diagnosis explicitly includes motor neuron disease; they are "
-                  "removed from every FTD-only case. Genetics is also optional in 7 selected "
-                  "young/familial Alzheimer cases."),
+                  "Genetic testing (C9orf72, GRN, MAPT) is optional in 27 cases, every bvFTD case "
+                  "with onset before 65 except the known GRN carrier, and is never required or "
+                  "recommended; genetic counselling is a must only with onset before 55, a "
+                  "suggestive family history or motor neuron disease. In P08, whose diagnosis "
+                  "includes motor neuron disease, EMG/NCS is required and respiratory testing is "
+                  "recommended as staging; both are absent from every FTD-only case. The two "
+                  "primary progressive aphasia cases (S11, S12) recommend a speech and language "
+                  "evaluation. Genetics is also optional in 7 selected young/familial Alzheimer "
+                  "cases."),
     dict(cond="ftd", filed="order_specialized_test", tool="perform_clinical_assessment",
          reviewer=1, tier="required", status="applied",
          seg=("Validated neuropsychological testing must be REQUIRED", "Genetic testing should"),
          src_seg=("Source:", None),
          response="Applied as a separate act: a structured cognitive and behavioural assessment is "
-                  "required in all 30 cases, scored against the six Rascovsky features, each "
-                  "marked present only where the history describes it."),
+                  "required in all 30 cases, scored against the six Rascovsky features in the 28 "
+                  "behavioural-variant cases and against the Gorno-Tempini features in the 2 "
+                  "primary progressive aphasia cases, each feature marked present only where the "
+                  "history describes it. The bedside screen scores are part of this result, not "
+                  "of the examination."),
     dict(cond="ftd", filed="order_ct_scan", tool="order_ct_scan",
          reviewer=1, tier="optional", status="applied",
          response="Applied without adding cases: S06 uses non-contrast CT because severe "
@@ -834,34 +867,48 @@ SPEC += [
                   "list rather than a generic structural read."),
     dict(cond="nph", filed="interpret_labs", tool="interpret_labs",
          reviewer=1, tier="optional", status="applied",
-         response="Applied: blood tests are optional in all 30 cases."),
+         response="Applied: blood tests are optional and targeted in 26 cases and recommended in "
+                  "the 4 with a case-specific mimic or lumbar-tap safety question (thyroid in "
+                  "NPH-M04 and S08, vitamin B12 with methylmalonic acid on metformin in M07, platelets "
+                  "and coagulation in cirrhosis in M08); none requires them."),
     dict(cond="nph", filed="analyze_csf", tool="analyze_csf",
          reviewer=1, tier="required", status="applied",
          response="Applied: required in all 30, as the large-volume tap with opening pressure."),
     dict(cond="nph", filed="order_specialized_test", tool="order_specialized_test",
          reviewer=1, tier="remove", status="applied",
-         response="Applied after a case-level re-audit: no NPH case policy requires a standalone "
-                  "neuropsychological battery or any other specialized test, and the 58 removed "
-                  "specialized-test follow-ups are no longer callable in the NPH cases. The "
-                  "required timed gait and brief cognitive comparison is represented by the "
-                  "clinical-assessment tool instead."),
+         response="Applied after a case-level re-audit: no NPH case requires or recommends a "
+                  "neuropsychological battery or any other specialized test, and the battery is "
+                  "avoided as waste in 29 cases. The one exception is NPH-P09, a cognitive-"
+                  "predominant case with a prior Alzheimer diagnosis, where the battery is optional "
+                  "and its authored subcortical-frontal profile lets the agent test that label. "
+                  "The timed gait and brief cognitive screen are done with the clinical-assessment "
+                  "tool instead."),
     dict(cond="nph", filed="order_specialized_test", tool="perform_clinical_assessment",
          reviewer=1, tier="required", status="applied",
          seg=("If Specialized test is kept as REQUIRED", "Neuropsychological testing"),
          src_seg=("Sources:", None),
-         response="Applied exactly as written: perform_clinical_assessment"
-                  "{gait_and_balance_timed} is required in all 30 cases and its report carries the "
-                  "before-and-after comparison, with each case's own timed-up-and-go and 10-metre "
-                  "figures. The previous universal >=20% cutoff was not supported by the cited "
-                  "guidelines: the cases now state the commonly used >10% TUG criterion and require "
-                  "interpretation of absolute and concordant changes. NPH-P08 remains negative "
-                  "because it shows no objective improvement."),
+         response="Applied: perform_clinical_assessment{gait_and_balance_timed} is required in "
+                  "all 30 cases as the baseline before the tap, and a second, post-tap reassessment "
+                  "is recommended in all 30. The baseline report no longer contains the post-tap "
+                  "result; the tap report and the reassessment give each case's own timed-up-and-go "
+                  "and 10-metre figures at 2 to 4 and 24 hours. It stays recommended rather than "
+                  "required only because the scorer cannot yet tell the two calls apart; it becomes "
+                  "required when it can. The previous universal >=20% cutoff was not supported by "
+                  "the cited guidelines: the cases describe a 10% TUG improvement as a commonly used "
+                  "threshold, not a guideline cut-off, and interpret absolute and concordant "
+                  "changes. NPH-P08 keeps a single tap with no objective improvement and then "
+                  "proceeds to extended lumbar drainage, which improves gait, because one negative "
+                  "tap does not exclude a shunt response."),
     dict(cond="nph", filed="order_advanced_imaging", tool="order_advanced_imaging",
          reviewer=1, tier="remove", status="applied",
-         response="Applied: advanced imaging is absent from the NPH panel, all 30 case policies, "
-                  "and the callable case follow-ups (60 PET, flow-MRI, DaTscan and other "
-                  "advanced-imaging payloads removed). The previous implementation had merely "
-                  "relabelled PET as optional, which did not implement a request to remove it."),
+         response="Applied: advanced imaging is absent from the NPH panel and from all 30 case "
+                  "policies, and is avoided as waste in all 30 (60 PET, flow-MRI, DaTscan and other "
+                  "advanced-imaging payloads removed). Five reports are authored back in four "
+                  "copathology cases (DaTscan in NPH-M05 and P02, amyloid and FDG PET in P01, FDG "
+                  "PET in P04), only so that an agent who orders one anyway receives the patient's "
+                  "real result instead of a contradicting normal; ordering them still counts as "
+                  "waste. The previous implementation had merely relabelled PET as optional, which "
+                  "did not implement a request to remove it."),
 
     # === temporal lobe epilepsy (reviewer 1) ===
     dict(cond="focal_epilepsy_temporal", filed="analyze_eeg", tool="analyze_eeg",
