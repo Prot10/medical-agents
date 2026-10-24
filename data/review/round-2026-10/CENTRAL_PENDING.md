@@ -12,10 +12,16 @@ lands.
 - Scorer: C71 codes the site, not the entity, so "glioblastoma, C71.1" still scores in an
   IDH-mutant astrocytoma through the code. Needs a per-case label requirement or ICD-O-3
   morphology codes; same root as the ICD-code-alone item above. (GLIO-HG, 24 Oct)
-- MockServer: a case's fallback is returned for any `test_type` or modality, so generic case
-  fallbacks answer studies they do not describe (GLIO-HG nulled them; check other conditions).
-- `case_io.py check` reports "1 error" when torch is missing (test_grpo_rollout.py fails to
-  collect); make it ignore that file.
+- MockServer: a case fallback now answers only its own study when it names it with a vocabulary
+  term (24 Oct). Fallbacks with an empty or prose discriminator still answer every variant:
+  `order_advanced_imaging` 102 empty and about 80 prose (`MRI`, `FDG-PET scan`,
+  `advanced imaging (off-pathway)`), `order_specialized_test` 116 empty. Write the term.
+- MockServer: prose `test_type` follow-ups in a tool with no initial output are served for any
+  test type (MG-RS15's `Neostigmine challenge` answers an `emg_ncs` or audiometry order). Write
+  the vocabulary term in stored `test_type`.
+- Schema: `EEGReport` has no `eeg_type`, so a follow-up trigger that repeats the index study's
+  term (`request_continuous_eeg_monitoring` with a `continuous_icu` index) can still capture the
+  index order. The SE generator must not emit such triggers, or add `eeg_type` as for echo.
 - Scorer: negation matching, so "non-aneurysmal SAH" does not score in an aneurysmal case (and
   in general "non-X" / "not X" answers do not match X). (SAH, 24 Oct)
 - Library: imaging variants a case does not store (e.g. CT perfusion) get normal defaults that may
@@ -38,6 +44,21 @@ lands.
   have no CMS rate and are estimates (botulinum_toxin_assay, open_biopsy,
   DNA_methylation_profiling, and one more marked in costs.yaml). Check them against the 2024 MPFS
   / CLFS before any cost result is reported.
+- Batch 3 (24 Oct, recalled): plasma_cholinesterase 9 (82480), RBC_cholinesterase 18 (82482),
+  NSE 23 (86316), toxoplasma_IgG 18 (86777), urine_sodium 7 (84300), CSF toxoplasma_PCR and
+  EBV_PCR 184 (87798), device_interrogation 51 (93288); genetic_panel:hemiplegic_migraine 1104
+  is an estimate (81479, unlisted).
+
+## Batch-3 cases waiting on data (terms and routing landed 24 Oct)
+- SE: P05 plasma_cholinesterase + RBC_cholinesterase; M08 toxoplasma_PCR, EBV_PCR (CSF),
+  toxoplasma_IgG; M04 urine_sodium; NSE for P03 only if re-timed to 72 h.
+- VASC-DEM-P08: stored `monitor_type` "pacemaker interrogation, stored device diagnostics" should
+  be `device_interrogation` (until then a device_interrogation order gets the library normal).
+- MIG-AURA: genetic_panel:hemiplegic_migraine (M03, RM11, RS11, P09). P07's separate short
+  follow-up is no longer needed: a Holter order cannot receive the loop-recorder AF.
+- Stored monitoring reports with a prose `monitor_type` (routed on `duration_hours` only): GBS 30
+  cases ("Continuous telemetry"), NPH-S10 (empty), SYNC-CARD P03 ("Continuous telemetry" under
+  `request_holter`), P04, RP04 ("event_monitor").
 
 ## Close-out recipe per batch (what batches 1 and 2 did)
 1. Workflow `bin/round-v2.js` (plan, fix, verify, audit; args `[{cond, cases}]`). 2. One close-out agent per condition

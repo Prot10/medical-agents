@@ -25,6 +25,27 @@ Matching, in words:
   * Among specific candidates, pick the highest token overlap; ties broken by
     (a) preferring a trigger not yet served this session so distinct re-orders
     escalate through distinct follow-ups, then (b) declaration order.
+  * The called tool's own enum terms (``continuous_icu``, ``lumbar_puncture``) are
+    study identities, and their tokens count only for the term the call names
+    (October 2026 review, SE CENTRAL 4):
+      - a token of a term the call does NOT name never counts. Free text naming
+        another study of the same tool ("routine and sleep-deprived EEGs were
+        non-diagnostic" on an ambulatory order) no longer routes the call to that
+        study's follow-up;
+      - a token of a term the call names only through the schema default (a CSF
+        order without ``source`` is a lumbar puncture) counts only when the
+        trigger names the whole term, so ``request_extended_lumbar_drainage`` does
+        not answer a tap test on "lumbar";
+      - a token of a term the call names explicitly counts, unless the stored
+        initial output already IS that study (its own discriminator field says so):
+        then only a trigger naming the whole term overrides it. That is the SE
+        defect, ``request_continuous_eeg_monitoring`` capturing the index
+        ``continuous_icu`` order. EEG reports carry no ``eeg_type`` yet, so for
+        EEG this last clause cannot fire and the trigger wording is the guard.
+  * ``accepts`` (the MockServer's "does this stored report describe the study
+    ordered") filters candidates BEFORE the choice. Choosing first and checking
+    after let a sibling that loses the check win a tie, and the call fell to the
+    library while the right follow-up sat in the case (SE-M05).
 
 Precedence (see ``resolve_followup``) — a specific re-order OVERRIDES the stale
 initial output, but a bare first call to a tool still returns its INITIAL output.
@@ -33,7 +54,7 @@ initial output, but a bare first call to a tool still returns its INITIAL output
 from __future__ import annotations
 
 import re
-from typing import Any, Sequence
+from typing import Any, Callable, Sequence
 
 # A follow-up's ``.output`` is a Pydantic model; we only touch ``.tool_name`` and
 # ``.trigger_action`` here, so type it structurally to avoid a schema import cycle.
@@ -149,12 +170,76 @@ def _tok_match(a: str, b: str) -> bool:
     return a == b or (len(a) >= 4 and len(b) >= 4 and (a.startswith(b) or b.startswith(a)))
 
 
-def _trigger_has_meaningful_tokens(trigger_action: str, tool_name: str) -> bool:
-    """True when the trigger names a *specific* study (not a pure ``re-run this tool``)."""
+def _distinctive(tokens: set[str], own: set[str]) -> set[str]:
+    return {t for t in tokens if t not in _GENERIC and not any(_tok_match(t, o) for o in own)}
+
+
+def _enum_sets(
+    tool_name: str,
+    agent_parameters: dict[str, Any] | None,
+    enum_terms: Sequence[str],
+    implied_terms: Sequence[str] = (),
+    index_terms: Sequence[str] = (),
+) -> tuple[set[str], list[tuple[set[str], bool]]]:
+    """The distinctive tokens of the tool's enum terms, and the terms this call names.
+
+    A term's distinctive tokens are the ones that are neither generic nor the tool's own name
+    (`amyloid_PET` -> {amyloid}; `continuous_icu` -> {continuous, icu}). A term is *called*
+    when a scalar parameter value of this call is that term, or when it is the default of a
+    parameter the call leaves out (`implied_terms`). Each called term comes with whether a
+    partial trigger may still count for it: only when the call names it explicitly and the
+    stored initial output is not already that study (`index_terms`).
+    """
     own = _tokenize(tool_name)
-    ttoks = _trigger_tokens(trigger_action)
+    values = {
+        str(v).strip().lower() for v in (agent_parameters or {}).values()
+        if isinstance(v, str)
+    }
+    implied = {t.strip().lower() for t in implied_terms}
+    index = {t.strip().lower() for t in index_terms}
+    every: set[str] = set()
+    called: list[tuple[set[str], bool]] = []
+    for term in enum_terms:
+        tokens = _distinctive({t for t in _SPLIT.split(term.lower()) if t and t not in _STOP}, own)
+        if not tokens:
+            continue
+        every |= tokens
+        key = term.strip().lower()
+        if key in values:
+            called.append((tokens, key not in index))
+        elif key in implied:
+            called.append((tokens, False))
+    return every, called
+
+
+def _counts(
+    token: str, ttoks: set[str], enum_tokens: set[str], called: list[tuple[set[str], bool]]
+) -> bool:
+    """Whether a matched trigger token may count (see the module docstring)."""
+    if not any(_tok_match(token, e) for e in enum_tokens):
+        return True
     return any(
-        t not in _GENERIC and not any(_tok_match(t, o) for o in own) for t in ttoks
+        any(_tok_match(token, e) for e in term)
+        and (partial_ok or all(any(_tok_match(e, t) for t in ttoks) for e in term))
+        for term, partial_ok in called
+    )
+
+
+def _trigger_has_meaningful_tokens(
+    trigger_action: str,
+    tool_name: str,
+    called_terms: Sequence[set[str]] = (),
+) -> bool:
+    """True when the trigger names a *specific* study (not a pure ``re-run this tool``).
+
+    Tokens of the enum term the call names do not make the trigger specific for that call:
+    `request_continuous_eeg_monitoring` is a plain re-order of an `eeg_type: continuous_icu`
+    recording, so it escalates past the index study on the repeat call.
+    """
+    own = _tokenize(tool_name)
+    ttoks = _distinctive(_trigger_tokens(trigger_action), own)
+    return any(
+        not any(any(_tok_match(t, e) for e in term) for term in called_terms) for t in ttoks
     )
 
 
@@ -163,6 +248,11 @@ def match_followup(
     agent_parameters: dict[str, Any] | None,
     followups: Sequence[Any],
     served_trigger_actions: set[str] | frozenset[str] = frozenset(),
+    *,
+    enum_terms: Sequence[str] = (),
+    implied_terms: Sequence[str] = (),
+    index_terms: Sequence[str] = (),
+    accepts: Callable[[Any], bool] | None = None,
 ) -> Any | None:
     """Return the best specific-re-order follow-up for this call, or ``None``.
 
@@ -178,20 +268,25 @@ def match_followup(
     """
     ctoks = _call_tokens(tool_name, agent_parameters)
     own = _tokenize(tool_name)
+    enum_tokens, called = _enum_sets(
+        tool_name, agent_parameters, enum_terms, implied_terms, index_terms
+    )
     best_key: tuple | None = None
     best_fu: Any | None = None
 
     for idx, fu in enumerate(followups):
         if fu.tool_name != tool_name:
             continue
+        if accepts is not None and not accepts(fu):
+            continue
         ttoks = _trigger_tokens(fu.trigger_action)
         if not ttoks:
             continue
-        matched = {t for t in ttoks if any(_tok_match(t, c) for c in ctoks)}
-        meaningful = {
-            t for t in matched
-            if t not in _GENERIC and not any(_tok_match(t, o) for o in own)
+        matched = {
+            t for t in ttoks
+            if any(_tok_match(t, c) for c in ctoks) and _counts(t, ttoks, enum_tokens, called)
         }
+        meaningful = _distinctive(matched, own)
         if not meaningful:
             continue
         jaccard = len(matched) / len(ttoks | ctoks) if (ttoks | ctoks) else 0.0
@@ -216,6 +311,10 @@ def resolve_followup(
     *,
     has_initial_output: bool,
     is_repeat_call: bool,
+    enum_terms: Sequence[str] = (),
+    implied_terms: Sequence[str] = (),
+    index_terms: Sequence[str] = (),
+    accepts: Callable[[Any], bool] | None = None,
 ) -> Any | None:
     """Resolve which follow-up (if any) to serve, honouring the precedence rule.
 
@@ -237,10 +336,21 @@ def resolve_followup(
          first call to a tool that has one) or falls through to the off-pathway
          fallback tier.
 
+    Tiers 1 and 3 consider only the follow-ups ``accepts`` (when given), so a candidate
+    that does not describe the study ordered never shadows one that does. Tier 2 does
+    not: its pick is not evidence that the follow-up answers this call, and skipping a
+    refused report there would hand the call the next stored report of any study (an
+    audiometry order receiving the case's autonomic testing), so a refused tier-2 pick
+    is left for the caller to refuse.
+
     Pure: never mutates ``served_trigger_actions``; the caller records the served
     trigger after this returns.
     """
-    specific = match_followup(tool_name, agent_parameters, followups, served_trigger_actions)
+    specific = match_followup(
+        tool_name, agent_parameters, followups, served_trigger_actions,
+        enum_terms=enum_terms, implied_terms=implied_terms, index_terms=index_terms,
+        accepts=accepts,
+    )
     if specific is not None:
         return specific
 
@@ -254,9 +364,13 @@ def resolve_followup(
         return (unserved or candidates)[0]
 
     if is_repeat_call:
+        _, called = _enum_sets(tool_name, agent_parameters, enum_terms, implied_terms)
         plain = [
             fu for fu in candidates
-            if not _trigger_has_meaningful_tokens(fu.trigger_action, tool_name)
+            if (accepts is None or accepts(fu))
+            and not _trigger_has_meaningful_tokens(
+                fu.trigger_action, tool_name, [term for term, _ in called]
+            )
         ]
         if plain:
             unserved = [fu for fu in plain if fu.trigger_action not in served_trigger_actions]

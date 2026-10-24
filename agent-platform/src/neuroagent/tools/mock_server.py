@@ -13,9 +13,13 @@ from .vocabulary import (
     advanced_imaging_modalities,
     assessment_types,
     body_imaging_studies,
+    by_type_values,
+    csf_sources,
     echocardiogram_types,
+    eeg_types,
     genetic_panels,
     microbiology_specimens,
+    mri_protocols,
     specialized_test_types,
     tissue_procedures,
 )
@@ -58,12 +62,62 @@ class MockServer:
         ),
         "obtain_tissue_diagnosis": ("procedure", tissue_procedures),
         "perform_clinical_assessment": ("assessment_type", assessment_types),
+        # Added on the October 2026 review. The monitors were once left out as "variants of one
+        # question", but a recording's duration decides what it can capture: a 24-hour Holter
+        # order received the case's 30-day monitor or 12 months of pacemaker diagnostics, and
+        # with them the paroxysmal AF the short recording was meant to miss (VASC-DEM M04, P08,
+        # P09, S07, S09; MIG-AURA-P07 needed a separate follow-up to work around it).
+        "order_cardiac_monitoring": (
+            "monitor_type", lambda packs=(): by_type_values("order_cardiac_monitoring", packs=packs)
+        ),
     }
-    # `order_cardiac_monitoring` is deliberately absent. Its variants differ in duration and
-    # setting, not in the question asked — a 48-hour Holter and a 24-hour one both report the
-    # rhythm — so serving the case's stored recording for a longer monitor is a fair simulation.
-    # The guard is for tools whose variants answer *different* questions: a different specimen,
-    # region, tracer or procedure.
+
+    # Every scalar enum a tool advertises, for the follow-up matcher: a trigger token that
+    # belongs to one of the called tool's own terms identifies a study only with its whole
+    # term (followup_matcher.match_followup). Lab panels, CSF assays and molecular assays are
+    # assay lists, not study names, and are left to the set-valued rule below.
+    _ENUM_TERMS: dict[str, Any] = {
+        "analyze_eeg": eeg_types,
+        "analyze_brain_mri": mri_protocols,
+        "analyze_csf": csf_sources,
+    }
+
+    # The schema default of each scalar enum (the tool classes' `parameter_schema`; pinned by
+    # tests/test_followup_enum_tokens.py): a call that leaves the parameter out names that term.
+    _ENUM_DEFAULTS: dict[str, tuple[str, str]] = {
+        "analyze_eeg": ("eeg_type", "routine"),
+        "analyze_csf": ("source", "lumbar_puncture"),
+        "order_echocardiogram": ("echo_type", "TTE"),
+        "order_cardiac_monitoring": ("monitor_type", "holter_24h"),
+    }
+
+    def _implied_terms(self, tool_name: str, parameters: dict[str, Any]) -> list[str]:
+        spec = self._ENUM_DEFAULTS.get(tool_name)
+        return [spec[1]] if spec is not None and parameters.get(spec[0]) is None else []
+
+    def _index_terms(self, tool_name: str, parameters: dict[str, Any], initial: Any) -> list[str]:
+        """The called term, when the stored initial output positively is that study."""
+        spec = self._DISCRIMINATOR.get(tool_name)
+        if spec is None or initial is None or parameters.get(spec[0]) is None:
+            return []
+        got = getattr(initial, spec[0], None) if isinstance(initial, BaseModel) else None
+        wanted = parameters[spec[0]]
+        return [str(wanted)] if got and self._fold(got) == self._fold(wanted) else []
+
+    def _enum_terms(self, tool_name: str) -> list[str]:
+        spec = self._DISCRIMINATOR.get(tool_name)
+        source = spec[1] if spec is not None else self._ENUM_TERMS.get(tool_name)
+        return list(source(packs=self.packs)) if source is not None else []
+
+    # Monitoring tiers (ESC 2018 syncope, AHA/ASA 2021 cryptogenic stroke): hours to a week
+    # (telemetry, Holter), weeks (external event monitors), months (loop recorder). The upper
+    # bound in hours of each tier, and the tier of each ordered monitor (`_monitor_answers`).
+    _MONITOR_TIER_HOURS: tuple[int, ...] = (7 * 24, 31 * 24)
+    _MONITOR_TIER: dict[str, int] = {
+        "telemetry": 0, "holter_24h": 0, "holter_48h": 0,
+        "event_monitor_14d": 1, "event_monitor_30d": 1,
+        "implantable_loop_recorder": 2,
+    }
 
     @staticmethod
     def _fold(value: Any) -> frozenset[str]:
@@ -101,12 +155,42 @@ class MockServer:
         if tool_name == "order_body_imaging":
             return self._body_study_matches(str(wanted), output)
         got = getattr(output, call_key, None) if isinstance(output, BaseModel) else None
-        if got in (None, ""):
-            return True
-        folded = self._fold(got)
-        if folded not in {self._fold(term) for term in vocabulary(packs=self.packs)}:
-            return True  # the report names the study in prose; not ours to adjudicate
-        return folded == self._fold(wanted)
+        folded = self._fold(got) if got not in (None, "") else frozenset()
+        if tool_name == "order_cardiac_monitoring":
+            return self._monitor_answers(str(wanted), got, output)
+        if folded and folded in {self._fold(term) for term in vocabulary(packs=self.packs)}:
+            return folded == self._fold(wanted)
+        return True  # the report names the study in prose; not ours to adjudicate
+
+    def _monitor_answers(self, wanted: str, got: Any, output: Any) -> bool:
+        """A stored rhythm recording answers an order for a monitor of its tier or a longer one.
+
+        The leak runs one way: a 30-day monitor, a loop recorder or a pacemaker's stored
+        diagnostics served for a Holter hands over the paroxysmal AF the short recording was
+        meant to miss. The other way is a fair simulation (what a Holter found, a 30-day monitor
+        would have found), and refusing it would answer the longer order with a normal library
+        report that contradicts the case. Within a tier (a 48-hour Holter for a 24-hour order,
+        72 hours of telemetry for a Holter) the yield is the same question and is served. A
+        device interrogation is not a recording made for the order, so it answers, and is
+        answered by, only its own type. A report's tier is read from its `duration_hours`, else
+        from its `monitor_type`.
+        """
+        got_term = next(
+            (term for term in by_type_values("order_cardiac_monitoring", packs=self.packs)
+             if got and self._fold(term) == self._fold(got)),
+            None,
+        )
+        if "device_interrogation" in (wanted, got_term):
+            return got_term == wanted
+        ordered = self._MONITOR_TIER.get(wanted)
+        hours = getattr(output, "duration_hours", 0) or 0
+        if hours:
+            stored = sum(hours > bound for bound in self._MONITOR_TIER_HOURS)
+        else:
+            stored = self._MONITOR_TIER.get(got_term or "")
+        if ordered is None or stored is None:
+            return True  # nothing to compare: not ours to adjudicate
+        return stored <= ordered
 
     _BODY_MODALITIES = frozenset({"ct", "cta", "mri", "ultrasound", "xray", "duplex"})
 
@@ -243,11 +327,19 @@ class MockServer:
         # same case. The discriminator is not a heuristic, so it goes first.
         followup = self._match_by_discriminator(tool_name, parameters)
         if followup is None:
+            # Candidates that do not describe the study ordered are dropped before the choice,
+            # not after it: SE-M05's pelvic ultrasound order tied between its MRI and ultrasound
+            # follow-ups, took the MRI by declaration order, had it refused on modality, and fell
+            # to the library normal while the case's ultrasound sat unserved.
             followup = resolve_followup(
                 tool_name, parameters, self.case.followup_outputs,
                 self._served_triggers,
                 has_initial_output=initial is not None,
                 is_repeat_call=is_repeat_call,
+                enum_terms=self._enum_terms(tool_name),
+                implied_terms=self._implied_terms(tool_name, parameters),
+                index_terms=self._index_terms(tool_name, parameters, initial),
+                accepts=lambda fu: self._answers_the_question(tool_name, parameters, fu.output),
             )
             # A set-valued order names several assays, and the trigger matcher can capture it on a
             # single shared token. When the initial output names more of what was ordered, it is the
@@ -278,10 +370,15 @@ class MockServer:
             )
 
         # Off-pathway fallback: a clinically coherent normal / non-contributory result for a
-        # tool that is not on this case's diagnostic pathway. The discriminator guard does NOT
-        # apply here — a fallback makes no claim about which study was run, it says the study
-        # did not contribute, so it answers any variant of the tool.
+        # tool that is not on this case's diagnostic pathway. The discriminator guard applies
+        # only where the fallback names its study with a vocabulary term: a fallback written as
+        # an `amino_acid_PET` report is that study, and served for an `FDG_PET` order it
+        # answered one question with another study's report (GLIO-HG; NMDAR-ENC CENTRAL 4). A
+        # fallback that names no study, or names it in prose, still answers any variant, which
+        # the library tier below would otherwise do with a less patient-specific report.
         output = self._match_fallback_output(tool_name, parameters)
+        if output is not None and not self._answers_the_question(tool_name, parameters, output):
+            output = None
         if output is not None:
             return ToolResult(
                 tool_name=tool_name, success=True, from_fallback=True,

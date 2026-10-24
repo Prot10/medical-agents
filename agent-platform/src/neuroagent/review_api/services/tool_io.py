@@ -114,6 +114,9 @@ _ANALYTE_SYNONYMS: dict[str, str] = {
     "complement_c3/c4": "complement",
     "smear": "peripheral smear",
     "blood_cultures_x3": "blood_cultures",
+    # October 2026 review (VASC-DEM): 140 case actions said `B12`, 62 `vitamin_B12`, priced as
+    # two rows that did not compare equal. One assay; the named spelling is advertised.
+    "b12": "vitamin_B12",
 }
 
 
@@ -333,7 +336,9 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
                     "'event_monitor_14d'/'event_monitor_30d': patient-activated, captures "
                     "infrequent events. 'implantable_loop_recorder': months to years of "
                     "monitoring (cryptogenic stroke, unexplained syncope). "
-                    "'telemetry': inpatient continuous monitoring."
+                    "'telemetry': inpatient continuous monitoring. 'device_interrogation': "
+                    "the stored rhythm diagnostics of a pacemaker, ICD or loop recorder already "
+                    "implanted (atrial high-rate episodes, AF burden)."
                 ),
                 "default": "holter_24h",
             },

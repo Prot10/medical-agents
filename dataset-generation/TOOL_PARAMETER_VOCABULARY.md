@@ -49,7 +49,18 @@ mycobacterial culture), `fungal_culture`, `india_ink` and `ADA` to `special_test
 laboratory panels (serum CrAg stays apart from the CSF `cryptococcal_antigen`: one specimen, one
 tool). Its batch-2 conditions added `CMV_PCR` to `special_tests`, and `anti_GQ1b_IgG`,
 `anti_GT1a_IgG` (two terms, not a ganglioside panel, which would price `anti-GM1 IgM` again),
-`botulinum_toxin_assay` and `plasma_free_metanephrines` to the laboratory panels.
+`botulinum_toxin_assay` and `plasma_free_metanephrines` to the laboratory panels. Its batch-3
+conditions added `toxoplasma_PCR` and `EBV_PCR` to `special_tests`, and `plasma_cholinesterase`
+and `RBC_cholinesterase` (two assays, read differently in organophosphate poisoning), `NSE`
+(post-arrest prognosis at 48 and 72 hours), `toxoplasma_IgG` and `urine_sodium` to the laboratory
+panels. `B12` and `vitamin_B12` are one assay: `vitamin_B12` is advertised and `B12` resolves to
+it through `_ANALYTE_SYNONYMS`.
+
+`order_cardiac_monitoring.monitor_type` is `telemetry`, `holter_24h`, `holter_48h`,
+`event_monitor_14d`, `event_monitor_30d`, `implantable_loop_recorder` or `device_interrogation`
+(the stored diagnostics of a pacemaker, ICD or loop recorder already implanted; added on the
+October 2026 review, VASC-DEM-P08). A stored monitoring report must carry its `monitor_type` as
+one of these terms: the MockServer routes on it (see `docs/benchmark/tool-contract.md`).
 
 A policy pattern's `required_arguments` is the minimum executable subset needed to match a
 call. A missing optional runtime argument is expected; an unknown key is not.
@@ -105,6 +116,7 @@ call. A missing optional runtime argument is expected; an unknown key is not.
 | `small_fiber_neuropathy` | Hereditary small-fibre neuropathy | SCN9A, SCN10A, SCN11A |
 | `PD` | Young-onset / monogenic Parkinson's | PRKN, PINK1, DJ-1, LRRK2, GBA, SNCA |
 | `hereditary_paraganglioma` | Hereditary paraganglioma-phaeochromocytoma | SDHA/B/C/D, SDHAF2, VHL, RET, NF1, TMEM127, MAX, FH |
+| `hemiplegic_migraine` | Familial and sporadic hemiplegic migraine | CACNA1A, ATP1A2, SCN1A, PRRT2 |
 
 ---
 

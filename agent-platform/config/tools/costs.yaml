@@ -48,6 +48,10 @@ tools:
       thyroid: 28
       TSH: 23
       lipid: 18
+      # One assay under two spellings: `vitamin_B12` is the advertised name and `B12` resolves to
+      # it through vocabulary._ANALYTE_SYNONYMS (October 2026 review, VASC-DEM), so ground truth
+      # naming either is satisfied by an agent naming the other. Both rows stay so every case's
+      # spelling is still priced; one assay, one price (CPT 82607).
       B12: 18
       vitamin_B12: 18
       folate: 14
@@ -273,6 +277,24 @@ tools:
       # catecholamine-secreting paraganglioma before any anaesthesia (October 2026 review,
       # GLIO-HG-RS01). CPT 83835.
       plasma_free_metanephrines: 22
+      # Requested by the October 2026 case review of status epilepticus (SE-P05, organophosphate
+      # poisoning with electrographic status): the stored labs report plasma and RBC cholinesterase
+      # activities that no assay could order. Two terms, because they are two assays read
+      # differently: plasma (butyryl) cholinesterase falls first and recovers in weeks, RBC
+      # acetylcholinesterase mirrors synaptic inhibition [Eddleston_2008]. CPT 82480 and 82482.
+      plasma_cholinesterase: 9
+      RBC_cholinesterase: 18
+      # Serum neuron-specific enolase at 48 and 72 hours, the biomarker of the ERC-ESICM 2021
+      # multimodal prognosis after cardiac arrest (October 2026 review, SE-P03 and SE-M07 name it
+      # in their prognostication plan). CPT 86316.
+      NSE: 23
+      # Toxoplasma gondii IgG, the serostatus that makes toxoplasmic encephalitis likely in
+      # advanced HIV (October 2026 review, SE-M08). CPT 86777. IgM is not added: reactivation is
+      # IgM-negative and the opportunistic-infection guideline does not use it.
+      toxoplasma_IgG: 18
+      # Spot urine sodium, with serum and urine osmolality the SIADH work-up of hyponatraemia
+      # (October 2026 review, SE-M04 [Spasovski_2014]). CPT 84300, priced as serum sodium.
+      urine_sodium: 7
     default_panel: 23
 
   analyze_csf:
@@ -321,6 +343,12 @@ tools:
       # (GBS-P02: CMV polyradiculitis in advanced HIV; RM16, RP15 and RS18 stored a CMV PCR
       # result that no order could name). CPT 87496, priced as HSV_PCR.
       CMV_PCR: 184
+      # CSF Toxoplasma gondii and Epstein-Barr virus PCR, which separate toxoplasmic
+      # encephalitis from primary CNS lymphoma in a ring-enhancing lesion in advanced HIV
+      # (October 2026 review, SE-M08; NIH/CDC/IDSA opportunistic-infection guideline). CPT 87798
+      # each (single-target amplified probe), priced as HSV_PCR.
+      toxoplasma_PCR: 184
+      EBV_PCR: 184
     # Where the CSF comes from. Billing does not change (`base` prices the sampling with the
     # basic studies), as for the MRI `protocols` block; the block is the source of the
     # `source` enum. Requested by the October 2026 review (BACT-MEN RS02: a shunt tap could not
@@ -366,6 +394,13 @@ tools:
       # no honest substitute among the external monitors, so it gets its own row rather
       # than being mis-mapped onto a 30-day event monitor.
       implantable_loop_recorder: 4600
+      # Interrogation of an implanted pacemaker, ICD or loop recorder: the stored diagnostics
+      # (atrial high-rate episodes, AF burden, ventricular episodes) since the last check.
+      # Requested by the October 2026 review of vascular dementia (VASC-DEM-P08: a dual-chamber
+      # pacemaker's 12 months of atrial data was coded as an implantable loop recorder, so the
+      # study priced 4600 for a device already in place). CPT 93288 (in-person interrogation
+      # evaluation, pacemaker).
+      device_interrogation: 51
 
   order_advanced_imaging:
     # Closed vocab defined in dataset-generation/TOOL_PARAMETER_VOCABULARY.md
@@ -486,6 +521,11 @@ tools:
       # review (GLIO-HG-RS01: a jugular foramen paraganglioma in a patient with a paraganglioma,
       # a phaeochromocytoma and two affected relatives had no germline test to order).
       hereditary_paraganglioma: 1380
+      # CACNA1A, ATP1A2, SCN1A and PRRT2, the familial and sporadic hemiplegic migraine genes
+      # (ICHD-3 1.2.3.1). Requested by the October 2026 review of migraine with aura (MIG-AURA
+      # M03, RM11, RS11, P09), where the test could only be written as a referral. CPT 81479
+      # (unlisted) for a four-gene panel; reference estimate, priced as the CADASIL panel.
+      hemiplegic_migraine: 1104
 
   # --- Tools added after the July 2026 clinical tool review -------------------------------
   # The reviewers' structural finding: the action space could only image the brain and could

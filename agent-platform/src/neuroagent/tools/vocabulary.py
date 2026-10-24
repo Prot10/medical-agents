@@ -121,6 +121,9 @@ _ANALYTE_SYNONYMS: dict[str, str] = {
     "complement_c3/c4": "complement",
     "smear": "peripheral smear",
     "blood_cultures_x3": "blood_cultures",
+    # October 2026 review (VASC-DEM): 140 case actions said `B12`, 62 `vitamin_B12`, priced as
+    # two rows that did not compare equal. One assay; the named spelling is advertised.
+    "b12": "vitamin_B12",
 }
 
 

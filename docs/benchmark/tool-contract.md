@@ -34,7 +34,7 @@ list, which reported legal values as illegal:
 | Tool | Parameter | Values |
 | --- | --- | --- |
 | `order_advanced_imaging` | `modality` | 21 (`amyloid_PET`, `tau_PET`, `FDG_PET`, `perfusion_SPECT`, `amino_acid_PET`, `cardiac_FDG_PET`, `DaTscan`, `MIBG_scan`, `perfusion_MRI`, `CT_perfusion`, `cardiac_MRI`, `coronary_CTA`, `coronary_angiography`, `cerebral_angiography`, `MR_spectroscopy`, `MR_angiography`, `MR_venography`, `carotid_duplex`, `transcranial_doppler`, `functional_MRI`, `DTI_tractography`) |
-| `order_specialized_test` | `test_type` | 21, plus `genetic_panel:<panel>` for 16 panels |
+| `order_specialized_test` | `test_type` | 21, plus `genetic_panel:<panel>` for 17 panels |
 | `order_body_imaging` | `study` | 16 (`<region>_<modality>` over pelvis/abdomen, testis, chest, chest-abdomen-pelvis, mediastinum, spine, peripheral nerve, leg veins, temporal arteries) |
 | `order_microbiology` | `specimen` | 9 |
 | `obtain_tissue_diagnosis` | `procedure` | 5 (`resection`, `stereotactic_biopsy`, `open_biopsy`, `lymph_node_biopsy`, `temporal_artery_biopsy`), plus 21 molecular assays |
@@ -74,6 +74,40 @@ test is appropriate" whenever a case lacked a fallback, in 104 of 105 tool × va
 some cases). Library answers carry `from_fallback` and `library` on the observation. The library is
 `status: draft` until physicians have reviewed it; `tests/test_fallback_library.py` proves every
 legal order is answered in every case.
+
+### Which stored report answers an order
+
+The MockServer (`tools/mock_server.py`, with `tools/followup_matcher.py`) never answers one study
+with another study's report. Where a stored report names its study with a vocabulary term (the
+discriminator field: `specimen`, `modality`, `echo_type`, `test_type`, `procedure`,
+`assessment_type`, `monitor_type`; region and modality for `order_body_imaging`), it answers only
+an order for that study. This holds for initial outputs, follow-ups and, since the October 2026
+review, the case's own `fallback_tool_outputs`: a case fallback written as an `amino_acid_PET`
+report is not served for an `FDG_PET` order, which gets the library normal. A report that names
+its study in prose, or not at all, is not adjudicated and answers any variant, so case authors
+should write the term.
+
+- Follow-ups that do not describe the study ordered are dropped *before* the trigger matcher
+  chooses among siblings (SE-M05: the MRI follow-up won a tie against the ultrasound one and was
+  then refused, leaving the ultrasound order to the library).
+- The tool's own enum terms (`continuous_icu`, `lumbar_puncture`, `pelvis_abdomen_MRI`) route as
+  study identities. A trigger token belonging to a term the call does not name never counts, so
+  free text recalling another study of the same tool does not route to it; a term the call
+  implies through the schema default counts only when the trigger names it whole; a term named
+  explicitly counts unless the initial output already is that study. EEG reports carry no
+  `eeg_type`, so for EEG a follow-up trigger must not repeat the index study's term
+  (`request_continuous_eeg_monitoring` when the index recording is `continuous_icu`).
+- `order_cardiac_monitoring` routes by tier: hours to a week (telemetry, Holter), weeks (event
+  monitors), months (loop recorder). A stored recording answers an order of its own tier or a
+  longer one, never a shorter one: a Holter order is not answered by a 30-day monitor or a loop
+  recorder, whose paroxysmal AF the short recording might miss. The tier is read from
+  `duration_hours`, else from `monitor_type`. `device_interrogation` answers, and is answered by,
+  only its own type.
+
+A library normal answers a study the case does not store, and for an alternative study on the
+case's own pathway it can contradict the case (a normal FDG-PET where the case stores an abnormal
+amyloid PET). A criterion alternative should therefore be a study the case stores; the monitoring
+tiers above are the one place where the MockServer bridges the gap itself.
 
 ### Recorded cases: "not available"
 
