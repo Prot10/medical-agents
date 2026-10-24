@@ -4,14 +4,7 @@
   "difficulty": "diagnostic_puzzle",
   "encounter_type": "outpatient",
   "fallback_tool_outputs": {
-    "advanced_imaging": {
-      "findings": [],
-      "impression": "No acute or structural abnormality identified",
-      "modality": "MRA",
-      "quantitative_data": null,
-      "recommended_actions": [],
-      "tracer_or_protocol": null
-    },
+    "advanced_imaging": null,
     "cardiac_monitoring": {
       "duration_hours": 24,
       "events": [],
@@ -81,93 +74,54 @@
   "followup_outputs": [
     {
       "output": {
-        "query": "",
-        "results": [],
-        "summary": ""
+        "findings": [
+          {
+            "interpretation": "Saccular aneurysm",
+            "region": "Left middle cerebral artery bifurcation (M1/M2)",
+            "signal": "4 mm saccular outpouching, neck 3 mm, dome projecting laterally; smooth wall, no daughter sac"
+          },
+          {
+            "interpretation": "No other aneurysm, stenosis or vascular malformation",
+            "region": "Remaining circle of Willis and intracranial arteries",
+            "signal": "Normal calibre and flow signal; complete circle of Willis"
+          }
+        ],
+        "impression": "1. 4 mm unruptured saccular aneurysm at the left MCA bifurcation, regular wall, no daughter sac. 2. No other intracranial aneurysm or vascular abnormality.",
+        "modality": "MR_angiography",
+        "quantitative_data": {
+          "aneurysm size": "4 mm",
+          "dome-to-neck ratio": "1.3",
+          "neck": "3 mm"
+        },
+        "recommended_actions": [],
+        "tracer_or_protocol": "3D time-of-flight intracranial MRA with source-image review"
+      },
+      "tool_name": "order_advanced_imaging",
+      "trigger_action": "request_mr_angiography_aneurysm_screening"
+    },
+    {
+      "output": {
+        "query": "screening and management of unruptured intracranial aneurysm with a family history of aneurysmal subarachnoid haemorrhage",
+        "results": [
+          {
+            "evidence_level": "guideline",
+            "finding": "Screening with CTA or MRA is recommended for people with two or more family members with intracranial aneurysm or SAH. Hypertension should be treated and smoking stopped in patients with an unruptured aneurysm; size, location, growth, age and family history inform the choice between treatment and surveillance.",
+            "source": "Thompson BG, Brown RD Jr, Amin-Hanjani S, et al. Guidelines for the management of patients with unruptured intracranial aneurysms (AHA/ASA). Stroke 2015;46:2368-2400"
+          },
+          {
+            "evidence_level": "pooled cohort analysis",
+            "finding": "Population, hypertension, age, size, earlier SAH from another aneurysm and site predict 5-year rupture risk; middle cerebral artery site and hypertension each add points.",
+            "source": "Greving JP, Wermer MJH, Brown RD Jr, et al. Development of the PHASES score for prediction of risk of rupture of intracranial aneurysms: a pooled analysis of six prospective cohort studies. Lancet Neurol 2014;13:59-66"
+          }
+        ],
+        "summary": "Screening is recommended when two or more relatives have an aneurysm or SAH; management of an unruptured aneurysm weighs rupture predictors, and hypertension and smoking are the modifiable ones."
       },
       "tool_name": "search_medical_literature",
       "trigger_action": "search_familial_intracranial_aneurysm_screening"
-    },
-    {
-      "output": {
-        "query": "",
-        "results": [],
-        "summary": "LITERATURE SEARCH: Hemiplegic Migraine \u2014 Preventive Therapy Options KEY FINDINGS:\n1. PROPRANOLOL IN HEMIPLEGIC MIGRAINE: Beta-blockers have some supportive use in general migraine prevention; verapamil, topiramate, and acetazolamide have more specific evidence for hemiplegic migraine prevention\n2. TRIPTAN USE IN HM: Triptans are cautioned (not absolutely contraindicated by all guidelines) in hemiplegic migraine due to vasoconstrictive mechanism during motor aura\n3. PREVENTIVE OPTIONS AFTER PROPRANOLOL FAILURE: Topiramate (25-100 mg/day) and verapamil are commonly used second-line options in hemiplegic migraine\n4. BLOOD PRESSURE: Hypertension is a well-established modifiable risk factor for both cardiovascular events and intracranial aneurysm rupture; adequate blood pressure management is important in this population Clinical correlation recommended. Topiramate and verapamil are commonly used when propranolol is insufficient for hemiplegic migraine; triptans are cautioned; blood pressure management is important with comorbid vascular considerations"
-      },
-      "tool_name": "search_medical_literature",
-      "trigger_action": "search_hemiplegic_migraine_propranolol_treatment_failure"
-    },
-    {
-      "output": {
-        "alternatives": [
-          "paracetamol 1000 mg",
-          "NSAIDs (meloxicam 7.5-15 mg)",
-          "antiemetics as needed"
-        ],
-        "contraindications": [
-          "Triptans cautioned in hemiplegic migraine (vasoconstrictive mechanism during motor aura)",
-          "Triptans additionally avoided with known unruptured intracranial aneurysm \u2014 theoretical vasoconstriction at aneurysm wall during migraine"
-        ],
-        "formulary_status": "avoid",
-        "interactions": [],
-        "proposed": "triptans in patient with unruptured 4mm MCA aneurysm and hemiplegic migraine",
-        "warnings": [
-          "Avoid triptans in this patient \u2014 both hemiplegic migraine contraindication and precautionary aneurysm avoidance"
-        ]
-      },
-      "tool_name": "check_drug_interactions",
-      "trigger_action": "search_aneurysm_triptan_interaction"
-    },
-    {
-      "output": {
-        "query": "",
-        "results": [],
-        "summary": ""
-      },
-      "tool_name": "search_medical_literature",
-      "trigger_action": "search_bp_control_aneurysm_migraine"
     }
   ],
   "ground_truth": {
     "action_criteria": [
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "query": "ICHD-3 migraine with aura diagnostic criteria SNOOP red flags"
-            },
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[ICHD_3]",
-          "ICHD_3"
-        ],
-        "criterion_id": "action-1-search-medical-literature",
-        "expected_evidence": "ICHD-3 criteria for migraine with aura confirmed; no SNOOP red flag present that mandates further workup",
-        "importance": "required",
-        "label": "Search guideline literature to confirm ICHD-3 1.2 criteria for migraine with aura and exclude SNOOP/CHATS red flags",
-        "rationale": "Search guideline literature to confirm ICHD-3 1.2 criteria for migraine with aura and exclude SNOOP/CHATS red flags"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "context": "hemiplegic_migraine_unruptured_aneurysm_triptan_contraindication"
-            },
-            "tool_name": "check_drug_interactions"
-          }
-        ],
-        "citations": [
-          "[AAN_2000]",
-          "AAN_2000"
-        ],
-        "criterion_id": "action-2-check-drug-interactions",
-        "expected_evidence": "TRIPTANS RELATIVELY CONTRAINDICATED in hemiplegic migraine; avoid triptans/ergotamines in unruptured aneurysm (theoretical vasoconstriction); BP target <130/80; consider beta-blocker or topiramate for prevention",
-        "importance": "required",
-        "label": "Check drug interactions and contraindications for acute (triptan/ergotamine/CGRP antagonist) and prophylactic (beta-blocker, topiramate, valproate, amitriptyline) migraine medications appropriate to this patient",
-        "rationale": "Check drug interactions and contraindications for acute (triptan/ergotamine/CGRP antagonist) and prophylactic (beta-blocker, topiramate, valproate, amitriptyline) migraine medications appropriate to this patient"
-      },
       {
         "alternatives": [
           {
@@ -178,49 +132,119 @@
           }
         ],
         "citations": [
-          "[ICHD_3]",
-          "ICHD-3; NICE CG150 (2025)"
+          "[ICHD_3]"
         ],
         "criterion_id": "action-3-perform-clinical-assessment",
-        "expected_evidence": "Document attack count; reversible aura modalities; gradual spread; succession; 5\u201360 minute duration (motor up to 72 hours); unilateral and positive symptoms; relation to headache; medications; examination and red flags",
+        "expected_evidence": "Five stereotyped attacks of motor then speech aura building over 20-25 min, fully reversible, with headache: sporadic hemiplegic migraine (1.2.3.2); red flags are the motor aura and two relatives with aneurysm",
         "importance": "required",
-        "label": "Take a structured headache/aura history, neurological examination and red-flag review; apply every ICHD-3 1.2 criterion explicitly",
-        "rationale": "Take a structured headache/aura history, neurological examination and red-flag review; apply every ICHD-3 1.2 criterion explicitly"
+        "label": "Take a structured headache and aura history with neurological examination and red-flag review, applying ICHD-3 1.2 and 1.2.3",
+        "rationale": "The history establishes hemiplegic migraine against TIA and identifies the red flags (motor aura, familial aneurysm) that need imaging."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_brain_mri"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "action-4-analyze-brain-mri",
+        "expected_evidence": "Normal brain parenchyma: no infarct, haemorrhage, microbleeds or vascular malformation",
+        "importance": "required",
+        "label": "Brain MRI: motor aura that has never been imaged with MRI",
+        "rationale": "Required: motor aura is a red flag and he has had only a CT; MRI excludes infarct and structural mimics. MRI does not establish migraine."
       },
       {
         "alternatives": [
           {
             "required_arguments": {
-              "contrast": false,
-              "protocol": "stroke"
+              "modality": "MR_angiography"
             },
-            "tool_name": "analyze_brain_mri"
+            "tool_name": "order_advanced_imaging"
           }
         ],
-        "citations": [
-          "[ICHD_3]",
-          "ICHD-3; NICE CG150 (2025)"
-        ],
-        "criterion_id": "action-4-analyze-brain-mri",
-        "expected_evidence": "Identify or exclude infarct, haemorrhage, mass, vascular lesion or another secondary mimic; MRI does not establish routine migraine",
+        "citations": [],
+        "criterion_id": "action-mra",
+        "expected_evidence": "4 mm unruptured saccular left MCA bifurcation aneurysm, regular wall, no other aneurysm",
         "importance": "required",
-        "label": "Obtain brain MRI because imaging answers a specific red-flag question: evaluate motor aura plus a first-degree familial subarachnoid-haemorrhage red flag",
-        "rationale": "Obtain brain MRI because imaging answers a specific red-flag question: evaluate motor aura plus a first-degree familial subarachnoid-haemorrhage red flag"
+        "label": "Intracranial MR angiography: screening for aneurysm with two affected first-degree relatives",
+        "rationale": "Required: his father had an aneurysmal SAH and his sister has an unruptured aneurysm; screening is recommended with two or more affected family members (Thompson BG et al., Stroke 2015)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "drug": "sumatriptan"
+            },
+            "tool_name": "check_drug_interactions"
+          },
+          {
+            "required_arguments": {
+              "drug": "rizatriptan"
+            },
+            "tool_name": "check_drug_interactions"
+          },
+          {
+            "required_arguments": {
+              "drug": "zolmitriptan"
+            },
+            "tool_name": "check_drug_interactions"
+          },
+          {
+            "required_arguments": {
+              "drug": "propranolol"
+            },
+            "tool_name": "check_drug_interactions"
+          },
+          {
+            "required_arguments": {
+              "drug": "verapamil"
+            },
+            "tool_name": "check_drug_interactions"
+          },
+          {
+            "required_arguments": {
+              "drug": "topiramate"
+            },
+            "tool_name": "check_drug_interactions"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "action-2-check-drug-interactions",
+        "expected_evidence": "Triptans and ergots avoided because of the hemiplegic migraine; verapamil not to be combined with propranolol (bradycardia, AV block); rizatriptan limited to 5 mg with propranolol",
+        "importance": "required",
+        "label": "Check acute and preventive migraine drugs against hemiplegic migraine and his propranolol",
+        "rationale": "Required: triptans are avoided in hemiplegic migraine, and the usual next preventive (verapamil) interacts with his propranolol."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "search_medical_literature"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "action-1-search-medical-literature",
+        "expected_evidence": "General evidence on familial aneurysm screening and rupture risk",
+        "importance": "optional",
+        "label": "Optional: literature on familial aneurysm screening and management of unruptured aneurysms",
+        "rationale": "Background evidence only; not a clinical step in the pathway."
       }
     ],
     "assessment": {
       "prohibited_recommendations": [
-        "Do not prescribe triptans or ergotamines",
-        "Do not anticoagulate without specific indication \u2014 increases rupture risk",
-        "Do not co-administer triptans with ergotamines"
+        "Do not prescribe triptans or ergot derivatives in hemiplegic migraine",
+        "Do not start antiplatelet or anticoagulant therapy for presumed TIA: the attacks have the features of migraine aura (motor then speech symptoms spreading over 20-25 minutes, previous identical attacks, headache after each) and imaging shows no infarct",
+        "Do not add verapamil to propranolol"
       ],
       "required_recommendations": [
-        "Brain MRI/MRA required (first hemiplegic migraine, family history of SAH)",
-        "Neurovascular referral for aneurysm risk-benefit (surveillance vs treatment)",
-        "Blood pressure optimisation (<130/80) \u2014 modifiable rupture risk factor",
-        "Avoid triptans and ergotamines in hemiplegic migraine and unruptured aneurysm",
-        "Smoking cessation if applicable",
-        "Counsel on warning signs of SAH (thunderclap headache, sudden severe deficit)"
+        "Confirm sporadic hemiplegic migraine (motor and speech aura with headache, normal MRI) and explain the aneurysm as a separate finding that does not cause the attacks",
+        "Refer to the neurovascular multidisciplinary team for the 4 mm left MCA bifurcation aneurysm to choose between surveillance imaging and treatment, taking into account two affected first-degree relatives, hypertension and the MCA site (PHASES 3) (AHA/ASA 2015)",
+        "Confirm his blood pressure with home or ambulatory readings and treat it to below 130/80 mmHg: hypertension is a modifiable rupture risk factor",
+        "Advise him to remain a non-smoker, keep alcohol within 14 units a week and avoid stimulants such as cocaine and amphetamines",
+        "Explain the warning symptoms of aneurysm rupture (sudden thunderclap headache, collapse, neck stiffness) and the need to call emergency services",
+        "Optimise prevention: propranolol 40 mg twice daily is a modest dose but his pulse is 62; either increase it if pulse and BP allow, or switch to a hemiplegic-migraine preventive such as verapamil, lamotrigine or acetazolamide, never adding verapamil to propranolol",
+        "Treat attacks with an NSAID (for example naproxen 500 mg) or paracetamol with an antiemetic"
       ]
     },
     "avoided_actions": [
@@ -235,7 +259,7 @@
           "[AAN_2000]"
         ],
         "criterion_id": "avoid-waste-1-order-ct-scan",
-        "rationale": "Head CT is less sensitive than MRI for migraine-relevant structural causes and is not indicated in typical migraine with aura; even when imaging is warranted, MRI is preferred",
+        "rationale": "A repeat head CT adds nothing: he had a normal CT, and MRI with MRA answers both the structural and the aneurysm question without radiation.",
         "severity": "waste"
       },
       {
@@ -249,7 +273,7 @@
           "[AAN_2000]"
         ],
         "criterion_id": "avoid-waste-2-analyze-csf",
-        "rationale": "Lumbar puncture is not indicated in migraine with aura; reserve for suspected SAH (with normal CT) or meningitis \u2014 neither present here",
+        "rationale": "Lumbar puncture is not indicated: there has been no thunderclap or sentinel headache suggesting SAH, and no suspicion of infection.",
         "severity": "waste"
       },
       {
@@ -259,11 +283,9 @@
             "tool_name": "order_echocardiogram"
           }
         ],
-        "citations": [
-          "[Charles_2017]"
-        ],
+        "citations": [],
         "criterion_id": "avoid-waste-3-order-echocardiogram",
-        "rationale": "Routine transthoracic / bubble echocardiogram (PFO screening) is NOT indicated in migraine with aura; PFO-migraine association is controversial and PFO closure does not reduce migraine [Charles_2017]",
+        "rationale": "Echocardiography is not indicated: there is no infarct or embolic event, and PFO screening is not part of the migraine work-up.",
         "severity": "waste"
       },
       {
@@ -277,7 +299,7 @@
           "[AAN_2000]"
         ],
         "criterion_id": "avoid-waste-4-order-cardiac-monitoring",
-        "rationale": "Ambulatory cardiac monitoring is not indicated in typical migraine with aura \u2014 no role unless cardioembolic stroke is on the differential",
+        "rationale": "Repeat cardiac monitoring is not indicated: a 24-hour Holter was normal and the attacks are migraine aura, not embolic events.",
         "severity": "waste"
       }
     ],
@@ -304,69 +326,77 @@
     },
     "differential": [
       {
-        "diagnosis": "Cardioembolic / large-artery TIA",
+        "diagnosis": "Transient ischaemic attack",
         "icd_code": "G45.9",
-        "key_features": "Motor aura always requires TIA exclusion; gradual march and normal MRI/MRA exclude acute infarction",
-        "likelihood": "moderate"
-      },
-      {
-        "diagnosis": "Familial hemiplegic migraine (CACNA1A / ATP1A2 / SCN1A)",
-        "icd_code": null,
-        "key_features": "No specific family history of hemiplegic migraine; sporadic form more likely",
+        "key_features": "Against: five stereotyped attacks with motor then speech symptoms building over 20-25 minutes, each followed by migrainous headache; normal MRI without infarct; normal CT and 24-hour Holter; MRA shows no stenosis.",
         "likelihood": "low"
       },
       {
-        "diagnosis": "Aneurysmal sentinel headache / unruptured aneurysm symptoms",
+        "diagnosis": "Familial hemiplegic migraine (CACNA1A, ATP1A2, SCN1A)",
+        "icd_code": "G43.409",
+        "key_features": "Against: no first- or second-degree relative with hemiplegic migraine; his sister has migraine without aura.",
+        "likelihood": "low"
+      },
+      {
+        "diagnosis": "Symptomatic unruptured aneurysm or sentinel headache",
         "icd_code": "I67.1",
-        "key_features": "Unruptured 4mm aneurysm rarely symptomatic; episodes are migrainous in character",
-        "likelihood": "low"
+        "key_features": "Against: a 4 mm aneurysm without mass effect does not cause recurrent motor aura; no thunderclap headache; headache follows each aura stereotypically.",
+        "likelihood": "very_low"
       },
       {
-        "diagnosis": "Vascular malformation (AVM, cavernoma)",
+        "diagnosis": "Vascular malformation (AVM or cavernoma)",
         "icd_code": "Q28.2",
-        "key_features": "MRI shows aneurysm only; no AVM or cavernoma",
+        "key_features": "Against: MRI with susceptibility imaging and MRA show no malformation.",
         "likelihood": "very_low"
       }
     ],
     "key_clinical_evidence": [
-      "Hemiplegic migraine requires MRI/MRA at first presentation \u2014 incidental aneurysm detection is a recognised consequence",
-      "Familial intracranial aneurysms (first-degree relative with SAH) carry higher rupture risk and warrant lower thresholds for treatment",
-      "Triptans are relatively contraindicated in both hemiplegic migraine and unruptured aneurysm",
-      "Tier per the July 2026 clinical review: ICHD-3: the diagnosis is made on the structured history. Imaging is for the red flags that history screens for, not for the diagnosis.",
-      "July 2026 review applied end to end: ICHD-3 history/examination is required in all cases; routine MRI, EEG, ECG, CSF, echocardiography, cardiac monitoring and laboratory panels are absent. Retained tests answer an explicit atypical-aura, seizure, infarct, MELAS, CADASIL or aneurysm question."
+      "Five stereotyped attacks of motor then speech aura, fully reversible and followed by headache, without affected relatives: sporadic hemiplegic migraine",
+      "Motor aura that had only been imaged with CT is a red flag for MRI",
+      "Two first-degree relatives with intracranial aneurysm or aneurysmal SAH make MRA screening indicated (AHA/ASA 2015)",
+      "MRA: 4 mm unruptured saccular left MCA bifurcation aneurysm; MRI otherwise normal",
+      "Triptans and ergots are avoided in hemiplegic migraine; verapamil must not be combined with propranolol"
     ],
     "red_herrings": [
       {
-        "correct_interpretation": "Family history raises baseline risk but the patient's 4mm aneurysm risk stratification depends on size, location, and modifiable factors; episodes themselves are migrainous",
-        "data_point": "Parent's recent SAH",
-        "field_path": "",
-        "intended_effect": "May anchor on imminent SAH risk in this patient",
-        "location": "patient.clinical_history (family_history)"
+        "correct_interpretation": "The family history indicates aneurysm screening; the attacks themselves are hemiplegic migraine, and a 4 mm aneurysm does not explain them.",
+        "data_point": "Father's recent aneurysmal SAH",
+        "field_path": "patient.clinical_history.family_history",
+        "intended_effect": "May anchor on the attacks being caused by an aneurysm or a sentinel bleed",
+        "location": "patient.clinical_history.family_history"
       },
       {
-        "correct_interpretation": "First-ever MRI/MRA was never performed despite 5 episodes with focal neurological deficits; father's SAH made MRA urgently necessary; 4mm MCA aneurysm found; this changes multiple management decisions",
-        "data_point": "Hemiplegic migraine diagnosis seems secure \u2014 propranolol was started; focus on migraine prevention",
-        "field_path": "",
-        "intended_effect": "Prior neurologist diagnosed hemiplegic migraine and started treatment; no MRA was considered necessary",
-        "location": ""
-      },
-      {
-        "correct_interpretation": "Both diagnoses are important: hemiplegic migraine is managed with topiramate (not propranolol which failed); unruptured aneurysm is managed conservatively with BP optimisation and annual MRA",
-        "data_point": "Father's SAH from aneurysm \u2014 focus on aneurysm screening only, not migraine diagnosis",
-        "field_path": "",
-        "intended_effect": "The aneurysm finding might overwhelm the clinical consultation and divert from migraine management",
-        "location": ""
+        "correct_interpretation": "Gradual build-up, succession of symptoms, stereotyped recurrence and the following headache identify migraine aura; MRI shows no infarct.",
+        "data_point": "Emergency department label 'likely TIA or hemiplegic migraine'",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "May prompt antiplatelet treatment for TIA",
+        "location": "patient.history_present_illness"
       }
     ],
     "review_status": "draft",
-    "sequence_constraints": [],
+    "sequence_constraints": [
+      {
+        "after_criterion_id": "action-4-analyze-brain-mri",
+        "before_criterion_id": "action-3-perform-clinical-assessment",
+        "citations": [],
+        "reason": "The structured history identifies the red flags that justify imaging.",
+        "severity": "soft"
+      },
+      {
+        "after_criterion_id": "action-mra",
+        "before_criterion_id": "action-4-analyze-brain-mri",
+        "citations": [],
+        "reason": "Parenchymal imaging comes before vessel imaging.",
+        "severity": "soft"
+      }
+    ],
     "stop_rule": {
-      "max_additional_actions": 0,
+      "max_additional_actions": 1,
       "required_before_assessment": [
-        "action-1-search-medical-literature",
-        "action-2-check-drug-interactions",
         "action-3-perform-clinical-assessment",
-        "action-4-analyze-brain-mri"
+        "action-4-analyze-brain-mri",
+        "action-mra",
+        "action-2-check-drug-interactions"
       ]
     }
   },
@@ -376,7 +406,7 @@
     "clinical_assessment": {
       "assessment_type": "structured_headache_history_ichd3",
       "criteria_met": {
-        "at_least_one_positive_aura_symptom": true,
+        "at_least_one_positive_aura_symptom": false,
         "at_least_one_unilateral_aura_symptom": true,
         "at_least_three_of_six_characteristics": true,
         "at_least_two_attacks": true,
@@ -389,52 +419,90 @@
       },
       "findings": [
         {
-          "element": "Temporal profile",
-          "result": "He has had five episodes over the past 18 months of right-sided arm weakness, clumsiness and difficulty with word finding, lasting 20-35 minutes, each followed by a severe left-sided throbbing headache rated 9/10 with marked nausea and photophobia lasting 10-16 hours."
+          "element": "Attack count",
+          "result": "Five stereotyped attacks in 18 months; two of them on propranolol 40 mg twice daily."
         },
         {
-          "element": "Temporal profile",
-          "result": "On re-review of his episodes: the motor and language deficit develops gradually over approximately 20-25 minutes, which he confirms on careful questioning."
+          "element": "Aura type and evolution",
+          "result": "Right hand and arm weakness with clumsiness, followed after several minutes by word-finding difficulty; the deficit builds up over 20-25 minutes. No visual or sensory symptoms reported."
+        },
+        {
+          "element": "Aura duration and reversibility",
+          "result": "20-35 minutes per attack, with full recovery of strength and speech."
         },
         {
           "element": "Headache relation",
-          "result": "He has had five episodes over the past 18 months of right-sided arm weakness, clumsiness and difficulty with word finding, lasting 20-35 minutes, each followed by a severe left-sided throbbing headache rated 9/10 with marked nausea and photophobia lasting 10-16 hours."
+          "result": "Each attack is followed within minutes by a severe (9/10) left-sided throbbing headache with nausea and photophobia lasting 10-16 hours."
+        },
+        {
+          "element": "Hemiplegic migraine criteria",
+          "result": "Fully reversible motor weakness with fully reversible speech disturbance (ICHD-3 1.2.3 B met). No first- or second-degree relative with hemiplegic migraine (sporadic form, 1.2.3.2)."
+        },
+        {
+          "element": "Family history",
+          "result": "Father: aneurysmal SAH (left MCA) 8 weeks ago. Sister: unruptured 3 mm posterior communicating artery aneurysm and migraine without aura."
+        },
+        {
+          "element": "Vascular risk",
+          "result": "Mild hypertension, not treated (BP 136/84 mmHg on propranolol); non-smoker; 6-8 units of alcohol a week."
+        },
+        {
+          "element": "Examination today",
+          "result": "Normal language, cranial nerves, power, reflexes, sensation, coordination and gait. Pulse 62 on propranolol."
         },
         {
           "element": "Red-flag review (SNNOOP10)",
-          "result": "Systemic features, neoplasia, neurological deficit outside the aura, sudden onset, older age at onset, pattern change, positional or Valsalva trigger, papilloedema, pregnancy and painful eye reviewed and recorded"
+          "result": "Motor aura: present. Two first-degree relatives with intracranial aneurysm or aneurysmal SAH: present. Thunderclap onset, systemic symptoms, onset after 50, deficit outside the attacks, positional or Valsalva trigger and papilloedema: absent."
         }
       ],
-      "impression": "Structured history documents 6 of 6 ICHD-3 criterion-C characteristics with reversible aura symptoms, neurological examination and red-flag review. Imaging or laboratory testing is not the diagnostic test for a typical attack.",
+      "impression": "Recurrent stereotyped motor and speech aura followed by migrainous headache, meeting ICHD-3 1.2.3.2 sporadic hemiplegic migraine (5 attacks; 5 of 6 criterion C characteristics). Red flags present: motor aura and a family history of intracranial aneurysm in two first-degree relatives.",
       "pre_post_comparison": null,
       "recommended_actions": [],
       "scores": {
-        "ICHD-3 criterion C characteristics met": "6 of 6 (at least 3 required)",
-        "aura modalities documented": "visual, sensory, speech/language, motor and/or brainstem features as present in the history",
-        "reference criteria applied": "ICHD-3 1.2 and the relevant subtype/complication criteria"
+        "ICHD-3 criterion C characteristics met": "5 of 6 (gradual spread, succession, duration within the motor limit, unilateral, headache within 60 min)",
+        "attack frequency": "about one every 3-4 months",
+        "aura modalities": "motor and speech/language",
+        "reference criteria applied": "ICHD-3 1.2.3 and 1.2.3.2"
       }
     },
     "csf": null,
     "ct": null,
+    "drug_interactions": {
+      "sumatriptan": {
+        "alternatives": [
+          "Acute: NSAID (for example naproxen 500 mg) or paracetamol, with an antiemetic",
+          "Prevention in hemiplegic migraine: verapamil (instead of, not with, propranolol), lamotrigine, acetazolamide, topiramate, flunarizine where licensed"
+        ],
+        "contraindications": [
+          "Triptans and ergot derivatives: avoid in hemiplegic migraine (product labels; no safety data in motor aura)."
+        ],
+        "formulary_status": "on formulary",
+        "interactions": [
+          "Propranolol + rizatriptan: propranolol raises rizatriptan levels by about 70%; the label dose is 5 mg. No such interaction with sumatriptan.",
+          "Propranolol + verapamil: additive negative chronotropic and dromotropic effects with risk of bradycardia, AV block and hypotension; avoid the combination, and allow a washout when switching.",
+          "Propranolol + topiramate: no clinically relevant interaction.",
+          "Propranolol + paracetamol or NSAIDs: no clinically relevant interaction; regular NSAIDs can blunt the antihypertensive effect."
+        ],
+        "proposed": "Acute and preventive migraine treatment in a man on propranolol 40 mg twice daily (pulse 62) with an unruptured intracranial aneurysm",
+        "summary": "Triptans and ergots are avoided in hemiplegic migraine; verapamil must not be added to propranolol; rizatriptan, if ever used with propranolol, is limited to 5 mg.",
+        "warnings": [
+          "No data on triptan use with an unruptured intracranial aneurysm; the restriction here comes from the hemiplegic migraine.",
+          "Propranolol dose increases are limited by a resting pulse of 62."
+        ]
+      }
+    },
     "ecg": null,
     "echo": null,
     "eeg": null,
     "labs": null,
-    "literature_search": {
-      "ICHD-3 migraine with aura diagnostic criteria SNOOP red flags": {
-        "query": "ICHD-3 migraine with aura diagnostic criteria SNOOP red flags",
-        "results": [
-          {
-            "evidence_level": "guideline recommendation",
-            "finding": "ICHD-3 criteria for migraine with aura confirmed; no SNOOP red flag present that mandates further workup",
-            "source": "ICHD_3"
-          }
-        ],
-        "summary": "ICHD-3 criteria for migraine with aura confirmed; no SNOOP red flag present that mandates further workup"
-      }
-    },
+    "literature_search": null,
     "mri": {
-      "additional_observations": [],
+      "additional_observations": [
+        "Technique: non-contrast 3 T brain MRI with T1, T2, FLAIR, DWI/ADC and susceptibility-weighted imaging.",
+        "No restricted diffusion; no acute or chronic infarct.",
+        "No haemorrhage, microbleed, superficial siderosis, cavernoma or arteriovenous malformation.",
+        "Ventricles, sulci and white matter normal for age. No mass."
+      ],
       "findings": [
         {
           "borders": null,
@@ -443,24 +511,14 @@
           "signal_characteristics": {
             "DWI": "no restriction",
             "FLAIR": "no signal abnormality",
+            "SWI": "no susceptibility signal",
             "T1": "normal"
           },
           "size": null,
           "type": "normal"
-        },
-        {
-          "borders": "well-defined saccular morphology",
-          "location": "left MCA bifurcation",
-          "mass_effect": "none",
-          "signal_characteristics": {
-            "MRA": "4mm outpouching at left M1/M2 bifurcation \u2014 saccular aneurysm",
-            "T1_Gd": "no enhancement of surrounding tissue"
-          },
-          "size": "4 mm",
-          "type": "vascular_abnormality"
         }
       ],
-      "impression": "1. Normal brain parenchyma. No DWI restriction. No acute infarct or signal abnormality. 2. 4 mm saccular outpouching at the left M1/M2 (MCA bifurcation) on MRA \u2014 saccular morphology consistent with an unruptured aneurysm. Normal circle of Willis otherwise. Neurovascular clinical correlation recommended.",
+      "impression": "Normal brain MRI. No infarct, haemorrhage, vascular malformation or mass.",
       "recommended_actions": [],
       "volumetrics": null
     },
@@ -468,17 +526,14 @@
   },
   "metadata": {
     "authoring_agent": "condition-expert:MIG-AURA",
-    "case_body_concerns": [
-      "Useless-tool entries dropped because the case has neither output nor fallback (silent irrelevance, per authoring guide \u00a71): ['analyze_ecg', 'analyze_eeg', 'interpret_labs']"
-    ],
+    "case_body_concerns": [],
     "citation_gap": [],
-    "condition_name": "Hemiplegic migraine with incidental unruptured MCA aneurysm (familial) \u2014 MRA omitted at initial workup; triptans contraindicated",
+    "condition_name": "Hemiplegic migraine with incidental unruptured MCA aneurysm found on familial aneurysm screening: triptans avoided, neurovascular referral",
     "criteria_pack_version": "1.0",
     "difficulty_description": "Diagnostic puzzle: hemiplegic migraine diagnosis is correct but MRA was never performed; father's SAH makes familial aneurysm screening mandatory; 4mm unruptured MCA aneurysm found; changes management including triptans avoidance and BP optimisation",
     "difficulty_rationale": "Diagnostic puzzle: hemiplegic migraine + incidental aneurysm with positive family history requires MRA, neurovascular referral, and BP optimisation",
     "expected_agent_confidence": 0.38,
     "fallback_tool_kinds": {
-      "advanced_imaging": "normal",
       "cardiac_monitoring": "normal",
       "csf": "normal",
       "ct": "normal",
@@ -492,20 +547,20 @@
   },
   "patient": {
     "age": 36,
-    "chief_complaint": "Recurrent right-sided weakness and dysphasia \u2014 second opinion after being told 'it's migraine'; parent recently had subarachnoid haemorrhage",
+    "chief_complaint": "Recurrent right-sided weakness and dysphasia, second opinion after being told 'it's migraine'; father recently had a subarachnoid haemorrhage and sister has an aneurysm",
     "clinical_history": {
       "allergies": [
         "No known drug allergies"
       ],
       "family_history": [
-        "Father: SAH from ruptured left MCA aneurysm (8 weeks ago). Sister: migraine without aura. No family history of hemiplegic migraine or coagulopathy."
+        "Father: SAH from ruptured left MCA aneurysm (8 weeks ago). Sister (39): migraine without aura; a 3 mm unruptured right posterior communicating artery aneurysm was found on MRA screening last month, arranged after their father's SAH. No family history of hemiplegic migraine or coagulopathy."
       ],
       "medications": [
         {
           "dose": "40 mg",
           "drug": "Propranolol",
           "frequency": "twice daily",
-          "indication": "Hemiplegic migraine prevention \u2014 two further episodes on treatment"
+          "indication": "Hemiplegic migraine prevention; two further episodes on treatment"
         },
         {
           "dose": "1000 mg",
@@ -525,8 +580,8 @@
       "sex": "male"
     },
     "ethnicity": "Black British",
-    "history_present_illness": "A 36-year-old Black British man presented to the neurology clinic for a second opinion. He has had five episodes over the past 18 months of right-sided arm weakness, clumsiness and difficulty with word finding, lasting 20-35 minutes, each followed by a severe left-sided throbbing headache rated 9/10 with marked nausea and photophobia lasting 10-16 hours. The first episode was assessed at the emergency department and was diagnosed as 'likely TIA or hemiplegic migraine.' A normal CT head and a normal 24-hour Holter were performed. He was subsequently seen by a neurologist who diagnosed hemiplegic migraine and started propranolol 40 mg BID. Two further episodes occurred on propranolol.\n\nNew information from this visit: his father (aged 64) had a subarachnoid haemorrhage (SAH) 8 weeks ago from a ruptured left MCA aneurysm. The patient is therefore seeking screening for intracranial aneurysm.\n\nOn re-review of his episodes: the motor and language deficit develops gradually over approximately 20-25 minutes, which he confirms on careful questioning. He has no family history of hemiplegic migraine. His sister has typical migraine without aura. He has mild hypertension (BP today 136/84). He is a non-smoker, occasional alcohol. He has no prior imaging of the intracranial vessels \u2014 only CT head was performed acutely.",
-    "hpi": "A 36-year-old Black British man presented to the neurology clinic for a second opinion. He has had five episodes over the past 18 months of right-sided arm weakness, clumsiness and difficulty with word finding, lasting 20-35 minutes, each followed by a severe left-sided throbbing headache rated 9/10 with marked nausea and photophobia lasting 10-16 hours. The first episode was assessed at the emergency department and was diagnosed as 'likely TIA or hemiplegic migraine.' A normal CT head and a normal 24-hour Holter were performed. He was subsequently seen by a neurologist who diagnosed hemiplegic migraine and started propranolol 40 mg BID. Two further episodes occurred on propranolol.\n\nNew information from this visit: his father (aged 64) had a subarachnoid haemorrhage (SAH) 8 weeks ago from a ruptured left MCA aneurysm. The patient is therefore seeking screening for intracranial aneurysm.\n\nOn re-review of his episodes: the motor and language deficit develops gradually over approximately 20-25 minutes, which he confirms on careful questioning. He has no family history of hemiplegic migraine. His sister has typical migraine without aura. He has mild hypertension (BP today 136/84). He is a non-smoker, occasional alcohol. He has no prior imaging of the intracranial vessels \u2014 only CT head was performed acutely.",
+    "history_present_illness": "A 36-year-old Black British man presented to the neurology clinic for a second opinion. He has had five episodes over the past 18 months of right-sided arm weakness, clumsiness and difficulty with word finding, lasting 20-35 minutes, each followed by a severe left-sided throbbing headache rated 9/10 with marked nausea and photophobia lasting 10-16 hours. The first episode was assessed at the emergency department and was diagnosed as 'likely TIA or hemiplegic migraine.' A normal CT head and a normal 24-hour Holter were performed. He was subsequently seen by a neurologist who diagnosed hemiplegic migraine and started propranolol 40 mg BID. Two further episodes occurred on propranolol.\n\nNew information from this visit: his father (aged 64) had a subarachnoid haemorrhage (SAH) 8 weeks ago from a ruptured left MCA aneurysm, and last month his sister was found to have a small unruptured aneurysm on screening MRA. The patient is therefore seeking screening for intracranial aneurysm.\n\nOn re-review of his episodes: the motor and language deficit develops gradually over approximately 20-25 minutes, which he confirms on careful questioning. He has no family history of hemiplegic migraine. His sister has typical migraine without aura. He has mild hypertension (BP today 136/84). He is a non-smoker, drinks 6-8 units of alcohol a week. He has no prior imaging of the intracranial vessels; only a CT head was performed acutely.",
+    "hpi": "A 36-year-old Black British man presented to the neurology clinic for a second opinion. He has had five episodes over the past 18 months of right-sided arm weakness, clumsiness and difficulty with word finding, lasting 20-35 minutes, each followed by a severe left-sided throbbing headache rated 9/10 with marked nausea and photophobia lasting 10-16 hours. The first episode was assessed at the emergency department and was diagnosed as 'likely TIA or hemiplegic migraine.' A normal CT head and a normal 24-hour Holter were performed. He was subsequently seen by a neurologist who diagnosed hemiplegic migraine and started propranolol 40 mg BID. Two further episodes occurred on propranolol.\n\nNew information from this visit: his father (aged 64) had a subarachnoid haemorrhage (SAH) 8 weeks ago from a ruptured left MCA aneurysm, and last month his sister was found to have a small unruptured aneurysm on screening MRA. The patient is therefore seeking screening for intracranial aneurysm.\n\nOn re-review of his episodes: the motor and language deficit develops gradually over approximately 20-25 minutes, which he confirms on careful questioning. He has no family history of hemiplegic migraine. His sister has typical migraine without aura. He has mild hypertension (BP today 136/84). He is a non-smoker, drinks 6-8 units of alcohol a week. He has no prior imaging of the intracranial vessels; only a CT head was performed acutely.",
     "neurological_exam": {
       "additional": "Bradycardia at 62 bpm on propranolol. No carotid bruits.",
       "coordination": "Finger-nose and heel-shin tests normal bilaterally.",
@@ -543,12 +598,12 @@
       "cardiovascular": "Regular bradycardic rhythm (62 bpm on propranolol); no murmurs; no carotid bruits",
       "extremities": "No edema",
       "general": "Well-appearing man; alert and fully oriented; no active neurological deficits today; bradycardic on propranolol",
-      "neurological": "Normal language: fluent, normal naming, normal repetition. Normal cranial nerves. Motor 5/5 throughout \u2014 no drift. DTR 2+ symmetric. No Babinski. Sensation intact. Coordination normal. Gait normal.",
+      "neurological": "Normal language: fluent, normal naming, normal repetition. Normal cranial nerves. Motor 5/5 throughout, no drift. DTR 2+ symmetric. No Babinski. Sensation intact. Coordination normal. Gait normal.",
       "respiratory": "Clear"
     },
     "pmh": [
       "Hemiplegic migraine diagnosis (under review)",
-      "Mild hypertension \u2014 BP 136/84",
+      "Mild hypertension, BP 136/84",
       "No prior MRI or MRA performed"
     ],
     "sex": "male",

@@ -4,14 +4,7 @@
   "difficulty": "diagnostic_puzzle",
   "encounter_type": "outpatient",
   "fallback_tool_outputs": {
-    "advanced_imaging": {
-      "findings": [],
-      "impression": "No abnormality identified.",
-      "modality": "",
-      "quantitative_data": null,
-      "recommended_actions": [],
-      "tracer_or_protocol": null
-    },
+    "advanced_imaging": null,
     "cardiac_monitoring": null,
     "csf": {
       "appearance": "clear and colourless",
@@ -34,18 +27,7 @@
       "impression": "No acute intracranial abnormality. No haemorrhage, mass, hydrocephalus, or large-territory infarct.",
       "recommended_actions": []
     },
-    "drug_interactions": {
-      "general": {
-        "alternatives": [],
-        "contraindications": [],
-        "formulary_status": "on formulary",
-        "interactions": [],
-        "proposed": "(agent not specified on this case's pathway)",
-        "warnings": [
-          "Non-specific interaction check; verify against a current formulary or interaction reference before prescribing."
-        ]
-      }
-    },
+    "drug_interactions": null,
     "ecg": null,
     "echo": null,
     "eeg": {
@@ -65,134 +47,120 @@
     "labs": null,
     "literature_search": null,
     "mri": null,
-    "specialized_test": {
-      "findings": [],
-      "impression": "Study within normal limits.",
-      "quantitative_data": null,
-      "recommended_actions": [],
-      "test_type": ""
-    }
+    "specialized_test": null
   },
   "followup_outputs": [
     {
       "output": {
-        "duration_hours": 48,
-        "events": [],
-        "findings": [],
-        "heart_rate_range": {
-          "average": 70,
-          "max": 112,
-          "min": 51
-        },
-        "impression": "No AF on 48-hour Holter; sinus rhythm throughout",
-        "monitor_type": "holter_48h",
+        "findings": [
+          {
+            "interpretation": "no stenosis, occlusion, beading or segmental narrowing",
+            "region": "posterior circulation",
+            "signal": "normal calibre and flow-related signal of both vertebral arteries, the basilar artery and both posterior cerebral arteries to their distal branches"
+          },
+          {
+            "interpretation": "no stenosis, aneurysm or vascular malformation",
+            "region": "anterior circulation",
+            "signal": "normal internal carotid, anterior and middle cerebral arteries"
+          },
+          {
+            "interpretation": "no intimal flap, intramural haematoma or stenosis",
+            "region": "cervical carotid and vertebral arteries",
+            "signal": "patent with smooth walls"
+          }
+        ],
+        "impression": "Normal intracranial and cervical MR angiography. No arterial stenosis, occlusion, vasculopathy or dissection.",
+        "modality": "MR_angiography",
+        "quantitative_data": null,
         "recommended_actions": [],
-        "rhythm_summary": "No AF on 48-hour Holter; sinus rhythm throughout"
+        "tracer_or_protocol": "3D time-of-flight MRA of the circle of Willis and contrast-enhanced MRA of the neck"
       },
-      "tool_name": "order_cardiac_monitoring",
-      "trigger_action": "request_cardiac_monitoring_af_screen"
+      "tool_name": "order_advanced_imaging",
+      "trigger_action": "request_mr_angiography_head_and_neck"
     },
     {
       "output": {
-        "chambers": {},
-        "ejection_fraction": null,
-        "findings": [
-          "TRANSTHORACIC ECHOCARDIOGRAM WITH BUBBLE STUDY\n\nFindings: Normal LV function, EF 64%. Normal valves. No intra-cardiac thrombus. Normal LA size.\n\nBUBBLE STUDY: No PFO detected. No microbubbles crossing.\n\nIMPRESSION: Normal echocardiogram. No PFO. No cardioembolic source."
+        "duration_hours": 720,
+        "events": [
+          {
+            "description": "activated for headache: sinus rhythm 84 bpm",
+            "timing": "day 9, 16:20",
+            "type": "patient_activated_event"
+          },
+          {
+            "description": "activated for headache: sinus rhythm 78 bpm",
+            "timing": "day 22, 07:45",
+            "type": "patient_activated_event"
+          }
         ],
-        "impression": "Normal echocardiogram; no PFO; no cardioembolic source",
+        "findings": [
+          "No atrial fibrillation, atrial flutter or atrial run of 30 s or more.",
+          "Isolated atrial ectopic beats (under 0.1%); no pauses over 2 s; no AV block."
+        ],
+        "heart_rate_range": {
+          "average": 71,
+          "max": 128,
+          "min": 52
+        },
+        "impression": "No atrial fibrillation or flutter over 30 days of monitoring. Sinus rhythm during both patient-activated events.",
+        "monitor_type": "event_monitor_30d",
         "recommended_actions": [],
-        "valves": {},
-        "wall_motion": null
+        "rhythm_summary": "Sinus rhythm throughout; no atrial fibrillation or flutter"
+      },
+      "tool_name": "order_cardiac_monitoring",
+      "trigger_action": "request_30_day_event_monitor_af_screen"
+    },
+    {
+      "output": {
+        "chambers": {
+          "LA": "normal size (indexed volume 24 mL/m2)",
+          "LV": "normal size and wall thickness, normal systolic function",
+          "RA": "normal size",
+          "RV": "normal size and function"
+        },
+        "echo_type": "bubble_study",
+        "ejection_fraction": 64.0,
+        "findings": [
+          "No intracardiac thrombus, mass or vegetation.",
+          "Interatrial septum intact on 2D and colour Doppler; no septal aneurysm.",
+          "Agitated saline injected at rest and with Valsalva release (adequate right atrial opacification and septal shift): no microbubbles in the left heart."
+        ],
+        "impression": "Normal transthoracic echocardiogram with agitated saline. No right-to-left shunt at rest or with Valsalva. No cardiac source of embolism identified.",
+        "recommended_actions": [],
+        "valves": {
+          "aortic": "trileaflet, structurally normal",
+          "mitral": "structurally normal",
+          "pulmonic": "normal",
+          "tricuspid": "normal"
+        },
+        "wall_motion": "no regional wall-motion abnormality"
       },
       "tool_name": "order_echocardiogram",
       "trigger_action": "request_bubble_echo_cardioembolic"
     },
     {
       "output": {
-        "query": "migrainous infarction ICHD-3 management antiplatelet DAPT clopidogrel prevention",
+        "query": "migrainous infarction criteria and antiplatelet secondary prevention after minor ischaemic stroke",
         "results": [
           {
-            "evidence_level": "ICHD-3 consensus; ESO guidelines; Level A (preventives)",
-            "finding": "ICHD-3 1.4.3 migrainous infarction: stroke during migraine aura; infarction in area corresponding to aura; no other stroke cause. Aspirin 75-150 mg daily for secondary prevention (weak evidence; extrapolated from ischaemic stroke). DAPT (aspirin + clopidogrel): POINT/CHANCE trials support short-term DAPT for high-risk TIA; for migrainous infarction DAPT benefit unproven \u2014 current guidelines do not support long-term DAPT. Combined OCP absolutely contraindicated. Migraine prevention CRITICAL \u2014 preventing migraine prevents infarction; topiramate (Level A), propranolol (Level A), anti-CGRP antibodies. Triptans cautioned \u2014 weak evidence, individualised decision.",
-            "source": "ICHD-3; ESO stroke guidelines; Cephalalgia review"
-          }
-        ],
-        "summary": ""
-      },
-      "tool_name": "search_medical_literature",
-      "trigger_action": "search_migrainous_infarction_management"
-    },
-    {
-      "output": {
-        "query": "triptans migrainous infarction safety contraindication EHF guidelines",
-        "results": [
+            "evidence_level": "classification",
+            "finding": "Migrainous infarction (1.4.3): one or more aura symptoms associated with an ischaemic brain lesion in the appropriate territory demonstrated by neuroimaging, in a patient with migraine with aura, during an attack typical of previous attacks except that aura symptoms persist for more than 60 minutes, and not better accounted for by another diagnosis. Persistent aura without infarction is 1.4.2.",
+            "source": "Headache Classification Committee of the International Headache Society. ICHD-3. Cephalalgia 2018;38:1-211"
+          },
           {
-            "evidence_level": "EHF 2022 guidelines; expert consensus",
-            "finding": "Triptans are vasoconstrictors; after migrainous infarction, theoretical concern about vasoconstriction in a susceptible territory. No randomised trials specifically address triptan use after migrainous infarction; case reports rare and contradictory. EHF and EFNS caution against triptans but evidence base is weak. Untreated severe migraine attacks cause significant suffering and may trigger further CSD. 2022 EHF guidelines suggest weighing individual risk vs benefit \u2014 if infarction was small and well-characterised, cautious triptan use may be acceptable with monitoring. Prioritise strong preventive therapy to reduce acute treatment need.",
-            "source": "European Headache Federation (EHF) 2022 guidelines; EFNS"
+            "evidence_level": "guideline",
+            "finding": "After minor non-cardioembolic ischaemic stroke, dual antiplatelet therapy started within 24 hours and continued for 21-90 days reduces early recurrence; thereafter a single antiplatelet agent is recommended for long-term prevention.",
+            "source": "Kleindorfer DO, Towfighi A, Chaturvedi S, et al. 2021 Guideline for the prevention of stroke in patients with stroke and transient ischemic attack. Stroke 2021;52:e364-e467"
           }
         ],
-        "summary": "Triptans cautioned (not absolutely contraindicated) after migrainous infarction; prioritise preventive therapy to reduce acute treatment need; shared decision-making"
+        "summary": "Migrainous infarction requires an infarct in the aura territory during an otherwise typical attack with aura over 60 minutes; after a minor stroke, short-term early dual antiplatelet therapy is followed by single-agent prevention."
       },
       "tool_name": "search_medical_literature",
-      "trigger_action": "search_triptan_contraindication_migrainous_infarction"
-    },
-    {
-      "output": {
-        "query": "driving DVLA restrictions migrainous infarction stroke 1 month visual field",
-        "results": [
-          {
-            "evidence_level": "DVLA regulatory guidance",
-            "finding": "After TIA or stroke with full recovery, DVLA regulations require a 1-month driving cessation period; resumption is permitted when there is no visual field defect on perimetry, no persisting neurological deficit, and no uncontrolled AF. Migrainous infarction is treated as a stroke for DVLA licensing purposes \u2014 the 1-month restriction applies. Formal visual field assessment is required before driving resumption is documented.",
-            "source": "DVLA At a Glance Guide (UK); DVLA medical standards"
-          }
-        ],
-        "summary": "UK DVLA regulations require a 1-month driving cessation after TIA/stroke; resumption requires documented full neurological recovery, no visual field defect on formal perimetry, and no uncontrolled AF; migrainous infarction is classified as a stroke for DVLA purposes"
-      },
-      "tool_name": "search_medical_literature",
-      "trigger_action": "search_driving_restrictions_migrainous_infarction"
+      "trigger_action": "search_migrainous_infarction_secondary_prevention"
     }
   ],
   "ground_truth": {
     "action_criteria": [
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "query": "ICHD-3 migraine with aura diagnostic criteria SNOOP red flags"
-            },
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[ICHD_3]",
-          "ICHD_3"
-        ],
-        "criterion_id": "action-1-search-medical-literature",
-        "expected_evidence": "ICHD-3 criteria for migraine with aura confirmed; no SNOOP red flag present that mandates further workup",
-        "importance": "required",
-        "label": "Search guideline literature to confirm ICHD-3 1.2 criteria for migraine with aura and exclude SNOOP/CHATS red flags",
-        "rationale": "Search guideline literature to confirm ICHD-3 1.2 criteria for migraine with aura and exclude SNOOP/CHATS red flags"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "drug": "sumatriptan"
-            },
-            "tool_name": "check_drug_interactions"
-          }
-        ],
-        "citations": [
-          "[AAN_2000]",
-          "AAN_2000"
-        ],
-        "criterion_id": "action-2-check-drug-interactions",
-        "expected_evidence": "Step down dual antiplatelet to single antiplatelet (aspirin or clopidogrel) at 21-90 days per stroke guidance; STOP triptans permanently after migrainous infarction; preventive therapy indicated",
-        "importance": "required",
-        "label": "Check drug interactions and contraindications for acute (triptan/ergotamine/CGRP antagonist) and prophylactic (beta-blocker, topiramate, valproate, amitriptyline) migraine medications appropriate to this patient",
-        "rationale": "Check drug interactions and contraindications for acute (triptan/ergotamine/CGRP antagonist) and prophylactic (beta-blocker, topiramate, valproate, amitriptyline) migraine medications appropriate to this patient"
-      },
       {
         "alternatives": [
           {
@@ -203,58 +171,81 @@
           }
         ],
         "citations": [
-          "[ICHD_3]",
-          "ICHD-3; NICE CG150 (2025)"
+          "[ICHD_3]"
         ],
         "criterion_id": "action-3-perform-clinical-assessment",
-        "expected_evidence": "Document attack count; reversible aura modalities; gradual spread; succession; 5\u201360 minute duration (motor up to 72 hours); unilateral and positive symptoms; relation to headache; medications; examination and red flags",
+        "expected_evidence": "Ten-year typical visual aura history; index attack typical except the left-field aura persisted about 5 h; no neck pain, thunderclap onset or palpitations; sumatriptan taken since; normal examination",
         "importance": "required",
-        "label": "Take a structured headache/aura history, neurological examination and red-flag review; apply every ICHD-3 1.2 criterion explicitly",
-        "rationale": "Take a structured headache/aura history, neurological examination and red-flag review; apply every ICHD-3 1.2 criterion explicitly"
+        "label": "Take a structured headache and aura history with examination and SNNOOP10 red-flag review, applying ICHD-3 1.2 and 1.4.3",
+        "rationale": "Migrainous infarction is defined clinically before it is confirmed by imaging: the index attack must be typical of her previous attacks except that the aura persists beyond 60 minutes (ICHD-3 1.4.3). The history also screens for other stroke mechanisms (dissection, RCVS, cardiac) and records the drugs that need review."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_brain_mri"
+          }
+        ],
+        "citations": [
+          "[ICHD_3]"
+        ],
+        "criterion_id": "action-4-analyze-brain-mri",
+        "expected_evidence": "4 mm subacute cortical infarct in the right occipital cortex at the site of the outside DWI lesion; no other lesion",
+        "importance": "required",
+        "label": "Repeat brain MRI to confirm the infarct and its location against the aura",
+        "rationale": "ICHD-3 1.4.3 criterion C requires an ischaemic infarct in the area relevant to the aura (right occipital cortex for a left-field aura); the outside report is not available, so the study is repeated and compared."
       },
       {
         "alternatives": [
           {
             "required_arguments": {
-              "contrast": false,
-              "protocol": "stroke"
+              "modality": "MR_angiography"
             },
-            "tool_name": "analyze_brain_mri"
+            "tool_name": "order_advanced_imaging"
           }
         ],
         "citations": [
-          "[ICHD_3]",
-          "ICHD-3; NICE CG150 (2025)"
+          "[ICHD_3]"
         ],
-        "criterion_id": "action-4-analyze-brain-mri",
-        "expected_evidence": "Identify or exclude infarct, haemorrhage, mass, vascular lesion or another secondary mimic; MRI does not establish routine migraine",
+        "criterion_id": "action-mra",
+        "expected_evidence": "Normal intracranial and cervical arteries: no PCA or vertebral stenosis, dissection or segmental narrowing",
         "importance": "required",
-        "label": "Obtain brain MRI because imaging answers a specific red-flag question: document the infarct required for migrainous-infarction criteria and exclude another stroke mechanism",
-        "rationale": "Obtain brain MRI because imaging answers a specific red-flag question: document the infarct required for migrainous-infarction criteria and exclude another stroke mechanism"
+        "label": "MR angiography of the head and neck to exclude dissection, stenosis and vasculopathy",
+        "rationale": "Migrainous infarction is a diagnosis of exclusion (criterion D): vertebral artery dissection, posterior circulation stenosis and RCVS cause occipital infarcts in young adults and must be excluded with vessel imaging."
       },
       {
         "alternatives": [
           {
             "required_arguments": {
               "panels": [
-                "glucose",
-                "HbA1c",
-                "lipid_panel",
                 "antiphospholipid"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          },
+          {
+            "required_arguments": {
+              "panels": [
+                "lupus_anticoagulant"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          },
+          {
+            "required_arguments": {
+              "panels": [
+                "anti_cardiolipin"
               ]
             },
             "tool_name": "interpret_labs"
           }
         ],
-        "citations": [
-          "[ICHD_3]",
-          "ICHD-3; NICE CG150 (2025)"
-        ],
+        "citations": [],
         "criterion_id": "action-5-interpret-labs",
-        "expected_evidence": "Answer the specific alternative-diagnosis question; blood tests do not confirm migraine",
-        "importance": "optional",
-        "label": "Order only tests targeted to this case's secondary-headache, infarct, mitochondrial or seizure differential",
-        "rationale": "Order only tests targeted to this case's secondary-headache, infarct, mitochondrial or seizure differential"
+        "expected_evidence": "Lupus anticoagulant negative, anticardiolipin and anti-beta2-glycoprotein I below 20 U; ESR and CRP normal; HbA1c and lipids normal",
+        "importance": "recommended",
+        "label": "Antiphospholipid antibodies, inflammatory markers and vascular risk bloods in a young woman with stroke",
+        "rationale": "Antiphospholipid syndrome is a treatable cause of arterial stroke in young women that would change secondary prevention; recommended rather than required because she has no history of thrombosis or pregnancy loss."
       },
       {
         "alternatives": [
@@ -265,15 +256,12 @@
             "tool_name": "order_cardiac_monitoring"
           }
         ],
-        "citations": [
-          "[AAN_2000]",
-          "AAN_2000"
-        ],
+        "citations": [],
         "criterion_id": "action-6-order-cardiac-monitoring",
-        "expected_evidence": "No paroxysmal AF; no cardioembolic source identified",
+        "expected_evidence": "No AF or flutter over 30 days; sinus rhythm during symptomatic events",
         "importance": "required",
-        "label": "Prolonged cardiac monitoring and bubble echo to exclude cardioembolic source",
-        "rationale": "Prolonged cardiac monitoring and bubble echo to exclude cardioembolic source"
+        "label": "30-day ambulatory ECG monitoring for paroxysmal AF",
+        "rationale": "Paroxysmal AF is a cardioembolic mechanism that must be excluded before an infarct is attributed to migraine; prolonged monitoring detects more AF than 24-48 h recordings."
       },
       {
         "alternatives": [
@@ -284,30 +272,84 @@
             "tool_name": "order_echocardiogram"
           }
         ],
-        "citations": [
-          "[AAN_2000]",
-          "AAN_2000"
-        ],
+        "citations": [],
         "criterion_id": "action-7-order-echocardiogram",
-        "expected_evidence": "Normal cardiac structure; no/small PFO; no thrombus",
+        "expected_evidence": "Normal cardiac structure and function; no thrombus; no right-to-left shunt at rest or with Valsalva",
         "importance": "required",
-        "label": "Echocardiogram with bubble study to evaluate PFO and cardiac source",
-        "rationale": "Echocardiogram with bubble study to evaluate PFO and cardiac source"
+        "label": "Transthoracic echocardiogram with agitated saline (bubble study)",
+        "rationale": "A cryptogenic-appearing stroke under 60 needs a structural cardiac source and a PFO excluded; a PFO with a high-risk anatomy would change management, unlike PFO screening in migraine alone."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "drug": "sumatriptan"
+            },
+            "tool_name": "check_drug_interactions"
+          },
+          {
+            "required_arguments": {
+              "drug": "clopidogrel"
+            },
+            "tool_name": "check_drug_interactions"
+          },
+          {
+            "required_arguments": {
+              "drug": "aspirin"
+            },
+            "tool_name": "check_drug_interactions"
+          },
+          {
+            "required_arguments": {
+              "drug": "desogestrel"
+            },
+            "tool_name": "check_drug_interactions"
+          },
+          {
+            "required_arguments": {
+              "drug": "Cerazette"
+            },
+            "tool_name": "check_drug_interactions"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "action-2-check-drug-interactions",
+        "expected_evidence": "Triptans contraindicated after stroke; NSAID with antiplatelets adds bleeding risk; POP after stroke UKMEC 3, copper IUD UKMEC 1",
+        "importance": "required",
+        "label": "Check sumatriptan, the dual antiplatelet therapy and her progestogen-only pill after the stroke",
+        "rationale": "Required: she is still taking sumatriptan after an ischaemic stroke, is on dual antiplatelet therapy and takes a progestogen-only pill whose category changes after stroke; each changes management."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "search_medical_literature"
+          }
+        ],
+        "citations": [
+          "[ICHD_3]"
+        ],
+        "criterion_id": "action-1-search-medical-literature",
+        "expected_evidence": "General evidence on ICHD-3 1.4.3 and antiplatelet duration after minor stroke",
+        "importance": "optional",
+        "label": "Literature on migrainous infarction criteria and secondary prevention",
+        "rationale": "Background reading only; not a clinical step in the patient's pathway."
       }
     ],
     "assessment": {
       "prohibited_recommendations": [
-        "Do not continue triptans after migrainous infarction",
-        "Do not continue dual antiplatelet therapy long-term in the absence of an ongoing indication",
-        "Do not restart combined oestrogen-progestogen contraception"
+        "Do not continue or restart triptans or ergot derivatives after migrainous infarction.",
+        "Do not continue dual antiplatelet therapy long term.",
+        "Do not start anticoagulation: there is no AF, cardiac thrombus or antiphospholipid syndrome.",
+        "Do not continue or start combined hormonal contraception (pill, patch or ring): it is UKMEC category 4 in migraine with aura and after stroke; offer a copper IUD or an LNG-IUS."
       ],
       "required_recommendations": [
-        "Confirm migrainous infarction by ICHD-3 1.4.3 criteria (aura >60 min + infarct on imaging in the relevant territory)",
-        "Complete stroke-aetiology workup (MRA, prolonged cardiac monitoring, echo with bubble study, antiphospholipid antibodies)",
-        "Stop triptans permanently after migrainous infarction",
-        "Step down DAPT to single antiplatelet per stroke secondary-prevention guidance",
-        "Initiate migraine preventive therapy",
-        "Counsel that combined OCP must remain stopped"
+        "Explain the diagnosis: migrainous infarction (ICHD-3 1.4.3), an attack typical of her aura except that it persisted about 5 hours, with a small right occipital cortical infarct in the corresponding area and no other mechanism on MRA, 30-day monitoring, bubble echo and antiphospholipid testing.",
+        "Stop sumatriptan permanently (triptans are contraindicated after stroke); treat attacks at headache onset with naproxen 500 mg and an antiemetic, with a proton pump inhibitor if NSAIDs are used often on antiplatelet therapy.",
+        "Stop dual antiplatelet therapy and continue a single antiplatelet agent long term (clopidogrel 75 mg or aspirin 75 mg): DAPT benefit after minor stroke applies when started within 24 hours and limited to 21-90 days (AHA/ASA 2021).",
+        "Start migraine prevention (2-4 attacks a month after a migrainous infarction): candesartan (fetotoxic: only with reliable contraception), propranolol or amitriptyline; if topiramate is chosen, start it only with highly effective contraception (copper or hormonal IUD, or implant) under the topiramate pregnancy prevention programme; it reduces the efficacy of oral and progestogen-only pills.",
+        "Review contraception: after stroke, continuing the progestogen-only pill is UKMEC category 3; offer a copper IUD (UKMEC 1) or an LNG-IUS (UKMEC 2).",
+        "Driving (DVLA group 1): she must not drive for 1 month after the stroke and may resume if recovery is complete with no visual field defect; she need not notify the DVLA unless a deficit persists after 1 month."
       ]
     },
     "avoided_actions": [
@@ -379,77 +421,119 @@
         "I63.1",
         "I63.8",
         "I63.81",
-        "I63.89"
+        "I63.89",
+        "G43.609",
+        "G43.619"
       ]
     },
     "differential": [
       {
-        "diagnosis": "Cardioembolic stroke during a coincidental migraine episode",
+        "diagnosis": "Cardioembolic stroke during a coincidental migraine attack",
         "icd_code": "I63.4",
-        "key_features": "Critical alternative \u2014 must be excluded with prolonged cardiac monitoring, echo, and bubble study; ILR/Holter normal, echo normal",
-        "likelihood": "high"
-      },
-      {
-        "diagnosis": "Paradoxical embolism through PFO",
-        "icd_code": "I63.4",
-        "key_features": "Bubble echo to evaluate \u2014 if PFO and cryptogenic stroke, closure may be considered",
-        "likelihood": "moderate"
-      },
-      {
-        "diagnosis": "Cervical / vertebral artery dissection",
-        "icd_code": "I77.71",
-        "key_features": "No neck pain or trauma; MRA shows no dissection",
+        "key_features": "No AF or flutter over 30 days of monitoring; normal echocardiogram without thrombus or structural disease.",
         "likelihood": "low"
       },
       {
-        "diagnosis": "Vasculitis / antiphospholipid syndrome",
+        "diagnosis": "Paradoxical embolism through a patent foramen ovale",
+        "icd_code": "I63.4",
+        "key_features": "No right-to-left shunt on agitated saline at rest or with Valsalva.",
+        "likelihood": "low"
+      },
+      {
+        "diagnosis": "Vertebral artery dissection or posterior circulation stenosis",
+        "icd_code": "I77.74",
+        "key_features": "No neck pain or trauma; normal intracranial and cervical MRA.",
+        "likelihood": "low"
+      },
+      {
+        "diagnosis": "Reversible cerebral vasoconstriction syndrome",
+        "icd_code": "I67.841",
+        "key_features": "No thunderclap headache; the attack matched her usual migraine; no segmental narrowing on MRA.",
+        "likelihood": "low"
+      },
+      {
+        "diagnosis": "Antiphospholipid syndrome",
         "icd_code": "D68.61",
-        "key_features": "ESR/CRP normal; antiphospholipid panel pending; repeat at 12 weeks if borderline",
+        "key_features": "Lupus anticoagulant, anticardiolipin and anti-beta2-glycoprotein I negative; no history of thrombosis or pregnancy loss.",
         "likelihood": "low"
+      },
+      {
+        "diagnosis": "Persistent aura without infarction (ICHD-3 1.4.2)",
+        "icd_code": "G43.509",
+        "key_features": "Excluded by definition: imaging shows an infarct in the aura territory, and the aura resolved within hours, not over a week.",
+        "likelihood": "very_low"
       }
     ],
     "key_clinical_evidence": [
-      "Migrainous infarction is a diagnosis of exclusion \u2014 competing aetiologies (cardioembolic, dissection, vasculitis, paradoxical embolism) must be ruled out first",
-      "Long-term DAPT is not standard after small cortical infarct \u2014 step down to single antiplatelet per current stroke guidance",
-      "Triptans are contraindicated permanently after migrainous infarction",
-      "Tier per the July 2026 clinical review: ICHD-3: the diagnosis is made on the structured history. Imaging is for the red flags that history screens for, not for the diagnosis.",
-      "Tier per the July 2026 clinical review: No laboratory test contributes to a migraine diagnosis; a targeted assay belongs to a specific suspicion.",
-      "July 2026 review applied end to end: ICHD-3 history/examination is required in all cases; routine MRI, EEG, ECG, CSF, echocardiography, cardiac monitoring and laboratory panels are absent. Retained tests answer an explicit atypical-aura, seizure, infarct, MELAS, CADASIL or aneurysm question."
+      "Migrainous infarction (ICHD-3 1.4.3) requires an attack typical of previous auras except that an aura symptom lasts over 60 minutes, an infarct in the corresponding area, and no better explanation; a 20-minute aura with an infarct does not qualify.",
+      "It is a diagnosis of exclusion: vessel imaging, prolonged cardiac monitoring, bubble echo and antiphospholipid testing must be negative.",
+      "Triptans and ergots are contraindicated permanently after the infarct.",
+      "DAPT after minor stroke applies when started within 24 hours and for 21-90 days; long-term prevention is a single antiplatelet agent.",
+      "After stroke, combined hormonal contraception is UKMEC 4 and continuing a progestogen-only pill UKMEC 3; a copper IUD is UKMEC 1."
     ],
     "red_herrings": [
       {
-        "correct_interpretation": "DAPT is appropriate short-term post-stroke but should be stepped down to single antiplatelet long-term in this case",
-        "data_point": "DAPT (aspirin + clopidogrel) prescribed at index event",
+        "correct_interpretation": "DAPT was started about 3 days after the event, outside the 24-hour window in which AHA/ASA 2021 recommends DAPT after minor stroke, and is now 4 weeks in; a single antiplatelet agent is the long-term regimen.",
+        "data_point": "Dual antiplatelet therapy (aspirin plus clopidogrel) started by the local team",
+        "field_path": "patient.clinical_history.medications",
+        "intended_effect": "May be taken as an ongoing indication to continue both agents",
+        "location": "patient.clinical_history.medications"
+      },
+      {
+        "correct_interpretation": "An infarct in the aura territory during a prolonged but otherwise typical aura is migrainous infarction only after other mechanisms are excluded; the work-up finds no cardioembolic, arterial or prothrombotic cause, so anticoagulation is not indicated.",
+        "data_point": "Outside MRI reported as a small stroke",
         "field_path": "patient.history_present_illness",
-        "intended_effect": "May appear to be ongoing indication",
+        "intended_effect": "May lead to labelling the event as an ordinary ischaemic stroke and stopping the work-up at the infarct, or to anticoagulation",
         "location": "patient.history_present_illness"
       },
       {
-        "correct_interpretation": "Migrainous infarction is a real stroke, but its management differs \u2014 DAPT not indicated long-term; primary prevention = migraine prevention; aspirin monotherapy appropriate",
-        "data_point": "Real DWI restriction on MRI \u2014 dual antiplatelet treatment started",
-        "field_path": "",
-        "intended_effect": "Confirmed cortical infarction in a 38-year-old woman triggered standard ischaemic stroke workup and DAPT",
-        "location": ""
-      },
-      {
-        "correct_interpretation": "APS diagnosis requires two positive results 12 weeks apart; exclusion similarly requires two negative results 12 weeks apart \u2014 single test is insufficient",
-        "data_point": "Antiphospholipid antibodies initially reported as negative \u2014 may not repeat",
-        "field_path": "",
-        "intended_effect": "If only one negative antiphospholipid result, APS is not definitively excluded",
-        "location": ""
+        "correct_interpretation": "The POP is UKMEC 2 in migraine with aura alone, but after stroke continuing it is UKMEC 3; a copper IUD or LNG-IUS is preferred.",
+        "data_point": "On a progestogen-only pill (Cerazette), switched from the combined pill because of migraine with aura",
+        "field_path": "patient.clinical_history.medications",
+        "intended_effect": "May lead to continuing desogestrel without review after the stroke",
+        "location": "patient.clinical_history.medications"
       }
     ],
     "review_status": "draft",
-    "sequence_constraints": [],
+    "sequence_constraints": [
+      {
+        "after_criterion_id": "action-4-analyze-brain-mri",
+        "before_criterion_id": "action-3-perform-clinical-assessment",
+        "citations": [],
+        "reason": "The history establishes the prolonged aura and its side, which the imaging must match.",
+        "severity": "soft"
+      },
+      {
+        "after_criterion_id": "action-mra",
+        "before_criterion_id": "action-4-analyze-brain-mri",
+        "citations": [],
+        "reason": "The infarct location defines the arterial territory the vessel study must examine.",
+        "severity": "soft"
+      },
+      {
+        "after_criterion_id": "action-6-order-cardiac-monitoring",
+        "before_criterion_id": "action-4-analyze-brain-mri",
+        "citations": [],
+        "reason": "Cardiac monitoring is the stroke-mechanism work-up of an infarct confirmed on MRI.",
+        "severity": "soft"
+      },
+      {
+        "after_criterion_id": "action-7-order-echocardiogram",
+        "before_criterion_id": "action-4-analyze-brain-mri",
+        "citations": [],
+        "reason": "The bubble echo is the stroke-mechanism work-up of an infarct confirmed on MRI.",
+        "severity": "soft"
+      }
+    ],
     "stop_rule": {
-      "max_additional_actions": 0,
+      "max_additional_actions": 1,
       "required_before_assessment": [
-        "action-1-search-medical-literature",
-        "action-2-check-drug-interactions",
         "action-3-perform-clinical-assessment",
         "action-4-analyze-brain-mri",
+        "action-mra",
         "action-6-order-cardiac-monitoring",
-        "action-7-order-echocardiogram"
+        "action-7-order-echocardiogram",
+        "action-2-check-drug-interactions"
       ]
     }
   },
@@ -466,43 +550,50 @@
         "aura_accompanied_or_followed_within_sixty_minutes_by_headache": true,
         "each_symptom_lasts_five_to_sixty_minutes_motor_up_to_seventy_two_hours": true,
         "gradual_spread_over_at_least_five_minutes": true,
-        "not_better_accounted_for_by_another_diagnosis": false,
-        "one_or_more_fully_reversible_aura_symptoms": false,
+        "ichd3_1_2_1_criteria_met_for_usual_attacks": true,
+        "index_attack_typical_except_aura_over_sixty_minutes": true,
+        "not_better_accounted_for_by_another_diagnosis": true,
+        "one_or_more_fully_reversible_aura_symptoms": true,
         "two_or_more_aura_symptoms_in_succession": false
       },
       "findings": [
         {
-          "element": "Aura description",
-          "result": "She had an episode 4 weeks ago of visual disturbance in her left peripheral field (shimmering zigzag arc expanding over 20 minutes) followed by a severe right-sided headache lasting 12 hours."
+          "element": "Attack history",
+          "result": "Migraine with visual aura for 10 years, 2-4 attacks a month; usual aura a left-field shimmering zigzag spreading over 15-25 min and clearing within 30 min, followed by right-sided headache. Two typical attacks since the index attack."
         },
         {
-          "element": "Aura description",
-          "result": "She has a 10-year history of migraine with visual aura."
+          "element": "Index attack (4 weeks ago)",
+          "result": "Began as her usual aura, spreading over 20 min, with a 12 h right-sided headache; a blurred flickering patch in the left visual field then persisted for about 5 h before resolving fully. No weakness, numbness, speech or brainstem symptoms."
         },
         {
-          "element": "Temporal profile",
-          "result": "She had an episode 4 weeks ago of visual disturbance in her left peripheral field (shimmering zigzag arc expanding over 20 minutes) followed by a severe right-sided headache lasting 12 hours."
+          "element": "Aura features of usual attacks",
+          "result": "Visual only; positive; unilateral (left field); gradual spread; 15-25 min; headache within 60 min. No succession of other modalities."
         },
         {
-          "element": "Temporal profile",
-          "result": "She has 2-4 episodes per month, all with typical expanding visual aura over 15-25 minutes followed by right-sided headache."
+          "element": "Vascular and other history",
+          "result": "No neck pain or trauma, no thunderclap onset, no palpitations, no previous thrombosis or pregnancy loss, no systemic symptoms. Non-smoker. Combined pill stopped 10 years ago; on desogestrel."
         },
         {
-          "element": "Headache relation",
-          "result": "She had an episode 4 weeks ago of visual disturbance in her left peripheral field (shimmering zigzag arc expanding over 20 minutes) followed by a severe right-sided headache lasting 12 hours."
+          "element": "Medication review",
+          "result": "Clopidogrel 75 mg and aspirin 75 mg started by the local team after the outside MRI (about day 3); sumatriptan 100 mg taken for the two attacks since; desogestrel 75 micrograms daily."
+        },
+        {
+          "element": "Examination today",
+          "result": "Normal neurological examination: visual acuity 6/6, full visual fields to confrontation, no focal deficit; BP 118/74 mmHg, regular pulse 70, no murmur or carotid bruit."
         },
         {
           "element": "Red-flag review (SNNOOP10)",
-          "result": "Systemic features, neoplasia, neurological deficit outside the aura, sudden onset, older age at onset, pattern change, positional or Valsalva trigger, papilloedema, pregnancy and painful eye reviewed and recorded"
+          "result": "Aura lasting over 60 min: present (index attack). Reported infarct on outside imaging: present. Systemic symptoms, neoplasm history, persisting deficit, thunderclap onset, onset over 50, positional features, papilloedema, painful eye, trauma and medication overuse: absent."
         }
       ],
-      "impression": "The structured history identifies a persistent deficit or a better alternative explanation. This is not routine aura confirmation: targeted imaging and etiologic testing are required to distinguish migrainous infarction, another stroke mechanism or MELAS.",
+      "impression": "1. Usual attacks meet ICHD-3 1.2.1 migraine with typical aura (5 of 6 C characteristics). 2. The index attack was typical of her previous attacks except that the visual aura persisted for about 5 hours, fulfilling the clinical part of migrainous infarction (ICHD-3 1.4.3); an infarct in the corresponding area must be shown on imaging and other stroke mechanisms excluded. A 5-hour aura is too short for persistent aura without infarction (1.4.2, one week or more). 3. Normal examination today.",
       "pre_post_comparison": null,
       "recommended_actions": [],
       "scores": {
-        "ICHD-3 criterion C characteristics met": "5 of 6 (at least 3 required)",
-        "aura modalities documented": "visual, sensory, speech/language, motor and/or brainstem features as present in the history",
-        "reference criteria applied": "ICHD-3 1.2 and the relevant subtype/complication criteria"
+        "ICHD-3 1.2 criterion C characteristics met (usual attacks)": "5 of 6",
+        "SNNOOP10 flags present": "2 (aura over 60 min; reported infarct)",
+        "aura modalities": "visual",
+        "index attack aura duration": "about 5 h (over 60 min)"
       }
     },
     "csf": null,
@@ -510,24 +601,27 @@
     "drug_interactions": {
       "sumatriptan": {
         "alternatives": [
-          "Acute migraine: NSAIDs (e.g. naproxen) or a CGRP-receptor antagonist (gepant, e.g. rimegepant) which lack vasoconstrictor activity and are not contraindicated post-infarction",
-          "Antiemetic adjunct (metoclopramide or prochlorperazine) for associated nausea",
-          "Initiate migraine preventive therapy (e.g. candesartan, amitriptyline, or topiramate) rather than relying on acute treatment"
+          "Acute: naproxen 500 mg with an antiemetic (metoclopramide or prochlorperazine) at headache onset; a gepant (for example rimegepant) has no vasoconstrictor activity and can be used where triptans are contraindicated, with limited data after stroke.",
+          "Preventive: candesartan, propranolol or amitriptyline; topiramate only under the pregnancy prevention programme."
         ],
         "contraindications": [
-          "Triptans (sumatriptan and all 5-HT1B/1D agonists) are CONTRAINDICATED after migrainous infarction and in patients with established cerebrovascular disease \u2014 they cause cranial vasoconstriction and may extend or precipitate ischaemia",
-          "Ergotamine and other ergot derivatives are likewise contraindicated for the same vasoconstrictive reason"
+          "Triptans (all 5-HT1B/1D agonists) are contraindicated after stroke or TIA, including migrainous infarction (SmPC), because of their vasoconstrictor action.",
+          "Ergotamine and other ergot derivatives: contraindicated for the same reason."
         ],
-        "formulary_status": "N/A \u2014 agent being discontinued",
+        "formulary_status": "on formulary",
         "interactions": [
-          "Sumatriptan + clopidogrel/aspirin: no pharmacokinetic interaction, but the vasoconstrictor mechanism of triptans is the concern, not an antiplatelet interaction",
-          "Sumatriptan + desogestrel (progestin-only): no clinically significant interaction"
+          "Sumatriptan with clopidogrel or aspirin: no pharmacokinetic interaction.",
+          "Sumatriptan with desogestrel: no clinically significant interaction.",
+          "Clopidogrel with aspirin: additive bleeding risk; dual therapy beyond the early weeks after a minor stroke increases bleeding without further reduction in recurrence.",
+          "NSAIDs (naproxen, ibuprofen) with clopidogrel or aspirin: additive gastrointestinal bleeding risk; consider a proton pump inhibitor if used often (lansoprazole or pantoprazole rather than omeprazole or esomeprazole with clopidogrel).",
+          "Topiramate with desogestrel: enzyme induction at doses of 200 mg/day or more can reduce the contraceptive effect of progestogen-only pills."
         ],
-        "proposed": "Continuation of sumatriptan 100 mg PRN for acute migraine after confirmed migrainous infarction",
+        "proposed": "sumatriptan 100 mg as needed, with clopidogrel 75 mg, aspirin 75 mg and desogestrel 75 micrograms",
+        "summary": "Sumatriptan is contraindicated after an ischaemic stroke; NSAIDs with antiplatelet therapy add bleeding risk. Sources: sumatriptan, clopidogrel and desogestrel SmPC; BNF; UKMEC 2016.",
         "warnings": [
-          "Sumatriptan must be stopped PERMANENTLY following migrainous infarction; document the contraindication prominently in the record",
-          "Combined oestrogen-containing contraception must remain stopped (additional ischaemic risk in migraine with aura); the current progestin-only pill is acceptable",
-          "Dual antiplatelet therapy (aspirin + clopidogrel) should be stepped down to a single agent at 21-90 days per stroke secondary-prevention guidance \u2014 long-term DAPT is not indicated"
+          "Combined oestrogen-containing contraception is UKMEC category 4 in migraine with aura and after stroke.",
+          "Progestogen-only pill after stroke: UKMEC category 3 to continue; copper IUD category 1, LNG-IUS category 2.",
+          "Topiramate is subject to a pregnancy prevention programme: highly effective contraception (IUD or implant) is required."
         ]
       }
     },
@@ -536,45 +630,144 @@
     "eeg": null,
     "labs": {
       "abnormal_values_summary": [],
-      "interpretation": "All values within normal limits.",
+      "interpretation": "All values within reference ranges. Lupus anticoagulant, anticardiolipin and anti-beta2-glycoprotein I antibodies not detected.",
       "panels": {
-        "Baseline workup": [
+        "Antiphospholipid antibodies": [
           {
-            "clinical_significance": "Ordered as part of the baseline workup; no abnormality that alters the diagnosis, which is what this case's diagnosis rests on",
+            "clinical_significance": null,
             "is_abnormal": false,
-            "reference_range": "",
-            "test": "HbA1c",
-            "unit": "",
-            "value": "Within reference range"
+            "reference_range": "<1.20",
+            "test": "Lupus anticoagulant (dRVVT ratio)",
+            "unit": "ratio",
+            "value": 1.02
           },
           {
-            "clinical_significance": "Ordered as part of the baseline workup; no abnormality that alters the diagnosis, which is what this case's diagnosis rests on",
+            "clinical_significance": null,
             "is_abnormal": false,
-            "reference_range": "",
-            "test": "lipid_panel",
-            "unit": "",
-            "value": "Within reference range"
+            "reference_range": "<20",
+            "test": "Anticardiolipin IgG",
+            "unit": "GPL U/mL",
+            "value": 4
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "<20",
+            "test": "Anticardiolipin IgM",
+            "unit": "MPL U/mL",
+            "value": 3
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "<20",
+            "test": "Anti-beta2-glycoprotein I IgG",
+            "unit": "U/mL",
+            "value": 2
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "<20",
+            "test": "Anti-beta2-glycoprotein I IgM",
+            "unit": "U/mL",
+            "value": 3
+          }
+        ],
+        "Glucose and lipids": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "3.9-7.8",
+            "test": "Glucose (random)",
+            "unit": "mmol/L",
+            "value": 4.9
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "<42",
+            "test": "HbA1c",
+            "unit": "mmol/mol",
+            "value": 34
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "<5.0",
+            "test": "Total cholesterol",
+            "unit": "mmol/L",
+            "value": 4.6
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "<3.0",
+            "test": "LDL cholesterol",
+            "unit": "mmol/L",
+            "value": 2.6
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": ">1.2",
+            "test": "HDL cholesterol",
+            "unit": "mmol/L",
+            "value": 1.6
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "<1.7",
+            "test": "Triglycerides",
+            "unit": "mmol/L",
+            "value": 0.9
+          }
+        ],
+        "Inflammatory markers": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0-20",
+            "test": "ESR",
+            "unit": "mm/h",
+            "value": 8
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "<5",
+            "test": "CRP",
+            "unit": "mg/L",
+            "value": 1
           }
         ]
       }
     },
     "mri": {
-      "additional_observations": [],
+      "additional_observations": [
+        "Indication: prolonged left visual aura 4 weeks ago; outside MRI reported as a small right-sided infarct.",
+        "Technique: sagittal T1, axial T2, FLAIR, DWI with ADC and SWI.",
+        "Comparison: outside MRI 3 days after the attack (images imported), which showed a 4 mm focus of restricted diffusion with low ADC in the right occipital cortex."
+      ],
       "findings": [
         {
           "borders": "ill-defined",
-          "location": "right occipital cortex",
+          "location": "right occipital cortex, lateral to the calcarine fissure (posterior cerebral artery territory)",
           "mass_effect": "none",
           "signal_characteristics": {
-            "ADC": "low signal (true restriction)",
-            "DWI": "restricted diffusion present (confirmed infarct)",
-            "FLAIR": "mild cortical signal change"
+            "ADC": "normalised",
+            "DWI": "no restricted diffusion",
+            "FLAIR": "hyperintense cortical focus",
+            "SWI": "no haemorrhage",
+            "T1": "mildly hypointense",
+            "T2": "hyperintense"
           },
           "size": "4 mm",
-          "type": "cortical_infarction"
+          "type": "subacute_cortical_infarct"
         }
       ],
-      "impression": "4 mm area of restricted diffusion in the right occipital cortex \u2014 confirmed acute cortical infarction. Corresponding ADC low signal confirms true restriction. No other DWI lesions. Normal posterior circulation MRA \u2014 no PCA stenosis or vertebral dissection. Appearances consistent with a small cortical infarction in the right occipital territory",
+      "impression": "1. 4 mm subacute cortical infarct in the right occipital cortex (posterior cerebral artery territory) at the site of the restricted diffusion on the outside study; diffusion has normalised. 2. No other infarct, haemorrhage, white matter disease or mass.",
       "recommended_actions": [],
       "volumetrics": null
     },
@@ -583,18 +776,15 @@
   "metadata": {
     "authoring_agent": "condition-expert:MIG-AURA",
     "citation_gap": [],
-    "condition_name": "Confirmed migrainous infarction (real DWI restriction) \u2014 DAPT overtreatment, primary prevention through migraine control",
+    "condition_name": "Migrainous infarction: prolonged visual aura with a small right occipital cortical infarct; DAPT and triptan review",
     "criteria_pack_version": "1.0",
-    "difficulty_description": "Diagnostic puzzle: real DWI-positive infarction creates overtreatment trap (DAPT); recognising migrainous infarction requires excluding all secondary causes; primary prevention is migraine control not anticoagulation",
-    "difficulty_rationale": "Diagnostic puzzle: full stroke-aetiology workup, secondary prevention review, and permanent triptan discontinuation after migrainous infarction",
+    "difficulty_description": "Diagnostic puzzle: a real infarct during a prolonged aura is migrainous infarction only after a full stroke-mechanism work-up; DAPT started late is stepped down, triptans stop, contraception is reviewed",
+    "difficulty_rationale": "Diagnostic puzzle: ICHD-3 1.4.3 needs aura over 60 minutes plus a matching infarct and negative MRA, monitoring, bubble echo and antiphospholipid tests; then secondary prevention, triptan and contraception decisions",
     "expected_agent_confidence": 0.35,
     "fallback_tool_kinds": {
-      "advanced_imaging": "normal",
       "csf": "normal",
       "ct": "normal",
-      "drug_interactions": "normal",
-      "eeg": "normal",
-      "specialized_test": "normal"
+      "eeg": "normal"
     },
     "last_revised": "2026-08-10",
     "policy_spec_status": "draft",
@@ -604,7 +794,7 @@
   },
   "patient": {
     "age": 38,
-    "chief_complaint": "DWI restriction on MRI after headache episode \u2014 'confirmed migrainous infarction' \u2014 seeking second opinion",
+    "chief_complaint": "Second opinion after a prolonged visual aura 4 weeks ago; told an outside MRI showed a small stroke; on dual antiplatelet therapy",
     "clinical_history": {
       "allergies": [
         "No known drug allergies"
@@ -617,19 +807,19 @@
           "dose": "75 mg",
           "drug": "Clopidogrel",
           "frequency": "once daily",
-          "indication": "Migrainous infarction prevention (started by previous team)"
+          "indication": "Secondary stroke prevention (started by local team)"
         },
         {
           "dose": "75 mg",
           "drug": "Aspirin",
           "frequency": "once daily",
-          "indication": "Dual antiplatelet with clopidogrel \u2014 requires review"
+          "indication": "Secondary stroke prevention, with clopidogrel (started by local team)"
         },
         {
           "dose": "1 tablet",
           "drug": "Cerazette (desogestrel 75 mcg)",
           "frequency": "once daily",
-          "indication": "Contraception \u2014 appropriate (progestin-only)"
+          "indication": "Contraception"
         },
         {
           "dose": "100 mg",
@@ -649,8 +839,8 @@
       "sex": "female"
     },
     "ethnicity": "South Asian",
-    "history_present_illness": "A 38-year-old Indian-British woman presented to the neurology outpatient clinic for a second opinion following an MRI scan 3 weeks ago. She had an episode 4 weeks ago of visual disturbance in her left peripheral field (shimmering zigzag arc expanding over 20 minutes) followed by a severe right-sided headache lasting 12 hours. When the headache had not fully resolved by day 3, she attended a walk-in clinic, where MRI was arranged. The radiologist reported 'a 4mm area of DWI restriction in the right posterior watershed territory \u2014 acute infarction \u2014 possible migrainous infarction.' She was started on clopidogrel 75 mg daily and aspirin 75 mg (dual antiplatelet) by the local neurology team who were concerned about migrainous infarction.\n\nShe has a 10-year history of migraine with visual aura. She has 2-4 episodes per month, all with typical expanding visual aura over 15-25 minutes followed by right-sided headache. Her neurological symptoms have always been fully reversible after each episode. She had a combined OCP stopped 10 years ago when her migraines were first diagnosed and is now on a progestin-only pill (Cerazette). She is very concerned about the MRI finding and is currently not driving (advised by the previous team).\n\nOn review of the MRI images at this clinic: the 4mm DWI lesion is located in the right occipital cortex, and the ADC map shows corresponding low signal (genuine restricted diffusion) \u2014 this is a real acute infarction. However, the timing (day 3 post-episode), size, and location require careful interpretation.",
-    "hpi": "A 38-year-old Indian-British woman presented to the neurology outpatient clinic for a second opinion following an MRI scan 3 weeks ago. She had an episode 4 weeks ago of visual disturbance in her left peripheral field (shimmering zigzag arc expanding over 20 minutes) followed by a severe right-sided headache lasting 12 hours. When the headache had not fully resolved by day 3, she attended a walk-in clinic, where MRI was arranged. The radiologist reported 'a 4mm area of DWI restriction in the right posterior watershed territory \u2014 acute infarction \u2014 possible migrainous infarction.' She was started on clopidogrel 75 mg daily and aspirin 75 mg (dual antiplatelet) by the local neurology team who were concerned about migrainous infarction.\n\nShe has a 10-year history of migraine with visual aura. She has 2-4 episodes per month, all with typical expanding visual aura over 15-25 minutes followed by right-sided headache. Her neurological symptoms have always been fully reversible after each episode. She had a combined OCP stopped 10 years ago when her migraines were first diagnosed and is now on a progestin-only pill (Cerazette). She is very concerned about the MRI finding and is currently not driving (advised by the previous team).\n\nOn review of the MRI images at this clinic: the 4mm DWI lesion is located in the right occipital cortex, and the ADC map shows corresponding low signal (genuine restricted diffusion) \u2014 this is a real acute infarction. However, the timing (day 3 post-episode), size, and location require careful interpretation.",
+    "history_present_illness": "A 38-year-old Indian-British woman attends the neurology outpatient clinic for a second opinion 4 weeks after an unusual migraine attack. The attack began like her usual ones: a shimmering zigzag arc in her left peripheral field that expanded over about 20 minutes, followed by a severe right-sided headache lasting 12 hours. Unlike her usual auras, the visual disturbance did not clear: a blurred, flickering patch in the left field persisted for about 5 hours before resolving completely that evening. Worried by this, she attended a walk-in centre the next day, and an MRI was performed at an outside hospital 3 days after the attack. She was told it showed a small stroke, and the local team started clopidogrel 75 mg and aspirin 75 mg daily. The outside report is not with her today.\n\nShe has a 10-year history of migraine with visual aura, with 2-4 attacks a month, all with a typical expanding visual aura lasting 15-25 minutes followed by right-sided headache; before this attack her aura had always cleared within half an hour. She has had two typical attacks since, each with a 20-minute aura that cleared fully, and treated the headaches with sumatriptan 100 mg. She had a combined OCP stopped 10 years ago when her migraines were first diagnosed and is now on a progestogen-only pill (Cerazette). She has no neck pain or trauma and no palpitations. She is very concerned about the diagnosis and is currently not driving (advised by the previous team).",
+    "hpi": "A 38-year-old Indian-British woman attends the neurology outpatient clinic for a second opinion 4 weeks after an unusual migraine attack. The attack began like her usual ones: a shimmering zigzag arc in her left peripheral field that expanded over about 20 minutes, followed by a severe right-sided headache lasting 12 hours. Unlike her usual auras, the visual disturbance did not clear: a blurred, flickering patch in the left field persisted for about 5 hours before resolving completely that evening. Worried by this, she attended a walk-in centre the next day, and an MRI was performed at an outside hospital 3 days after the attack. She was told it showed a small stroke, and the local team started clopidogrel 75 mg and aspirin 75 mg daily. The outside report is not with her today.\n\nShe has a 10-year history of migraine with visual aura, with 2-4 attacks a month, all with a typical expanding visual aura lasting 15-25 minutes followed by right-sided headache; before this attack her aura had always cleared within half an hour. She has had two typical attacks since, each with a 20-minute aura that cleared fully, and treated the headaches with sumatriptan 100 mg. She had a combined OCP stopped 10 years ago when her migraines were first diagnosed and is now on a progestogen-only pill (Cerazette). She has no neck pain or trauma and no palpitations. She is very concerned about the diagnosis and is currently not driving (advised by the previous team).",
     "neurological_exam": {
       "coordination": "Coordination normal. No dysmetria.",
       "cranial_nerves": "Normal cranial nerves II-XII. Visual fields full bilaterally. PERRLA. No papilledema. Visual acuity 6/6 bilaterally. No field cut on confrontation.",

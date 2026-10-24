@@ -4,14 +4,7 @@
   "difficulty": "diagnostic_puzzle",
   "encounter_type": "outpatient",
   "fallback_tool_outputs": {
-    "advanced_imaging": {
-      "findings": [],
-      "impression": "No abnormality identified.",
-      "modality": "MRA",
-      "quantitative_data": null,
-      "recommended_actions": [],
-      "tracer_or_protocol": null
-    },
+    "advanced_imaging": null,
     "cardiac_monitoring": {
       "duration_hours": 24,
       "events": [],
@@ -42,20 +35,24 @@
       "special_tests": {}
     },
     "ct": {
-      "additional_observations": [],
+      "additional_observations": [
+        "Bilateral symmetric punctate calcification of the globus pallidus."
+      ],
       "angiography_findings": null,
       "contrast_used": false,
       "findings": [
         {
-          "density": "hyperdense",
-          "description": "calcified focus consistent with an old, benign granuloma",
-          "location": "right frontal lobe",
-          "size": "3 mm",
-          "type": "calcification"
+          "density": "hypodense",
+          "description": "Ill-defined cortical and subcortical hypodensity with mild gyral swelling, not confined to a single arterial territory",
+          "location": "right parieto-occipital cortex and subcortical white matter",
+          "size": "about 6 cm",
+          "type": "hypodensity"
         }
       ],
-      "impression": "No acute intracranial abnormality. Incidental calcified granuloma, benign.",
-      "recommended_actions": []
+      "impression": "1. Right parieto-occipital cortical and subcortical hypodensity with mild swelling, not confined to one arterial territory; MRI recommended. 2. Bilateral globus pallidus calcification. No haemorrhage.",
+      "recommended_actions": [
+        "MRI recommended."
+      ]
     },
     "drug_interactions": null,
     "ecg": null,
@@ -69,118 +66,184 @@
   "followup_outputs": [
     {
       "output": {
-        "query": "",
-        "results": [],
-        "summary": ""
-      },
-      "tool_name": "search_medical_literature",
-      "trigger_action": "search_melas_vs_hemiplegic_migraine_differentiation"
-    },
-    {
-      "output": {
-        "chambers": {},
-        "ejection_fraction": null,
         "findings": [
-          "ECHOCARDIOGRAM\n\nIndication: Cardiac screening\n\nFindings: Mild concentric left ventricular hypertrophy (IVSd 12 mm, mildly increased). LVEF 60% \u2014 preserved systolic function. No LVOT obstruction. Mild diastolic dysfunction (E/A ratio 0.8 \u2014 Grade I diastolic dysfunction). Normal valves. No hypertrophic obstructive pattern.\n\nIMPRESSION: Mild concentric LVH with Grade I diastolic dysfunction. Normal systolic function. No hypertrophic obstructive cardiomyopathy. Clinical correlation recommended."
+          {
+            "interpretation": "Lactate peak with neuronal loss or dysfunction in the lesion",
+            "region": "Right parieto-occipital lesion",
+            "signal": "Inverted doublet at 1.33 ppm; NAA reduced (NAA/Cr 1.1)"
+          },
+          {
+            "interpretation": "Lactate in cortex outside the lesion",
+            "region": "Normal-appearing left occipital cortex",
+            "signal": "Smaller inverted doublet at 1.33 ppm; NAA preserved"
+          },
+          {
+            "interpretation": "Raised ventricular lactate",
+            "region": "Lateral ventricular CSF",
+            "signal": "Lactate doublet present"
+          }
         ],
-        "impression": "Mild concentric LVH with Grade I diastolic dysfunction; preserved systolic function. Recommend clinical correlation.",
+        "impression": "1. Lactate peak in the right parieto-occipital lesion with reduced NAA. 2. Lactate also present in normal-appearing contralateral cortex and in ventricular CSF, indicating a widespread rather than lesion-confined lactate excess.",
+        "modality": "MR_spectroscopy",
+        "quantitative_data": {
+          "lesion NAA/Cr": "1.1",
+          "normal-appearing cortex NAA/Cr": "1.7"
+        },
         "recommended_actions": [],
-        "valves": {},
-        "wall_motion": null
+        "tracer_or_protocol": "single-voxel PRESS, TE 144 ms; voxels in the right parieto-occipital lesion, normal-appearing left occipital cortex and lateral ventricular CSF"
       },
-      "tool_name": "order_echocardiogram",
-      "trigger_action": "request_cardiac_echo_melas"
+      "tool_name": "order_advanced_imaging",
+      "trigger_action": "request_mr_spectroscopy"
     },
     {
       "output": {
-        "query": "",
-        "results": [],
-        "summary": ""
+        "abnormal_values_summary": [
+          "m.3243A>G 62% (urine)",
+          "m.3243A>G 28% (blood)",
+          "Lactate 2.8 mmol/L (high)",
+          "Lactate to pyruvate ratio 28 (high)",
+          "CK 182 U/L (high)"
+        ],
+        "interpretation": "m.3243A>G detected: heteroplasmy 62% in urine epithelial cells and 28% in blood leukocytes. Raised lactate (2.8 mmol/L) and lactate to pyruvate ratio (28); CK mildly raised (182 U/L).",
+        "panels": {
+          "Metabolic": [
+            {
+              "clinical_significance": null,
+              "is_abnormal": true,
+              "reference_range": "0.5-2.2",
+              "test": "Lactate (venous, at rest)",
+              "unit": "mmol/L",
+              "value": 2.8
+            },
+            {
+              "clinical_significance": null,
+              "is_abnormal": false,
+              "reference_range": "0.03-0.10",
+              "test": "Pyruvate",
+              "unit": "mmol/L",
+              "value": 0.1
+            },
+            {
+              "clinical_significance": null,
+              "is_abnormal": true,
+              "reference_range": "10-25",
+              "test": "Lactate to pyruvate ratio",
+              "unit": "ratio",
+              "value": 28
+            },
+            {
+              "clinical_significance": null,
+              "is_abnormal": true,
+              "reference_range": "24-170",
+              "test": "Creatine kinase",
+              "unit": "U/L",
+              "value": 182
+            }
+          ],
+          "Mitochondrial DNA": [
+            {
+              "clinical_significance": null,
+              "is_abnormal": true,
+              "reference_range": "not detected",
+              "test": "m.3243A>G (MT-TL1), urine epithelial cells",
+              "unit": "% mutant mtDNA",
+              "value": "detected, heteroplasmy 62%"
+            },
+            {
+              "clinical_significance": null,
+              "is_abnormal": true,
+              "reference_range": "not detected",
+              "test": "m.3243A>G (MT-TL1), blood leukocytes",
+              "unit": "% mutant mtDNA",
+              "value": "detected, heteroplasmy 28%"
+            }
+          ]
+        }
       },
-      "tool_name": "search_medical_literature",
-      "trigger_action": "search_melas_acute_treatment_arginine"
-    },
-    {
-      "output": {
-        "alternatives": [
-          "paracetamol 1000 mg for headache",
-          "ibuprofen 400-600 mg for headache",
-          "oral L-arginine at episode onset (vasodilatory)"
-        ],
-        "contraindications": [
-          "Triptans CONTRAINDICATED in MELAS \u2014 vasoconstrictive mechanism worsens stroke-like episode severity and duration"
-        ],
-        "formulary_status": "contraindicated",
-        "interactions": [
-          "Triptans are 5-HT1B/1D agonists causing vasoconstriction \u2014 in MELAS, stroke-like episodes result from energy failure in cerebrovascular endothelium; vasoconstriction may worsen ischaemia during episodes"
-        ],
-        "proposed": "triptans (sumatriptan) in MELAS (m.3243A>G confirmed)",
-        "warnings": [
-          "Metformin is generally contraindicated in mitochondrial disorders due to risk of lactic acidosis exacerbation",
-          "Valproate carries specific mitochondrial toxicity concerns and should be avoided in mitochondrial disease"
-        ]
-      },
-      "tool_name": "check_drug_interactions",
-      "trigger_action": "search_triptan_contraindication_melas"
+      "tool_name": "interpret_labs",
+      "trigger_action": "request_m3243a_g_mtdna_urine_heteroplasmy"
     },
     {
       "output": {
         "findings": [
           {
-            "result": "Elevated lactate peak in affected territory \u2014 supports MELAS",
-            "study": "MR_spectroscopy"
+            "description": "Indication: episodes of focal deficit with headache; mother with m.3243A>G."
+          },
+          {
+            "description": "Samples: urine epithelial cells and blood leukocytes (urine preferred, as blood heteroplasmy for this variant declines with age). Method: quantitative pyrosequencing for m.3243A>G, with mtDNA sequencing of common pathogenic variants."
+          },
+          {
+            "description": "Result: m.3243A>G (MT-TL1) detected, heteroplasmy 62% in urine and 28% in blood. No other pathogenic mtDNA variant detected."
           }
         ],
-        "impression": "Elevated lactate peak in affected territory \u2014 supports MELAS.",
-        "modality": "MR_spectroscopy",
-        "quantitative_data": null,
+        "impression": "Pathogenic m.3243A>G (MT-TL1) variant, heteroplasmy 62% in urine and 28% in blood.",
+        "quantitative_data": {
+          "blood heteroplasmy": "28%",
+          "urine heteroplasmy": "62%"
+        },
         "recommended_actions": [],
-        "tracer_or_protocol": null
+        "test_type": "genetic_panel:mitochondrial"
       },
-      "tool_name": "order_advanced_imaging",
-      "trigger_action": "request_mr_spectroscopy"
+      "tool_name": "order_specialized_test",
+      "trigger_action": "request_mitochondrial_genetic_testing_m3243"
+    },
+    {
+      "output": {
+        "chambers": {
+          "LA": "normal size",
+          "LV": "normal cavity size; mild concentric hypertrophy (IVSd 12 mm, posterior wall 11 mm)",
+          "RA": "normal size",
+          "RV": "normal size and function"
+        },
+        "echo_type": "TTE",
+        "ejection_fraction": 60.0,
+        "findings": [
+          "Mild concentric left ventricular hypertrophy, IVSd 12 mm.",
+          "Grade I diastolic dysfunction (E/A 0.8).",
+          "No left ventricular outflow tract obstruction at rest or with Valsalva.",
+          "No pericardial effusion."
+        ],
+        "impression": "1. Mild concentric left ventricular hypertrophy with grade I diastolic dysfunction. 2. Preserved systolic function, LVEF 60%; no outflow obstruction; normal valves.",
+        "recommended_actions": [],
+        "valves": {
+          "aortic": "trileaflet, normal",
+          "mitral": "normal",
+          "pulmonic": "normal",
+          "tricuspid": "normal"
+        },
+        "wall_motion": "no regional wall-motion abnormality"
+      },
+      "tool_name": "order_echocardiogram",
+      "trigger_action": "request_transthoracic_echo_cardiomyopathy_screen"
+    },
+    {
+      "output": {
+        "query": "MELAS stroke-like episodes diagnosis and management, hemiplegic migraine criteria",
+        "results": [
+          {
+            "evidence_level": "expert consensus",
+            "finding": "Recommends surveillance for cardiomyopathy and conduction disease (ECG and echocardiography), hearing loss and diabetes; advises avoiding valproate where alternatives exist; on consensus, suggests intravenous L-arginine in acute stroke-like episodes and oral arginine for prevention, on low-level evidence.",
+            "source": "Parikh S, Goldstein A, Karaa A, et al. Patient care standards for primary mitochondrial disease: a consensus statement from the Mitochondrial Medicine Society. Genet Med 2017;19(12)"
+          },
+          {
+            "evidence_level": "expert consensus",
+            "finding": "Stroke-like episodes are frequently accompanied by focal seizures, which should be treated promptly; the evidence for L-arginine is judged insufficient for a firm recommendation.",
+            "source": "Ng YS, Bindoff LA, Gorman GS, et al. Consensus-based statements for the management of mitochondrial stroke-like episodes. Wellcome Open Res 2019;4:201"
+          },
+          {
+            "evidence_level": "classification criteria",
+            "finding": "Hemiplegic migraine (1.2.3) requires fully reversible motor weakness together with fully reversible visual, sensory and/or speech or language symptoms.",
+            "source": "Headache Classification Committee of the International Headache Society. ICHD-3. Cephalalgia 2018;38:1-211"
+          }
+        ],
+        "summary": "Consensus statements guide multisystem surveillance and acute management of mitochondrial stroke-like episodes; the evidence for L-arginine is weak and the two consensus groups differ on it."
+      },
+      "tool_name": "search_medical_literature",
+      "trigger_action": "search_melas_stroke_like_episode_management"
     }
   ],
   "ground_truth": {
     "action_criteria": [
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "query": "ICHD-3 migraine with aura diagnostic criteria SNOOP red flags"
-            },
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[ICHD_3]",
-          "ICHD_3"
-        ],
-        "criterion_id": "action-1-search-medical-literature",
-        "expected_evidence": "ICHD-3 criteria for migraine with aura confirmed; no SNOOP red flag present that mandates further workup",
-        "importance": "required",
-        "label": "Search guideline literature to confirm ICHD-3 1.2 criteria for migraine with aura and exclude SNOOP/CHATS red flags",
-        "rationale": "Search guideline literature to confirm ICHD-3 1.2 criteria for migraine with aura and exclude SNOOP/CHATS red flags"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "context": "MELAS_triptan_valproate_contraindication"
-            },
-            "tool_name": "check_drug_interactions"
-          }
-        ],
-        "citations": [
-          "[AAN_2000]",
-          "AAN_2000"
-        ],
-        "criterion_id": "action-2-check-drug-interactions",
-        "expected_evidence": "TRIPTANS AND ERGOTAMINES CONTRAINDICATED in MELAS (vasoconstriction risk); valproate and metformin generally avoided in MELAS; arginine for acute stroke-like episodes [Holland_2012]",
-        "importance": "required",
-        "label": "Check drug interactions and contraindications for acute (triptan/ergotamine/CGRP antagonist) and prophylactic (beta-blocker, topiramate, valproate, amitriptyline) migraine medications appropriate to this patient",
-        "rationale": "Check drug interactions and contraindications for acute (triptan/ergotamine/CGRP antagonist) and prophylactic (beta-blocker, topiramate, valproate, amitriptyline) migraine medications appropriate to this patient"
-      },
       {
         "alternatives": [
           {
@@ -191,76 +254,27 @@
           }
         ],
         "citations": [
-          "[ICHD_3]",
-          "ICHD-3; NICE CG150 (2025)"
+          "[ICHD_3]"
         ],
         "criterion_id": "action-3-perform-clinical-assessment",
-        "expected_evidence": "Document attack count; reversible aura modalities; gradual spread; succession; 5\u201360 minute duration (motor up to 72 hours); unilateral and positive symptoms; relation to headache; medications; examination and red flags",
+        "expected_evidence": "Brief motor-only attacks (4 of 6, but ICHD-3 1.2.3 B not met); the latest episode left a persistent field defect; short stature, deafness and maternal MELAS mean criterion D fails",
         "importance": "required",
-        "label": "Take a structured headache/aura history, neurological examination and red-flag review; apply every ICHD-3 1.2 criterion explicitly",
-        "rationale": "Take a structured headache/aura history, neurological examination and red-flag review; apply every ICHD-3 1.2 criterion explicitly"
+        "label": "Take a structured headache and aura history with neurological examination and red-flag review, applying ICHD-3 1.2 and 1.2.3",
+        "rationale": "The history shows that the hemiplegic migraine label does not meet ICHD-3 and that the latest episode is a persistent deficit, which with the systemic features points to mitochondrial disease."
       },
       {
         "alternatives": [
           {
-            "required_arguments": {
-              "contrast": false,
-              "protocol": "standard"
-            },
+            "required_arguments": {},
             "tool_name": "analyze_brain_mri"
           }
         ],
-        "citations": [
-          "[ICHD_3]",
-          "ICHD-3; NICE CG150 (2025)"
-        ],
+        "citations": [],
         "criterion_id": "action-4-analyze-brain-mri",
-        "expected_evidence": "Identify or exclude infarct, haemorrhage, mass, vascular lesion or another secondary mimic; MRI does not establish routine migraine",
+        "expected_evidence": "Right parieto-occipital cortical lesion crossing MCA and PCA territories with gyral swelling and mostly normal to increased ADC: a stroke-like, not arterial, pattern",
         "importance": "required",
-        "label": "Obtain brain MRI because imaging answers a specific red-flag question: investigate persistent deficits and a mitochondrial stroke-like disorder",
-        "rationale": "Obtain brain MRI because imaging answers a specific red-flag question: investigate persistent deficits and a mitochondrial stroke-like disorder"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "panels": [
-                "lactate",
-                "CK",
-                "m3243A_G_mtDNA"
-              ]
-            },
-            "tool_name": "interpret_labs"
-          }
-        ],
-        "citations": [
-          "[ICHD_3]",
-          "ICHD-3; NICE CG150 (2025)"
-        ],
-        "criterion_id": "action-5-interpret-labs",
-        "expected_evidence": "Answer the specific alternative-diagnosis question; blood tests do not confirm migraine",
-        "importance": "optional",
-        "label": "Order only tests targeted to this case's secondary-headache, infarct, mitochondrial or seizure differential",
-        "rationale": "Order only tests targeted to this case's secondary-headache, infarct, mitochondrial or seizure differential"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "echo_type": "TTE"
-            },
-            "tool_name": "order_echocardiogram"
-          }
-        ],
-        "citations": [
-          "[AAN_2000]",
-          "AAN_2000"
-        ],
-        "criterion_id": "action-6-order-echocardiogram",
-        "expected_evidence": "Screen for mitochondrial cardiomyopathy / conduction disease",
-        "importance": "required",
-        "label": "Cardiology evaluation with echocardiogram (mitochondrial cardiomyopathy screening)",
-        "rationale": "Cardiology evaluation with echocardiogram (mitochondrial cardiomyopathy screening)"
+        "label": "Brain MRI with DWI/ADC: characterise the lesion behind the persistent field defect",
+        "rationale": "Required: a persistent deficit after an episode; the territory and diffusion pattern separate a metabolic stroke-like lesion from an arterial infarct."
       },
       {
         "alternatives": [
@@ -271,31 +285,168 @@
             "tool_name": "order_advanced_imaging"
           }
         ],
-        "citations": [
-          "[AAN_2000]",
-          "AAN_2000"
-        ],
+        "citations": [],
         "criterion_id": "action-7-order-advanced-imaging",
-        "expected_evidence": "Elevated lactate peak in affected territory \u2014 supports MELAS",
+        "expected_evidence": "Lactate doublet in the lesion and in normal-appearing cortex and ventricular CSF, with reduced NAA in the lesion",
         "importance": "recommended",
-        "label": "MR spectroscopy to confirm lactate peak in affected territory",
-        "rationale": "MR spectroscopy to confirm lactate peak in affected territory"
+        "label": "MR spectroscopy of the lesion and of normal-appearing brain",
+        "rationale": "Recommended: widespread brain lactate supports a mitochondrial cause of the stroke-like lesion."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "panels": [
+                "lactate"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          },
+          {
+            "required_arguments": {
+              "panels": [
+                "CK"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "action-5-interpret-labs",
+        "expected_evidence": "Resting lactate 2.8 mmol/L with lactate to pyruvate ratio 28; CK mildly raised; glucose and HbA1c normal",
+        "importance": "recommended",
+        "label": "Blood lactate, pyruvate, CK, glucose and HbA1c",
+        "rationale": "Recommended: raised lactate supports mitochondrial disease, and glucose and HbA1c screen for the diabetes of m.3243A>G."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "panels": [
+                "m3243A_G_mtDNA"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          },
+          {
+            "required_arguments": {
+              "test_type": "genetic_panel:mitochondrial"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "action-mtdna-test",
+        "expected_evidence": "m.3243A>G present with 62% heteroplasmy in urine and 28% in blood",
+        "importance": "required",
+        "label": "Test for m.3243A>G, preferably in urine epithelial cells, with heteroplasmy level",
+        "rationale": "Required: her mother carries m.3243A>G and her episode, MRI and systemic features suggest MELAS; urine is preferred because blood heteroplasmy falls with age (Parikh S et al., Genet Med 2017)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "echo_type": "TTE"
+            },
+            "tool_name": "order_echocardiogram"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "action-6-order-echocardiogram",
+        "expected_evidence": "Mild concentric LV hypertrophy (IVSd 12 mm) with grade I diastolic dysfunction and preserved ejection fraction",
+        "importance": "required",
+        "label": "Transthoracic echocardiogram to screen for mitochondrial cardiomyopathy",
+        "rationale": "Required: hypertrophic cardiomyopathy is common with m.3243A>G and screening is standard care (Parikh S et al., Genet Med 2017)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_ecg"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "action-ecg",
+        "expected_evidence": "Sinus rhythm with LVH voltage; no pre-excitation or conduction block",
+        "importance": "recommended",
+        "label": "12-lead ECG to screen for pre-excitation and conduction disease",
+        "rationale": "Recommended: pre-excitation and conduction disease occur in m.3243A>G disease and ECG is part of the cardiac screen (Parikh S et al., Genet Med 2017)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "drug": "valproate"
+            },
+            "tool_name": "check_drug_interactions"
+          },
+          {
+            "required_arguments": {
+              "drug": "sodium valproate"
+            },
+            "tool_name": "check_drug_interactions"
+          },
+          {
+            "required_arguments": {
+              "drug": "topiramate"
+            },
+            "tool_name": "check_drug_interactions"
+          },
+          {
+            "required_arguments": {
+              "drug": "levetiracetam"
+            },
+            "tool_name": "check_drug_interactions"
+          },
+          {
+            "required_arguments": {
+              "drug": "metformin"
+            },
+            "tool_name": "check_drug_interactions"
+          },
+          {
+            "required_arguments": {
+              "drug": "sumatriptan"
+            },
+            "tool_name": "check_drug_interactions"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "action-2-check-drug-interactions",
+        "expected_evidence": "Valproate and metformin to be avoided in mitochondrial disease, caution with topiramate (acidosis); levetiracetam if seizures; vasoconstrictive migraine drugs avoided",
+        "importance": "recommended",
+        "label": "Check the medicines to avoid in mitochondrial disease before planning seizure, headache or diabetes treatment",
+        "rationale": "Recommended: she takes only ibuprofen and no antiseizure or preventive medicine is planned now, but the plan for future stroke-like episodes, seizures and diabetes depends on these restrictions."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "search_medical_literature"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "action-1-search-medical-literature",
+        "expected_evidence": "General evidence on managing mitochondrial stroke-like episodes",
+        "importance": "optional",
+        "label": "Optional: literature on mitochondrial stroke-like episodes and hemiplegic migraine criteria",
+        "rationale": "Background evidence only; not a clinical step in the pathway."
       }
     ],
     "assessment": {
       "prohibited_recommendations": [
-        "Do not prescribe triptans or ergotamines in MELAS",
-        "Do not prescribe valproate or metformin in MELAS where alternatives exist",
-        "Do not assume episodes are 'just hemiplegic migraine' in the presence of MELAS family history and red-flag features"
+        "Do not use valproate for seizures or migraine prevention, or metformin for diabetes, in mitochondrial disease",
+        "Do not prescribe triptans or ergot derivatives after a stroke-like episode: vasoconstrictors are avoided in MELAS on expert opinion",
+        "Do not keep the hemiplegic migraine label: the attacks lack the non-motor aura ICHD-3 requires and the latest episode left a persistent deficit"
       ],
       "required_recommendations": [
-        "Test for m.3243A>G in peripheral blood and urine epithelial cells",
-        "Cardiology evaluation (echo, ECG) \u2014 mitochondrial cardiomyopathy / conduction disease screen",
-        "Audiology evaluation \u2014 sensorineural hearing loss",
-        "Glucose monitoring \u2014 increased diabetes risk",
-        "Genetic counselling \u2014 maternal inheritance, heteroplasmy",
-        "Avoid triptans, ergotamines, valproate, metformin",
-        "L-arginine for acute stroke-like episodes (off-label, low-level evidence)"
+        "Explain the diagnosis: MELAS from the maternally inherited m.3243A>G variant (62% in urine) with a recent stroke-like episode; the previous attacks do not meet ICHD-3 criteria for hemiplegic migraine",
+        "Give a written emergency plan for stroke-like episodes: urgent assessment, treatment of seizures, hydration and avoidance of fasting; intravenous L-arginine at presentation and oral arginine prophylaxis may be considered per Mitochondrial Medicine Society consensus (Parikh 2017), stating that the evidence is low and that the 2019 international consensus on stroke-like episodes (Ng YS et al., Wellcome Open Res 2019) found the evidence insufficient to recommend it",
+        "Refer to cardiology for the mild concentric LV hypertrophy, with ECG and echocardiography surveillance at least yearly",
+        "Arrange formal audiology for the sensorineural hearing loss and hearing aid assessment",
+        "Screen for diabetes at least yearly (HbA1c or fasting glucose) and avoid metformin if diabetes develops",
+        "Refer to clinical genetics: maternal inheritance means any children she has may inherit the variant at unpredictable heteroplasmy; discuss reproductive options and offer testing to maternal relatives",
+        "Refer for visual field assessment and rehabilitation for the left homonymous field defect"
       ]
     },
     "avoided_actions": [
@@ -310,7 +461,7 @@
           "[AAN_2000]"
         ],
         "criterion_id": "avoid-waste-1-order-ct-scan",
-        "rationale": "Head CT is less sensitive than MRI for migraine-relevant structural causes and is not indicated in typical migraine with aura; even when imaging is warranted, MRI is preferred",
+        "rationale": "Head CT adds nothing once MRI is available: it shows the lesion poorly and cannot assess diffusion or spectroscopy.",
         "severity": "waste"
       },
       {
@@ -324,7 +475,7 @@
           "[AAN_2000]"
         ],
         "criterion_id": "avoid-waste-2-analyze-csf",
-        "rationale": "Lumbar puncture is not indicated in migraine with aura; reserve for suspected SAH (with normal CT) or meningitis \u2014 neither present here",
+        "rationale": "Lumbar puncture is not needed: urine m.3243A>G testing establishes the diagnosis, and there is no suspicion of infection or inflammation.",
         "severity": "waste"
       },
       {
@@ -338,7 +489,7 @@
           "[AAN_2000]"
         ],
         "criterion_id": "avoid-waste-3-order-cardiac-monitoring",
-        "rationale": "Ambulatory cardiac monitoring is not indicated in typical migraine with aura \u2014 no role unless cardioembolic stroke is on the differential",
+        "rationale": "Ambulatory monitoring is not indicated at this visit: there are no palpitations or syncope, and the ECG shows no pre-excitation or conduction disease.",
         "severity": "waste"
       }
     ],
@@ -356,70 +507,77 @@
     },
     "differential": [
       {
-        "diagnosis": "Sporadic hemiplegic migraine (ICHD-3 1.2.3)",
-        "icd_code": null,
-        "key_features": "Phenotype overlaps; key differentiators are short stature, sensorineural hearing loss, mathematics learning difficulty, and a mother with confirmed MELAS \u2014 all point to mitochondrial disease",
-        "likelihood": "high"
-      },
-      {
-        "diagnosis": "Familial hemiplegic migraine (CACNA1A / ATP1A2 / SCN1A)",
-        "icd_code": null,
-        "key_features": "No family history of hemiplegic migraine specifically; mother's MELAS diagnosis directs workup to m.3243A>G",
+        "diagnosis": "Sporadic hemiplegic migraine (ICHD-3 1.2.3.2)",
+        "icd_code": "G43.409",
+        "key_features": "Against: the brief attacks are motor only, so ICHD-3 1.2.3 B is not met; the latest episode left a persistent field defect with a cortical lesion crossing arterial territories; widespread lactate on MRS; m.3243A>G at 62% in urine.",
         "likelihood": "low"
       },
       {
-        "diagnosis": "Mitochondrial disease other than MELAS",
-        "icd_code": null,
-        "key_features": "Could be MELAS-MERRF overlap; m.3243A>G testing definitive",
-        "likelihood": "low"
-      },
-      {
-        "diagnosis": "Cardioembolic TIA",
-        "icd_code": "G45.9",
-        "key_features": "Young patient with normal cardiac workup",
+        "diagnosis": "Familial hemiplegic migraine (CACNA1A, ATP1A2, SCN1A)",
+        "icd_code": "G43.409",
+        "key_features": "Against: no relative with hemiplegic migraine; the maternal disease is MELAS and the variant is found in the patient.",
         "likelihood": "very_low"
+      },
+      {
+        "diagnosis": "Arterial ischaemic stroke",
+        "icd_code": "I63.9",
+        "key_features": "Against: the lesion crosses MCA and PCA territories, is cortical with gyral swelling and has mostly normal to increased ADC; lactate also in normal-appearing cortex; no vascular risk factors.",
+        "likelihood": "low"
+      },
+      {
+        "diagnosis": "Other m.3243A>G phenotype (maternally inherited diabetes and deafness)",
+        "icd_code": "E88.49",
+        "key_features": "Hearing loss is shared, but a stroke-like episode with a cortical lesion and raised lactate defines MELAS; no diabetes yet.",
+        "likelihood": "low"
       }
     ],
     "key_clinical_evidence": [
-      "MELAS commonly presents with stroke-like episodes that overlap with hemiplegic migraine phenotype",
-      "Maternal inheritance pattern, short stature, sensorineural hearing loss, learning difficulty, and confirmed MELAS in mother all direct workup to m.3243A>G",
-      "MELAS-specific MRI pattern (non-vascular territory lesions, lactate peak on MRS) supports the diagnosis",
-      "Tier per the July 2026 clinical review: ICHD-3: the diagnosis is made on the structured history. Imaging is for the red flags that history screens for, not for the diagnosis.",
-      "Tier per the July 2026 clinical review: No laboratory test contributes to a migraine diagnosis; a targeted assay belongs to a specific suspicion.",
-      "July 2026 review applied end to end: ICHD-3 history/examination is required in all cases; routine MRI, EEG, ECG, CSF, echocardiography, cardiac monitoring and laboratory panels are absent. Retained tests answer an explicit atypical-aura, seizure, infarct, MELAS, CADASIL or aneurysm question."
+      "The brief attacks are motor only and do not meet ICHD-3 1.2.3 B; the latest episode lasted days and left a left homonymous field defect",
+      "Short stature, BMI 18.8, sensorineural hearing loss and learning difficulty with a mother carrying m.3243A>G",
+      "MRI: right parieto-occipital cortical lesion crossing MCA and PCA territories with gyral swelling and mostly normal to increased ADC",
+      "MRS: lactate in the lesion, normal-appearing cortex and ventricular CSF; serum lactate 2.8 mmol/L, lactate to pyruvate ratio 28",
+      "m.3243A>G heteroplasmy 62% in urine and 28% in blood confirms MELAS",
+      "Echo: mild concentric LV hypertrophy with grade I diastolic dysfunction; ECG with LVH voltage and no pre-excitation"
     ],
     "red_herrings": [
       {
-        "correct_interpretation": "Family history of MELAS plus phenotypic stigmata mandate mitochondrial workup before accepting hemiplegic migraine label",
-        "data_point": "Initial 'hemiplegic migraine' label",
+        "correct_interpretation": "The attacks do not meet ICHD-3 1.2.3, and the family history and systemic features require a mitochondrial work-up.",
+        "data_point": "Prior diagnosis of hemiplegic migraine",
         "field_path": "patient.chief_complaint",
-        "intended_effect": "May lock in migraine diagnosis without further workup",
+        "intended_effect": "May lock in a migraine diagnosis without further work-up",
         "location": "patient.chief_complaint"
       },
       {
-        "correct_interpretation": "MELAS stroke-like episodes can present identically; MELAS clues (maternal inheritance of MELAS, bilateral sensorineural hearing loss, short stature, elevated lactate) distinguish MELAS from hemiplegic migraine; m.3243A>G confirmed",
-        "data_point": "Episodic left arm weakness with gradual onset and subsequent headache \u2014 hemiplegic migraine pattern",
-        "field_path": "",
-        "intended_effect": "Gradual motor arm weakness over 15-20 minutes followed by severe headache is a classic hemiplegic migraine description",
-        "location": ""
-      },
-      {
-        "correct_interpretation": "m.3243A>G is maternally transmitted \u2014 the patient inherited it from her mother; mutation confirmed in patient's own testing; MELAS diagnosis established",
-        "data_point": "Mother has MELAS \u2014 patient may have hemiplegic migraine (different condition from MELAS)",
-        "field_path": "",
-        "intended_effect": "MELAS and hemiplegic migraine are different disorders; having a parent with MELAS does not mean the patient has MELAS (though maternal transmission is the mechanism)",
-        "location": ""
+        "correct_interpretation": "Migraine-like headache and transient focal attacks are common in MELAS; the persistent deficit, the stroke-like MRI lesion and m.3243A>G establish MELAS.",
+        "data_point": "Left arm weakness spreading over 15-20 minutes followed by severe headache",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Gradual motor weakness followed by headache resembles hemiplegic migraine",
+        "location": "patient.history_present_illness"
       }
     ],
     "review_status": "draft",
-    "sequence_constraints": [],
+    "sequence_constraints": [
+      {
+        "after_criterion_id": "action-4-analyze-brain-mri",
+        "before_criterion_id": "action-3-perform-clinical-assessment",
+        "citations": [],
+        "reason": "The history defines the persistent deficit that imaging characterises.",
+        "severity": "soft"
+      },
+      {
+        "after_criterion_id": "action-mtdna-test",
+        "before_criterion_id": "action-4-analyze-brain-mri",
+        "citations": [],
+        "reason": "The stroke-like lesion on MRI is part of the indication for genetic testing.",
+        "severity": "soft"
+      }
+    ],
     "stop_rule": {
-      "max_additional_actions": 0,
+      "max_additional_actions": 1,
       "required_before_assessment": [
-        "action-1-search-medical-literature",
-        "action-2-check-drug-interactions",
         "action-3-perform-clinical-assessment",
         "action-4-analyze-brain-mri",
+        "action-mtdna-test",
         "action-6-order-echocardiogram"
       ]
     }
@@ -430,7 +588,7 @@
     "clinical_assessment": {
       "assessment_type": "structured_headache_history_ichd3",
       "criteria_met": {
-        "at_least_one_positive_aura_symptom": true,
+        "at_least_one_positive_aura_symptom": false,
         "at_least_one_unilateral_aura_symptom": true,
         "at_least_three_of_six_characteristics": true,
         "at_least_two_attacks": true,
@@ -438,164 +596,208 @@
         "each_symptom_lasts_five_to_sixty_minutes_motor_up_to_seventy_two_hours": true,
         "gradual_spread_over_at_least_five_minutes": true,
         "not_better_accounted_for_by_another_diagnosis": false,
-        "one_or_more_fully_reversible_aura_symptoms": false,
-        "two_or_more_aura_symptoms_in_succession": true
+        "one_or_more_fully_reversible_aura_symptoms": true,
+        "two_or_more_aura_symptoms_in_succession": false
       },
       "findings": [
         {
-          "element": "Temporal profile",
-          "result": "A 29-year-old Japanese woman was referred to the neurology clinic with a 2-year history of episodic left arm weakness lasting 20-40 minutes followed by a severe right-sided headache, nausea, and photophobia lasting 6-10 hours."
+          "element": "Scope",
+          "result": "criteria_met refers to the six brief attacks; the latest episode is assessed separately below."
         },
         {
-          "element": "Temporal profile",
-          "result": "The motor symptoms spread from left hand (weakness and clumsiness) to involve the left forearm over 15-20 minutes before reaching maximum deficit."
+          "element": "Brief attacks (6 in 2 years)",
+          "result": "Left hand weakness and clumsiness spreading to the forearm over 15-20 minutes, lasting 20-40 minutes, fully recovered within an hour, followed by a severe right-sided headache with nausea and photophobia for 6-10 hours. No visual, sensory or speech symptoms reported in these attacks."
         },
         {
-          "element": "Headache relation",
-          "result": "A 29-year-old Japanese woman was referred to the neurology clinic with a 2-year history of episodic left arm weakness lasting 20-40 minutes followed by a severe right-sided headache, nausea, and photophobia lasting 6-10 hours."
+          "element": "Hemiplegic migraine criteria",
+          "result": "ICHD-3 1.2.3 needs fully reversible motor weakness together with visual, sensory and/or speech symptoms; motor symptoms alone were reported, so 1.2.3 B is not met."
+        },
+        {
+          "element": "Latest episode (10 days ago)",
+          "result": "Onset over hours of left arm weakness, left-sided visual loss, severe headache with vomiting and confusion; arm recovered over about 4 days; the left visual field loss persists. Not reversible, so it is not an aura."
+        },
+        {
+          "element": "Systemic features",
+          "result": "Short stature (150 cm), BMI 18.8, bilateral sensorineural hearing loss, learning difficulty at school, fatigue."
+        },
+        {
+          "element": "Family history",
+          "result": "Mother with MELAS, m.3243A>G, ragged red fibres on muscle biopsy. No siblings; paternal side unaffected."
+        },
+        {
+          "element": "Medication use",
+          "result": "Ibuprofen 400 mg as needed. No triptan, preventive or antiseizure medicine."
+        },
+        {
+          "element": "Examination today",
+          "result": "Left inferior homonymous quadrantanopia with macular sparing; slightly slow responses; power, reflexes, sensation, coordination and gait normal."
         },
         {
           "element": "Red-flag review (SNNOOP10)",
-          "result": "Systemic features, neoplasia, neurological deficit outside the aura, sudden onset, older age at onset, pattern change, positional or Valsalva trigger, papilloedema, pregnancy and painful eye reviewed and recorded"
+          "result": "Neurological deficit persisting beyond the attack: present. Systemic features (hearing loss, short stature, low BMI): present. Confusion with the latest episode: present. Thunderclap onset, onset after 50, positional or Valsalva trigger, papilloedema, pregnancy and painful eye: absent."
         }
       ],
-      "impression": "The structured history identifies a persistent deficit or a better alternative explanation. This is not routine aura confirmation: targeted imaging and etiologic testing are required to distinguish migrainous infarction, another stroke mechanism or MELAS.",
+      "impression": "The brief attacks meet ICHD-3 criterion C (4 of 6) but not 1.2.3 B, because only motor symptoms occur. The latest episode left a persistent homonymous field defect and is not an aura. With short stature, sensorineural hearing loss and a mother with m.3243A>G MELAS, criterion D is not met: a mitochondrial stroke-like episode must be excluded.",
       "pre_post_comparison": null,
       "recommended_actions": [],
       "scores": {
-        "ICHD-3 criterion C characteristics met": "6 of 6 (at least 3 required)",
-        "aura modalities documented": "visual, sensory, speech/language, motor and/or brainstem features as present in the history",
-        "reference criteria applied": "ICHD-3 1.2 and the relevant subtype/complication criteria"
+        "ICHD-3 criterion C characteristics met (brief attacks)": "4 of 6 (gradual spread, duration within the motor limit, unilateral, headache within 60 min)",
+        "aura modality (brief attacks)": "motor only",
+        "latest episode": "persistent deficit (left homonymous field defect)",
+        "reference criteria applied": "ICHD-3 1.2, 1.2.3"
       }
     },
     "csf": null,
     "ct": null,
-    "ecg": null,
+    "drug_interactions": {
+      "valproate": {
+        "alternatives": [
+          "Seizures: levetiracetam or lacosamide",
+          "Acute headache: paracetamol or an NSAID with an antiemetic"
+        ],
+        "contraindications": [
+          "Sodium valproate: avoid in mitochondrial disease; it can worsen mitochondrial function and is hepatotoxic in POLG disease. Use levetiracetam or lacosamide for seizures.",
+          "Metformin: avoid because of the risk of lactic acidosis; relevant if diabetes develops."
+        ],
+        "formulary_status": "on formulary",
+        "interactions": [
+          "Ibuprofen (current): no specific restriction in mitochondrial disease; avoid during vomiting or dehydration because of renal risk."
+        ],
+        "proposed": "Medicines to use or avoid in a patient with m.3243A>G mitochondrial disease (current: ibuprofen as needed)",
+        "summary": "Valproate and metformin are avoided in mitochondrial disease; topiramate needs caution for acidosis; levetiracetam is the usual antiseizure choice.",
+        "warnings": [
+          "Topiramate: can cause metabolic acidosis; use with caution.",
+          "Prolonged high-dose propofol infusion: caution in mitochondrial disease (propofol infusion syndrome).",
+          "Triptans and ergot derivatives: no controlled data in mitochondrial disease; as vasoconstrictors they are generally avoided after a stroke-like episode."
+        ]
+      }
+    },
+    "ecg": {
+      "axis": "normal (+40 degrees)",
+      "findings": [
+        "No pre-excitation; normal PR interval.",
+        "Voltage criteria for left ventricular hypertrophy (Sokolow-Lyon 38 mm) without repolarisation abnormality.",
+        "No conduction block."
+      ],
+      "interpretation": "Sinus rhythm. Voltage criteria for left ventricular hypertrophy. No pre-excitation or conduction disease.",
+      "intervals": {
+        "PR": "150 ms",
+        "QRS": "96 ms",
+        "QT": "410 ms",
+        "QTc": "432 ms"
+      },
+      "rate": 68,
+      "rhythm": "Sinus rhythm"
+    },
     "echo": null,
     "eeg": null,
     "labs": {
       "abnormal_values_summary": [
-        "Serum lactate 2.8 mmol/L [ELEVATED \u2014 ref 0.5-2.2]",
-        "m.3243A>G heteroplasmy 62% in urine [PATHOGENIC MUTATION CONFIRMED]",
-        "m.3243A>G heteroplasmy 28% in blood [PATHOGENIC MUTATION CONFIRMED]",
-        "CK 182 U/L [mildly elevated]"
+        "Lactate 2.8 mmol/L (high)",
+        "Lactate to pyruvate ratio 28 (high)",
+        "CK 182 U/L (high)"
       ],
-      "interpretation": "m.3243A>G mitochondrial DNA variant detected \u2014 heteroplasmy 62% in urine, 28% in blood. Serum lactate 2.8 mmol/L (elevated; ref 0.5\u20132.2). Pyruvate borderline elevated with raised lactate-to-pyruvate ratio. CK mildly elevated",
+      "interpretation": "Raised resting lactate (2.8 mmol/L) with a raised lactate to pyruvate ratio (28). Mildly raised CK (182 U/L). Glucose and HbA1c within reference ranges.",
       "panels": {
-        "metabolic": [
+        "Glucose": [
           {
             "clinical_significance": null,
-            "is_abnormal": true,
-            "reference_range": "",
-            "test": "lactate_serum",
-            "unit": "",
-            "value": "2.8 mmol/L [H] (ref: 0.5-2.2)"
-          },
-          {
-            "clinical_significance": null,
-            "is_abnormal": true,
-            "reference_range": "",
-            "test": "pyruvate",
-            "unit": "",
-            "value": "0.14 mmol/L (ref: 0.03-0.10) \u2014 borderline elevated"
-          },
-          {
-            "clinical_significance": null,
-            "is_abnormal": true,
-            "reference_range": "",
-            "test": "lactate_pyruvate_ratio",
-            "unit": "",
-            "value": "20 (ref: <20) \u2014 borderline elevated"
-          },
-          {
-            "clinical_significance": null,
-            "is_abnormal": true,
-            "reference_range": "",
-            "test": "CK",
-            "unit": "",
-            "value": "182 U/L (ref: 24-170) \u2014 mildly elevated"
-          }
-        ],
-        "mitochondrial_dna": [
-          {
-            "clinical_significance": null,
-            "is_abnormal": true,
-            "reference_range": "",
-            "test": "m3243AG_blood",
-            "unit": "",
-            "value": "heteroplasmy 28% in blood leukocytes \u2014 POSITIVE"
-          },
-          {
-            "clinical_significance": null,
-            "is_abnormal": true,
-            "reference_range": "",
-            "test": "m3243AG_urine",
-            "unit": "",
-            "value": "heteroplasmy 62% in urinary epithelial cells \u2014 POSITIVE (urine preferred, higher heteroplasmy)"
+            "is_abnormal": false,
+            "reference_range": "3.0-6.0",
+            "test": "Fasting glucose",
+            "unit": "mmol/L",
+            "value": 5.3
           },
           {
             "clinical_significance": null,
             "is_abnormal": false,
-            "reference_range": "",
-            "test": "interpretation",
-            "unit": "",
-            "value": "m.3243A>G mutation detected. Heteroplasmy 62% in urinary epithelial cells; 28% in blood leukocytes. Note: urine heteroplasmy is typically higher than blood heteroplasmy for this variant."
+            "reference_range": "20-41",
+            "test": "HbA1c",
+            "unit": "mmol/mol",
+            "value": 38
+          }
+        ],
+        "Metabolic": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "0.5-2.2",
+            "test": "Lactate (venous, at rest)",
+            "unit": "mmol/L",
+            "value": 2.8
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.03-0.10",
+            "test": "Pyruvate",
+            "unit": "mmol/L",
+            "value": 0.1
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "10-25",
+            "test": "Lactate to pyruvate ratio",
+            "unit": "ratio",
+            "value": 28
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "24-170",
+            "test": "Creatine kinase",
+            "unit": "U/L",
+            "value": 182
           }
         ]
       }
     },
-    "literature_search": {
-      "ICHD-3 migraine with aura diagnostic criteria SNOOP red flags": {
-        "query": "ICHD-3 migraine with aura diagnostic criteria SNOOP red flags",
-        "results": [
-          {
-            "evidence_level": "guideline recommendation",
-            "finding": "ICHD-3 criteria for migraine with aura confirmed; no SNOOP red flag present that mandates further workup",
-            "source": "ICHD_3"
-          }
-        ],
-        "summary": "ICHD-3 criteria for migraine with aura confirmed; no SNOOP red flag present that mandates further workup"
-      }
-    },
+    "literature_search": null,
     "mri": {
-      "additional_observations": [],
+      "additional_observations": [
+        "Technique: non-contrast 3 T brain MRI with T1, T2, FLAIR, DWI/ADC and susceptibility-weighted imaging.",
+        "The lesion extends from the right posterior parietal cortex into the lateral and inferior occipital cortex, across the boundary between the middle and posterior cerebral artery territories.",
+        "No haemorrhage on susceptibility-weighted imaging. Symmetric susceptibility signal in both globi pallidi, consistent with mineralisation.",
+        "No other acute lesion. Mild cerebellar volume loss for age. Ventricles normal."
+      ],
       "findings": [
         {
-          "borders": null,
-          "location": "whole brain",
-          "mass_effect": "none",
+          "borders": "ill-defined; predominantly cortical with gyral swelling and subcortical extension",
+          "location": "right parieto-occipital cortex and subcortical white matter",
+          "mass_effect": "mild local sulcal effacement",
           "signal_characteristics": {
-            "DWI": "no restriction",
-            "FLAIR": "no cortical signal change",
-            "T1": "normal",
-            "T2": "normal"
+            "ADC": "mixed: normal to increased over most of the lesion, with small cortical areas of reduced ADC",
+            "DWI": "cortical hyperintensity",
+            "FLAIR": "hyperintense cortex with gyral swelling",
+            "T1": "hypointense, no cortical T1 hyperintensity",
+            "T2": "hyperintense"
           },
-          "size": null,
-          "type": "normal"
+          "size": "6.0 cm x 3.5 cm",
+          "type": "cortical_stroke_like_lesion"
         }
       ],
-      "impression": "No acute intracranial abnormality. No DWI restriction. No posterior cortical FLAIR change. No structural lesion, mass, or hemorrhage",
-      "recommended_actions": [],
+      "impression": "1. Subacute right parieto-occipital cortical and subcortical lesion with gyral swelling, crossing the middle and posterior cerebral artery territories, with mixed, predominantly normal to increased ADC. The distribution and diffusion pattern are not typical of an arterial infarct; a metabolic stroke-like lesion is the leading imaging consideration. 2. No haemorrhage. Mild cerebellar volume loss.",
+      "recommended_actions": [
+        "MR spectroscopy of the lesion and of normal-appearing cortex recommended."
+      ],
       "volumetrics": null
     },
     "specialized_test": null
   },
   "metadata": {
     "authoring_agent": "condition-expert:MIG-AURA",
-    "case_body_concerns": [
-      "Useless-tool entries dropped because the case has neither output nor fallback (silent irrelevance, per authoring guide \u00a71): ['analyze_ecg']"
-    ],
+    "case_body_concerns": [],
     "citation_gap": [],
-    "condition_name": "MELAS (m.3243A>G) with stroke-like episodes misdiagnosed as hemiplegic migraine \u2014 urine testing for heteroplasmy, triptans contraindicated",
+    "condition_name": "MELAS (m.3243A>G) with a stroke-like episode, previously labelled hemiplegic migraine: urine heteroplasmy testing and multisystem screening",
     "criteria_pack_version": "1.0",
-    "difficulty_description": "Diagnostic puzzle: hemiplegic migraine is clinically plausible but MELAS clues (hearing loss, short stature, elevated lactate, maternal inheritance) and m.3243A>G mutation establish MELAS; triptans must be stopped",
+    "difficulty_description": "Diagnostic puzzle: hemiplegic migraine is clinically plausible but MELAS clues (hearing loss, short stature, elevated lactate, maternal inheritance) and m.3243A>G mutation establish MELAS; triptans and valproate are avoided",
     "difficulty_rationale": "Diagnostic puzzle: MELAS masquerading as hemiplegic migraine \u2014 requires mitochondrial workup, MR spectroscopy, multisystem screen",
     "expected_agent_confidence": 0.35,
     "fallback_tool_kinds": {
-      "advanced_imaging": "normal",
       "cardiac_monitoring": "normal",
       "csf": "normal",
-      "ct": "incidental"
+      "ct": "case_specific"
     },
     "last_revised": "2026-08-10",
     "policy_spec_status": "draft",
@@ -605,7 +807,7 @@
   },
   "patient": {
     "age": 29,
-    "chief_complaint": "Recurrent left arm weakness and headache \u2014 diagnosed as hemiplegic migraine; mother has MELAS",
+    "chief_complaint": "Recurrent left arm weakness and headache diagnosed as hemiplegic migraine; a longer episode 10 days ago has left a visual field defect; mother has MELAS",
     "clinical_history": {
       "allergies": [
         "No known drug allergies"
@@ -632,14 +834,14 @@
       "sex": "female"
     },
     "ethnicity": "East Asian",
-    "history_present_illness": "A 29-year-old Japanese woman was referred to the neurology clinic with a 2-year history of episodic left arm weakness lasting 20-40 minutes followed by a severe right-sided headache, nausea, and photophobia lasting 6-10 hours. She has had 6 episodes in 2 years. The motor symptoms spread from left hand (weakness and clumsiness) to involve the left forearm over 15-20 minutes before reaching maximum deficit. Full recovery occurs within 40-60 minutes.\n\nThe key complicating factor: her mother was diagnosed with MELAS (Mitochondrial Encephalomyopathy, Lactic Acidosis, and Stroke-like episodes) 3 years ago. The mother's MELAS was confirmed by muscle biopsy (ragged red fibres) and mitochondrial DNA analysis (m.3243A>G mutation). This has raised the concern that the daughter's episodic neurological episodes could be MELAS stroke-like episodes rather than hemiplegic migraine.\n\nThe daughter herself has mild bilateral sensorineural hearing loss (noted on audiometry at work health check). She is shorter than average (height 150cm) and her BMI is 18.8. She had mild learning difficulties at school \u2014 she struggled with mathematics. She is currently a shop assistant. She has no personal history of stroke, seizures, diabetes, or cardiac disease. She is a non-smoker, no alcohol. She has never had the m.3243A>G mutation test herself.",
-    "hpi": "A 29-year-old Japanese woman was referred to the neurology clinic with a 2-year history of episodic left arm weakness lasting 20-40 minutes followed by a severe right-sided headache, nausea, and photophobia lasting 6-10 hours. She has had 6 episodes in 2 years. The motor symptoms spread from left hand (weakness and clumsiness) to involve the left forearm over 15-20 minutes before reaching maximum deficit. Full recovery occurs within 40-60 minutes.\n\nThe key complicating factor: her mother was diagnosed with MELAS (Mitochondrial Encephalomyopathy, Lactic Acidosis, and Stroke-like episodes) 3 years ago. The mother's MELAS was confirmed by muscle biopsy (ragged red fibres) and mitochondrial DNA analysis (m.3243A>G mutation). This has raised the concern that the daughter's episodic neurological episodes could be MELAS stroke-like episodes rather than hemiplegic migraine.\n\nThe daughter herself has mild bilateral sensorineural hearing loss (noted on audiometry at work health check). She is shorter than average (height 150cm) and her BMI is 18.8. She had mild learning difficulties at school \u2014 she struggled with mathematics. She is currently a shop assistant. She has no personal history of stroke, seizures, diabetes, or cardiac disease. She is a non-smoker, no alcohol. She has never had the m.3243A>G mutation test herself.",
+    "history_present_illness": "A 29-year-old Japanese woman was referred to the neurology clinic with a 2-year history of episodic left arm weakness lasting 20-40 minutes followed by a severe right-sided headache, nausea, and photophobia lasting 6-10 hours. She has had 6 episodes in 2 years. The motor symptoms spread from left hand (weakness and clumsiness) to involve the left forearm over 15-20 minutes before reaching maximum deficit. Full recovery occurs within 40-60 minutes.\n\nTen days ago she had a different episode. Over several hours she developed left arm weakness, loss of vision to her left, a severe right-sided headache with repeated vomiting, and her flatmate found her muddled and slow to answer. She stayed in bed at home for 3 days, thinking it was a bad migraine. The arm recovered over about 4 days, but she still bumps into objects on her left and cannot read the left side of the shop till screen.\n\nThe key complicating factor: her mother was diagnosed with MELAS (Mitochondrial Encephalomyopathy, Lactic Acidosis, and Stroke-like episodes) 3 years ago. The mother's MELAS was confirmed by muscle biopsy (ragged red fibres) and mitochondrial DNA analysis (m.3243A>G mutation). This has raised the concern that the daughter's episodic neurological episodes could be MELAS stroke-like episodes rather than hemiplegic migraine.\n\nThe daughter herself has mild bilateral sensorineural hearing loss (noted on audiometry at work health check). She is shorter than average (height 150cm) and her BMI is 18.8. She had mild learning difficulties at school \u2014 she struggled with mathematics. She is currently a shop assistant. She has no personal history of stroke, seizures, diabetes, or cardiac disease. She is a non-smoker, no alcohol. She has never had the m.3243A>G mutation test herself.",
+    "hpi": "A 29-year-old Japanese woman was referred to the neurology clinic with a 2-year history of episodic left arm weakness lasting 20-40 minutes followed by a severe right-sided headache, nausea, and photophobia lasting 6-10 hours. She has had 6 episodes in 2 years. The motor symptoms spread from left hand (weakness and clumsiness) to involve the left forearm over 15-20 minutes before reaching maximum deficit. Full recovery occurs within 40-60 minutes.\n\nTen days ago she had a different episode. Over several hours she developed left arm weakness, loss of vision to her left, a severe right-sided headache with repeated vomiting, and her flatmate found her muddled and slow to answer. She stayed in bed at home for 3 days, thinking it was a bad migraine. The arm recovered over about 4 days, but she still bumps into objects on her left and cannot read the left side of the shop till screen.\n\nThe key complicating factor: her mother was diagnosed with MELAS (Mitochondrial Encephalomyopathy, Lactic Acidosis, and Stroke-like episodes) 3 years ago. The mother's MELAS was confirmed by muscle biopsy (ragged red fibres) and mitochondrial DNA analysis (m.3243A>G mutation). This has raised the concern that the daughter's episodic neurological episodes could be MELAS stroke-like episodes rather than hemiplegic migraine.\n\nThe daughter herself has mild bilateral sensorineural hearing loss (noted on audiometry at work health check). She is shorter than average (height 150cm) and her BMI is 18.8. She had mild learning difficulties at school \u2014 she struggled with mathematics. She is currently a shop assistant. She has no personal history of stroke, seizures, diabetes, or cardiac disease. She is a non-smoker, no alcohol. She has never had the m.3243A>G mutation test herself.",
     "neurological_exam": {
       "additional": "Audiometry documented bilateral mild sensorineural hearing loss (high-frequency pattern). No proximal muscle weakness on examination.",
       "coordination": "Finger-nose and heel-shin tests normal bilaterally. No dysmetria.",
-      "cranial_nerves": "Normal cranial nerves II-XII. Visual fields full by confrontation. PERRLA 3mm bilaterally. Extraocular movements full. No facial asymmetry. Tongue midline.",
+      "cranial_nerves": "Left inferior homonymous quadrantanopia on confrontation, extending into the left upper quadrant peripherally; macula spared. PERRLA 3mm bilaterally. Extraocular movements full. No facial asymmetry. Tongue midline.",
       "gait": "Normal gait and tandem gait. Romberg negative.",
-      "mental_status": "Alert and fully oriented. Normal cognition. No aphasia.",
+      "mental_status": "Alert and fully oriented. Slightly slow to respond; no aphasia; attends to both sides.",
       "motor": "Motor strength 5/5 in all four limbs. No pronator drift. Normal tone.",
       "reflexes": "Deep tendon reflexes 2+ and symmetric throughout. Plantar responses flexor bilaterally.",
       "sensory": "Intact to light touch, pinprick, and vibration throughout. No hemisensory deficit."
@@ -649,8 +851,8 @@
       "abdomen": "Soft; lean habitus",
       "cardiovascular": "Regular rate and rhythm; no murmurs",
       "extremities": "No edema; no proximal muscle weakness",
-      "general": "Small, thin, Asian woman; alert and fully oriented; no active neurological deficits today",
-      "neurological": "Normal cranial nerves. Visual fields full. PERRLA. Motor 5/5 throughout today \u2014 no drift. DTR 2+ symmetric. Sensation intact. Cerebellar: Normal finger-nose and heel-shin. Gait normal. Audiometry: Bilateral mild sensorineural hearing loss documented.",
+      "general": "Small, thin woman; alert and fully oriented; left visual field defect; no other neurological deficit today",
+      "neurological": "Left inferior homonymous quadrantanopia. Other cranial nerves normal. PERRLA. Motor 5/5 throughout today, no drift. DTR 2+ symmetric. Sensation intact. Cerebellar: normal finger-nose and heel-shin. Gait normal. Audiometry: bilateral mild sensorineural hearing loss documented.",
       "respiratory": "Clear"
     },
     "pmh": [

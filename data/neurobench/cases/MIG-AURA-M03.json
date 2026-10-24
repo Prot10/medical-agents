@@ -4,14 +4,7 @@
   "difficulty": "moderate",
   "encounter_type": "outpatient",
   "fallback_tool_outputs": {
-    "advanced_imaging": {
-      "findings": [],
-      "impression": "No abnormality identified.",
-      "modality": "MRA head and neck",
-      "quantitative_data": null,
-      "recommended_actions": [],
-      "tracer_or_protocol": null
-    },
+    "advanced_imaging": null,
     "cardiac_monitoring": null,
     "csf": {
       "appearance": "clear and colourless",
@@ -41,107 +34,80 @@
     "labs": null,
     "literature_search": null,
     "mri": null,
-    "specialized_test": {
-      "findings": [
-        {
-          "finding": "minor non-specific abnormality",
-          "interpretation": "of uncertain and likely no clinical significance"
-        }
-      ],
-      "impression": "Minor non-specific finding.",
-      "quantitative_data": null,
-      "recommended_actions": [],
-      "test_type": "Neurodiagnostic assessment"
-    }
+    "specialized_test": null
   },
   "followup_outputs": [
     {
       "output": {
-        "alternatives": [],
-        "contraindications": [],
+        "findings": [
+          {
+            "finding": "Normal calibre, no stenosis, intimal flap or intramural haematoma",
+            "interpretation": "No cervical artery dissection or stenosis",
+            "region": "Cervical carotid and vertebral arteries"
+          },
+          {
+            "finding": "No stenosis, occlusion, segmental narrowing or aneurysm",
+            "interpretation": "Normal intracranial arteries",
+            "region": "Intracranial circulation, including the left middle cerebral artery"
+          }
+        ],
+        "impression": "Normal intracranial and cervical MR angiography. No stenosis, dissection, aneurysm or vascular malformation.",
+        "modality": "MR_angiography",
+        "quantitative_data": null,
+        "recommended_actions": [],
+        "tracer_or_protocol": "3D time-of-flight MR angiography of the circle of Willis and contrast-enhanced MR angiography of the cervical arteries"
+      },
+      "tool_name": "order_advanced_imaging",
+      "trigger_action": "request_mr_angiography_intracranial_and_cervical"
+    },
+    {
+      "output": {
+        "alternatives": [
+          "NSAID (naproxen 500 mg or ibuprofen 400-600 mg) with an antiemetic (metoclopramide 10 mg or prochlorperazine)",
+          "Gepants (rimegepant, ubrogepant) do not cause vasoconstriction; limited data in hemiplegic migraine"
+        ],
+        "contraindications": [
+          "Hemiplegic migraine and migraine with brainstem aura: triptans are excluded by the product labels because of a theoretical vasoconstrictive risk and no trial data; avoid.",
+          "Ergot derivatives (ergotamine, dihydroergotamine): avoid in hemiplegic migraine for the same reason.",
+          "Triptans are also contraindicated by label after stroke or TIA, in ischaemic heart disease, peripheral vascular disease and uncontrolled hypertension."
+        ],
         "formulary_status": "on formulary",
         "interactions": [
-          "DRUG REVIEW \u2014 ASPIRIN IN SETTING OF TRANSIENT MOTOR AND APHASIC SYMPTOMS\n\nQuery: Aspirin 75 mg started empirically for possible TIA.\n\nFINDINGS:\nTIA INDICATION: Aspirin is used for secondary prevention after confirmed TIA. When TIA is not confirmed by imaging or clinical criteria, the indication is uncertain.\n\nVASCULAR RISK CONTEXT: Elevated LDL 148 mg/dL is an independent indication for lipid-lowering therapy (statin) regardless of neurological diagnosis. Statin therapy is indicated when 10-year cardiovascular risk exceeds treatment thresholds per current guidelines.\n\nASPIRIN AND MIGRAINE: Aspirin has no established role in migraine prevention at antiplatelet doses. High-dose aspirin (900 mg) may be used for acute migraine attacks.\n\nClinical correlation with neurological diagnosis required before continuing antiplatelet therapy long-term."
+          "Aspirin 75 mg (current): no pharmacokinetic interaction with triptans.",
+          "Paracetamol (current as needed): no interaction."
         ],
-        "proposed": "check_aspirin_migraine_hemiplegic_aura",
+        "proposed": "Sumatriptan (and other triptans)",
+        "summary": "Triptans and ergots are label-restricted in hemiplegic migraine; an NSAID with an antiemetic is the usual acute treatment.",
         "warnings": [
-          "Aspirin is indicated for secondary prevention after confirmed TIA; the indication should be reviewed once the neurological diagnosis is established; elevated LDL is an independent indication for lipid-lowering therapy per current cardiovascular risk guidelines."
+          "A retrospective series of 76 people with hemiplegic migraine treated with triptans reported no ischaemic events (Artto V et al., Eur J Neurol 2007;14:1053-1056); the label restriction still applies."
         ]
       },
       "tool_name": "check_drug_interactions",
-      "trigger_action": "check_aspirin_migraine_hemiplegic_aura"
+      "trigger_action": "check_sumatriptan_triptan_rizatriptan_zolmitriptan_hemiplegic_migraine"
     },
     {
       "output": {
-        "query": "search_sporadic_hemiplegic_migraine_diagnosis",
+        "query": "sporadic hemiplegic migraine diagnosis and acute treatment",
         "results": [
           {
-            "abstract": "LITERATURE SEARCH: Sporadic Hemiplegic Migraine \u2014 Diagnosis and Management\n\nKEY FINDINGS:\n1. SPORADIC HEMIPLEGIC MIGRAINE (SHM): ICHD-3 requires: Migraine with motor aura; \u22651 aura symptom spreading gradually; no first or second degree relative with identical attacks (distinguishes from familial hemiplegic migraine)\n2. DIAGNOSIS REQUIRES \u22652 ATTACKS: SHM cannot be diagnosed after a single motor/sensory/aphasic aura episode; prior isolated visual episodes may represent typical migraine with aura.\n3. GENETICS: SHM: de novo or non-inherited mutations in CACNA1A, ATP1A2, SCN1A; genetic testing not routine unless severe/recurrent\n4. TIA DIFFERENTIATION: Normal DWI is KEY. In SHM, DWI is normal even with motor deficit. In TIA, DWI may show restricted diffusion (though not always acutely)\n5. MANAGEMENT: No specific SHM treatment differs significantly from migraine with aura. Avoid vasoconstrictors (triptans) if motor aura is suspected (theory-based; some guidelines caution against triptans in hemiplegic migraine)\n6. FIRST EPISODE: Diagnosis of SHM cannot be made on first episode alone \u2014 ICHD-3 requires \u22652; follow up and document second episode\n\nCONCLUSION: After second episode, SHM can be confirmed. Normal DWI is reassuring. Avoid triptans if motor aura confirmed.",
-            "relevance": "high",
-            "title": "Literature review"
-          }
-        ],
-        "summary": "SHM requires \u22652 episodes for diagnosis; normal DWI is key; avoid triptans if motor aura confirmed; wait for second episode to confirm"
-      },
-      "tool_name": "search_medical_literature",
-      "trigger_action": "search_sporadic_hemiplegic_migraine_diagnosis"
-    },
-    {
-      "output": {
-        "query": "search_triptan_use_motor_aura",
-        "results": [
+            "evidence_level": "consensus classification",
+            "finding": "Hemiplegic migraine needs at least two attacks with fully reversible motor weakness and fully reversible visual, sensory and/or speech symptoms; motor symptoms may last up to 72 hours. The sporadic form has no affected first- or second-degree relative.",
+            "source": "Headache Classification Committee of the IHS. ICHD-3. Cephalalgia 2018;38:1-211 (1.2.3 Hemiplegic migraine)"
+          },
           {
-            "abstract": "LITERATURE SEARCH: Triptans and Motor Aura \u2014 Safety in Hemiplegic Migraine\n\nKEY FINDINGS:\n1. THEORETICAL CONCERN: Triptans are vasoconstrictors; theoretical risk of worsening ischaemia during a migraine aura involving motor weakness\n2. GUIDELINES: AAN/HIS guidelines CAUTION AGAINST triptans in hemiplegic migraine; however, this caution is largely theoretical \u2014 actual cases of triptan-associated harm in HM are rare case reports\n3. ALTERNATIVE ACUTE TREATMENTS: NSAIDs (naproxen 500-750 mg), antiemetics (metoclopramide); DHE also typically avoided in hemiplegic migraine\n4. IF DIAGNOSIS UNCERTAIN: A first motor aura episode without prior confirmed hemiplegic migraine \u2014 triptans are relatively (not absolutely) contraindicated; clinical judgment required\n5. AVOID PREMATURE LABELLING: with prior visual aura episodes and a first motor aura episode, labelling as hemiplegic migraine prematurely may over-restrict treatment; a second documented episode is required before restricting triptans\n\nCONCLUSION: Avoid triptans if hemiplegic migraine confirmed. For now \u2014 NSAIDs and antiemetics for acute treatment pending diagnostic clarity.",
-            "relevance": "high",
-            "title": "Literature review"
+            "evidence_level": "narrative review",
+            "finding": "CACNA1A, ATP1A2 and SCN1A variants explain part of familial and a minority of sporadic cases; the first attack needs exclusion of stroke and other secondary causes. Acute treatment usually relies on NSAIDs and antiemetics because vasoconstrictors are label-restricted.",
+            "source": "Russell MB, Ducros A. Sporadic and familial hemiplegic migraine: pathophysiological mechanisms, clinical characteristics, diagnosis, and management. Lancet Neurol 2011;10:457-470"
           }
         ],
-        "summary": ""
+        "summary": "Hemiplegic migraine is defined by repeated reversible motor aura; first attacks require exclusion of secondary causes, and acute treatment avoids vasoconstrictors by convention."
       },
       "tool_name": "search_medical_literature",
-      "trigger_action": "search_triptan_use_motor_aura"
+      "trigger_action": "search_sporadic_hemiplegic_migraine_diagnosis_and_acute_treatment"
     }
   ],
   "ground_truth": {
     "action_criteria": [
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "query": "ICHD-3 migraine with aura diagnostic criteria SNOOP red flags"
-            },
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[ICHD_3]",
-          "ICHD_3"
-        ],
-        "criterion_id": "action-1-search-medical-literature",
-        "expected_evidence": "ICHD-3 criteria for migraine with aura confirmed; no SNOOP red flag present that mandates further workup",
-        "importance": "required",
-        "label": "Search guideline literature to confirm ICHD-3 1.2 criteria for migraine with aura and exclude SNOOP/CHATS red flags",
-        "rationale": "Search guideline literature to confirm ICHD-3 1.2 criteria for migraine with aura and exclude SNOOP/CHATS red flags"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "context": "hemiplegic_migraine_triptan_contraindication"
-            },
-            "tool_name": "check_drug_interactions"
-          }
-        ],
-        "citations": [
-          "[AAN_2000]",
-          "AAN_2000"
-        ],
-        "criterion_id": "action-2-check-drug-interactions",
-        "expected_evidence": "TRIPTANS AND ERGOTAMINES ARE CONTRAINDICATED IN HEMIPLEGIC MIGRAINE \u2014 use NSAIDs, antiemetics, or lasmiditan/gepants instead; review statin indication given elevated LDL",
-        "importance": "required",
-        "label": "Check drug interactions and contraindications for acute (triptan/ergotamine/CGRP antagonist) and prophylactic (beta-blocker, topiramate, valproate, amitriptyline) migraine medications appropriate to this patient",
-        "rationale": "Check drug interactions and contraindications for acute (triptan/ergotamine/CGRP antagonist) and prophylactic (beta-blocker, topiramate, valproate, amitriptyline) migraine medications appropriate to this patient"
-      },
       {
         "alternatives": [
           {
@@ -152,48 +118,138 @@
           }
         ],
         "citations": [
-          "[ICHD_3]",
-          "ICHD-3; NICE CG150 (2025)"
+          "[ICHD_3]"
         ],
         "criterion_id": "action-3-perform-clinical-assessment",
-        "expected_evidence": "Document attack count; reversible aura modalities; gradual spread; succession; 5\u201360 minute duration (motor up to 72 hours); unilateral and positive symptoms; relation to headache; medications; examination and red flags",
+        "expected_evidence": "Repeated typical visual auras for 4-5 years and one attack of right hand tingling spreading over 20-25 minutes, then grip weakness and slurred speech, 25-30 minutes, followed by migrainous headache; no affected relative; normal examination; motor aura and pattern change are red flags",
         "importance": "required",
-        "label": "Take a structured headache/aura history, neurological examination and red-flag review; apply every ICHD-3 1.2 criterion explicitly",
-        "rationale": "Take a structured headache/aura history, neurological examination and red-flag review; apply every ICHD-3 1.2 criterion explicitly"
+        "label": "Take a structured headache and aura history with examination and apply ICHD-3 criteria for migraine with aura and hemiplegic migraine",
+        "rationale": "The history establishes migraine with typical aura and shows that the new attack meets the hemiplegic migraine criteria except the second attack (probable sporadic hemiplegic migraine); it also identifies the red flags that make imaging and vessel imaging appropriate."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_brain_mri"
+          }
+        ],
+        "citations": [
+          "[AAN_2000]"
+        ],
+        "criterion_id": "action-4-analyze-brain-mri",
+        "expected_evidence": "No infarct, haemorrhage or structural lesion 10 days after the attack; three punctate non-specific frontal subcortical hyperintensities",
+        "importance": "recommended",
+        "label": "Brain MRI for a first motor aura",
+        "rationale": "Motor aura and a change in aura pattern are red flags; MRI excludes infarction and structural causes and is preferred to CT (Evans RW et al., Headache 2020;60:318-336; AAN 2000)."
       },
       {
         "alternatives": [
           {
             "required_arguments": {
-              "contrast": false,
-              "protocol": "standard"
+              "modality": "MR_angiography"
             },
-            "tool_name": "analyze_brain_mri"
+            "tool_name": "order_advanced_imaging"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "action-mra",
+        "expected_evidence": "Normal intracranial and cervical arteries: no stenosis, dissection or aneurysm",
+        "importance": "recommended",
+        "label": "MR angiography of the intracranial and cervical arteries",
+        "rationale": "A first transient motor deficit in a 42-year-old with mild hypertension needs exclusion of a large-artery stenosis or cervical dissection before it is attributed to migraine."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "drug": "sumatriptan"
+            },
+            "tool_name": "check_drug_interactions"
+          },
+          {
+            "required_arguments": {
+              "drug": "triptan"
+            },
+            "tool_name": "check_drug_interactions"
+          },
+          {
+            "required_arguments": {
+              "drug": "triptans"
+            },
+            "tool_name": "check_drug_interactions"
+          },
+          {
+            "required_arguments": {
+              "drug": "rizatriptan"
+            },
+            "tool_name": "check_drug_interactions"
+          },
+          {
+            "required_arguments": {
+              "drug": "zolmitriptan"
+            },
+            "tool_name": "check_drug_interactions"
+          },
+          {
+            "required_arguments": {
+              "drug": "naratriptan"
+            },
+            "tool_name": "check_drug_interactions"
+          },
+          {
+            "required_arguments": {
+              "drug": "eletriptan"
+            },
+            "tool_name": "check_drug_interactions"
+          },
+          {
+            "required_arguments": {
+              "drug": "almotriptan"
+            },
+            "tool_name": "check_drug_interactions"
+          },
+          {
+            "required_arguments": {
+              "drug": "frovatriptan"
+            },
+            "tool_name": "check_drug_interactions"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "action-2-check-drug-interactions",
+        "expected_evidence": "Triptans and ergots label-restricted in hemiplegic migraine; NSAID with an antiemetic as the acute alternative",
+        "importance": "required",
+        "label": "Check triptans before choosing acute treatment for a motor aura",
+        "rationale": "Triptans are the default acute treatment for migraine with aura, but their labels exclude hemiplegic migraine, so the check changes the acute plan."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "search_medical_literature"
           }
         ],
         "citations": [
-          "[ICHD_3]",
-          "ICHD-3; NICE CG150 (2025)"
+          "[ICHD_3]"
         ],
-        "criterion_id": "action-4-analyze-brain-mri",
-        "expected_evidence": "Identify or exclude infarct, haemorrhage, mass, vascular lesion or another secondary mimic; MRI does not establish routine migraine",
-        "importance": "recommended",
-        "label": "Obtain brain MRI because imaging answers a specific red-flag question: evaluate this first, changed, late-onset, prolonged, motor, brainstem or otherwise atypical aura",
-        "rationale": "Obtain brain MRI because imaging answers a specific red-flag question: evaluate this first, changed, late-onset, prolonged, motor, brainstem or otherwise atypical aura"
+        "criterion_id": "action-1-search-medical-literature",
+        "expected_evidence": "General evidence on the criteria, genetics and acute treatment of hemiplegic migraine",
+        "importance": "optional",
+        "label": "Search the literature on sporadic hemiplegic migraine (optional)",
+        "rationale": "Background reading only; the diagnosis rests on the history and the exclusion of secondary causes."
       }
     ],
     "assessment": {
       "prohibited_recommendations": [
-        "Do not prescribe triptans in hemiplegic migraine",
-        "Do not prescribe ergotamines in hemiplegic migraine",
-        "Do not co-administer ergotamines with triptans"
+        "Do not prescribe triptans or ergot derivatives: they are avoided in hemiplegic migraine; use an NSAID with an antiemetic.",
+        "Do not start antiplatelet or anticoagulant therapy for presumed TIA: the episode had the features of migraine aura (a positive sensory symptom spreading over 20-25 minutes, then motor and speech symptoms in succession, followed by a migrainous headache, on a background of typical visual aura) and imaging shows no infarct."
       ],
       "required_recommendations": [
-        "Brain MRI/MRA required for first motor aura to exclude vascular cause",
-        "Avoid triptans and ergotamines in hemiplegic migraine",
-        "Use NSAIDs, antiemetics, or gepants/lasmiditan for acute therapy",
-        "Address elevated LDL with lifestyle and consider statin per primary prevention thresholds",
-        "Consider preventive therapy if recurrent episodes (topiramate, verapamil)"
+        "Stop the aspirin started for possible TIA: the episode was a migraine aura with motor features, imaging shows no infarct and he has no other indication for antiplatelet therapy; explain this to the patient and his GP.",
+        "For acute attacks use an NSAID (naproxen 500 mg or ibuprofen 400-600 mg) with an antiemetic (metoclopramide 10 mg or prochlorperazine) at headache onset; avoid triptans and ergots while hemiplegic migraine is the working diagnosis.",
+        "Give a headache diary and review; start prevention if motor aura recurs (verapamil, lamotrigine, or flunarizine where licensed).",
+        "Refer to clinical genetics for hemiplegic migraine gene testing (CACNA1A, ATP1A2, SCN1A, PRRT2) if motor aura recurs or a relative is affected.",
+        "Ask his GP to assess cardiovascular risk (blood pressure, lipids, HbA1c and QRISK3, which counts migraine) and treat his hypertension if it stays above target."
       ]
     },
     "avoided_actions": [
@@ -222,23 +278,7 @@
           "[AAN_2000]"
         ],
         "criterion_id": "avoid-waste-2-analyze-csf",
-        "rationale": "Lumbar puncture is not indicated in migraine with aura; reserve for suspected SAH (with normal CT) or meningitis \u2014 neither present here",
-        "severity": "waste"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "modality": "MR_angiography"
-            },
-            "tool_name": "order_advanced_imaging"
-          }
-        ],
-        "citations": [
-          "[AAN_2000]"
-        ],
-        "criterion_id": "avoid-waste-3-order-advanced-imaging",
-        "rationale": "Routine MRA is not indicated in typical migraine with aura \u2014 reserve for sudden-onset / thunderclap headache, suspected dissection, or focal deficit raising concern for vascular cause",
+        "rationale": "Lumbar puncture is not indicated in migraine with aura; reserve for suspected SAH (with normal CT) or meningitis; neither is present here",
         "severity": "waste"
       }
     ],
@@ -265,68 +305,87 @@
     },
     "differential": [
       {
-        "diagnosis": "Cardioembolic / large-artery TIA",
+        "diagnosis": "Transient ischemic attack (large-artery or cardioembolic)",
         "icd_code": "G45.9",
-        "key_features": "Motor aura always requires TIA exclusion; gradual onset and subsequent migrainous headache argue against TIA; normal MRI/MRA needed",
-        "likelihood": "moderate"
+        "key_features": "Positive symptoms spreading over 20-25 minutes, then weakness and speech change in succession, followed by migrainous headache, in a man with years of typical visual aura; MRI shows no infarct and MRA no stenosis or dissection. A normal DWI does not exclude TIA; the distinction is clinical.",
+        "likelihood": "low"
+      },
+      {
+        "diagnosis": "Cervical artery dissection",
+        "icd_code": "I77.71",
+        "key_features": "No neck pain or trauma; cervical MRA shows no intimal flap or intramural haematoma.",
+        "likelihood": "very_low"
       },
       {
         "diagnosis": "Focal motor seizure",
         "icd_code": "G40.109",
-        "key_features": "Seizure propagation is seconds; 15-20 min march is too slow",
-        "likelihood": "low"
+        "key_features": "Seizure symptoms spread over seconds; a 20-25 minute sensory march followed by weakness and a migrainous headache is aura.",
+        "likelihood": "very_low"
       },
       {
         "diagnosis": "Familial hemiplegic migraine (CACNA1A / ATP1A2 / SCN1A)",
         "icd_code": null,
-        "key_features": "No family history of hemiplegic migraine \u2014 sporadic form more likely; genetic testing optional",
+        "key_features": "No first- or second-degree relative with motor aura, which defines the sporadic form.",
         "likelihood": "low"
       },
       {
         "diagnosis": "CADASIL",
         "icd_code": "I67.850",
-        "key_features": "No family history of stroke/dementia; consider only with positive family history",
+        "key_features": "Father's stroke at 68 is a common late-life event; MRI shows three punctate frontal subcortical hyperintensities with normal anterior temporal white matter and external capsules.",
         "likelihood": "very_low"
       }
     ],
     "key_clinical_evidence": [
-      "Hemiplegic migraine is defined by fully reversible motor aura and requires TIA exclusion at first presentation",
-      "Triptans and ergotamines are contraindicated in hemiplegic migraine due to vasoconstriction risk",
-      "Sporadic form (no family history) is more common than familial; genetic testing is optional",
-      "Tier per the July 2026 clinical review: ICHD-3: the diagnosis is made on the structured history. Imaging is for the red flags that history screens for, not for the diagnosis.",
-      "July 2026 review applied end to end: ICHD-3 history/examination is required in all cases; routine MRI, EEG, ECG, CSF, echocardiography, cardiac monitoring and laboratory panels are absent. Retained tests answer an explicit atypical-aura, seizure, infarct, MELAS, CADASIL or aneurysm question."
+      "Years of typical visual aura every few months, then a first attack of right hand tingling spreading over 20-25 minutes, followed by grip weakness and slurred speech, resolving in 25-30 minutes and followed by migrainous headache.",
+      "One motor attack and no affected relative: probable sporadic hemiplegic migraine; ICHD-3 needs a second motor attack for 1.2.3.",
+      "Brain MRI shows no infarct and MRA shows normal intracranial and cervical arteries; the aspirin started for possible TIA has no indication.",
+      "Triptans and ergots are label-restricted in hemiplegic migraine: acute treatment is an NSAID with an antiemetic."
     ],
     "red_herrings": [
       {
-        "correct_interpretation": "Elevated LDL warrants primary prevention attention but does not change the migraine diagnosis once TIA is excluded by normal MRI/MRA",
-        "data_point": "Elevated LDL",
-        "field_path": "",
-        "intended_effect": "May anchor on atherosclerotic TIA",
-        "location": "patient.clinical_history (or labs)"
+        "correct_interpretation": "Sensory symptoms spreading over 20-25 minutes, then motor and speech symptoms in succession, followed by migrainous headache, in a man with years of visual aura, are the features of motor aura; MRI and MRA are normal.",
+        "data_point": "Transient right arm weakness and slurred speech in a 42-year-old man with mild hypertension, documented in the emergency department as possible TIA",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "May anchor on TIA and continue antiplatelet therapy",
+        "location": "patient.history_present_illness"
       },
       {
-        "correct_interpretation": "Normal DWI at 10 days post-episode is reassuring; gradual spread over 20-25 minutes is characteristic of CSD not embolism; prior 4-5 year history of visual episodes establishes migraine predisposition",
-        "data_point": "Motor weakness, speech difficulty, and first-ever episode in a 42-year-old \u2014 appropriate TIA workup",
-        "field_path": "",
-        "intended_effect": "Motor weakness and speech difficulty in a 42-year-old man with hypertension and elevated LDL is a reasonable TIA concern",
-        "location": ""
+        "correct_interpretation": "The aspirin was started pending specialist review; once the episode is recognised as aura it should be stopped.",
+        "data_point": "Aspirin 75 mg started by the GP after the emergency visit",
+        "field_path": "patient.clinical_history.medications[0]",
+        "intended_effect": "May suggest that a vascular diagnosis has already been made",
+        "location": "patient.clinical_history.medications[0]"
       },
       {
-        "correct_interpretation": "These are genuine vascular risk factors requiring statin treatment, but they do not change the neurological diagnosis; DWI is normal; the LDL should be treated regardless",
-        "data_point": "Elevated LDL 148 and family history of stroke at 68",
-        "field_path": "",
-        "intended_effect": "Elevated cholesterol and family stroke history strengthen TIA hypothesis",
-        "location": ""
+        "correct_interpretation": "These are ordinary vascular risk factors to manage in primary care; they do not explain a stereotyped spreading aura.",
+        "data_point": "Father had a stroke at 68; mild hypertension",
+        "field_path": "patient.clinical_history.family_history[0]",
+        "intended_effect": "Vascular risk factors strengthen the TIA hypothesis",
+        "location": "patient.clinical_history.family_history[0]"
+      },
+      {
+        "correct_interpretation": "Small non-specific subcortical hyperintensities are common in migraine with aura; there is no infarct on DWI.",
+        "data_point": "Three punctate frontal subcortical white matter hyperintensities on MRI",
+        "field_path": "initial_tool_outputs.mri.findings[0]",
+        "intended_effect": "May be read as small-vessel ischaemia supporting TIA",
+        "location": "initial_tool_outputs.mri.findings[0]"
       }
     ],
     "review_status": "draft",
-    "sequence_constraints": [],
+    "sequence_constraints": [
+      {
+        "after_criterion_id": "action-4-analyze-brain-mri",
+        "before_criterion_id": "action-3-perform-clinical-assessment",
+        "citations": [],
+        "reason": "The structured history identifies the red flags (motor aura, pattern change) that justify imaging.",
+        "severity": "soft"
+      }
+    ],
     "stop_rule": {
-      "max_additional_actions": 0,
+      "max_additional_actions": 1,
       "required_before_assessment": [
-        "action-1-search-medical-literature",
-        "action-2-check-drug-interactions",
-        "action-3-perform-clinical-assessment"
+        "action-3-perform-clinical-assessment",
+        "action-2-check-drug-interactions"
       ]
     }
   },
@@ -336,50 +395,79 @@
     "clinical_assessment": {
       "assessment_type": "structured_headache_history_ichd3",
       "criteria_met": {
+        "all_criteria_for_hemiplegic_migraine_1_2_3_met": false,
         "at_least_one_positive_aura_symptom": true,
         "at_least_one_unilateral_aura_symptom": true,
         "at_least_three_of_six_characteristics": true,
         "at_least_two_attacks": true,
+        "at_least_two_attacks_with_motor_aura": false,
         "aura_accompanied_or_followed_within_sixty_minutes_by_headache": true,
         "each_symptom_lasts_five_to_sixty_minutes_motor_up_to_seventy_two_hours": true,
         "gradual_spread_over_at_least_five_minutes": true,
         "not_better_accounted_for_by_another_diagnosis": true,
         "one_or_more_fully_reversible_aura_symptoms": true,
+        "probable_hemiplegic_migraine_met": true,
         "two_or_more_aura_symptoms_in_succession": true
       },
       "findings": [
         {
-          "element": "Aura description",
-          "result": "A 42-year-old Pakistani-British man was referred to the neurology outpatient clinic after being evaluated in the emergency department 10 days ago for what was documented as a 'possible TIA or hemiplegic migraine.' He describes a single episode in which he was at work when he developed a gradual o..."
+          "element": "Attack count (criterion A)",
+          "result": "Visual aura attacks every few months for 4-5 years (shimmering lights in one corner of vision, 15-20 minutes, then mild headache). One attack with motor aura, 10 days ago."
         },
         {
-          "element": "Aura description",
-          "result": "However, on careful questioning, he says he had 'visual episodes' once every few months over the past 4-5 years \u2014 brief shimmering lights in one corner of his vision, lasting 15-20 minutes, after which he had a mild headache that he attributed to 'eyestrain' or 'stress' and took paracetamol."
+          "element": "Aura type (criterion B), index attack",
+          "result": "Sensory (right hand tingling), then motor (reduced right grip, dropped a pen), with speech that felt slow and thick. Fully reversible."
         },
         {
-          "element": "Temporal profile",
-          "result": "A 42-year-old Pakistani-British man was referred to the neurology outpatient clinic after being evaluated in the emergency department 10 days ago for what was documented as a 'possible TIA or hemiplegic migraine.' He describes a single episode in which he was at work when he developed a gradual o..."
+          "element": "Spread (C1)",
+          "result": "Tingling spread from the right hand to the forearm over 20-25 minutes."
         },
         {
-          "element": "Temporal profile",
-          "result": "He also noticed mild difficulty articulating words during the episode, saying his speech felt 'slow and thick.' The sensory and motor symptoms lasted approximately 25-30 minutes and resolved completely."
+          "element": "Succession (C2)",
+          "result": "Sensory, then motor and speech symptoms."
         },
         {
-          "element": "Headache relation",
-          "result": "Immediately afterwards, he developed the worst headache of his life \u2014 left-sided throbbing pain 9/10 in severity with nausea, severe photophobia, and phonophobia."
+          "element": "Duration (C3)",
+          "result": "Sensory and motor symptoms 25-30 minutes (motor aura may last up to 72 hours); previous visual auras 15-20 minutes."
         },
         {
-          "element": "Red-flag review (SNNOOP10)",
-          "result": "Systemic features, neoplasia, neurological deficit outside the aura, sudden onset, older age at onset, pattern change, positional or Valsalva trigger, papilloedema, pregnancy and painful eye reviewed and recorded"
+          "element": "Laterality (C4)",
+          "result": "Unilateral, right arm."
+        },
+        {
+          "element": "Positive symptom (C5)",
+          "result": "Tingling; shimmering lights in the previous attacks."
+        },
+        {
+          "element": "Headache (C6)",
+          "result": "Left-sided throbbing headache straight after the aura, building over about 30 minutes to 9/10, with nausea, vomiting three times, photophobia and phonophobia; 18 hours."
+        },
+        {
+          "element": "Family history (sporadic versus familial)",
+          "result": "No first- or second-degree relative with attacks of motor aura."
+        },
+        {
+          "element": "Examination today",
+          "result": "Speech normal. Visual fields full, cranial nerves normal, power 5/5 without drift, sensation intact, reflexes 2+ and symmetric, plantars flexor, coordination and gait normal. BP 134/84 mmHg."
+        },
+        {
+          "element": "Red flags (SNNOOP10)",
+          "result": "Focal neurological symptoms with motor weakness and a change in aura pattern: present. Headache onset was not thunderclap (built over about 30 minutes). Systemic symptoms, history of neoplasm, persisting deficit, age over 50, positional or Valsalva trigger, papilloedema, progressive headache, head trauma, immune suppression and analgesic overuse: absent."
+        },
+        {
+          "element": "Medicines and vascular risk",
+          "result": "Aspirin 75 mg daily started by the GP after the emergency visit; paracetamol as needed. Mild hypertension managed with lifestyle measures; non-smoker; BMI 27.7; father had a stroke at 68."
         }
       ],
-      "impression": "Structured history documents 6 of 6 ICHD-3 criterion-C characteristics with reversible aura symptoms, neurological examination and red-flag review. Imaging or laboratory testing is not the diagnostic test for a typical attack.",
+      "impression": "1. Long-standing migraine with typical visual aura (ICHD-3 1.2.1 criteria met).\n2. A first attack with fully reversible motor weakness, sensory and speech symptoms followed by migrainous headache, with no affected relative: criteria for hemiplegic migraine met except the second attack. Supports probable sporadic hemiplegic migraine.\n3. Red flags present: motor aura and change in aura pattern.",
       "pre_post_comparison": null,
       "recommended_actions": [],
       "scores": {
+        "Aura modalities": "visual (previous attacks); sensory, motor, speech (index attack)",
+        "ICHD-3 criterion A": "met for migraine with aura (repeated visual auras); not met for hemiplegic migraine (1 motor attack)",
+        "ICHD-3 criterion B": "met (reversible sensory, motor and speech symptoms)",
         "ICHD-3 criterion C characteristics met": "6 of 6 (at least 3 required)",
-        "aura modalities documented": "visual, sensory, speech/language, motor and/or brainstem features as present in the history",
-        "reference criteria applied": "ICHD-3 1.2 and the relevant subtype/complication criteria"
+        "ICHD-3 criterion D": "met on history and examination"
       }
     },
     "csf": null,
@@ -389,9 +477,28 @@
     "eeg": null,
     "labs": null,
     "mri": {
-      "additional_observations": [],
-      "findings": [],
-      "impression": "No acute intracranial abnormality. No restricted diffusion. Three non-specific white matter hyperintensities. Normal MRA intracranial and cervical arteries \u2014 no stenosis or dissection",
+      "additional_observations": [
+        "No restricted diffusion on DWI and ADC.",
+        "No haemorrhage, subarachnoid blood or microhaemorrhage on FLAIR and susceptibility-weighted imaging.",
+        "No mass, abnormal flow voids or cortical malformation.",
+        "Anterior temporal white matter and external capsules normal.",
+        "Ventricles, sulci and posterior fossa normal for age."
+      ],
+      "findings": [
+        {
+          "borders": "well defined",
+          "location": "Bilateral frontal subcortical white matter (two left, one right)",
+          "mass_effect": "none",
+          "signal_characteristics": {
+            "DWI": "no restricted diffusion",
+            "T1": "isointense",
+            "T2/FLAIR": "hyperintense"
+          },
+          "size": "2-4 mm",
+          "type": "white_matter_lesion"
+        }
+      ],
+      "impression": "1. No acute or subacute infarct, haemorrhage or structural lesion.\n2. Three punctate frontal subcortical white matter T2/FLAIR hyperintensities, non-specific.",
       "recommended_actions": [],
       "volumetrics": null
     },
@@ -405,14 +512,12 @@
     "citation_gap": [],
     "condition_name": "Probable sporadic hemiplegic migraine (first motor aura episode) with longstanding antecedent visual aura",
     "criteria_pack_version": "1.0",
-    "difficulty_description": "Moderate: TIA vs hemiplegic migraine with motor, sensory, and aphasic features; prior visual aura history not initially connected; elevated LDL as incidental finding requiring management",
-    "difficulty_rationale": "Moderate: hemiplegic migraine requires MRI/MRA and triptan contraindication management",
+    "difficulty_description": "Moderate: TIA versus hemiplegic migraine with sensory, motor and speech features; prior visual aura history not initially connected; empirical aspirin to stop",
+    "difficulty_rationale": "Moderate: first motor aura needs MRI and vessel imaging, and acute treatment must avoid triptans",
     "expected_agent_confidence": 0.58,
     "fallback_tool_kinds": {
-      "advanced_imaging": "normal",
       "csf": "normal",
-      "ct": "normal",
-      "specialized_test": "incidental"
+      "ct": "normal"
     },
     "last_revised": "2026-08-10",
     "policy_spec_status": "draft",
@@ -422,7 +527,7 @@
   },
   "patient": {
     "age": 42,
-    "chief_complaint": "First-ever episode of right arm weakness during a severe headache \u2014 sent urgently from ED",
+    "chief_complaint": "First-ever episode of right arm weakness and slurred speech followed by severe headache, referred after an emergency visit",
     "clinical_history": {
       "allergies": [
         "No known drug allergies"
@@ -435,7 +540,7 @@
           "dose": "75 mg",
           "drug": "Aspirin",
           "frequency": "once daily",
-          "indication": "Started empirically by GP after 'possible TIA' \u2014 requires review"
+          "indication": "Started by GP after the emergency department visit for 'possible TIA'"
         },
         {
           "dose": "1000 mg",
@@ -456,8 +561,8 @@
       "sex": "male"
     },
     "ethnicity": "South Asian",
-    "history_present_illness": "A 42-year-old Pakistani-British man was referred to the neurology outpatient clinic after being evaluated in the emergency department 10 days ago for what was documented as a 'possible TIA or hemiplegic migraine.' He describes a single episode in which he was at work when he developed a gradual onset tingling in his right hand that over approximately 20-25 minutes progressed to involve his right forearm, and he noticed his grip strength was reduced \u2014 he dropped his pen. He also noticed mild difficulty articulating words during the episode, saying his speech felt 'slow and thick.' The sensory and motor symptoms lasted approximately 25-30 minutes and resolved completely. Immediately afterwards, he developed the worst headache of his life \u2014 left-sided throbbing pain 9/10 in severity with nausea, severe photophobia, and phonophobia. He vomited three times. The headache lasted 18 hours.\n\nHe had no prior episodes of this type. However, on careful questioning, he says he had 'visual episodes' once every few months over the past 4-5 years \u2014 brief shimmering lights in one corner of his vision, lasting 15-20 minutes, after which he had a mild headache that he attributed to 'eyestrain' or 'stress' and took paracetamol. He never consulted a doctor about these and had not made the connection. He has mild hypertension, is a non-smoker, and his father had a stroke at age 68. He is a secondary school science teacher. His GP started him on aspirin 75 mg after the ED visit pending specialist review.",
-    "hpi": "A 42-year-old Pakistani-British man was referred to the neurology outpatient clinic after being evaluated in the emergency department 10 days ago for what was documented as a 'possible TIA or hemiplegic migraine.' He describes a single episode in which he was at work when he developed a gradual onset tingling in his right hand that over approximately 20-25 minutes progressed to involve his right forearm, and he noticed his grip strength was reduced \u2014 he dropped his pen. He also noticed mild difficulty articulating words during the episode, saying his speech felt 'slow and thick.' The sensory and motor symptoms lasted approximately 25-30 minutes and resolved completely. Immediately afterwards, he developed the worst headache of his life \u2014 left-sided throbbing pain 9/10 in severity with nausea, severe photophobia, and phonophobia. He vomited three times. The headache lasted 18 hours.\n\nHe had no prior episodes of this type. However, on careful questioning, he says he had 'visual episodes' once every few months over the past 4-5 years \u2014 brief shimmering lights in one corner of his vision, lasting 15-20 minutes, after which he had a mild headache that he attributed to 'eyestrain' or 'stress' and took paracetamol. He never consulted a doctor about these and had not made the connection. He has mild hypertension, is a non-smoker, and his father had a stroke at age 68. He is a secondary school science teacher. His GP started him on aspirin 75 mg after the ED visit pending specialist review.",
+    "history_present_illness": "A 42-year-old Pakistani-British man was referred to the neurology outpatient clinic after being evaluated in the emergency department 10 days ago for what was documented as a 'possible TIA or hemiplegic migraine.' He describes a single episode in which he was at work when he developed a gradual onset tingling in his right hand that over approximately 20-25 minutes progressed to involve his right forearm, and he noticed his grip strength was reduced \u2014 he dropped his pen. He also noticed mild difficulty articulating words during the episode, saying his speech felt 'slow and thick.' The sensory and motor symptoms lasted approximately 25-30 minutes and resolved completely. Immediately afterwards, he developed a left-sided throbbing headache that built up over about 30 minutes to 9/10, far worse than his usual mild headaches, with nausea, severe photophobia, and phonophobia. He vomited three times. The headache lasted 18 hours.\n\nHe had no prior episodes of this type. However, on careful questioning, he says he had 'visual episodes' once every few months over the past 4-5 years \u2014 brief shimmering lights in one corner of his vision, lasting 15-20 minutes, after which he had a mild headache that he attributed to 'eyestrain' or 'stress' and took paracetamol. He never consulted a doctor about these and had not made the connection. He has mild hypertension, is a non-smoker, and his father had a stroke at age 68. He is a secondary school science teacher. His GP started him on aspirin 75 mg after the ED visit pending specialist review.",
+    "hpi": "A 42-year-old Pakistani-British man was referred to the neurology outpatient clinic after being evaluated in the emergency department 10 days ago for what was documented as a 'possible TIA or hemiplegic migraine.' He describes a single episode in which he was at work when he developed a gradual onset tingling in his right hand that over approximately 20-25 minutes progressed to involve his right forearm, and he noticed his grip strength was reduced \u2014 he dropped his pen. He also noticed mild difficulty articulating words during the episode, saying his speech felt 'slow and thick.' The sensory and motor symptoms lasted approximately 25-30 minutes and resolved completely. Immediately afterwards, he developed a left-sided throbbing headache that built up over about 30 minutes to 9/10, far worse than his usual mild headaches, with nausea, severe photophobia, and phonophobia. He vomited three times. The headache lasted 18 hours.\n\nHe had no prior episodes of this type. However, on careful questioning, he says he had 'visual episodes' once every few months over the past 4-5 years \u2014 brief shimmering lights in one corner of his vision, lasting 15-20 minutes, after which he had a mild headache that he attributed to 'eyestrain' or 'stress' and took paracetamol. He never consulted a doctor about these and had not made the connection. He has mild hypertension, is a non-smoker, and his father had a stroke at age 68. He is a secondary school science teacher. His GP started him on aspirin 75 mg after the ED visit pending specialist review.",
     "neurological_exam": {
       "coordination": "Coordination normal.",
       "cranial_nerves": "Normal cranial nerves II-XII. No speech difficulty at present. Full visual fields. PERRLA.",

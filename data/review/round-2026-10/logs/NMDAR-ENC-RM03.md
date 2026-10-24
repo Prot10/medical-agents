@@ -1,0 +1,63 @@
+# NMDAR-ENC-RM03
+Reviewer status: R1 none, R2 none (condition not reviewed in this round) | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| none: condition not reviewed | - | - |
+
+## Own findings
+| dim (A schema, B consistency, C clinical, D leakage, E language) | severity (blocker/major/minor) | field path | finding | action (FIXED/FLAGGED) |
+| --- | --- | --- | --- | --- |
+| A | blocker | `ground_truth.action_criteria` | Plan C1: non-schema `basic`, `screen_for`, exact literature `query`, MRI `protocol`, eleven-panel labs list. | FIXED: plan 3.2 arguments; labs (age 62) add `paraneoplastic_panel` and `autoimmune_encephalitis_panel`, no beta-hCG. |
+| C | major | criterion `action-5-order-body-imaging`, `initial_tool_outputs.body_imaging` | A 62-year-old former 50 pack-year smoker was screened with pelvic ultrasound only, while the musts called for CT; women 45 or older need a carcinoma search (C11). | FIXED: criterion `{study: chest_abdomen_pelvis_CT, contrast: true}`; the stored report is now a contrast CT of chest, abdomen and pelvis (no tumour or lymphadenopathy; mild upper-lobe emphysema; incidental 1.2 cm simple renal cyst; atrophic uterus and ovaries, matching the former ultrasound). A pelvic ultrasound order now receives the library's normal report, which agrees. |
+| C | major | `ground_truth.assessment.required_recommendations` | "FDG-PET if cross-sectional imaging is unrevealing" names an unorderable body PET; "levetiracetam or valproate"; conditional teratoma consults. | FIXED: M3 for older patients (CT negative, repeat screening if refractory or relapsing); full canonical set plus case items (potassium and glucose monitoring during steroids, ward with cardiac monitoring and fall precautions, hyponatraemia must). |
+| C | major | criterion `siadh-osmolality-workup` (new), `initial_tool_outputs.labs.panels.Hyponatraemia work-up` (new) | Sodium 128 on hydrochlorothiazide and citalopram with no osmolality or urine studies (plan C5, 3.2). | FIXED: recommended criterion `{panels: [serum_osmolality, urine_osmolality]}`; labs report serum osmolality 266 (L), urine osmolality 412, urine sodium 46, morning cortisol 14.2 (normal, part of an SIADH work-up). Answered by the same labs report (perfect-agent warning expected, plan 3.2). |
+| C | major | must (hyponatraemia, new) | No management of moderate hyponatraemia with a thiazide, an SSRI and orthostatic hypotension. | FIXED: stop co-amilozide, review citalopram, assess volume status (isotonic saline if hypovolaemic, fluid restriction if SIADH), correct by no more than 10 mmol/L in 24 h (Spasovski 2014). Written against plain fluid restriction because the orthostatic drop may be hypovolaemic. |
+| B | major | `ground_truth.action_criteria`, `followup_outputs` order | Literature first, DDI second; no cEEG. | FIXED: labs, MRI, CSF, EEG, CAP CT, cEEG, SIADH work-up, DDI, literature (ids kept); follow-ups cEEG, immunotherapy DDI, literature. |
+| C | major | `followup_outputs[0]` (new), criterion `ceeg-escalation` (new) | cEEG must, no cEEG report. | FIXED: 24 h cEEG with three left temporal seizures (behavioural arrest, lip automatisms), FIRDA, no extreme delta brush, no periodic sharp-wave complexes. |
+| C | major | criterion `action-7-check-drug-interactions`, DDI outputs | DDI recommended per C10; follow-up had sound content but alternatives included rituximab; no generic output. | FIXED: `{}` arguments, recommended; new initial general report (thiazide + citalopram hyponatraemia and QT, steroid/salbutamol/thiazide hypokalaemia, citalopram 20 mg ceiling over 60, IVIG pseudohyponatraemia and thrombosis, lacosamide PR, aciclovir hydration, D2 class warning, HBV screening); follow-up rewritten in report voice with plasma exchange as the only alternative. |
+| D | major | criterion `action-6-search-medical-literature`, `followup_outputs` literature | Literature recommended; output cited "Dalmau, Annals of Neurology 2014, lung cancer" and "Lancaster, JNNP 2011" with titles that do not match real papers; "approximately 5%" figure. | FIXED: optional, `{}`; output uses Titulaer late-onset 2013 (canonical sentence), Graus 2021 (NMDAR intermediate-risk, Hu/CV2/Ma2/Yo/Ri high-risk) and Titulaer 2013; canonical initial literature output with the late-onset result. |
+| B | blocker | `initial_tool_outputs.csf.special_tests`, `initial_tool_outputs.labs.panels` | CSF "Pending" twice while labs gave CSF 1:64 twice (C4). | FIXED: CSF `NMDAR_antibodies` "Positive, titre 1:64 (...resulted day 6)", duplicate key deleted; labs keep serum 1:40 only; culture "No growth at 72 hours". |
+| B | major | `initial_tool_outputs.labs` | Exclusion-studies leak, duplicate inflammatory panel, anti-TPO, Hu, CV2 and ANA inside the encephalitis panel, toxicology under "Other". | FIXED: rebuilt per C5 with values kept; bilirubin and albumin added to the hepatic panel (normal). |
+| D | minor | `initial_tool_outputs.ecg.interpretation` | "No arrhythmia ... that would account for a syncopal episode" (C13). | FIXED: "Normal sinus rhythm, rate 62. Normal axis and intervals. No acute ST-T changes." |
+| D | minor | `initial_tool_outputs.eeg.impression` | Disease differential in the EEG impression ("encephalitic process, metabolic encephalopathy, or early neurodegenerative disease"). | FIXED: ACNS numbered impression, no disease names; no extreme delta brush or periodic discharges. |
+| B | minor | `initial_tool_outputs.mri` | "No brain metastases identified", "No evidence of metastatic disease": carry-over from a lung-mass version (no cancer in this case). | FIXED: removed; numbered impression with pertinent negatives. |
+| B | minor | `fallback_tool_outputs.cardiac_monitoring`, `.advanced_imaging`, `.specialized_test` | Holter max 128 while she is bradycardic-normal (56-78) and orthostatic; catch-all fallbacks. | FIXED: sinus rhythm 52-96 bpm, no pauses, AV block or sustained arrhythmia; the other two null. |
+| C | major | `ground_truth.differential` | Template HSV high, AE and psychiatric moderate; LGI1, classical paraneoplastic LE, dementia, drug hyponatraemia and syncope (all raised by the case) missing. | FIXED: eight low entries with the case's data (LGI1 named as the usual mimic at this age; Hu/CV2 with CT negative; CJD without PSWC or diffusion restriction; Alzheimer disease; thiazide/SSRI hyponatraemia; syncope; pseudodementia/serotonin syndrome). |
+| C | major | `ground_truth.key_clinical_evidence` | Template with wrong claims and young-woman tumour text. | FIXED: six case-specific bullets including late-onset tumour risk. |
+| B | major | `ground_truth.red_herrings` | Prodrome red herring although the HPI denies any illness or fever; "previously well young adult" for a 62-year-old with depression; "Mild" for 128. | FIXED: prodrome removed; dementia/pseudodementia red herring; "Moderate hyponatraemia (sodium 128 mEq/L) on a thiazide and an SSRI"; orthostatic collapse red herring (`patient.neurological_exam.additional`). |
+| C | minor | `ground_truth.assessment.prohibited_recommendations` | P3 "young patient" wrong at 62. | FIXED: canonical P1-P5. |
+| E | minor | criteria `rationale`, `citations`, `expected_evidence` | Rationale = label; citation twins. | FIXED. |
+| B | minor | `ground_truth.sequence_constraints`, `.stop_rule` | None; max 0. | FIXED: soft MRI before CSF; max 2. |
+| B | minor | `metadata.difficulty_description`, `.difficulty_rationale` | Mentioned a lung mass (none in the case) and pending antibodies. | FIXED. |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+
+A 62-year-old former heavy smoker with a 3-month amnestic decline, focal seizures with lip automatisms, orofacial dyskinesias, orthostatic hypotension and sodium 128 on co-amilozide and citalopram. Required: labs including onconeural and neuronal-surface panels, MRI before LP (soft), CSF, EEG, and contrast CT of the chest, abdomen and pelvis instead of a pelvic ultrasound (CT shows no tumour, mild emphysema and a simple renal cyst). Recommended: cEEG (three left temporal seizures), serum/urine osmolality and urine sodium (now in the labs), and the interaction check, which now states the thiazide-SSRI sodium risk, steroid hypokalaemia and IVIG pseudohyponatraemia. CSF carries its own result (1:64), labs only the serum titre (1:40). Musts add hyponatraemia management (stop the thiazide, volume assessment, correction limit), steroid potassium and glucose monitoring, ward admission with cardiac monitoring and fall precautions, and repeat tumour screening if refractory instead of a body PET. The differential now lists LGI1 encephalitis, classical paraneoplastic limbic encephalitis, CJD, Alzheimer disease, drug-induced hyponatraemia, syncope and pseudodementia, all low with the excluding data; the irrelevant prodrome red herring is gone.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+
+- New citation keys used (plan CENTRAL 1): `[Titulaer_late_2013]`, `[Graus_2021]`, `[Gresa-Arribas_2014]`, `[Herman_2015]`, `[Spasovski_2014]`.
+- New criterion ids `ceeg-escalation` (lower case; the schema rejects `cEEG-escalation`) and `siadh-osmolality-workup`. Other workers' SIADH criteria should share one id; I used `siadh-osmolality-workup`.
+
+## Open questions for Andrea (judgment calls you could not settle)
+
+- None.
+
+## Verification
+
+Adversarial check (24 Oct 2026). Checked every own-finding row against the file: tumour criterion and stored report are a contrast CAP CT (age 62, 50 pack-years) with atrophic ovaries, no tumour; labs criterion adds paraneoplastic and autoimmune panels, no beta-hCG; SIADH criterion answered by the labs report (perfect-agent warning expected by plan 3.2); serum osmolality 266 agrees with the calculated value (2 x 128 + 102/18 + 14/2.8 = 267); the hyponatraemia must correctly avoids plain fluid restriction while the orthostatic drop may be hypovolaemic and notes that urine sodium on a thiazide does not separate drug effect from SIADH; citalopram 20 mg is at the over-60 ceiling; CSF 1:64 / serum 1:40 split correct; cEEG consistent with the routine EEG (left temporal, lip automatisms); literature verified (Titulaer late-onset 2013; Graus 2021 intermediate-risk NMDAR, high-risk Hu/CV2/Ma2/Yo/Ri). Differential entries all low with the case's data. Penicillin allergy has no conflict.
+
+Found and fixed:
+- `ground_truth.key_clinical_evidence[0]` counted orthostatic hypotension on co-amilozide as the Graus autonomic group ("5 of six"). The diuretic confounds it; rewritten to "4 of the six Graus 2016 groups, with orthostatic hypotension a possible fifth (autonomic) that her diuretic confounds".
+- `initial_tool_outputs.drug_interactions.general.interactions[0..1]` and the immunotherapy DDI follow-up `interactions[0]`: co-amilozide contains amiloride, which offsets thiazide potassium loss (her potassium is 4.2); the lines now say the potassium loss is "partly offset by amiloride" instead of presenting unopposed thiazide hypokalaemia.
+perfect_agent (with the expected SIADH warning), case_io check and guards clean after the edits.
+
+## Condition audit (24 Oct 2026)
+
+Condition auditor, after the workers and verifiers. Uniformity checks over all 30 cases; changes made here through `case_io` (all re-checked: `perfect_agent.py` 30/30, `case_io.py check` and the case guards clean):
+- `ground_truth.assessment.prohibited_recommendations[1]` and `[3]` (B/E, minor): the canonical P2 and P4 texts still carried an em dash before "antibody turnaround" and before "exclude mass effect", and an en dash in "1-2 weeks", while 18 other cases already had the dash-free canonical wording. Now "...high: antibody turnaround can take 1-2 weeks..." and "...new seizures: exclude mass effect first." Meaning unchanged.
+- `followup_outputs[0].output.eeg_type` (A, minor): the continuous EEG report had no `eeg_type`, unlike the other 25 cEEG reports; set to `continuous_icu` so the report names the study it is (the MockServer discriminator reads this field). Content unchanged.
+- `ground_truth.avoided_actions[avoid-waste-3-order-advanced-imaging].rationale` (B, minor): the amyloid PET waste rationale still said "in a young patient" for a 62-year-old (the template sentence; RP01-RP03 and RS02 had been rewritten). Now names her age and the 3-month course with seizures, dyskinesias, dysautonomia and inflammatory CSF; the entry stays waste (plan 3.3).
+- `patient.neurological_exam.mental_status` (B, minor): "Abbreviated mental test score 7/10" contradicted the same exam (disoriented to date, year and place, 0 of 3 recall, unable to count backwards), which fails at least five AMT items. Now 5/10.

@@ -69,85 +69,62 @@
     },
     "eeg": null,
     "labs": null,
-    "literature_search": {
-      "general": {
-        "query": "general",
-        "results": [],
-        "summary": "No directly applicable, high-quality evidence was retrieved for this query. Recommend correlating with current society guidelines."
-      }
-    },
+    "literature_search": null,
     "mri": null,
-    "specialized_test": {
-      "findings": [],
-      "impression": "Study within normal limits.",
-      "quantitative_data": null,
-      "recommended_actions": [],
-      "test_type": "general_laboratory_panel"
-    }
+    "specialized_test": null
   },
   "followup_outputs": [
     {
       "output": {
-        "alternatives": [
-          "desogestrel 75 mcg (Cerazette) \u2014 progesterone-only pill, WHO MEC Category 1",
-          "etonogestrel implant (Nexplanon) \u2014 WHO MEC Category 1"
+        "findings": [
+          {
+            "interpretation": "Patent dural venous sinuses",
+            "region": "Superior sagittal, straight, transverse and sigmoid sinuses, internal jugular veins",
+            "signal": "Normal flow and enhancement; no filling defect"
+          },
+          {
+            "interpretation": "No cortical or deep vein thrombosis",
+            "region": "Cortical and deep cerebral veins, including the left hemispheric cortical veins",
+            "signal": "Normal opacification; no cord sign"
+          }
         ],
-        "contraindications": [
-          "Combined OCP is WHO MEC Category 4 (absolute contraindication) in ALL migraine with aura including hemiplegic subtypes \u2014 unacceptable ischaemic stroke risk due to oestrogen-mediated procoagulant state combined with CSD haemodynamic vulnerability",
-          "Risk applies to all doses of oestrogen including EE 20 mcg (low-dose) \u2014 dose does not mitigate Category 4 classification in hemiplegic migraine"
-        ],
-        "formulary_status": "contraindicated",
-        "interactions": [],
-        "proposed": "combined oral contraceptive (ethinylestradiol 20 mcg + desogestrel) in hemiplegic migraine with motor aura",
-        "warnings": [
-          "Combined OCP should not be continued in migraine with aura; progestin-only alternatives (desogestrel 75 mcg, etonogestrel implant) are WHO MEC Category 1 in migraine with aura and are appropriate replacements",
-          "No oestrogen-containing preparation is appropriate in any subtype of migraine with aura"
-        ]
+        "impression": "1. No cerebral venous sinus or cortical vein thrombosis. 2. Left transverse sinus mildly smaller than the right, a normal variant with normal flow.",
+        "modality": "MR_venography",
+        "quantitative_data": null,
+        "recommended_actions": [],
+        "tracer_or_protocol": "contrast-enhanced 3D MR venography with 2D time-of-flight"
       },
-      "tool_name": "check_drug_interactions",
-      "trigger_action": "check_ocp_safety_hemiplegic_migraine"
+      "tool_name": "order_advanced_imaging",
+      "trigger_action": "request_mr_venography_cerebral_venous_sinuses"
+    },
+    {
+      "output": {
+        "query": "hemiplegic migraine with aura-triggered seizure, hormonal contraception and topiramate",
+        "results": [
+          {
+            "evidence_level": "classification",
+            "finding": "1.2.3 hemiplegic migraine requires fully reversible motor weakness with visual, sensory or speech aura; 1.2.3.2 sporadic when no first- or second-degree relative is affected. 1.4.4 migraine aura-triggered seizure: a seizure during, or within 1 hour after, an attack of migraine with aura.",
+            "source": "Headache Classification Committee of the IHS. ICHD-3. Cephalalgia 2018;38:1-211"
+          },
+          {
+            "evidence_level": "guideline",
+            "finding": "Combined hormonal methods are category 4 at any age in migraine with aura; progestogen-only methods and the copper IUD are category 1 or 2.",
+            "source": "Faculty of Sexual and Reproductive Healthcare. UK Medical Eligibility Criteria for Contraceptive Use (UKMEC) 2016, amended 2019"
+          },
+          {
+            "evidence_level": "regulatory",
+            "finding": "Topiramate must not be used for migraine prophylaxis in women of childbearing potential unless the conditions of the pregnancy prevention programme, including highly effective contraception, are met; it may reduce the effectiveness of hormonal contraceptives.",
+            "source": "MHRA Drug Safety Update, June 2024: topiramate pregnancy prevention programme"
+          }
+        ],
+        "summary": "ICHD-3 recognises seizures triggered by migraine aura; combined hormonal contraception is unacceptable in migraine with aura; topiramate needs a pregnancy prevention programme."
+      },
+      "tool_name": "search_medical_literature",
+      "trigger_action": "search_hemiplegic_migraine_seizure_contraception_topiramate"
     }
   ],
   "ground_truth": {
     "action_criteria": [
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "query": "ICHD-3 migraine with aura diagnostic criteria SNOOP red flags"
-            },
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[ICHD_3]",
-          "ICHD_3"
-        ],
-        "criterion_id": "action-1-search-medical-literature",
-        "expected_evidence": "ICHD-3 criteria for migraine with aura confirmed; no SNOOP red flag present that mandates further workup",
-        "importance": "recommended",
-        "label": "Search guideline literature to confirm ICHD-3 1.2 criteria for migraine with aura and exclude SNOOP/CHATS red flags",
-        "rationale": "Search guideline literature to confirm ICHD-3 1.2 criteria for migraine with aura and exclude SNOOP/CHATS red flags"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "context": "hemiplegic_migraine_with_migralepsy_OCP"
-            },
-            "tool_name": "check_drug_interactions"
-          }
-        ],
-        "citations": [
-          "[AAN_2000]",
-          "AAN_2000"
-        ],
-        "criterion_id": "action-2-check-drug-interactions",
-        "expected_evidence": "TRIPTANS AND ERGOTAMINES CONTRAINDICATED in hemiplegic migraine; OCP safety review; AED choice if seizure recurs",
-        "importance": "required",
-        "label": "Check drug interactions and contraindications for acute (triptan/ergotamine/CGRP antagonist) and prophylactic (beta-blocker, topiramate, valproate, amitriptyline) migraine medications appropriate to this patient",
-        "rationale": "Check drug interactions and contraindications for acute (triptan/ergotamine/CGRP antagonist) and prophylactic (beta-blocker, topiramate, valproate, amitriptyline) migraine medications appropriate to this patient"
-      },
       {
         "alternatives": [
           {
@@ -158,34 +135,43 @@
           }
         ],
         "citations": [
-          "[ICHD_3]",
-          "ICHD-3; NICE CG150 (2025)"
+          "[ICHD_3]"
         ],
         "criterion_id": "action-3-perform-clinical-assessment",
-        "expected_evidence": "Document attack count; reversible aura modalities; gradual spread; succession; 5\u201360 minute duration (motor up to 72 hours); unilateral and positive symptoms; relation to headache; medications; examination and red flags",
+        "expected_evidence": "Known sporadic hemiplegic migraine; this attack has visual, speech and motor aura with headache and two focal seizures within an hour of the aura; red flags are first seizures, reduced GCS and an oestrogen pill",
         "importance": "required",
-        "label": "Take a structured headache/aura history, neurological examination and red-flag review; apply every ICHD-3 1.2 criterion explicitly",
-        "rationale": "Take a structured headache/aura history, neurological examination and red-flag review; apply every ICHD-3 1.2 criterion explicitly"
+        "label": "Take a structured headache and aura history with examination and red-flag review, applying ICHD-3 1.2.3 and 1.4.4",
+        "rationale": "The history separates a prolonged hemiplegic aura with aura-triggered seizures from stroke, venous thrombosis and encephalitis, and identifies the red flags that need imaging and EEG."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_brain_mri"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "action-4-analyze-brain-mri",
+        "expected_evidence": "Left hemispheric cortical swelling across arterial territories with normal diffusion and no haemorrhage",
+        "importance": "required",
+        "label": "Brain MRI: persistent deficit, reduced consciousness and first seizures during an attack",
+        "rationale": "Required: a deficit lasting hours with seizures needs infarct, haemorrhage and other structural causes excluded."
       },
       {
         "alternatives": [
           {
             "required_arguments": {
-              "contrast": false,
-              "protocol": "stroke"
+              "modality": "MR_venography"
             },
-            "tool_name": "analyze_brain_mri"
+            "tool_name": "order_advanced_imaging"
           }
         ],
-        "citations": [
-          "[ICHD_3]",
-          "ICHD-3; NICE CG150 (2025)"
-        ],
-        "criterion_id": "action-4-analyze-brain-mri",
-        "expected_evidence": "Identify or exclude infarct, haemorrhage, mass, vascular lesion or another secondary mimic; MRI does not establish routine migraine",
+        "citations": [],
+        "criterion_id": "action-mrv",
+        "expected_evidence": "Patent dural venous sinuses and cortical veins; no venous thrombosis",
         "importance": "required",
-        "label": "Obtain brain MRI because imaging answers a specific red-flag question: exclude an acute structural lesion after motor aura and a witnessed seizure",
-        "rationale": "Obtain brain MRI because imaging answers a specific red-flag question: exclude an acute structural lesion after motor aura and a witnessed seizure"
+        "label": "MR venography: exclude cerebral venous thrombosis in a woman on an oestrogen pill with cortical oedema and seizures",
+        "rationale": "Required: seizures with hemispheric cortical oedema in a woman taking combined oral contraception can be the presentation of cerebral venous thrombosis."
       },
       {
         "alternatives": [
@@ -194,56 +180,145 @@
               "eeg_type": "video"
             },
             "tool_name": "analyze_eeg"
+          },
+          {
+            "required_arguments": {
+              "eeg_type": "routine"
+            },
+            "tool_name": "analyze_eeg"
           }
         ],
-        "citations": [
-          "[ICHD_3]",
-          "ICHD-3; NICE CG150 (2025)"
-        ],
+        "citations": [],
         "criterion_id": "action-5-analyze-eeg",
-        "expected_evidence": "Capture or assess epileptiform activity relevant to the suspected aura-triggered seizure",
+        "expected_evidence": "Continuous left hemispheric slowing; no epileptiform discharges, lateralised periodic discharges or electrographic seizures",
         "importance": "required",
-        "label": "Obtain video-EEG because a convulsive event was witnessed; this evaluates the seizure component, not the migraine",
-        "rationale": "Obtain video-EEG because a convulsive event was witnessed; this evaluates the seizure component, not the migraine"
+        "label": "EEG (video or routine) after two witnessed focal seizures with persistent confusion",
+        "rationale": "Required: excludes ongoing non-convulsive seizures and lateralised periodic discharges in a confused patient after seizures; it assesses the seizures, not the migraine."
       },
       {
         "alternatives": [
           {
             "required_arguments": {
               "panels": [
-                "CBC",
-                "CMP",
-                "glucose",
                 "lactate"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          },
+          {
+            "required_arguments": {
+              "panels": [
+                "CMP"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          },
+          {
+            "required_arguments": {
+              "panels": [
+                "CBC"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          },
+          {
+            "required_arguments": {
+              "panels": [
+                "glucose"
               ]
             },
             "tool_name": "interpret_labs"
           }
         ],
-        "citations": [
-          "[ICHD_3]",
-          "ICHD-3; NICE CG150 (2025)"
-        ],
+        "citations": [],
         "criterion_id": "action-6-interpret-labs",
-        "expected_evidence": "Answer the specific alternative-diagnosis question; blood tests do not confirm migraine",
+        "expected_evidence": "Normal blood count, electrolytes, glucose, CRP and CK; venous lactate 1.3 mmol/L; beta-hCG negative",
+        "importance": "recommended",
+        "label": "Blood tests after first seizures: glucose, electrolytes, blood count, inflammatory markers and lactate",
+        "rationale": "Recommended: metabolic and infective causes of seizures are excluded, and a normal lactate argues against MELAS."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "drug": "Mercilon"
+            },
+            "tool_name": "check_drug_interactions"
+          },
+          {
+            "required_arguments": {
+              "drug": "ethinylestradiol"
+            },
+            "tool_name": "check_drug_interactions"
+          },
+          {
+            "required_arguments": {
+              "drug": "combined oral contraceptive"
+            },
+            "tool_name": "check_drug_interactions"
+          },
+          {
+            "required_arguments": {
+              "drug": "topiramate"
+            },
+            "tool_name": "check_drug_interactions"
+          },
+          {
+            "required_arguments": {
+              "drug": "lamotrigine"
+            },
+            "tool_name": "check_drug_interactions"
+          },
+          {
+            "required_arguments": {
+              "drug": "verapamil"
+            },
+            "tool_name": "check_drug_interactions"
+          },
+          {
+            "required_arguments": {
+              "drug": "sumatriptan"
+            },
+            "tool_name": "check_drug_interactions"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "action-2-check-drug-interactions",
+        "expected_evidence": "Combined pill to stop because of aura (UKMEC 4); topiramate lowers oral contraceptive efficacy and is teratogenic; triptans, ergots and valproate avoided",
+        "importance": "required",
+        "label": "Check her combined pill and topiramate, and the preventive and acute options, against hemiplegic migraine",
+        "rationale": "Required: she takes an oestrogen-containing pill with migraine with aura, and topiramate interacts with oral contraception and needs a pregnancy prevention programme."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "search_medical_literature"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "action-1-search-medical-literature",
+        "expected_evidence": "General evidence on aura-triggered seizures and contraception in migraine with aura",
         "importance": "optional",
-        "label": "Order only tests targeted to this case's secondary-headache, infarct, mitochondrial or seizure differential",
-        "rationale": "Order only tests targeted to this case's secondary-headache, infarct, mitochondrial or seizure differential"
+        "label": "Optional: literature on hemiplegic migraine with seizures, contraception and topiramate",
+        "rationale": "Background evidence only; not a clinical step in the pathway."
       }
     ],
     "assessment": {
       "prohibited_recommendations": [
-        "Do not prescribe triptans or ergotamines in hemiplegic migraine",
-        "Do not start combined oestrogen-progestogen contraception",
-        "Do not commit to long-term AED on the basis of a single migralepsy seizure"
+        "Do not prescribe triptans or ergot derivatives in hemiplegic migraine",
+        "Do not continue or start combined hormonal contraception (pill, patch or ring): migraine with aura is UKMEC category 4; offer an IUD or an implant, since topiramate weakens oral methods.",
+        "Do not offer valproate for migraine prevention or seizures in a woman who can become pregnant"
       ],
       "required_recommendations": [
-        "Confirm hemiplegic migraine \u2014 fully reversible motor aura plus visual / sensory / speech aura",
-        "Document seizure with EEG and consider AED if recurrence (migralepsy is a recognised ICHD-3 entity)",
-        "Confirm MRI changes reversible on follow-up imaging",
-        "Avoid triptans and ergotamines in hemiplegic migraine",
-        "Genetic panel (CACNA1A / ATP1A2 / SCN1A)",
-        "Re-evaluate OCP if patient is on combined OCP"
+        "Diagnose a prolonged attack of sporadic hemiplegic migraine with migraine aura-triggered seizures (ICHD-3 1.2.3.2 and 1.4.4), with venous thrombosis, infarct and metabolic causes excluded",
+        "Stop Mercilon now: migraine with aura makes combined hormonal contraception UKMEC category 4",
+        "If topiramate is chosen, start it only with highly effective contraception (copper or hormonal IUD, or implant) under the topiramate pregnancy prevention programme; it reduces the efficacy of oral and progestogen-only pills",
+        "Review prevention, as she still has one to two attacks a month on topiramate 150 mg a day: continue topiramate under those conditions, or switch to lamotrigine (also treats seizures; levels rise once the pill is stopped) or verapamil",
+        "Treat attacks with an NSAID (for example naproxen 500 mg) and an antiemetic",
+        "Repeat brain MRI after recovery (for example at 4 to 6 weeks) to confirm the cortical changes have resolved; persistent change needs re-evaluation",
+        "Refer to clinical genetics for hemiplegic migraine gene testing (CACNA1A, ATP1A2, SCN1A, PRRT2)",
+        "Advise her not to drive and to tell the DVLA about the seizures if she holds a licence"
       ]
     },
     "avoided_actions": [
@@ -254,25 +329,9 @@
             "tool_name": "order_ct_scan"
           }
         ],
-        "citations": [
-          "[AAN_2000]"
-        ],
+        "citations": [],
         "criterion_id": "avoid-waste-1-order-ct-scan",
-        "rationale": "Head CT is less sensitive than MRI for migraine-relevant structural causes and is not indicated in typical migraine with aura; even when imaging is warranted, MRI is preferred",
-        "severity": "waste"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "analyze_ecg"
-          }
-        ],
-        "citations": [
-          "[AAN_2000]"
-        ],
-        "criterion_id": "avoid-waste-2-analyze-ecg",
-        "rationale": "Routine ECG is not indicated for migraine workup; only a baseline ECG to screen triptan contraindications in patients with cardiovascular risk factors has any role",
+        "rationale": "Once MRI is available a head CT adds nothing: MRI with diffusion answers infarct, haemorrhage and cortical oedema.",
         "severity": "waste"
       },
       {
@@ -282,11 +341,9 @@
             "tool_name": "order_echocardiogram"
           }
         ],
-        "citations": [
-          "[Charles_2017]"
-        ],
+        "citations": [],
         "criterion_id": "avoid-waste-3-order-echocardiogram",
-        "rationale": "Routine transthoracic / bubble echocardiogram (PFO screening) is NOT indicated in migraine with aura; PFO-migraine association is controversial and PFO closure does not reduce migraine [Charles_2017]",
+        "rationale": "Echocardiography is not indicated: diffusion imaging shows no infarct and the lesion is not embolic.",
         "severity": "waste"
       },
       {
@@ -296,11 +353,9 @@
             "tool_name": "order_cardiac_monitoring"
           }
         ],
-        "citations": [
-          "[AAN_2000]"
-        ],
+        "citations": [],
         "criterion_id": "avoid-waste-4-order-cardiac-monitoring",
-        "rationale": "Ambulatory cardiac monitoring is not indicated in typical migraine with aura \u2014 no role unless cardioembolic stroke is on the differential",
+        "rationale": "Ambulatory cardiac monitoring is not indicated: the events were witnessed focal motor seizures, not syncope, and there is no infarct.",
         "severity": "waste"
       }
     ],
@@ -327,90 +382,90 @@
     },
     "differential": [
       {
-        "diagnosis": "Familial hemiplegic migraine (CACNA1A / ATP1A2 / SCN1A)",
-        "icd_code": null,
-        "key_features": "Genetic panel pending; sporadic and familial forms are clinically indistinguishable in isolated cases",
-        "likelihood": "moderate"
+        "diagnosis": "Familial hemiplegic migraine (CACNA1A, ATP1A2, SCN1A, PRRT2)",
+        "icd_code": "G43.409",
+        "key_features": "Against: no first- or second-degree relative with similar attacks. A new pathogenic variant is still possible, hence the genetics referral.",
+        "likelihood": "low"
       },
       {
-        "diagnosis": "Focal motor seizure with secondary aphasia and post-ictal Todd's paralysis",
+        "diagnosis": "Focal epilepsy with post-ictal (Todd) paresis",
         "icd_code": "G40.109",
-        "key_features": "Witnessed shaking episode raises seizure question; migralepsy (seizure occurring during migraine aura) is the most parsimonious explanation when EEG shows no ongoing epileptiform activity",
-        "likelihood": "moderate"
-      },
-      {
-        "diagnosis": "Autoimmune encephalitis (NMDAR / LGI1)",
-        "icd_code": "G04.81",
-        "key_features": "CSF and antibody panels exclude",
+        "key_features": "Against: the seizures followed a visual aura and headache in a stereotyped attack type present since 14; no previous seizure; EEG without epileptiform discharges.",
         "likelihood": "low"
       },
       {
-        "diagnosis": "MELAS / mitochondrial disease",
-        "icd_code": null,
-        "key_features": "No family history, normal lactate, normal m.3243A>G; reversible MRI changes can mimic MELAS lesions",
+        "diagnosis": "Cerebral venous thrombosis",
+        "icd_code": "I67.6",
+        "key_features": "Against: MR venography shows patent sinuses and cortical veins; no haemorrhage on MRI.",
+        "likelihood": "very_low"
+      },
+      {
+        "diagnosis": "Autoimmune or viral encephalitis",
+        "icd_code": "G04.90",
+        "key_features": "Against: afebrile, CRP 2, recurrent stereotyped attacks with full recovery for 12 years, no subacute cognitive or psychiatric prodrome.",
         "likelihood": "low"
       },
       {
-        "diagnosis": "Ischaemic stroke / cervical artery dissection",
+        "diagnosis": "MELAS or other mitochondrial disease",
+        "icd_code": "E88.41",
+        "key_features": "Against: lactate 1.3 mmol/L, previous mitochondrial blood tests normal, no hearing loss or short stature recorded, no maternal family history.",
+        "likelihood": "low"
+      },
+      {
+        "diagnosis": "Ischaemic stroke",
         "icd_code": "I63.9",
-        "key_features": "MRA normal, reversible MRI changes argue against permanent infarct",
-        "likelihood": "low"
+        "key_features": "Against: no restricted diffusion after hours of deficit; cortical change crosses arterial territories.",
+        "likelihood": "very_low"
       }
     ],
     "key_clinical_evidence": [
-      "Migralepsy (ICHD-3 1.4.4) is a seizure triggered by migraine aura \u2014 requires aura to be temporally followed by a seizure",
-      "Reversible MRI signal changes are recognised in hemiplegic migraine and should not be misinterpreted as permanent infarct",
-      "Hemiplegic migraine workup must exclude MELAS, autoimmune encephalitis, and structural causes",
-      "Tier per the July 2026 clinical review: ICHD-3: the diagnosis is made on the structured history. Imaging is for the red flags that history screens for, not for the diagnosis.",
-      "Tier per the July 2026 clinical review: No laboratory test contributes to a migraine diagnosis; a targeted assay belongs to a specific suspicion.",
-      "July 2026 review applied end to end: ICHD-3 history/examination is required in all cases; routine MRI, EEG, ECG, CSF, echocardiography, cardiac monitoring and laboratory panels are absent. Retained tests answer an explicit atypical-aura, seizure, infarct, MELAS, CADASIL or aneurysm question."
+      "Known sporadic hemiplegic migraine since 14; this attack has visual, speech and motor aura with headache and two focal seizures within an hour of the aura",
+      "MRI: left hemispheric cortical swelling across territories with normal diffusion; MR venography normal",
+      "EEG: left hemispheric slowing without epileptiform discharges",
+      "Lactate and screening bloods normal; no family history of hemiplegic migraine",
+      "Taking an ethinylestradiol pill with topiramate: the pill must stop and topiramate needs highly effective contraception"
     ],
     "red_herrings": [
       {
-        "correct_interpretation": "Single seizure during aura is migralepsy, not chronic epilepsy; EEG normalises interictally",
-        "data_point": "Witnessed shaking episode",
+        "correct_interpretation": "The seizures occurred within an hour of the aura in a typical hemiplegic attack: migraine aura-triggered seizures (ICHD-3 1.4.4), with no previous seizure and no epileptiform discharges.",
+        "data_point": "Two episodes of right-hand rhythmic jerking with unresponsiveness",
         "field_path": "patient.history_present_illness",
-        "intended_effect": "May anchor on primary epilepsy diagnosis",
+        "intended_effect": "May anchor on new-onset focal epilepsy",
         "location": "patient.history_present_illness"
       },
       {
-        "correct_interpretation": "Reversible signal changes on follow-up imaging are characteristic of hemiplegic migraine",
-        "data_point": "Acute MRI signal changes",
+        "correct_interpretation": "Non-territorial cortical oedema with normal diffusion fits a prolonged hemiplegic aura; venography, bloods and lactate exclude the main mimics, and follow-up MRI should show resolution.",
+        "data_point": "Left hemispheric cortical swelling with FLAIR hyperintensity",
         "field_path": "initial_tool_outputs.mri",
-        "intended_effect": "May suggest infarct, encephalitis, or MELAS",
+        "intended_effect": "May suggest infarct, encephalitis or MELAS",
         "location": "initial_tool_outputs.mri"
-      },
-      {
-        "correct_interpretation": "Seizures are migralepsy \u2014 focal seizures triggered by hemiplegic migraine aura, not a primary epileptic disorder. EEG showed no epileptiform discharges or hemispheric dysfunction. The MRI abnormalities (cortical swelling, FLAIR signal) are reversible and DWI-negative, inconsistent with post-ictal changes from status epilepticus.",
-        "data_point": "Two focal right-sided motor seizures during the attack",
-        "field_path": "",
-        "intended_effect": "",
-        "location": ""
-      },
-      {
-        "correct_interpretation": "Critically, DWI is normal, CSF shows no pleocytosis, autoimmune antibody panels negative, HSV PCR negative. Reversibility on 72-hour follow-up MRI confirms CSD-mediated cortical hyperaemia in hemiplegic migraine.",
-        "data_point": "Diffuse left hemispheric cortical swelling and T2/FLAIR hyperintensity",
-        "field_path": "",
-        "intended_effect": "",
-        "location": ""
-      },
-      {
-        "correct_interpretation": "MRV would show no sinus thrombosis. DWI is normal excluding arterial infarction. However, OCP is WHO Category 4 in hemiplegic migraine and must be stopped, even though it is not the cause of this acute attack \u2014 this is a critical management action the agent must identify.",
-        "data_point": "Current use of combined OCP (Mercilon EE 20 mcg)",
-        "field_path": "",
-        "intended_effect": "",
-        "location": ""
       }
     ],
     "review_status": "draft",
-    "sequence_constraints": [],
+    "sequence_constraints": [
+      {
+        "after_criterion_id": "action-4-analyze-brain-mri",
+        "before_criterion_id": "action-3-perform-clinical-assessment",
+        "citations": [],
+        "reason": "The history and examination identify the red flags that the imaging answers.",
+        "severity": "soft"
+      },
+      {
+        "after_criterion_id": "action-mrv",
+        "before_criterion_id": "action-4-analyze-brain-mri",
+        "citations": [],
+        "reason": "Parenchymal imaging comes before venous imaging.",
+        "severity": "soft"
+      }
+    ],
     "stop_rule": {
-      "max_additional_actions": 0,
+      "max_additional_actions": 1,
       "required_before_assessment": [
-        "action-2-check-drug-interactions",
         "action-3-perform-clinical-assessment",
         "action-4-analyze-brain-mri",
-        "action-5-analyze-eeg"
+        "action-mrv",
+        "action-5-analyze-eeg",
+        "action-2-check-drug-interactions"
       ]
     }
   },
@@ -420,7 +475,7 @@
     "clinical_assessment": {
       "assessment_type": "structured_headache_history_ichd3",
       "criteria_met": {
-        "at_least_one_positive_aura_symptom": true,
+        "at_least_one_positive_aura_symptom": false,
         "at_least_one_unilateral_aura_symptom": true,
         "at_least_three_of_six_characteristics": true,
         "at_least_two_attacks": true,
@@ -433,151 +488,281 @@
       },
       "findings": [
         {
-          "element": "Aura description",
-          "result": "A 26-year-old woman presented to the emergency department brought by her partner with a 3-hour history of severe left-sided throbbing headache that began approximately 30 minutes after she developed blurred vision in her right visual field."
+          "element": "Previous attacks",
+          "result": "Since age 14, one to two attacks a month of unilateral throbbing headache with arm weakness on alternating sides, always fully resolved within a few hours. Diagnosed as sporadic hemiplegic migraine at 22; normal CT, MRI, MRA, lumbar puncture and metabolic and mitochondrial blood tests at 17 and 22."
         },
         {
-          "element": "Aura description",
-          "result": "Shortly after the headache peaked, her partner noticed that she was struggling to find words and her right arm appeared weak."
+          "element": "Current attack: aura sequence",
+          "result": "Blurred vision in the right visual field, then left-sided headache about 30 minutes later, then word-finding difficulty and right arm weakness after the headache peaked. Spread of each symptom over minutes not documented; no positive visual or sensory phenomena described."
         },
         {
-          "element": "Temporal profile",
-          "result": "A 26-year-old woman presented to the emergency department brought by her partner with a 3-hour history of severe left-sided throbbing headache that began approximately 30 minutes after she developed blurred vision in her right visual field."
+          "element": "Current attack: duration",
+          "result": "Right-sided weakness and expressive dysphasia present for about 2 hours at assessment, within the 72-hour limit for motor aura; the visual field restriction is already improving."
         },
         {
-          "element": "Temporal profile",
-          "result": "Within the following hour she experienced two brief episodes of right-hand rhythmic jerking lasting approximately 90 seconds each, during which she was unresponsive, followed by postictal confusion lasting approximately 20 minutes."
+          "element": "Seizures",
+          "result": "During the speech and motor aura, within the hour after it began: two episodes of right-hand rhythmic jerking of about 90 seconds with unresponsiveness, followed by confusion for about 20 minutes. No previous seizure."
         },
         {
-          "element": "Headache relation",
-          "result": "A 26-year-old woman presented to the emergency department brought by her partner with a 3-hour history of severe left-sided throbbing headache that began approximately 30 minutes after she developed blurred vision in her right visual field."
+          "element": "Hemiplegic migraine criteria",
+          "result": "Fully reversible motor weakness with visual and speech aura in previous attacks (ICHD-3 1.2.3 B). No first- or second-degree relative with hemiplegic migraine (1.2.3.2 sporadic)."
+        },
+        {
+          "element": "Medicines",
+          "result": "Topiramate 75 mg twice daily for two years, after flunarizine failed; still one to two attacks a month. Combined oral contraceptive Mercilon (ethinylestradiol 20 micrograms, desogestrel 150 micrograms)."
+        },
+        {
+          "element": "Examination",
+          "result": "GCS 14, temperature 37.1 C, BP 128/76. Expressive dysphasia, right homonymous field restriction (improving), right lower facial weakness, right arm power 3/5, right leg 4/5, right extensor plantar. Fundi normal."
         },
         {
           "element": "Red-flag review (SNNOOP10)",
-          "result": "Systemic features, neoplasia, neurological deficit outside the aura, sudden onset, older age at onset, pattern change, positional or Valsalva trigger, papilloedema, pregnancy and painful eye reviewed and recorded"
+          "result": "Neurological deficit with impaired consciousness and first seizures: present. Hormonal contraception (oestrogen): present. Fever, sudden onset, onset after 50, pregnancy, positional trigger and papilloedema: absent."
         }
       ],
-      "impression": "Structured history documents 5 of 6 ICHD-3 criterion-C characteristics with reversible aura symptoms, neurological examination and red-flag review. Imaging or laboratory testing is not the diagnostic test for a typical attack.",
+      "impression": "Prolonged attack of motor, visual and speech aura with headache in a woman with known sporadic hemiplegic migraine (ICHD-3 1.2.3.2; 4 of 6 criterion C characteristics in this attack), complicated by two focal seizures within an hour of the aura (fits ICHD-3 1.4.4 migraine aura-triggered seizure if no other cause is found). Red flags present: first seizures, impaired consciousness and use of an oestrogen-containing pill.",
       "pre_post_comparison": null,
       "recommended_actions": [],
       "scores": {
-        "ICHD-3 criterion C characteristics met": "5 of 6 (at least 3 required)",
-        "aura modalities documented": "visual, sensory, speech/language, motor and/or brainstem features as present in the history",
-        "reference criteria applied": "ICHD-3 1.2 and the relevant subtype/complication criteria"
+        "GCS": "14 (E4 V4 M6)",
+        "ICHD-3 criterion C characteristics met (current attack)": "4 of 6 (succession, duration within the motor limit, unilateral, headache within 60 min)",
+        "aura modalities": "visual, speech/language, motor",
+        "reference criteria applied": "ICHD-3 1.2.3, 1.2.3.2 and 1.4.4"
       }
     },
     "csf": null,
+    "drug_interactions": {
+      "Mercilon": {
+        "alternatives": [
+          "Contraception: copper IUD or levonorgestrel IUD (not affected by topiramate)",
+          "Prevention: lamotrigine (aura-predominant migraine; also an antiseizure medicine), verapamil, acetazolamide",
+          "Acute: NSAID (for example naproxen 500 mg) with an antiemetic"
+        ],
+        "contraindications": [
+          "Combined hormonal contraception in migraine with aura: UKMEC 2016 category 4 (unacceptable risk of ischaemic stroke); stop.",
+          "Triptans and ergot derivatives: avoid in hemiplegic migraine.",
+          "Valproate: not for migraine prevention in a woman who can become pregnant."
+        ],
+        "formulary_status": "on formulary",
+        "interactions": [
+          "Topiramate + combined or progestogen-only pill: topiramate can reduce the contraceptive efficacy of oral hormonal methods (dose-related; MHRA 2024 advises not relying on them alone).",
+          "Lamotrigine + ethinylestradiol: oestrogen lowers lamotrigine levels by about half; levels rise when the pill is stopped.",
+          "Topiramate + acetazolamide: additive risk of metabolic acidosis and renal stones.",
+          "Verapamil + topiramate: no clinically relevant interaction."
+        ],
+        "proposed": "Ethinylestradiol 20 micrograms with desogestrel 150 micrograms (Mercilon) and topiramate 75 mg twice daily in a 26-year-old woman with hemiplegic migraine and aura-triggered seizures",
+        "summary": "Mercilon must stop (UKMEC 4 with aura); topiramate weakens oral contraception and needs the pregnancy prevention programme with an IUD; triptans, ergots and valproate are avoided.",
+        "warnings": [
+          "Topiramate is teratogenic (oral clefts, low birth weight, possible neurodevelopmental effects); use requires the MHRA pregnancy prevention programme and highly effective contraception.",
+          "In migraine with aura the copper IUD is UKMEC category 1 and progestogen-only methods (levonorgestrel IUD, implant, desogestrel pill, injectable) are UKMEC category 2."
+        ]
+      }
+    },
     "ecg": null,
     "echo": null,
     "eeg": {
-      "activating_procedures": {},
-      "artifacts": [],
+      "activating_procedures": {
+        "hyperventilation": "not performed (patient confused)",
+        "photic_stimulation": "no photic response"
+      },
+      "artifacts": [
+        {
+          "description": "intermittent movement artefact, no event captured",
+          "type": "movement"
+        }
+      ],
       "background": {
-        "hemispheric_asymmetry": "none beyond mild bilateral theta",
-        "overall": "mild diffuse slowing consistent with post-ictal state; no hemispheric asymmetry",
-        "pdr": "6-7 Hz theta-range activity bilaterally \u2014 post-ictal slowing"
+        "hemispheric_asymmetry": "left slower than right",
+        "overall": "continuous left hemispheric polymorphic theta and delta slowing, maximal posteriorly; right hemisphere normal",
+        "pdr": "8 Hz over the right posterior head region; poorly formed over the left"
       },
       "classification": "abnormal",
       "findings": [
         {
-          "clinical_correlation": "",
-          "frequency": "",
-          "location": "Left hemisphere",
-          "morphology": "Mild diffuse slowing, predominantly theta range (5-7 Hz) consistent with postictal state. No epileptiform discharges.",
-          "state": "",
-          "type": "Left hemisphere"
+          "clinical_correlation": "focal cerebral dysfunction of the left hemisphere",
+          "frequency": "2-5 Hz",
+          "location": "left hemisphere, maximal temporo-parieto-occipital",
+          "morphology": "continuous polymorphic theta and delta activity",
+          "state": "awake and drowsy",
+          "type": "slowing"
         },
         {
           "clinical_correlation": "",
           "frequency": "",
-          "location": "Right hemisphere",
-          "morphology": "Comparable mild background slowing. No focal hemispheric asymmetry greater than left.",
-          "state": "",
-          "type": "Right hemisphere"
-        },
-        {
-          "clinical_correlation": "",
-          "frequency": "",
-          "location": "Overall",
-          "morphology": "No persistent hemispheric dysfunction. No delta-wave asymmetry. No ictal activity. No sharp waves, spike-and-wave, or epileptiform discharges recorded during this session.",
-          "state": "",
-          "type": "Overall"
+          "location": "both hemispheres",
+          "morphology": "no spikes, sharp waves or lateralised periodic discharges",
+          "state": "awake and drowsy",
+          "type": "epileptiform activity"
         }
       ],
-      "impression": "This is an ABNORMAL EEG. Mild diffuse background slowing in the theta range bilaterally, consistent with a post-ictal or encephalopathic state. No interictal epileptiform discharges. No ictal activity or electrographic seizures recorded. No persistent hemispheric asymmetry",
-      "limitations": "",
+      "impression": "Abnormal EEG recorded on the day of admission: continuous left hemispheric slowing, maximal posteriorly. No interictal epileptiform discharges, no lateralised periodic discharges and no electrographic seizures; no clinical events captured.",
+      "limitations": "Recorded about 4 hours after the last seizure; the slowing may be post-ictal or reflect the underlying left hemispheric process.",
       "recommended_actions": []
     },
     "labs": {
       "abnormal_values_summary": [],
-      "interpretation": "All values within normal limits.",
+      "interpretation": "Blood count, renal function, electrolytes, calcium, magnesium, glucose, CRP and CK within reference ranges. Venous lactate 1.3 mmol/L. Serum beta-hCG negative.",
       "panels": {
-        "Baseline workup": [
+        "CBC": [
           {
-            "clinical_significance": "Ordered as part of the baseline workup; no abnormality that alters the diagnosis, which is what this case's diagnosis rests on",
+            "clinical_significance": null,
             "is_abnormal": false,
-            "reference_range": "",
-            "test": "lactate",
-            "unit": "",
-            "value": "Within reference range"
+            "reference_range": "115-155",
+            "test": "Haemoglobin",
+            "unit": "g/L",
+            "value": 132
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "4.0-11.0",
+            "test": "White cell count",
+            "unit": "x10^9/L",
+            "value": 8.9
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "150-400",
+            "test": "Platelets",
+            "unit": "x10^9/L",
+            "value": 268
+          }
+        ],
+        "CK": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "25-200",
+            "test": "Creatine kinase",
+            "unit": "U/L",
+            "value": 146
+          }
+        ],
+        "CMP": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "135-145",
+            "test": "Sodium",
+            "unit": "mmol/L",
+            "value": 139
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "3.5-5.3",
+            "test": "Potassium",
+            "unit": "mmol/L",
+            "value": 4.1
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "45-84",
+            "test": "Creatinine",
+            "unit": "umol/L",
+            "value": 64
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "22-29",
+            "test": "Bicarbonate",
+            "unit": "mmol/L",
+            "value": 23
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "2.20-2.60",
+            "test": "Adjusted calcium",
+            "unit": "mmol/L",
+            "value": 2.36
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.70-1.00",
+            "test": "Magnesium",
+            "unit": "mmol/L",
+            "value": 0.84
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "<33",
+            "test": "ALT",
+            "unit": "U/L",
+            "value": 18
+          }
+        ],
+        "CRP": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "<5",
+            "test": "C-reactive protein",
+            "unit": "mg/L",
+            "value": 2
+          }
+        ],
+        "beta-hCG": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "<5 (non-pregnant)",
+            "test": "Serum beta-hCG",
+            "unit": "IU/L",
+            "value": "<2"
+          }
+        ],
+        "glucose": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "3.5-7.8",
+            "test": "Glucose (random)",
+            "unit": "mmol/L",
+            "value": 5.8
+          }
+        ],
+        "lactate": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.5-2.2",
+            "test": "Lactate (venous)",
+            "unit": "mmol/L",
+            "value": 1.3
           }
         ]
       }
     },
-    "literature_search": {
-      "ICHD-3 migraine with aura diagnostic criteria SNOOP red flags": {
-        "query": "ICHD-3 migraine with aura diagnostic criteria SNOOP red flags",
-        "results": [
-          {
-            "evidence_level": "guideline recommendation",
-            "finding": "ICHD-3 criteria for migraine with aura confirmed; no SNOOP red flag present that mandates further workup",
-            "source": "ICHD_3"
-          }
-        ],
-        "summary": "ICHD-3 criteria for migraine with aura confirmed; no SNOOP red flag present that mandates further workup"
-      }
-    },
+    "literature_search": null,
     "mri": {
-      "additional_observations": [],
+      "additional_observations": [
+        "Technique: 3 T brain MRI with T1, T2, FLAIR, DWI/ADC and susceptibility-weighted imaging, no contrast.",
+        "No haemorrhage or microbleed.",
+        "Right hemisphere, posterior fossa and deep grey matter normal. No hydrocephalus."
+      ],
       "findings": [
         {
-          "borders": "diffuse, non-territorial, no vascular territory demarcation",
-          "location": "left cerebral hemisphere, frontoparietal cortex",
-          "mass_effect": "mild sulcal effacement left hemisphere \u2014 consistent with vasogenic oedema",
+          "borders": "diffuse, not confined to an arterial territory",
+          "location": "left cerebral hemisphere, frontal, parietal and occipital cortex",
+          "mass_effect": "mild sulcal effacement over the left hemisphere, no midline shift",
           "signal_characteristics": {
-            "ADC": "NORMAL \u2014 no cytotoxic oedema",
-            "DWI": "NORMAL \u2014 no diffusion restriction (critical finding)",
-            "FLAIR": "gyral cortical hyperintensity with sulcal effacement",
-            "T1_Gd": "no leptomeningeal or cortical enhancement",
-            "T2": "diffuse cortical hyperintensity"
+            "ADC": "normal",
+            "DWI": "no restricted diffusion",
+            "FLAIR": "gyral cortical hyperintensity",
+            "SWI": "no susceptibility signal",
+            "T2": "cortical hyperintensity with swelling"
           },
-          "size": "diffuse hemispheric involvement",
+          "size": "most of the left hemispheric cortex",
           "type": "cortical_swelling"
-        },
-        {
-          "borders": "gyral/cortical distribution",
-          "location": "left parietal and occipital cortex",
-          "mass_effect": "mild",
-          "signal_characteristics": {
-            "DWI": "no restriction",
-            "FLAIR": "cortical ribbon hyperintensity",
-            "T2": "hyperintense"
-          },
-          "size": "multifocal gyral involvement",
-          "type": "signal_abnormality"
-        },
-        {
-          "borders": null,
-          "location": "circle of Willis and major cerebral arteries",
-          "mass_effect": "none",
-          "signal_characteristics": {
-            "MRA": "patent bilateral ICA, MCA, ACA, PCA, basilar; no occlusion, stenosis, or dissection; no arterial filling defect"
-          },
-          "size": null,
-          "type": "vascular_assessment"
         }
       ],
-      "impression": "1. Diffuse left hemispheric cortical swelling with T2/FLAIR gyral cortical hyperintensity and mild sulcal effacement. 2. Critically, DWI is NORMAL \u2014 no restricted diffusion, no cytotoxic oedema. No leptomeningeal or cortical enhancement. 3. Normal MRA \u2014 no arterial occlusion, stenosis, or dissection. The pattern of vasogenic cortical oedema without cytotoxic oedema and non-territorial distribution does not conform to an arterial infarct. Imaging differential includes cortical spreading depression, autoimmune encephalitis, and other causes of cortical vasogenic oedema. Follow-up MRI is recommended to assess reversibility",
+      "impression": "1. Left hemispheric cortical swelling with T2/FLAIR gyral hyperintensity and mild sulcal effacement, crossing arterial territories. 2. No restricted diffusion and no haemorrhage. 3. Imaging differential: cortical oedema related to a prolonged migraine aura, post-ictal change, encephalitis, mitochondrial disease. Not the pattern of an arterial infarct.",
       "recommended_actions": [],
       "volumetrics": null
     },
@@ -585,22 +770,18 @@
   },
   "metadata": {
     "authoring_agent": "condition-expert:MIG-AURA",
-    "case_body_concerns": [
-      "Required tool(s) lacking initial or followup outputs in the case body \u2014 agent calling them will fall back to off-pathway tier or empty result; tools: ['search_medical_literature (only fallback)']"
-    ],
+    "case_body_concerns": [],
     "citation_gap": [],
-    "condition_name": "Sporadic hemiplegic migraine with reversible MRI changes and focal motor seizures",
+    "condition_name": "Sporadic hemiplegic migraine with aura-triggered seizures and reversible cortical oedema, on a combined pill with topiramate",
     "criteria_pack_version": "1.0",
     "difficulty_description": "Moderate difficulty due to MRI showing diffuse cortical swelling and T2/FLAIR hyperintensity (concerning for ischemia or encephalitis) with simultaneously normal DWI. Focal motor seizures complicate the picture (migralepsy consideration). Sporadic hemiplegic migraine diagnosis requires systematic exclusion of acute infarction, MELAS, epilepsy, and autoimmune causes.",
-    "difficulty_rationale": "Diagnostic puzzle: hemiplegic migraine with migralepsy and reversible MRI changes \u2014 extensive mimic exclusion (MELAS, encephalitis, primary epilepsy, stroke)",
+    "difficulty_rationale": "Diagnostic puzzle: hemiplegic migraine with migralepsy and reversible MRI changes; extensive mimic exclusion (MELAS, encephalitis, primary epilepsy, stroke)",
     "expected_agent_confidence": 0.58,
     "fallback_tool_kinds": {
       "cardiac_monitoring": "normal",
       "ct": "normal",
       "ecg": "normal",
-      "echo": "normal",
-      "literature_search": "normal",
-      "specialized_test": "normal"
+      "echo": "normal"
     },
     "generation_method": "real_case_seed",
     "last_revised": "2026-08-10",
@@ -627,13 +808,13 @@
           "dose": "75 mg",
           "drug": "Topiramate",
           "frequency": "twice daily",
-          "indication": "Migraine prevention \u2014 inadequate control"
+          "indication": "Migraine prevention; one to two attacks a month on treatment"
         },
         {
           "dose": "1 tablet",
           "drug": "Mercilon (desogestrel 150 mcg / ethinylestradiol 20 mcg)",
           "frequency": "daily",
-          "indication": "Contraception \u2014 WHO Category 4 \u2014 must be stopped"
+          "indication": "Contraception"
         }
       ],
       "past_medical_history": [],
@@ -647,13 +828,13 @@
       "sex": "female"
     },
     "ethnicity": "White British",
-    "history_present_illness": "A 26-year-old woman presented to the emergency department brought by her partner with a 3-hour history of severe left-sided throbbing headache that began approximately 30 minutes after she developed blurred vision in her right visual field. Shortly after the headache peaked, her partner noticed that she was struggling to find words and her right arm appeared weak. Within the following hour she experienced two brief episodes of right-hand rhythmic jerking lasting approximately 90 seconds each, during which she was unresponsive, followed by postictal confusion lasting approximately 20 minutes. She has had episodes of unilateral throbbing headache accompanied by transient arm weakness affecting alternating sides since the age of 14. During those earlier attacks, the weakness has always resolved completely within a few hours, and previous assessments including head CT, brain MRI, MR angiography, lumbar puncture, and basic metabolic and mitochondrial blood tests were all documented as normal at age 17 and again at age 22. She was commenced on topiramate 75 mg twice daily approximately two years ago following inadequate response to flunarizine; despite this she continues to have one to two attacks monthly. There is no family history of similar episodes, hemiplegic migraine, or any neurological condition. She does not smoke, drinks alcohol only occasionally, and uses no illicit substances. She takes topiramate and a combined oral contraceptive pill (Mercilon, desogestrel 150 mcg / ethinylestradiol 20 mcg). She has no known drug allergies.",
-    "hpi": "A 26-year-old woman presented to the emergency department brought by her partner with a 3-hour history of severe left-sided throbbing headache that began approximately 30 minutes after she developed blurred vision in her right visual field. Shortly after the headache peaked, her partner noticed that she was struggling to find words and her right arm appeared weak. Within the following hour she experienced two brief episodes of right-hand rhythmic jerking lasting approximately 90 seconds each, during which she was unresponsive, followed by postictal confusion lasting approximately 20 minutes. She has had episodes of unilateral throbbing headache accompanied by transient arm weakness affecting alternating sides since the age of 14. During those earlier attacks, the weakness has always resolved completely within a few hours, and previous assessments including head CT, brain MRI, MR angiography, lumbar puncture, and basic metabolic and mitochondrial blood tests were all documented as normal at age 17 and again at age 22. She was commenced on topiramate 75 mg twice daily approximately two years ago following inadequate response to flunarizine; despite this she continues to have one to two attacks monthly. There is no family history of similar episodes, hemiplegic migraine, or any neurological condition. She does not smoke, drinks alcohol only occasionally, and uses no illicit substances. She takes topiramate and a combined oral contraceptive pill (Mercilon, desogestrel 150 mcg / ethinylestradiol 20 mcg). She has no known drug allergies.",
+    "history_present_illness": "A 26-year-old woman presented to the emergency department brought by her partner with a 3-hour history of severe left-sided throbbing headache that began approximately 30 minutes after she developed blurred vision in her right visual field. Shortly after the headache peaked, her partner noticed that she was struggling to find words and her right arm appeared weak. Within the following hour she experienced two brief episodes of right-hand rhythmic jerking lasting approximately 90 seconds each, during which she was unresponsive, followed by postictal confusion lasting approximately 20 minutes. She has had episodes of unilateral throbbing headache accompanied by transient arm weakness affecting alternating sides since the age of 14. During those earlier attacks, the weakness has always resolved completely within a few hours, and previous assessments including head CT, brain MRI, MR angiography, lumbar puncture, and basic metabolic and mitochondrial blood tests were all documented as normal at age 17 and again at age 22. She has not had a seizure before. She was commenced on topiramate 75 mg twice daily approximately two years ago following inadequate response to flunarizine; despite this she continues to have one to two attacks monthly. There is no family history of similar episodes, hemiplegic migraine, or any neurological condition. She does not smoke, drinks alcohol only occasionally, and uses no illicit substances. She takes topiramate and a combined oral contraceptive pill (Mercilon, desogestrel 150 mcg / ethinylestradiol 20 mcg). She has no known drug allergies.",
+    "hpi": "A 26-year-old woman presented to the emergency department brought by her partner with a 3-hour history of severe left-sided throbbing headache that began approximately 30 minutes after she developed blurred vision in her right visual field. Shortly after the headache peaked, her partner noticed that she was struggling to find words and her right arm appeared weak. Within the following hour she experienced two brief episodes of right-hand rhythmic jerking lasting approximately 90 seconds each, during which she was unresponsive, followed by postictal confusion lasting approximately 20 minutes. She has had episodes of unilateral throbbing headache accompanied by transient arm weakness affecting alternating sides since the age of 14. During those earlier attacks, the weakness has always resolved completely within a few hours, and previous assessments including head CT, brain MRI, MR angiography, lumbar puncture, and basic metabolic and mitochondrial blood tests were all documented as normal at age 17 and again at age 22. She has not had a seizure before. She was commenced on topiramate 75 mg twice daily approximately two years ago following inadequate response to flunarizine; despite this she continues to have one to two attacks monthly. There is no family history of similar episodes, hemiplegic migraine, or any neurological condition. She does not smoke, drinks alcohol only occasionally, and uses no illicit substances. She takes topiramate and a combined oral contraceptive pill (Mercilon, desogestrel 150 mcg / ethinylestradiol 20 mcg). She has no known drug allergies.",
     "neurological_exam": {
       "coordination": "Limited on right due to weakness. Left cerebellar tests intact.",
       "cranial_nerves": "Visual fields by confrontation: mild right homonymous visual field restriction that patient reports is improving from earlier. Pupils 4mm equal and reactive. Extraocular movements full. Fundoscopy normal. Facial symmetry slightly reduced on right with right lower facial droop. Tongue protruded midline.",
-      "gait": "Not assessed \u2014 patient was bed-bound at presentation.",
-      "mental_status": "Alert, mildly confused, oriented to person and place but not time. Motor aphasia \u2014 single word responses, no paraphasic errors. Follows simple one-step commands.",
+      "gait": "Not assessed: bed-bound at presentation.",
+      "mental_status": "Alert, mildly confused, oriented to person and place but not time. Motor aphasia: single-word responses, no paraphasic errors. Follows simple one-step commands.",
       "motor": "Right upper extremity: power 3/5 throughout. Right lower extremity: power 4/5. Left upper and lower extremity: power 5/5. Tone normal bilaterally.",
       "reflexes": "Brisk throughout. Right plantar extensor (Babinski positive). Left plantar flexor.",
       "sensation": "Intact to light touch and pinprick bilaterally. No cortical sensory deficits.",
@@ -665,7 +846,7 @@
       "neurological": "GCS 14 (E4V4M6)."
     },
     "pmh": [
-      "Sporadic hemiplegic migraine \u2014 diagnosed age 22, ICHD-3 1.2.3",
+      "Sporadic hemiplegic migraine, diagnosed at age 22 (ICHD-3 1.2.3)",
       "No prior seizure disorder",
       "No prior stroke or TIA",
       "No connective tissue disease"
