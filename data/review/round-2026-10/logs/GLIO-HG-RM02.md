@@ -71,3 +71,15 @@ Adversarial verifier, 24 Oct 2026. Read the log, the notes (a02b3fb0, fea3f998, 
   5. The CT CAP criterion rationale was a copy of its label. It now reads "Optional: a solitary intramedullary metastasis is very unlikely at 34 without a known primary."
   6. `[Hasbun_2001]` (CT before LP in suspected meningitis) was cited on the spinal-block LP harm entry, which it does not support. The worker had flagged this. The citation is removed, so the entry now has none, as the pack has no source for spinal coning (CENTRAL, already logged).
 - After the fixes: `perfect_agent.py` passes, `case_io.py check` reports no failure naming the case, and `test_case_guards` passes.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/GLIO-HG-decisions.md` (Andrea, 24 Oct 2026: open points resolved for dataset quality).
+
+- accepted[0]: 'Glioblastoma, IDH-wildtype, WHO grade 4 (cervical spinal cord)' -> 'Glioblastoma, IDH-wildtype, CNS WHO grade 4 (cervical spinal cord)' (summary CENTRAL 3: WHO CNS5 writes "CNS WHO grade"; ruling 3 label correction)
+- action-performance-status: recommended -> required (Q3: KPS selects the treatment branch in every case, EANO 2021; Reviewer 2 RP04 0289beef applied as a class)
+- stop rule: + action-performance-status (Q3: KPS selects the treatment branch in every case, EANO 2021; Reviewer 2 RP04 0289beef applied as a class)
+- must removed: 'Obtain contrast-enhanced MRI of the spine, with brain MRI for neuraxis staging, before any invasive procedure.' (Q9: diagnostic step restating a required criterion; musts are management, ruling 4)
+- fallback specialized_test (generic 'Study within normal limits.', test_type '') -> null; the library answers by test_type (auditor flag, S01 class: a case fallback is served for any order of the tool, whatever the test type)
+- avoid-harm-1-analyze-csf: citation [Hollis_1986] added (LP below a spinal block); it had none
+- Synonyms re-expanded from `diagnosis_synonyms.yaml` (`--prune --conditions brain_tumor_glioma`): removed ['spinal cord glioma', 'intramedullary glioma']; added ['intramedullary glioblastoma', 'glioblastoma', 'GBM', 'high grade glioma', 'malignant glioma'] (entity, grade and H3 scoping; summary CENTRAL 2).

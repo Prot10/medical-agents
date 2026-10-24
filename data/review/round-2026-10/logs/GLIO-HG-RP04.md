@@ -41,3 +41,14 @@ None. Decided in-round: `H3K27_status` not required, because the splenial extens
 ## Verification
 
 Adversarial verifier, 24 Oct 2026. All three note ids are in the table and applied: SOX10_IHC and Melan_A_HMB45_IHC in both tissue alternatives and reported negative in both tissue follow-ups, must 7 naming only orderable markers; treat-class levetiracetam must, recommended EEG with a new report, no EEG waste entry and no normal fallback EEG; required performance status in the stop rule with KPS 70 / ECOG 2 derived from the exam and the pre-illness KPS 80 labelled as such. Checked the left inferior quadrantanopia against the right parietal lesion, the left temporal sharp waves against the left superior temporal lesion and the speech arrest, the 6 mm shift against the LP harm entry, the required CT CAP and its hepatic red-herring path, labs flags, aspirin and hydrochlorothiazide in the drug check, the treatment must against KPS 70 and MGMT unmethylated, identical tissue reports, and the decision not to require H3 K27 status (hemispheric mass with splenial extension; H3 K27M still reported not detected): defensible. Found nothing that needed a change; no edit made.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/GLIO-HG-decisions.md` (Andrea, 24 Oct 2026: open points resolved for dataset quality).
+
+- accepted[0]: 'Glioblastoma, IDH-wildtype, WHO grade 4, multicentric (right parieto-occipital dominant lesion with right frontal and left temporal satellite lesions)' -> 'Glioblastoma, IDH-wildtype, CNS WHO grade 4, multicentric (right parieto-occipital dominant lesion with right frontal and left temporal satellite lesions)' (summary CENTRAL 3: WHO CNS5 writes "CNS WHO grade"; ruling 3 label correction)
+- must removed: 'Obtain MRI brain with and without gadolinium contrast (tumor protocol) as the first step to characterize the multifocal lesions and define biopsy target' (Q9: diagnostic step restating a required criterion; musts are management, ruling 4)
+- must removed: 'Perform systemic staging CT chest/abdomen/pelvis with contrast to exclude active extracranial primary malignancy before diagnosing primary brain tumor' (Q9: diagnostic step restating a required criterion; musts are management, ruling 4)
+- must removed: 'Order pre-operative labs (CBC, CMP, coagulation, type and screen) before any surgical intervention' (Q9: diagnostic step restating a required criterion; musts are management, ruling 4)
+- fallback specialized_test (generic 'No abnormality identified on this study.', test_type '') -> null; the library answers by test_type (auditor flag, S01 class: a case fallback is served for any order of the tool, whatever the test type)
+- Synonyms re-expanded from `diagnosis_synonyms.yaml` (`--prune --conditions brain_tumor_glioma`): removed ['astrocytoma grade 4']; added ['glioblastoma idh wildtype'] (entity, grade and H3 scoping; summary CENTRAL 2).

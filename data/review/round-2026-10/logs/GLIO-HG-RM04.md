@@ -51,3 +51,15 @@ Adversarial verifier, 24 Oct 2026. All three note ids are in the table and appli
 - `initial_tool_outputs.mri.impression`: the MRI named "gliosarcoma" (a histological subtype that imaging cannot identify; answer leakage of the case's subtype) and ended with "Tissue diagnosis recommended." (management text, plan C9). Now "most consistent with a high-grade glial neoplasm; a solitary hemorrhagic metastasis cannot be excluded", without the recommendation.
 - `ground_truth.red_herrings[2].data_point` claimed "HbA1c 8.1%" for `past_medical_history[0]`, which records 7.8% three months ago (8.1% is the admission panel). Now "Type 2 diabetes mellitus on metformin and sitagliptin (HbA1c 7.8% three months ago, 8.1% on the admission panel)".
 Re-ran perfect-agent (pass), `case_io.py check` (no failure names the case) and the case guards (pass).
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/GLIO-HG-decisions.md` (Andrea, 24 Oct 2026: open points resolved for dataset quality).
+
+- action-performance-status: recommended -> required (Q3: KPS selects the treatment branch in every case, EANO 2021; Reviewer 2 RP04 0289beef applied as a class)
+- stop rule: + action-performance-status (Q3: KPS selects the treatment branch in every case, EANO 2021; Reviewer 2 RP04 0289beef applied as a class)
+- must removed: 'Obtain urgent MRI brain with and without gadolinium contrast (tumor protocol with DWI, FLAIR, SWI) before any invasive procedure' (Q9: diagnostic step restating a required criterion; musts are management, ruling 4)
+- must rewritten: 'Obtain pre-operative CBC, BMP, coagulation, and type & screen; confirm the platelet count of 118 x10^9/L with a repeat count and blood film, and stop aspirin (primary prevention) about 7 days before craniotomy.' -> 'Confirm the platelet count of 118 x10^9/L with a repeat count and blood film before surgery, and stop aspirin (primary prevention) about 7 days before craniotomy.' (Q9: the duplicated diagnostic part dropped, the management part kept)
+- AIOM question numbers removed from the text (edition 2026 numbering unverified) (Q1: AIOM cited as the 2026 update; Quesito numbering not verifiable)
+- fallback specialized_test (generic 'Study within normal limits.', test_type '') -> null; the library answers by test_type (auditor flag, S01 class: a case fallback is served for any order of the tool, whatever the test type)
+- Synonyms re-expanded from `diagnosis_synonyms.yaml` (`--prune --conditions brain_tumor_glioma`): removed ['astrocytoma grade 4']; added ['glioblastoma idh wildtype', 'gliosarcoma'] (entity, grade and H3 scoping; summary CENTRAL 2).

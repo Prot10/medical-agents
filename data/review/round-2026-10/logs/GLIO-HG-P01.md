@@ -48,3 +48,14 @@ None.
 ## Verification
 
 Adversarial check (24 Oct 2026). All three notes verified: the red herring now argues from the printed thin smooth ring, central restricted diffusion and WBC 11.2 (with normal procalcitonin, no fever, post-ictal timing) and lets the aspirate decide; the HPI CT shows a hypodense lesion with oedema, no enhancement; Na 140, Cl 103, HCO3 25 (gap 12) and MCHC 33.7 are physiological. Checked group B order (aspiration and biopsy first, then resection), one follow-up per procedure with identical integrated diagnosis, the ID and dental musts replacing the consult tools, the recommended blood cultures, the treat-class must, the sulfonamide allergy in the drug check, and the LP harm with the 4 mm shift. Found and fixed: (1) both `red_herrings[].field_path` were empty; set to `patient.clinical_history.past_medical_history[1]` (dental abscess) and `patient.clinical_history.family_history[1]` (maternal MS); (2) the blood-culture output listed `gram_stain` in `tests` with `gram_stain: null` (no Gram stain is reported on sterile bottles); `tests` is now `["culture"]`; (3) the tissue rationale attributed "frozen section, Gram stain and culture separate abscess from necrotic tumour" to EANO 2021, which does not address brain abscess; the attribution now sits only on the integrated-diagnosis sentence (the abscess guideline key is already requested under CENTRAL). perfect_agent, case_io check and the case guards are clean after the edits.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/GLIO-HG-decisions.md` (Andrea, 24 Oct 2026: open points resolved for dataset quality).
+
+- accepted[0]: 'Glioblastoma, IDH-wildtype, WHO grade 4' -> 'Glioblastoma, IDH-wildtype, CNS WHO grade 4' (summary CENTRAL 3: WHO CNS5 writes "CNS WHO grade"; ruling 3 label correction)
+- action-performance-status: recommended -> required (Q3: KPS selects the treatment branch in every case, EANO 2021; Reviewer 2 RP04 0289beef applied as a class)
+- stop rule: + action-performance-status (Q3: KPS selects the treatment branch in every case, EANO 2021; Reviewer 2 RP04 0289beef applied as a class)
+- antibiotic-timing text: ESCMID 2024 qualifier (within about 24 hours) added (Q10: the withholding rule is conditional on neurosurgery within about 24 hours, ESCMID 2024)
+- fallback specialized_test (generic 'Study within normal limits.', test_type '') -> null; the library answers by test_type (auditor flag, S01 class: a case fallback is served for any order of the tool, whatever the test type)
+- Synonyms re-expanded from `diagnosis_synonyms.yaml` (`--prune --conditions brain_tumor_glioma`): removed ['astrocytoma grade 4']; added ['glioblastoma idh wildtype'] (entity, grade and H3 scoping; summary CENTRAL 2).

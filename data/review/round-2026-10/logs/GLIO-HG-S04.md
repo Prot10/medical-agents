@@ -46,3 +46,12 @@ Adversarial check, 24 Oct 2026. Read the log, the git diff and the whole final c
   - (B, minor, same class the worker fixed in S02 and S03) `patient.neurological_exam.mental_status` "Speech is fluent but with occasional word-finding pauses" with a right frontoparietal tumour and left language dominance on fMRI (LI 0.89). Now "Speech is fluent with intact naming; responses are slowed."
   - (B, minor) the drug check omitted the over-the-counter ibuprofen that the HPI records and that a must stops. Added "Dexamethasone + Ibuprofen (over the counter): combined corticosteroid and NSAID use increases the risk of gastrointestinal ulceration and bleeding; ibuprofen also impairs platelet function." Guard tests still pass (no expected-evidence echo).
 - perfect_agent.py and case_io.py check clean after the edits.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/GLIO-HG-decisions.md` (Andrea, 24 Oct 2026: open points resolved for dataset quality).
+
+- accepted[0]: 'Glioblastoma, IDH-wildtype, WHO grade 4 (right frontoparietal)' -> 'Glioblastoma, IDH-wildtype, CNS WHO grade 4 (right frontoparietal)' (summary CENTRAL 3: WHO CNS5 writes "CNS WHO grade"; ruling 3 label correction)
+- AIOM question numbers removed from the text (edition 2026 numbering unverified) (Q1: AIOM cited as the 2026 update; Quesito numbering not verifiable)
+- fallback specialized_test (generic 'Study within normal limits.', test_type 'neuropsychological_screening') -> null; the library answers by test_type (auditor flag, S01 class: a case fallback is served for any order of the tool, whatever the test type)
+- Synonyms re-expanded from `diagnosis_synonyms.yaml` (`--prune --conditions brain_tumor_glioma`): removed ['astrocytoma grade 4']; added ['glioblastoma idh wildtype'] (entity, grade and H3 scoping; summary CENTRAL 2).

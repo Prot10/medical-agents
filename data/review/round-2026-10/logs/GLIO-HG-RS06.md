@@ -54,3 +54,14 @@ Found and changed:
 - `followup_outputs[request_ct_chest_abdomen_pelvis]` lungs: "Mild background emphysematous changes" in a never smoker with no lung history, an unexplained template finding. Removed.
 - `fallback_tool_outputs.ecg`: QTc 441 ms called "at the upper limit of normal" and "borderline"; for a woman the upper limit is 460 ms. Reworded as normal for a woman (the baseline ECG must stays, for the hydroxychloroquine QT risk).
 Verified as sound: no-seizure prohibition and levetiracetam removed from the drug check; required performance status (71) in the stop rule; drug check recommended with real hydroxychloroquine QT, antacid spacing and sulfonamide content; hypofractionated 40 Gy/15 with temozolomide (Perry 2017) at 71, KPS 70, MGMT methylated; creatinine 0.95 with eGFR 64 matches CKD stage 2.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/GLIO-HG-decisions.md` (Andrea, 24 Oct 2026: open points resolved for dataset quality).
+
+- accepted[0]: 'Glioblastoma, IDH-wildtype, WHO grade 4 (left temporal-parietal)' -> 'Glioblastoma, IDH-wildtype, CNS WHO grade 4 (left temporal-parietal)' (summary CENTRAL 3: WHO CNS5 writes "CNS WHO grade"; ruling 3 label correction)
+- must removed: 'Obtain MRI brain with and without gadolinium contrast (tumor protocol) before any invasive procedure' (Q9: diagnostic step restating a required criterion; musts are management, ruling 4)
+- must removed: 'Obtain pre-operative labs (CBC, BMP including renal function, coagulation, type and screen) before craniotomy or biopsy' (Q9: diagnostic step restating a required criterion; musts are management, ruling 4)
+- AIOM question numbers removed from the text (edition 2026 numbering unverified) (Q1: AIOM cited as the 2026 update; Quesito numbering not verifiable)
+- fallback specialized_test (generic 'Study within normal limits.', test_type '') -> null; the library answers by test_type (auditor flag, S01 class: a case fallback is served for any order of the tool, whatever the test type)
+- Synonyms re-expanded from `diagnosis_synonyms.yaml` (`--prune --conditions brain_tumor_glioma`): removed ['astrocytoma grade 4']; added ['glioblastoma idh wildtype'] (entity, grade and H3 scoping; summary CENTRAL 2).

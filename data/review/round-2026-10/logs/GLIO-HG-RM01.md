@@ -73,3 +73,12 @@ Adversarial verifier, 24 Oct 2026. Read the log, the notes (16e1c115, 61968ced) 
   - anion gap 13, MCHC 34.3, and Hct consistent with RBC x MCV.
 - Found and fixed: the MRI impression ended "Tissue diagnosis is recommended." Deleted (C9).
 - After the fix: `perfect_agent.py` passes, `case_io.py check` reports no failure naming the case, and `test_case_guards` passes.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/GLIO-HG-decisions.md` (Andrea, 24 Oct 2026: open points resolved for dataset quality).
+
+- accepted[0]: 'Glioblastoma, IDH-wildtype, WHO grade 4 (pontine / brainstem)' -> 'Glioblastoma, IDH-wildtype, CNS WHO grade 4 (pontine / brainstem)' (summary CENTRAL 3: WHO CNS5 writes "CNS WHO grade"; ruling 3 label correction)
+- must removed: 'Obtain MRI brain with and without gadolinium contrast (tumor protocol) before any invasive procedure.' (Q9: diagnostic step restating a required criterion; musts are management, ruling 4)
+- fallback specialized_test (generic 'Study within normal limits.', test_type '') -> null; the library answers by test_type (auditor flag, S01 class: a case fallback is served for any order of the tool, whatever the test type)
+- Synonyms re-expanded from `diagnosis_synonyms.yaml` (`--prune --conditions brain_tumor_glioma`): removed ['glioma who grade 4', 'grade 4 glioma', 'astrocytoma grade 4']; added ['glioblastoma idh wildtype'] (entity, grade and H3 scoping; summary CENTRAL 2).

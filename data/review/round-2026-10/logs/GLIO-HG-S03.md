@@ -48,3 +48,14 @@ Adversarial check, 24 Oct 2026. Read the log, the git diff and the whole final c
 - No reviewer notes. Checked each own finding against the file: leftward version and leftward shift, removal of aphasia and hemianopia (exam now "Visual fields full"), continue forms of the levetiracetam and dexamethasone musts (HPI says both were started in the ED), latex must, drug check against his own medicines with no sulfa line, assay list with IDH sequencing at 52 in both alternatives and in both reports, fMRI and DTI, KPS 70 / ECOG 2, labs (gap 140 - 105 - 26 = 9, RBC 4.7 x MCV 91.5 = 43.0).
 - Found and fixed (B, minor, class fixed by the worker in S02, S04 and S06 but missed here): `fallback_tool_outputs.csf` opening pressure 16 cm H2O and "Unremarkable CSF" in a patient with bilateral papilledema and 8 mm shift. Now 26 cm H2O, "Elevated opening pressure. Normal cell count, protein and glucose." (The LP itself stays harm; the fallback only answers an off-pathway order.)
 - perfect_agent.py and case_io.py check clean after the edit.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/GLIO-HG-decisions.md` (Andrea, 24 Oct 2026: open points resolved for dataset quality).
+
+- accepted[0]: 'Glioblastoma, IDH-wildtype, WHO grade 4' -> 'Glioblastoma, IDH-wildtype, CNS WHO grade 4' (summary CENTRAL 3: WHO CNS5 writes "CNS WHO grade"; ruling 3 label correction)
+- action-performance-status: recommended -> required (Q3: KPS selects the treatment branch in every case, EANO 2021; Reviewer 2 RP04 0289beef applied as a class)
+- stop rule: + action-performance-status (Q3: KPS selects the treatment branch in every case, EANO 2021; Reviewer 2 RP04 0289beef applied as a class)
+- AIOM question numbers removed from the text (edition 2026 numbering unverified) (Q1: AIOM cited as the 2026 update; Quesito numbering not verifiable)
+- fallback specialized_test (generic 'Study within normal limits.', test_type 'neuropsychological_screening') -> null; the library answers by test_type (auditor flag, S01 class: a case fallback is served for any order of the tool, whatever the test type)
+- Synonyms re-expanded from `diagnosis_synonyms.yaml` (`--prune --conditions brain_tumor_glioma`): removed ['astrocytoma grade 4']; added ['glioblastoma idh wildtype'] (entity, grade and H3 scoping; summary CENTRAL 2).

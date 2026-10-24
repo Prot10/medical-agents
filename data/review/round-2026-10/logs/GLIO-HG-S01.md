@@ -56,3 +56,14 @@ Adversarial check, 24 Oct 2026. Read the log, the git diff and the whole final c
 - Found and fixed (B, minor, class the worker fixed in S02 and S03 but missed here): `patient.neurological_exam.mental_status` "Language fluent but with intermittent word-finding pauses" in a right-handed man with a right frontal tumour and left language dominance on fMRI (LI 0.85, remote from the lesion). Now "Language fluent with intact naming and repetition; responses are slowed."
 - Left as is: the HPI opens with "witnessed generalized tonic-clonic seizure" and then describes the focal left-arm onset; the exam and the must state focal onset with bilateral spread, so the case is internally consistent.
 - perfect_agent.py and case_io.py check clean after the edit.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/GLIO-HG-decisions.md` (Andrea, 24 Oct 2026: open points resolved for dataset quality).
+
+- accepted[0]: 'Glioblastoma, IDH-wildtype, WHO grade 4' -> 'Glioblastoma, IDH-wildtype, CNS WHO grade 4' (summary CENTRAL 3: WHO CNS5 writes "CNS WHO grade"; ruling 3 label correction)
+- action-performance-status: recommended -> required (Q3: KPS selects the treatment branch in every case, EANO 2021; Reviewer 2 RP04 0289beef applied as a class)
+- stop rule: + action-performance-status (Q3: KPS selects the treatment branch in every case, EANO 2021; Reviewer 2 RP04 0289beef applied as a class)
+- AIOM question numbers removed from the text (edition 2026 numbering unverified) (Q1: AIOM cited as the 2026 update; Quesito numbering not verifiable)
+- fallback specialized_test (generic 'Study within normal limits.', test_type 'neuropsychological_screening') -> null; the library answers by test_type (auditor flag, S01 class: a case fallback is served for any order of the tool, whatever the test type)
+- Synonyms re-expanded from `diagnosis_synonyms.yaml` (`--prune --conditions brain_tumor_glioma`): removed ['astrocytoma grade 4']; added ['glioblastoma idh wildtype'] (entity, grade and H3 scoping; summary CENTRAL 2).

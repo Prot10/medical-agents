@@ -48,3 +48,14 @@ Adversarial check, 24 Oct 2026. Read the log, the git diff and the whole final c
 - No reviewer notes. Every own finding checked against the file: CBC (Hb 14.1, Hct 43.2, RBC 4.65 x MCV 92.8 = 43.2, MCHC 32.6; female reference ranges), BMP (Na 138, Cl 101, HCO3 24, gap 13; female creatinine range), type and screen, literature removed, tissue in two procedure-matched follow-ups with identical results, assay list per C4 in both alternatives, fMRI and DTI outputs and recommended criteria with soft constraints, KPS 70 / ECOG 2, musts (surgery, dexamethasone, herniation monitoring, treat must, aspirin and ibuprofen stop, glucose, Stupp at 64 with KPS 70), LP prohibition and harm rationale naming shift, uncal herniation and papilledema, CSF fallback 29 cm H2O.
 - The removal of the aphasic features is sound (left-lateralized language LI 0.82 remote from a right frontal tumour); the left homonymous hemianopia is explained by the optic radiation in the edematous temporal stem and sagittal stratum on DTI.
 - Nothing found that needed a change. perfect_agent.py and case_io.py check clean.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/GLIO-HG-decisions.md` (Andrea, 24 Oct 2026: open points resolved for dataset quality).
+
+- accepted[0]: 'Glioblastoma, IDH-wildtype, WHO grade 4' -> 'Glioblastoma, IDH-wildtype, CNS WHO grade 4' (summary CENTRAL 3: WHO CNS5 writes "CNS WHO grade"; ruling 3 label correction)
+- action-performance-status: recommended -> required (Q3: KPS selects the treatment branch in every case, EANO 2021; Reviewer 2 RP04 0289beef applied as a class)
+- stop rule: + action-performance-status (Q3: KPS selects the treatment branch in every case, EANO 2021; Reviewer 2 RP04 0289beef applied as a class)
+- AIOM question numbers removed from the text (edition 2026 numbering unverified) (Q1: AIOM cited as the 2026 update; Quesito numbering not verifiable)
+- fallback specialized_test (generic 'Minor non-specific finding.', test_type '') -> null; the library answers by test_type (auditor flag, S01 class: a case fallback is served for any order of the tool, whatever the test type)
+- Synonyms re-expanded from `diagnosis_synonyms.yaml` (`--prune --conditions brain_tumor_glioma`): removed ['astrocytoma grade 4']; added ['glioblastoma idh wildtype'] (entity, grade and H3 scoping; summary CENTRAL 2).

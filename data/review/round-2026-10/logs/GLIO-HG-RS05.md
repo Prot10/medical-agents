@@ -49,3 +49,16 @@ Found and changed:
 - `initial_tool_outputs.mri.impression` ended with "Tissue diagnosis recommended." (plan C9). Removed.
 - `key_clinical_evidence[6]` was the template "For IDH-wildtype GBM, standard treatment is maximal safe resection followed by the Stupp protocol", not conditioned on age and KPS (plan C11). Rewritten for this patient: at 64 with KPS 70, 60 Gy in 30 fractions with concomitant and adjuvant temozolomide (Stupp 2005; EANO 2021), MGMT methylation predicting greater benefit. Consistent with must 6.
 Verified as sound: HPI leak replaced by a non-contrast CT; speech arrest with preserved awareness classed as a focal aware seizure (treat must); the qualified awake-mapping surgery must against the documented comprehension and naming deficits; fluent paraphasic aphasia matches the posterior temporal site; right-hand sensory and graphesthesia findings are explained by the temporoparietal and inferior parietal extension; aspirin must and prohibition agree; fallback EEG now abnormal.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/GLIO-HG-decisions.md` (Andrea, 24 Oct 2026: open points resolved for dataset quality).
+
+- accepted[0]: 'Glioblastoma, IDH-wildtype, WHO grade 4 (left temporal lobe)' -> 'Glioblastoma, IDH-wildtype, CNS WHO grade 4 (left temporal lobe)' (summary CENTRAL 3: WHO CNS5 writes "CNS WHO grade"; ruling 3 label correction)
+- action-performance-status: recommended -> required (Q3: KPS selects the treatment branch in every case, EANO 2021; Reviewer 2 RP04 0289beef applied as a class)
+- stop rule: + action-performance-status (Q3: KPS selects the treatment branch in every case, EANO 2021; Reviewer 2 RP04 0289beef applied as a class)
+- must removed: 'Obtain MRI brain with and without gadolinium contrast (tumor protocol) before any invasive procedure' (Q9: diagnostic step restating a required criterion; musts are management, ruling 4)
+- must rewritten: 'Obtain pre-operative labs (CBC, BMP, coagulation, type & screen) and discontinue aspirin at least 7-10 days before craniotomy' -> 'Discontinue aspirin 7 to 10 days before craniotomy.' (Q9: the duplicated diagnostic part dropped, the management part kept)
+- AIOM question numbers removed from the text (edition 2026 numbering unverified) (Q1: AIOM cited as the 2026 update; Quesito numbering not verifiable)
+- fallback specialized_test (generic 'Study within normal limits.', test_type '') -> null; the library answers by test_type (auditor flag, S01 class: a case fallback is served for any order of the tool, whatever the test type)
+- Synonyms re-expanded from `diagnosis_synonyms.yaml` (`--prune --conditions brain_tumor_glioma`): removed ['astrocytoma grade 4']; added ['glioblastoma idh wildtype'] (entity, grade and H3 scoping; summary CENTRAL 2).

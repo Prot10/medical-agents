@@ -53,3 +53,14 @@ Condition auditor, cross-case uniformity pass. Changed:
   `metadata.fallback_tool_kinds.eeg` updated to match.
 - `metadata.condition_name`: retired "anaplastic astrocytoma, WHO grade 3" now "astrocytoma, IDH-mutant, CNS WHO grade 3" (WHO CNS5 terminology).
 Re-ran perfect-agent (30/30 pass), `case_io.py check` (no failure names the case) and the case guards (60 passed).
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/GLIO-HG-decisions.md` (Andrea, 24 Oct 2026: open points resolved for dataset quality).
+
+- accepted[0]: 'Astrocytoma, IDH-mutant, CNS WHO grade 3 (ATRX-loss, left frontoparietal)' -> 'Astrocytoma, IDH-mutant, CNS WHO grade 3 (left frontoparietal)' (summary CENTRAL 3: WHO CNS5 writes "CNS WHO grade"; ruling 3 label correction)
+- action-performance-status: recommended -> required (Q3: KPS selects the treatment branch in every case, EANO 2021; Reviewer 2 RP04 0289beef applied as a class)
+- stop rule: + action-performance-status (Q3: KPS selects the treatment branch in every case, EANO 2021; Reviewer 2 RP04 0289beef applied as a class)
+- AIOM question numbers removed from the text (edition 2026 numbering unverified) (Q1: AIOM cited as the 2026 update; Quesito numbering not verifiable)
+- fallback specialized_test (generic 'Study within normal limits.', test_type '') -> null; the library answers by test_type (auditor flag, S01 class: a case fallback is served for any order of the tool, whatever the test type)
+- Synonyms re-expanded from `diagnosis_synonyms.yaml` (`--prune --conditions brain_tumor_glioma`): removed ['glioblastoma', 'GBM', 'glioma who grade 4', 'grade 4 glioma', 'astrocytoma grade 4']; added ['astrocytoma idh mutant grade 3'] (entity, grade and H3 scoping; summary CENTRAL 2).

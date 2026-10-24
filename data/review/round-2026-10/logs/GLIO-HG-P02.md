@@ -65,3 +65,14 @@ Condition auditor, cross-case uniformity pass. Changed:
 - `ground_truth.red_herrings[1].field_path` was empty: now `followup_outputs[2].output.panels.HIV_and_opportunistic_infection_serology[5]`.
 - `patient.history_present_illness`: "a CT head revealed an enhancing brain lesion" now "a CT head revealed a right frontal mass with surrounding edema" (non-contrast CT cannot show enhancement; C8 class).
 Re-ran perfect-agent (30/30 pass), `case_io.py check` (no failure names the case) and the case guards (60 passed).
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/GLIO-HG-decisions.md` (Andrea, 24 Oct 2026: open points resolved for dataset quality).
+
+- action-performance-status: recommended -> required (Q3: KPS selects the treatment branch in every case, EANO 2021; Reviewer 2 RP04 0289beef applied as a class)
+- stop rule: + action-performance-status (Q3: KPS selects the treatment branch in every case, EANO 2021; Reviewer 2 RP04 0289beef applied as a class)
+- must removed: 'Obtain MRI brain with and without gadolinium contrast (tumor protocol) before any invasive procedure.' (Q9: diagnostic step restating a required criterion; musts are management, ruling 4)
+- must removed: 'Obtain pre-operative labs (CBC, BMP, coagulation, type and screen) before the stereotactic biopsy.' (Q9: diagnostic step restating a required criterion; musts are management, ruling 4)
+- fallback specialized_test (generic 'Study within normal limits.', test_type '') -> null; the library answers by test_type (auditor flag, S01 class: a case fallback is served for any order of the tool, whatever the test type)
+- Synonyms re-expanded from `diagnosis_synonyms.yaml` (`--prune --conditions brain_tumor_glioma`): removed ['cns lymphoma']; added ['primary cns diffuse large b cell lymphoma', 'hiv associated cns lymphoma', 'aids related cns lymphoma', 'ebv positive diffuse large b cell lymphoma cns'] (entity, grade and H3 scoping; summary CENTRAL 2).
