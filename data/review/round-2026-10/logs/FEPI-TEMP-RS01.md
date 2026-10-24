@@ -38,3 +38,12 @@ This 22-year-old man has had gelastic seizures since infancy, drop attacks from 
 
 - Decided: the video-EEG gained two habitual temporal-type seizures and interictal left temporal sharp waves. The label ("focal epilepsy of left temporal lobe origin with mesial temporal sclerosis ... dual pathology") needs a temporal epileptogenic zone, the HPI reports these seizures 2-4 times a week and the exam records one during the admission, so a 72-hour recording that captured none of them while capturing seven gelastic seizures did not support the label. Nothing for Andrea to supply unless the source case (PMC3687620) reports otherwise.
 - Decided: a must on paternal valproate exposure (MHRA and EMA 2024) was added although the plan does not list it, because the patient is a young man on long-term valproate and the advice is current regulatory guidance.
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. Checked the log against the case file and `git diff master`. Tiers (MRI, video-EEG required; PET, drug check, literature optional), MRI `{protocol: epilepsy}`, no constraints and the stop rule (MRI, video-EEG; `max_additional_actions: 2`, as plan 3.4 sets) match the plan. Volumetrics hold (2.41 vs 3.12 cm3: index -0.13, 22.8% smaller). The MRI names the hamartoma and definite HS, the video-EEG carries the temporal seizures the label needs, the drug output's valproate-clonazepam statements (additive sedation, labelled absence-status warning) and the MHRA/EMA 2024 paternal valproate advice are correct, the literature figures (Wiebe 58% vs 8%, ERSET 11/15 vs 0/23) are right, there is no HLA must (plan), and the differential is graded after the work-up. Guards pass.
+
+Found and fixed:
+- `metadata.fallback_tool_kinds.ct` still said `normal` after the worker rewrote the CT fallback to show the hypothalamic lesion: set to `case_specific`.
+
+Noted, not changed: the case stores no routine EEG, so a routine EEG order gets the library's normal report although the patient has frequent left temporal sharp waves (true before this round; a routine EEG may be normal). `metadata.case_body_concerns` keeps a stale note about an up-front ECG the case does not have (metadata only).

@@ -42,3 +42,11 @@ Ms. Coyoy (renamed), 31, from rural Guatemala, living in a shelter, at 33 weeks,
 
 - Decided, deviating from the plan: the MRI criterion requires `{protocol: epilepsy}` instead of `{protocol: epilepsy, contrast: false}`. The tool has no default for `contrast`, so the plan's version would fail an agent that orders a correct epilepsy-protocol MRI and simply does not ask for gadolinium. The safety intent is kept by the harm-level avoided action on `{contrast: true}`, which caps any run that does request gadolinium.
 - Decided: a red herring on the negative cysticercosis IgG and a differential entry for calcified tuberculomas or toxoplasmosis were added (not in the plan), because the MRI impression raises them and negative serology in calcified neurocysticercosis is a recognized pitfall [IDSA_NCC_2018].
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. Checked the log against the case file and `git diff master`. Tiers (labs, MRI, routine EEG required; ECG, drug check, literature optional), the emergency order (labs, ECG, MRI, EEG, drug check, literature), no constraints and the stop rule (labs, MRI, EEG; `max_additional_actions: 2`, as plan 3.4 sets) match the plan. The labs criterion `{panels: [BMP, LFTs, CBC, urinalysis, AED_levels]}` is met by a CMP order (the reward expands CMP to BMP plus LFTs). The worker's choice of `{protocol: epilepsy}` with a harm-level `{contrast: true}` avoided action, instead of the plan's `contrast: false`, is sound and keeps the safety intent. Timeline (first delivery and diagnosis at 21, son of 10, 31 now), asymmetry index 0.12 and 21%, eclampsia exclusion values, the red-herring path `labs.panels.Infectious_Workup[0]` (cysticercosis IgG), QuantiFERON and HIV cited by the differential, the albendazole and gadolinium prohibitions and the literature sources (White 2018, Garcia 2014, Harden 2009 levels, Tomson 2018) all check out. Guards pass.
+
+Found and fixed:
+- `initial_tool_outputs.eeg.findings[0].morphology`: discharges typed "Sharp waves" had "duration 40-60 ms", a spike duration (sharp waves last 70-200 ms); now 80-120 ms.
+- `metadata.fallback_tool_kinds.ct` still said `normal` after the CT fallback was rewritten with the calcifications: set to `case_specific`.

@@ -41,3 +41,13 @@ Mr. Deshpande (renamed), 52, South Asian, with diabetes on metformin, hypertensi
 
 - Decided: the asymmetry index sign was corrected to -0.25 to follow the (L - R)/(L + R) definition the plan fixes for the condition (RS01 uses the same convention for a smaller left hippocampus).
 - Decided: a zonisamide prohibition was added (not in the plan) because zonisamide is a sulfonamide and its label contraindicates it in sulfonamide hypersensitivity; the drug check stays optional because no first-line choice is affected.
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. Checked the log against the case file and `git diff master`. Tiers (MRI, routine EEG required; labs recommended; ECG, drug check, literature optional), no constraints and the stop rule (MRI, EEG; `max_additional_actions: 2`, as plan 3.4 sets) match the plan. Volumetrics (1.9 vs 3.2 cm3: 41%, index -0.25), the red herring `labs.panels.BMP[6]` (glucose 138), the HLA-B*15:02 must, the sulfonamide allergy against the zonisamide prohibition, the Glauser 2013 levels and the Fisher 2014 and 2017 sources hold. Guards pass.
+
+Found and fixed:
+- `initial_tool_outputs.eeg.findings[0].morphology`: "Sharp waves" with "duration 40-70 ms" (spike range); now 80-150 ms.
+- `followup_outputs` literature, SANAD II finding: "neither levetiracetam nor zonisamide was non-inferior for 12-month remission" misstates the trial (zonisamide was non-inferior in the intention-to-treat analysis, not per protocol). Corrected.
+- `followup_outputs` drug check: "mild CYP3A4 induction" was attributed to carbamazepine as well as oxcarbazepine; carbamazepine is a strong inducer. Reworded.
+- `initial_tool_outputs.ecg`: PR 154, QRS 86, QTc 416 at 76/min were identical to RP05 (and M02, RM04, S05), and 76/min was 10 beats below the triage rate of 86. Now 84/min, PR 168, QRS 92, QTc 428; the ECG criterion `expected_evidence` says 84/min.

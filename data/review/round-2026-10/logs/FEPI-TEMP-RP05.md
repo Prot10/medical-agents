@@ -43,3 +43,14 @@ This 41-year-old right-handed woman with obesity has 18 months of stereotyped fo
 
 - Decided: the plan's generic "CSF elsewhere waste" was not applied here. This patient has mildly blurred discs without spontaneous venous pulsations, pulsatile tinnitus, a partial empty sella and obesity, a recognized association with temporal encephaloceles; an LP with opening pressure is a defensible step before skull-base repair, so scoring it as waste would penalize reasonable care. The CSF avoided action was deleted (no criterion added: neuro-ophthalmic assessment comes first and is a must); the case fallback CSF (opening pressure 16 cm H2O, normal) still answers an LP. Nothing for Andrea to supply.
 - Decided: neuro-ophthalmology assessment added as a must because the case's own exam raises possible raised intracranial pressure, which matters for repair of a skull-base defect; the IIH prohibition and red herring are kept.
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. Checked the log against the case file and `git diff master`. Tiers, MRI arguments `{protocol: epilepsy}`, criterion order, follow-up order (literature last), no sequence constraints and the stop rule (MRI, routine EEG; `max_additional_actions: 2`, as plan 3.4 sets) match plan section 4. Red-herring paths resolve (HPI outside MRI; `mri.findings[2]` partial empty sella). The encephalocele size (about 5 mm on MRI, 5.2 mm on CT), normal hippocampal volumes, sertraline timeline (started a month ago, stopped after two weeks), the sulfonamide allergy against the zonisamide prohibition, neuropsychology arithmetic (CVLT-II 1.2 and 1.7 SD) and the deletion of the CSF waste action (reasoned in the log; the CSF fallback with opening pressure 16 is consistent) all hold. Leak and discriminator guards pass.
+
+Found and fixed:
+- `followup_outputs` neuropsychology: the worker's new "Processing speed — WAIS-IV Processing Speed Index" added an em dash; all test names in that report now use a colon.
+- `followup_outputs` literature `summary` named the anteroinferior temporal encephalocele as the cause missed on standard MRI, which pointed at this case's answer; it now lists the lesions a dedicated MRI finds (subtle HS, FCD, small tumors, encephaloceles). The literature criterion `expected_evidence` now names the query topic (dedicated MRI and structural causes in TLE with a normal standard MRI).
+- `initial_tool_outputs.ecg` and `fallback_tool_outputs.ecg`: PR 154, QRS 86, QTc 416 at 76/min were identical to RS05 (and M02, RM04, S05); intervals changed to PR 148, QRS 84, QTc 422 in both blocks (rate kept at the triage 76).
+
+Left for the close-out: the identical ECG intervals in FEPI-TEMP M02, RM04 and S05, and the surname Reyes, used in eight cases of other conditions (CENTRAL request 9).
