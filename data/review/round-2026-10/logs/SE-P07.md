@@ -55,3 +55,9 @@ Found and changed:
 - `initial_tool_outputs.labs.interpretation` said the venous blood gas was "within normal limits" while the panel flags pH 7.44 high and pCO2 38 low: now states the respiratory alkalosis; venous pH, pCO2 and the low fibrinogen added to `abnormal_values_summary`.
 Accepted without change: NCSE kept `moderate` (the worker's reasoning holds: nothing in the remaining pathway excludes it, and the must is the diagnostic benzodiazepine trial).
 Re-run: `perfect_agent.py SE-P07 -v` ok; case guards pass; `case_io.py check SE-P07` schema OK, synonym guard OK, no failure names SE-P07.
+
+## Close-out (24 Oct 2026)
+Decisions in `plans/SE-decisions.md`.
+- label: "...; EEG triphasic waves mimicking non-convulsive status epilepticus but resolving with ammonia correction" -> "...; EEG triphasic waves mimicking non-convulsive status epilepticus": the clause reported a treatment response (ruling 4; SE summary CENTRAL 3c).
+- synonyms: `--prune` removed "hepatic coma" and K72.91 (GCS 13, West Haven grade II, not coma; the K72 entries grant "hepatic coma" only to HEP-ENC-S06). Pending item in CENTRAL_PENDING settled.
+- Checks: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, SE case guards pass, `apply_diagnosis_synonyms.py --check --conditions status_epilepticus` clean.

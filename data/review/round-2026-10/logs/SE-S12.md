@@ -42,3 +42,8 @@ Adversarial verifier, 24 Oct 2026. Read the log, the diff and the whole final ca
 - Other checks: LGI1 is no longer in the core labs (the leak is fixed). The serum panel is required with its own follow-up, and the CSF is recommended with `autoimmune_panel` and `HSV_PCR` keys. The hard CT-before-CSF constraint is present. The methylprednisolone must matches the plan. The lacosamide and no-fosphenytoin choice agrees with the prohibition on enzyme inducers. The carbamazepine must is gone. Checks are clean.
 - Found and fixed: red herring 1 said "re-escalation and IVIG required", while the IVIG must is conditional ("if the FBDS do not settle on steroids"). It now reads "immunotherapy must be re-escalated (high-dose corticosteroids, IVIG if the FBDS do not settle, and maintenance escalation)". The stale `metadata.revision_reason` now points to this log.
 - The worker's open question (CSF recommended vs required) is a sound judgment and stays as logged.
+
+## Close-out (24 Oct 2026)
+Decisions in `plans/SE-decisions.md`.
+- `icd_codes[0]` G41.2 -> G41.8 (other SE): faciobrachial dystonic seizure status is a motor SE, not complex partial NCSE (SE summary CENTRAL 3b). NCSE labels removed; new scoped synonym "faciobrachial dystonic seizures" (entry G41.8+fbds). "LGI1 encephalitis" alone is deliberately not a synonym: the relapsing anti-LGI1 encephalitis is in the history, so naming it does not show the status the case scores. `accepted[0]` unchanged.
+- Checks: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, SE case guards pass, `apply_diagnosis_synonyms.py --check --conditions status_epilepticus` clean.

@@ -55,3 +55,8 @@ Found and changed:
 - TTE follow-up reported a bubble study "with release of Valsalva" in a drowsy, aphasic patient with GCS 12 who cannot perform one: now "at rest (Valsalva could not be performed)".
 Accepted without change: CTA head and neck recommended per plan section 4 (the outside CTA is not described as including the neck); the valproate-after-thrombolysis prohibition is a precaution, not a guideline rule, and is worded as a preference.
 Re-run: `perfect_agent.py SE-P04 -v` ok; case guards pass; `case_io.py check SE-P04` schema OK, synonym guard OK, no failure names SE-P04.
+
+## Close-out (24 Oct 2026)
+Decisions in `plans/SE-decisions.md`.
+- `icd_codes[0]` I63.512 -> R56.9 with scoped labels (entry R56.9, cases [SE-P04]): "stroke lateralized periodic discharges", "stroke LPDs", "stroke ictal interictal continuum", "stroke seizures", "stroke seizure", "acute symptomatic seizures", "acute symptomatic seizure". Reason: the left MCA stroke is in the chief complaint and HPI, so the stroke labels and I63 codes gave full diagnosis credit for repeating the history; what the case scores is the post-stroke seizures with LPDs on the ictal-interictal continuum without NCSE (HEP-ENC-P04 precedent: code the missing diagnosis). The pending prune of "stroke", "embolic", "cardioembolic" and "lacunar" labels (CENTRAL_PENDING) is superseded: all stroke-only labels and I63 codes are gone. `accepted[0]` unchanged. Known residue (scorer, CENTRAL): "NCSE with LPDs after stroke" still contains the tokens of "stroke LPDs".
+- Checks: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, SE case guards pass, `apply_diagnosis_synonyms.py --check --conditions status_epilepticus` clean.

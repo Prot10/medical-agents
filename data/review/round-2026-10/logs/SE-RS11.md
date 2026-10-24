@@ -51,3 +51,8 @@ Found and changed:
 - Literature summary called gabapentin and vigabatrin "GABAergic" alongside sodium-channel agents: reworded without the mechanism label.
 Accepted without change: the extent of the rewrite in an approved case is justified by the logged real errors (template block contradicting the troponin, treatment-response outputs, EEG naming the syndrome, drug check carrying a treatment plan and male teratogenicity).
 Re-run: `perfect_agent.py SE-RS11 -v` ok; case guards pass; `case_io.py check SE-RS11` schema OK, synonym guard OK, no failure names SE-RS11.
+
+## Close-out (24 Oct 2026)
+Decisions in `plans/SE-decisions.md`.
+- synonyms: the G41 category no longer grants the type codes G41.0, G41.2 and G41.8 (a type code is granted only by the case's own code, so an answer coded with the wrong SE type no longer scores by code); `apply_diagnosis_synonyms.py --prune --conditions status_epilepticus` removed G41.2 and G41.8 from `ground_truth.diagnosis.icd_codes`. Labels unchanged.
+- Checks: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, SE case guards pass, `apply_diagnosis_synonyms.py --check --conditions status_epilepticus` clean.

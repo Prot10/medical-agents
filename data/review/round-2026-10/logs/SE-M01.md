@@ -59,3 +59,8 @@ Found and fixed:
 - B minor pathway order: the tumour-search chest/abdomen/pelvis CT sat in `initial_tool_outputs.body_imaging` (shown to reviewers as the initial work-up, before the antibody result that prompts it; plan 3.2 limits initial outputs to labs, CT, EEG), and the optional ECG follow-up came after the panel while its criterion is placed before the MRI. FIXED: body CT moved unchanged to a follow-up `request_chest_abdomen_pelvis_ct` right after the paraneoplastic panel (`initial_tool_outputs.body_imaging` null; it is the only body-imaging payload, so any body-imaging order still receives it, probed for `chest_abdomen_pelvis_CT` and `chest_CT`); ECG follow-up moved first, matching the criterion order.
 Not changed: the case-level ECG fallback (rate 85) differs from the ECG follow-up (rate 86) but is unreachable (the follow-up answers every ECG order, first or repeat).
 Checks re-run after my edits: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, `test_case_guards -k` pass.
+
+## Close-out (24 Oct 2026)
+Decisions in `plans/SE-decisions.md`.
+- synonyms: the G41 category no longer grants the type codes G41.0, G41.2 and G41.8 (a type code is granted only by the case's own code, so an answer coded with the wrong SE type no longer scores by code); `apply_diagnosis_synonyms.py --prune --conditions status_epilepticus` removed G41.0 and G41.8 from `ground_truth.diagnosis.icd_codes`. Labels unchanged.
+- Checks: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, SE case guards pass, `apply_diagnosis_synonyms.py --check --conditions status_epilepticus` clean.

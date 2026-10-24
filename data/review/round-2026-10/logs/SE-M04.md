@@ -51,3 +51,8 @@ Found and fixed:
 - B minor `patient.neurological_exam.mental_status`: "Awake with eyes open; GCS 8 (E3V2M3)": eyes open spontaneously is E4. FIXED: "GCS 9 (E4V2M3)".
 Noted, not changed: the urine culture reports "no growth at 24 hours" although he arrived 2 hours after the event; the benchmark returns results at order time, and the worker removed the blood cultures mainly because no criterion asked for them, so this is left as is.
 Checks re-run after my edits: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, `test_case_guards -k` pass.
+
+## Close-out (24 Oct 2026)
+Decisions in `plans/SE-decisions.md`.
+- synonyms: the G41 category no longer grants the type codes G41.0, G41.2 and G41.8 (a type code is granted only by the case's own code, so an answer coded with the wrong SE type no longer scores by code); `apply_diagnosis_synonyms.py --prune --conditions status_epilepticus` removed G41.0 and G41.8 from `ground_truth.diagnosis.icd_codes`. Labels unchanged.
+- Checks: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, SE case guards pass, `apply_diagnosis_synonyms.py --check --conditions status_epilepticus` clean.

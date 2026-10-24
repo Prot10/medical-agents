@@ -48,3 +48,8 @@ Found and fixed (real errors only; the case is approved):
 - B minor `patient.neurological_exam.mental_status`: "Awake ... GCS 11 (E3V3M5)" while the HPI says she is minimally following commands in the ED: awake is E4 and following commands is M6. FIXED: "GCS 13 (E4V3M6)" and "follows simple commands only intermittently" added so the components are derivable.
 - B minor `action-3-order-ct-scan.expected_evidence`: "suggests PRES" (with an em dash) while the CT impression says PRES and ictal edema cannot be distinguished on CT. FIXED: "Subtle bilateral posterior cortical-subcortical hypodensity, nonspecific on CT (PRES versus ictal edema); no hemorrhage or mass".
 Checks re-run after my edits: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, `test_case_guards -k` pass.
+
+## Close-out (24 Oct 2026)
+Decisions in `plans/SE-decisions.md`.
+- synonyms: the G41 category no longer grants the type codes G41.0, G41.2 and G41.8 (a type code is granted only by the case's own code, so an answer coded with the wrong SE type no longer scores by code); `apply_diagnosis_synonyms.py --prune --conditions status_epilepticus` removed G41.0 and G41.8 from `ground_truth.diagnosis.icd_codes`. Labels unchanged.
+- Checks: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, SE case guards pass, `apply_diagnosis_synonyms.py --check --conditions status_epilepticus` clean.

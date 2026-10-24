@@ -42,3 +42,9 @@ None. Decided: the circumstances of the ingestion are left unknown (rather than 
 
 ## Verification
 `perfect_agent.py SE-P08 -v`: pass; labs, CT and the `continuous_icu` EEG receive the initial outputs, the drug check its follow-up. `test_case_guards -k SE-P08`: first run flagged the drug-check criterion's expected evidence overlapping its own output; the criterion text was reworded; 2 passed. `case_io.py check` (all 30 SE cases): schema OK, synonym guard OK, no failure names SE-P08.
+
+## Close-out (24 Oct 2026)
+Decisions in `plans/SE-decisions.md`.
+- label: "..., requiring IV pyridoxine as specific antidote" removed (treatment clause, ruling 4; SE summary CENTRAL 3c). The pyridoxine must is unchanged.
+- synonym "pyridoxine deficiency seizures" retired: it names dietary or inherited pyridoxine deficiency (or pyridoxine-dependent epilepsy), a different cause.
+- Checks: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, SE case guards pass, `apply_diagnosis_synonyms.py --check --conditions status_epilepticus` clean.

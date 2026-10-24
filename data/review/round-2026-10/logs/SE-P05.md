@@ -45,3 +45,9 @@ None. Decided, against the plan's item for this case: the respiratory function c
 
 ## Verification
 `perfect_agent.py SE-P05 -v`: pass; labs, CT, the `continuous_icu` EEG and the ECG receive the initial outputs, the drug check its follow-up. `test_case_guards -k SE-P05`: 2 passed. `case_io.py check` (all 30 SE cases): schema OK, synonym guard OK, no failure names SE-P05.
+
+## Close-out (24 Oct 2026)
+Decisions in `plans/SE-decisions.md`.
+- label: "Organophosphate poisoning with cholinergic toxidrome and nicotinic CNS seizures presenting as apparent non-convulsive status epilepticus, complicated by intermediate syndrome at 48 hours" -> "Organophosphate poisoning with cholinergic crisis and electrographic status epilepticus". The EEG records real electrographic SE (nine seizures in the first hour), the seizures are not a nicotinic mechanism, and the intermediate syndrome is a future event the case no longer reports (SE summary CENTRAL 3c).
+- synonym "cholinergic toxidrome" retired: it names a syndrome shared by carbamates, nerve agents, muscarinic mushrooms and cholinesterase-inhibitor drugs, so it credited a wrong agent.
+- Checks: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, SE case guards pass, `apply_diagnosis_synonyms.py --check --conditions status_epilepticus` clean.

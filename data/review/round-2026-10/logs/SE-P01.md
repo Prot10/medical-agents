@@ -46,3 +46,8 @@ Adversarial verification, 24 Oct 2026. Checked: notes 53545e21 (FDG-PET criterio
 
 ## Condition audit (24 Oct 2026)
 Changed: `ground_truth.assessment.required_recommendations[3]` read "Give IV thiamine 500 mg three times daily for 2 to 3 days, then 250 mg daily ... [EFNS_Wernicke_2010; Brophy_2012]". EFNS 2010 (Galvin et al.) recommends 200 mg three times daily IV; the 500 mg regimen is common practice (Royal College of Physicians) but is not what the cited key says, which this log's CENTRAL item and the verifier had already flagged. Now: "Give high-dose IV thiamine, at least 200 mg three times daily [EFNS_Wernicke_2010] (commonly 500 mg three times daily for 2 to 3 days, then 250 mg daily), with or before any dextrose, without delaying glucose [Brophy_2012]." This matches the wording SE-S05 uses. The regimen a physician would give is unchanged; only the attribution is corrected. Re-run: perfect_agent ok, case guards pass, case_io check clean.
+
+## Close-out (24 Oct 2026)
+Decisions in `plans/SE-decisions.md`.
+- synonyms: the G41 category no longer grants the type codes G41.0, G41.2 and G41.8 (a type code is granted only by the case's own code, so an answer coded with the wrong SE type no longer scores by code); `apply_diagnosis_synonyms.py --prune --conditions status_epilepticus` removed G41.0 and G41.8 from `ground_truth.diagnosis.icd_codes`. Labels unchanged.
+- Checks: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, SE case guards pass, `apply_diagnosis_synonyms.py --check --conditions status_epilepticus` clean.

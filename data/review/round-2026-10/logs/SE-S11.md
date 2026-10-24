@@ -39,3 +39,8 @@ None.
 Adversarial verifier, 24 Oct 2026. Read the log, the diff and the whole final case (large rewrite).
 - No notes. Cross-field checks: the timeline is consistent (dialysis Friday, missed Monday, presenting Tuesday, 4 days) in the HPI and the exam. GCS 5 during convulsions. The label values (BUN 142, K 6.8, Ca 6.8, Na 128) match the labs. Corrected calcium is about 7.3, which matches the differential. The ECG (QRS 128, PR 212, peaked T) matches the expected text and the calcium gluconate must. Levetiracetam renal dosing in the drug check (load unchanged, 500-1000 mg daily plus a post-dialysis supplement) matches the must. The prohibitions on magnesium and phosphate products and on gadolinium agree with the labs and the non-contrast MRI. Both drug-check constraints are soft (plan C13). The hyperkalemia drug-check follow-up and the leaking "general" block are gone. Checks are clean.
 - Changed: only the stale `metadata.revision_reason`, which now points to this log. No clinical error found.
+
+## Close-out (24 Oct 2026)
+Decisions in `plans/SE-decisions.md`.
+- synonyms: the G41 category no longer grants the type codes G41.0, G41.2 and G41.8 (a type code is granted only by the case's own code, so an answer coded with the wrong SE type no longer scores by code); `apply_diagnosis_synonyms.py --prune --conditions status_epilepticus` removed G41.2 and G41.8 from `ground_truth.diagnosis.icd_codes`. Labels unchanged.
+- Checks: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, SE case guards pass, `apply_diagnosis_synonyms.py --check --conditions status_epilepticus` clean.

@@ -119,6 +119,58 @@
     },
     {
       "output": {
+        "abnormal_values_summary": [],
+        "interpretation": "Serum neuronal surface antibody panel negative; anti-thyroid peroxidase within range. A negative serum result does not exclude autoimmune encephalitis. Clinical correlation recommended.",
+        "panels": {
+          "Autoimmune encephalitis panel (serum)": [
+            {
+              "clinical_significance": "Neuronal surface and onconeural antibodies are found in a subset of patients with autoimmune encephalitis; a negative serum result does not exclude the diagnosis. Clinical correlation recommended.",
+              "is_abnormal": false,
+              "reference_range": "Negative",
+              "test": "Anti-LGI1 IgG",
+              "unit": "qualitative",
+              "value": "Negative"
+            },
+            {
+              "clinical_significance": "Neuronal surface and onconeural antibodies are found in a subset of patients with autoimmune encephalitis; a negative serum result does not exclude the diagnosis. Clinical correlation recommended.",
+              "is_abnormal": false,
+              "reference_range": "Negative",
+              "test": "Anti-CASPR2 IgG",
+              "unit": "qualitative",
+              "value": "Negative"
+            },
+            {
+              "clinical_significance": "Neuronal surface and onconeural antibodies are found in a subset of patients with autoimmune encephalitis; a negative serum result does not exclude the diagnosis. Clinical correlation recommended.",
+              "is_abnormal": false,
+              "reference_range": "Negative",
+              "test": "Anti-NMDAR IgG",
+              "unit": "qualitative",
+              "value": "Negative"
+            },
+            {
+              "clinical_significance": "Neuronal surface and onconeural antibodies are found in a subset of patients with autoimmune encephalitis; a negative serum result does not exclude the diagnosis. Clinical correlation recommended.",
+              "is_abnormal": false,
+              "reference_range": "Negative",
+              "test": "Anti-GABA-B IgG",
+              "unit": "qualitative",
+              "value": "Negative"
+            },
+            {
+              "clinical_significance": null,
+              "is_abnormal": false,
+              "reference_range": "below 35",
+              "test": "Anti-thyroid peroxidase",
+              "unit": "IU/mL",
+              "value": 18
+            }
+          ]
+        }
+      },
+      "tool_name": "interpret_labs",
+      "trigger_action": "request_autoimmune_encephalitis_panel"
+    },
+    {
+      "output": {
         "appearance": "clear and colorless",
         "cell_count": {
           "rbc": "1 /uL",
@@ -202,22 +254,20 @@
                 "CBC",
                 "CMP",
                 "magnesium",
-                "tox_screen",
-                "autoimmune_encephalitis_panel"
+                "tox_screen"
               ]
             },
             "tool_name": "interpret_labs"
           }
         ],
         "citations": [
-          "[Brophy_2012]",
-          "[Graus_2016]"
+          "[Brophy_2012]"
         ],
         "criterion_id": "action-2-interpret-labs",
-        "expected_evidence": "Glucose 102 mg/dL, venous lactate 3.4 mmol/L and CK 412 U/L after a convulsion; electrolytes, magnesium, renal and hepatic function normal; toxicology negative; serum LGI1, CASPR2, NMDAR and GABA-B antibodies negative: no reversible metabolic, toxic or antibody-mediated cause",
+        "expected_evidence": "Glucose 102 mg/dL, venous lactate 3.4 mmol/L and CK 412 U/L after a convulsion; electrolytes, magnesium, renal and hepatic function normal; toxicology negative: no reversible metabolic or toxic cause",
         "importance": "required",
-        "label": "Emergency laboratory work-up: glucose, CBC, electrolytes, magnesium, renal and hepatic function, toxicology screen, serum autoimmune encephalitis antibodies",
-        "rationale": "Glucose, electrolyte, renal and hepatic derangements are reversible causes of seizures and decide the ASM and its dose; a toxicology screen because this is a first seizure in a patient on psychotropic drugs, and a serum antibody panel because autoimmune encephalitis is the treatable mimic of rapidly progressive dementia [Brophy_2012; Graus_2016]."
+        "label": "Emergency laboratory work-up: glucose, CBC, electrolytes, magnesium, renal and hepatic function, toxicology screen",
+        "rationale": "Glucose, electrolyte, renal and hepatic derangements are reversible causes of seizures and decide the ASM and its dose; a toxicology screen because this is a first seizure in a patient on psychotropic drugs [Brophy_2012]."
       },
       {
         "alternatives": [
@@ -277,6 +327,26 @@
         "importance": "required",
         "label": "MRI brain with DWI and FLAIR for the cause of the rapidly progressive dementia and new seizures",
         "rationale": "New-onset status epilepticus on a rapidly progressive dementia needs MRI; the outside study is not available here, and the cortical and striatal diffusion pattern is one of the diagnostic markers of prion disease while also excluding encephalitis and a structural lesion [Hermann_2021; Glauser_2016]."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "panels": [
+                "autoimmune_encephalitis_panel"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          }
+        ],
+        "citations": [
+          "[Graus_2016]"
+        ],
+        "criterion_id": "action-autoimmune-panel",
+        "expected_evidence": "Serum LGI1, CASPR2, NMDAR and GABA-B antibodies negative; anti-thyroid peroxidase 18 IU/mL, normal",
+        "importance": "recommended",
+        "label": "Serum autoimmune encephalitis antibody panel (LGI1, CASPR2, NMDAR, GABA-B) with anti-thyroid peroxidase",
+        "rationale": "Autoimmune encephalitis is the treatable mimic of rapidly progressive dementia with seizures, and serum is the more sensitive specimen for LGI1 and CASPR2 [Graus_2016]."
       },
       {
         "alternatives": [
@@ -453,16 +523,17 @@
     "diagnosis": {
       "accepted": [
         "Sporadic Creutzfeldt-Jakob disease with superimposed focal left temporal non-convulsive status epilepticus on a background of typical periodic sharp wave complexes",
-        "creutzfeldt jakob disease",
-        "creutzfeldt-jakob disease",
-        "CJD",
-        "sporadic CJD",
-        "prion disease"
+        "CJD status epilepticus",
+        "sCJD status epilepticus",
+        "creutzfeldt jakob disease status epilepticus",
+        "prion disease status epilepticus",
+        "CJD NCSE",
+        "sCJD NCSE",
+        "creutzfeldt jakob disease NCSE",
+        "prion disease NCSE"
       ],
       "icd_codes": [
-        "A81.09",
-        "A81.00",
-        "A81.0"
+        "G41.2"
       ]
     },
     "differential": [
@@ -612,50 +683,8 @@
         "Venous lactate 3.4 mmol/L (H; ref 0.5-2.0)",
         "Creatine kinase 412 U/L (H; ref 39-308)"
       ],
-      "interpretation": "Mild hyperglycemia (glucose 102 mg/dL), venous lactate 3.4 mmol/L and creatine kinase 412 U/L, the pattern expected within hours of a generalized convulsion. Blood count, electrolytes, magnesium, renal and hepatic function normal. Toxicology screen negative. Serum autoimmune encephalitis antibody panel negative.",
+      "interpretation": "Mild hyperglycemia (glucose 102 mg/dL), venous lactate 3.4 mmol/L and creatine kinase 412 U/L, the pattern expected within hours of a generalized convulsion. Blood count, electrolytes, magnesium, renal and hepatic function normal. Toxicology screen negative.",
       "panels": {
-        "Autoimmune encephalitis panel (serum)": [
-          {
-            "clinical_significance": "Neuronal surface and onconeural antibodies are found in a subset of patients with autoimmune encephalitis; a negative serum result does not exclude the diagnosis. Clinical correlation recommended.",
-            "is_abnormal": false,
-            "reference_range": "Negative",
-            "test": "Anti-LGI1 IgG",
-            "unit": "qualitative",
-            "value": "Negative"
-          },
-          {
-            "clinical_significance": "Neuronal surface and onconeural antibodies are found in a subset of patients with autoimmune encephalitis; a negative serum result does not exclude the diagnosis. Clinical correlation recommended.",
-            "is_abnormal": false,
-            "reference_range": "Negative",
-            "test": "Anti-CASPR2 IgG",
-            "unit": "qualitative",
-            "value": "Negative"
-          },
-          {
-            "clinical_significance": "Neuronal surface and onconeural antibodies are found in a subset of patients with autoimmune encephalitis; a negative serum result does not exclude the diagnosis. Clinical correlation recommended.",
-            "is_abnormal": false,
-            "reference_range": "Negative",
-            "test": "Anti-NMDAR IgG",
-            "unit": "qualitative",
-            "value": "Negative"
-          },
-          {
-            "clinical_significance": "Neuronal surface and onconeural antibodies are found in a subset of patients with autoimmune encephalitis; a negative serum result does not exclude the diagnosis. Clinical correlation recommended.",
-            "is_abnormal": false,
-            "reference_range": "Negative",
-            "test": "Anti-GABA-B IgG",
-            "unit": "qualitative",
-            "value": "Negative"
-          },
-          {
-            "clinical_significance": null,
-            "is_abnormal": false,
-            "reference_range": "below 35",
-            "test": "Anti-thyroid peroxidase",
-            "unit": "IU/mL",
-            "value": 18
-          }
-        ],
         "CBC": [
           {
             "clinical_significance": null,
@@ -842,7 +871,7 @@
     "case_body_concerns": [],
     "citation_gap": [],
     "criteria_pack_version": "1.0",
-    "difficulty_rationale": "4 required (labs, CT, cEEG, MRI) + 2 recommended; probable sporadic prion disease presenting with a first convulsion and recurrent left temporal electrographic seizures superimposed on generalized periodic sharp wave complexes; teaching is the periodic-versus-ictal distinction, exclusion of the treatable mimics, QT-aware ASM choice and goals of care; 2 grounded red herrings.",
+    "difficulty_rationale": "4 required (labs, CT, cEEG, MRI) + 3 recommended (serum antibody panel, CSF, drug check); probable sporadic prion disease presenting with a first convulsion and recurrent left temporal electrographic seizures superimposed on generalized periodic sharp wave complexes; teaching is the periodic-versus-ictal distinction, exclusion of the treatable mimics, QT-aware ASM choice and goals of care; 2 grounded red herrings.",
     "fallback_tool_kinds": {
       "cardiac_monitoring": "normal",
       "ecg": "normal",
