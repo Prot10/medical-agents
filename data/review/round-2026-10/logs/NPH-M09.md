@@ -1,0 +1,38 @@
+# NPH-M09
+Reviewer status: R1 not reviewed, R2 not reviewed (NPH has no notes file) | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| (none) | n/a | NPH was never annotated; no note ids exist. The July 2026 tool review (Reviewer 1, `condition_tool_guidance.yaml` key `nph`) is applied through the condition plan. |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| A | major | criterion `action-1-search-medical-literature`, `stop_rule`, `followup_outputs[0]` (`request_literature_post_traumatic_nph`), `fallback_tool_outputs.literature_search` | Literature search `required` and in the stop rule; the follow-up gave unverifiable figures ("60-75% improvement", a 2017 "case series" with no source) and patient-applicable conclusions. | FIXED (C1): criterion, stop-rule id, follow-up and fallback removed. |
+| D | major | `patient.history_present_illness` | "head CT ... Evans index estimated 0.34" and "referred him for inpatient NPH evaluation"; editorial closing sentence about the trajectory. | FIXED (C3): CT reported qualitatively, referral question stated; the 3-month MRI Evans 0.30 kept because it differs from the index MRI and documents change (C3 exception). |
+| C | minor | HPI, neuropsychology quote | "Post-concussive syndrome" used for a severe TBI (GCS 6, DAI), where the term does not apply. | FIXED: quote and physiatrist attribution now name the diffuse axonal injury. |
+| B | minor | `patient.clinical_history.past_medical_history` | "Type 2 diabetes mellitus (diet-controlled)" while on metformin 500 mg twice daily. | FIXED (C9): "Type 2 diabetes mellitus on metformin". |
+| D | major | `patient.neurological_exam.gait`, `.mental_status` | TUG 31 s, 10-m walk 24 s, MoCA 19/30, recall and trail-making results; "Frontal-subcortical pattern" interpretation. | FIXED (C4): qualitative only; numbers in the gait report and MoCA follow-up. |
+| D | major | `initial_tool_outputs.mri.impression` | Impression argued the differential ("cannot be attributed to ex-vacuo effect from this finding alone"); periventricular signal labelled "transependymal CSF seepage"; no technique, temporal horns, Fazekas, MTA; DAI with no microhaemorrhages on SWI. | FIXED (C5, C7): canonical numbered impression with comparison to the prior MRI; Fazekas 1; temporal horns enlarged; incomplete DESH stated (tight convexity, no Sylvian enlargement); SWI microhaemorrhages at grey-white junctions and splenium added to match the documented DAI; technique and MTA 1. |
+| D | major | `initial_tool_outputs.clinical_assessment` | Baseline report carried a garbled post-tap comparison, "positive tap test" and engineering `criteria_met`. | FIXED (C6): baseline only (TUG 31 s with walker, 10-m walk 24 s/27 steps, turn 8 steps, freezing, retropulsion, falls). |
+| B | minor | `initial_tool_outputs.csf` | RBC without unit; interpretation a recital ending in a verdict-like sentence. | FIXED (C5): canonical interpretation; protein 52 shown with age-adjusted reference. |
+| C | minor | `initial_tool_outputs.labs` | RPR and HIV not indicated in a post-traumatic case (template carry-over); interpretation named causes ("No metabolic or infectious cause..."); "PT/INR" row. | FIXED (C9): RPR/HIV removed; `coagulation` panel; pattern-only interpretation. |
+| A | major | `ground_truth.action_criteria`, `followup_outputs` | No cognitive screen or post-tap reassessment; rationales repeated labels. | FIXED: MRI, labs (optional, `{}`), baseline gait, MoCA (optional), CSF, post-tap reassessment (recommended); two authored follow-ups. |
+| C | major | `ground_truth.assessment.required_recommendations` | Six musts, five of them process steps (MRI before LP, document gait, remove 30-50 mL, reassess). | FIXED (C11): referral naming the TBI antecedent; sertraline and depression; counselling on DAI deficits; falls (2 falls documented). |
+| C | major | `ground_truth.assessment.prohibited_recommendations` | "DESH-like features, progressive triad, normal opening pressure and a positive tap test are all required" (wrong per F1/F4). | FIXED (C12): canonical text; static-sequelae and ex-vacuo prohibitions reworded. |
+| C | major | `ground_truth.differential` | Static sequelae "high", depression "moderate", iNPH "moderate" after the positive tap. | FIXED (C13): static sequelae low, depression low, iNPH very_low; ex-vacuo atrophy after DAI added (low, plan open question 6); VCI low; focal encephalomalacia very_low. Static-sequelae ICD F07.2 (postconcussional syndrome) replaced by S06.2X9S. |
+| C | minor | `ground_truth.avoided_actions` | No CT waste entry although MRI is available and a CT was done 2 weeks ago; advanced imaging, neuropsych battery and generic CSF assays not marked. | FIXED (3.3). |
+| B | minor | `fallback_tool_outputs.ct`, `.echo` | CT fallback carried a teaching sentence and a recommendation; echo said "incidental to the current neurological evaluation" and lacked `echo_type`. | FIXED (C18). |
+| B | minor | `sequence_constraints`, `stop_rule`, `key_clinical_evidence`, `red_herrings`, `metadata` | Non-canonical reasons; allowance 0; tier sentence; "positive response (>10-15% TUG, or MoCA improvement)"; red herring cited a deleted impression sentence and a moved index. | FIXED: canonical; red herring 2 points to `mri.findings[6]`. |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+The HPI keeps the injury, the 3-month MRI (Evans 0.30) and the deteriorating trajectory but no longer gives the recent CT measurement, the referral diagnosis or the timed and MoCA results; post-concussive wording is replaced by diffuse axonal injury. The MRI reads communicating ventriculomegaly with Evans 0.35 (up from 0.30), callosal angle 82 degrees, enlarged temporal horns, incomplete DESH, Fazekas 1, a patent aqueduct, a 1.2 cm right frontal contusion, DAI microhaemorrhages and superficial siderosis, without arguing the differential. The baseline gait report (TUG 31 s, 10-m walk 24 s) no longer holds the tap result; the CSF report and a separate reassessment give TUG 24 s at 2 hours and 21 s at 24 hours (32%) and MoCA 19 to 22. The literature step is removed. Musts: shunt referral for post-traumatic hydrocephalus, continuing sertraline, counselling that DAI deficits will remain, and falls prevention. The differential is set after the tap: static sequelae, ex-vacuo atrophy and depression low, iNPH very low.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+- R1: add G91.3 (post-traumatic hydrocephalus, unspecified) to the accepted ICD codes of this case through `diagnosis_synonyms.yaml` and `apply_diagnosis_synonyms.py`.
+- R2: `[Nakajima_2021]` is not yet in the NPH criteria pack.
+- R4: post-tap reassessment criterion shares the baseline pattern.
+
+## Open questions for Andrea (judgment calls you could not settle)
+None. Plan open question 6 resolved here: the iNPH entry stays at very_low and an explicit "post-traumatic ventriculomegaly ex vacuo" entry is added at low, because it is the realistic alternative after diffuse axonal injury and the serial MRI and tap response are what refute it.

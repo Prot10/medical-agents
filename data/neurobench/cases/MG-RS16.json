@@ -4,14 +4,7 @@
   "difficulty": "moderate",
   "encounter_type": "inpatient",
   "fallback_tool_outputs": {
-    "advanced_imaging": {
-      "findings": [],
-      "impression": "No abnormality identified.",
-      "modality": "FDG-PET scan",
-      "quantitative_data": null,
-      "recommended_actions": [],
-      "tracer_or_protocol": null
-    },
+    "advanced_imaging": null,
     "cardiac_monitoring": {
       "duration_hours": 24,
       "events": [],
@@ -50,7 +43,7 @@
       "angiography_findings": null,
       "contrast_used": false,
       "findings": [],
-      "impression": "No acute intracranial abnormality. Normal study, and it does not address the question this patient's workup turns on.",
+      "impression": "Non-contrast CT head: no acute intracranial abnormality. Impression: normal non-contrast CT of the head.",
       "recommended_actions": []
     },
     "drug_interactions": null,
@@ -62,6 +55,7 @@
         "RA": "normal size",
         "RV": "normal size and function"
       },
+      "echo_type": "TTE",
       "ejection_fraction": 65.0,
       "findings": [
         "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
@@ -98,58 +92,19 @@
   "followup_outputs": [
     {
       "output": {
-        "abnormal_values_summary": [
-          "AChR binding antibody 8.0 nmol/L (ref <0.4 nmol/L) \u2014 markedly elevated"
-        ],
-        "interpretation": "AChR binding antibody markedly elevated at 8.0 nmol/L (reference < 0.4 nmol/L). AChR blocking antibody positive. Anti-MuSK antibody negative. Anti-acetylcholine receptor antibodies are found in a subset of patients with neuromuscular junction disorders; an elevated result is associated with autoimmune neuromuscular junction disease",
-        "panels": {
-          "Acetylcholine_Receptor_Antibody_Panel": [
-            {
-              "is_abnormal": true,
-              "reference_range": "< 0.4 nmol/L",
-              "test": "AChR binding antibody",
-              "unit": "nmol/L",
-              "value": "8.0 nmol/L"
-            },
-            {
-              "is_abnormal": true,
-              "reference_range": "< 25%",
-              "test": "AChR blocking antibody",
-              "unit": "nmol/L",
-              "value": "2.4 nmol/L"
-            },
-            {
-              "is_abnormal": false,
-              "reference_range": "< 0.4 nmol/L",
-              "test": "Anti-MuSK antibody",
-              "unit": "nmol/L",
-              "value": "< 0.4 nmol/L (negative)"
-            }
-          ],
-          "Baseline workup": [
-            {
-              "clinical_significance": "Ordered as part of the baseline workup; no abnormality that alters the diagnosis, which is what this case's diagnosis rests on",
-              "is_abnormal": false,
-              "reference_range": "",
-              "test": "TSH",
-              "unit": "",
-              "value": "Within reference range"
-            }
-          ]
-        }
-      },
-      "tool_name": "interpret_labs",
-      "trigger_action": "request_achr_musk_lrp4_antibodies"
-    },
-    {
-      "output": {
         "findings": [
           {
-            "description": "SINGLE-FIBER EMG \u2014 EXTENSOR DIGITORUM COMMUNIS\n\nMCD: 72 \u00b5s [normal <35 \u00b5s] MARKEDLY ABNORMAL\nBlocking: 26% of potential pairs\n\nCONCLUSION: Markedly increased jitter with blocking is consistent with a disorder of neuromuscular transmission. Clinical correlation recommended."
+            "description": "20 fiber pairs. Mean MCD 72 microseconds (reference <35). Increased jitter in 15 of 20 pairs (75%); blocking in 26% of pairs.",
+            "muscle": "Right extensor digitorum (voluntary activation)"
           }
         ],
-        "impression": "SFEMG: MCD 72 \u00b5s with 26% blocking \u2014 markedly abnormal; consistent with a disorder of neuromuscular transmission.",
-        "quantitative_data": null,
+        "impression": "Abnormal single-fiber EMG of the extensor digitorum: markedly increased jitter with impulse blocking, consistent with a disorder of neuromuscular transmission. Clinical correlation recommended.",
+        "quantitative_data": {
+          "blocking": "26% of pairs",
+          "mean_MCD": "72 microseconds (reference <35)",
+          "muscle": "right extensor digitorum",
+          "pairs_with_increased_jitter": "15/20 (75%)"
+        },
         "recommended_actions": [],
         "test_type": "emg_single_fiber"
       },
@@ -158,112 +113,39 @@
     },
     {
       "output": {
-        "query": "search head drop mg neck extensors",
-        "results": [
-          {
-            "content": "LITERATURE SEARCH: Isolated Neck Extensor Weakness (Head Drop) as Neuromuscular Junction Disorder Presentation\n\nKEY FINDINGS:\n1. DROPPED HEAD SYNDROME: Causes include ALS (bulbar onset), myopathy (isolated neck extensor myopathy, IBM, mitochondrial), Parkinson's disease antecollis, and neuromuscular junction disorders\n2. PARKINSON'S ANTECOLLIS vs NEUROMUSCULAR NECK DROP: PD antecollis results from increased axial tone (rigidity) of anterior cervical muscles, not true extensor weakness; isolated neck extensor weakness is not a characteristic feature of Parkinson's disease\n3. NECK EXTENSOR PREDOMINANCE IN NMJ DISEASE: Late-onset NMJ disease (>60) with anti-AChR or anti-MuSK antibodies can preferentially affect neck extensors; head drop as the presenting feature is recognized in a minority of cases\n4. DIAGNOSTIC APPROACH: RNS of neck extensors is more sensitive than limb RNS in cases of cervical predominance; cholinesterase inhibitor trials are reported in the literature as part of the evaluation\n5. CERVICAL MYELOPATHY vs NMJ NECK DROP: Cervical myelopathy requires demonstrable cord compression on MRI; NMJ disorders cause pure muscular weakness without cord signal change",
-            "title": "Clinical literature"
-          }
-        ],
-        "summary": "MG neck drop is a recognized but rare presentation; PD antecollis from rigidity not weakness; RNS neck extensors and AChR antibody are key"
-      },
-      "tool_name": "search_medical_literature",
-      "trigger_action": "search_head_drop_mg_neck_extensors"
-    },
-    {
-      "output": {
         "findings": [
           {
-            "panel": "Pulmonary_function",
-            "reference_range": "< -60 cm H2O",
-            "result": "-64 cm H2O",
-            "test": "NIF (Negative Inspiratory Force)"
+            "reference_range": ">=80% predicted",
+            "result": "3.30 L (88% predicted; 39 mL/kg)",
+            "test": "FVC"
           },
           {
-            "panel": "Pulmonary_function",
-            "reference_range": "> 80%",
-            "result": "88%",
-            "test": "FVC % predicted"
+            "reference_range": "more negative than -60 cmH2O",
+            "result": "-64 cmH2O",
+            "test": "MIP (NIF)"
+          },
+          {
+            "reference_range": ">=80 cmH2O",
+            "result": "88 cmH2O",
+            "test": "MEP"
+          },
+          {
+            "reference_range": "",
+            "result": "Effective voluntary cough",
+            "test": "Cough"
           }
         ],
-        "impression": "Pulmonary function adequate. NIF -64 cm H2O (reference < -60 cm H2O \u2014 meets threshold for adequate respiratory reserve). FVC 88% predicted. No immediate respiratory compromise.",
+        "impression": "FVC 3.30 L (88% predicted, 39 mL/kg), MEP 88 cmH2O and effective cough within reference limits; MIP -64 cmH2O at the lower limit of normal. No respiratory muscle weakness at present.",
         "quantitative_data": {
-          "FVC % predicted": "88%",
-          "NIF (Negative Inspiratory Force)": "-64 cm H2O"
+          "FVC": "3.30 L (88% predicted; 39 mL/kg; weight 84 kg)",
+          "MEP": "88 cmH2O",
+          "MIP": "-64 cmH2O"
         },
         "recommended_actions": [],
         "test_type": "respiratory_function"
       },
       "tool_name": "order_specialized_test",
       "trigger_action": "request_respiratory_function"
-    },
-    {
-      "output": {
-        "alternatives": [],
-        "contraindications": [],
-        "formulary_status": "on formulary",
-        "interactions": [
-          "DRUG INTERACTION REVIEW \u2014 ATORVASTATIN\n\nQuery: Statin myopathy potential in the setting of neuromuscular weakness; interaction of atorvastatin with pyridostigmine and azathioprine\n\nFINDINGS:\n  ATORVASTATIN \u2014 MYOPATHY RISK:\n  - Statins (HMG-CoA reductase inhibitors) can cause myopathy and rhabdomyolysis, typically presenting with elevated CK and proximal weakness\n  - Baseline CK should be documented when evaluating new-onset weakness in patients on statins\n  - Published case reports describe statin-associated unmasking or exacerbation of pre-existing neuromuscular junction disease, though causality is not established\n\n  ATORVASTATIN + PYRIDOSTIGMINE:\n  - No clinically significant pharmacokinetic interaction documented in the literature\n\n  ATORVASTATIN + AZATHIOPRINE:\n  - No established clinically significant interaction; hepatic transaminase and CK monitoring is standard when azathioprine is initiated"
-        ],
-        "proposed": "check_atorvastatin_mg_interaction",
-        "warnings": [
-          "Statin myopathy risk: document baseline CK; statins have been associated with neuromuscular junction disease unmasking in case reports; no pharmacokinetic interaction with pyridostigmine; monitor LFTs when azathioprine is co-prescribed"
-        ]
-      },
-      "tool_name": "check_drug_interactions",
-      "trigger_action": "check_atorvastatin_mg_interaction"
-    },
-    {
-      "output": {
-        "query": "request mgtx thymectomy",
-        "results": [
-          {
-            "content": "LITERATURE SEARCH: MGTX Trial and Thymectomy in Generalized Neuromuscular Junction Disease\n\nMGTX TRIAL (Wolfe GI et al., NEJM 2016):\n  - Enrolled: AChR antibody-positive generalized MG patients aged 18\u201365 years\n  - Results: Thymectomy combined with prednisone was associated with significantly better outcomes than prednisone alone (lower QMG score, lower prednisone dose requirement, fewer treatment failures)\n  - The trial explicitly excluded patients older than 65 years\n  - Expert consensus: The benefit of thymectomy in patients older than 65 without thymoma is less well established; society guidelines recommend individualized multidisciplinary assessment\n\nAGE AND THYMECTOMY EVIDENCE:\n  - Surgical risk in elderly patients is higher, particularly in the presence of cardiovascular comorbidity\n  - In the absence of thymoma, the evidence base for thymectomy at age >65 is extrapolated from younger cohorts\n  - Published expert opinion favors individualized case-by-case evaluation including imaging, functional status, and comorbidities",
-            "title": "Clinical literature"
-          }
-        ],
-        "summary": "MGTX trial age limit 65; thymectomy less established for age 73 without thymoma; medical management first; multidisciplinary discussion"
-      },
-      "tool_name": "search_medical_literature",
-      "trigger_action": "request_mgtx_thymectomy"
-    },
-    {
-      "output": {
-        "findings": [
-          {
-            "reference_range": "see impression",
-            "test": "respiratory_function",
-            "value": "Baseline FVC/NIF to assess crisis risk in patients with bulbar or limb involvement"
-          }
-        ],
-        "impression": "Bedside respiratory function testing: forced vital capacity, maximal inspiratory and expiratory pressures, negative inspiratory force. Baseline FVC/NIF to assess crisis risk in patients with bulbar or limb involvement.",
-        "quantitative_data": {
-          "measured": "FVC, MIP, MEP, NIF"
-        },
-        "recommended_actions": [],
-        "test_type": "respiratory_function"
-      },
-      "tool_name": "order_specialized_test",
-      "trigger_action": "request_respiratory_function"
-    },
-    {
-      "output": {
-        "findings": [
-          {
-            "reference_range": "see impression",
-            "test": "ice_pack_test",
-            "value": "Improvement of ptosis after 2 minutes of cooling supports MG"
-          }
-        ],
-        "impression": "Ice-pack test: a cold pack applied to the more ptotic eyelid for two minutes, with the margin-reflex distance measured before and after. Improvement of ptosis after 2 minutes of cooling supports MG.",
-        "quantitative_data": {
-          "protocol": "2 minutes of cooling, margin-reflex distance before and after"
-        },
-        "recommended_actions": [],
-        "test_type": "ice_pack_test"
-      },
-      "tool_name": "order_specialized_test",
-      "trigger_action": "request_ice_pack_test"
     }
   ],
   "ground_truth": {
@@ -274,8 +156,6 @@
             "required_arguments": {
               "panels": [
                 "anti_AChR",
-                "anti_MuSK",
-                "anti_LRP4",
                 "TSH"
               ]
             },
@@ -283,14 +163,13 @@
           }
         ],
         "citations": [
-          "[Wolfe_2016]",
-          "Wolfe_2016"
+          "[Punga_2022]"
         ],
         "criterion_id": "action-1-interpret-labs",
-        "expected_evidence": "AChR antibody positive; TSH evaluates for comorbid thyroid disease",
+        "expected_evidence": "AChR binding antibody 8.0 nmol/L with elevated blocking antibody; MuSK negative; CK and thyroid function normal",
         "importance": "required",
-        "label": "Order serologies: anti-AChR (binding, blocking, modulating), anti-MuSK, anti-LRP4, and TSH/free-T4 for thyroid autoimmunity",
-        "rationale": "Order serologies: anti-AChR (binding, blocking, modulating), anti-MuSK, anti-LRP4, and TSH/free-T4 for thyroid autoimmunity"
+        "label": "Order AChR binding antibody and thyroid function",
+        "rationale": "Fatigable head drop with bulbar symptoms points to a disorder of neuromuscular transmission; AChR binding antibody is the first-line test and TSH screens for thyroid disease (Jacob S et al., Pract Neurol 2025; Evoli A et al., Neurol Sci 2019)."
       },
       {
         "alternatives": [
@@ -301,34 +180,12 @@
             "tool_name": "order_specialized_test"
           }
         ],
-        "citations": [
-          "[Wolfe_2016]",
-          "Wolfe_2016"
-        ],
+        "citations": [],
         "criterion_id": "action-2-order-specialized-test",
-        "expected_evidence": "Decrement >10% in symptomatic muscles supports postsynaptic NMJ disorder",
+        "expected_evidence": "Decrement of 19% neck extensors, 16% trapezius, 12% nasalis, none in ADM; normal needle EMG",
         "importance": "required",
-        "label": "Order repetitive nerve stimulation (RNS) at 2-3 Hz across proximal and facial muscles",
-        "rationale": "Order repetitive nerve stimulation (RNS) at 2-3 Hz across proximal and facial muscles"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "test_type": "emg_single_fiber"
-            },
-            "tool_name": "order_specialized_test"
-          }
-        ],
-        "citations": [
-          "[Wolfe_2016]",
-          "Wolfe_2016"
-        ],
-        "criterion_id": "action-3-order-specialized-test",
-        "expected_evidence": "Increased jitter and blocking on extensor digitorum communis or orbicularis oculi confirms NMJ transmission failure",
-        "importance": "recommended",
-        "label": "Order single-fiber EMG (gold standard >95% sensitivity)",
-        "rationale": "Order single-fiber EMG (gold standard >95% sensitivity)"
+        "label": "Order repetitive nerve stimulation including neck and facial muscles, with needle EMG",
+        "rationale": "In axial-predominant weakness RNS of proximal and facial muscles is more sensitive than distal limb RNS; needle EMG separates MG from neck extensor myopathy and motor neuron disease (Jacob S et al., Pract Neurol 2025)."
       },
       {
         "alternatives": [
@@ -338,62 +195,30 @@
               "study": "mediastinum_CT"
             },
             "tool_name": "order_body_imaging"
+          },
+          {
+            "required_arguments": {
+              "contrast": true,
+              "study": "chest_CT"
+            },
+            "tool_name": "order_body_imaging"
+          },
+          {
+            "required_arguments": {
+              "contrast": true,
+              "study": "mediastinum_MRI"
+            },
+            "tool_name": "order_body_imaging"
           }
         ],
         "citations": [
-          "[Wolfe_2016]",
-          "Wolfe_2016"
+          "[Wolfe_2016]"
         ],
         "criterion_id": "action-4-order-body-imaging",
-        "expected_evidence": "No thymoma; thymic involution appropriate for age",
+        "expected_evidence": "No anterior mediastinal mass; thymic involution appropriate for age",
         "importance": "required",
-        "label": "Order CT chest with contrast for thymoma screening",
-        "rationale": "Order CT chest with contrast for thymoma screening"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "query": "myasthenia gravis MGFA classification treatment thymectomy"
-            },
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[Sanders_2016]",
-          "Sanders_2016"
-        ],
-        "criterion_id": "action-5-search-medical-literature",
-        "expected_evidence": "MGFA classification stages disease severity; thymectomy benefits AChR+ generalized MG (MGTX); IVIG/PLEX for crisis",
-        "importance": "required",
-        "label": "Review MGFA classification and current treatment guidance (pyridostigmine, prednisone, steroid-sparing, IVIG/PLEX, thymectomy)",
-        "rationale": "Review MGFA classification and current treatment guidance (pyridostigmine, prednisone, steroid-sparing, IVIG/PLEX, thymectomy)"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "drug": "pyridostigmine",
-              "screen_for": [
-                "aminoglycosides",
-                "fluoroquinolones",
-                "telithromycin",
-                "magnesium_IV",
-                "neuromuscular_blockers"
-              ]
-            },
-            "tool_name": "check_drug_interactions"
-          }
-        ],
-        "citations": [
-          "[Wolfe_2016]",
-          "Wolfe_2016"
-        ],
-        "criterion_id": "action-6-check-drug-interactions",
-        "expected_evidence": "Flag aminoglycosides, fluoroquinolones, IV magnesium, telithromycin, NMBs as contraindicated or use-with-caution in MG",
-        "importance": "required",
-        "label": "Check drug interactions for MG-exacerbating agents (aminoglycosides, fluoroquinolones, telithromycin, IV magnesium, neuromuscular blockers, procainamide)",
-        "rationale": "Check drug interactions for MG-exacerbating agents (aminoglycosides, fluoroquinolones, telithromycin, IV magnesium, neuromuscular blockers, procainamide)"
+        "label": "Order mediastinal CT with contrast to look for thymoma",
+        "rationale": "Thymic imaging is indicated in every patient with MG; a thymoma would need resection at any age (Jacob S et al., Pract Neurol 2025)."
       },
       {
         "alternatives": [
@@ -404,52 +229,72 @@
             "tool_name": "order_specialized_test"
           }
         ],
-        "citations": [
-          "[Sanders_2016]",
-          "Sanders_2016"
-        ],
+        "citations": [],
         "criterion_id": "action-7-order-specialized-test",
-        "expected_evidence": "Baseline FVC/NIF to assess crisis risk in patients with bulbar or limb involvement",
+        "expected_evidence": "FVC 88% predicted (39 mL/kg), MIP -64 and MEP 88 cmH2O, effective cough",
         "importance": "recommended",
-        "label": "Bedside respiratory function testing (FVC, MIP/MEP, NIF) \u2014 repeat q4h in crisis",
-        "rationale": "Bedside respiratory function testing (FVC, MIP/MEP, NIF) \u2014 repeat q4h in crisis"
+        "label": "Measure baseline respiratory function (FVC, MIP, MEP)",
+        "rationale": "Dysphagia and dysphonia are bulbar involvement and the planned steroids can cause early worsening: baseline FVC, MIP and MEP stage the respiratory risk (Lawn ND et al., Arch Neurol 2001)."
       },
       {
         "alternatives": [
           {
             "required_arguments": {
-              "test_type": "ice_pack_test"
+              "test_type": "emg_single_fiber"
             },
             "tool_name": "order_specialized_test"
           }
         ],
-        "citations": [
-          "[Wolfe_2016]",
-          "Wolfe_2016"
+        "citations": [],
+        "criterion_id": "action-3-order-specialized-test",
+        "expected_evidence": "Markedly increased jitter with blocking in extensor digitorum",
+        "importance": "optional",
+        "label": "Single-fiber EMG (not needed when RNS is diagnostic)",
+        "rationale": "RNS already shows a decrement in three muscles with positive AChR antibodies; single-fiber EMG adds no diagnostic information but is not wasteful."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "check_drug_interactions"
+          }
         ],
-        "criterion_id": "action-8-order-specialized-test",
-        "expected_evidence": "Improvement of ptosis after 2 minutes of cooling supports MG",
-        "importance": "recommended",
-        "label": "Bedside ice-pack test for ptosis (cheap, ~80% sensitive for ocular MG)",
-        "rationale": "Bedside ice-pack test for ptosis (cheap, ~80% sensitive for ocular MG)"
+        "citations": [],
+        "criterion_id": "action-6-check-drug-interactions",
+        "expected_evidence": "No interaction with the current medicines; statin association noted",
+        "importance": "optional",
+        "label": "Check his medicines against pyridostigmine",
+        "rationale": "Metformin, amlodipine, aspirin and atorvastatin have no pharmacokinetic interaction with pyridostigmine; optional."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "search_medical_literature"
+          }
+        ],
+        "citations": [
+          "[Sanders_2016]"
+        ],
+        "criterion_id": "action-5-search-medical-literature",
+        "expected_evidence": "General guidance on MG management",
+        "importance": "optional",
+        "label": "Review guidance on the management of generalized myasthenia gravis",
+        "rationale": "Background reading on management; not a clinical step in the work-up."
       }
     ],
     "assessment": {
       "prohibited_recommendations": [
-        "Do NOT prescribe aminoglycoside antibiotics (gentamicin, tobramycin, amikacin) \u2014 risk of precipitating myasthenic crisis",
-        "Do NOT prescribe fluoroquinolones (ciprofloxacin, levofloxacin, moxifloxacin) \u2014 FDA black-box warning for MG exacerbation",
-        "Do NOT prescribe telithromycin \u2014 contraindicated in MG",
-        "Do NOT administer IV magnesium for MG patients (e.g., for hypomagnesaemia, eclampsia prophylaxis) without alternative \u2014 blocks NMJ transmission",
-        "Do NOT use non-depolarizing neuromuscular blockers without anaesthesia/MG-aware dosing protocols",
-        "Do NOT initiate high-dose corticosteroids as sole outpatient therapy without hospitalization or pyridostigmine bridge \u2014 risk of paradoxical worsening at days 5-10",
-        "Do NOT attribute fluctuating fatigable weakness to a functional disorder before completing serology + RNS + single-fiber EMG workup"
+        "Do not start high-dose prednisone (above 20 mg/day) as an outpatient; start low and titrate, or start high dose only with inpatient monitoring, because initial steroid-induced worsening can precipitate crisis.",
+        "Avoid fluoroquinolones, aminoglycosides, macrolides and IV magnesium unless no alternative exists and the patient is monitored; use non-depolarising neuromuscular blockers only at reduced dose with quantitative monitoring.",
+        "Do not attribute the head drop to Parkinson disease antecollis and start or escalate dopaminergic treatment instead of treating MG."
       ],
       "required_recommendations": [
-        "Confirm AChR antibody positivity",
-        "RNS with neck extensors \u2014 abnormal decrement supports MG",
-        "CT chest for thymoma",
-        "Initiate pyridostigmine and coordinate cardiac/diabetes care for steroid plan",
-        "Cervical collar for symptomatic head drop during recovery"
+        "Diagnose AChR antibody-positive generalized myasthenia gravis with axial (neck extensor) predominance and mild bulbar weakness, MGFA class IIIa: fatigable head drop, AChR binding antibody 8.0 nmol/L, decrement in neck, trapezius and facial muscles with a normal needle EMG, no thymoma; the parkinsonism does not explain the head drop.",
+        "Start pyridostigmine 30 mg three times daily, titrating to effect up to 60 mg four to five times daily, watching for bradycardia given his coronary disease.",
+        "Start prednisone low (10-20 mg/day, increasing by 5-10 mg every 3-7 days) with bone protection and close glucose monitoring and diabetes treatment adjustment, and add an early steroid-sparing agent (azathioprine after TPMT testing) to limit steroid exposure [Sanders_2016].",
+        "Fit a soft or head-supporting cervical collar for the head drop while treatment takes effect.",
+        "Arrange speech and language therapy swallowing assessment with diet modification as needed, and advise him to seek care at once for choking, worsening dysphagia or breathlessness."
       ]
     },
     "avoided_actions": [
@@ -460,11 +305,9 @@
             "tool_name": "analyze_eeg"
           }
         ],
-        "citations": [
-          "[Wolfe_2016]"
-        ],
+        "citations": [],
         "criterion_id": "avoid-waste-1-analyze-eeg",
-        "rationale": "MG is a peripheral neuromuscular junction disorder; EEG has no diagnostic role.",
+        "rationale": "EEG has no role in a disorder of the neuromuscular junction (Jacob S et al., Pract Neurol 2025).",
         "severity": "waste"
       },
       {
@@ -474,11 +317,9 @@
             "tool_name": "analyze_csf"
           }
         ],
-        "citations": [
-          "[Wolfe_2016]"
-        ],
+        "citations": [],
         "criterion_id": "avoid-waste-2-analyze-csf",
-        "rationale": "No CSF role in MG; LP risks complications without diagnostic yield.",
+        "rationale": "CSF has no role in MG (Jacob S et al., Pract Neurol 2025); no CNS or Miller Fisher alternative is raised here.",
         "severity": "waste"
       },
       {
@@ -490,11 +331,9 @@
             "tool_name": "order_advanced_imaging"
           }
         ],
-        "citations": [
-          "[Wolfe_2016]"
-        ],
+        "citations": [],
         "criterion_id": "avoid-waste-3-order-advanced-imaging",
-        "rationale": "Advanced imaging (PET/MR spectroscopy/perfusion) is not indicated for MG diagnosis or staging; CT chest covers thymoma screening.",
+        "rationale": "FDG-PET is not indicated in MG; mediastinal CT covers thymoma screening (Jacob S et al., Pract Neurol 2025).",
         "severity": "waste"
       },
       {
@@ -504,11 +343,9 @@
             "tool_name": "order_echocardiogram"
           }
         ],
-        "citations": [
-          "[Wolfe_2016]"
-        ],
+        "citations": [],
         "criterion_id": "avoid-waste-4-order-echocardiogram",
-        "rationale": "Echocardiography is not indicated for MG unless a comorbid cardiac question exists.",
+        "rationale": "His coronary disease is stable and asymptomatic; echocardiography does not contribute to the diagnosis of MG.",
         "severity": "waste"
       },
       {
@@ -518,11 +355,9 @@
             "tool_name": "order_cardiac_monitoring"
           }
         ],
-        "citations": [
-          "[Wolfe_2016]"
-        ],
+        "citations": [],
         "criterion_id": "avoid-waste-5-order-cardiac-monitoring",
-        "rationale": "Cardiac monitoring is not indicated for MG unless arrhythmia or autonomic disease is independently suspected.",
+        "rationale": "No palpitations, syncope or arrhythmia; cardiac monitoring does not contribute to the diagnosis of MG.",
         "severity": "waste"
       }
     ],
@@ -544,94 +379,88 @@
     },
     "differential": [
       {
-        "diagnosis": "Isolated neck extensor myopathy (INEM)",
-        "icd_code": "G72.9",
-        "key_features": "INEM gives fixed head drop without fatigability; RNS would be normal; this RNS shows decrement.",
-        "likelihood": "moderate"
-      },
-      {
-        "diagnosis": "Cervical myelopathy / spondylosis",
-        "icd_code": "M47.12",
-        "key_features": "Mild spondylosis without cord compression; fatigable pattern unexplained.",
+        "diagnosis": "Isolated neck extensor myopathy",
+        "icd_code": "G72.89",
+        "key_features": "Isolated head drop in an older man raises it, but the weakness is fatigable, AChR antibodies are present, RNS shows a decrement and the needle EMG has no myopathic change.",
         "likelihood": "low"
       },
       {
-        "diagnosis": "Camptocormia of Parkinson's disease",
+        "diagnosis": "Parkinson disease with antecollis",
         "icd_code": "G20",
-        "key_features": "PD trunk flexion is different from neck extensor fatigability; nigral signal changes may be age-related.",
+        "key_features": "Hypomimia, bradykinesia, rigidity, festination and reduced nigral SWI signal support coexisting parkinsonism, but antecollis comes from anterior neck rigidity, not 2/5 extensor weakness, and the decrement and AChR antibodies explain the head drop.",
         "likelihood": "low"
+      },
+      {
+        "diagnosis": "Cervical myelopathy from spondylosis",
+        "icd_code": "M47.12",
+        "key_features": "MRI shows spondylosis without cord compression or signal change; limb strength, reflexes and sensation are normal.",
+        "likelihood": "very_low"
       },
       {
         "diagnosis": "ALS with axial onset",
         "icd_code": "G12.21",
-        "key_features": "ALS axial onset rare; would show neurogenic EMG and UMN signs.",
-        "likelihood": "low"
+        "key_features": "No wasting, fasciculations or upper motor neuron signs and a normal needle EMG without denervation.",
+        "likelihood": "very_low"
       },
       {
         "diagnosis": "Inclusion body myositis",
         "icd_code": "G72.41",
-        "key_features": "IBM is asymmetric, distal-predominant, slowly progressive; not fatigable.",
-        "likelihood": "low"
+        "key_features": "Limbs are 5/5 with no finger flexor or quadriceps weakness, CK is normal and the needle EMG has no myopathic change.",
+        "likelihood": "very_low"
+      },
+      {
+        "diagnosis": "Statin-associated myopathy",
+        "icd_code": "G72.0",
+        "key_features": "Atorvastatin has been taken unchanged for years; CK is normal and the needle EMG shows no myopathy.",
+        "likelihood": "very_low"
       }
     ],
     "key_clinical_evidence": [
-      "Fluctuating, fatigable weakness with diurnal pattern (worse evening) is the clinical hallmark of MG \u2014 fixed weakness suggests an alternative diagnosis.",
-      "Ocular involvement (ptosis, diplopia) is asymmetric and fatigable in MG; thyroid eye disease causes restrictive (not fatigable) ophthalmoplegia.",
-      "Single-fiber EMG (sensitivity >95%) is the most sensitive electrodiagnostic test \u2014 order when RNS is non-diagnostic or serology is negative.",
-      "All confirmed MG cases require CT chest for thymoma \u2014 present in roughly 10-15% of generalized MG; thymectomy (MGTX trial) improves long-term outcomes in non-thymoma AChR+ MG as well.",
-      "Aminoglycosides, fluoroquinolones, telithromycin, IV magnesium, and neuromuscular blockers can precipitate myasthenic crisis and must be screened against any new prescription.",
-      "Isolated head drop in elderly males raises differential of MG, INEM, IBM, motor neuron disease, and parkinsonian camptocormia; RNS decrement and AChR positivity are decisive here."
+      "Four months of head drop with 2/5 neck extensor weakness, worse in the evening, plus mild fatigable dysphagia and dysphonia; limbs 5/5, no ptosis.",
+      "Coexisting parkinsonism (hypomimia, bradykinesia, asymmetric rigidity, festination) and a father with Parkinson disease.",
+      "AChR binding antibody 8.0 nmol/L with elevated blocking antibody; MuSK negative; CK and thyroid function normal.",
+      "RNS: decrement of 19% in neck extensors, 16% in trapezius and 12% in nasalis with none in ADM; normal needle EMG.",
+      "Mediastinal CT with contrast is indicated in every patient with MG to detect thymoma. Here it shows no thymoma; at 73 thymectomy is not routinely indicated without thymoma (MGTX enrolled patients up to 65).",
+      "Head drop is a recognized presentation of late-onset MG and must be separated from neck extensor myopathy, motor neuron disease and parkinsonian antecollis."
     ],
     "red_herrings": [
       {
-        "correct_interpretation": "RNS decrement and AChR positivity establish MG; Parkinson features may coexist but do not explain the fatigable neck extensor weakness.",
-        "data_point": "Mild reduced nigral signal on SWI; Parkinson-like features",
+        "correct_interpretation": "The nigral SWI change may accompany coexisting parkinsonism or age, but it does not explain fatigable neck extensor weakness, which the decrement and AChR antibodies attribute to MG.",
+        "data_point": "Mildly reduced nigral signal on SWI",
         "field_path": "initial_tool_outputs.mri",
-        "intended_effect": "Attribute head drop to Parkinson camptocormia and miss MG.",
+        "intended_effect": "Attribute the head drop to Parkinson disease antecollis and miss MG.",
         "location": "MRI brain"
       },
       {
-        "correct_interpretation": "PD antecollis is from axial rigidity of anterior neck, not true extensor weakness; 2/5 neck extensors is MG weakness \u2014 not PD",
+        "correct_interpretation": "Parkinson antecollis results from anterior neck rigidity, not true extensor weakness; 2/5 fatigable neck extensor weakness with a decrement is MG.",
         "data_point": "Parkinson-like features (hypomimia, bradykinesia, rigidity) suggesting antecollis from Parkinson's disease",
-        "field_path": "",
-        "intended_effect": "Parkinson's antecollis (dropped head from forward flexion) is a known PD complication; combined with family history, PD antecollis is strongly suggested",
-        "location": ""
+        "field_path": "patient.neurological_exam.motor",
+        "intended_effect": "Attribute the head drop to Parkinson disease antecollis, given the parkinsonian signs and the family history.",
+        "location": "neurological examination"
       },
       {
-        "correct_interpretation": "No cord compression, no signal change on MRI; myelopathy excluded; spondylosis is an incidental finding",
+        "correct_interpretation": "There is no cord compression or signal change and the limb examination is normal; spondylosis is incidental.",
         "data_point": "Cervical spondylosis on MRI",
-        "field_path": "",
-        "intended_effect": "Cervical spondylosis with neck problems could explain head drop from myelopathy",
-        "location": ""
+        "field_path": "initial_tool_outputs.mri",
+        "intended_effect": "Attribute the head drop to cervical spondylotic myelopathy.",
+        "location": "MRI cervical spine"
       },
       {
-        "correct_interpretation": "Normal CK (78 U/L); statin myopathy causes myopathic EMG pattern and elevated CK; RNS shows NMJ pattern not myopathic pattern; AChR antibody is diagnostic",
+        "correct_interpretation": "Atorvastatin is long-standing, CK is normal (78 U/L) and the needle EMG has no myopathic change; the RNS decrement and AChR antibody establish MG.",
         "data_point": "Atorvastatin as potential cause of myopathy",
-        "field_path": "",
-        "intended_effect": "Statin myopathy can cause neck weakness; patient is on atorvastatin",
-        "location": ""
+        "field_path": "patient.clinical_history.medications",
+        "intended_effect": "Attribute the neck weakness to statin myopathy.",
+        "location": "medications"
       }
     ],
     "review_status": "draft",
-    "sequence_constraints": [
-      {
-        "after_criterion_id": "action-2-order-specialized-test",
-        "before_criterion_id": "action-1-interpret-labs",
-        "citations": [
-          "[Wolfe_2016]"
-        ],
-        "reason": "Order AChR/MuSK/LRP4 serologies first; reserve single-fiber EMG for seronegative or RNS-non-diagnostic cases (resource stewardship).",
-        "severity": "soft"
-      }
-    ],
+    "sequence_constraints": [],
     "stop_rule": {
-      "max_additional_actions": 0,
+      "max_additional_actions": 2,
       "required_before_assessment": [
         "action-1-interpret-labs",
         "action-2-order-specialized-test",
-        "action-4-order-body-imaging",
-        "action-5-search-medical-literature",
-        "action-6-check-drug-interactions"
+        "action-4-order-body-imaging"
       ]
     }
   },
@@ -641,7 +470,7 @@
       "contrast": true,
       "findings": [
         {
-          "description": "CT CHEST WITH CONTRAST\n\nIndication: Newly suspected MG \u2014 thymoma screen\n\nFINDINGS: No anterior mediastinal mass. Thymic involution appropriate for age. No lung mass. No mediastinal adenopathy.\n\nIMPRESSION: Normal chest CT. No thymoma.",
+          "description": "CT CHEST WITH IV CONTRAST\n\nIndication: Evaluation for thymoma\n\nFINDINGS: No anterior mediastinal mass. Thymic involution appropriate for age. No lung mass. No mediastinal or hilar adenopathy. Lung bases clear.\n\nIMPRESSION: No thymoma. Normal chest CT.",
           "location": "mediastinum",
           "type": "additional_observation"
         }
@@ -650,59 +479,177 @@
       "measurements": null,
       "modality": "CT",
       "recommended_actions": [],
-      "region": "mediastinum"
+      "region": "chest/mediastinum"
     },
     "cardiac_monitoring": null,
     "csf": null,
     "ct": null,
+    "drug_interactions": {
+      "pyridostigmine": {
+        "alternatives": [],
+        "contraindications": [],
+        "formulary_status": "on formulary",
+        "interactions": [
+          "Metformin, amlodipine, aspirin: no clinically relevant interaction with pyridostigmine.",
+          "Atorvastatin: no pharmacokinetic interaction with pyridostigmine. Statins have been reported to unmask or worsen myasthenia gravis in case reports; causality is not established."
+        ],
+        "proposed": "pyridostigmine",
+        "summary": "No interactions between pyridostigmine and the current medicines; statins carry a reported, unproven association with worsening of myasthenia gravis.",
+        "warnings": [
+          "Pyridostigmine: muscarinic adverse effects include increased secretions, diarrhea, cramps and bradycardia; use with care in coronary artery disease."
+        ]
+      }
+    },
     "ecg": {
       "axis": "normal",
       "clinical_correlation": "",
       "findings": [
-        "ELECTROCARDIOGRAM\n\nRHYTHM: Sinus rhythm 72 bpm\nQTc: 440 ms\nINTERPRETATION: Normal sinus rhythm. Mild LVH (hypertension, CAD). No ischemic changes. No arrhythmia.\n\nCONCLUSION: Normal ECG."
+        "ELECTROCARDIOGRAM\n\nRHYTHM: Sinus rhythm 70 bpm\nPR 176 ms, QRS 92 ms, QTc 440 ms\nNormal axis. Voltage criteria for left ventricular hypertrophy. No ischemic ST-T change. No arrhythmia."
       ],
-      "interpretation": "Normal sinus rhythm; mild LVH; no arrhythmia",
+      "interpretation": "Sinus rhythm with voltage criteria for left ventricular hypertrophy; no ischemic change or arrhythmia.",
       "intervals": {
-        "PR": "162 ms",
-        "QRS": "88 ms",
+        "PR": "176 ms",
+        "QRS": "92 ms",
         "QTc": "440 ms"
       },
-      "rate": 72,
+      "rate": 70,
       "rhythm": "sinus rhythm"
     },
     "echo": null,
     "eeg": null,
     "labs": {
-      "abnormal_values_summary": [],
-      "interpretation": "All values within normal limits.",
+      "abnormal_values_summary": [
+        "AChR binding antibody 8.0 nmol/L (reference <=0.02 nmol/L)",
+        "AChR blocking antibody 62% (reference <=15%)",
+        "HbA1c 7.4% (reference <5.7%)"
+      ],
+      "interpretation": "AChR binding antibody elevated (8.0 nmol/L) and AChR blocking antibody elevated (62%). MuSK antibody not detected. CK, TSH and free T4 within reference ranges. HbA1c 7.4%, consistent with known type 2 diabetes. AChR binding antibodies are found in most patients with acquired autoimmune myasthenia gravis; clinical correlation recommended.",
       "panels": {
-        "Exclusion studies": [
+        "Acetylcholine_Receptor_Antibody_Panel": [
           {
-            "clinical_significance": "Ordered to exclude an alternative cause; the result does not support one, which is what this case's diagnosis rests on",
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "<=0.02 nmol/L",
+            "test": "AChR binding antibody (RIA)",
+            "unit": "nmol/L",
+            "value": "8.0"
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "<=15%",
+            "test": "AChR blocking antibody",
+            "unit": "%",
+            "value": "62"
+          },
+          {
+            "clinical_significance": null,
             "is_abnormal": false,
-            "reference_range": "",
+            "reference_range": "<=0.02 nmol/L",
+            "test": "Anti-MuSK antibody (RIA)",
+            "unit": "nmol/L",
+            "value": "<0.01"
+          }
+        ],
+        "Metabolic": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "<5.7%",
+            "test": "HbA1c",
+            "unit": "%",
+            "value": "7.4"
+          }
+        ],
+        "Muscle_enzymes": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "39-308 U/L",
+            "test": "Creatine kinase",
+            "unit": "U/L",
+            "value": "78"
+          }
+        ],
+        "Thyroid_function": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.4-4.0 mIU/L",
             "test": "TSH",
-            "unit": "",
-            "value": "Within reference range"
+            "unit": "mIU/L",
+            "value": "2.3"
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.8-1.8 ng/dL",
+            "test": "Free T4",
+            "unit": "ng/dL",
+            "value": "1.2"
           }
         ]
+      }
+    },
+    "literature_search": {
+      "myasthenia gravis": {
+        "query": "myasthenia gravis diagnosis and treatment guidance",
+        "results": [
+          {
+            "evidence_level": "consensus guideline",
+            "finding": "Consensus guidance recommends AChR antibody testing first, MuSK testing when AChR antibodies are absent, and electrodiagnostic confirmation by repetitive nerve stimulation or single-fiber EMG. Chest CT or MRI is recommended in all patients to detect thymoma.",
+            "source": "Sanders DB et al., Neurology 2016;87:419-425; Narayanaswami P et al., Neurology 2021;96:114-122"
+          },
+          {
+            "evidence_level": "randomized controlled trial",
+            "finding": "In the MGTX trial thymectomy improved outcomes over three years in non-thymomatous AChR-positive generalized MG aged 18-65.",
+            "source": "Wolfe GI et al., N Engl J Med 2016;375:511-522 (MGTX)"
+          }
+        ],
+        "summary": "Consensus guidance (Sanders 2016; update Narayanaswami 2021): AChR antibody testing first, MuSK when AChR antibodies are absent, RNS or single-fiber EMG for electrodiagnostic confirmation, chest CT or MRI in all patients for thymoma. MGTX (Wolfe 2016): thymectomy improved three-year outcomes in non-thymomatous AChR-positive generalized MG aged 18-65."
       }
     },
     "mri": {
       "additional_observations": [],
       "findings": [],
-      "impression": "No cervical cord compression or myelopathic signal change. Mild cervical spondylosis without cord contact. Mild reduced nigral signal on susceptibility-weighted imaging. No acute intracranial abnormality",
+      "impression": "MRI brain and cervical spine: 1. Mild multilevel cervical spondylosis without cord contact, cord compression or cord signal change. 2. Mildly reduced signal of the substantia nigra on susceptibility-weighted imaging, of uncertain significance at this age. 3. No acute intracranial abnormality.",
       "recommended_actions": [],
       "volumetrics": null
     },
     "specialized_test": {
       "findings": [
         {
-          "description": "REPETITIVE NERVE STIMULATION \u2014 NECK EXTENSOR AND CRANIAL NERVE INNERVATED MUSCLES\n\nIndication: Isolated neck extensor weakness; exclude NMJ disorder\n\nTECHNIQUE: 3 Hz RNS at the neck extensor muscle (C2-C4 accessory-cervical innervation), trapezius, and nasalis\n\nRESULTS:\n  Neck extensor: Reduction in compound muscle action potential amplitude and area between 1st and 4th stimuli: 19% decrement ABNORMAL\n  Trapezius: Decrement 16% ABNORMAL\n  Nasalis: Decrement 12% ABNORMAL\n  Abductor digiti minimi (ulnar): Decrement 5% NORMAL\n\nNEEDLE EMG: No fibrillations, no fasciculations, no myopathic changes in neck extensors or limb muscles.\n\nCONCLUSION: Abnormal decremental response in neck extensor and proximal cranial muscles with normal distal limb muscles. Pattern consistent with a disorder of neuromuscular transmission with proximal and cranial predominance. No myopathic features on needle EMG. Clinical correlation recommended."
+          "description": "3 Hz trains of 10 stimuli; skin temperature 33 C; no anticholinesterase medication taken.",
+          "site": "Technique"
+        },
+        {
+          "description": "Baseline CMAP 3.1 mV; decrement 1st to 4th response 19%.",
+          "site": "Cervical paraspinal (neck extensor) muscles"
+        },
+        {
+          "description": "Baseline CMAP 6.8 mV; decrement 16%.",
+          "site": "Right trapezius (spinal accessory nerve)"
+        },
+        {
+          "description": "Baseline CMAP 2.2 mV; decrement 12%.",
+          "site": "Right nasalis (facial nerve)"
+        },
+        {
+          "description": "Baseline CMAP 9.0 mV; decrement 5%. After 10 s maximal contraction CMAP 9.2 mV; no facilitation.",
+          "site": "Right abductor digiti minimi (ulnar nerve)"
+        },
+        {
+          "description": "Cervical paraspinal, deltoid, first dorsal interosseous, vastus lateralis and tibialis anterior: no fibrillation potentials or fasciculations; normal motor unit potentials and recruitment.",
+          "site": "Needle EMG"
         }
       ],
-      "impression": "RNS: 19% decrement neck extensors, 16% trapezius, 12% nasalis; normal needle EMG \u2014 abnormal decremental pattern with proximal and cranial predominance. Consistent with a disorder of neuromuscular transmission",
-      "quantitative_data": null,
+      "impression": "1. Decrement of 12-19% at 3 Hz in neck extensor, trapezius and nasalis muscles. 2. No decrement in abductor digiti minimi; normal baseline CMAP amplitudes; no post-exercise facilitation. 3. Normal needle EMG, with no neurogenic or myopathic change. Findings are consistent with a postsynaptic disorder of neuromuscular transmission with axial and cranial predominance. Clinical correlation recommended.",
+      "quantitative_data": {
+        "ADM_decrement": "5%",
+        "nasalis_decrement": "12%",
+        "neck_extensor_decrement": "19%",
+        "trapezius_decrement": "16%"
+      },
       "recommended_actions": [],
       "test_type": "repetitive_nerve_stimulation"
     }
@@ -711,20 +658,19 @@
     "authoring_agent": "condition-expert:MG",
     "case_body_concerns": [],
     "citation_gap": [],
-    "condition_name": "Late-onset AChR+ MG presenting as isolated head drop with Parkinson-like comorbidity",
+    "condition_name": "Late-onset AChR+ MG presenting as head drop with coexisting parkinsonism",
     "criteria_pack_version": "1.0",
-    "difficulty_description": "Straightforward: isolated 2/5 neck extensor weakness with disproportionality to PD features; RNS decrement + AChR antibody 8.0 nmol/L are diagnostic; distinguishing MG weakness from PD antecollis rigidity is the key clinical step",
-    "difficulty_rationale": "5 required tools, 1 red herrings, typical AChR+ generalized MG",
+    "difficulty_description": "Moderate: head drop in a man with parkinsonism invites antecollis, myelopathy or myopathy; AChR antibody and an axial RNS decrement with a normal needle EMG establish MG.",
+    "difficulty_rationale": "3 required actions (AChR serology with thyroid function, RNS with neck and facial muscles, mediastinal CT), respiratory function recommended; 4 red herrings (nigral SWI change, parkinsonism, cervical spondylosis, atorvastatin); axial-predominant AChR+ MG.",
     "expected_agent_confidence": 0.84,
     "fallback_tool_kinds": {
-      "advanced_imaging": "normal",
       "cardiac_monitoring": "normal",
       "csf": "incidental",
       "echo": "normal",
       "eeg": "normal"
     },
     "generation_method": "real_case_seed",
-    "last_revised": "2026-08-08",
+    "last_revised": "2026-10-24",
     "policy_spec_status": "draft",
     "revision_reason": "per-case audit: baseline panels named by an optimal action and absent from the payload actually served (TSH). Reported as unremarkable only after checking that nothing in the case \u2014 no abnormal row, no interpretation, no expected_finding, no reasoning \u2014 states an abnormality for them",
     "source": "MedCaseReasoning",
@@ -736,8 +682,7 @@
     ]
   },
   "patient": {
-    "age": 73,
-    "chief_complaint": "Neck drooping and head drop, mild dysphagia and dysphonia, with Parkinson-like features",
+    "chief_complaint": "Head drop, mild dysphagia and dysphonia, with parkinsonian features",
     "clinical_history": {
       "allergies": [
         "No known drug allergies"
@@ -784,18 +729,17 @@
     "demographics": {
       "age": 73,
       "bmi": 27.7,
+      "ethnicity": "White European",
       "handedness": "right",
       "sex": "male"
     },
-    "ethnicity": "White European",
-    "history_present_illness": "A 73-year-old man presented to the neurology ward with a several-month history of progressive neck flexion weakness and an inability to hold his head upright. He described a gradual worsening of head drop over approximately 4 months such that he needed to manually support his chin when seated or walking. He also noted mild dysphagia for solids and a hoarse, quieter quality to his voice over the past 2 months. He denied ptosis, diplopia, limb weakness, or sensory symptoms. His family history was notable for Parkinson's disease in his father. He did not smoke or drink alcohol and was on no medications prior to admission.\n\nHis past medical history included type 2 diabetes mellitus, coronary artery disease (managed conservatively), and arterial hypertension, as well as mild cervical spondylosis identified on prior imaging. On neurological examination, he was alert with hypomimia, mild bilateral bradykinesia, and asymmetric limb rigidity. There was no ptosis or diplopia. Extraocular movements were full. Strength testing revealed profound 2/5 power in the neck extensor group bilaterally with preserved 5/5 strength in all four limbs, shoulder girdle, and hip girdle muscles. Cognition was intact (MMSE 28/30). Gait was slightly shuffling with mild festination.\n\nBrain and cervical spine MRI studies showed no structural abnormalities \u2014 specifically no compressive pathology, no anterior spinal cord compression, and no signal change in the dorsal columns or anterior horn cells. The combination of isolated neck extensor weakness with preserved limb strength was felt to be highly atypical for Parkinson's disease, which prompted dedicated neuromuscular evaluation.",
-    "hpi": "A 73-year-old man presented to the neurology ward with a several-month history of progressive neck flexion weakness and an inability to hold his head upright. He described a gradual worsening of head drop over approximately 4 months such that he needed to manually support his chin when seated or walking. He also noted mild dysphagia for solids and a hoarse, quieter quality to his voice over the past 2 months. He denied ptosis, diplopia, limb weakness, or sensory symptoms. His family history was notable for Parkinson's disease in his father. He did not smoke or drink alcohol and was on no medications prior to admission.\n\nHis past medical history included type 2 diabetes mellitus, coronary artery disease (managed conservatively), and arterial hypertension, as well as mild cervical spondylosis identified on prior imaging. On neurological examination, he was alert with hypomimia, mild bilateral bradykinesia, and asymmetric limb rigidity. There was no ptosis or diplopia. Extraocular movements were full. Strength testing revealed profound 2/5 power in the neck extensor group bilaterally with preserved 5/5 strength in all four limbs, shoulder girdle, and hip girdle muscles. Cognition was intact (MMSE 28/30). Gait was slightly shuffling with mild festination.\n\nBrain and cervical spine MRI studies showed no structural abnormalities \u2014 specifically no compressive pathology, no anterior spinal cord compression, and no signal change in the dorsal columns or anterior horn cells. The combination of isolated neck extensor weakness with preserved limb strength was felt to be highly atypical for Parkinson's disease, which prompted dedicated neuromuscular evaluation.",
+    "history_present_illness": "A 73-year-old man was admitted to the neurology ward with progressive neck extensor weakness and an inability to hold his head upright. Over about 4 months the head drop had worsened so that he needed to support his chin with his hand when seated or walking; it was mildest on waking and worst in the evening and after walking. Over the past 2 months he had also noticed mild dysphagia for solids and a hoarse, quieter voice, both worse at the end of meals and conversations. He denied ptosis, diplopia, limb weakness, breathlessness or sensory symptoms. His father had Parkinson disease. He did not smoke or drink alcohol. His regular medicines were metformin, amlodipine, aspirin and atorvastatin, the statin taken unchanged for six years.\n\nHis past medical history included type 2 diabetes mellitus, coronary artery disease (managed conservatively), arterial hypertension and mild cervical spondylosis on prior imaging. On neurological examination he was alert with hypomimia, mild bilateral bradykinesia and asymmetric limb rigidity (right more than left). There was no ptosis and extraocular movements were full. Neck extensor power was 2/5 bilaterally, with 5/5 strength in all four limbs, shoulder girdle and hip girdle muscles. Cognition was intact (MMSE 28/30). Gait was slightly shuffling with mild festination.",
     "neurological_exam": {
       "coordination": "Coordination intact.",
-      "cranial_nerves": "No ptosis. No diplopia. Full extraocular movements. Hypomimia. No facial weakness.",
+      "cranial_nerves": "No ptosis. Full extraocular movements without diplopia. Hypomimia. No facial weakness. Palate elevates symmetrically; tongue normal in bulk and strength.",
       "gait": "Slightly shuffling gait with mild festination.",
       "mental_status": "Alert; MMSE 28/30. No significant cognitive impairment. Hypomimia.",
-      "motor": "Neck extensors: 2/5 bilaterally (profound weakness \u2014 cannot maintain head against gravity). All other muscle groups: 5/5. No fasciculations. Mild bilateral bradykinesia. Asymmetric rigidity (right > left).",
+      "motor": "Neck extensors 2/5 bilaterally (cannot hold the head up against gravity); neck flexors 4/5. All limb muscle groups 5/5. No wasting or fasciculations. Mild bilateral bradykinesia. Asymmetric rigidity (right > left).",
       "reflexes": "DTR 2+ symmetric.",
       "sensory": "Sensation intact throughout."
     },
@@ -804,17 +748,10 @@
       "abdomen": "Soft; no organomegaly",
       "cardiovascular": "Regular rate and rhythm; no murmurs",
       "extremities": "No edema; no rash",
-      "general": "Alert; hypomimia; head drop present \u2014 patient required chin support to maintain upright head posture",
-      "neurological": "Alert; MMSE 28/30. No ptosis. No diplopia. Full extraocular movements. Hypomimia. Mild bilateral bradykinesia. Asymmetric rigidity (right > left). Neck extensors: 2/5 bilaterally (profound weakness \u2014 cannot maintain head against gravity). All other muscle groups: 5/5. No fasciculations. DTR 2+ symmetric. Sensation intact throughout. Slight festinating gait. MMSE intact.",
-      "respiratory": "Mild decreased breath sounds at right base"
+      "general": "Alert; hypomimia; head drop, supporting his chin with his hand to keep the head upright. Weight 84 kg, height 174 cm.",
+      "neurological": "Alert; MMSE 28/30. No ptosis. Full extraocular movements. Hypomimia. Mild bilateral bradykinesia. Asymmetric rigidity (right > left). Neck extensors 2/5 bilaterally, neck flexors 4/5; limbs 5/5. No fasciculations. DTR 2+ symmetric. Sensation intact. Slightly shuffling gait with mild festination.",
+      "respiratory": "Chest clear to auscultation; no accessory muscle use; speaks in full sentences."
     },
-    "pmh": [
-      "Type 2 diabetes mellitus",
-      "Coronary artery disease (managed conservatively)",
-      "Arterial hypertension",
-      "Mild cervical spondylosis on prior imaging"
-    ],
-    "sex": "male",
     "vitals": {
       "bp_diastolic": 82,
       "bp_systolic": 140,

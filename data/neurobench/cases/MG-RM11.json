@@ -4,14 +4,7 @@
   "difficulty": "moderate",
   "encounter_type": "inpatient",
   "fallback_tool_outputs": {
-    "advanced_imaging": {
-      "findings": [],
-      "impression": "No abnormality identified.",
-      "modality": "",
-      "quantitative_data": null,
-      "recommended_actions": [],
-      "tracer_or_protocol": null
-    },
+    "advanced_imaging": null,
     "cardiac_monitoring": {
       "duration_hours": 24,
       "events": [],
@@ -50,7 +43,7 @@
       "angiography_findings": null,
       "contrast_used": false,
       "findings": [],
-      "impression": "No acute intracranial abnormality. Normal study, and it does not address the question this patient's workup turns on.",
+      "impression": "Non-contrast CT head: no acute intracranial abnormality. Impression: normal non-contrast CT of the head.",
       "recommended_actions": []
     },
     "drug_interactions": null,
@@ -76,6 +69,7 @@
         "RA": "normal size",
         "RV": "normal size and function"
       },
+      "echo_type": "TTE",
       "ejection_fraction": 66.0,
       "findings": [
         "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
@@ -114,140 +108,64 @@
       "output": {
         "findings": [
           {
-            "measurement": "Mean MCD",
-            "reference_range": "<34 us",
-            "significance": "Clearly increased jitter \u2014 NMJ dysfunction confirmed",
-            "value": "54 microseconds"
+            "panel": "Pulmonary_Function_Bedside",
+            "reference_range": ">=80% predicted (predicted 4.0 L)",
+            "result": "2.8 L (70% predicted; 40.8 mL/kg) L",
+            "test": "FVC (sitting)"
           },
           {
-            "measurement": "Blocking",
-            "reference_range": "<10%",
-            "significance": "Abnormal blocking \u2014 NMJ transmission failure",
-            "value": "10/20 pairs (50%)"
+            "panel": "Pulmonary_Function_Bedside",
+            "reference_range": "fall <10%",
+            "result": "2.6 L (7% fall from sitting)",
+            "test": "FVC (supine)"
+          },
+          {
+            "panel": "Pulmonary_Function_Bedside",
+            "reference_range": "more negative than -60 cmH2O",
+            "result": "-48 cmH2O L",
+            "test": "MIP (NIF)"
+          },
+          {
+            "panel": "Pulmonary_Function_Bedside",
+            "reference_range": ">=95 cmH2O",
+            "result": "71 cmH2O L",
+            "test": "MEP"
+          },
+          {
+            "panel": "Pulmonary_Function_Bedside",
+            "reference_range": "",
+            "result": "Moderately strong",
+            "test": "Cough"
+          },
+          {
+            "panel": "Arterial_Blood_Gas",
+            "reference_range": "7.35-7.45",
+            "result": "7.41",
+            "test": "pH"
+          },
+          {
+            "panel": "Arterial_Blood_Gas",
+            "reference_range": "35-45 mmHg",
+            "result": "41 mmHg",
+            "test": "PaCO2"
+          },
+          {
+            "panel": "Arterial_Blood_Gas",
+            "reference_range": ">80 mmHg",
+            "result": "86 mmHg",
+            "test": "PaO2"
           }
         ],
-        "impression": "Abnormal SFEMG extensor digitorum communis. Mean MCD 54 \u00b5s (reference <34 \u00b5s) with 50% blocking rate. Findings are consistent with a disorder of neuromuscular junction transmission",
+        "impression": "1. Reduced FVC 2.8 L (70% predicted; 40.8 mL/kg) with a 7% supine fall. 2. Reduced MIP -48 cmH2O and MEP 71 cmH2O. 3. Arterial blood gas within reference ranges.",
         "quantitative_data": {
-          "blocking": "50%",
-          "mean_MCD": "54 us"
+          "FVC": "2.8 L (70% predicted; 40.8 mL/kg at 68.6 kg)",
+          "MEP": "71 cmH2O",
+          "MIP (NIF)": "-48 cmH2O",
+          "PaCO2": "41 mmHg"
         },
         "recommended_actions": [
-          "Single-fiber EMG result should be correlated with clinical and serological findings."
+          "Repeat bedside FVC, MIP and MEP to establish the trend."
         ],
-        "test_type": "emg_single_fiber"
-      },
-      "tool_name": "order_specialized_test",
-      "trigger_action": "request_emg_single_fiber"
-    },
-    {
-      "output": {
-        "alternatives": [],
-        "contraindications": [
-          "Avoid aminoglycosides \u2014 worsen MG (not in current chemotherapy regimen)"
-        ],
-        "formulary_status": "Pyridostigmine: formulary",
-        "interactions": [
-          "Vincristine is neurotoxic \u2014 causes peripheral neuropathy; does not directly worsen NMJ transmission",
-          "Pyridostigmine + vincristine: no significant pharmacokinetic interaction; both can affect neuromuscular function but via different mechanisms"
-        ],
-        "proposed": "Pyridostigmine for MG in patient on vincristine-containing EPOCH chemotherapy",
-        "warnings": [
-          "Vincristine neuropathy and MG coexist \u2014 clinical deterioration may reflect either vincristine toxicity progression or MG worsening; monitor both",
-          "EPOCH chemotherapy includes dexamethasone \u2014 steroid component may have partial MG benefit",
-          "If MG worsens significantly, consider IVIG rather than additional immunosuppression given active lymphoma treatment",
-          "Pyridostigmine cholinergic GI effects may worsen vincristine constipation \u2014 monitor carefully"
-        ]
-      },
-      "tool_name": "check_drug_interactions",
-      "trigger_action": "request_vincristine_mg_interaction"
-    },
-    {
-      "output": {
-        "abnormal_values_summary": [
-          "IgG total 520 mg/dL (below reference 700\u20131600 mg/dL)."
-        ],
-        "interpretation": "Abnormal values: IgG total 520 mg/dL (L).",
-        "panels": {
-          "Pre-IVIG Assessment": [
-            {
-              "clinical_significance": null,
-              "is_abnormal": false,
-              "reference_range": "70-400",
-              "test": "IgA",
-              "unit": "mg/dL",
-              "value": 168
-            },
-            {
-              "clinical_significance": null,
-              "is_abnormal": false,
-              "reference_range": "0.7-1.2",
-              "test": "Creatinine",
-              "unit": "mg/dL",
-              "value": 1.1
-            },
-            {
-              "clinical_significance": null,
-              "is_abnormal": true,
-              "reference_range": "700-1600",
-              "test": "IgG total",
-              "unit": "mg/dL",
-              "value": 520
-            }
-          ]
-        }
-      },
-      "tool_name": "interpret_labs",
-      "trigger_action": "request_ivig_lymphoma_mg"
-    },
-    {
-      "output": {
-        "query": "Myasthenia gravis T-cell lymphoma paraneoplastic NMJ disorder association",
-        "results": [
-          {
-            "finding": "Postsynaptic NMJ autoimmunity has been reported in association with non-Hodgkin lymphoma subtypes; anti-AChR antibodies can have a paraneoplastic origin; treatment of the underlying hematologic malignancy may improve neuromuscular symptoms, but concurrent chemotherapy-related axonal neuropathy (notably from vinca alkaloids) can complicate the clinical picture and should be evaluated as a separate process.",
-            "journal": "Neurology 2022",
-            "title": "Paraneoplastic NMJ disorders associated with hematologic malignancy"
-          },
-          {
-            "finding": "Anti-titin positive in MG can indicate thymoma OR paraneoplastic MG from other malignancies; CT chest should be performed but anti-titin alone does not confirm thymoma when CT is negative",
-            "journal": "Muscle Nerve 2021",
-            "title": "Anti-titin antibodies and thymoma vs paraneoplastic MG"
-          }
-        ],
-        "summary": "Paraneoplastic MG with anti-AChR antibodies has been reported in T-cell lymphoma and other non-SCLC malignancies. Anti-titin positive without CT-confirmed thymoma in a lymphoma patient is consistent with paraneoplastic mechanism. IVIG and pyridostigmine are appropriate; corticosteroids are problematic given lymphoma treatment. Lymphoma treatment remains priority."
-      },
-      "tool_name": "search_medical_literature",
-      "trigger_action": "request_paraneoplastic_mg_literature"
-    },
-    {
-      "output": {
-        "findings": [
-          {
-            "panel": "Respiratory Monitoring",
-            "reference_range": ">-60",
-            "result": "-48",
-            "test": "NIF"
-          },
-          {
-            "panel": "Respiratory Monitoring",
-            "reference_range": ">3.0L predicted",
-            "result": "2.8",
-            "test": "FVC"
-          },
-          {
-            "panel": "Respiratory Monitoring",
-            "reference_range": "Normal",
-            "result": "pH 7.41, pCO2 41, pO2 86",
-            "test": "ABG"
-          }
-        ],
-        "impression": "Abnormal values: NIF -48 cmH2O (L), FVC 2.8 L (L).",
-        "quantitative_data": {
-          "ABG": "pH 7.41, pCO2 41, pO2 86",
-          "FVC": "2.8",
-          "NIF": "-48"
-        },
-        "recommended_actions": [],
         "test_type": "respiratory_function"
       },
       "tool_name": "order_specialized_test",
@@ -255,41 +173,78 @@
     },
     {
       "output": {
-        "abnormal_values_summary": [
-          "All additional antibodies within reference limits."
+        "findings": [
+          {
+            "result": "0.5 mm",
+            "significance": "",
+            "test": "Left MRD1 before ice"
+          },
+          {
+            "result": "3.0 mm",
+            "significance": "Improvement 2.5 mm",
+            "test": "Left MRD1 after 2 minutes of ice"
+          },
+          {
+            "result": "2.5 mm",
+            "significance": "",
+            "test": "Right MRD1 before ice"
+          },
+          {
+            "result": "3.5 mm",
+            "significance": "Improvement 1.0 mm",
+            "test": "Right MRD1 after 2 minutes of ice"
+          }
         ],
-        "interpretation": "All values within normal limits.",
-        "panels": {
-          "Additional Antibodies": [
-            {
-              "clinical_significance": null,
-              "is_abnormal": false,
-              "reference_range": "<0.02",
-              "test": "Anti-MuSK (confirmed)",
-              "unit": "nmol/L",
-              "value": "<0.02"
-            },
-            {
-              "clinical_significance": null,
-              "is_abnormal": false,
-              "reference_range": "Negative",
-              "test": "Anti-LRP4",
-              "unit": "qualitative",
-              "value": "Negative"
-            },
-            {
-              "clinical_significance": null,
-              "is_abnormal": false,
-              "reference_range": "<0.02",
-              "test": "Anti-VGCC confirmed",
-              "unit": "nmol/L",
-              "value": "<0.02"
-            }
-          ]
-        }
+        "impression": "Positive ice-pack test on the left (MRD1 improvement 2.5 mm); 1.0 mm improvement on the right.",
+        "quantitative_data": {
+          "left_MRD1_change": "+2.5 mm",
+          "right_MRD1_change": "+1.0 mm"
+        },
+        "recommended_actions": [],
+        "test_type": "ice_pack_test"
       },
-      "tool_name": "interpret_labs",
-      "trigger_action": "request_musk_antibodies"
+      "tool_name": "order_specialized_test",
+      "trigger_action": "request_ice_pack_test"
+    },
+    {
+      "output": {
+        "findings": [
+          {
+            "measurement": "Muscle",
+            "reference_range": "",
+            "significance": "",
+            "value": "Left orbicularis oculi, voluntary activation, concentric needle"
+          },
+          {
+            "measurement": "Mean MCD (20 pairs)",
+            "reference_range": "<38 us",
+            "significance": "Increased",
+            "value": "54 us"
+          },
+          {
+            "measurement": "Pairs with increased jitter",
+            "reference_range": "<=1/20",
+            "significance": "Increased",
+            "value": "14/20 (70%)"
+          },
+          {
+            "measurement": "Pairs with blocking",
+            "reference_range": "0",
+            "significance": "Present",
+            "value": "8/20 (40%)"
+          }
+        ],
+        "impression": "Abnormal single-fibre EMG of the left orbicularis oculi: mean MCD 54 us, increased jitter in 14 of 20 pairs and blocking in 8 of 20. Findings indicate impaired neuromuscular transmission. Clinical correlation recommended.",
+        "quantitative_data": {
+          "abnormal_pairs": "70%",
+          "blocking": "40%",
+          "mean_MCD": "54 us"
+        },
+        "recommended_actions": [],
+        "test_type": "emg_single_fiber"
+      },
+      "tool_name": "order_specialized_test",
+      "trigger_action": "request_emg_single_fiber"
     }
   ],
   "ground_truth": {
@@ -298,10 +253,42 @@
         "alternatives": [
           {
             "required_arguments": {
+              "test_type": "respiratory_function"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "action-6-order-specialized-test",
+        "expected_evidence": "FVC 2.8 L (70% predicted, 40.8 mL/kg), MIP -48 cmH2O, MEP 71 cmH2O, normal ABG",
+        "importance": "required",
+        "label": "Measure respiratory function now and trend it",
+        "rationale": "Nasal speech and jaw fatigue with proximal weakness: FVC, MIP and MEP stage bulbar-respiratory reserve and decide the level of care and the urgency of IVIG (Lawn 2001 thresholds)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "ice_pack_test"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[Gilhus_2016]"
+        ],
+        "criterion_id": "action-ice-pack-test",
+        "expected_evidence": "Left MRD1 improves by 2.5 mm after 2 minutes of ice",
+        "importance": "recommended",
+        "label": "Perform a bedside ice-pack test on the left ptosis",
+        "rationale": "Asymmetric fatigable ptosis is present; an improvement of at least 2 mm after cooling supports a neuromuscular junction cause at the bedside."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
               "panels": [
                 "anti_AChR",
-                "anti_MuSK",
-                "anti_LRP4",
                 "TSH"
               ]
             },
@@ -309,14 +296,31 @@
           }
         ],
         "citations": [
-          "[Wolfe_2016]",
-          "Wolfe_2016"
+          "[Gilhus_2016]"
         ],
         "criterion_id": "action-1-interpret-labs",
-        "expected_evidence": "AChR antibody positive; TSH evaluates for comorbid thyroid disease",
+        "expected_evidence": "Anti-AChR binding 1.4 nmol/L with elevated blocking and modulating antibodies; VGCC negative; thyroid function normal",
         "importance": "required",
-        "label": "Order serologies: anti-AChR (binding, blocking, modulating), anti-MuSK, anti-LRP4, and TSH/free-T4 for thyroid autoimmunity",
-        "rationale": "Order serologies: anti-AChR (binding, blocking, modulating), anti-MuSK, anti-LRP4, and TSH/free-T4 for thyroid autoimmunity"
+        "label": "Order AChR binding antibody and thyroid function",
+        "rationale": "Fatigable ptosis, diplopia, nasal speech and proximal weakness during chemotherapy: AChR antibodies separate MG from vincristine neurotoxicity and chemotherapy fatigue; thyroid function screens for associated autoimmunity (Jacob 2025 ABN guidance)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "repetitive_nerve_stimulation"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[Gilhus_2016]"
+        ],
+        "criterion_id": "action-repetitive-nerve-stimulation",
+        "expected_evidence": "Borderline decrement in nasalis (9%) and trapezius (8%), no post-exercise facilitation, and a length-dependent axonal sensory neuropathy on NCS",
+        "importance": "required",
+        "label": "Order repetitive nerve stimulation with nerve conduction studies",
+        "rationale": "RNS of weak facial and proximal muscles tests the junction, the post-exercise study screens for LEMS in a patient with cancer and low reflexes, and the conduction studies characterise the vincristine neuropathy (Jacob 2025 ABN guidance)."
       },
       {
         "alternatives": [
@@ -328,14 +332,13 @@
           }
         ],
         "citations": [
-          "[Wolfe_2016]",
-          "Wolfe_2016"
+          "[Gilhus_2016]"
         ],
         "criterion_id": "action-2-order-specialized-test",
-        "expected_evidence": "Decrement >10% in symptomatic muscles supports postsynaptic NMJ disorder",
-        "importance": "required",
-        "label": "Perform single-fibre electromyography of a clinically weak muscle: the most sensitive electrodiagnostic test of neuromuscular-junction transmission, and the appropriate electrodiagnostic step when repetitive stimulation is normal or not available",
-        "rationale": "Perform single-fibre electromyography of a clinically weak muscle: the most sensitive electrodiagnostic test of neuromuscular-junction transmission, and the appropriate electrodiagnostic step when repetitive stimulation is normal or not available"
+        "expected_evidence": "Increased jitter (mean MCD 54 us) and blocking in orbicularis oculi",
+        "importance": "recommended",
+        "label": "Order single-fibre EMG of a facial muscle",
+        "rationale": "RNS is borderline; SFEMG of a weak facial muscle, outside the territory of the length-dependent vincristine neuropathy that also raises jitter, confirms the transmission defect (Jacob 2025 ABN guidance)."
       },
       {
         "alternatives": [
@@ -345,100 +348,69 @@
               "study": "mediastinum_CT"
             },
             "tool_name": "order_body_imaging"
+          },
+          {
+            "required_arguments": {
+              "contrast": true,
+              "study": "chest_CT"
+            },
+            "tool_name": "order_body_imaging"
           }
         ],
         "citations": [
-          "[Wolfe_2016]",
-          "Wolfe_2016"
+          "[Wolfe_2016]"
         ],
         "criterion_id": "action-3-order-body-imaging",
-        "expected_evidence": "No thymoma; thymic involution appropriate for age",
+        "expected_evidence": "No thymoma; fatty involuted thymus; residual paratracheal nodal tissue decreased from staging",
         "importance": "required",
-        "label": "Order CT chest with contrast for thymoma screening",
-        "rationale": "Order CT chest with contrast for thymoma screening"
+        "label": "Order mediastinal CT with contrast for thymoma",
+        "rationale": "Thymic imaging is indicated in every patient with MG, including those with another cancer; a thymoma would need surgery in its own right (Jacob 2025 ABN guidance)."
       },
       {
         "alternatives": [
           {
-            "required_arguments": {
-              "query": "myasthenia gravis MGFA classification treatment thymectomy"
-            },
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[Sanders_2016]",
-          "Sanders_2016"
-        ],
-        "criterion_id": "action-4-search-medical-literature",
-        "expected_evidence": "MGFA classification stages disease severity; thymectomy benefits AChR+ generalized MG (MGTX); IVIG/PLEX for crisis",
-        "importance": "required",
-        "label": "Review MGFA classification and current treatment guidance (pyridostigmine, prednisone, steroid-sparing, IVIG/PLEX, thymectomy)",
-        "rationale": "Review MGFA classification and current treatment guidance (pyridostigmine, prednisone, steroid-sparing, IVIG/PLEX, thymectomy)"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "drug": "pyridostigmine",
-              "screen_for": [
-                "aminoglycosides",
-                "fluoroquinolones",
-                "telithromycin",
-                "magnesium_IV",
-                "neuromuscular_blockers"
-              ]
-            },
+            "required_arguments": {},
             "tool_name": "check_drug_interactions"
           }
         ],
         "citations": [
-          "[Wolfe_2016]",
-          "Wolfe_2016"
+          "[Sanders_2016]"
         ],
         "criterion_id": "action-5-check-drug-interactions",
-        "expected_evidence": "Flag aminoglycosides, fluoroquinolones, IV magnesium, telithromycin, NMBs as contraindicated or use-with-caution in MG",
-        "importance": "required",
-        "label": "Check drug interactions for MG-exacerbating agents (aminoglycosides, fluoroquinolones, telithromycin, IV magnesium, neuromuscular blockers, procainamide)",
-        "rationale": "Check drug interactions for MG-exacerbating agents (aminoglycosides, fluoroquinolones, telithromycin, IV magnesium, neuromuscular blockers, procainamide)"
+        "expected_evidence": "No NMJ interaction of the EPOCH drugs; fluoroquinolones and aminoglycosides to be avoided in febrile neutropenia; steroid adds infection risk",
+        "importance": "recommended",
+        "label": "Check his chemotherapy and supportive medicines against the MG treatment",
+        "rationale": "Recurrent febrile neutropenia makes fluoroquinolone prophylaxis and aminoglycosides likely future exposures, and EPOCH already contains prednisone; the check shapes the antibiotic plan and the steroid decision."
       },
       {
         "alternatives": [
           {
-            "required_arguments": {
-              "test_type": "respiratory_function"
-            },
-            "tool_name": "order_specialized_test"
+            "required_arguments": {},
+            "tool_name": "search_medical_literature"
           }
         ],
         "citations": [
-          "[Sanders_2016]",
-          "Sanders_2016"
+          "[Sanders_2016]"
         ],
-        "criterion_id": "action-6-order-specialized-test",
-        "expected_evidence": "Baseline FVC/NIF to assess crisis risk in patients with bulbar or limb involvement",
-        "importance": "recommended",
-        "label": "Bedside respiratory function testing (FVC, MIP/MEP, NIF) \u2014 repeat q4h in crisis",
-        "rationale": "Bedside respiratory function testing (FVC, MIP/MEP, NIF) \u2014 repeat q4h in crisis"
+        "criterion_id": "action-4-search-medical-literature",
+        "expected_evidence": "General published guidance on MG diagnosis and management",
+        "importance": "optional",
+        "label": "Optionally review published guidance on MG management",
+        "rationale": "Background reading only; no diagnostic or management step depends on it."
       }
     ],
     "assessment": {
       "prohibited_recommendations": [
-        "Do NOT prescribe aminoglycoside antibiotics (gentamicin, tobramycin, amikacin) \u2014 risk of precipitating myasthenic crisis",
-        "Do NOT prescribe fluoroquinolones (ciprofloxacin, levofloxacin, moxifloxacin) \u2014 FDA black-box warning for MG exacerbation",
-        "Do NOT prescribe telithromycin \u2014 contraindicated in MG",
-        "Do NOT administer IV magnesium for MG patients (e.g., for hypomagnesaemia, eclampsia prophylaxis) without alternative \u2014 blocks NMJ transmission",
-        "Do NOT use non-depolarizing neuromuscular blockers without anaesthesia/MG-aware dosing protocols",
-        "Do NOT initiate high-dose corticosteroids as sole outpatient therapy without hospitalization or pyridostigmine bridge \u2014 risk of paradoxical worsening at days 5-10",
-        "Do NOT attribute fluctuating fatigable weakness to a functional disorder before completing serology + RNS + single-fiber EMG workup",
-        "Do NOT use fluoroquinolones or aminoglycosides during febrile neutropenia in this MG patient \u2014 substitute with non-NMJ-blocking agents."
+        "Avoid fluoroquinolones, aminoglycosides, macrolides and IV magnesium unless no alternative exists and the patient is monitored; use non-depolarising neuromuscular blockers only at reduced dose with quantitative monitoring.",
+        "Do not start high-dose prednisone (above 20 mg/day) as an outpatient; start low and titrate, or start high dose only with inpatient monitoring, because initial steroid-induced worsening can precipitate crisis.",
+        "Do not attribute fatigable ptosis, diplopia or bulbar weakness to vincristine neurotoxicity or chemotherapy fatigue before AChR antibody testing and neurophysiology."
       ],
       "required_recommendations": [
-        "Confirm AChR antibody positivity and identify thymic abnormality on CT (here minimal residual mediastinal soft tissue from treated lymphoma \u2014 no thymoma)",
-        "Single-fiber EMG to confirm NMJ disorder distinct from chemotherapy neuropathy",
-        "Coordinate immunosuppression with oncology \u2014 patient is neutropenic and immunocompromised",
-        "Bedside FVC/NIF given cumulative chemotherapy and infection risk",
-        "Avoid further aminoglycoside or fluoroquinolone exposure (relevant during febrile neutropenia episodes)"
+        "Start pyridostigmine 30-60 mg three to five times daily, titrated to effect (maximum about 360-480 mg/day).",
+        "Give IVIG 2 g/kg over 2-5 days for the bulbar weakness with reduced respiratory reserve (FVC 70%, MIP -48 cmH2O), with hydration and renal monitoring; IVIG is preferred to escalating immunosuppression in a patient with recurrent neutropenia and recent sepsis.",
+        "Admit to a monitored bed and repeat FVC, MIP and MEP at least twice daily while bulbar symptoms persist; move to intensive care if FVC falls below 20 mL/kg, MIP is weaker than -30 cmH2O, MEP is below 40 cmH2O or swallowing or cough fail.",
+        "Plan MG immunotherapy jointly with haematology: the EPOCH prednisone pulses continue, any maintenance prednisone or steroid-sparing agent is agreed with oncology because of neutropenia, and control of the lymphoma is part of treating the MG; thymectomy is deferred while stage IV lymphoma is on treatment and is reconsidered with thoracic surgery once the lymphoma is in remission (MGTX benefit in AChR-positive generalized MG aged 18-65).",
+        "Ask haematology to avoid fluoroquinolone prophylaxis and aminoglycosides and to use an MG-safe beta-lactam (for example cefepime or piperacillin-tazobactam) for febrile neutropenia."
       ]
     },
     "avoided_actions": [
@@ -449,11 +421,9 @@
             "tool_name": "analyze_eeg"
           }
         ],
-        "citations": [
-          "[Wolfe_2016]"
-        ],
+        "citations": [],
         "criterion_id": "avoid-waste-1-analyze-eeg",
-        "rationale": "MG is a peripheral neuromuscular junction disorder; EEG has no diagnostic role.",
+        "rationale": "No seizure or encephalopathy; EEG has no role in a neuromuscular junction disorder (Jacob 2025 ABN guidance).",
         "severity": "waste"
       },
       {
@@ -463,11 +433,9 @@
             "tool_name": "analyze_csf"
           }
         ],
-        "citations": [
-          "[Wolfe_2016]"
-        ],
+        "citations": [],
         "criterion_id": "avoid-waste-2-analyze-csf",
-        "rationale": "No CSF role in MG; LP risks complications without diagnostic yield.",
+        "rationale": "The signs are fatigable, AChR antibodies are positive and contrast MRI of brain and spine shows no leptomeningeal or cranial nerve enhancement; CSF cytology would not change management, and CSF has no role in MG.",
         "severity": "waste"
       },
       {
@@ -479,11 +447,9 @@
             "tool_name": "order_advanced_imaging"
           }
         ],
-        "citations": [
-          "[Wolfe_2016]"
-        ],
+        "citations": [],
         "criterion_id": "avoid-waste-3-order-advanced-imaging",
-        "rationale": "Advanced imaging (PET/MR spectroscopy/perfusion) is not indicated for MG diagnosis or staging; CT chest covers thymoma screening.",
+        "rationale": "FDG-PET belongs to the lymphoma response schedule; it does not answer the MG question, and contrast CT answers the thymic one.",
         "severity": "waste"
       },
       {
@@ -493,11 +459,9 @@
             "tool_name": "order_echocardiogram"
           }
         ],
-        "citations": [
-          "[Wolfe_2016]"
-        ],
+        "citations": [],
         "criterion_id": "avoid-waste-4-order-echocardiogram",
-        "rationale": "Echocardiography is not indicated for MG unless a comorbid cardiac question exists.",
+        "rationale": "Anthracycline echo surveillance belongs to the oncology schedule; it does not answer the MG question.",
         "severity": "waste"
       },
       {
@@ -507,11 +471,9 @@
             "tool_name": "order_cardiac_monitoring"
           }
         ],
-        "citations": [
-          "[Wolfe_2016]"
-        ],
+        "citations": [],
         "criterion_id": "avoid-waste-5-order-cardiac-monitoring",
-        "rationale": "Cardiac monitoring is not indicated for MG unless arrhythmia or autonomic disease is independently suspected.",
+        "rationale": "No palpitations, syncope or arrhythmia; cardiac monitoring is not part of the MG work-up.",
         "severity": "waste"
       }
     ],
@@ -535,56 +497,57 @@
       {
         "diagnosis": "Vincristine peripheral neuropathy alone",
         "icd_code": "G62.0",
-        "key_features": "Vincristine can cause distal sensorimotor neuropathy but does NOT produce fatigable ptosis, diplopia, or RNS decrement; both processes coexist here.",
-        "likelihood": "moderate"
+        "key_features": "NCS show a length-dependent axonal sensory neuropathy that explains the distal signs and low ankle reflexes, but not the fatigable ptosis, diplopia, nasal speech or proximal weakness; AChR antibodies and facial SFEMG show a coexisting MG.",
+        "likelihood": "low"
       },
       {
         "diagnosis": "Lambert-Eaton myasthenic syndrome (lymphoma-associated)",
         "icd_code": "G73.1",
-        "key_features": "Lymphomas are uncommon causes of LEMS; baseline CMAPs and high-rate RNS facilitation pattern would clarify; here AChR positive suggests MG.",
-        "likelihood": "moderate"
+        "key_features": "VGCC antibodies negative, normal baseline CMAPs in the tested muscles and no post-exercise facilitation (11%), with prominent ocular signs and positive AChR antibodies.",
+        "likelihood": "very_low"
       },
       {
         "diagnosis": "Steroid-related myopathy",
         "icd_code": "M62.84",
-        "key_features": "Steroids in EPOCH could cause proximal myopathy but not fatigable bulbar weakness or RNS decrement.",
+        "key_features": "EPOCH prednisone could cause proximal weakness, but not fatigable ptosis, diplopia or bulbar weakness.",
         "likelihood": "low"
       },
       {
-        "diagnosis": "Chemotherapy fatigue / cachexia",
+        "diagnosis": "Chemotherapy fatigue or cachexia",
         "icd_code": "R53.83",
-        "key_features": "Generalized fatigue from chemo is expected but does not produce focal fatigable cranial signs.",
-        "likelihood": "low"
+        "key_features": "Generalized fatigue does not produce focal fatigable cranial signs or abnormal jitter.",
+        "likelihood": "very_low"
       },
       {
-        "diagnosis": "Brainstem lymphomatous infiltration",
-        "icd_code": "C85.9",
-        "key_features": "No mass lesion on brain MRI; CSF and imaging not supportive.",
-        "likelihood": "low"
+        "diagnosis": "Leptomeningeal or brainstem lymphoma",
+        "icd_code": "C84.40",
+        "key_features": "Contrast MRI of brain and spine shows no mass, leptomeningeal or cranial nerve enhancement, and the deficits fluctuate and fatigue.",
+        "likelihood": "very_low"
       }
     ],
     "key_clinical_evidence": [
-      "Fluctuating, fatigable weakness with diurnal pattern (worse evening) is the clinical hallmark of MG \u2014 fixed weakness suggests an alternative diagnosis.",
-      "Ocular involvement (ptosis, diplopia) is asymmetric and fatigable in MG; thyroid eye disease causes restrictive (not fatigable) ophthalmoplegia.",
-      "Single-fiber EMG (sensitivity >95%) is the most sensitive electrodiagnostic test \u2014 order when RNS is non-diagnostic or serology is negative.",
-      "All confirmed MG cases require CT chest for thymoma \u2014 present in roughly 10-15% of generalized MG; thymectomy (MGTX trial) improves long-term outcomes in non-thymoma AChR+ MG as well.",
-      "Aminoglycosides, fluoroquinolones, telithromycin, IV magnesium, and neuromuscular blockers can precipitate myasthenic crisis and must be screened against any new prescription.",
-      "Vincristine peripheral neuropathy and MG are clinically distinguishable: vincristine \u2192 distal stocking-glove sensory loss; MG \u2192 fatigable proximal/bulbar weakness.",
-      "Active malignancy + immunosuppression: steroid-sparing strategies and infection control influence MG treatment selection."
+      "Fatigable asymmetric ptosis, diplopia with fatigable left abduction weakness, nasal speech, jaw fatigue and fatigable proximal weakness are not explained by the length-dependent vincristine neuropathy.",
+      "Positive ice-pack test on the left (MRD1 +2.5 mm).",
+      "Anti-AChR binding 1.4 nmol/L with elevated blocking and modulating antibodies establishes AChR-positive MG; VGCC antibodies are negative.",
+      "RNS decrement is borderline (9% nasalis, 8% trapezius) without facilitation; SFEMG of orbicularis oculi shows increased jitter and blocking.",
+      "NCS confirm a separate length-dependent axonal sensory neuropathy consistent with vincristine toxicity.",
+      "Reduced FVC (70%, 40.8 mL/kg), MIP -48 and MEP 71 cmH2O with bulbar symptoms justify IVIG and monitored care.",
+      "Mediastinal CT shows no thymoma; thymectomy is deferred while stage IV lymphoma is on treatment and reconsidered in remission.",
+      "Recurrent febrile neutropenia makes MG-unsafe antibiotics (fluoroquinolones, aminoglycosides) a practical risk."
     ],
     "red_herrings": [
       {
-        "correct_interpretation": "Fatigable ptosis, diplopia, dysphagia with RNS decrement and AChR positivity = MG; vincristine neuropathy is a separate concurrent process; anti-titin can be positive in late-onset MG without thymoma.",
-        "data_point": "Active peripheral T-cell lymphoma on EPOCH chemotherapy; multiple febrile neutropenia episodes; anti-titin positive",
+        "correct_interpretation": "Fatigable ptosis, diplopia and bulbar weakness with positive AChR antibodies and abnormal facial SFEMG indicate MG; the vincristine neuropathy is a separate, length-dependent process.",
+        "data_point": "Active peripheral T-cell lymphoma on EPOCH chemotherapy with vincristine neuropathy and multiple febrile neutropenia episodes",
         "field_path": "patient.clinical_history.past_medical_history",
-        "intended_effect": "Attribute weakness to chemotherapy-induced fatigue, vincristine neuropathy, or lymphoma progression; anti-titin attributed to thymoma when no thymoma is present.",
+        "intended_effect": "Attribute weakness to chemotherapy fatigue, vincristine neuropathy or lymphoma progression.",
         "location": "past medical history"
       },
       {
-        "correct_interpretation": "Mild cytopenias are expected on EPOCH and do not explain fatigable ocular/bulbar weakness; MG workup is separately indicated.",
+        "correct_interpretation": "Mild cytopenias are expected on EPOCH and do not explain fatigable ocular and bulbar weakness.",
         "data_point": "Cytopenias: WBC 3.2, Hgb 10.2, platelets 142",
         "field_path": "initial_tool_outputs.labs.panels",
-        "intended_effect": "Attribute weakness/dyspnea to anemia; ignore MG.",
+        "intended_effect": "Attribute weakness and fatigue to anemia; ignore MG.",
         "location": "labs"
       }
     ],
@@ -593,21 +556,25 @@
       {
         "after_criterion_id": "action-2-order-specialized-test",
         "before_criterion_id": "action-1-interpret-labs",
-        "citations": [
-          "[Wolfe_2016]"
-        ],
-        "reason": "Order AChR/MuSK/LRP4 serologies first; reserve single-fiber EMG for seronegative or RNS-non-diagnostic cases (resource stewardship).",
+        "citations": [],
+        "reason": "AChR antibody testing precedes single-fibre EMG; SFEMG is reserved for seronegative patients or a normal or borderline RNS (Jacob 2025).",
+        "severity": "soft"
+      },
+      {
+        "after_criterion_id": "action-2-order-specialized-test",
+        "before_criterion_id": "action-repetitive-nerve-stimulation",
+        "citations": [],
+        "reason": "Repetitive nerve stimulation is done first; SFEMG follows when RNS is normal or borderline (Jacob 2025).",
         "severity": "soft"
       }
     ],
     "stop_rule": {
-      "max_additional_actions": 0,
+      "max_additional_actions": 2,
       "required_before_assessment": [
+        "action-6-order-specialized-test",
         "action-1-interpret-labs",
-        "action-2-order-specialized-test",
-        "action-3-order-body-imaging",
-        "action-4-search-medical-literature",
-        "action-5-check-drug-interactions"
+        "action-repetitive-nerve-stimulation",
+        "action-3-order-body-imaging"
       ]
     }
   },
@@ -617,51 +584,69 @@
       "contrast": true,
       "findings": [
         {
-          "description": "Minimal residual mediastinal soft tissue \u2014 responding lymphoma. No anterior mediastinal mass consistent with thymoma.",
-          "location": "Mediastinum",
-          "type": "Post-treatment lymphadenopathy residual"
+          "description": "Fatty involuted thymus. No anterior mediastinal mass or nodule.",
+          "location": "Anterior mediastinum",
+          "type": "Anterior mediastinum"
         },
         {
-          "description": "No new pulmonary mass",
-          "location": "mediastinum",
+          "description": "Residual soft tissue, largest 1.3 cm short axis (right paratracheal), decreased from 3.1 cm on the prior staging CT.",
+          "location": "Right paratracheal and subcarinal stations",
+          "type": "Residual nodal soft tissue"
+        },
+        {
+          "description": "No pulmonary mass, nodule or consolidation.",
+          "location": "lungs",
           "type": "additional_observation"
         },
         {
-          "description": "Consistent with lymphoma treatment response",
-          "location": "mediastinum",
-          "type": "additional_observation"
-        },
-        {
-          "description": "No separate anterior mediastinal nodule",
-          "location": "mediastinum",
+          "description": "No pleural effusion.",
+          "location": "pleura",
           "type": "additional_observation"
         }
       ],
-      "impression": "CT chest with contrast: No anterior mediastinal mass identified. Minimal residual mediastinal soft tissue is consistent with treated lymphadenopathy. No separate thymic lesion",
-      "measurements": null,
+      "impression": "CT chest with contrast: 1. No anterior mediastinal mass; fatty involuted thymus. 2. Residual right paratracheal and subcarinal nodal soft tissue (1.3 cm), decreased from the prior staging CT. 3. Lungs clear.",
+      "measurements": {
+        "Right paratracheal node, short axis": "1.3 cm (prior 3.1 cm)"
+      },
       "modality": "CT",
-      "recommended_actions": [
-        "No anterior mediastinal mass identified; correlate clinically.",
-        "Follow-up imaging per primary oncology team as clinically indicated."
-      ],
-      "region": "mediastinum"
+      "recommended_actions": [],
+      "region": "mediastinum, chest"
     },
     "cardiac_monitoring": null,
     "ct": null,
-    "drug_interactions": null,
+    "drug_interactions": {
+      "general": {
+        "alternatives": [],
+        "contraindications": [],
+        "formulary_status": "on formulary",
+        "interactions": [
+          "Vincristine: dose-dependent axonal neuropathy; no effect on neuromuscular junction transmission and no interaction with pyridostigmine.",
+          "Pyridostigmine increases gastrointestinal motility (diarrhea, cramps); it does not add to vincristine constipation.",
+          "Etoposide, doxorubicin, cyclophosphamide, filgrastim, ondansetron, trimethoprim-sulfamethoxazole: no interaction with pyridostigmine or IVIG and no recognized effect on neuromuscular transmission.",
+          "Prednisone is already part of EPOCH (days 1-5 of each cycle); additional corticosteroid adds to infection risk in a patient with recurrent neutropenia."
+        ],
+        "proposed": "Pyridostigmine, IVIG, prednisone (screened against the current medication list and EPOCH)",
+        "summary": "",
+        "warnings": [
+          "Myasthenia gravis: avoid fluoroquinolones (including neutropenia prophylaxis) and aminoglycosides; choose an MG-safe beta-lactam for febrile neutropenia. Macrolides and IV magnesium also worsen MG.",
+          "IVIG: check renal function and hydrate; thrombotic risk is increased in active malignancy."
+        ]
+      }
+    },
     "ecg": null,
     "echo": null,
     "eeg": null,
     "labs": {
       "abnormal_values_summary": [
-        "Anti-AChR binding 1.4 nmol/L (above reference <0.5 nmol/L); anti-AChR blocking 24% (above reference <15%); anti-AChR modulating 38% (above reference <20%). Anti-AChR antibodies are associated with myasthenia gravis; clinical correlation recommended.",
-        "Anti-titin positive; this antibody is found in myasthenia gravis, particularly in association with thymoma; clinical correlation recommended.",
-        "Anti-VGCC P/Q-type within reference limits.",
-        "Chemotherapy-related cytopenias: WBC 3.2 (L), Hgb 10.2 (L), platelets 142 (L)."
+        "Anti-AChR binding antibody 1.4 nmol/L (H)",
+        "Anti-AChR blocking antibody 24% (H)",
+        "Anti-AChR modulating antibody 38% (H)",
+        "WBC 3.2 x10^9/L (L), hemoglobin 10.2 g/dL (L), platelets 142 x10^9/L (L)",
+        "LDH 680 U/L (H)"
       ],
-      "interpretation": "Abnormal values: Anti-AChR Binding 1.4 nmol/L (H), Anti-AChR Blocking 24% (H), Anti-AChR Modulating 38% (H), Anti-titin Positive qualitative (H), WBC 3.2 x10^9/L (L), Hemoglobin 10.2 g/dL (L), Platelets 142 x10^9/L (L), LDH 680 U/L (H).",
+      "interpretation": "Anti-AChR binding 1.4 nmol/L, blocking 24% and modulating 38%, all elevated; anti-MuSK and anti-VGCC P/Q-type not detected. Mild leukopenia (ANC 1800), anemia and thrombocytopenia. LDH elevated. Thyroid function, sodium, potassium and creatinine within reference ranges. Acetylcholine receptor antibodies are found in a subset of patients with disorders of neuromuscular transmission; clinical correlation recommended.",
       "panels": {
-        "CBC and Chemotherapy Monitoring": [
+        "CBC": [
           {
             "clinical_significance": null,
             "is_abnormal": true,
@@ -695,16 +680,6 @@
             "value": 142
           }
         ],
-        "Exclusion studies": [
-          {
-            "clinical_significance": "Ordered to exclude an alternative cause; the result does not support one, which is what this case's diagnosis rests on",
-            "is_abnormal": false,
-            "reference_range": "",
-            "test": "TSH",
-            "unit": "",
-            "value": "Within reference range"
-          }
-        ],
         "Metabolic": [
           {
             "clinical_significance": null,
@@ -713,6 +688,14 @@
             "test": "Sodium",
             "unit": "mEq/L",
             "value": 136
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "3.5-5.1",
+            "test": "Potassium",
+            "unit": "mEq/L",
+            "value": 4.1
           },
           {
             "clinical_significance": null,
@@ -731,85 +714,86 @@
             "value": 680
           }
         ],
-        "Neuromuscular Antibodies": [
+        "Neuromuscular_Antibodies": [
           {
             "clinical_significance": null,
             "is_abnormal": true,
-            "reference_range": "<0.5",
-            "test": "Anti-AChR Binding",
+            "reference_range": "<=0.02",
+            "test": "Anti-AChR binding antibody",
             "unit": "nmol/L",
             "value": 1.4
           },
           {
             "clinical_significance": null,
             "is_abnormal": true,
-            "reference_range": "<15%",
-            "test": "Anti-AChR Blocking",
+            "reference_range": "<=15",
+            "test": "Anti-AChR blocking antibody",
             "unit": "%",
-            "value": "24%"
+            "value": 24
           },
           {
             "clinical_significance": null,
             "is_abnormal": true,
-            "reference_range": "<20%",
-            "test": "Anti-AChR Modulating",
+            "reference_range": "<=20",
+            "test": "Anti-AChR modulating antibody",
             "unit": "%",
-            "value": "38%"
+            "value": 38
           },
           {
             "clinical_significance": null,
             "is_abnormal": false,
-            "reference_range": "<0.02",
-            "test": "Anti-MuSK",
+            "reference_range": "<=0.02",
+            "test": "Anti-MuSK antibody",
             "unit": "nmol/L",
-            "value": "<0.02"
+            "value": "<0.01"
           },
           {
             "clinical_significance": null,
             "is_abnormal": false,
-            "reference_range": "<0.02",
-            "test": "Anti-VGCC P/Q-type",
+            "reference_range": "<=0.02",
+            "test": "Anti-VGCC P/Q-type antibody",
             "unit": "nmol/L",
-            "value": "<0.02"
-          },
-          {
-            "clinical_significance": null,
-            "is_abnormal": true,
-            "reference_range": "Negative",
-            "test": "Anti-titin",
-            "unit": "qualitative",
-            "value": "Positive"
+            "value": "<0.01"
           }
         ],
-        "Paraneoplastic Panel": [
+        "Thyroid_Function": [
           {
             "clinical_significance": null,
             "is_abnormal": false,
-            "reference_range": "Negative",
-            "test": "Anti-Hu",
-            "unit": "qualitative",
-            "value": "Negative"
+            "reference_range": "0.4-4.0",
+            "test": "TSH",
+            "unit": "mIU/L",
+            "value": 1.9
           },
           {
             "clinical_significance": null,
             "is_abnormal": false,
-            "reference_range": "Negative",
-            "test": "Anti-Yo",
-            "unit": "qualitative",
-            "value": "Negative"
-          },
-          {
-            "clinical_significance": null,
-            "is_abnormal": false,
-            "reference_range": "Negative",
-            "test": "Anti-SOX1",
-            "unit": "qualitative",
-            "value": "Negative"
+            "reference_range": "0.8-1.8",
+            "test": "Free T4",
+            "unit": "ng/dL",
+            "value": 1.3
           }
         ]
       }
     },
-    "literature_search": null,
+    "literature_search": {
+      "myasthenia gravis diagnosis and management": {
+        "query": "myasthenia gravis diagnosis and management",
+        "results": [
+          {
+            "evidence_level": "international consensus guidance",
+            "finding": "Pyridostigmine is the initial symptomatic treatment; IVIG or plasma exchange is used for severe or rapidly worsening weakness, including bulbar weakness; corticosteroids or immunosuppressive therapy are used when goals are not met.",
+            "source": "Sanders DB et al. Neurology 2016;87:419-425; update Narayanaswami P et al. Neurology 2021;96:114-122"
+          },
+          {
+            "evidence_level": "randomized controlled trial (MGTX)",
+            "finding": "Thymectomy improved clinical outcomes over three years in non-thymomatous AChR-positive generalized MG aged 18-65.",
+            "source": "Wolfe GI et al. N Engl J Med 2016;375:511-522"
+          }
+        ],
+        "summary": "Consensus guidance (Sanders DB et al., Neurology 2016;87:419-425; update Narayanaswami P et al., Neurology 2021;96:114-122) recommends AChR antibody testing first, MuSK testing when AChR antibodies are absent, and electrodiagnostic confirmation by repetitive nerve stimulation or single-fibre EMG. Chest CT or MRI is recommended in all patients to detect thymoma. In the MGTX trial (Wolfe GI et al., N Engl J Med 2016;375:511-522) thymectomy improved outcomes over three years in non-thymomatous AChR-positive generalized MG aged 18-65."
+      }
+    },
     "mri": {
       "additional_observations": [
         "No cranial nerve enhancement",
@@ -829,35 +813,74 @@
             "T2": "Normal"
           },
           "size": null,
-          "type": "No CNS lymphoma"
+          "type": "Normal brain and brainstem"
         }
       ],
       "impression": "Brain and spine MRI with contrast: No intracranial or intraspinal mass lesion. No leptomeningeal or cranial nerve enhancement. No diffusion restriction. No structural abnormality identified",
       "recommended_actions": [],
       "volumetrics": null
     },
-    "specialized_test": null
+    "specialized_test": {
+      "findings": [
+        {
+          "result": "3 Hz trains of 10 stimuli; limb temperature 33 C; no cholinesterase inhibitor taken",
+          "significance": "",
+          "test": "Technique"
+        },
+        {
+          "result": "9% decrement (1st to 4th response); baseline CMAP 2.1 mV (normal)",
+          "significance": "Borderline",
+          "test": "RNS facial nerve, nasalis, 3 Hz"
+        },
+        {
+          "result": "8% decrement; baseline CMAP 7.4 mV (normal)",
+          "significance": "Borderline",
+          "test": "RNS spinal accessory nerve, trapezius, 3 Hz"
+        },
+        {
+          "result": "7% decrement; baseline CMAP 6.9 mV (normal)",
+          "significance": "Within normal limits",
+          "test": "RNS axillary nerve, deltoid, 3 Hz"
+        },
+        {
+          "result": "Baseline CMAP 8.8 mV; increment 11%",
+          "significance": "No facilitation",
+          "test": "Abductor digiti minimi after 10 s maximal exercise"
+        },
+        {
+          "result": "Sural SNAP 3 uV bilaterally (reference >=6 uV); superficial peroneal SNAP absent; median and ulnar SNAPs low normal",
+          "significance": "Abnormal",
+          "test": "Sensory NCS"
+        },
+        {
+          "result": "Peroneal CMAP 1.6 mV at the extensor digitorum brevis (reference >=2.0 mV) with normal conduction velocity; median, ulnar and tibial normal; no conduction block",
+          "significance": "Abnormal",
+          "test": "Motor NCS"
+        }
+      ],
+      "impression": "1. Borderline decrement at 3 Hz in nasalis (9%) and trapezius (8%), below the 10% threshold; normal baseline CMAP amplitudes in the tested muscles and no post-exercise facilitation. 2. Length-dependent, predominantly sensory axonal polyneuropathy (reduced sural and absent superficial peroneal SNAPs, low peroneal CMAP) without demyelinating features. Clinical correlation recommended.",
+      "quantitative_data": {
+        "decrement_deltoid": "7%",
+        "decrement_nasalis": "9%",
+        "decrement_trapezius": "8%",
+        "post_exercise_increment_ADM": "11%",
+        "sural_SNAP": "3 uV"
+      },
+      "recommended_actions": [],
+      "test_type": "repetitive_nerve_stimulation"
+    }
   },
   "metadata": {
-    "actions_withdrawn": [
-      {
-        "action": "Bedside ice-pack test for ptosis (cheap, ~80% sensitive for ocular MG)",
-        "category": "recommended",
-        "reason": "The bedside ice-pack test is recommended here but its result is not stored in this case, or in any case in the condition \u2014 the only mention of it anywhere is this recommendation. Its outcome does not follow from the documented ptosis, and at roughly 80% sensitivity it is not definitional of the diagnosis, so authoring a result would be inventing one. Withdrawn from the gold standard during the per-case audit of 2026-08-07; reinstate it with a clinician-authored report.",
-        "study": "ice_pack_test",
-        "tool_name": "order_specialized_test"
-      }
-    ],
+    "actions_withdrawn": [],
     "authoring_agent": "condition-expert:MG",
     "case_body_concerns": [],
     "citation_gap": [],
     "condition_name": "Myasthenia gravis",
     "criteria_pack_version": "1.0",
-    "difficulty_description": "Moderate: concurrent vincristine neuropathy and lymphoma create diagnostic uncertainty; borderline RNS requires SFEMG for confirmation; LEMS must be excluded",
-    "difficulty_rationale": "5 required tools, 2 red herrings, typical AChR+ generalized MG",
+    "difficulty_description": "Moderate: concurrent vincristine neuropathy and lymphoma create diagnostic uncertainty; borderline RNS makes SFEMG useful for confirmation; LEMS must be excluded",
+    "difficulty_rationale": "4 required tools, 2 red herrings, AChR+ generalized MG during lymphoma chemotherapy with a coexisting vincristine neuropathy",
     "expected_agent_confidence": 0.62,
     "fallback_tool_kinds": {
-      "advanced_imaging": "normal",
       "cardiac_monitoring": "normal",
       "csf": "normal",
       "ecg": "normal",
@@ -866,9 +889,9 @@
     },
     "generated": "2026-03-29",
     "generation_method": "real_case_seed",
-    "last_revised": "2026-08-08",
+    "last_revised": "2026-10-24",
     "policy_spec_status": "draft",
-    "revision_reason": "per-case audit: 1 assay(s) the gold standard requires were never delivered, so an agent doing what the gold says saw nothing; reported as exclusions, which is what the case asserts by asserting its diagnosis",
+    "revision_reason": "October 2026 review round: RNS report and ice-pack report authored, criteria, musts and differential rebuilt per the MG plan",
     "source": "MedCaseReasoning",
     "source_license": "CC-BY 4.0",
     "source_pmcid": "PMC10629858",
@@ -907,12 +930,6 @@
           "indication": "Chemotherapy-induced nausea"
         },
         {
-          "dose": "40 mg",
-          "drug": "Dexamethasone",
-          "frequency": "Days 1-4 of each cycle",
-          "indication": "EPOCH regimen component"
-        },
-        {
           "dose": "1 tablet",
           "drug": "Trimethoprim-sulfamethoxazole DS",
           "frequency": "three times weekly",
@@ -920,9 +937,10 @@
         }
       ],
       "past_medical_history": [
-        "Peripheral T-cell lymphoma (high-grade, stage IV) \u2014 receiving EPOCH chemotherapy, currently after cycle 4 of 6",
+        "Peripheral T-cell lymphoma (high-grade, stage IV), receiving dose-adjusted EPOCH chemotherapy, currently after cycle 4 of 6",
         "Febrile neutropenia episodes (multiple) during chemotherapy",
-        "Prior ICU admission for severe sepsis during chemotherapy cycle 2"
+        "Prior ICU admission for severe sepsis during chemotherapy cycle 2",
+        "Vincristine-associated peripheral neuropathy (distal sensory symptoms in the feet since cycle 2)"
       ],
       "social_history": {
         "alcohol": "Rare",
@@ -938,18 +956,21 @@
       "handedness": "right",
       "sex": "male"
     },
-    "history_present_illness": "A 57-year-old man with high-grade peripheral T-cell lymphoma receiving EPOCH chemotherapy (after 4 of 6 planned cycles) presented with new bilateral ptosis and diplopia over 5 weeks. He had been doing well on chemotherapy with near-complete metabolic response on interim PET-CT, but his oncology team noted new drooping of his left eyelid at a clinic visit. The patient confirmed the ptosis had been present for 5 weeks and was progressive. He developed horizontal diplopia 3 weeks ago, initially intermittent and worse after a long day, and now present during most of his waking hours. He also reported jaw fatigue when eating \u2014 he rested between bites during meal times. His voice had become increasingly nasal, a change his wife noted clearly. He denied significant dysphagia. He had been attributing all new neurological symptoms to chemotherapy toxicity, which had already caused peripheral neuropathy from vincristine. He had multiple prior episodes of febrile neutropenia requiring hospitalization and had a severe sepsis episode after his second cycle requiring one week in the ICU. His oncologist was concerned about: (1) central nervous system lymphoma invasion, (2) paraneoplastic syndrome, (3) chemotherapy neurotoxicity (vincristine-induced cranial neuropathy), and (4) opportunistic infection. Brain MRI was performed and reported as showing no CNS lymphoma. He was referred to neurology for NMJ evaluation after the oncologist noted the fatigable pattern was inconsistent with typical vincristine neuropathy, which causes peripheral sensorimotor neuropathy rather than cranial neuropathy with fatigability.",
+    "history_present_illness": "A 57-year-old man with high-grade peripheral T-cell lymphoma receiving EPOCH chemotherapy (after 4 of 6 planned cycles) presented with new bilateral ptosis and diplopia over 5 weeks. He had been doing well on chemotherapy with near-complete metabolic response on interim PET-CT, but his oncology team noted new drooping of his left eyelid at a clinic visit. The patient confirmed the ptosis had been present for 5 weeks and was progressive. He developed horizontal diplopia 3 weeks ago, initially intermittent and worse after a long day, and now present during most of his waking hours. He also reported jaw fatigue when eating and rested between bites during meals. His voice had become increasingly nasal, a change his wife noted clearly. He denied significant dysphagia. He had been attributing all new neurological symptoms to chemotherapy toxicity, which had already caused a vincristine peripheral neuropathy. He had multiple prior episodes of febrile neutropenia requiring hospitalization and had a severe sepsis episode after his second cycle requiring one week in the ICU. His oncologist was concerned about: (1) central nervous system lymphoma invasion, (2) paraneoplastic syndrome, (3) chemotherapy neurotoxicity (vincristine-induced cranial neuropathy), and (4) opportunistic infection. A contrast MRI of the brain and spine obtained by oncology last week was reported as showing no CNS lymphoma. He was referred to neurology for evaluation of the eye and bulbar symptoms.",
     "neurological_exam": {
-      "additional": "NIF -48 cmH2O (borderline). No dysphagia currently. Mild jaw fatigue on eating. Oncology team suspected chemotherapy neurotoxicity \u2014 vincristine peripheral neuropathy confirmed but does not explain all findings.",
+      "additional": "No dysphagia currently. Mild jaw fatigue on eating. Speech becomes nasal after counting to 30.",
       "coordination": "Mild bilateral dysmetria on heel-shin (vincristine).",
-      "cranial_nerves": "Bilateral ptosis, left greater than right. Levator excursion left 7mm, right 10mm. Fatigable ptosis on sustained upgaze (left eye complete at 50 seconds). Horizontal diplopia on leftward gaze. Limited left eye adduction. Pupils equal, reactive. Facial weakness bilateral. Voice nasal after sustained speech.",
-      "gait": "Mildly broad-based. Steppage pattern bilaterally (vincristine neuropathy).",
+      "cranial_nerves": "Bilateral ptosis, left greater than right. Levator excursion left 7 mm, right 10 mm. Fatigable ptosis on sustained upgaze (left lid covers the pupil at 50 seconds). Horizontal diplopia on leftward gaze with limited left eye abduction that worsens with sustained gaze. Pupils equal, reactive. Bilateral facial weakness (orbicularis oculi and orbicularis oris). Voice nasal after sustained speech.",
+      "gait": "Mildly broad-based. Mild bilateral steppage.",
       "mental_status": "Alert and oriented x4. Mildly fatigued appearance. Normal language. Mildly slowed processing from chemotherapy-related fatigue.",
-      "motor": "Proximal upper extremity weakness: deltoids 4/5 bilaterally. Hip flexors 4/5. Distal strength intact. Deep tendon reflexes: 1+ throughout \u2014 mildly hyporeflexic (chemotherapy-related). Fatigable weakness documented on exam.",
-      "reflexes": "1+ throughout (mild hyporeflexia \u2014 vincristine neuropathy). Plantar downgoing.",
+      "motor": "Proximal weakness: deltoids 4/5 bilaterally, hip flexors 4/5, both declining after repeated testing. Distal strength intact except mild toe extensor weakness bilaterally. No fasciculations.",
+      "reflexes": "1+ in the arms and knees, ankle jerks absent (vincristine neuropathy). Plantar downgoing.",
       "sensory": "Mild stocking-glove diminished sensation feet (vincristine peripheral neuropathy)."
     },
     "patient_id": "MG-RM11",
+    "physical_exam": {
+      "general": "Weight 68.6 kg, height 172 cm. Thin, mildly fatigued, no respiratory distress. Alopecia."
+    },
     "vitals": {
       "bp_diastolic": 72,
       "bp_systolic": 118,

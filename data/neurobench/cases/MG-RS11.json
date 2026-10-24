@@ -4,14 +4,7 @@
   "difficulty": "moderate",
   "encounter_type": "inpatient",
   "fallback_tool_outputs": {
-    "advanced_imaging": {
-      "findings": [],
-      "impression": "No abnormality identified.",
-      "modality": "MRA head and neck",
-      "quantitative_data": null,
-      "recommended_actions": [],
-      "tracer_or_protocol": null
-    },
+    "advanced_imaging": null,
     "cardiac_monitoring": {
       "duration_hours": 24,
       "events": [],
@@ -50,7 +43,7 @@
       "angiography_findings": null,
       "contrast_used": false,
       "findings": [],
-      "impression": "No acute intracranial abnormality. Normal study, and it does not address the question this patient's workup turns on.",
+      "impression": "Non-contrast CT head: no acute intracranial abnormality. Impression: normal non-contrast CT of the head.",
       "recommended_actions": []
     },
     "drug_interactions": null,
@@ -62,6 +55,7 @@
         "RA": "normal size",
         "RV": "normal size and function"
       },
+      "echo_type": "TTE",
       "ejection_fraction": 61.0,
       "findings": [
         "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
@@ -98,59 +92,52 @@
   "followup_outputs": [
     {
       "output": {
-        "abnormal_values_summary": [
-          "AChR binding antibody 7.6 nmol/L (ref <0.4 nmol/L) \u2014 markedly elevated",
-          "AChR blocking antibody positive"
+        "findings": [
+          {
+            "description": "3 Hz trains of 10 stimuli; skin temperature 33 C; no anticholinesterase medication taken.",
+            "site": "Technique"
+          },
+          {
+            "description": "Baseline CMAP 2.1 mV; decrement 1st to 4th response 7%.",
+            "site": "Right nasalis (facial nerve)"
+          },
+          {
+            "description": "Baseline CMAP 5.8 mV; decrement 4%.",
+            "site": "Right trapezius (accessory nerve)"
+          },
+          {
+            "description": "Baseline CMAP 9.6 mV; decrement 2%. After 10 s maximal contraction CMAP 9.9 mV (3% increment); no post-exercise facilitation.",
+            "site": "Right abductor digiti minimi (ulnar nerve)"
+          }
         ],
-        "interpretation": "AChR binding antibody markedly elevated at 7.6 nmol/L (reference < 0.4 nmol/L). AChR blocking antibody positive. Anti-MuSK antibody negative. Anti-acetylcholine receptor antibodies are found in a subset of patients with neuromuscular junction disorders; an elevated result is associated with autoimmune neuromuscular junction disease",
-        "panels": {
-          "Acetylcholine_Receptor_Antibody_Panel": [
-            {
-              "is_abnormal": true,
-              "reference_range": "< 0.4 nmol/L",
-              "test": "AChR binding antibody",
-              "unit": "nmol/L",
-              "value": "7.6 nmol/L"
-            },
-            {
-              "is_abnormal": true,
-              "reference_range": "< 25%",
-              "test": "AChR blocking antibody",
-              "unit": "nmol/L",
-              "value": "2.3 nmol/L"
-            },
-            {
-              "is_abnormal": false,
-              "reference_range": "< 0.4 nmol/L",
-              "test": "Anti-MuSK antibody",
-              "unit": "nmol/L",
-              "value": "< 0.4 nmol/L (negative)"
-            }
-          ],
-          "Baseline workup": [
-            {
-              "clinical_significance": "Ordered as part of the baseline workup; no abnormality that alters the diagnosis, which is what this case's diagnosis rests on",
-              "is_abnormal": false,
-              "reference_range": "",
-              "test": "TSH",
-              "unit": "",
-              "value": "Within reference range"
-            }
-          ]
-        }
+        "impression": "1. No decrement greater than 10% at 3 Hz in nasalis, trapezius or abductor digiti minimi. 2. Normal baseline CMAP amplitudes; no post-exercise facilitation. Normal repetitive nerve stimulation study. Single-fiber EMG recommended if a disorder of neuromuscular transmission remains suspected.",
+        "quantitative_data": {
+          "ADM_decrement": "2%",
+          "ADM_post_exercise_change": "+3%",
+          "nasalis_decrement": "7%",
+          "trapezius_decrement": "4%"
+        },
+        "recommended_actions": [],
+        "test_type": "repetitive_nerve_stimulation"
       },
-      "tool_name": "interpret_labs",
-      "trigger_action": "request_achr_musk_lrp4_antibodies"
+      "tool_name": "order_specialized_test",
+      "trigger_action": "request_repetitive_nerve_stimulation"
     },
     {
       "output": {
         "findings": [
           {
-            "description": "SINGLE-FIBER EMG \u2014 ORBICULARIS OCULI\n\nMCD: 54 \u00b5s [normal <35 \u00b5s] ABNORMAL\nBlocking: 16% of potential pairs\n\nIMPRESSION: Increased jitter with 16% blocking, consistent with a disorder of neuromuscular transmission. Clinical correlation recommended."
+            "description": "20 fiber pairs analysed. Mean consecutive difference (MCD) 54 microseconds (reference <35). Increased jitter in 11 of 20 pairs (55%); impulse blocking in 16% of pairs.",
+            "muscle": "Left orbicularis oculi (voluntary activation, concentric needle)"
           }
         ],
-        "impression": "SFEMG (orbicularis oculi): MCD 54 \u00b5s with 16% blocking \u2014 increased jitter consistent with a disorder of neuromuscular transmission",
-        "quantitative_data": null,
+        "impression": "Abnormal single-fiber EMG of the left orbicularis oculi: increased jitter (mean MCD 54 microseconds) with impulse blocking, consistent with a disorder of neuromuscular transmission. Increased jitter is not specific; clinical correlation recommended.",
+        "quantitative_data": {
+          "blocking": "16% of pairs",
+          "mean_MCD": "54 microseconds (reference <35)",
+          "muscle": "left orbicularis oculi",
+          "pairs_with_increased_jitter": "11/20 (55%)"
+        },
         "recommended_actions": [],
         "test_type": "emg_single_fiber"
       },
@@ -159,16 +146,41 @@
     },
     {
       "output": {
+        "findings": [
+          {
+            "description": "MRD1 1.0 mm before; ice pack over the closed left lid for 2 minutes; MRD1 3.5 mm immediately after (improvement 2.5 mm).",
+            "site": "Left upper eyelid"
+          },
+          {
+            "description": "MRD1 4.0 mm, no ptosis; not tested.",
+            "site": "Right upper eyelid"
+          }
+        ],
+        "impression": "Positive ice pack test: left MRD1 improved by 2.5 mm after 2 minutes of cooling (positive threshold 2 mm).",
+        "quantitative_data": {
+          "change": "+2.5 mm",
+          "left_MRD1_after": "3.5 mm",
+          "left_MRD1_before": "1.0 mm"
+        },
+        "recommended_actions": [],
+        "test_type": "ice_pack_test"
+      },
+      "tool_name": "order_specialized_test",
+      "trigger_action": "request_ice_pack_test"
+    },
+    {
+      "output": {
         "abnormal_values_summary": [],
-        "interpretation": "Anti-GQ1b antibody: negative (< 1:100). Anti-GQ1b antibody is detected in the majority of patients with Miller-Fisher syndrome; a negative result makes this diagnosis less likely",
+        "interpretation": "Anti-GQ1b IgG not detected (<1:100). Anti-GQ1b antibodies are found in most patients with Miller Fisher syndrome; a negative result does not exclude it. Clinical correlation recommended.",
         "panels": {
           "Anti_ganglioside_panel": [
             {
+              "clinical_significance": null,
               "is_abnormal": false,
               "reference_range": "< 1:100",
               "test": "Anti-GQ1b IgG",
               "unit": "titre",
-              "value": "< 1:100 (negative)"
+              "value": "<1:100"
             }
           ]
         }
@@ -180,58 +192,38 @@
       "output": {
         "findings": [
           {
-            "panel": "Pulmonary_function",
-            "reference_range": "< -60 cm H2O",
-            "result": "-68 cm H2O",
-            "test": "NIF (Negative Inspiratory Force)"
+            "reference_range": ">=80% predicted",
+            "result": "3.02 L (92% predicted; 39 mL/kg)",
+            "test": "FVC"
           },
           {
-            "panel": "Pulmonary_function",
-            "reference_range": "> 80%",
-            "result": "92%",
-            "test": "FVC % predicted"
+            "reference_range": "more negative than -60 cmH2O",
+            "result": "-68 cmH2O",
+            "test": "MIP (NIF)"
+          },
+          {
+            "reference_range": ">=60 cmH2O",
+            "result": "88 cmH2O",
+            "test": "MEP"
+          },
+          {
+            "reference_range": ">=25",
+            "result": "40",
+            "test": "Single-breath count"
           }
         ],
-        "impression": "Pulmonary function adequate. NIF -68 cm H2O (reference < -60 cm H2O \u2014 meets threshold for adequate respiratory reserve). FVC 92% predicted. No immediate respiratory compromise.",
+        "impression": "FVC 3.02 L (92% predicted, 39 mL/kg), MIP -68 cmH2O and MEP 88 cmH2O within reference limits. Normal respiratory muscle function.",
         "quantitative_data": {
-          "FVC % predicted": "92%",
-          "NIF (Negative Inspiratory Force)": "-68 cm H2O"
+          "FVC": "3.02 L (92% predicted; 39 mL/kg; weight 78 kg)",
+          "MEP": "88 cmH2O",
+          "MIP": "-68 cmH2O",
+          "single_breath_count": "40"
         },
         "recommended_actions": [],
         "test_type": "respiratory_function"
       },
       "tool_name": "order_specialized_test",
       "trigger_action": "request_respiratory_function"
-    },
-    {
-      "output": {
-        "query": "search ocular mg management",
-        "results": [
-          {
-            "content": "LITERATURE SEARCH: Ocular MG \u2014 Treatment and Progression\n\nKEY FINDINGS:\n1. PYRIDOSTIGMINE: Acetylcholinesterase inhibition is a standard symptomatic approach; particularly noted for ptosis improvement.\n2. GENERALIZATION RISK: Approximately 50% of patients with purely ocular disease at onset generalize to bulbar or limb involvement within 2 years; presence of AChR antibodies is associated with higher risk.\n3. IMMUNOSUPPRESSION: Corticosteroids are used for ocular MG not controlled by symptomatic treatment; evidence suggests reduced rate of generalization.\n4. THYMECTOMY: Role in isolated ocular MG is uncertain; the MGTX randomized trial enrolled patients with generalized disease.\n5. RESPIRATORY MONITORING: Serial NIF and FVC measurement is recommended given potential for progression.",
-            "title": "Clinical literature"
-          }
-        ],
-        "summary": "Approximately 50% generalization risk within 2 years in AChR-positive ocular MG; pyridostigmine and immunosuppression are standard approaches; thymectomy role in isolated ocular MG is uncertain."
-      },
-      "tool_name": "search_medical_literature",
-      "trigger_action": "search_ocular_mg_management"
-    },
-    {
-      "output": {
-        "alternatives": [],
-        "contraindications": [],
-        "formulary_status": "on formulary",
-        "interactions": [
-          "DRUG INTERACTION REVIEW \u2014 AMLODIPINE IN PATIENTS WITH NEUROMUSCULAR JUNCTION DISEASE\n\nQuery: Calcium channel blocker (amlodipine) and neuromuscular transmission\n\nFINDINGS:\n  AMLODIPINE (calcium channel blocker):\n  - Calcium is required for acetylcholine vesicle release at the NMJ; calcium channel blockers may theoretically impair this step\n  - Case reports of NMJ disease worsening with calcium channel blockers exist but are uncommon\n  - Clinical significance of amlodipine at standard doses appears low for most patients\n  - ACE inhibitors or ARBs are alternative antihypertensives without known NMJ effects\n\n  HYDROCHLOROTHIAZIDE:\n  - No known pharmacodynamic interaction with NMJ function reported"
-        ],
-        "proposed": "check_amlodipine_mg",
-        "warnings": [
-          "Amlodipine: low risk of NMJ effects at standard doses; monitor for any worsening of neuromuscular symptoms; HCTZ has no known NMJ interaction."
-        ]
-      },
-      "tool_name": "check_drug_interactions",
-      "trigger_action": "check_amlodipine_mg"
     }
   ],
   "ground_truth": {
@@ -242,8 +234,6 @@
             "required_arguments": {
               "panels": [
                 "anti_AChR",
-                "anti_MuSK",
-                "anti_LRP4",
                 "TSH"
               ]
             },
@@ -251,14 +241,13 @@
           }
         ],
         "citations": [
-          "[Wolfe_2016]",
-          "Wolfe_2016"
+          "[Punga_2022]"
         ],
         "criterion_id": "action-1-interpret-labs",
-        "expected_evidence": "AChR antibody positive; TSH evaluates for comorbid thyroid disease",
+        "expected_evidence": "AChR binding antibody 7.6 nmol/L with elevated blocking antibody; MuSK negative; TSH and free T4 normal",
         "importance": "required",
-        "label": "Order serologies: anti-AChR (binding, blocking, modulating), anti-MuSK, anti-LRP4, and TSH/free-T4 for thyroid autoimmunity",
-        "rationale": "Order serologies: anti-AChR (binding, blocking, modulating), anti-MuSK, anti-LRP4, and TSH/free-T4 for thyroid autoimmunity"
+        "label": "Order AChR binding antibody and thyroid function",
+        "rationale": "Fatigable asymmetric ptosis and ophthalmoparesis with a Cogan lid twitch: AChR binding antibody is the first-line serological test (positive in about half of ocular MG), and TSH screens for coexisting autoimmune thyroid disease, which also enters the differential of eyelid swelling with restricted eye movements (Jacob S et al., Pract Neurol 2025; Evoli A et al., Neurol Sci 2019)."
       },
       {
         "alternatives": [
@@ -267,17 +256,36 @@
               "test_type": "emg_single_fiber"
             },
             "tool_name": "order_specialized_test"
+          },
+          {
+            "required_arguments": {
+              "test_type": "repetitive_nerve_stimulation"
+            },
+            "tool_name": "order_specialized_test"
           }
         ],
-        "citations": [
-          "[Wolfe_2016]",
-          "Wolfe_2016"
-        ],
+        "citations": [],
         "criterion_id": "action-2-order-specialized-test",
-        "expected_evidence": "Decrement >10% in symptomatic muscles supports postsynaptic NMJ disorder",
+        "expected_evidence": "SFEMG of left orbicularis oculi: mean MCD 54 microseconds with blocking in 16% of pairs; RNS of nasalis, trapezius and ADM without significant decrement",
         "importance": "required",
-        "label": "Perform single-fibre electromyography of a clinically weak muscle: the most sensitive electrodiagnostic test of neuromuscular-junction transmission, and the appropriate electrodiagnostic step when repetitive stimulation is normal or not available",
-        "rationale": "Perform single-fibre electromyography of a clinically weak muscle: the most sensitive electrodiagnostic test of neuromuscular-junction transmission, and the appropriate electrodiagnostic step when repetitive stimulation is normal or not available"
+        "label": "Confirm the neuromuscular transmission defect electrophysiologically (single-fiber EMG of a facial muscle or repetitive nerve stimulation)",
+        "rationale": "Repetitive nerve stimulation is normal in more than half of patients with ocular MG; single-fiber EMG of a facial muscle is the more sensitive study, although increased jitter is not specific. Either study satisfies the electrodiagnostic step (Jacob S et al., Pract Neurol 2025)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "ice_pack_test"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "action-ice-pack-test",
+        "expected_evidence": "Left MRD1 improved from 1.0 mm to 3.5 mm after 2 minutes of ice",
+        "importance": "recommended",
+        "label": "Perform the ice pack test on the ptotic left eyelid",
+        "rationale": "Left ptosis on examination: an improvement of MRD1 by at least 2 mm after 2-5 minutes of cooling supports a disorder of neuromuscular transmission at the bedside, at no cost."
       },
       {
         "alternatives": [
@@ -287,62 +295,48 @@
               "study": "mediastinum_CT"
             },
             "tool_name": "order_body_imaging"
+          },
+          {
+            "required_arguments": {
+              "contrast": true,
+              "study": "chest_CT"
+            },
+            "tool_name": "order_body_imaging"
+          },
+          {
+            "required_arguments": {
+              "contrast": true,
+              "study": "mediastinum_MRI"
+            },
+            "tool_name": "order_body_imaging"
           }
         ],
         "citations": [
-          "[Wolfe_2016]",
-          "Wolfe_2016"
+          "[Gilhus_2016]"
         ],
         "criterion_id": "action-3-order-body-imaging",
-        "expected_evidence": "No thymoma; thymic involution appropriate for age",
+        "expected_evidence": "No anterior mediastinal mass; thymic involution appropriate for age",
         "importance": "required",
-        "label": "Order CT chest with contrast for thymoma screening",
-        "rationale": "Order CT chest with contrast for thymoma screening"
+        "label": "Order mediastinal CT with contrast to look for thymoma",
+        "rationale": "Thymic imaging is indicated in every patient with MG, including ocular MG, because a thymoma would change management (thoracic surgery) (Jacob S et al., Pract Neurol 2025)."
       },
       {
         "alternatives": [
           {
             "required_arguments": {
-              "query": "myasthenia gravis MGFA classification treatment thymectomy"
-            },
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[Sanders_2016]",
-          "Sanders_2016"
-        ],
-        "criterion_id": "action-4-search-medical-literature",
-        "expected_evidence": "MGFA classification stages disease severity; thymectomy benefits AChR+ generalized MG (MGTX); IVIG/PLEX for crisis",
-        "importance": "required",
-        "label": "Review MGFA classification and current treatment guidance (pyridostigmine, prednisone, steroid-sparing, IVIG/PLEX, thymectomy)",
-        "rationale": "Review MGFA classification and current treatment guidance (pyridostigmine, prednisone, steroid-sparing, IVIG/PLEX, thymectomy)"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "drug": "pyridostigmine",
-              "screen_for": [
-                "aminoglycosides",
-                "fluoroquinolones",
-                "telithromycin",
-                "magnesium_IV",
-                "neuromuscular_blockers"
+              "panels": [
+                "anti_GQ1b_IgG"
               ]
             },
-            "tool_name": "check_drug_interactions"
+            "tool_name": "interpret_labs"
           }
         ],
-        "citations": [
-          "[Wolfe_2016]",
-          "Wolfe_2016"
-        ],
-        "criterion_id": "action-5-check-drug-interactions",
-        "expected_evidence": "Flag aminoglycosides, fluoroquinolones, IV magnesium, telithromycin, NMBs as contraindicated or use-with-caution in MG",
-        "importance": "required",
-        "label": "Check drug interactions for MG-exacerbating agents (aminoglycosides, fluoroquinolones, telithromycin, IV magnesium, neuromuscular blockers, procainamide)",
-        "rationale": "Check drug interactions for MG-exacerbating agents (aminoglycosides, fluoroquinolones, telithromycin, IV magnesium, neuromuscular blockers, procainamide)"
+        "citations": [],
+        "criterion_id": "action-anti-gq1b",
+        "expected_evidence": "Anti-GQ1b IgG negative",
+        "importance": "optional",
+        "label": "Test anti-GQ1b IgG if Miller Fisher syndrome is still considered",
+        "rationale": "Ophthalmoparesis raises Miller Fisher syndrome, but there is no ataxia, areflexia or antecedent infection; anti-GQ1b is optional."
       },
       {
         "alternatives": [
@@ -353,33 +347,42 @@
             "tool_name": "order_specialized_test"
           }
         ],
-        "citations": [
-          "[Sanders_2016]",
-          "Sanders_2016"
-        ],
+        "citations": [],
         "criterion_id": "action-6-order-specialized-test",
-        "expected_evidence": "Baseline FVC/NIF to assess crisis risk in patients with bulbar or limb involvement",
-        "importance": "recommended",
-        "label": "Bedside respiratory function testing (FVC, MIP/MEP, NIF) \u2014 repeat q4h in crisis",
-        "rationale": "Bedside respiratory function testing (FVC, MIP/MEP, NIF) \u2014 repeat q4h in crisis"
+        "expected_evidence": "FVC 92% predicted (39 mL/kg), MIP -68 cmH2O and MEP 88 cmH2O, all normal",
+        "importance": "optional",
+        "label": "Measure baseline respiratory function",
+        "rationale": "Purely ocular disease without bulbar or limb weakness: a baseline FVC, MIP and MEP is optional and serves as a reference if the disease generalizes."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "search_medical_literature"
+          }
+        ],
+        "citations": [
+          "[Sanders_2016]"
+        ],
+        "criterion_id": "action-4-search-medical-literature",
+        "expected_evidence": "General guidance on ocular MG treatment",
+        "importance": "optional",
+        "label": "Review guidance on the treatment of ocular myasthenia gravis",
+        "rationale": "Background reading on treatment and prognosis; not a clinical step in the work-up."
       }
     ],
     "assessment": {
       "prohibited_recommendations": [
-        "Do NOT prescribe aminoglycoside antibiotics (gentamicin, tobramycin, amikacin) \u2014 risk of precipitating myasthenic crisis",
-        "Do NOT prescribe fluoroquinolones (ciprofloxacin, levofloxacin, moxifloxacin) \u2014 FDA black-box warning for MG exacerbation",
-        "Do NOT prescribe telithromycin \u2014 contraindicated in MG",
-        "Do NOT administer IV magnesium for MG patients (e.g., for hypomagnesaemia, eclampsia prophylaxis) without alternative \u2014 blocks NMJ transmission",
-        "Do NOT use non-depolarizing neuromuscular blockers without anaesthesia/MG-aware dosing protocols",
-        "Do NOT initiate high-dose corticosteroids as sole outpatient therapy without hospitalization or pyridostigmine bridge \u2014 risk of paradoxical worsening at days 5-10",
-        "Do NOT attribute fluctuating fatigable weakness to a functional disorder before completing serology + RNS + single-fiber EMG workup"
+        "Do not start high-dose prednisone (above 20 mg/day) as an outpatient; start low and titrate, or start high dose only with inpatient monitoring, because initial steroid-induced worsening can precipitate crisis.",
+        "Avoid fluoroquinolones, aminoglycosides, macrolides and IV magnesium unless no alternative exists and the patient is monitored; use non-depolarising neuromuscular blockers only at reduced dose with quantitative monitoring.",
+        "Do not attribute fatigable ptosis and diplopia to a brainstem vascular cause (or start secondary stroke prevention for presumed TIA) before AChR antibody testing and neurophysiology."
       ],
       "required_recommendations": [
-        "Confirm AChR antibody positivity",
-        "RNS and ice-pack test as bedside support",
-        "CT chest for thymoma screening (here negative)",
-        "Initiate pyridostigmine and counsel about generalization risk",
-        "Plan follow-up at 3, 6, 12, 24 months for early detection of generalization"
+        "Diagnose AChR antibody-positive ocular myasthenia gravis (MGFA class I): fatigable asymmetric left ptosis with a Cogan lid twitch and variable ophthalmoparesis with an INO-like pattern, AChR binding antibody 7.6 nmol/L, increased jitter with blocking on single-fiber EMG, positive ice pack test, normal brain and orbit imaging, no thymoma on mediastinal CT.",
+        "Start pyridostigmine 30 mg three times daily, titrating to effect up to 60 mg four to five times daily, with advice on muscarinic side effects.",
+        "If ptosis or diplopia remain disabling on pyridostigmine, add low-dose prednisone (10-20 mg/day, increasing by 5-10 mg every 3-7 days to the lowest effective dose) with bone protection, and monitor blood pressure, glucose and potassium (she takes hydrochlorothiazide) [Sanders_2016].",
+        "Counsel that about half of patients with ocular MG generalize, mostly within 2 years, and to seek care at once for swallowing, speech, limb or breathing weakness; arrange neurology follow-up at regular intervals over the first 2 years.",
+        "Give the patient a written list of medicines that can worsen MG (fluoroquinolones, aminoglycosides, macrolides, IV magnesium, beta-blockers including timolol eye drops) to show every prescriber."
       ]
     },
     "avoided_actions": [
@@ -390,11 +393,9 @@
             "tool_name": "analyze_eeg"
           }
         ],
-        "citations": [
-          "[Wolfe_2016]"
-        ],
+        "citations": [],
         "criterion_id": "avoid-waste-1-analyze-eeg",
-        "rationale": "MG is a peripheral neuromuscular junction disorder; EEG has no diagnostic role.",
+        "rationale": "EEG has no role in a disorder of the neuromuscular junction (Jacob S et al., Pract Neurol 2025).",
         "severity": "waste"
       },
       {
@@ -404,11 +405,9 @@
             "tool_name": "analyze_csf"
           }
         ],
-        "citations": [
-          "[Wolfe_2016]"
-        ],
+        "citations": [],
         "criterion_id": "avoid-waste-2-analyze-csf",
-        "rationale": "No CSF role in MG; LP risks complications without diagnostic yield.",
+        "rationale": "CSF has no role in MG; Miller Fisher syndrome, the only CSF-related mimic here, is unlikely without ataxia or areflexia and is tested by serum anti-GQ1b (Jacob S et al., Pract Neurol 2025).",
         "severity": "waste"
       },
       {
@@ -420,11 +419,9 @@
             "tool_name": "order_advanced_imaging"
           }
         ],
-        "citations": [
-          "[Wolfe_2016]"
-        ],
+        "citations": [],
         "criterion_id": "avoid-waste-3-order-advanced-imaging",
-        "rationale": "Advanced imaging (PET/MR spectroscopy/perfusion) is not indicated for MG diagnosis or staging; CT chest covers thymoma screening.",
+        "rationale": "FDG-PET is not indicated in MG; mediastinal CT covers thymoma screening (Jacob S et al., Pract Neurol 2025).",
         "severity": "waste"
       },
       {
@@ -434,11 +431,9 @@
             "tool_name": "order_echocardiogram"
           }
         ],
-        "citations": [
-          "[Wolfe_2016]"
-        ],
+        "citations": [],
         "criterion_id": "avoid-waste-4-order-echocardiogram",
-        "rationale": "Echocardiography is not indicated for MG unless a comorbid cardiac question exists.",
+        "rationale": "No cardiac question in this patient; echocardiography does not contribute to the diagnosis of ocular MG.",
         "severity": "waste"
       },
       {
@@ -448,11 +443,9 @@
             "tool_name": "order_cardiac_monitoring"
           }
         ],
-        "citations": [
-          "[Wolfe_2016]"
-        ],
+        "citations": [],
         "criterion_id": "avoid-waste-5-order-cardiac-monitoring",
-        "rationale": "Cardiac monitoring is not indicated for MG unless arrhythmia or autonomic disease is independently suspected.",
+        "rationale": "No palpitations, syncope or arrhythmia; cardiac monitoring does not contribute to the diagnosis of ocular MG.",
         "severity": "waste"
       }
     ],
@@ -474,88 +467,82 @@
     },
     "differential": [
       {
-        "diagnosis": "Generalized MG progression risk",
-        "icd_code": "G70.01",
-        "key_features": "About 50% of ocular MG generalizes within 2 years \u2014 monitor for limb/bulbar involvement.",
-        "likelihood": "high"
+        "diagnosis": "Brainstem lesion with internuclear ophthalmoplegia (stroke, TIA or demyelination)",
+        "icd_code": "H51.2",
+        "key_features": "INO-like pattern raised it, but MRI brain with MRA shows no brainstem or MLF lesion, there is no abducting nystagmus, and the ptosis is fatigable with a Cogan lid twitch.",
+        "likelihood": "very_low"
       },
       {
         "diagnosis": "Thyroid eye disease",
         "icd_code": "H06.2",
-        "key_features": "No proptosis or lid retraction; fatigable rather than restrictive.",
+        "key_features": "Eyelid swelling and restricted elevation could suggest it, but there is no proptosis or lid retraction, the orbits are normal on imaging, TSH and free T4 are normal and the deficit is fatigable rather than restrictive.",
         "likelihood": "low"
       },
       {
-        "diagnosis": "Cranial nerve palsy (microvascular)",
+        "diagnosis": "Microvascular cranial nerve palsy",
         "icd_code": "H49.9",
-        "key_features": "Microvascular CN palsy is acute and monocular; this is bilateral and fluctuating.",
+        "key_features": "Hypertension is a risk factor, but the deficit involves both eyes, fits no single nerve, fluctuates and is accompanied by fatigable ptosis.",
         "likelihood": "low"
       },
       {
-        "diagnosis": "CPEO / mitochondrial",
-        "icd_code": "H49.4",
-        "key_features": "Fluctuating diurnal pattern incompatible with CPEO.",
+        "diagnosis": "Orbital cellulitis or orbital inflammation",
+        "icd_code": "H05.00",
+        "key_features": "Eyelid swelling, but no fever, pain on eye movement, chemosis or proptosis, and normal orbits on imaging.",
         "likelihood": "very_low"
       },
       {
-        "diagnosis": "Miller-Fisher syndrome",
+        "diagnosis": "Miller Fisher syndrome",
         "icd_code": "G61.0",
-        "key_features": "Anti-GQ1b negative; no antecedent infection; no ataxia/areflexia.",
+        "key_features": "Ophthalmoparesis, but no ataxia, areflexia or antecedent infection; anti-GQ1b negative if tested.",
+        "likelihood": "very_low"
+      },
+      {
+        "diagnosis": "Chronic progressive external ophthalmoplegia",
+        "icd_code": "H49.4",
+        "key_features": "Two-week fluctuating course, fatigability, Cogan lid twitch and positive AChR antibodies are against a slowly progressive mitochondrial myopathy.",
         "likelihood": "very_low"
       }
     ],
     "key_clinical_evidence": [
-      "Fluctuating, fatigable weakness with diurnal pattern (worse evening) is the clinical hallmark of MG \u2014 fixed weakness suggests an alternative diagnosis.",
-      "Ocular involvement (ptosis, diplopia) is asymmetric and fatigable in MG; thyroid eye disease causes restrictive (not fatigable) ophthalmoplegia.",
-      "Single-fiber EMG (sensitivity >95%) is the most sensitive electrodiagnostic test \u2014 order when RNS is non-diagnostic or serology is negative.",
-      "All confirmed MG cases require CT chest for thymoma \u2014 present in roughly 10-15% of generalized MG; thymectomy (MGTX trial) improves long-term outcomes in non-thymoma AChR+ MG as well.",
-      "Aminoglycosides, fluoroquinolones, telithromycin, IV magnesium, and neuromuscular blockers can precipitate myasthenic crisis and must be screened against any new prescription.",
-      "Ocular MG: about 50% generalize within 2 years; treatment of ocular MG may reduce generalization risk (modest evidence).",
-      "Bedside ice-pack test is a cheap, ~80% sensitive screen for ptosis."
+      "Fatigable asymmetric left ptosis with a Cogan lid twitch and variable ophthalmoparesis with an INO-like pattern, pupils spared, limbs and bulbar function normal.",
+      "AChR binding antibody 7.6 nmol/L with elevated blocking antibody; MuSK negative; TSH and free T4 normal.",
+      "Single-fiber EMG of the left orbicularis oculi: mean MCD 54 microseconds with blocking in 16% of pairs; RNS of nasalis, trapezius and ADM without significant decrement, as is common in ocular MG.",
+      "Ice pack test: left MRD1 improved from 1.0 to 3.5 mm.",
+      "Brain MRI with MRA and MRV and orbital CT before referral were normal; no brainstem lesion explains the eye movements.",
+      "Mediastinal CT with contrast is indicated in every patient with MG to detect thymoma; here it shows age-appropriate thymic involution.",
+      "About half of patients with ocular MG generalize, mostly within 2 years; follow-up and patient education are part of management."
     ],
     "red_herrings": [
       {
-        "correct_interpretation": "True INO requires structural MLF lesion; normal brain MRI and fatigable nature confirm MG etiology",
-        "data_point": "Pseudo-INO pattern suggesting brainstem TIA",
-        "field_path": "",
+        "correct_interpretation": "An INO needs an MLF lesion; the normal brain MRI, the absent abducting nystagmus and the fatigable ptosis with Cogan lid twitch point to a pseudo-INO of neuromuscular junction origin.",
+        "data_point": "INO-like pattern suggesting a brainstem lesion or TIA",
+        "field_path": "patient.neurological_exam.cranial_nerves",
         "intended_effect": "Pseudo-INO with bilateral horizontal restriction mimics true INO from brainstem lesion",
-        "location": ""
+        "location": "neurological exam"
       },
       {
-        "correct_interpretation": "No fever, no chemosis, no proptosis, normal orbital MRI \u2014 orbital infection excluded",
+        "correct_interpretation": "No fever, chemosis, proptosis or pain on eye movement, and normal orbital imaging: orbital infection or inflammation is excluded.",
         "data_point": "Periorbital swelling suggesting orbital cellulitis",
-        "field_path": "",
+        "field_path": "patient.chief_complaint",
         "intended_effect": "Eyelid swelling + restricted eye movement can resemble orbital cellulitis",
-        "location": ""
+        "location": "chief complaint and exam"
       },
       {
-        "correct_interpretation": "Normal MRI/MRA excludes vascular etiology; MG is the diagnosis regardless of vascular risk factors",
+        "correct_interpretation": "Normal MRI and MRA exclude a vascular cause; the fluctuating, fatigable bilateral pattern is not microvascular.",
         "data_point": "Hypertension as vascular risk factor",
-        "field_path": "",
+        "field_path": "patient.clinical_history.past_medical_history",
         "intended_effect": "Hypertension raises pre-test probability for TIA/stroke as cause of focal neurological signs",
-        "location": ""
+        "location": "past medical history"
       }
     ],
     "review_status": "draft",
-    "sequence_constraints": [
-      {
-        "after_criterion_id": "action-2-order-specialized-test",
-        "before_criterion_id": "action-1-interpret-labs",
-        "citations": [
-          "[Wolfe_2016]"
-        ],
-        "reason": "Order AChR/MuSK/LRP4 serologies first; reserve single-fiber EMG for seronegative or RNS-non-diagnostic cases (resource stewardship).",
-        "severity": "soft"
-      }
-    ],
+    "sequence_constraints": [],
     "stop_rule": {
-      "max_additional_actions": 0,
+      "max_additional_actions": 2,
       "required_before_assessment": [
         "action-1-interpret-labs",
         "action-2-order-specialized-test",
-        "action-3-order-body-imaging",
-        "action-4-search-medical-literature",
-        "action-5-check-drug-interactions"
+        "action-3-order-body-imaging"
       ]
     }
   },
@@ -565,7 +552,7 @@
       "contrast": true,
       "findings": [
         {
-          "description": "CT CHEST WITH CONTRAST\n\nIndication: Newly diagnosed MG; screen for thymoma\n\nTECHNIQUE: CT chest with IV contrast\n\nFINDINGS: No anterior mediastinal mass. Normal thymic involution for age 52. No pulmonary nodules. No mediastinal adenopathy.\n\nIMPRESSION: No thymoma. Normal chest CT.",
+          "description": "CT CHEST WITH CONTRAST\n\nIndication: Evaluation for thymoma\n\nTECHNIQUE: CT chest with IV contrast\n\nFINDINGS: No anterior mediastinal mass. Normal thymic involution for age 52. No pulmonary nodules. No mediastinal adenopathy.\n\nIMPRESSION: No thymoma. Normal chest CT.",
           "location": "mediastinum",
           "type": "additional_observation"
         }
@@ -574,7 +561,7 @@
       "measurements": null,
       "modality": "CT",
       "recommended_actions": [],
-      "region": "mediastinum"
+      "region": "chest/mediastinum"
     },
     "cardiac_monitoring": null,
     "csf": null,
@@ -583,9 +570,9 @@
       "axis": "normal",
       "clinical_correlation": "",
       "findings": [
-        "ELECTROCARDIOGRAM\n\nPatient: 52-year-old female\nIndication: Pre-investigation baseline\n\nRHYTHM: Sinus rhythm at 72 bpm\nQTc: 422 ms\nINTERPRETATION: Normal sinus rhythm. LVH by voltage criteria (consistent with hypertension). No ischemic changes. No arrhythmia.\n\nCONCLUSION: Normal ECG with mild LVH pattern."
+        "ELECTROCARDIOGRAM\n\nPatient: 52-year-old female\nIndication: Pre-investigation baseline\n\nRHYTHM: Sinus rhythm at 72 bpm\nPR 162 ms, QRS 88 ms, QTc 422 ms\nVoltage criteria for left ventricular hypertrophy. No acute ST-T changes. No arrhythmia."
       ],
-      "interpretation": "Normal sinus rhythm; mild LVH (hypertension); no arrhythmia",
+      "interpretation": "Sinus rhythm. Left ventricular hypertrophy by voltage criteria. No acute ST-T changes.",
       "intervals": {
         "PR": "162 ms",
         "QRS": "88 ms",
@@ -597,19 +584,74 @@
     "echo": null,
     "eeg": null,
     "labs": {
-      "abnormal_values_summary": [],
-      "interpretation": "All values within normal limits.",
+      "abnormal_values_summary": [
+        "AChR binding antibody 7.6 nmol/L (reference <=0.02 nmol/L)",
+        "AChR blocking antibody 38% (reference <=15%)"
+      ],
+      "interpretation": "AChR binding antibody elevated (7.6 nmol/L) and AChR blocking antibody elevated (38%). MuSK antibody not detected. TSH and free T4 within reference ranges. AChR binding antibodies are found in most patients with acquired autoimmune myasthenia gravis; clinical correlation recommended.",
       "panels": {
-        "Exclusion studies": [
+        "Acetylcholine_Receptor_Antibody_Panel": [
           {
-            "clinical_significance": "Ordered to exclude an alternative cause; the result does not support one, which is what this case's diagnosis rests on",
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "<=0.02 nmol/L",
+            "test": "AChR binding antibody (RIA)",
+            "unit": "nmol/L",
+            "value": "7.6"
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "<=15%",
+            "test": "AChR blocking antibody",
+            "unit": "%",
+            "value": "38"
+          },
+          {
+            "clinical_significance": null,
             "is_abnormal": false,
-            "reference_range": "",
+            "reference_range": "<=0.02 nmol/L",
+            "test": "Anti-MuSK antibody (RIA)",
+            "unit": "nmol/L",
+            "value": "<0.01"
+          }
+        ],
+        "Thyroid_function": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.4-4.0 mIU/L",
             "test": "TSH",
-            "unit": "",
-            "value": "Within reference range"
+            "unit": "mIU/L",
+            "value": "1.9"
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.8-1.8 ng/dL",
+            "test": "Free T4",
+            "unit": "ng/dL",
+            "value": "1.2"
           }
         ]
+      }
+    },
+    "literature_search": {
+      "ocular myasthenia gravis": {
+        "query": "ocular myasthenia gravis diagnosis and treatment",
+        "results": [
+          {
+            "evidence_level": "consensus guideline",
+            "finding": "Consensus guidance recommends AChR antibody testing first, MuSK testing when AChR antibodies are absent, and electrodiagnostic confirmation by repetitive nerve stimulation or single-fiber EMG. Chest CT or MRI is recommended in all patients to detect thymoma. In ocular MG, corticosteroids are advised when the response to pyridostigmine is unsatisfactory.",
+            "source": "Sanders DB et al., Neurology 2016;87:419-425; Narayanaswami P et al., Neurology 2021;96:114-122"
+          },
+          {
+            "evidence_level": "review",
+            "finding": "Disease that remains purely ocular is called ocular myasthenia; a large proportion of patients presenting with ocular symptoms develop generalized weakness, most within the first two years.",
+            "source": "Gilhus NE, N Engl J Med 2016;375:2570-2581"
+          }
+        ],
+        "summary": "Consensus guidance: AChR antibody testing first, MuSK when AChR is negative, RNS or single-fiber EMG for electrodiagnostic confirmation, thymic imaging in all patients; corticosteroids for ocular MG not controlled by pyridostigmine. Generalization occurs in many patients presenting with ocular symptoms, mostly within two years."
       }
     },
     "mri": {
@@ -622,32 +664,23 @@
     "specialized_test": null
   },
   "metadata": {
-    "actions_withdrawn": [
-      {
-        "action": "Bedside ice-pack test for ptosis (cheap, ~80% sensitive for ocular MG)",
-        "category": "recommended",
-        "reason": "The bedside ice-pack test is recommended here but its result is not stored in this case, or in any case in the condition \u2014 the only mention of it anywhere is this recommendation. Its outcome does not follow from the documented ptosis, and at roughly 80% sensitivity it is not definitional of the diagnosis, so authoring a result would be inventing one. Withdrawn from the gold standard during the per-case audit of 2026-08-07; reinstate it with a clinician-authored report.",
-        "study": "ice_pack_test",
-        "tool_name": "order_specialized_test"
-      }
-    ],
+    "actions_withdrawn": [],
     "authoring_agent": "condition-expert:MG",
     "case_body_concerns": [],
     "citation_gap": [],
     "condition_name": "Ocular myasthenia gravis with pseudo-INO pattern",
     "criteria_pack_version": "1.0",
-    "difficulty_description": "Straightforward: imaging excludes structural cause; Cogan lid twitch and AChR antibody confirm MG; pseudo-INO in MG is a classic presentation",
-    "difficulty_rationale": "5 required tools, 0 red herrings, typical AChR+ generalized MG",
+    "difficulty_description": "Moderate: an INO-like pattern and eyelid swelling point first to a brainstem or orbital cause; normal imaging, the Cogan lid twitch, positive AChR antibody and abnormal SFEMG establish ocular MG.",
+    "difficulty_rationale": "3 required actions (AChR serology with thyroid function, SFEMG or RNS, mediastinal CT), ice pack recommended; 3 red herrings (INO-like pattern, eyelid swelling, hypertension); ocular AChR-positive MG with a normal RNS.",
     "expected_agent_confidence": 0.85,
     "fallback_tool_kinds": {
-      "advanced_imaging": "normal",
       "cardiac_monitoring": "normal",
       "csf": "normal",
       "echo": "normal",
       "eeg": "normal"
     },
     "generation_method": "real_case_seed",
-    "last_revised": "2026-08-08",
+    "last_revised": "2026-10-24",
     "policy_spec_status": "draft",
     "revision_reason": "per-case audit: baseline panels named by an optimal action and absent from the payload actually served (TSH). Reported as unremarkable only after checking that nothing in the case \u2014 no abnormal row, no interpretation, no expected_finding, no reasoning \u2014 states an abnormality for them",
     "source": "MedCaseReasoning",
@@ -659,7 +692,6 @@
     ]
   },
   "patient": {
-    "age": 52,
     "chief_complaint": "Bilateral eyelid swelling and double vision with abnormal eye movements",
     "clinical_history": {
       "allergies": [
@@ -694,15 +726,14 @@
     "demographics": {
       "age": 52,
       "bmi": 28.7,
+      "ethnicity": "African American",
       "handedness": "right",
       "sex": "female"
     },
-    "ethnicity": "African American",
-    "history_present_illness": "A 52-year-old African American woman with hypertension presented to the neurology ward with a 2-week history of bilateral eyelid swelling, double vision, and abnormal eye movements. She reported blurred vision that fluctuated in severity, with the right eye appearing more affected. She initially noticed left upper eyelid swelling and heaviness, followed by diplopia on rightward gaze. She denied fever, photophobia, jaw or swallowing difficulty, limb weakness, numbness, or gait disturbance. She had no preceding infections, vaccinations, or recent travel. She declined the ice pack test initially as she was concerned it would cause pain.\n\nOn examination, swelling of the left upper eyelid was prominent. Extraocular movement testing revealed the right eye failed to move fully in the horizontal plane, and the left eye had impaired adduction with preserved abduction, producing a pattern consistent with pseudo-internuclear ophthalmoplegia (pseudo-INO). The left upper eyelid was ptotic. On upgaze, the left eye failed to fully elevate. A Cogan lid twitch sign was elicited in the left eye on downgaze and return to primary position. Visual acuity and fundoscopy were normal. The rest of the neurological examination was unremarkable.\n\nGiven the pseudo-INO pattern, the neurology team initially considered a brainstem structural lesion or TIA and ordered urgent imaging. CT of the orbits, MRI of the brain, MRA, and MRV were all unremarkable. Following normal imaging, the pattern of fatigable, asymmetric ocular motor signs prompted consideration of myasthenia gravis.",
-    "hpi": "A 52-year-old African American woman with hypertension presented to the neurology ward with a 2-week history of bilateral eyelid swelling, double vision, and abnormal eye movements. She reported blurred vision that fluctuated in severity, with the right eye appearing more affected. She initially noticed left upper eyelid swelling and heaviness, followed by diplopia on rightward gaze. She denied fever, photophobia, jaw or swallowing difficulty, limb weakness, numbness, or gait disturbance. She had no preceding infections, vaccinations, or recent travel. She declined the ice pack test initially as she was concerned it would cause pain.\n\nOn examination, swelling of the left upper eyelid was prominent. Extraocular movement testing revealed the right eye failed to move fully in the horizontal plane, and the left eye had impaired adduction with preserved abduction, producing a pattern consistent with pseudo-internuclear ophthalmoplegia (pseudo-INO). The left upper eyelid was ptotic. On upgaze, the left eye failed to fully elevate. A Cogan lid twitch sign was elicited in the left eye on downgaze and return to primary position. Visual acuity and fundoscopy were normal. The rest of the neurological examination was unremarkable.\n\nGiven the pseudo-INO pattern, the neurology team initially considered a brainstem structural lesion or TIA and ordered urgent imaging. CT of the orbits, MRI of the brain, MRA, and MRV were all unremarkable. Following normal imaging, the pattern of fatigable, asymmetric ocular motor signs prompted consideration of myasthenia gravis.",
+    "history_present_illness": "A 52-year-old African American woman with hypertension was admitted with a 2-week history of bilateral eyelid swelling, double vision, and abnormal eye movements. She reported blurred vision that fluctuated in severity, with the right eye appearing more affected. She initially noticed left upper eyelid swelling and heaviness, followed by diplopia on rightward gaze. She denied fever, photophobia, jaw or swallowing difficulty, limb weakness, numbness, or gait disturbance. She had no preceding infections, vaccinations, or recent travel.\n\nOn examination, swelling of the left upper eyelid was prominent. Extraocular movement testing revealed the right eye failed to move fully in the horizontal plane, and the left eye had impaired adduction with preserved abduction, producing an internuclear ophthalmoplegia-like pattern. The left upper eyelid was ptotic. On upgaze, the left eye failed to fully elevate. A Cogan lid twitch sign was elicited in the left eye on downgaze and return to primary position. Visual acuity and fundoscopy were normal. The rest of the neurological examination was unremarkable.\n\nGiven the internuclear ophthalmoplegia-like pattern, the admitting team first considered a brainstem structural lesion or TIA and obtained urgent imaging on the day of admission: CT of the orbits, MRI of the brain, MRA and MRV were all reported as unremarkable. She was then referred to neurology for further evaluation of the eye movement disorder.",
     "neurological_exam": {
       "coordination": "Coordination normal.",
-      "cranial_nerves": "Left upper eyelid ptosis with periorbital swelling. Cogan lid twitch positive (left). Right eye: limited horizontal movement in both directions. Left eye: impaired adduction with preserved abduction (pseudo-INO pattern). Left eye: failure to fully elevate on upgaze. No nystagmus. Visual acuity 20/20 bilaterally. Pupils equal and reactive. No proptosis. No pain on eye movement.",
+      "cranial_nerves": "Left upper eyelid ptosis with periorbital swelling. Cogan lid twitch positive (left). Right eye: limited horizontal movement in both directions. Left eye: impaired adduction with preserved abduction, without abducting nystagmus. Left eye: failure to fully elevate on upgaze. No nystagmus. Visual acuity 20/20 bilaterally. Pupils equal and reactive. No proptosis. No pain on eye movement.",
       "gait": "Gait normal.",
       "mental_status": "Alert, oriented. No cognitive impairment.",
       "motor": "Motor exam 5/5 all limbs. No fasciculations.",
@@ -714,16 +745,10 @@
       "abdomen": "Soft; non-tender",
       "cardiovascular": "Regular rate and rhythm; no murmurs",
       "extremities": "No edema; no rash",
-      "general": "Alert, well-appearing woman; left upper eyelid swelling and ptosis evident",
-      "neurological": "Left upper eyelid ptosis with periorbital swelling. Cogan lid twitch positive (left). Right eye: limited horizontal movement in both directions. Left eye: impaired adduction with preserved abduction (pseudo-INO pattern). Left eye failure to fully elevate on upgaze. No nystagmus. Visual acuity 20/20 bilaterally. Pupils equal and reactive. No proptosis. No pain on eye movement. Motor exam 5/5 all limbs. Reflexes 2+ symmetric. Sensation intact. Coordination normal. No fasciculations.",
+      "general": "Alert, well-appearing woman; left upper eyelid swelling and ptosis evident. Weight 78 kg, height 165 cm.",
+      "neurological": "Left upper eyelid ptosis with periorbital swelling. Cogan lid twitch positive (left). Right eye: limited horizontal movement in both directions. Left eye: impaired adduction with preserved abduction, without abducting nystagmus. Left eye failure to fully elevate on upgaze. No nystagmus. Visual acuity 20/20 bilaterally. Pupils equal and reactive. No proptosis. No pain on eye movement. Motor exam 5/5 all limbs. Reflexes 2+ symmetric. Sensation intact. Coordination normal. No fasciculations.",
       "respiratory": "Clear bilaterally"
     },
-    "pmh": [
-      "Hypertension, managed with amlodipine",
-      "No prior neurological or autoimmune diagnosis",
-      "No ocular surgery or trauma"
-    ],
-    "sex": "female",
     "vitals": {
       "bp_diastolic": 88,
       "bp_systolic": 148,

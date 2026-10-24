@@ -4,14 +4,6 @@
   "difficulty": "moderate",
   "encounter_type": "outpatient",
   "fallback_tool_outputs": {
-    "advanced_imaging": {
-      "findings": [],
-      "impression": "No abnormality identified.",
-      "modality": "advanced imaging (off-pathway)",
-      "quantitative_data": null,
-      "recommended_actions": [],
-      "tracer_or_protocol": null
-    },
     "cardiac_monitoring": {
       "duration_hours": 24,
       "events": [],
@@ -33,8 +25,16 @@
       "additional_observations": [],
       "angiography_findings": null,
       "contrast_used": false,
-      "findings": [],
-      "impression": "No acute intracranial abnormality. No haemorrhage, mass, hydrocephalus, or large-territory infarct.",
+      "findings": [
+        {
+          "density": null,
+          "description": "Volume loss with widened frontal and anterior temporal sulci and enlarged frontal horns, out of proportion to age",
+          "location": "bilateral frontal and anterior temporal lobes",
+          "size": null,
+          "type": "atrophy"
+        }
+      ],
+      "impression": "Non-contrast CT head: bifrontal and anterior temporal volume loss with widened sulci and enlarged frontal horns, out of proportion to age. No haemorrhage, mass, hydrocephalus or established infarct. CT is insensitive to early or subtle atrophy; MRI characterises the pattern better.",
       "recommended_actions": []
     },
     "drug_interactions": null,
@@ -102,52 +102,33 @@
   "followup_outputs": [
     {
       "output": {
-        "alternatives": [
-          "Trazodone: sedating antidepressant; used off-label for agitation and sleep disturbance",
-          "Fluvoxamine: SSRI; off-label use for compulsive behaviors"
-        ],
-        "contraindications": [
-          "Acetylcholinesterase inhibitors (donepezil, rivastigmine, galantamine): no established benefit in frontotemporal dementia; may exacerbate behavioral disinhibition"
-        ],
-        "formulary_status": "Sertraline: on formulary",
-        "interactions": [
-          "Metformin + sertraline: minimal interaction; monitor blood glucose as SSRIs can affect glycemic control"
-        ],
-        "proposed": "Selective serotonin reuptake inhibitor (sertraline 100 mg/day) for behavioral symptoms in bvFTD",
-        "warnings": [
-          "Metformin + sertraline: SSRIs may affect glycemic control; monitor blood glucose",
-          "Benzodiazepines: increased fall risk and potential paradoxical disinhibition in elderly patients",
-          "Antipsychotics: increased cerebrovascular event risk in dementia; use with caution and specialist oversight"
-        ]
-      },
-      "tool_name": "check_drug_interactions",
-      "trigger_action": "request_drug_interactions_for_symptomatic_treatment"
-    },
-    {
-      "output": {
         "findings": [
           {
             "domain": "Executive Function",
-            "result": "Severely impaired \u2014 Trails B: >3 minutes with multiple errors; WCST perseverative errors 85th percentile; Stroop: 1st percentile; FAB 10/18"
+            "result": "Severely impaired: Trails B discontinued at 300 s with multiple errors; WCST perseverative errors below the 1st percentile; Stroop interference 1st percentile; FAB 10/18"
           },
           {
             "domain": "Social Cognition",
-            "result": "Severely impaired \u2014 Faux Pas Test: 3/20; complete failure on perspective-taking and social inference tasks"
+            "result": "Severely impaired: Faux Pas Test 3/20; failure on perspective-taking and social inference tasks"
           },
           {
             "domain": "Memory",
-            "result": "Moderately impaired but predominantly retrieval-based (frontal) \u2014 free recall impaired, cued recall relatively better; CVLT-II: 15th percentile with cueing benefit"
+            "result": "Impaired free recall with clear benefit from cueing (CVLT-II total 15th percentile); recognition discriminability within normal limits"
           },
           {
             "domain": "Language",
-            "result": "Intact naming; reduced verbal fluency consistent with frontal dysfunction"
+            "result": "Intact naming; reduced verbal fluency"
+          },
+          {
+            "domain": "Visuospatial",
+            "result": "VOSP cube analysis 9/10 and number location 9/10 (within normal limits); Rey figure copy 29/36 with a piecemeal, poorly planned approach"
           },
           {
             "domain": "Behavior",
-            "result": "FrSBe: severe disinhibition (98th percentile), severe apathy (91st percentile), executive dysfunction (96th percentile); NPI-Q caregiver distress: 24/36"
+            "result": "FrSBe: severe disinhibition (98th percentile), severe apathy (91st percentile), executive dysfunction (96th percentile); NPI-Q caregiver distress 24/36"
           }
         ],
-        "impression": "Neuropsychological profile: severely impaired executive function (Trails B, Stroop 1st percentile, WCST perseverations 85th percentile) and social cognition (Faux Pas 3/20) with retrieval-predominant memory pattern and intact confrontation naming. Selective anterior-network deficit pattern with posterior cortical sparing",
+        "impression": "Severe executive dysfunction (Trails B discontinued, WCST and Stroop at or below the 1st percentile, FAB 10/18) and impaired social cognition (Faux Pas 3/20), with a retrieval-type memory deficit that improves with cueing, normal recognition, intact naming and preserved visuospatial perception. The profile is executive and social-cognitive predominant with relative sparing of memory recognition and visuospatial function, consistent with a frontal-network syndrome.",
         "quantitative_data": {
           "FAB": "10/18",
           "MMSE": "21/30"
@@ -160,6 +141,107 @@
         "test_type": "neuropsych_battery"
       },
       "trigger_action": "request_reviewed_neuropsych_battery"
+    },
+    {
+      "output": {
+        "abnormal_values_summary": [],
+        "interpretation": "Syphilis and HIV serology negative.",
+        "panels": {
+          "Serology": [
+            {
+              "clinical_significance": null,
+              "is_abnormal": false,
+              "reference_range": "non-reactive",
+              "test": "RPR",
+              "unit": "",
+              "value": "non-reactive"
+            },
+            {
+              "clinical_significance": null,
+              "is_abnormal": false,
+              "reference_range": "negative",
+              "test": "HIV-1/2 antigen/antibody",
+              "unit": "",
+              "value": "negative"
+            }
+          ]
+        }
+      },
+      "tool_name": "interpret_labs",
+      "tool_parameters": {
+        "panels": [
+          "RPR",
+          "HIV"
+        ]
+      },
+      "trigger_action": "request_rpr_hiv_syphilis_serology"
+    },
+    {
+      "output": {
+        "findings": [
+          {
+            "finding": "Severe hypometabolism, symmetric, involving prefrontal, orbitofrontal, and cingulate cortex",
+            "region": "Bilateral frontal cortex"
+          },
+          {
+            "finding": "Moderate-to-severe hypometabolism",
+            "region": "Bilateral anterior temporal lobes"
+          },
+          {
+            "finding": "Preserved metabolism.",
+            "region": "Posterior cingulate cortex"
+          },
+          {
+            "finding": "Normal metabolism.",
+            "region": "Parietal and occipital cortex"
+          }
+        ],
+        "impression": "Severe bilateral frontal and moderate-to-severe anterior temporal hypometabolism with preserved posterior cingulate, parietal and occipital metabolism, a pattern consistent with a frontotemporal metabolic profile.",
+        "modality": "FDG_PET",
+        "quantitative_data": {
+          "Z_score_bilateral_frontal": "-4.1 SD below age-matched norms",
+          "frontal_to_occipital_ratio": "0.67 (severely reduced; normal >0.90)"
+        },
+        "recommended_actions": [],
+        "tracer_or_protocol": "18F-fluorodeoxyglucose"
+      },
+      "tool_name": "order_advanced_imaging",
+      "tool_parameters": {
+        "modality": "FDG_PET"
+      },
+      "trigger_action": "request_optional_fdg_pet"
+    },
+    {
+      "output": {
+        "findings": [
+          {
+            "finding": "Marked symmetric hypoperfusion of prefrontal, orbitofrontal and anterior cingulate cortex",
+            "region": "Bilateral frontal cortex"
+          },
+          {
+            "finding": "Moderate hypoperfusion",
+            "region": "Bilateral anterior temporal lobes"
+          },
+          {
+            "finding": "Preserved perfusion",
+            "region": "Posterior cingulate and precuneus"
+          },
+          {
+            "finding": "Normal perfusion",
+            "region": "Parietal and occipital cortex"
+          }
+        ],
+        "impression": "Marked bilateral frontal and moderate anterior temporal hypoperfusion with preserved posterior cingulate, parietal and occipital perfusion, a pattern consistent with a frontotemporal perfusion profile.",
+        "modality": "perfusion_SPECT",
+        "quantitative_data": null,
+        "recommended_actions": [],
+        "tracer_or_protocol": "99mTc-HMPAO"
+      },
+      "tool_name": "order_advanced_imaging",
+      "tool_parameters": {
+        "modality": "perfusion_SPECT"
+      },
+      "trigger_action": "request_optional_perfusion_spect"
     },
     {
       "output": {
@@ -183,7 +265,7 @@
             "test": "MAPT mutation"
           }
         ],
-        "impression": "All values within normal limits.",
+        "impression": "No C9orf72 hexanucleotide repeat expansion (both alleles below 30 repeats). No pathogenic or likely pathogenic variant in GRN or MAPT. A negative result does not exclude a genetic cause outside the genes tested; results to be discussed in post-test genetic counselling.",
         "quantitative_data": {
           "C9orf72 repeat expansion": "Not detected (<30 repeats)",
           "GRN mutation (progranulin)": "No pathogenic variant detected",
@@ -200,38 +282,23 @@
     },
     {
       "output": {
-        "findings": [
-          {
-            "finding": "Severe hypometabolism, symmetric, involving prefrontal, orbitofrontal, and cingulate cortex",
-            "region": "Bilateral frontal cortex"
-          },
-          {
-            "finding": "Moderate-to-severe hypometabolism",
-            "region": "Bilateral anterior temporal lobes"
-          },
-          {
-            "finding": "Preserved metabolism.",
-            "region": "Posterior cingulate cortex"
-          },
-          {
-            "finding": "Normal metabolism.",
-            "region": "Parietal and occipital cortex"
-          }
+        "alternatives": [],
+        "contraindications": [
+          "Concurrent MAO inhibitor or pimozide"
         ],
-        "impression": "Severe bilateral frontotemporal hypometabolism \u2014 a pattern consistent with a frontotemporal metabolic profile. Posterior cingulate cortex metabolism preserved",
-        "modality": "FDG_PET",
-        "quantitative_data": {
-          "Z_score_bilateral_frontal": "-4.1 SD below age-matched norms",
-          "frontal_to_occipital_ratio": "0.67 (severely reduced; normal >0.90)"
-        },
-        "recommended_actions": [],
-        "tracer_or_protocol": "18F-fluorodeoxyglucose"
+        "formulary_status": "Sertraline: on formulary",
+        "interactions": [
+          "Sertraline + metformin: no clinically significant interaction",
+          "Sertraline + amlodipine: no clinically significant interaction"
+        ],
+        "proposed": "Sertraline",
+        "warnings": [
+          "Hyponatraemia risk in older adults; check sodium after starting",
+          "Concomitant alcohol use is not advised"
+        ]
       },
-      "tool_name": "order_advanced_imaging",
-      "tool_parameters": {
-        "modality": "FDG_PET"
-      },
-      "trigger_action": "request_optional_fdg_pet"
+      "tool_name": "check_drug_interactions",
+      "trigger_action": "request_sertraline_interaction_check"
     }
   ],
   "ground_truth": {
@@ -246,14 +313,13 @@
           }
         ],
         "citations": [
-          "[Rascovsky_2011]",
-          "Rascovsky_2011"
+          "[Rascovsky_2011]"
         ],
         "criterion_id": "action-2-perform-clinical-assessment",
-        "expected_evidence": "At least three of the six behavioural features documented from the informant history, with a dysexecutive profile and relatively spared memory and visuospatial function",
+        "expected_evidence": "Five of the six Rascovsky features from the wife's account (disinhibition, apathy, loss of empathy, compulsions, hyperorality) with functional decline; bedside recall and clock are also impaired",
         "importance": "required",
-        "label": "Perform a structured behavioural and cognitive assessment with informant history, scored against the six behavioural features of the Rascovsky criteria \u2014 disinhibition, apathy, loss of empathy, perseverative or compulsive behaviour, dietary change, and a dysexecutive profile with relative sparing of memory and visuospatial function \u2014 and record how many are present",
-        "rationale": "Perform a structured behavioural and cognitive assessment with informant history, scored against the six behavioural features of the Rascovsky criteria \u2014 disinhibition, apathy, loss of empathy, perseverative or compulsive behaviour, dietary change, and a dysexecutive profile with relative sparing of memory and visuospatial function \u2014 and record how many are present"
+        "label": "Structured informant history and bedside cognitive screen scored against the Rascovsky features",
+        "rationale": "The diagnosis of bvFTD rests on the behavioural features obtained from an informant; the screen documents the cognitive profile."
       },
       {
         "alternatives": [
@@ -265,33 +331,13 @@
           }
         ],
         "citations": [
-          "[Rascovsky_2011]",
-          "Rascovsky 2011 bvFTD criteria"
+          "[Rascovsky_2011]"
         ],
         "criterion_id": "action-3-order-specialized-test",
-        "expected_evidence": "Frontal-executive and social-cognition deficits with relative sparing of episodic memory and visuospatial function",
+        "expected_evidence": "Severe executive and social-cognition deficits; memory deficit of retrieval type with normal recognition; visuospatial perception preserved",
         "importance": "required",
-        "label": "Order comprehensive neuropsychological battery characterising executive function, social cognition, language and memory",
-        "rationale": "Order comprehensive neuropsychological battery characterising executive function, social cognition, language and memory"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "test_type": "genetic_panel:FTD"
-            },
-            "tool_name": "order_specialized_test"
-          }
-        ],
-        "citations": [
-          "[Pottier_2016]",
-          "Pottier 2016 FTLD genetics review"
-        ],
-        "criterion_id": "action-4-order-specialized-test",
-        "expected_evidence": "Identifies or excludes pathogenic C9orf72 / GRN / MAPT variant relevant to prognosis and cascade testing",
-        "importance": "optional",
-        "label": "Offer an FTD/ALS gene panel after pre-test genetic counselling because of young onset or a suggestive pedigree; testing remains optional",
-        "rationale": "Offer an FTD/ALS gene panel after pre-test genetic counselling because of young onset or a suggestive pedigree; testing remains optional"
+        "label": "Neuropsychological battery including executive and social-cognition measures",
+        "rationale": "Quantifies the executive and social-cognition profile and the relative sparing of memory and visuospatial function."
       },
       {
         "alternatives": [
@@ -311,14 +357,14 @@
           }
         ],
         "citations": [
-          "[AAN_dementia_2018]",
-          "AAN dementia practice guideline"
+          "[NICE_NG97]",
+          "[SNLG_ISS_2024]"
         ],
         "criterion_id": "action-5-interpret-labs",
-        "expected_evidence": "No reversible metabolic or infectious cause of cognitive decline identified",
+        "expected_evidence": "Blood count, chemistry, thyroid, B12, folate and inflammatory markers within range apart from glucose 112 mg/dL in known type 2 diabetes",
         "importance": "required",
-        "label": "Order metabolic dementia panel (TSH, B12, CMP, RPR/HIV per risk) to exclude reversible mimics",
-        "rationale": "Order metabolic dementia panel (TSH, B12, CMP, RPR/HIV per risk) to exclude reversible mimics"
+        "label": "Reversible-cause blood tests: CBC, CMP, TSH, B12, folate, ESR, CRP",
+        "rationale": "Excludes metabolic, endocrine, nutritional and inflammatory contributors before attributing decline to neurodegeneration."
       },
       {
         "alternatives": [
@@ -332,13 +378,13 @@
         ],
         "citations": [
           "[Rascovsky_2011]",
-          "Rascovsky 2011 bvFTD criteria"
+          "[NICE_NG97]"
         ],
         "criterion_id": "action-6-analyze-brain-mri",
-        "expected_evidence": "Bilateral frontal and/or anterior temporal atrophy in a lobar pattern with relative posterior sparing",
+        "expected_evidence": "Severe bilateral frontal and anterior temporal atrophy (knife-blade pattern) with normal hippocampi, preserved posterior cortex and no structural or significant vascular lesion",
         "importance": "required",
-        "label": "Obtain brain MRI with volumetric coronal T1 to assess frontal/anterior temporal atrophy and exclude alternative structural cause",
-        "rationale": "Obtain brain MRI with volumetric coronal T1 to assess frontal/anterior temporal atrophy and exclude alternative structural cause"
+        "label": "MRI brain without contrast, dementia protocol",
+        "rationale": "Shows the frontal and anterior temporal atrophy pattern and excludes structural and vascular causes."
       },
       {
         "alternatives": [
@@ -347,73 +393,93 @@
               "modality": "FDG_PET"
             },
             "tool_name": "order_advanced_imaging"
+          },
+          {
+            "required_arguments": {
+              "modality": "perfusion_SPECT"
+            },
+            "tool_name": "order_advanced_imaging"
           }
         ],
         "citations": [
-          "[NICE_NG97]",
-          "NICE_NG97"
+          "[Foster_2007]",
+          "[NICE_NG97]"
         ],
         "criterion_id": "action-7-order-advanced-imaging",
-        "expected_evidence": "Frontal and anterior-temporal dysfunction with relative posterior preservation, interpreted in clinical context",
+        "expected_evidence": "Bilateral frontal and anterior temporal hypometabolism or hypoperfusion with preserved posterior cingulate and parietal activity",
         "importance": "optional",
-        "label": "Consider FDG-PET only after clinical assessment, labs and structural imaging if the dementia subtype remains uncertain",
-        "rationale": "Consider FDG-PET only after clinical assessment, labs and structural imaging if the dementia subtype remains uncertain"
+        "label": "FDG-PET when the structural picture is unresolved",
+        "rationale": "Frontal and anterior temporal hypometabolism with posterior sparing supports FTD over AD."
       },
       {
         "alternatives": [
           {
             "required_arguments": {
-              "query": "Behavioural variant FTD diagnosis and management"
+              "test_type": "genetic_panel:FTD"
             },
-            "tool_name": "search_medical_literature"
+            "tool_name": "order_specialized_test"
           }
         ],
         "citations": [
-          "[Bang_2015]",
-          "Bang 2015 Lancet review"
+          "[Pottier_2016]",
+          "[ACMG_NSGC_2011]"
         ],
-        "criterion_id": "action-8-search-medical-literature",
-        "expected_evidence": "Confirms Rascovsky 2011 criteria, FDG-PET evidence (Foster 2007), and management approach (Bang 2015)",
-        "importance": "recommended",
-        "label": "Search medical literature for behavioural variant ftd diagnosis and management",
-        "rationale": "Search medical literature for behavioural variant ftd diagnosis and management"
+        "criterion_id": "action-4-order-specialized-test",
+        "expected_evidence": "No C9orf72 expansion and no pathogenic GRN or MAPT variant",
+        "importance": "optional",
+        "label": "Genetic counselling and FTD gene panel (C9orf72, GRN, MAPT)",
+        "rationale": "Onset at 56 is young onset; counselled testing may be offered without a family history, since C9orf72 expansions also occur in apparently sporadic FTD."
       },
       {
         "alternatives": [
           {
             "required_arguments": {
-              "drug": "sertraline",
-              "indication": "behavioural symptoms in FTD"
+              "drug": "sertraline"
             },
             "tool_name": "check_drug_interactions"
           }
         ],
         "citations": [
-          "[Bang_2015]",
-          "Bang 2015 Lancet review"
+          "[Bang_2015]"
         ],
         "criterion_id": "action-9-check-drug-interactions",
-        "expected_evidence": "Sertraline safe with current regimen; no contraindication; advise against AChE inhibitors",
+        "expected_evidence": "No interaction of consequence with amlodipine or metformin; sodium and alcohol cautions",
         "importance": "optional",
-        "label": "Consider symptomatic SSRI (e.g., sertraline) for disinhibition / compulsive behaviors and review drug interactions",
-        "rationale": "Consider symptomatic SSRI (e.g., sertraline) for disinhibition / compulsive behaviors and review drug interactions"
+        "label": "Interaction check before an SSRI for disinhibition and compulsive behaviour",
+        "rationale": "An SSRI is the usual first symptomatic option; the check covers his antihypertensive and antidiabetic drugs and his alcohol use."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "search_medical_literature"
+          }
+        ],
+        "citations": [
+          "[Rascovsky_2011]",
+          "[Bang_2015]"
+        ],
+        "criterion_id": "action-8-search-medical-literature",
+        "expected_evidence": "General evidence on bvFTD criteria and supportive care",
+        "importance": "optional",
+        "label": "Literature search on bvFTD criteria and management",
+        "rationale": "General background only; no diagnostic or management step depends on it."
       }
     ],
     "assessment": {
       "prohibited_recommendations": [
-        "Do not start acetylcholinesterase inhibitors (donepezil, rivastigmine, galantamine): no benefit in FTD and may worsen behavioral symptoms.",
-        "Do not start memantine: no evidence of benefit in bvFTD and may worsen behavioral symptoms.",
+        "Do not start a cholinesterase inhibitor (donepezil, rivastigmine, galantamine): no benefit in FTD, NICE NG97 advises against it, and it may worsen behaviour.",
+        "Do not start memantine: a randomised trial showed no benefit in FTD and NICE NG97 advises against it.",
         "Avoid antipsychotics as first-line behavioral therapy given increased cerebrovascular and mortality risk in dementia; reserve for refractory dangerous agitation with specialist oversight.",
         "Avoid benzodiazepines for behavioral control: risk of paradoxical disinhibition and falls.",
-        "Do not attribute the syndrome to alcohol alone: the structural and metabolic frontotemporal pattern is not explained by alcohol-related cognitive disorder."
+        "Do not attribute the syndrome to alcohol alone: the lobar frontal and anterior temporal atrophy and the behavioural profile are not explained by alcohol-related brain damage."
       ],
       "required_recommendations": [
-        "Address escalating alcohol use as a symptom of frontal disinhibition rather than the primary cause; coordinate medical and behavioural intervention.",
-        "Initiate driving safety assessment and remove access to large financial transactions until capacity is formally evaluated.",
-        "Apply Rascovsky 2011 bvFTD criteria explicitly (\u22653 of 6 core features within 3 years) and document functional decline.",
-        "Assess and document decision-making, financial, and driving capacity given the high risk of impulsivity and impaired judgment in FTD.",
-        "Provide caregiver education, safety planning, and referral to FTD-focused support resources.",
-        "Offer genetic counselling and discuss cascade testing options if a pathogenic variant is identified or suspected."
+        "Apply the Rascovsky 2011 criteria: state which features are present, the functional decline, and the level of certainty (possible or probable).",
+        "Explain why alcohol-related brain damage does not account for the progressive syndrome, and manage the escalating alcohol use as part of the behavioural change (limit access, involve his wife, support abstinence).",
+        "Address safety and capacity: driving, finances (over $14,000 in impulsive online purchases: restrict access to cards and accounts) and lasting power of attorney while he can still take part.",
+        "Arrange caregiver education and support, and a plan for behavioural symptoms that avoids cholinesterase inhibitors and memantine.",
+        "Offer genetic counselling before any genetic test, and discuss what a result would mean for relatives."
       ]
     },
     "avoided_actions": [
@@ -481,7 +547,7 @@
           }
         ],
         "citations": [
-          "[AAN_dementia_2018]"
+          "[NICE_NG97]"
         ],
         "criterion_id": "avoid-waste-5-order-ct-scan",
         "rationale": "Non-contrast head CT lacks the resolution and lobar specificity needed to characterise frontotemporal atrophy; MRI is the standard structural study.",
@@ -516,7 +582,7 @@
           "[Bang_2015]"
         ],
         "criterion_id": "avoid-waste-7-order-advanced-imaging",
-        "rationale": "Perfusion MRI is not indicated in the standard FTD workup once a structural MRI and FDG-PET (or amyloid PET) have characterised the lobar pattern.",
+        "rationale": "Perfusion MRI is not part of the FTD work-up; FDG-PET, or perfusion SPECT where it is unavailable, is the functional study used when needed.",
         "severity": "waste"
       },
       {
@@ -548,7 +614,7 @@
           "[Bang_2015]"
         ],
         "criterion_id": "avoid-waste-9-order-advanced-imaging",
-        "rationale": "DaTscan evaluates presynaptic dopaminergic terminals; it is not indicated unless overt parkinsonism raises concern for PD, DLB, or atypical parkinsonism (PSP/CBS overlap).",
+        "rationale": "DaTscan evaluates presynaptic dopaminergic terminals; mild symmetric rigidity without bradykinesia or tremor does not call for it, and it would not change the diagnosis.",
         "severity": "waste"
       }
     ],
@@ -573,47 +639,53 @@
     "differential": [
       {
         "diagnosis": "Alzheimer disease (frontal-presenting variant)",
-        "key_features": "Older adult with cognitive decline; would expect posterior parietotemporal hypometabolism and positive amyloid biomarkers \u2014 case shows frontal-predominant atrophy and negative amyloid PET.",
-        "likelihood": "moderate"
+        "key_features": "Bedside recall and clock are impaired, but memory is of retrieval type with normal recognition, the hippocampi are normal and the atrophy is frontal and anterior temporal with posterior sparing; an amyloid or CSF AD biomarker study is optional if doubt remains.",
+        "likelihood": "low"
       },
       {
-        "diagnosis": "Primary psychiatric disorder (late-onset mood / personality disorder, frontal alcoholism)",
-        "key_features": "Heavy alcohol escalation could mimic disinhibition; severe knife-blade frontal atrophy, frontal release signs, and utilisation behavior are organic findings inconsistent with a primary psychiatric diagnosis.",
-        "likelihood": "moderate"
+        "diagnosis": "Primary psychiatric disorder (late-onset mood or personality disorder)",
+        "key_features": "No psychiatric history; new behaviour at 56 with functional decline, frontal release signs, utilisation behaviour and lobar atrophy is not explained by a primary psychiatric disorder.",
+        "likelihood": "low"
       },
       {
-        "diagnosis": "Alcohol-related (Korsakoff / frontal alcohol-related) cognitive disorder",
-        "key_features": "Recent alcohol escalation; pattern of frontal atrophy + posterior sparing is more severe and focal than typical alcohol-related changes; alcohol escalation itself is likely a symptom of frontal disinhibition.",
+        "diagnosis": "Alcohol-related brain damage (including Wernicke-Korsakoff syndrome)",
+        "key_features": "Recent escalation to 6-8 beers nightly, but no ataxia, ophthalmoplegia or neuropathy; loss of empathy, compulsions and knife-blade lobar atrophy are not the pattern of alcohol-related damage, and the drinking is itself part of the change in oral behaviour.",
+        "likelihood": "low"
+      },
+      {
+        "diagnosis": "Atypical parkinsonian syndrome with frontal behaviour (PSP, corticobasal syndrome)",
+        "key_features": "Mild symmetric rigidity, hypomimia and reduced arm swing, but no bradykinesia, gaze palsy, falls, limb apraxia or asymmetry.",
         "likelihood": "low"
       },
       {
         "diagnosis": "Normal pressure hydrocephalus",
-        "key_features": "Gait shuffling could suggest NPH but no urinary incontinence, no disproportionate ventriculomegaly, and atrophic pattern dominates.",
+        "key_features": "Shuffling gait, but no urinary incontinence; ventricular enlargement is proportionate to the frontal atrophy.",
         "likelihood": "low"
       },
       {
-        "diagnosis": "FTD-MND (motor neuron disease) overlap",
-        "key_features": "No fasciculations, bulbar dysfunction, or limb weakness; EMG not yet pursued but no clinical motor neuron signs.",
+        "diagnosis": "FTD with motor neuron disease",
+        "key_features": "Normal bulk and full strength, and no bulbar symptoms are described; nothing on examination suggests motor neuron disease.",
         "likelihood": "low"
       }
     ],
     "key_clinical_evidence": [
-      "Five Rascovsky core features are present (disinhibition, apathy, loss of empathy, perseverative/compulsive behavior, hyperorality) plus executive dysfunction on FAB and neuropsychological testing \u2014 comfortably meets \u22653 of 6.",
-      "Knife-blade gyral atrophy on coronal T1 with bifrontal and anterior temporal volume loss is highly characteristic of FTLD; preserved hippocampal volume and posterior cortex argue against AD.",
-      "Severe bifrontal hypometabolism on FDG-PET with preserved posterior cingulate metabolism is the classic FTD pattern (Foster 2007).",
-      "Negative amyloid PET and normal CSF A\u03b242/p-tau effectively exclude underlying neurodegenerative pathology, securing the bvFTD diagnosis.",
-      "Mild bilateral upper-extremity rigidity and shuffling gait do not justify DaTscan \u2014 extrapyramidal features can occur in advanced bvFTD and the imaging pattern already explains the syndrome."
+      "Five of the six Rascovsky features on his wife's account (disinhibition, apathy, loss of empathy, compulsive behaviour, hyperorality), with loss of work and of self-care, meet possible bvFTD with significant functional decline.",
+      "Severe bilateral frontal and anterior temporal atrophy with a knife-blade pattern, normal hippocampi and preserved posterior cortex on MRI give the imaging support for probable bvFTD.",
+      "Neuropsychology shows severe executive and social-cognition deficits with a retrieval-type memory deficit, normal recognition and preserved visuospatial perception.",
+      "The frontal and anterior temporal pattern with relative posterior sparing makes Alzheimer disease less likely; an amyloid or CSF AD biomarker study is optional if doubt remains.",
+      "Mild symmetric rigidity without rest tremor or bradykinesia is compatible with bvFTD and does not by itself call for dopamine transporter imaging.",
+      "The escalation of alcohol intake belongs to the change in oral behaviour; it does not explain the lobar atrophy, the compulsions or the loss of empathy."
     ],
     "red_herrings": [
       {
-        "correct_interpretation": "Escalating alcohol use in this context is itself a manifestation of frontal disinhibition; the structural/metabolic frontotemporal pattern is not explained by alcohol.",
+        "correct_interpretation": "Escalating alcohol use here is part of the change in oral behaviour and disinhibition; the lobar frontotemporal atrophy is not explained by alcohol.",
         "data_point": "Escalation of alcohol intake from 1\u20132 to 6\u20138 beers nightly",
         "field_path": "patient.clinical_history.social_history.alcohol",
         "intended_effect": "Suggests primary alcohol-related cognitive disorder driving disinhibition.",
         "location": "social_history.alcohol"
       },
       {
-        "correct_interpretation": "Mild extrapyramidal features are common in advanced bvFTD and do not warrant DaTscan once the frontotemporal imaging pattern is established.",
+        "correct_interpretation": "Mild symmetric rigidity without rest tremor or bradykinesia is compatible with bvFTD and does not by itself call for dopamine transporter imaging.",
         "data_point": "Mild bilateral cogwheel upper-extremity rigidity and shuffling gait",
         "field_path": "patient.neurological_exam.motor",
         "intended_effect": "Could prompt DaTscan for suspected parkinsonism.",
@@ -621,14 +693,24 @@
       },
       {
         "correct_interpretation": "Mild hyperglycaemia is consistent with the patient's known type 2 diabetes mellitus and does not explain frontotemporal degeneration.",
-        "data_point": "Glucose 112 mg/dL flagged as abnormal in BMP",
-        "field_path": "initial_tool_outputs.labs.panels.BMP",
+        "data_point": "Glucose 112 mg/dL flagged high",
+        "field_path": "initial_tool_outputs.labs.panels.Chemistry",
         "intended_effect": "Could be over-interpreted as metabolic contribution; agent might pursue additional metabolic workup.",
-        "location": "labs.BMP.Glucose"
+        "location": "labs.Chemistry.Glucose"
       }
     ],
     "review_status": "draft",
-    "sequence_constraints": [],
+    "sequence_constraints": [
+      {
+        "after_criterion_id": "action-4-order-specialized-test",
+        "before_criterion_id": "action-2-perform-clinical-assessment",
+        "citations": [
+          "[ACMG_NSGC_2011]"
+        ],
+        "reason": "Genetic testing follows the clinical diagnosis and counselling.",
+        "severity": "soft"
+      }
+    ],
     "stop_rule": {
       "max_additional_actions": 0,
       "required_before_assessment": [
@@ -643,8 +725,8 @@
     "clinical_assessment": {
       "assessment_type": "cognitive_screen",
       "criteria_met": {
-        "dysexecutive_profile_with_relative_sparing_of_memory_and_visuospatial": true,
-        "early_apathy_or_inertia": false,
+        "dysexecutive_profile_with_relative_sparing_of_memory_and_visuospatial": false,
+        "early_apathy_or_inertia": true,
         "early_behavioural_disinhibition": true,
         "early_loss_of_sympathy_or_empathy": true,
         "hyperorality_or_dietary_change": true,
@@ -655,50 +737,60 @@
       "findings": [
         {
           "domain": "Early behavioural disinhibition",
-          "result": "His wife reports that the change began subtly \u2014 he became less interested in conversation, more irritable, and started making inappropriate comments at family gatherings."
+          "result": "Present: sexually explicit remarks to neighbours and to staff, inappropriate comments at family gatherings, impulsive online purchases of over $14,000."
+        },
+        {
+          "domain": "Early apathy or inertia",
+          "result": "Present: lost interest in conversation and in his daily jogging; his wife has to guide him to shower."
         },
         {
           "domain": "Early loss of sympathy or empathy",
-          "result": "Over the following year, the changes became unmistakable: he began making sexually explicit remarks to female neighbors, laughed at his granddaughter's injury, and showed complete indifference when their dog died."
+          "result": "Present: laughed at his granddaughter's injury and was indifferent when the family dog died."
         },
         {
-          "domain": "Perseverative stereotyped or compulsive behaviour",
-          "result": "She describes him as having 'lost his soul.' He has developed compulsive behaviors: he insists on eating the same three meals daily, paces the living room for exactly 30 minutes every evening, and has begun hoarding items from grocery stores."
+          "domain": "Perseverative, stereotyped or compulsive behaviour",
+          "result": "Present: eats the same three meals daily, paces the living room for exactly 30 minutes every evening, hoards items from grocery stores; utilisation behaviour on examination."
         },
         {
           "domain": "Hyperorality or dietary change",
-          "result": "His diet has changed dramatically \u2014 he craves sweets and high-calorie foods and has gained 18 pounds."
+          "result": "Present: craving for sweets and high-calorie food with an 18 lb weight gain, alcohol up from 1-2 to 6-8 beers nightly; took crackers from the desk unprompted."
         },
         {
-          "domain": "Dysexecutive profile with relative sparing of memory and visuospatial",
-          "result": "FAB 10/18 \u2014 fails go/no-go, environmental autonomy, conflicting instructions, and lexical fluency."
+          "domain": "Executive profile with relative sparing of memory and visuospatial function",
+          "result": "Not established at the bedside: executive deficits (FAB 10/18, animal fluency 7 in 60 s, concrete proverbs), but delayed recall 0/3, disoriented to date and month, and failed pentagon copy and clock drawing."
         },
         {
-          "domain": "Bedside cognitive testing",
-          "result": "MMSE 21/30 \u2014 loses 3 points on delayed recall (0/3), 3 points on serial sevens, 2 points on orientation to date and month."
+          "domain": "Informant",
+          "result": "History from his wife of 30 years; the patient denies the changes and the alcohol use and shows no insight."
         },
         {
-          "domain": "Bedside cognitive testing",
-          "result": "Clock drawing severely abnormal: numbers placed randomly outside clock face."
+          "domain": "Bedside cognitive screen",
+          "result": "MMSE 21/30: delayed recall 0/3, serial sevens loses 3, orientation loses 2 (date, month), pentagon copy failed with perseverative strokes. Clock drawing: numbers placed randomly outside the face."
+        },
+        {
+          "domain": "Functional decline",
+          "result": "Left work as an accountant 2 years ago after errors in client accounts; needs prompting and help for personal hygiene; unsafe financial decisions."
         }
       ],
-      "impression": "5 of the six Rascovsky behavioural features are documented, against the three required for possible behavioural-variant frontotemporal dementia, alongside a dysexecutive bedside profile. The diagnosis is behavioural and is made on this assessment; imaging supports it and does not substitute for it. Memory and visuospatial function are relatively spared, which is the discriminator against Alzheimer's disease and the reason a screening total alone understates the syndrome.",
+      "impression": "5 of the 6 Rascovsky features are present on informant history and examination (disinhibition, apathy, loss of empathy, compulsive behaviour, hyperorality), with documented decline in daily function. This meets possible bvFTD; imaging and neuropsychological testing decide whether it is probable. Memory and visuospatial items are also impaired on the bedside screen, which keeps Alzheimer disease in the differential.",
       "pre_post_comparison": null,
       "recommended_actions": [],
       "scores": {
-        "MMSE (from the bedside examination)": "21/30",
-        "Rascovsky behavioural features present": "5 of 6 (three are required for possible behavioural-variant FTD)",
-        "Verbal fluency": "7 items in 60 s"
+        "Category fluency (animals)": "7 in 60 s",
+        "FAB": "10/18",
+        "MMSE": "21/30",
+        "Rascovsky behavioural features present": "5 of 6"
       }
     },
     "labs": {
       "abnormal_values_summary": [
-        "Glucose 112 mg/dL (mildly elevated)"
+        "Glucose 112 mg/dL (high)"
       ],
-      "interpretation": "Abnormal values: Glucose 112 mg/dL (H).",
+      "interpretation": "Glucose 112 mg/dL (high). Other results within reference ranges.",
       "panels": {
-        "BMP": [
+        "Chemistry": [
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "136-145",
             "test": "Sodium",
@@ -706,11 +798,36 @@
             "value": 138
           },
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "3.5-5.1",
             "test": "Potassium",
             "unit": "mEq/L",
             "value": 4.0
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "7-25",
+            "test": "BUN",
+            "unit": "mg/dL",
+            "value": 18
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.7-1.2",
+            "test": "Creatinine",
+            "unit": "mg/dL",
+            "value": 1.0
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": ">=60",
+            "test": "eGFR",
+            "unit": "mL/min/1.73m2",
+            "value": 87
           },
           {
             "clinical_significance": null,
@@ -721,29 +838,57 @@
             "value": 112
           },
           {
+            "clinical_significance": null,
             "is_abnormal": false,
-            "reference_range": "0.7-1.2",
-            "test": "Creatinine",
+            "reference_range": "8.6-10.3",
+            "test": "Calcium",
             "unit": "mg/dL",
-            "value": 1.0
+            "value": 9.4
           },
           {
+            "clinical_significance": null,
             "is_abnormal": false,
-            "reference_range": "7-25",
-            "test": "BUN",
+            "reference_range": "7-56",
+            "test": "ALT",
+            "unit": "U/L",
+            "value": 29
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "10-40",
+            "test": "AST",
+            "unit": "U/L",
+            "value": 27
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "40-129",
+            "test": "ALP",
+            "unit": "U/L",
+            "value": 74
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.1-1.2",
+            "test": "Total bilirubin",
             "unit": "mg/dL",
-            "value": 18
+            "value": 0.7
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "3.5-5.0",
+            "test": "Albumin",
+            "unit": "g/dL",
+            "value": 4.2
           }
         ],
-        "CBC": [
+        "Haematology": [
           {
-            "is_abnormal": false,
-            "reference_range": "4.5-11.0",
-            "test": "WBC",
-            "unit": "x10^9/L",
-            "value": 7.1
-          },
-          {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "13.5-17.5",
             "test": "Hemoglobin",
@@ -751,21 +896,31 @@
             "value": 15.2
           },
           {
+            "clinical_significance": null,
             "is_abnormal": false,
-            "reference_range": "80-100",
-            "test": "MCV",
-            "unit": "fL",
-            "value": 94
+            "reference_range": "4.5-11.0",
+            "test": "WBC",
+            "unit": "x10^9/L",
+            "value": 7.1
           },
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "150-400",
             "test": "Platelets",
             "unit": "x10^9/L",
             "value": 241
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "80-100",
+            "test": "MCV",
+            "unit": "fL",
+            "value": 94
           }
         ],
-        "Reviewed_FTD_panel_additions": [
+        "Inflammatory": [
           {
             "clinical_significance": null,
             "is_abnormal": false,
@@ -783,31 +938,9 @@
             "value": 1.6
           }
         ],
-        "Special": [
-          {
-            "is_abnormal": false,
-            "reference_range": "70-140",
-            "test": "Copper",
-            "unit": "mcg/dL",
-            "value": 102
-          },
-          {
-            "is_abnormal": false,
-            "reference_range": "20-40",
-            "test": "Ceruloplasmin",
-            "unit": "mg/dL",
-            "value": 30
-          },
-          {
-            "is_abnormal": false,
-            "reference_range": "within normal limits",
-            "test": "Heavy metal screen",
-            "unit": "",
-            "value": "within normal limits"
-          }
-        ],
         "Thyroid": [
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "0.4-4.0",
             "test": "TSH",
@@ -815,8 +948,9 @@
             "value": 2.1
           }
         ],
-        "Vitamins_Metabolic": [
+        "Vitamins": [
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "200-900",
             "test": "Vitamin B12",
@@ -824,18 +958,12 @@
             "value": 388
           },
           {
+            "clinical_significance": null,
             "is_abnormal": false,
-            "reference_range": "non-reactive",
-            "test": "RPR",
-            "unit": "",
-            "value": "non-reactive"
-          },
-          {
-            "is_abnormal": false,
-            "reference_range": "negative",
-            "test": "HIV",
-            "unit": "",
-            "value": "negative"
+            "reference_range": ">3.0",
+            "test": "Folate",
+            "unit": "ng/mL",
+            "value": 9.6
           }
         ]
       }
@@ -845,18 +973,35 @@
         "query": "Behavioural variant FTD diagnosis and management",
         "results": [
           {
-            "evidence_level": "guideline recommendation",
-            "finding": "Confirms Rascovsky 2011 criteria, FDG-PET evidence (Foster 2007), and management approach (Bang 2015)",
+            "evidence_level": "consensus diagnostic criteria",
+            "finding": "Three of six core features within the first three years define possible bvFTD.",
+            "source": "Rascovsky_2011"
+          },
+          {
+            "evidence_level": "consensus diagnostic criteria",
+            "finding": "Probable bvFTD requires functional decline and supportive imaging.",
+            "source": "Rascovsky_2011"
+          },
+          {
+            "evidence_level": "consensus diagnostic criteria",
+            "finding": "Primary psychiatric disorders are the commonest misdiagnosis.",
+            "source": "Rascovsky_2011"
+          },
+          {
+            "evidence_level": "narrative review",
+            "finding": "No disease-modifying treatment is available.",
             "source": "Bang_2015"
           }
         ],
-        "summary": "Confirms Rascovsky 2011 criteria, FDG-PET evidence (Foster 2007), and management approach (Bang 2015)"
+        "summary": "Rascovsky and colleagues (2011) define possible behavioural variant FTD by three of six behavioural and cognitive features, probable bvFTD by added functional decline and frontal or anterior temporal involvement on structural or functional imaging, and definite bvFTD by histopathology or a pathogenic mutation. Psychiatric disorders are the main mimics and are excluded on course and examination rather than on a single test. Treatment is supportive: SSRIs or trazodone for behaviour, caregiver support and safety planning; cholinesterase inhibitors and memantine are not recommended."
       }
     },
     "mri": {
       "additional_observations": [
         "Ventricles mildly enlarged commensurate with frontal atrophy",
-        "No DWI restriction"
+        "No DWI restriction",
+        "Periventricular and deep white matter: a few punctate FLAIR hyperintensities (Fazekas 1). No microbleeds on SWI.",
+        "No mass, haemorrhage or hydrocephalus."
       ],
       "findings": [
         {
@@ -892,11 +1037,11 @@
           "type": "atrophy"
         }
       ],
-      "impression": "Severe bilateral frontal and anterior temporal lobe atrophy with knife-blade gyral pattern and mild caudate atrophy. Normal hippocampal volume. Posterior parietal and occipital cortex preserved",
+      "impression": "1. Severe bilateral frontal and moderate-to-severe anterior temporal lobe atrophy with a knife-blade gyral pattern; mild caudate atrophy. 2. Normal hippocampal volume; posterior parietal and occipital cortex preserved. 3. No mass, haemorrhage, hydrocephalus or significant vascular lesion.",
       "recommended_actions": [],
       "volumetrics": {
         "anterior_temporal_lobes": "18% below age-matched norms",
-        "frontal_lobes": "22% below age-matched norms \u2014 severe bilateral",
+        "frontal_lobes": "22% below age-matched norms, severe bilateral",
         "hippocampal_volume": "within normal limits bilaterally",
         "occipital_lobes": "normal",
         "parietal_lobes": "normal"
@@ -909,10 +1054,10 @@
     "citation_gap": [],
     "condition_full_name": "Behavioral variant frontotemporal dementia",
     "criteria_pack_version": "1.0",
-    "difficulty_rationale": "Required core: structured behavioural/cognitive assessment with informant, validated neuropsychological testing, targeted baseline labs, and brain MRI. Case-specific additions: optional FDG-PET; optional counselled genetic testing.",
+    "difficulty_rationale": "Required core: structured informant assessment, neuropsychological battery, reversible-cause blood tests and MRI. Optional: FDG-PET or perfusion SPECT, counselled genetic testing, an SSRI interaction check and a literature search. The bedside memory and clock failures and the alcohol escalation must be weighed against the frontal profile.",
     "fallback_tool_kinds": {
       "cardiac_monitoring": "normal",
-      "ct": "normal",
+      "ct": "case",
       "ecg": "normal",
       "echo": "normal",
       "eeg": "normal",
@@ -956,7 +1101,7 @@
       ],
       "past_medical_history": [
         "Hypertension, diagnosed 10 years ago, on medication",
-        "Type 2 diabetes mellitus, diagnosed 7 years ago, diet-controlled",
+        "Type 2 diabetes mellitus, diagnosed 7 years ago, treated with metformin",
         "No psychiatric history"
       ],
       "social_history": {
@@ -976,14 +1121,14 @@
       "handedness": "right",
       "sex": "male"
     },
-    "history_present_illness": "Mr. K. is a 58-year-old right-handed White male brought in by his wife of 30 years for progressive personality and behavioral changes over the past 2 years. His wife reports that the change began subtly \u2014 he became less interested in conversation, more irritable, and started making inappropriate comments at family gatherings. Over the following year, the changes became unmistakable: he began making sexually explicit remarks to female neighbors, laughed at his granddaughter's injury, and showed complete indifference when their dog died. She describes him as having 'lost his soul.' He has developed compulsive behaviors: he insists on eating the same three meals daily, paces the living room for exactly 30 minutes every evening, and has begun hoarding items from grocery stores. His diet has changed dramatically \u2014 he craves sweets and high-calorie foods and has gained 18 pounds. His personal hygiene is severely degraded; his wife must physically guide him to shower.\n\nProfessionally, he retired from accounting 2 years ago after colleagues reported he was making errors in client accounts and had made inappropriate comments to staff. He shows no insight into his deficits and is not distressed. His wife has discovered he has been making online purchases totaling over $14,000, mostly buying things that he immediately forgets having ordered. His alcohol use has escalated from 1-2 beers occasionally to 6-8 beers nightly, which he denies entirely. He has never had psychiatric illness and there is no family history of dementia. Neurological review of systems is otherwise negative.",
+    "history_present_illness": "Mr. K. is a 58-year-old right-handed White male brought in by his wife of 30 years for progressive personality and behavioral changes over the past 2 years. His wife reports that the change began subtly \u2014 he became less interested in conversation, more irritable, and started making inappropriate comments at family gatherings. Over the following year, the changes became unmistakable: he began making sexually explicit remarks to female neighbors, laughed at his granddaughter's injury, and showed complete indifference when their dog died. She describes him as having 'lost his soul.' He has developed compulsive behaviors: he insists on eating the same three meals daily, paces the living room for exactly 30 minutes every evening, and has begun hoarding items from grocery stores. His diet has changed dramatically \u2014 he craves sweets and high-calorie foods and has gained 18 pounds. His personal hygiene is severely degraded; his wife must physically guide him to shower.\n\nProfessionally, he retired from accounting 2 years ago after colleagues reported he was making errors in client accounts and had made inappropriate comments to staff. He shows no insight into his deficits and is not distressed. His wife has discovered he has been making online purchases totaling over $14,000, mostly buying things that he immediately forgets having ordered. His alcohol use has escalated from 1-2 beers a night to 6-8 beers nightly, which he denies entirely. He has never had psychiatric illness and there is no family history of dementia. Neurological review of systems is otherwise negative.",
     "neurological_exam": {
       "additional": "Hyperorality observed during exam \u2014 patient took crackers from desk without being offered. Poor hygiene noted by examiner: food stains on clothing, body odor.",
       "coordination": "Finger-to-nose intact. No dysmetria.",
       "cranial_nerves": "Intact. Pupils equal and reactive. Extraocular movements full. Mild bilateral facial hypomimia noted.",
       "gait": "Mildly shuffling, reduced arm swing. No apraxia.",
       "mental_status": "Alert but severely disinhibited throughout the exam. Makes inappropriate sexual comments to the female medical assistant. Laughs inappropriately when discussing his job loss. MMSE 21/30 \u2014 loses 3 points on delayed recall (0/3), 3 points on serial sevens, 2 points on orientation to date and month. Cannot copy interlocking pentagons (perseverates on strokes). Clock drawing severely abnormal: numbers placed randomly outside clock face. FAB 10/18 \u2014 fails go/no-go, environmental autonomy, conflicting instructions, and lexical fluency. Category fluency (animals): 7 in 60 seconds (severely impaired). Cannot explain proverbs (concrete interpretation). Utilization behavior: automatically picks up pen on desk and begins writing without instruction.",
-      "motor": "Normal bulk. Mild bilateral upper extremity rigidity (cogwheel quality) without tremor. Strength 5/5 throughout.",
+      "motor": "Normal bulk. Mild bilateral upper extremity rigidity (cogwheel quality) without tremor. No bradykinesia on repetitive finger tapping. Strength 5/5 throughout.",
       "reflexes": "2+ bilaterally. Bilateral grasp reflex present. Snout and palmomental reflexes present bilaterally (frontal release signs).",
       "sensory": "Intact to light touch and pinprick bilaterally."
     },

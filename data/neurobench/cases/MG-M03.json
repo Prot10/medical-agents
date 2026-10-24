@@ -4,14 +4,7 @@
   "difficulty": "moderate",
   "encounter_type": "inpatient",
   "fallback_tool_outputs": {
-    "advanced_imaging": {
-      "findings": [],
-      "impression": "No abnormality identified.",
-      "modality": "",
-      "quantitative_data": null,
-      "recommended_actions": [],
-      "tracer_or_protocol": null
-    },
+    "advanced_imaging": null,
     "cardiac_monitoring": {
       "duration_hours": 24,
       "events": [],
@@ -41,7 +34,14 @@
       "protein": "38 mg/dL",
       "special_tests": {}
     },
-    "ct": null,
+    "ct": {
+      "additional_observations": [],
+      "angiography_findings": null,
+      "contrast_used": false,
+      "findings": [],
+      "impression": "Non-contrast CT head: no acute intracranial abnormality. Impression: normal non-contrast CT of the head.",
+      "recommended_actions": []
+    },
     "drug_interactions": null,
     "ecg": {
       "axis": "normal",
@@ -65,6 +65,7 @@
         "RA": "normal size",
         "RV": "normal size and function"
       },
+      "echo_type": "TTE",
       "ejection_fraction": 63.0,
       "findings": [
         "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
@@ -115,22 +116,35 @@
       "output": {
         "findings": [
           {
-            "measurement": "Mean MCD",
-            "reference_range": "<34 us",
-            "significance": "Markedly increased jitter",
+            "measurement": "Muscle",
+            "reference_range": "",
+            "significance": "",
+            "value": "Left orbicularis oculi, voluntary activation"
+          },
+          {
+            "measurement": "Mean consecutive difference (MCD)",
+            "reference_range": "<=33 microseconds",
+            "significance": "Increased",
             "value": "72 microseconds"
           },
           {
-            "measurement": "Blocking",
-            "reference_range": "<10%",
-            "significance": "High blocking rate \u2014 severe NMJ failure in facial muscles",
-            "value": "14/20 pairs (70%)"
+            "measurement": "Pairs with jitter above the individual-pair limit (45 microseconds)",
+            "reference_range": "<=1 of 20",
+            "significance": "Increased",
+            "value": "16 of 20 (80%)"
+          },
+          {
+            "measurement": "Pairs with impulse blocking",
+            "reference_range": "0",
+            "significance": "Present",
+            "value": "7 of 20 (35%)"
           }
         ],
-        "impression": "Markedly abnormal SFEMG orbicularis oculi. Mean MCD 72 \u00b5s (reference <34 \u00b5s) with 70% blocking rate. Increased jitter and blocking indicate severely impaired neuromuscular junction transmission. Findings are consistent with a disorder of neuromuscular transmission",
+        "impression": "Abnormal single-fiber EMG of the left orbicularis oculi: markedly increased jitter (mean MCD 72 microseconds, 16 of 20 pairs abnormal) with impulse blocking in 7 of 20 pairs, indicating impaired neuromuscular transmission.",
         "quantitative_data": {
-          "blocking": "70%",
-          "mean_MCD": "72 us"
+          "mean_MCD": "72 us",
+          "pairs_above_limit": "16/20",
+          "pairs_with_blocking": "7/20"
         },
         "recommended_actions": [],
         "test_type": "emg_single_fiber"
@@ -142,172 +156,123 @@
       "output": {
         "findings": [
           {
-            "panel": "Respiratory Evaluation",
-            "reference_range": ">-60",
-            "result": "-40",
-            "test": "NIF"
+            "result": "1.5 mm",
+            "significance": "",
+            "test": "Left upper lid, MRD1 before ice"
           },
           {
-            "panel": "Respiratory Evaluation",
-            "reference_range": ">2.5L predicted",
-            "result": "1.9",
-            "test": "FVC"
+            "result": "4.0 mm",
+            "significance": "Improved by 2.5 mm",
+            "test": "Left upper lid, MRD1 after 2 minutes of ice"
           },
           {
-            "panel": "Respiratory Evaluation",
-            "reference_range": ">0.70",
-            "result": "0.58",
-            "test": "FEV1/FVC ratio"
+            "result": "3.0 mm",
+            "significance": "",
+            "test": "Right upper lid, MRD1 before ice"
           },
           {
-            "panel": "Respiratory Evaluation",
-            "reference_range": "Normal",
-            "result": "pH 7.40, pCO2 44, pO2 74",
-            "test": "ABG"
+            "result": "3.5 mm",
+            "significance": "Improved by 0.5 mm",
+            "test": "Right upper lid, MRD1 after 2 minutes of ice"
           }
         ],
-        "impression": "Abnormal values: NIF -40 cmH2O (L), FVC 1.9 L (L), FEV1/FVC ratio 0.58 ratio (L).",
+        "impression": "Positive ice-pack test on the left (MRD1 improved by 2.5 mm after 2 minutes of cooling); no significant change on the right.",
         "quantitative_data": {
-          "ABG": "pH 7.40, pCO2 44, pO2 74",
-          "FEV1/FVC ratio": "0.58",
-          "FVC": "1.9",
-          "NIF": "-40"
+          "left_MRD1_change": "+2.5 mm",
+          "right_MRD1_change": "+0.5 mm"
         },
         "recommended_actions": [],
-        "test_type": "respiratory_function"
+        "test_type": "ice_pack_test"
       },
       "tool_name": "order_specialized_test",
-      "trigger_action": "request_respiratory_function"
-    },
-    {
-      "output": {
-        "alternatives": [
-          "Azathioprine as steroid-sparing first-line to minimize steroid dose",
-          "Mycophenolate mofetil alternative steroid-sparing"
-        ],
-        "contraindications": [
-          "High-dose steroids as sole initial MG therapy without glucose monitoring plan is dangerous in T2DM",
-          "Consider initiating insulin for glycemic control during steroid therapy"
-        ],
-        "formulary_status": "Prednisone: formulary",
-        "interactions": [
-          "Prednisone + metformin: corticosteroids antagonize insulin secretion and cause hyperglycemia; metformin will be insufficient to control steroid-induced hyperglycemia",
-          "Prednisone worsening: expected glucose increase 40-80 mg/dL with moderate doses"
-        ],
-        "proposed": "Prednisone for immunosuppression in MG in patient with Type 2 DM on metformin (HbA1c 7.8%)",
-        "warnings": [
-          "Start prednisone at low dose (10-15 mg/day) and escalate slowly to minimize glycemic impact and avoid MG crisis",
-          "Intensify glucose monitoring \u2014 check BG before meals and at bedtime",
-          "Consider endocrinology consultation for steroid-diabetes management"
-        ]
-      },
-      "tool_name": "check_drug_interactions",
-      "trigger_action": "request_steroid_diabetes_interaction"
+      "trigger_action": "request_ice_pack_test"
     },
     {
       "output": {
         "contrast": true,
         "findings": [
           {
-            "density": "Soft tissue, homogeneously enhancing",
-            "description": "Well-circumscribed encapsulated anterior mediastinal mass. No pericardial, pleural, or great vessel invasion. Surgical approach feasible.",
+            "description": "Encapsulated solid nodule, intermediate T1 and mildly high T2 signal, homogeneous enhancement, no signal drop on opposed-phase chemical shift imaging; preserved fat planes.",
             "location": "Anterior mediastinum",
             "size": "2.2 x 1.8 x 2.0 cm",
             "type": "Anterior mediastinal mass"
           },
           {
-            "description": "COPD changes \u2014 surgical risk modified by pulmonary function",
-            "location": "mediastinum",
-            "type": "additional_observation"
+            "description": "No lymphadenopathy. No pleural or pericardial effusion.",
+            "location": "Mediastinum",
+            "type": "pertinent_negative"
           }
         ],
-        "impression": "Well-circumscribed encapsulated anterior mediastinal mass 2.2 x 1.8 x 2.0 cm with homogeneous enhancement. No pericardial, pleural, or great vessel invasion. No mediastinal lymphadenopathy. Bilateral emphysematous changes present. Surgical approach appears feasible. Tissue diagnosis recommended",
+        "impression": "1. 2.2 cm encapsulated anterior mediastinal solid nodule without signal loss on chemical shift imaging and without signs of invasion; appearance most consistent with a thymoma.",
         "measurements": {
           "Anterior mediastinal mass": "2.2 x 1.8 x 2.0 cm"
         },
-        "modality": "CT",
-        "recommended_actions": [
-          "Tissue diagnosis recommended"
-        ],
+        "modality": "MRI",
+        "recommended_actions": [],
         "region": "mediastinum"
       },
       "tool_name": "order_body_imaging",
-      "trigger_action": "request_thymectomy_evaluation"
+      "trigger_action": "request_mediastinum_mri"
     },
     {
       "output": {
-        "abnormal_values_summary": [
-          "PSA 4.2 ng/mL (mildly elevated)",
-          "All paraneoplastic antibodies within reference limits"
-        ],
-        "interpretation": "Abnormal values: PSA 4.2 ng/mL (H).",
-        "panels": {
-          "Paraneoplastic Evaluation": [
-            {
-              "clinical_significance": null,
-              "is_abnormal": true,
-              "reference_range": "<4.0",
-              "test": "PSA",
-              "unit": "ng/mL",
-              "value": 4.2
-            },
-            {
-              "clinical_significance": null,
-              "is_abnormal": false,
-              "reference_range": "<0.02",
-              "test": "Anti-VGCC (P/Q-type)",
-              "unit": "nmol/L",
-              "value": "<0.02"
-            },
-            {
-              "clinical_significance": null,
-              "is_abnormal": false,
-              "reference_range": "All negative",
-              "test": "Comprehensive paraneoplastic panel",
-              "unit": "qualitative",
-              "value": "All negative (Hu, Yo, Ri, CV2, amphiphysin)"
-            }
-          ]
-        }
-      },
-      "tool_name": "interpret_labs",
-      "trigger_action": "request_prostate_cancer_paraneoplastic"
-    },
-    {
-      "output": {
-        "alternatives": [
-          "Ipratropium (shorter-acting) as alternative bronchodilator if tiotropium-pyridostigmine interaction clinically significant",
-          "Optimize pyridostigmine dose to overcome any pharmacological antagonism"
-        ],
-        "contraindications": [],
-        "formulary_status": "Both tiotropium and pyridostigmine: formulary",
-        "interactions": [
-          "Tiotropium (M3 antagonist inhaled) + pyridostigmine (AChE inhibitor): theoretical pharmacological antagonism \u2014 anticholinergic tiotropium may reduce efficacy of cholinergic pyridostigmine at NMJ",
-          "Clinical significance: tiotropium is inhaled with local pulmonary effects; pyridostigmine acts at NMJ; antagonism is primarily theoretical and minimal in clinical practice"
-        ],
-        "proposed": "Continue tiotropium (muscarinic antagonist) for COPD in patient starting pyridostigmine (cholinesterase inhibitor) for MG",
-        "warnings": [
-          "Monitor MG symptom control after initiating pyridostigmine \u2014 if inadequate, consider whether tiotropium is contributing",
-          "Do NOT discontinue tiotropium (COPD management critical); continue both and titrate pyridostigmine to symptom control",
-          "If concerns persist, ipratropium can be substituted for tiotropium with shorter duration of anticholinergic effect"
-        ]
-      },
-      "tool_name": "check_drug_interactions",
-      "trigger_action": "request_tiotropium_interactions_mg"
-    },
-    {
-      "output": {
-        "axis": "",
         "findings": [
-          "Baseline ECG to screen for ischemia / arrhythmia prior to surgical referral"
+          {
+            "reference_range": "Predicted 3.60 L; LLN 2.80 L",
+            "result": "2.45 L (68% predicted; 27 mL/kg at 92 kg)",
+            "significance": "L",
+            "test": "FVC (seated)"
+          },
+          {
+            "reference_range": "Predicted 2.78 L",
+            "result": "1.42 L (51% predicted)",
+            "significance": "L",
+            "test": "FEV1"
+          },
+          {
+            "reference_range": ">0.70",
+            "result": "0.58",
+            "significance": "L (obstructive)",
+            "test": "FEV1/FVC"
+          },
+          {
+            "reference_range": "More negative than -75 cmH2O",
+            "result": "-40 cmH2O",
+            "significance": "L (reduced)",
+            "test": "Maximal inspiratory pressure (MIP/NIF)"
+          },
+          {
+            "reference_range": ">100 cmH2O",
+            "result": "62 cmH2O",
+            "significance": "L (reduced)",
+            "test": "Maximal expiratory pressure (MEP)"
+          },
+          {
+            "reference_range": "pH 7.35-7.45, PaCO2 35-45, PaO2 >80",
+            "result": "pH 7.40, PaCO2 44 mmHg, PaO2 74 mmHg",
+            "significance": "PaO2 L",
+            "test": "Arterial blood gas (room air)"
+          }
         ],
-        "interpretation": "Baseline ECG to screen for ischemia / arrhythmia prior to surgical referral.",
-        "intervals": {},
-        "rate": 0,
-        "rhythm": "see impression"
+        "impression": "1. Obstructive ventilatory defect (FEV1/FVC 0.58, FEV1 51% predicted). 2. Reduced FVC (2.45 L, 68% predicted, 27 mL/kg). 3. Reduced maximal inspiratory (-40 cmH2O) and expiratory (62 cmH2O) pressures, indicating respiratory muscle weakness in addition to airflow obstruction. 4. Mild hypoxemia with normal PaCO2.",
+        "quantitative_data": {
+          "FEV1_FVC": "0.58",
+          "FEV1_L": "1.42",
+          "FVC_L": "2.45",
+          "FVC_mL_per_kg": "27",
+          "FVC_pct_pred": "68",
+          "MEP_cmH2O": "62",
+          "MIP_cmH2O": "-40",
+          "PaCO2_mmHg": "44",
+          "PaO2_mmHg": "74"
+        },
+        "recommended_actions": [
+          "Repeat measurements to establish a trend."
+        ],
+        "test_type": "respiratory_function"
       },
-      "tool_name": "analyze_ecg",
-      "trigger_action": "request_analyze_ecg"
+      "tool_name": "order_specialized_test",
+      "trigger_action": "request_respiratory_function"
     }
   ],
   "ground_truth": {
@@ -318,8 +283,6 @@
             "required_arguments": {
               "panels": [
                 "anti_AChR",
-                "anti_MuSK",
-                "anti_LRP4",
                 "TSH"
               ]
             },
@@ -327,14 +290,13 @@
           }
         ],
         "citations": [
-          "[Wolfe_2016]",
-          "Wolfe_2016"
+          "[Punga_2022]"
         ],
         "criterion_id": "action-1-interpret-labs",
-        "expected_evidence": "AChR antibody positive; TSH evaluates for comorbid thyroid disease",
+        "expected_evidence": "AChR binding antibody 0.9 nmol/L (reference <0.5) with raised blocking and modulating antibodies; TSH normal; HbA1c 7.8%.",
         "importance": "required",
-        "label": "Order serologies: anti-AChR (binding, blocking, modulating), anti-MuSK, anti-LRP4, and TSH/free-T4 for thyroid autoimmunity",
-        "rationale": "Order serologies: anti-AChR (binding, blocking, modulating), anti-MuSK, anti-LRP4, and TSH/free-T4 for thyroid autoimmunity"
+        "label": "Order AChR binding antibody and thyroid function",
+        "rationale": "Fatigable ptosis, diplopia, fatigable chewing and nasal speech with proximal weakness point to generalized MG; AChR binding antibody is the first test and thyroid function is tested in every MG patient (Jacob 2025, Evoli 2019)."
       },
       {
         "alternatives": [
@@ -346,14 +308,13 @@
           }
         ],
         "citations": [
-          "[Wolfe_2016]",
-          "Wolfe_2016"
+          "[Gilhus_2016]"
         ],
         "criterion_id": "action-2-order-specialized-test",
-        "expected_evidence": "Decrement >10% in symptomatic muscles supports postsynaptic NMJ disorder",
+        "expected_evidence": "Decrement of 14% in masseter and 11% in nasalis at 3 Hz, normal baseline CMAP and no post-exercise facilitation.",
         "importance": "required",
-        "label": "Order repetitive nerve stimulation (RNS) at 2-3 Hz across proximal and facial muscles",
-        "rationale": "Order repetitive nerve stimulation (RNS) at 2-3 Hz across proximal and facial muscles"
+        "label": "Order repetitive nerve stimulation including facial and masticatory muscles",
+        "rationale": "Neurophysiology confirms the junctional disorder and, with normal CMAPs and no facilitation, argues against LEMS, which his smoking history and cancer history raise (Jacob 2025)."
       },
       {
         "alternatives": [
@@ -365,14 +326,31 @@
           }
         ],
         "citations": [
-          "[Wolfe_2016]",
-          "Wolfe_2016"
+          "[Gilhus_2016]"
         ],
         "criterion_id": "action-3-order-specialized-test",
-        "expected_evidence": "Increased jitter and blocking on extensor digitorum communis or orbicularis oculi confirms NMJ transmission failure",
+        "expected_evidence": "Mean MCD 72 microseconds in orbicularis oculi with blocking in 7 of 20 pairs.",
+        "importance": "optional",
+        "label": "Single-fiber EMG only if RNS were non-diagnostic",
+        "rationale": "RNS and AChR antibodies are already positive; SFEMG is acceptable but not expected."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "ice_pack_test"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[Gilhus_2016]"
+        ],
+        "criterion_id": "action-ice-pack-test",
+        "expected_evidence": "Left MRD1 improved from 1.5 to 4.0 mm after 2 minutes of cooling (positive, at least 2 mm).",
         "importance": "recommended",
-        "label": "Order single-fiber EMG (gold standard >95% sensitivity)",
-        "rationale": "Order single-fiber EMG (gold standard >95% sensitivity)"
+        "label": "Bedside ice-pack test of the ptotic left eyelid",
+        "rationale": "Fatigable bilateral ptosis, left more than right; the ice-pack test is a cost-free bedside test for myasthenic ptosis."
       },
       {
         "alternatives": [
@@ -382,62 +360,31 @@
               "study": "mediastinum_CT"
             },
             "tool_name": "order_body_imaging"
+          },
+          {
+            "required_arguments": {
+              "contrast": true,
+              "study": "chest_CT"
+            },
+            "tool_name": "order_body_imaging"
+          },
+          {
+            "required_arguments": {
+              "contrast": true,
+              "study": "mediastinum_MRI"
+            },
+            "tool_name": "order_body_imaging"
           }
         ],
         "citations": [
-          "[Wolfe_2016]",
-          "Wolfe_2016"
+          "[Gilhus_2016]",
+          "[Wolfe_2016]"
         ],
         "criterion_id": "action-4-order-body-imaging",
-        "expected_evidence": "Anterior mediastinal mass \u2014 thymoma",
+        "expected_evidence": "Encapsulated 2.2 x 1.8 x 2.0 cm anterior mediastinal nodule without invasion, most consistent with thymoma; upper-lobe emphysema.",
         "importance": "required",
-        "label": "Order CT chest with contrast for thymoma screening",
-        "rationale": "Order CT chest with contrast for thymoma screening"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "query": "myasthenia gravis MGFA classification treatment thymectomy"
-            },
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[Sanders_2016]",
-          "Sanders_2016"
-        ],
-        "criterion_id": "action-5-search-medical-literature",
-        "expected_evidence": "MGFA classification stages disease severity; thymectomy benefits AChR+ generalized MG (MGTX); IVIG/PLEX for crisis",
-        "importance": "recommended",
-        "label": "Review MGFA classification and current treatment guidance (pyridostigmine, prednisone, steroid-sparing, IVIG/PLEX, thymectomy)",
-        "rationale": "Review MGFA classification and current treatment guidance (pyridostigmine, prednisone, steroid-sparing, IVIG/PLEX, thymectomy)"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "drug": "pyridostigmine",
-              "screen_for": [
-                "aminoglycosides",
-                "fluoroquinolones",
-                "telithromycin",
-                "magnesium_IV",
-                "neuromuscular_blockers"
-              ]
-            },
-            "tool_name": "check_drug_interactions"
-          }
-        ],
-        "citations": [
-          "[Wolfe_2016]",
-          "Wolfe_2016"
-        ],
-        "criterion_id": "action-6-check-drug-interactions",
-        "expected_evidence": "Flag aminoglycosides, fluoroquinolones, IV magnesium, telithromycin, NMBs as contraindicated or use-with-caution in MG",
-        "importance": "required",
-        "label": "Check drug interactions for MG-exacerbating agents (aminoglycosides, fluoroquinolones, telithromycin, IV magnesium, neuromuscular blockers, procainamide)",
-        "rationale": "Check drug interactions for MG-exacerbating agents (aminoglycosides, fluoroquinolones, telithromycin, IV magnesium, neuromuscular blockers, procainamide)"
+        "label": "Order mediastinal CT with contrast for thymoma",
+        "rationale": "Mediastinal imaging is indicated in every patient with MG; a thymoma is an indication for resection whatever the MG severity."
       },
       {
         "alternatives": [
@@ -449,51 +396,60 @@
           }
         ],
         "citations": [
-          "[Sanders_2016]",
-          "Sanders_2016"
+          "[Gilhus_2016]"
         ],
         "criterion_id": "action-7-order-specialized-test",
-        "expected_evidence": "Baseline FVC/NIF to assess crisis risk in patients with bulbar or limb involvement",
+        "expected_evidence": "Obstruction (FEV1/FVC 0.58) with FVC 68% predicted (27 mL/kg) and reduced MIP (-40) and MEP (62 cmH2O).",
         "importance": "recommended",
-        "label": "Bedside respiratory function testing (FVC, MIP/MEP, NIF) \u2014 repeat q4h in crisis",
-        "rationale": "Bedside respiratory function testing (FVC, MIP/MEP, NIF) \u2014 repeat q4h in crisis"
+        "label": "Measure respiratory function (spirometry, MIP, MEP)",
+        "rationale": "Bulbar weakness on a background of GOLD 2 COPD: respiratory muscle strength must be measured separately from airflow to stage MG and to plan thymectomy (Lawn 2001)."
       },
       {
         "alternatives": [
           {
             "required_arguments": {},
-            "tool_name": "analyze_ecg"
+            "tool_name": "check_drug_interactions"
           }
         ],
         "citations": [
-          "[Sanders_2016]",
-          "Sanders_2016"
+          "[Sanders_2016]"
         ],
-        "criterion_id": "action-8-analyze-ecg",
-        "expected_evidence": "Baseline ECG to screen for ischemia / arrhythmia prior to surgical referral",
+        "criterion_id": "action-6-check-drug-interactions",
+        "expected_evidence": "No interaction requiring a change; caution with bronchial secretions in COPD; tiotropium may be continued.",
         "importance": "optional",
-        "label": "Pre-thymectomy ECG and cardiac risk assessment given age and comorbidities",
-        "rationale": "Pre-thymectomy ECG and cardiac risk assessment given age and comorbidities"
+        "label": "Check his medicines before starting pyridostigmine",
+        "rationale": "His medicines (metformin, losartan, tiotropium, albuterol, tamsulosin) carry no interaction that changes management; the check is reasonable but not required."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "search_medical_literature"
+          }
+        ],
+        "citations": [
+          "[Sanders_2016]"
+        ],
+        "criterion_id": "action-5-search-medical-literature",
+        "expected_evidence": "General consensus guidance on serology, neurophysiology and thymoma imaging.",
+        "importance": "optional",
+        "label": "Literature on MG work-up and thymectomy (optional)",
+        "rationale": "Not a clinical step; optional reference only."
       }
     ],
     "assessment": {
       "prohibited_recommendations": [
-        "Do NOT prescribe aminoglycoside antibiotics (gentamicin, tobramycin, amikacin) \u2014 risk of precipitating myasthenic crisis",
-        "Do NOT prescribe fluoroquinolones (ciprofloxacin, levofloxacin, moxifloxacin) \u2014 FDA black-box warning for MG exacerbation",
-        "Do NOT prescribe telithromycin \u2014 contraindicated in MG",
-        "Do NOT administer IV magnesium for MG patients (e.g., for hypomagnesaemia, eclampsia prophylaxis) without alternative \u2014 blocks NMJ transmission",
-        "Do NOT use non-depolarizing neuromuscular blockers without anaesthesia/MG-aware dosing protocols",
-        "Do NOT initiate high-dose corticosteroids as sole outpatient therapy without hospitalization or pyridostigmine bridge \u2014 risk of paradoxical worsening at days 5-10",
-        "Do NOT attribute fluctuating fatigable weakness to a functional disorder before completing serology + RNS + single-fiber EMG workup",
-        "Do NOT prescribe respiratory fluoroquinolones (levofloxacin, moxifloxacin) for COPD exacerbation in this patient \u2014 substitute with macrolide or beta-lactam."
+        "Avoid fluoroquinolones, aminoglycosides, macrolides and IV magnesium unless no alternative exists and the patient is monitored; use non-depolarising neuromuscular blockers only at reduced dose with quantitative monitoring.",
+        "Do not start high-dose prednisone (above 20 mg/day) as an outpatient; start low and titrate, or start high dose only with inpatient monitoring, because initial steroid-induced worsening can precipitate crisis.",
+        "Do not prescribe a penicillin (documented hives)."
       ],
       "required_recommendations": [
-        "Confirm AChR antibody positivity",
-        "CT chest with contrast \u2014 thymoma identified (anterior mediastinal mass 2.2 x 1.8 cm)",
-        "Refer to thoracic surgery for thymectomy after MG optimization",
-        "Coordinate steroid plan with diabetes team given HbA1c 7.8% \u2014 high-dose prednisone will require insulin adjustment",
-        "Pre-treatment respiratory function (FVC, MIP/MEP) given COPD baseline (GOLD Stage 2)",
-        "Avoid fluoroquinolones for any infection \u2014 bronchitis exacerbation common in COPD"
+        "Start pyridostigmine 30 mg orally three to four times daily and titrate to effect, monitoring bronchial secretions and wheeze because of his COPD; continue tiotropium.",
+        "Refer to thoracic surgery for resection of the anterior mediastinal nodule (presumed thymoma) once MG is controlled, with pre-operative pulmonary assessment for his COPD and pre-operative IVIG (2 g/kg) or plasma exchange because of bulbar and respiratory muscle weakness (Sanders 2016).",
+        "Start prednisone low (10-20 mg/day, increased by 5-10 mg every 3-7 days) or at high dose only with inpatient monitoring, with capillary glucose monitoring and insulin added or adjusted by the diabetes team, since prednisone will raise glucose beyond what metformin controls (HbA1c 7.8%).",
+        "Plan a steroid-sparing agent (azathioprine after TPMT/NUDT15 testing) if long-term immunosuppression is needed.",
+        "For a COPD exacerbation needing antibiotics, avoid fluoroquinolones, macrolides and aminoglycosides; doxycycline is a reasonable choice, and his penicillin allergy (hives) excludes amoxicillin and other penicillins.",
+        "Repeat MIP, MEP and FVC to follow the trend, with ICU-level care if FVC falls below 20 mL/kg, MIP is weaker than -30 cmH2O, MEP falls below 40 cmH2O, or bulbar weakness compromises cough or secretions."
       ]
     },
     "avoided_actions": [
@@ -504,11 +460,9 @@
             "tool_name": "analyze_eeg"
           }
         ],
-        "citations": [
-          "[Wolfe_2016]"
-        ],
+        "citations": [],
         "criterion_id": "avoid-waste-1-analyze-eeg",
-        "rationale": "MG is a peripheral neuromuscular junction disorder; EEG has no diagnostic role.",
+        "rationale": "MG is a disorder of the neuromuscular junction; EEG has no diagnostic role here (Jacob 2025).",
         "severity": "waste"
       },
       {
@@ -518,11 +472,9 @@
             "tool_name": "analyze_csf"
           }
         ],
-        "citations": [
-          "[Wolfe_2016]"
-        ],
+        "citations": [],
         "criterion_id": "avoid-waste-2-analyze-csf",
-        "rationale": "No CSF role in MG; LP risks complications without diagnostic yield.",
+        "rationale": "CSF has no role in MG; he has no ataxia, areflexia or CNS sign to raise a CSF-informative alternative (Jacob 2025).",
         "severity": "waste"
       },
       {
@@ -534,11 +486,9 @@
             "tool_name": "order_advanced_imaging"
           }
         ],
-        "citations": [
-          "[Wolfe_2016]"
-        ],
+        "citations": [],
         "criterion_id": "avoid-waste-3-order-advanced-imaging",
-        "rationale": "Advanced imaging (PET/MR spectroscopy/perfusion) is not indicated for MG diagnosis or staging; CT chest covers thymoma screening.",
+        "rationale": "FDG-PET is not indicated in MG; contrast CT characterizes the mediastinal nodule and shows no lung lesion (Jacob 2025).",
         "severity": "waste"
       },
       {
@@ -548,11 +498,9 @@
             "tool_name": "analyze_brain_mri"
           }
         ],
-        "citations": [
-          "[Wolfe_2016]"
-        ],
+        "citations": [],
         "criterion_id": "avoid-waste-4-analyze-brain-mri",
-        "rationale": "Brain MRI is non-contributory in typical MG; reserve for cases where an alternative CNS cause (brainstem lesion, demyelination) is genuinely in the differential.",
+        "rationale": "A brain MRI was already reported normal; with positive AChR antibodies and RNS and no central signs a repeat adds nothing (Jacob 2025).",
         "severity": "waste"
       }
     ],
@@ -576,8 +524,8 @@
       {
         "diagnosis": "Lambert-Eaton myasthenic syndrome (LEMS, paraneoplastic)",
         "icd_code": "G73.1",
-        "key_features": "Smoking history and prostate cancer raise paraneoplastic concern; however, baseline CMAP normal here, high-rate RNS does not show >100% facilitation, anti-VGCC negative expected.",
-        "likelihood": "moderate"
+        "key_features": "Smoking history raises the question of SCLC-associated LEMS; against it: normal baseline CMAPs, 5% post-exercise increment (no facilitation), preserved reflexes, no autonomic symptoms, no lung lesion on CT, and positive AChR antibodies.",
+        "likelihood": "low"
       },
       {
         "diagnosis": "COPD exacerbation with deconditioning",
@@ -600,30 +548,27 @@
       {
         "diagnosis": "Brainstem stroke",
         "icd_code": "G46.3",
-        "key_features": "No fixed lateralized deficit, MRI without acute lesion, fluctuating pattern excludes stroke.",
+        "key_features": "No fixed lateralized deficit or long-tract signs; the brain MRI done by his primary care physician was reportedly normal; the deficits fluctuate.",
         "likelihood": "very_low"
       }
     ],
     "key_clinical_evidence": [
-      "Fluctuating, fatigable weakness with diurnal pattern (worse evening) is the clinical hallmark of MG \u2014 fixed weakness suggests an alternative diagnosis.",
-      "Ocular involvement (ptosis, diplopia) is asymmetric and fatigable in MG; thyroid eye disease causes restrictive (not fatigable) ophthalmoplegia.",
-      "Single-fiber EMG (sensitivity >95%) is the most sensitive electrodiagnostic test \u2014 order when RNS is non-diagnostic or serology is negative.",
-      "All confirmed MG cases require CT chest for thymoma \u2014 present in roughly 10-15% of generalized MG; thymectomy (MGTX trial) improves long-term outcomes in non-thymoma AChR+ MG as well.",
-      "Aminoglycosides, fluoroquinolones, telithromycin, IV magnesium, and neuromuscular blockers can precipitate myasthenic crisis and must be screened against any new prescription.",
-      "Anti-titin or anti-RyR antibodies in an MG patient strongly predict thymoma \u2014 CT chest is mandatory and surgical referral is non-negotiable.",
-      "Late-onset MG (>50y) commonly presents with thymoma \u2014 CT chest mandatory; this patient's anti-titin antibody further supports thymoma association.",
-      "COPD + diabetes complicate steroid initiation: plan glucose management and rehabilitation up front."
+      "Fatigable asymmetric ptosis, diplopia, fatigable chewing, nasal speech and proximal weakness worse in the afternoon: generalized MG with bulbar involvement (MGFA IIb).",
+      "AChR binding antibody 0.9 nmol/L with raised blocking and modulating antibodies, and a postsynaptic RNS decrement (masseter 14%, nasalis 11%) with normal CMAPs and no facilitation.",
+      "Mediastinal CT with contrast is indicated in every patient with MG to detect thymoma. Here it shows a 2.2 cm encapsulated anterior mediastinal nodule most consistent with thymoma, an indication for resection.",
+      "COPD (FEV1/FVC 0.58) and respiratory muscle weakness (MIP -40, MEP 62 cmH2O) coexist; surgery and steroid plans must account for both.",
+      "Type 2 diabetes with HbA1c 7.8%: corticosteroids need a glucose plan; penicillin allergy and MG-unsafe antibiotics narrow the choice for COPD exacerbations."
     ],
     "red_herrings": [
       {
-        "correct_interpretation": "COPD changes are chronic and unrelated; the actionable finding is the anterior mediastinal mass \u2014 thymoma; fatigable bulbar/ocular weakness is the MG signature.",
+        "correct_interpretation": "Emphysema is chronic and expected after 40 pack-years; it does not explain fatigable ptosis, diplopia or chewing fatigue. The actionable finding is the anterior mediastinal nodule.",
         "data_point": "Bilateral upper-lobe emphysematous changes (chronic COPD) on CT",
-        "field_path": "initial_tool_outputs.ct.additional_observations",
+        "field_path": "initial_tool_outputs.body_imaging.findings",
         "intended_effect": "Attribute dyspnea solely to COPD and miss MG/thymoma diagnosis.",
         "location": "CT chest"
       },
       {
-        "correct_interpretation": "Diabetic cranial neuropathy is acute, painful, and monocular; this is fluctuating, bilateral, fatigable \u2014 classic MG.",
+        "correct_interpretation": "Diabetic cranial mononeuropathy is acute, often painful and affects a single nerve without fatigability; this is bilateral, fluctuating and fatigable with bulbar and limb involvement.",
         "data_point": "HbA1c 7.8% (suboptimal diabetes control)",
         "field_path": "initial_tool_outputs.labs.panels",
         "intended_effect": "Anchor on diabetes-related cranial neuropathy as the cause of ptosis/diplopia.",
@@ -633,62 +578,94 @@
     "review_status": "draft",
     "sequence_constraints": [
       {
-        "after_criterion_id": "action-2-order-specialized-test",
+        "after_criterion_id": "action-3-order-specialized-test",
         "before_criterion_id": "action-1-interpret-labs",
-        "citations": [
-          "[Wolfe_2016]"
-        ],
-        "reason": "Order AChR/MuSK/LRP4 serologies first; reserve single-fiber EMG for seronegative or RNS-non-diagnostic cases (resource stewardship).",
+        "citations": [],
+        "reason": "AChR antibody testing precedes single-fiber EMG; SFEMG is reserved for seronegative patients or a normal RNS (Jacob 2025).",
+        "severity": "soft"
+      },
+      {
+        "after_criterion_id": "action-3-order-specialized-test",
+        "before_criterion_id": "action-2-order-specialized-test",
+        "citations": [],
+        "reason": "Repetitive nerve stimulation is done first; SFEMG follows when RNS is normal (Jacob 2025).",
         "severity": "soft"
       }
     ],
     "stop_rule": {
-      "max_additional_actions": 0,
+      "max_additional_actions": 2,
       "required_before_assessment": [
         "action-1-interpret-labs",
         "action-2-order-specialized-test",
-        "action-4-order-body-imaging",
-        "action-6-check-drug-interactions"
+        "action-4-order-body-imaging"
       ]
     }
   },
   "initial_tool_outputs": {
     "advanced_imaging": null,
-    "cardiac_monitoring": null,
-    "ct": {
-      "additional_observations": [
-        "COPD emphysematous changes bilateral upper lobes",
-        "No other pulmonary nodules",
-        "No mediastinal lymphadenopathy"
-      ],
-      "angiography_findings": null,
-      "contrast_used": true,
+    "body_imaging": {
+      "contrast": true,
       "findings": [
         {
-          "density": "Soft tissue density",
-          "description": "Small soft tissue nodule in anterior mediastinum. Well-circumscribed. No invasion of great vessels or pericardium. No calcification.",
+          "density": "Soft tissue, homogeneously enhancing",
+          "description": "Well-circumscribed, encapsulated soft tissue nodule in the thymic bed. No calcification. Preserved fat planes with the pericardium, great vessels and pleura.",
           "location": "Anterior mediastinum",
-          "size": "2.2 x 1.8 cm",
-          "type": "Anterior mediastinal soft tissue nodule"
+          "size": "2.2 x 1.8 x 2.0 cm",
+          "type": "Anterior mediastinal mass"
+        },
+        {
+          "description": "Centrilobular emphysematous changes in both upper lobes. No pulmonary nodule or mass.",
+          "location": "Both upper lobes",
+          "type": "Emphysema"
+        },
+        {
+          "description": "No mediastinal or hilar lymphadenopathy. No pleural or pericardial effusion.",
+          "location": "Mediastinum and pleura",
+          "type": "pertinent_negative"
         }
       ],
-      "impression": "1. Well-circumscribed 2.2 x 1.8 cm soft-tissue nodule in the anterior mediastinum. No calcification. No invasion of adjacent structures. Appearance is consistent with a primary thymic neoplasm. 2. Bilateral upper-lobe emphysematous changes. No mediastinal lymphadenopathy. Tissue diagnosis recommended",
-      "recommended_actions": [
-        "Tissue diagnosis recommended",
-        "Pulmonary function testing prior to any planned procedure"
-      ]
+      "impression": "1. Well-circumscribed 2.2 x 1.8 x 2.0 cm homogeneously enhancing anterior mediastinal nodule without features of invasion; appearance most consistent with a thymoma. 2. Bilateral upper-lobe centrilobular emphysema. No pulmonary nodule or lymphadenopathy.",
+      "measurements": {
+        "Anterior mediastinal mass": "2.2 x 1.8 x 2.0 cm"
+      },
+      "modality": "CT",
+      "recommended_actions": [],
+      "region": "mediastinum chest"
     },
-    "drug_interactions": null,
+    "cardiac_monitoring": null,
+    "ct": null,
+    "drug_interactions": {
+      "pyridostigmine": {
+        "alternatives": [],
+        "contraindications": [
+          "Pyridostigmine: mechanical intestinal or urinary obstruction."
+        ],
+        "formulary_status": "Pyridostigmine bromide 60 mg tablets: formulary",
+        "interactions": [
+          "Pyridostigmine + tiotropium: no interaction at the neuromuscular junction. Tiotropium is an inhaled muscarinic (M3) antagonist without nicotinic action; it does not reduce the effect of pyridostigmine on muscle strength and may blunt its airway muscarinic effects. Continue both.",
+          "Pyridostigmine + albuterol, losartan, tamsulosin: no clinically relevant interaction.",
+          "Pyridostigmine + metformin: no pharmacokinetic interaction; gastrointestinal adverse effects (diarrhea, cramps) may be additive."
+        ],
+        "proposed": "Pyridostigmine",
+        "summary": "No interaction requiring a change to the current medicines; caution with bronchial secretions in COPD.",
+        "warnings": [
+          "Pyridostigmine increases bronchial secretions and can provoke bronchospasm: use with caution in COPD and asthma and monitor sputum and wheeze.",
+          "Drugs that impair neuromuscular transmission (aminoglycosides, fluoroquinolones, macrolides, IV magnesium, neuromuscular blockers, beta-blockers) can worsen myasthenic weakness."
+        ]
+      }
+    },
     "ecg": null,
     "echo": null,
     "eeg": null,
     "labs": {
       "abnormal_values_summary": [
-        "Anti-AChR antibodies abnormal (blocking 25%, modulating 35%)",
-        "Anti-titin positive \u2014 thymoma concern",
-        "HbA1c 7.8% \u2014 diabetes management critical when starting steroids"
+        "Anti-AChR binding antibody 0.9 nmol/L (H)",
+        "Anti-AChR blocking antibody 25% (H)",
+        "Anti-AChR modulating antibody 35% (H)",
+        "Glucose 142 mg/dL (H)",
+        "HbA1c 7.8% (H)"
       ],
-      "interpretation": "Abnormal values: Anti-AChR Binding 0.9 nmol/L (H), Anti-AChR Blocking 25% (H), Anti-AChR Modulating 35% (H), Anti-titin Positive qualitative (H), Glucose 142 mg/dL (H), HbA1c 7.8 % (H).",
+      "interpretation": "Anti-AChR binding antibody positive (0.9 nmol/L), with raised blocking (25%) and modulating (35%) antibodies. Anti-MuSK negative. Glucose 142 mg/dL and HbA1c 7.8% raised. Blood count, sodium, creatinine, TSH and free T4 within reference ranges. Anti-AChR antibodies are found in most patients with generalized myasthenia gravis; clinical correlation recommended.",
       "panels": {
         "CBC": [
           {
@@ -714,16 +691,6 @@
             "test": "Platelets",
             "unit": "x10^9/L",
             "value": 198
-          }
-        ],
-        "Exclusion studies": [
-          {
-            "clinical_significance": "Ordered to exclude an alternative cause; the result does not support one, which is what this case's diagnosis rests on",
-            "is_abnormal": false,
-            "reference_range": "",
-            "test": "TSH",
-            "unit": "",
-            "value": "Within reference range"
           }
         ],
         "Metabolic Panel": [
@@ -792,109 +759,99 @@
             "test": "Anti-MuSK",
             "unit": "nmol/L",
             "value": "<0.02"
-          },
-          {
-            "clinical_significance": null,
-            "is_abnormal": true,
-            "reference_range": "Negative",
-            "test": "Anti-titin",
-            "unit": "qualitative",
-            "value": "Positive"
           }
         ],
-        "Paraneoplastic Panel": [
+        "Thyroid Panel": [
           {
             "clinical_significance": null,
             "is_abnormal": false,
-            "reference_range": "Negative",
-            "test": "Anti-Hu (ANNA-1)",
-            "unit": "qualitative",
-            "value": "Negative"
+            "reference_range": "0.40-4.00",
+            "test": "TSH",
+            "unit": "mIU/L",
+            "value": 2.4
           },
           {
             "clinical_significance": null,
             "is_abnormal": false,
-            "reference_range": "Negative",
-            "test": "Anti-Yo",
-            "unit": "qualitative",
-            "value": "Negative"
-          },
-          {
-            "clinical_significance": null,
-            "is_abnormal": false,
-            "reference_range": "<0.02",
-            "test": "Anti-VGCC",
-            "unit": "nmol/L",
-            "value": "<0.02"
+            "reference_range": "0.8-1.8",
+            "test": "Free T4",
+            "unit": "ng/dL",
+            "value": 1.1
           }
         ]
       }
     },
     "literature_search": {
-      "myasthenia gravis MGFA classification treatment thymectomy": {
-        "query": "myasthenia gravis MGFA classification treatment thymectomy",
+      "myasthenia gravis diagnosis thymoma thymectomy guidance": {
+        "query": "myasthenia gravis diagnosis thymoma thymectomy guidance",
         "results": [
           {
-            "evidence_level": "guideline recommendation",
-            "finding": "MGFA classification stages disease severity; thymectomy benefits AChR+ generalized MG (MGTX); IVIG/PLEX for crisis",
-            "source": "Sanders_2016"
+            "evidence_level": "consensus guideline",
+            "finding": "Pyridostigmine is the initial symptomatic treatment; corticosteroids or immunosuppressive therapy are used when treatment goals are not met; thymectomy is recommended for thymoma and should be considered in AChR-positive generalized MG; IVIG and plasma exchange are used for impending or manifest crisis and before surgery in patients with significant bulbar or respiratory weakness.",
+            "source": "Sanders DB et al., Neurology 2016;87:419-425 (international consensus guidance)"
+          },
+          {
+            "evidence_level": "consensus guideline",
+            "finding": "Thymectomy recommendations were updated after MGTX for non-thymomatous AChR-positive generalized MG aged 18-65; eculizumab is an option in severe refractory AChR-positive generalized MG; methotrexate may be considered as a steroid-sparing agent.",
+            "source": "Narayanaswami P et al., Neurology 2021;96:114-122 (2020 update)"
+          },
+          {
+            "evidence_level": "randomized controlled trial",
+            "finding": "Extended transsternal thymectomy plus prednisone improved the time-weighted quantitative MG score and reduced prednisone requirement over three years compared with prednisone alone in non-thymomatous AChR-positive generalized MG.",
+            "source": "Wolfe GI et al., N Engl J Med 2016;375:511-522 (MGTX)"
           }
         ],
-        "summary": "MGFA classification stages disease severity; thymectomy benefits AChR+ generalized MG (MGTX); IVIG/PLEX for crisis"
+        "summary": "Consensus guidance (Sanders DB et al., Neurology 2016;87:419-425; update Narayanaswami P et al., Neurology 2021;96:114-122) recommends AChR antibody testing first, MuSK testing when AChR antibodies are absent, and electrodiagnostic confirmation by repetitive nerve stimulation or single-fibre EMG. Chest CT or MRI is recommended in all patients to detect thymoma. In the MGTX trial (Wolfe GI et al., N Engl J Med 2016;375:511-522) thymectomy improved outcomes over three years in non-thymomatous AChR-positive generalized MG aged 18-65."
       }
     },
     "mri": null,
     "specialized_test": {
       "findings": [
         {
-          "result": "10% CMAP decrement",
-          "significance": "Meets threshold for abnormal decremental response",
-          "test": "RNS deltoid 3Hz"
+          "result": "3 Hz trains; limbs warmed to 33 C; no cholinesterase inhibitor taken",
+          "significance": "",
+          "test": "Technique"
         },
         {
-          "result": "11% CMAP decrement",
-          "significance": "Abnormal \u2014 bulbar involvement",
-          "test": "RNS nasalis 3Hz"
+          "result": "14% decrement (1st to 4th response)",
+          "significance": "Abnormal",
+          "test": "RNS trigeminal nerve, masseter, 3 Hz"
         },
         {
-          "result": "14% CMAP decrement",
-          "significance": "Clearly abnormal \u2014 masseter (bulbar) involvement",
-          "test": "RNS masseter 3Hz"
+          "result": "11% decrement",
+          "significance": "Abnormal",
+          "test": "RNS facial nerve, nasalis, 3 Hz"
         },
         {
-          "result": "Brief facilitation followed by exhaustion at 3 min",
-          "significance": "Post-exercise facilitation followed by exhaustion",
-          "test": "Post-exercise pattern"
+          "result": "10% decrement",
+          "significance": "Borderline",
+          "test": "RNS axillary nerve, deltoid, 3 Hz"
         },
         {
-          "result": "Normal",
-          "significance": "Normal baseline CMAP amplitudes; no evidence of peripheral neuropathy",
-          "test": "NCS all limbs"
+          "result": "CMAP amplitude increase 5%; decrement repaired immediately after exercise, exhaustion to 16% at 3 minutes",
+          "significance": "No facilitation; post-exercise repair and exhaustion",
+          "test": "Post-exercise (10 s maximal contraction), deltoid"
+        },
+        {
+          "result": "Normal CMAP and SNAP amplitudes and conduction velocities",
+          "significance": "Normal",
+          "test": "Nerve conduction studies (median, ulnar, peroneal motor; median, sural sensory)"
         }
       ],
-      "impression": "Clearly abnormal repetitive nerve stimulation with 10-14% decremental CMAP responses at 3 Hz in deltoid, nasalis, and masseter muscles. Post-exercise brief facilitation followed by exhaustion at 3 minutes. Normal baseline CMAP amplitudes on NCS. Findings are consistent with a disorder of neuromuscular transmission. Single-fiber EMG recommended for highest sensitivity",
+      "impression": "1. Abnormal decremental response at 3 Hz in masseter (14%) and nasalis (11%), borderline in deltoid (10%), with post-exercise repair and exhaustion. 2. Normal baseline CMAP amplitudes and no post-exercise facilitation. 3. Normal nerve conduction studies. Findings indicate a postsynaptic disorder of neuromuscular transmission. Clinical correlation recommended.",
       "quantitative_data": {
-        "CMAP_baseline": "Normal",
-        "max_decrement": "14% (masseter)"
+        "baseline_CMAP": "Normal",
+        "decrement_deltoid": "10%",
+        "decrement_masseter": "14%",
+        "decrement_nasalis": "11%",
+        "post_exercise_increment_deltoid": "5%"
       },
-      "recommended_actions": [
-        "Single-fiber EMG for highest sensitivity",
-        "Neuromuscular antibody testing",
-        "CT chest for mediastinal evaluation"
-      ],
+      "recommended_actions": [],
       "test_type": "repetitive_nerve_stimulation"
     }
   },
   "metadata": {
-    "actions_withdrawn": [
-      {
-        "action": "Bedside ice-pack test for ptosis (cheap, ~80% sensitive for ocular MG)",
-        "category": "recommended",
-        "reason": "The bedside ice-pack test is recommended here but its result is not stored in this case, or in any case in the condition \u2014 the only mention of it anywhere is this recommendation. Its outcome does not follow from the documented ptosis, and at roughly 80% sensitivity it is not definitional of the diagnosis, so authoring a result would be inventing one. Withdrawn from the gold standard during the per-case audit of 2026-08-07; reinstate it with a clinician-authored report.",
-        "study": "ice_pack_test",
-        "tool_name": "order_specialized_test"
-      }
-    ],
+    "actions_withdrawn": [],
     "authoring_agent": "condition-expert:MG",
     "case_body_concerns": [],
     "citation_gap": [],
@@ -986,7 +943,7 @@
     },
     "history_present_illness": "A 67-year-old man with type 2 diabetes, COPD, and prostate cancer on active surveillance presented for evaluation of progressive bilateral ptosis, double vision, and difficulty chewing over 3 months. His wife first noticed his eyelids drooping approximately 3 months ago, initially intermittent and worse in the afternoons. He then developed horizontal diplopia when looking to the left, which was intermittent and positional. He began having difficulty chewing tough foods \u2014 he would tire out halfway through a meal and would need to rest his jaw. He has lost approximately 4 pounds over the past 2 months because he avoids foods that require prolonged chewing. He denies dysphagia with liquids but acknowledges occasional difficulty with large solid boluses. His voice has become softer and more nasal sounding after talking for more than 5 minutes, which his wife has noticed. He has no history of neck or back pain, no extremity weakness at rest, no falls, no bowel or bladder dysfunction. He was initially referred to ophthalmology who noted no structural eyelid pathology and no proptosis. He was then seen by his primary care physician who ordered brain MRI, which was reportedly normal. He was subsequently referred to the neurology clinic where examination revealed clear fatigability. His COPD is well-controlled on tiotropium with moderate exercise tolerance. The pulmonologist was concerned about overlapping respiratory muscle weakness potentially contributing to his reduced exercise capacity. He has not had any recent infections or antibiotic treatments. He denies weight loss beyond the 4 pounds from reduced food intake.",
     "neurological_exam": {
-      "additional": "NIF -40 cmH2O. FVC 68% predicted (reduced at baseline due to COPD \u2014 important to account for). No active respiratory distress. SpO2 95% on room air.",
+      "additional": "No active respiratory distress. SpO2 95% on room air.",
       "coordination": "Normal.",
       "cranial_nerves": "Bilateral ptosis, left greater than right. Levator excursion left 6mm, right 9mm. Fatigable ptosis on upgaze at 50 seconds. Limited adduction of left eye. Diplopia on left lateral gaze. No proptosis. Pupils 4mm symmetric reactive. No facial sensory loss. Mild bilateral facial weakness. Dysarthria noted after prolonged conversation.",
       "gait": "Mildly slow, waddling on prolonged walking.",
@@ -996,6 +953,10 @@
       "sensory": "Intact to light touch, pinprick, vibration. No sensory deficit."
     },
     "patient_id": "MG-M03",
+    "physical_exam": {
+      "general": "Weight 92 kg, height 175 cm. Well appearing.",
+      "respiratory": "Prolonged expiration, scattered expiratory wheeze, no crackles. No accessory muscle use. Cough moderately strong."
+    },
     "vitals": {
       "bp_diastolic": 88,
       "bp_systolic": 148,

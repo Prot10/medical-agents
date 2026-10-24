@@ -24,14 +24,22 @@
     "csf": null,
     "ct": {
       "additional_observations": [
-        "No acute intracranial haemorrhage, established infarct, mass, or midline shift.",
-        "Grey-white differentiation preserved; basal cisterns patent.",
+        "No mass, haemorrhage or midline shift.",
+        "Basal cisterns patent.",
         "Bone windows unremarkable."
       ],
       "angiography_findings": null,
       "contrast_used": false,
-      "findings": [],
-      "impression": "Non-contrast head CT without acute intracranial abnormality.",
+      "findings": [
+        {
+          "density": "CSF density",
+          "description": "Enlarged lateral and third ventricles (Evans index about 0.35)",
+          "location": "lateral and third ventricles",
+          "size": null,
+          "type": "ventriculomegaly"
+        }
+      ],
+      "impression": "Enlarged lateral and third ventricles (Evans index about 0.35), no mass, haemorrhage or midline shift.",
       "recommended_actions": []
     },
     "drug_interactions": null,
@@ -93,59 +101,72 @@
   "followup_outputs": [
     {
       "output": {
-        "alternatives": [],
-        "contraindications": [],
-        "formulary_status": "Available",
-        "interactions": [
-          "Tamoxifen \u2014 potent CYP2D6 substrate; no relevant anesthetic interactions",
-          "Duloxetine \u2014 moderate CYP inhibitor; no significant interaction with anesthesia"
-        ],
-        "proposed": "VP shunt surgery in breast cancer survivor on tamoxifen",
-        "warnings": [
-          "Continue tamoxifen perioperatively \u2014 do not hold; interruption risks cancer recurrence",
-          "Duloxetine \u2014 continue perioperatively; abrupt discontinuation may cause discontinuation syndrome",
-          "Routine post-operative DVT prophylaxis is appropriate"
-        ]
-      },
-      "tool_name": "check_drug_interactions",
-      "trigger_action": "request_oncology_comanagement"
-    },
-    {
-      "output": {
-        "query": "NPH in cancer survivors differential diagnosis leptomeningeal carcinomatosis CSF cytology",
-        "results": [
+        "assessment_type": "cognitive_screen",
+        "criteria_met": null,
+        "findings": [
           {
-            "key_finding": "NPH and LMC can have overlapping features (cognitive decline, incontinence); negative CSF cytology x2 combined with negative post-contrast MRI and positive tap trial effectively excludes LMC",
-            "title": "Diagnostic evaluation of ventriculomegaly in patients with cancer history \u2014 algorithm for excluding leptomeningeal disease",
-            "year": "2021"
+            "observation": "Visuospatial / executive",
+            "result": "2/5: trail-making error, clock with misplaced hands, cube copied"
           },
           {
-            "key_finding": "Single CSF cytology sensitivity for LMC is 45-60%; three separate cytospin preparations increase sensitivity to >85%; negative x3 with negative MRI strongly excludes LMC",
-            "title": "False-negative CSF cytology in LMC \u2014 implications for practice",
-            "year": "2020"
+            "observation": "Naming",
+            "result": "3/3"
+          },
+          {
+            "observation": "Attention",
+            "result": "5/6: serial 7s with one error"
+          },
+          {
+            "observation": "Language",
+            "result": "3/3"
+          },
+          {
+            "observation": "Abstraction",
+            "result": "1/2"
+          },
+          {
+            "observation": "Delayed recall",
+            "result": "2/5 free recall; 4/5 with category cues"
+          },
+          {
+            "observation": "Orientation",
+            "result": "6/6"
           }
         ],
-        "summary": "Single CSF cytology sensitivity for leptomeningeal carcinomatosis is 45\u201360%; three separate cytospin preparations increase sensitivity to >85%. Negative CSF cytology combined with negative post-contrast MRI is associated with effective exclusion of leptomeningeal carcinomatosis. Objective tap-test gait improvement is associated with VP shunt response in iNPH."
+        "impression": "MoCA 22/30 with executive and attentional errors and reduced free recall that improves with cueing.",
+        "pre_post_comparison": null,
+        "recommended_actions": [],
+        "scores": {
+          "MoCA": "22/30"
+        }
       },
-      "tool_name": "search_medical_literature",
-      "trigger_action": "request_literature_nph_cancer_survivor"
+      "tool_name": "perform_clinical_assessment",
+      "trigger_action": "request_moca_cognitive_screen"
     },
     {
       "output": {
         "appearance": "Clear, colorless",
         "cell_count": {
-          "RBC": "4",
+          "RBC": "4/mcL",
           "WBC": "3 cells/mcL",
           "differential": "Lymphocytes"
         },
         "glucose": "66 mg/dL",
         "glucose_ratio": "0.65",
-        "interpretation": "NO MALIGNANT CELLS \u2014 three separate cytospin preparations reviewed, all negative for leptomeningeal carcinomatosis; No abnormal lymphoid or epithelial cell population \u2014 negative for malignancy",
+        "interpretation": "Normal opening pressure (15 cmH2O) and normal CSF cell count, protein and glucose. After removal of 40 mL, TUG changed from 27 s to 21 s at 2 hours and 19 s at 24 hours (30% at 24 hours); 10-m walk 21 s to 14 s at 24 hours (33%); MoCA 22 to 25. No incontinence in the 24 hours after the tap. Cytology: no malignant cells. Flow cytometry: no abnormal cell population.",
         "opening_pressure": "15 cmH2O",
-        "protein": "52 mg/dL",
+        "protein": "52 mg/dL (reference 15-60 mg/dL, age over 60)",
         "special_tests": {
-          "cytology": "NO MALIGNANT CELLS \u2014 three separate cytospin preparations reviewed, all negative for leptomeningeal carcinomatosis",
-          "flow_cytometry": "No abnormal lymphoid or epithelial cell population \u2014 negative for malignancy"
+          "cognitive": "MoCA 22 to 25 (3 points at 24 hours)",
+          "cytology": "No malignant cells in three cytospin preparations (10 mL submitted)",
+          "flow_cytometry": "No abnormal lymphoid or epithelial cell population",
+          "post_tap_10m_24h": "14 seconds (33% improvement)",
+          "post_tap_tug_24h": "19 seconds (30% improvement)",
+          "post_tap_tug_2h": "21 seconds (22% improvement)",
+          "pre_tap_10m": "21 seconds",
+          "pre_tap_tug": "27 seconds",
+          "urinary": "No incontinence in 24 hours after the tap; decreased urgency",
+          "volume_removed": "40 mL"
         }
       },
       "tool_name": "analyze_csf",
@@ -156,27 +177,41 @@
         ]
       },
       "trigger_action": "request_targeted_csf_cytology_flow"
+    },
+    {
+      "output": {
+        "assessment_type": "gait_and_balance_timed (post-tap reassessment)",
+        "criteria_met": null,
+        "findings": [
+          {
+            "observation": "Gait pattern at 24 hours",
+            "result": "Longer steps, no start hesitation"
+          },
+          {
+            "observation": "Urinary symptoms at 24 hours",
+            "result": "Decreased urgency, no incontinence"
+          }
+        ],
+        "impression": "TUG 30% faster and 10-m walk 33% faster at 24 hours than at baseline; MoCA 3 points higher.",
+        "pre_post_comparison": {
+          "10-metre walk": "21 s at baseline; 14 s at 24 hours (33%)",
+          "MoCA": "22/30 at baseline; 25/30 at 24 hours",
+          "Timed Up and Go": "27 s at baseline; 21 s at 2 hours (22%); 19 s at 24 hours (30%)"
+        },
+        "recommended_actions": [],
+        "scores": {
+          "10-metre walk, 24 hours": "14 s",
+          "MoCA, 24 hours": "25/30",
+          "Timed Up and Go, 2 hours": "21 s",
+          "Timed Up and Go, 24 hours": "19 s"
+        }
+      },
+      "tool_name": "perform_clinical_assessment",
+      "trigger_action": "request_post_reassessment"
     }
   ],
   "ground_truth": {
     "action_criteria": [
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[Williams_2016]",
-          "NPH_pack"
-        ],
-        "criterion_id": "action-1-search-medical-literature",
-        "expected_evidence": "Relkin 2005 INPH Study Group criteria; Tisell 2011 tap-test predictors; Williams 2016 review",
-        "importance": "recommended",
-        "label": "Literature review of iNPH diagnostic criteria and shunt-response predictors",
-        "rationale": "Literature review of iNPH diagnostic criteria and shunt-response predictors"
-      },
       {
         "alternatives": [
           {
@@ -186,54 +221,29 @@
         ],
         "citations": [
           "[Relkin_2005]",
-          "NPH_pack"
+          "[Nakajima_2021]"
         ],
         "criterion_id": "action-2-analyze-brain-mri",
-        "expected_evidence": "Ventriculomegaly with Evans index >0.3, DESH pattern (tight high-convexity sulci + widened Sylvian fissures), callosal angle <90\u00b0, periventricular transependymal signal; no mass effect or aqueductal obstruction",
+        "expected_evidence": "Evans index 0.35, tight high-convexity sulci, callosal angle 81 degrees, temporal horns enlarged, aqueduct patent, no obstruction; no leptomeningeal, ependymal or parenchymal enhancement; Fazekas 1, MTA 1",
         "importance": "required",
-        "label": "Brain MRI \u2014 measure Evans index, callosal angle, assess DESH pattern; exclude mass effect, hydrocephalus from secondary cause, and atrophy",
-        "rationale": "Brain MRI \u2014 measure Evans index, callosal angle, assess DESH pattern; exclude mass effect, hydrocephalus from secondary cause, and atrophy"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "panels": [
-                "TSH",
-                "B12",
-                "RPR",
-                "HIV"
-              ]
-            },
-            "tool_name": "interpret_labs"
-          }
-        ],
-        "citations": [
-          "[Relkin_2005]",
-          "NPH_pack"
-        ],
-        "criterion_id": "action-3-interpret-labs",
-        "expected_evidence": "TSH, B12, RPR, HIV negative or within normal range; reversible mimics excluded",
-        "importance": "optional",
-        "label": "Reversible-cause labs (TSH, B12, RPR, HIV) to exclude metabolic / infectious dementia mimics",
-        "rationale": "Reversible-cause labs (TSH, B12, RPR, HIV) to exclude metabolic / infectious dementia mimics"
+        "label": "Brain MRI with the iNPH markers and contrast",
+        "rationale": "In a breast cancer survivor the MRI must both characterise the ventriculomegaly and look for leptomeningeal or parenchymal enhancement before CSF is removed."
       },
       {
         "alternatives": [
           {
             "required_arguments": {},
-            "tool_name": "analyze_csf"
+            "tool_name": "interpret_labs"
           }
         ],
         "citations": [
-          "[Tisell_2011]",
-          "NPH_pack"
+          "[Relkin_2005]"
         ],
-        "criterion_id": "action-4-analyze-csf",
-        "expected_evidence": "Opening pressure compatible with NPH criteria; 30-50 mL CSF removed; prespecified pre/post gait and cognitive measures show objective change relevant to shunt responsiveness",
-        "importance": "required",
-        "label": "Large-volume lumbar puncture (30-50 mL tap test) with opening pressure and prespecified pre/post objective gait and cognitive assessment",
-        "rationale": "Large-volume lumbar puncture (30-50 mL tap test) with opening pressure and prespecified pre/post objective gait and cognitive assessment"
+        "criterion_id": "action-3-interpret-labs",
+        "expected_evidence": "Normal blood count, sodium, creatinine, TSH, vitamin B12 and CA 15-3 (22 U/mL); HIV non-reactive",
+        "importance": "optional",
+        "label": "Targeted labs for reversible contributors",
+        "rationale": "Blood tests do not diagnose iNPH; here they screen for metabolic contributors, and the tumour marker adds little to the CSF and MRI."
       },
       {
         "alternatives": [
@@ -245,17 +255,42 @@
           }
         ],
         "citations": [
-          "[Relkin_2005]",
-          "Relkin_2005"
+          "[Nakajima_2021]"
         ],
         "criterion_id": "action-6-perform-clinical-assessment",
-        "expected_evidence": "Baseline timed gait recorded before the tap and repeated after it, with the response interpreted from the prespecified objective change and the cognitive screen repeated alongside",
+        "expected_evidence": "TUG 27 s, 10-metre walk 21 s, magnetic shuffling gait with start hesitation, en-bloc turn, 2-step retropulsion",
         "importance": "required",
-        "label": "Measure gait and balance objectively before the large-volume tap \u2014 timed-up-and-go, 10-metre walk, step length, falls risk \u2014 and repeat the same measures and the cognitive screen after it. The baseline must be recorded before the puncture or the post-tap change cannot be interpreted",
-        "rationale": "Measure gait and balance objectively before the large-volume tap \u2014 timed-up-and-go, 10-metre walk, step length, falls risk \u2014 and repeat the same measures and the cognitive screen after it. The baseline must be recorded before the puncture or the post-tap change cannot be interpreted"
+        "label": "Baseline timed gait assessment before the tap",
+        "rationale": "The tap response can only be judged against objective baseline TUG and 10-metre walk times recorded before CSF is removed."
       },
       {
         "alternatives": [
+          {
+            "required_arguments": {
+              "assessment_type": "cognitive_screen"
+            },
+            "tool_name": "perform_clinical_assessment"
+          }
+        ],
+        "citations": [
+          "[Relkin_2005]"
+        ],
+        "criterion_id": "action-cognitive-screen",
+        "expected_evidence": "MoCA 22/30 with executive and attention errors, free recall 2/5 improving to 4/5 with cues",
+        "importance": "optional",
+        "label": "Bedside cognitive screen",
+        "rationale": "A baseline MoCA documents the executive and recall deficits and lets the post-tap score be compared with it."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "special_tests": [
+                "cytology"
+              ]
+            },
+            "tool_name": "analyze_csf"
+          },
           {
             "required_arguments": {
               "special_tests": [
@@ -267,30 +302,60 @@
           }
         ],
         "citations": [
-          "[Nakajima_2021]",
-          "NPH_pack"
+          "[Relkin_2005]",
+          "[Marmarou_2005]",
+          "[Nakajima_2021]"
         ],
-        "criterion_id": "action-7-analyze-csf",
-        "expected_evidence": "No malignant cells and no abnormal population on flow cytometry",
+        "criterion_id": "action-4-analyze-csf",
+        "expected_evidence": "Opening pressure 15 cmH2O, normal cells, protein and glucose; cytology without malignant cells, flow cytometry without an abnormal population; 40 mL removed; TUG 27 to 19 s at 24 hours (30%), 10-metre walk 21 to 14 s, MoCA 22 to 25",
         "importance": "required",
-        "label": "Targeted CSF cytology and flow cytometry to exclude leptomeningeal carcinomatosis",
-        "rationale": "Targeted CSF cytology and flow cytometry to exclude leptomeningeal carcinomatosis"
+        "label": "Lumbar tap test with opening pressure and CSF cytology",
+        "rationale": "The same puncture must measure the opening pressure and the gait response and send cytology, because leptomeningeal carcinomatosis is the alternative the oncology team raised."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "assessment_type": "gait_and_balance_timed"
+            },
+            "tool_name": "perform_clinical_assessment"
+          }
+        ],
+        "citations": [
+          "[Nakajima_2021]"
+        ],
+        "criterion_id": "action-post-tap-gait-reassessment",
+        "expected_evidence": "TUG 21 s at 2 hours and 19 s at 24 hours (30%), 10-metre walk 14 s (33%), MoCA 25/30, no incontinence",
+        "importance": "recommended",
+        "label": "Post-tap timed gait reassessment",
+        "rationale": "Repeating the same timed measures at 2 and 24 hours after CSF removal is what turns the puncture into a tap test."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "check_drug_interactions"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "action-drug-interaction-tamoxifen",
+        "expected_evidence": "Flags the duloxetine-tamoxifen CYP2D6 problem and a venlafaxine alternative",
+        "importance": "optional",
+        "label": "Medication interaction review",
+        "rationale": "Her antidepressant and her tamoxifen share a CYP2D6 pathway that matters for her cancer care, though not for the hydrocephalus decision."
       }
     ],
     "assessment": {
       "prohibited_recommendations": [
-        "Do not perform large-volume lumbar puncture before MRI excludes mass effect or obstructive hydrocephalus",
-        "Do not infer iNPH from ventriculomegaly alone \u2014 DESH, callosal angle <90\u00b0, and a clinical triad are required",
-        "Do not diagnose Alzheimer's disease in a patient with gait-predominant presentation and ventriculomegaly without first excluding NPH",
-        "Do not attribute the syndrome to 'normal ageing' or 'deconditioning' once the imaging criteria for ventriculomegaly are met",
-        "Do not commit to iNPH without ruling out leptomeningeal disease by CSF cytology when active or recent malignancy is in the history"
+        "Do not diagnose iNPH from ventriculomegaly alone: the diagnosis needs the clinical syndrome (gait disturbance with cognitive or urinary symptoms) and supportive imaging, with no other cause explaining them [Relkin_2005]",
+        "Do not commit to iNPH without ruling out leptomeningeal disease by CSF cytology and contrast MRI in a patient with a history of breast cancer",
+        "Do not attribute the syndrome to cancer recurrence without CSF or imaging evidence of it"
       ],
       "required_recommendations": [
-        "Obtain brain MRI before lumbar puncture to exclude mass effect or obstructive hydrocephalus",
-        "Document objective pre-tap gait (TUG and 10-metre walk) and a cognitive baseline so that pre/post-tap change can be quantified \u2014 both are recorded by the objective gait-and-balance assessment performed immediately before the tap",
-        "Remove 30-50 mL of CSF during the tap test (a low-volume LP under-samples and biases the test toward false negative)",
-        "Re-assess gait and cognition 1-4 hours after the tap and again at 24 hours (the response window for tap-test prediction of shunt benefit)",
-        "Refer to neurosurgery for VP shunt evaluation when imaging, clinical, and tap-test criteria support iNPH"
+        "Refer to neurosurgery for CSF shunting with a programmable valve, on the basis of the tap-test improvement of 30% in TUG at 24 hours, the supportive MRI (tight high-convexity sulci, acute callosal angle) and normal-pressure CSF with negative cytology [Nakajima_2021]",
+        "Inform the oncologist that CSF cytology and flow cytometry are negative and contrast MRI shows no leptomeningeal or parenchymal disease, and continue tamoxifen with routine oncology surveillance",
+        "Review duloxetine with the oncologist: as a moderate CYP2D6 inhibitor it may lower endoxifen levels and tamoxifen efficacy, so an antidepressant with minimal CYP2D6 inhibition (for example venlafaxine) is preferred (CPIC 2018 tamoxifen guideline)",
+        "Falls-prevention measures (physiotherapy, home assessment, walking aid) while awaiting surgery"
       ]
     },
     "avoided_actions": [
@@ -303,7 +368,7 @@
         ],
         "citations": [],
         "criterion_id": "avoid-waste-1-analyze-eeg",
-        "rationale": "EEG is non-specific for NPH and does not distinguish from neurodegenerative alternatives in this chronic gait/cognitive presentation",
+        "rationale": "EEG has no role in a chronic gait and cognitive syndrome without seizures or fluctuating awareness",
         "severity": "waste"
       },
       {
@@ -315,7 +380,7 @@
         ],
         "citations": [],
         "criterion_id": "avoid-waste-2-analyze-ecg",
-        "rationale": "ECG is unrelated to the diagnostic workup of chronic gait + cognitive + urinary triad once cardiogenic syncope is not on the differential",
+        "rationale": "There is no syncope, palpitation or cardiac question in this gait and cognitive work-up",
         "severity": "waste"
       },
       {
@@ -327,7 +392,7 @@
         ],
         "citations": [],
         "criterion_id": "avoid-waste-3-order-echocardiogram",
-        "rationale": "Echocardiography does not contribute to NPH evaluation in the absence of syncope or cardioembolic stroke workup",
+        "rationale": "Echocardiography answers no question in this work-up: there is no cardioembolic event or heart failure",
         "severity": "waste"
       },
       {
@@ -339,7 +404,7 @@
         ],
         "citations": [],
         "criterion_id": "avoid-waste-4-order-ct-scan",
-        "rationale": "Head CT is inferior to MRI for measuring Evans index and callosal angle and for excluding secondary causes; only justified if MRI is contraindicated",
+        "rationale": "Head CT adds nothing once brain MRI is available, which measures the ventricles, callosal angle and DESH better",
         "severity": "waste"
       },
       {
@@ -351,7 +416,81 @@
         ],
         "citations": [],
         "criterion_id": "avoid-waste-5-order-cardiac-monitoring",
-        "rationale": "Cardiac monitoring has no diagnostic role in NPH and is reserved for syncope or arrhythmia workup",
+        "rationale": "Rhythm monitoring has no role without syncope or a suspected arrhythmia",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "order_advanced_imaging"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "avoid-waste-advanced-imaging",
+        "rationale": "Molecular or advanced imaging does not change the iNPH decision, which rests on MRI and the tap test",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "neuropsych_battery"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "avoid-waste-neuropsych-battery",
+        "rationale": "A full neuropsychological battery is not needed for the iNPH decision; the bedside screen and timed gait measures are",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "special_tests": [
+                "14_3_3_protein"
+              ]
+            },
+            "tool_name": "analyze_csf"
+          },
+          {
+            "required_arguments": {
+              "special_tests": [
+                "RT_QuIC"
+              ]
+            },
+            "tool_name": "analyze_csf"
+          },
+          {
+            "required_arguments": {
+              "special_tests": [
+                "oligoclonal_bands"
+              ]
+            },
+            "tool_name": "analyze_csf"
+          },
+          {
+            "required_arguments": {
+              "special_tests": [
+                "HSV_PCR"
+              ]
+            },
+            "tool_name": "analyze_csf"
+          },
+          {
+            "required_arguments": {
+              "special_tests": [
+                "meningitis_panel"
+              ]
+            },
+            "tool_name": "analyze_csf"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "avoid-waste-generic-csf-assays",
+        "rationale": "Prion, inflammatory and infectious CSF assays answer no question in a chronic afebrile gait syndrome with normal CSF cells",
         "severity": "waste"
       }
     ],
@@ -371,56 +510,53 @@
     },
     "differential": [
       {
-        "diagnosis": "Vascular cognitive impairment / subcortical ischaemic vascular disease",
-        "icd_code": "F01.50",
-        "key_features": "Small-vessel disease can produce gait apraxia and executive slowing, but ventriculomegaly out of proportion to white-matter burden and a positive tap test favour NPH",
-        "likelihood": "high"
+        "diagnosis": "Leptomeningeal carcinomatosis or CNS metastasis from breast cancer",
+        "icd_code": "C79.32",
+        "key_features": "Raised by the cancer history, but cytology and flow cytometry are negative, CSF cells and glucose are normal, there are no cranial nerve signs and contrast MRI shows no leptomeningeal or parenchymal enhancement.",
+        "likelihood": "low"
       },
       {
-        "diagnosis": "Leptomeningeal carcinomatosis",
-        "icd_code": "C79.32",
-        "key_features": "Active malignancy mandates exclusion by CSF cytology and gadolinium-enhanced MRI; iNPH is supported when CSF cytology is negative on adequate sampling",
-        "likelihood": "moderate"
+        "diagnosis": "Vascular cognitive impairment / subcortical ischaemic vascular disease",
+        "icd_code": "F01.50",
+        "key_features": "Deep white matter disease is only Fazekas grade 1 without lacunes.",
+        "likelihood": "low"
       },
       {
         "diagnosis": "Parkinson's disease / atypical parkinsonism",
         "icd_code": "G20",
-        "key_features": "Shuffling gait overlaps, but absence of resting tremor, asymmetric rigidity, or L-dopa response and presence of magnetic gait + DESH favour NPH",
-        "likelihood": "moderate"
+        "key_features": "No rest tremor, rigidity or bradykinesia; the lower-body gait disorder improved after CSF removal.",
+        "likelihood": "low"
       },
       {
         "diagnosis": "Alzheimer's disease",
         "icd_code": "G30.9",
-        "key_features": "Cognitive decline overlaps; AD typically presents with episodic-memory predominance and hippocampal atrophy rather than frontal-subcortical pattern and magnetic gait; targeted CSF Alzheimer biomarkers can evaluate suspected copathology when the result would change counselling or management",
-        "likelihood": "moderate"
+        "key_features": "Hippocampi are preserved (MTA 1) and recall improves with cueing, an executive rather than amnestic profile.",
+        "likelihood": "low"
       },
       {
-        "diagnosis": "Cerebral atrophy with secondary ex-vacuo ventriculomegaly",
+        "diagnosis": "Cerebral atrophy with ex-vacuo ventriculomegaly",
         "icd_code": "G31.9",
-        "key_features": "Ventriculomegaly proportionate to sulcal widening, callosal angle >90\u00b0, and absence of DESH or transependymal signal argue against true NPH",
-        "likelihood": "moderate"
+        "key_features": "Tight high-convexity sulci and an acute callosal angle of 81 degrees argue against atrophy.",
+        "likelihood": "low"
       },
       {
-        "diagnosis": "Post-traumatic or post-SAH communicating hydrocephalus",
+        "diagnosis": "Secondary communicating hydrocephalus (post-traumatic, post-haemorrhagic or post-meningitic)",
         "icd_code": "G91.0",
-        "key_features": "No history of trauma, SAH, or meningitis on review; would be considered if history suggested antecedent intracranial event",
+        "key_features": "No head injury, haemorrhage, meningitis or cranial irradiation precedes the decline.",
         "likelihood": "low"
       }
     ],
     "key_clinical_evidence": [
-      "iNPH diagnosis (Relkin 2005 INPH Study Group) requires (a) Hakim's triad of gait disturbance, cognitive impairment, and urinary urgency/incontinence \u2014 gait is typically first and most prominent; (b) ventriculomegaly with Evans >0.3 and DESH on MRI without mass effect; (c) age >40 and chronic course; (d) opening pressure <25 cmH2O; (e) absence of an alternative explanation",
-      "MRI is the imaging modality of choice \u2014 measure Evans index and callosal angle (<90\u00b0 supports NPH) and confirm DESH (tight high-convexity sulci + wide Sylvian fissures)",
-      "The tap test removes 30-50 mL of CSF after measuring opening pressure and compares prespecified objective gait and cognitive measures before and after drainage; a positive response supports shunt responsiveness, while a negative single tap does not exclude NPH",
-      "Tap-test sensitivity is only 50-80%; a single negative tap does not exclude NPH \u2014 an extended (3-5 day) lumbar drainage trial can resolve borderline cases",
-      "Reversible-cause laboratory tests do not diagnose NPH and are optional; order targeted tests only when the presentation suggests a metabolic, endocrine, infectious, inflammatory, vitamin, or medication-related mimic",
-      "Alzheimer copathology is common in iNPH and may reduce cognitive benefit from shunting without necessarily eliminating gait benefit",
-      "Shunt response is best predicted by an objectively positive tap test or extended drainage trial in a patient who meets imaging and clinical criteria",
-      "Tier per the July 2026 clinical review: The reversible-cause screen is good practice but does not establish or exclude hydrocephalus; the tap test does."
+      "Probable iNPH requires insidious onset after age 40, at least 3 to 6 months of progression, no antecedent such as trauma, haemorrhage or meningitis, and a gait disturbance with cognitive or urinary symptoms [Relkin_2005]",
+      "Imaging: Evans index 0.35 without obstruction, with tight high-convexity sulci, a callosal angle of 81 degrees and temporal horn enlargement [Nakajima_2021]",
+      "Normal opening pressure (15 cmH2O) with normal CSF content; TUG improved 30% at 24 hours after a 40 mL tap, above the commonly used 10% criterion [Nakajima_2021]",
+      "Tap-test sensitivity is 26% to 61% with PPV 73% to 100% [Marmarou_2005]",
+      "In a cancer survivor, negative CSF cytology on the tap sample with no leptomeningeal enhancement on contrast MRI makes leptomeningeal carcinomatosis unlikely; a single negative cytology does not exclude it absolutely, so new cranial nerve or radicular signs would justify repeat sampling"
     ],
     "red_herrings": [
       {
-        "correct_interpretation": "Negative CSF cytology on adequate sampling and absence of leptomeningeal enhancement on gadolinium MRI exclude leptomeningeal disease; iNPH remains the operative diagnosis",
-        "data_point": "Past breast cancer (currently in clinical remission)",
+        "correct_interpretation": "Negative cytology and flow cytometry, normal CSF cells and glucose and no enhancement on contrast MRI make leptomeningeal disease unlikely, and the magnetic gait with a tap response indicates iNPH.",
+        "data_point": "Breast cancer (lumpectomy, radiation and chemotherapy 6 years ago, in clinical remission on tamoxifen)",
         "field_path": "patient.clinical_history.past_medical_history",
         "intended_effect": "The syndrome is presumptively attributed to leptomeningeal carcinomatosis and NPH is not pursued",
         "location": "clinical_history.past_medical_history"
@@ -434,96 +570,119 @@
         "citations": [
           "[Relkin_2005]"
         ],
-        "reason": "MRI must precede large-volume LP to exclude mass effect or secondary obstructive hydrocephalus before removing 30-50 mL of CSF",
+        "reason": "Brain imaging must exclude a mass or obstructive hydrocephalus before CSF is removed [Relkin_2005]",
         "severity": "hard"
       },
       {
         "after_criterion_id": "action-4-analyze-csf",
         "before_criterion_id": "action-6-perform-clinical-assessment",
         "citations": [
-          "[Relkin_2005]"
+          "[Nakajima_2021]"
         ],
-        "reason": "The baseline gait and cognition must be measured before the large-volume tap, or the post-tap change cannot be interpreted and the tap test yields nothing",
+        "reason": "The baseline gait must be measured before the tap, or the post-tap change cannot be interpreted [Nakajima_2021]",
         "severity": "soft"
       }
     ],
     "stop_rule": {
-      "max_additional_actions": 0,
+      "max_additional_actions": 1,
       "required_before_assessment": [
         "action-2-analyze-brain-mri",
-        "action-4-analyze-csf",
         "action-6-perform-clinical-assessment",
-        "action-7-analyze-csf"
+        "action-4-analyze-csf"
       ]
     }
   },
   "initial_tool_outputs": {
     "clinical_assessment": {
       "assessment_type": "gait_and_balance_timed",
-      "criteria_met": {
-        "cognition_reassessed_after_the_tap": true,
-        "objective_gait_measured_before_the_tap": true,
-        "response_meets_the_threshold": true,
-        "same_measures_repeated_after_the_tap": true
-      },
+      "criteria_met": null,
       "findings": [
         {
           "observation": "Gait pattern",
-          "result": "Wide-based, shuffling magnetic gait."
+          "result": "Wide-based, shuffling magnetic gait with short steps and reduced foot clearance"
         },
         {
-          "observation": "Gait pattern",
-          "result": "Freezing on initiation."
+          "observation": "Freezing",
+          "result": "Start hesitation on initiation"
         },
         {
-          "observation": "Gait pattern",
-          "result": "Pull test \u2014 2 steps backward."
+          "observation": "Turning",
+          "result": "En-bloc turn"
+        },
+        {
+          "observation": "Tandem walk",
+          "result": "Unable"
+        },
+        {
+          "observation": "Postural reflexes",
+          "result": "Pull test: 2 steps of retropulsion before recovery"
+        },
+        {
+          "observation": "Walking aid",
+          "result": "Four-wheeled walker"
+        },
+        {
+          "observation": "Urinary symptoms",
+          "result": "Urge incontinence 2-3 times a week, reported by patient"
         }
       ],
-      "impression": "Objective gait and cognition were measured before the large-volume tap and repeated after it. The objective improvement is consistent with a positive tap response and increases the likelihood of shunt responsiveness; it must be integrated with the clinical syndrome and structural imaging.",
-      "pre_post_comparison": {
-        "after the tap": "The same measures were repeated after the tap, and this is what the case's own tap-trial report states: Positive tap trial. TUG improved 30% at 24 hours (27 sec to 19 sec); 10-meter walk improved 33% (21 sec to 14 sec); MoCA improved 3 points (22 to 25). No incontinence in 24 hours post-tap; decreased urgency reported.",
-        "before the tap": "Wide-based, shuffling magnetic gait.; Freezing on initiation.; Pull test \u2014 2 steps backward.",
-        "interpretation": "positive tap test"
-      },
+      "impression": "Slow, wide-based, short-stepped magnetic gait with start hesitation, en-bloc turning and impaired postural reflexes.",
+      "pre_post_comparison": null,
       "recommended_actions": [],
       "scores": {
-        "MoCA (from the bedside examination)": "22/30",
-        "assessment timing": "immediately before the large-volume tap, then repeated after it",
-        "positive-response threshold": ">10% TUG improvement is a commonly used criterion; interpret with absolute change and concordant gait/cognitive findings"
+        "10-metre walk": "21 s",
+        "MoCA (same session)": "22/30",
+        "Timed Up and Go": "27 s"
       }
     },
     "csf": {
       "appearance": "Clear, colorless",
       "cell_count": {
-        "RBC": "4",
+        "RBC": "4/mcL",
         "WBC": "3 cells/mcL",
         "differential": "Lymphocytes"
       },
       "glucose": "66 mg/dL",
       "glucose_ratio": "0.65",
-      "interpretation": "Opening pressure: 15 cmH2O. WBC: 3 cells/mcL; RBC: 4. Protein: 52 mg/dL. Glucose: 66 mg/dL. Positive tap trial. TUG improved 30% at 24 hours (27 sec to 19 sec); 10-meter walk improved 33% (21 sec to 14 sec); MoCA improved 3 points (22 to 25). No incontinence in 24 hours post-tap; decreased urgency reported",
+      "interpretation": "Normal opening pressure (15 cmH2O) and normal CSF cell count, protein and glucose. After removal of 40 mL, TUG changed from 27 s to 21 s at 2 hours and 19 s at 24 hours (30% at 24 hours); 10-m walk 21 s to 14 s at 24 hours (33%); MoCA 22 to 25. No incontinence in the 24 hours after the tap.",
       "opening_pressure": "15 cmH2O",
-      "protein": "52 mg/dL",
+      "protein": "52 mg/dL (reference 15-60 mg/dL, age over 60)",
       "special_tests": {
-        "cognitive": "MoCA 22 to 25 (3 points at 24h)",
+        "cognitive": "MoCA 22 to 25 (3 points at 24 hours)",
         "post_tap_10m_24h": "14 seconds (33% improvement)",
         "post_tap_tug_24h": "19 seconds (30% improvement)",
         "post_tap_tug_2h": "21 seconds (22% improvement)",
         "pre_tap_10m": "21 seconds",
         "pre_tap_tug": "27 seconds",
-        "urinary": "No incontinence in 24h post-tap; decreased urgency",
+        "urinary": "No incontinence in 24 hours after the tap; decreased urgency",
         "volume_removed": "40 mL"
       }
     },
+    "drug_interactions": {
+      "tamoxifen": {
+        "alternatives": [
+          "Venlafaxine (minimal CYP2D6 inhibition)"
+        ],
+        "contraindications": [],
+        "formulary_status": "All on formulary",
+        "interactions": [
+          "Duloxetine with tamoxifen: duloxetine is a moderate CYP2D6 inhibitor and may reduce conversion of tamoxifen to its active metabolite endoxifen, potentially lowering its efficacy. Avoid the combination where possible; antidepressants with minimal CYP2D6 inhibition (for example venlafaxine) are preferred.",
+          "Amlodipine: no clinically relevant interaction with tamoxifen or duloxetine."
+        ],
+        "proposed": "Medication review: tamoxifen 20 mg, duloxetine 60 mg, amlodipine 5 mg",
+        "summary": "",
+        "warnings": [
+          "Duloxetine should be tapered, not stopped abruptly, if it is changed."
+        ]
+      }
+    },
     "labs": {
-      "abnormal_values_summary": [
-        "CA 15-3 28 U/mL (at upper normal limit \u2014 stable per oncology)"
-      ],
-      "interpretation": "Abnormal values: CA 15-3 28 U/mL (at upper limit of normal \u2014 not strictly within <28 reference range; stable per oncology surveillance).",
+      "abnormal_values_summary": [],
+      "interpretation": "Normal blood count, sodium, creatinine, TSH, vitamin B12 and CA 15-3. HIV non-reactive.",
       "panels": {
         "BMP": [
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "136-145",
             "test": "Sodium",
@@ -531,6 +690,7 @@
             "value": 140
           },
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "0.6-1.1",
             "test": "Creatinine",
@@ -538,18 +698,9 @@
             "value": 0.8
           }
         ],
-        "Baseline workup": [
-          {
-            "clinical_significance": "Ordered as part of the baseline workup; no abnormality that alters the diagnosis, which is what this case's diagnosis rests on",
-            "is_abnormal": false,
-            "reference_range": "",
-            "test": "HIV",
-            "unit": "",
-            "value": "Non-reactive"
-          }
-        ],
         "CBC": [
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "4.5-11.0",
             "test": "WBC",
@@ -557,6 +708,7 @@
             "value": 6.8
           },
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "12.0-16.0",
             "test": "Hemoglobin",
@@ -564,6 +716,7 @@
             "value": 13.2
           },
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "150-400",
             "test": "Platelets",
@@ -573,6 +726,7 @@
         ],
         "Metabolic": [
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "0.4-4.0",
             "test": "TSH",
@@ -580,88 +734,135 @@
             "value": 1.9
           },
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "200-900",
             "test": "Vitamin B12",
             "unit": "pg/mL",
             "value": 468
-          },
+          }
+        ],
+        "Serology": [
           {
             "clinical_significance": null,
-            "is_abnormal": true,
+            "is_abnormal": false,
+            "reference_range": "Non-reactive",
+            "test": "HIV",
+            "unit": "",
+            "value": "Non-reactive"
+          }
+        ],
+        "Tumour markers": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
             "reference_range": "<28",
-            "test": "CA 15-3 (breast cancer marker)",
+            "test": "CA 15-3",
             "unit": "U/mL",
-            "value": 28
+            "value": 22
           }
         ]
       }
     },
     "mri": {
-      "additional_observations": [],
+      "additional_observations": [
+        "Technique: 3T brain MRI, sagittal T1, axial T2, FLAIR, DWI, SWI and coronal 3D T1, with post-gadolinium 3D T1 and FLAIR (requested for the cancer history).",
+        "No restricted diffusion. No haemorrhage.",
+        "No obstructing lesion, mass or aqueductal stenosis."
+      ],
       "findings": [
         {
           "borders": null,
-          "location": "bilateral lateral ventricles",
+          "location": "lateral and third ventricles",
           "mass_effect": null,
           "signal_characteristics": {
-            "description": "Evans index 0.35"
+            "description": "Enlarged lateral and third ventricles, Evans index 0.35"
           },
           "size": null,
           "type": "ventriculomegaly"
         },
         {
           "borders": null,
-          "location": "high convexity",
+          "location": "temporal horns",
           "mass_effect": null,
           "signal_characteristics": {
-            "description": "Partial DESH \u2014 tight high convexity"
+            "description": "Temporal horns enlarged out of proportion to the hippocampi"
           },
           "size": null,
-          "type": "DESH"
+          "type": "temporal horn enlargement"
+        },
+        {
+          "borders": null,
+          "location": "high convexity and Sylvian fissures",
+          "mass_effect": null,
+          "signal_characteristics": {
+            "description": "Tight high-convexity and medial parietal sulci; Sylvian fissures not enlarged (DESH incomplete)"
+          },
+          "size": null,
+          "type": "sulcal pattern"
         },
         {
           "borders": null,
           "location": "corpus callosum",
           "mass_effect": null,
           "signal_characteristics": {
-            "description": "Callosal angle 81 degrees"
+            "description": "Callosal angle 81 degrees on the coronal plane through the posterior commissure"
           },
           "size": null,
           "type": "callosal angle"
         },
         {
           "borders": null,
-          "location": "cerebral cortex, meninges",
-          "mass_effect": null,
-          "signal_characteristics": {
-            "description": "No leptomeningeal enhancement on post-contrast T1"
-          },
-          "size": null,
-          "type": "leptomeningeal enhancement assessment"
-        },
-        {
-          "borders": null,
-          "location": "brain parenchyma",
-          "mass_effect": null,
-          "signal_characteristics": {
-            "description": "No parenchymal metastases"
-          },
-          "size": null,
-          "type": "breast metastasis assessment"
-        },
-        {
-          "borders": null,
           "location": "periventricular white matter",
           "mass_effect": null,
           "signal_characteristics": {
-            "description": "Mild periventricular FLAIR"
+            "FLAIR": "Thin smooth periventricular hyperintense rim; deep white matter Fazekas grade 1; no lacunes"
           },
           "size": null,
           "type": "periventricular signal"
+        },
+        {
+          "borders": null,
+          "location": "cerebral aqueduct and fourth ventricle",
+          "mass_effect": null,
+          "signal_characteristics": {
+            "T2": "Aqueduct patent with a flow void; fourth ventricle normal in size"
+          },
+          "size": null,
+          "type": "CSF pathway"
+        },
+        {
+          "borders": null,
+          "location": "leptomeninges, ependyma and cranial nerves",
+          "mass_effect": null,
+          "signal_characteristics": {
+            "post-contrast T1": "No leptomeningeal, ependymal or cranial nerve enhancement"
+          },
+          "size": null,
+          "type": "enhancement"
+        },
+        {
+          "borders": null,
+          "location": "brain parenchyma and calvarium",
+          "mass_effect": null,
+          "signal_characteristics": {
+            "post-contrast T1": "No enhancing parenchymal or calvarial lesion"
+          },
+          "size": null,
+          "type": "enhancement"
+        },
+        {
+          "borders": null,
+          "location": "hippocampi",
+          "mass_effect": null,
+          "signal_characteristics": {
+            "description": "Hippocampal volume preserved for age, MTA score 1 bilaterally"
+          },
+          "size": null,
+          "type": "medial temporal lobes"
         }
       ],
-      "impression": "1. Ventriculomegaly with Evans index 0.35. 2. Partial disproportionate sulcal effacement at high convexity (partial DESH pattern). 3. Callosal angle 81 degrees. 4. No leptomeningeal enhancement on post-contrast T1. 5. No parenchymal enhancing lesions. 6. Mild periventricular FLAIR signal",
+      "impression": "1. Communicating ventriculomegaly (Evans index 0.35) with tight high-convexity sulci, an acute callosal angle of 81 degrees and temporal horn enlargement, and no obstructing lesion; Sylvian fissures not enlarged. 2. No leptomeningeal, ependymal or parenchymal enhancement. 3. Thin periventricular FLAIR rim; deep white matter Fazekas grade 1. 4. MTA 1.",
       "recommended_actions": [],
       "volumetrics": null
     }
@@ -672,8 +873,8 @@
     "citation_gap": [],
     "created_by": "NeuroBench v5 generator",
     "criteria_pack_version": "1.0",
-    "difficulty_rationale": "5 required, 1 recommended, and 1 optional actions after the July 2026 NPH review; 1 grounded red herring(s); 6 differential alternatives.",
-    "difficulty_variant_description": "Diagnostic puzzle NPH \u2014 breast cancer survivor with Hakim's triad; leptomeningeal carcinomatosis as major red herring requiring comprehensive exclusion (cytology x3, flow cytometry, MRI, staging CT) before NPH diagnosis confirmed.",
+    "difficulty_rationale": "3 required (brain MRI, baseline timed gait, CSF tap test with cytology), 1 recommended (post-tap reassessment) and 3 optional (labs, cognitive screen, medication interaction review) actions; 1 grounded red herring; 6 differential alternatives.",
+    "difficulty_variant_description": "Diagnostic puzzle: iNPH in a breast cancer survivor with a gait, cognitive and urinary syndrome; leptomeningeal carcinomatosis is the major alternative and is excluded by CSF cytology and flow cytometry on the tap sample and by contrast MRI.",
     "expected_agent_confidence": 0.32,
     "fallback_tool_kinds": {
       "cardiac_monitoring": "normal",
@@ -681,13 +882,11 @@
       "echo": "normal",
       "eeg": "normal"
     },
-    "last_revised": "2026-08-10",
+    "last_revised": "2026-10-24",
     "policy_spec_status": "draft",
-    "revision_reason": "case-level re-audit of all NPH reviewer requests: the tap report is routed to CSF, timed gait/cognitive assessment is the required pre/post measure, the standalone neuropsychological battery and advanced imaging are removed from gold actions and callable authored follow-ups, laboratories remain optional, unrelated CSF assays are no longer returned for free, and the unsupported universal 20% response threshold is corrected",
+    "revision_reason": "October 2026 review round: NPH plan classes C1-C20 applied (literature and fake-consult steps removed, cytology merged into the required tap, baseline and post-tap gait split, reports made modality-pure, musts and differential rebuilt).",
     "version": "policy-v1",
-    "vocab_gap": [
-      "Phase-contrast (CSF flow) MRI is referenced in followup outputs but is not in the TOOL_PARAMETER_VOCABULARY closed list for order_advanced_imaging \u2014 recommend adding 'phase_contrast_MRI' or 'CSF_flow_MRI' to the modality vocabulary"
-    ]
+    "vocab_gap": []
   },
   "patient": {
     "chief_complaint": "Progressive gait deterioration, memory decline, and new urinary incontinence \u2014 oncology team concerned about cancer recurrence or leptomeningeal disease",
@@ -720,7 +919,7 @@
         }
       ],
       "past_medical_history": [
-        "Leptomeningeal carcinomatosis concern (breast cancer, treated with lumpectomy + radiation + chemotherapy 6 years ago, currently in clinical remission)",
+        "Breast cancer (lumpectomy, radiation and chemotherapy 6 years ago, in clinical remission on tamoxifen)",
         "Chronic back pain",
         "Hypertension"
       ],
@@ -739,13 +938,13 @@
       "handedness": "right",
       "sex": "female"
     },
-    "history_present_illness": "A 69-year-old retired nurse with breast cancer in clinical remission (6 years post-treatment) was admitted for urgent neurological evaluation of progressive gait deterioration, memory decline, and urinary incontinence over the past 10 months. She was treated with lumpectomy, radiation, and chemotherapy (doxorubicin-cyclophosphamide followed by paclitaxel) 6 years ago and has been in clinical remission on tamoxifen maintenance. Her oncologist and oncology team are alarmed because her symptoms \u2014 gait deterioration, cognitive decline, and urinary incontinence \u2014 could represent leptomeningeal carcinomatosis (LMC) recurrence, and they have requested urgent neurology consultation. She describes progressive shuffling gait beginning 10 months ago, three falls (no injury), and increasing reliance on a walker. Urinary urgency began approximately 7 months ago, progressing to frank incontinence 2-3 times per week. She describes increasing forgetfulness and difficulty following complex nursing reports she used to review voluntarily. Her oncologist noticed the gait change at a routine visit and was concerned about CNS metastasis or LMC. However, a neurology fellow who examined her noted the gait had a distinctly magnetic quality. A head MRI showed Evans index 0.35 and raised both LMC (leptomeningeal enhancement? \u2014 no enhancement present) and NPH as concerns.",
+    "history_present_illness": "A 69-year-old retired nurse with breast cancer in clinical remission (6 years post-treatment) was admitted for urgent neurological evaluation of progressive gait deterioration, memory decline, and urinary incontinence over the past 10 months. She was treated with lumpectomy, radiation, and chemotherapy (doxorubicin-cyclophosphamide followed by paclitaxel) 6 years ago and has been in clinical remission on tamoxifen maintenance. Her oncology team is concerned that the gait deterioration, cognitive decline and urinary incontinence could represent leptomeningeal carcinomatosis or CNS metastasis, and requested urgent neurology consultation. She describes progressive shuffling gait beginning 10 months ago, three falls (no injury), and increasing reliance on a walker. Urinary urgency began approximately 7 months ago, progressing to frank incontinence 2-3 times per week. She describes increasing forgetfulness and difficulty following complex nursing reports she used to review voluntarily. Her oncologist noticed the gait change at a routine visit. A neurology fellow who examined her noted that the gait had a distinctly magnetic quality.",
     "neurological_exam": {
-      "additional": "No meningismus. No papilledema. No cranial nerve palsies (would suggest LMC). Bilateral grasp reflexes present (frontal). No skin lesions suggesting metastases.",
+      "additional": "No meningismus. No papilledema. No cranial nerve palsies. Bilateral grasp reflexes present. No skin lesions suggesting metastases.",
       "coordination": "Intact finger-nose. Normal heel-shin.",
       "cranial_nerves": "Normal. No papilledema. No diplopia. No facial numbness. PERRL.",
-      "gait": "Wide-based, shuffling magnetic gait. Freezing on initiation. TUG 27 seconds. 10-meter walk 21 seconds. Cannot tandem walk. Pull test \u2014 2 steps backward.",
-      "mental_status": "Alert, oriented x3. Anxious about cancer recurrence. MoCA 22/30. Mild delayed recall (2/5), executive dysfunction. Normal language. No aphasia.",
+      "gait": "Wide-based, shuffling magnetic gait with freezing on initiation; uses a walker. Cannot tandem walk. Pull test: 2 steps backward. Timed gait measures reported separately.",
+      "mental_status": "Alert, oriented x3. Anxious about cancer recurrence. Slowed responses, normal language, no aphasia. Formal cognitive screening reported separately.",
       "motor": "Normal tone and strength. No focal deficits. No radiculopathic signs.",
       "reflexes": "2+ throughout. Bilateral plantar flexors.",
       "sensory": "Normal throughout. No dermatomal sensory loss."

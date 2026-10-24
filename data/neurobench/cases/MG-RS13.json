@@ -4,14 +4,7 @@
   "difficulty": "moderate",
   "encounter_type": "inpatient",
   "fallback_tool_outputs": {
-    "advanced_imaging": {
-      "findings": [],
-      "impression": "No abnormality identified.",
-      "modality": "FDG-PET scan",
-      "quantitative_data": null,
-      "recommended_actions": [],
-      "tracer_or_protocol": null
-    },
+    "advanced_imaging": null,
     "cardiac_monitoring": {
       "duration_hours": 24,
       "events": [],
@@ -50,7 +43,7 @@
       "angiography_findings": null,
       "contrast_used": false,
       "findings": [],
-      "impression": "No acute intracranial abnormality. Normal study, and it does not address the question this patient's workup turns on.",
+      "impression": "Non-contrast CT head: no acute intracranial abnormality. Impression: normal non-contrast CT of the head.",
       "recommended_actions": []
     },
     "drug_interactions": null,
@@ -62,6 +55,7 @@
         "RA": "normal size",
         "RV": "normal size and function"
       },
+      "echo_type": "TTE",
       "ejection_fraction": 59.0,
       "findings": [
         "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
@@ -98,59 +92,31 @@
   "followup_outputs": [
     {
       "output": {
-        "abnormal_values_summary": [
-          "AChR binding antibody 4.8 nmol/L (ref <0.4 nmol/L) \u2014 markedly elevated",
-          "AChR blocking antibody positive"
-        ],
-        "interpretation": "AChR binding antibody markedly elevated at 4.8 nmol/L (reference < 0.4 nmol/L). AChR blocking antibody positive. Anti-MuSK antibody negative. Anti-acetylcholine receptor antibodies are found in a subset of patients with neuromuscular junction disorders; an elevated result is associated with autoimmune neuromuscular junction disease",
-        "panels": {
-          "Acetylcholine_Receptor_Antibody_Panel": [
-            {
-              "is_abnormal": true,
-              "reference_range": "< 0.4 nmol/L",
-              "test": "AChR binding antibody",
-              "unit": "nmol/L",
-              "value": "4.8 nmol/L"
-            },
-            {
-              "is_abnormal": true,
-              "reference_range": "< 25%",
-              "test": "AChR blocking antibody",
-              "unit": "nmol/L",
-              "value": "1.4 nmol/L"
-            },
-            {
-              "is_abnormal": false,
-              "reference_range": "< 0.4 nmol/L",
-              "test": "Anti-MuSK antibody",
-              "unit": "nmol/L",
-              "value": "< 0.4 nmol/L (negative)"
-            }
-          ],
-          "Baseline workup": [
-            {
-              "clinical_significance": "Ordered as part of the baseline workup; no abnormality that alters the diagnosis, which is what this case's diagnosis rests on",
-              "is_abnormal": false,
-              "reference_range": "",
-              "test": "TSH",
-              "unit": "",
-              "value": "Within reference range"
-            }
-          ]
-        }
-      },
-      "tool_name": "interpret_labs",
-      "trigger_action": "request_achr_musk_lrp4_antibodies"
-    },
-    {
-      "output": {
         "findings": [
           {
-            "description": "REPETITIVE NERVE STIMULATION STUDY\n\nTECHNIQUE: 3 Hz RNS at orbicularis oculi, trapezius, deltoid\n\nRESULTS:\n  Orbicularis oculi: Decrement 18% ABNORMAL\n  Trapezius: Decrement 14% ABNORMAL\n  Deltoid: Decrement 11% ABNORMAL\n\nIMPRESSION: Decremental responses in cranial and proximal muscles at 3 Hz, consistent with a disorder of neuromuscular transmission. Clinical correlation recommended."
+            "description": "3 Hz trains of 10 stimuli; limb temperature 33 C; no anticholinesterase medication taken.",
+            "site": "Technique"
+          },
+          {
+            "description": "Baseline CMAP 1.9 mV; decrement 1st to 4th response 18%.",
+            "site": "Right orbicularis oculi (facial nerve)"
+          },
+          {
+            "description": "Baseline CMAP 6.2 mV; decrement 14%.",
+            "site": "Right trapezius (accessory nerve)"
+          },
+          {
+            "description": "Baseline CMAP 8.4 mV; decrement 11%. After 10 s maximal contraction: repair of the decrement to 4%, CMAP increment 5%; no facilitation.",
+            "site": "Right deltoid (axillary nerve)"
           }
         ],
-        "impression": "RNS: 18%, 14%, 11% decrement in orbicularis, trapezius, deltoid \u2014 decremental pattern in cranial and proximal muscles, consistent with a disorder of neuromuscular transmission",
-        "quantitative_data": null,
+        "impression": "1. Decrement of 11-18% at 3 Hz in orbicularis oculi, trapezius and deltoid. 2. Normal baseline CMAP amplitudes; no post-exercise facilitation. Findings are consistent with a postsynaptic disorder of neuromuscular transmission. Clinical correlation recommended.",
+        "quantitative_data": {
+          "deltoid_decrement": "11%",
+          "orbicularis_oculi_decrement": "18%",
+          "post_exercise_increment": "5%",
+          "trapezius_decrement": "14%"
+        },
         "recommended_actions": [],
         "test_type": "repetitive_nerve_stimulation"
       },
@@ -161,11 +127,17 @@
       "output": {
         "findings": [
           {
-            "description": "SINGLE-FIBER EMG \u2014 EXTENSOR DIGITORUM COMMUNIS\n\nMCD: 64 \u00b5s [normal <35 \u00b5s] MARKEDLY ABNORMAL\nBlocking: 24% of potential pairs\n\nIMPRESSION: Markedly increased mean consecutive difference with 24% blocking, consistent with a disorder of neuromuscular transmission. Clinical correlation recommended."
+            "description": "20 fiber pairs analysed. Mean MCD 64 microseconds (reference <34). Increased jitter in 15 of 20 pairs (75%); impulse blocking in 24% of pairs.",
+            "muscle": "Right extensor digitorum communis (voluntary activation)"
           }
         ],
-        "impression": "SFEMG (extensor digitorum communis): MCD 64 \u00b5s with 24% blocking \u2014 markedly increased jitter consistent with a disorder of neuromuscular transmission",
-        "quantitative_data": null,
+        "impression": "Abnormal single-fiber EMG of the extensor digitorum communis: markedly increased jitter (mean MCD 64 microseconds) with impulse blocking, consistent with a disorder of neuromuscular transmission. Clinical correlation recommended.",
+        "quantitative_data": {
+          "blocking": "24% of pairs",
+          "mean_MCD": "64 microseconds (reference <34)",
+          "muscle": "right extensor digitorum communis",
+          "pairs_with_increased_jitter": "15/20 (75%)"
+        },
         "recommended_actions": [],
         "test_type": "emg_single_fiber"
       },
@@ -174,85 +146,65 @@
     },
     {
       "output": {
-        "alternatives": [],
-        "contraindications": [],
-        "formulary_status": "on formulary",
-        "interactions": [
-          "DRUG INTERACTION REVIEW \u2014 PYRIDOSTIGMINE WITH METHOTREXATE AND HYDROXYCHLOROQUINE\n\nQuery: Adding pyridostigmine to regimen including methotrexate and hydroxychloroquine\n\nFINDINGS:\n  PYRIDOSTIGMINE + METHOTREXATE: No clinically significant pharmacokinetic interaction identified.\n  PYRIDOSTIGMINE + HYDROXYCHLOROQUINE: No adverse pharmacodynamic interaction; hydroxychloroquine has been used off-label in some NMJ disorder protocols; QTc monitoring is recommended.\n  HYDROXYCHLOROQUINE (QTc): Prolongs QTc; baseline and follow-up ECG monitoring is recommended.\n  METHOTREXATE: Established immunosuppressive agent; azathioprine is more commonly used in NMJ disease management with stronger evidence base; TPMT genotyping recommended before azathioprine initiation."
-        ],
-        "proposed": "request_pyridostigmine_trial",
-        "warnings": [
-          "Pyridostigmine: no significant interaction with methotrexate or hydroxychloroquine; QTc monitoring required with hydroxychloroquine; TPMT genotyping recommended before azathioprine."
-        ]
-      },
-      "tool_name": "check_drug_interactions",
-      "trigger_action": "request_pyridostigmine_trial"
-    },
-    {
-      "output": {
-        "query": "search brown syndrome vs mg",
-        "results": [
-          {
-            "content": "LITERATURE SEARCH: Brown Syndrome vs Ocular Neuromuscular Junction Disease \u2014 Diagnostic Pitfalls\n\nKEY FINDINGS:\n1. BROWN SYNDROME: Restriction of superior oblique tendon sheath causing limited elevation in adduction; typically unilateral; MRI shows no EOM enlargement or tendon inflammation in idiopathic cases; may be idiopathic, inflammatory, or traumatic.\n2. OCULAR NMJ DISEASE: Can present with vertical strabismus and restricted elevation that mimics Brown syndrome; distinguishing features include ice pack test response, fatigability, diurnal variation, and Cogan lid twitch.\n3. BILATERAL BROWN SYNDROME IN ADULTS: Rare; bilateral adult-onset presentation without a clear mechanical cause has been reported in the context of NMJ disease.\n4. CASE REPORTS: Multiple reports exist of NMJ disease initially characterised as Brown syndrome prior to NMJ evaluation; progression to ptosis and bulbar symptoms is a reported clinical trajectory.\n5. MANAGEMENT SHIFT: Diagnosis of NMJ disease leads to different pharmacological management than connective tissue-related motility disorders.",
-            "title": "Clinical literature"
-          }
-        ],
-        "summary": "Bilateral adult-onset Brown syndrome without structural correlate should trigger NMJ evaluation; ice pack test and AChR antibody testing are key diagnostic steps."
-      },
-      "tool_name": "search_medical_literature",
-      "trigger_action": "search_brown_syndrome_vs_mg"
-    },
-    {
-      "output": {
-        "query": "request mgtx thymectomy",
-        "results": [
-          {
-            "content": "LITERATURE SEARCH: MGTX Trial \u2014 Thymectomy in Non-Thymomatous Generalized MG\n\nMGTX TRIAL (Wolfe GI et al., NEJM 2016):\n  Population: AChR-positive generalized MG patients aged 18\u201365 without thymoma\n  Results: Thymectomy + prednisone vs prednisone alone\n  Primary outcome: Thymectomy group had significantly lower quantitative MG score over 3 years\n  Secondary outcome: Less prednisone required; fewer treatment failures; fewer hospitalizations\n  ELIGIBILITY CRITERIA: Age 18\u201365, AChR-positive, generalized MG, no thymoma on imaging",
-            "title": "Clinical literature"
-          }
-        ],
-        "summary": "MGTX trial (NEJM 2016) demonstrated benefit of thymectomy plus prednisone over prednisone alone in AChR-positive generalized MG patients aged 18\u201365 without thymoma."
-      },
-      "tool_name": "search_medical_literature",
-      "trigger_action": "request_mgtx_thymectomy"
-    },
-    {
-      "output": {
         "findings": [
           {
-            "reference_range": "see impression",
-            "test": "respiratory_function",
-            "value": "Baseline FVC/NIF to assess crisis risk in patients with bulbar or limb involvement"
-          }
-        ],
-        "impression": "Bedside respiratory function testing: forced vital capacity, maximal inspiratory and expiratory pressures, negative inspiratory force. Baseline FVC/NIF to assess crisis risk in patients with bulbar or limb involvement.",
-        "quantitative_data": {
-          "measured": "FVC, MIP, MEP, NIF"
-        },
-        "recommended_actions": [],
-        "test_type": "respiratory_function"
-      },
-      "tool_name": "order_specialized_test",
-      "trigger_action": "request_respiratory_function"
-    },
-    {
-      "output": {
-        "findings": [
+            "description": "MRD1 0.5 mm before; ice pack over the closed lids for 5 minutes; MRD1 4.5 mm after (improvement 4.0 mm).",
+            "site": "Right upper eyelid"
+          },
           {
-            "reference_range": "see impression",
-            "test": "ice_pack_test",
-            "value": "Improvement of ptosis after 2 minutes of cooling supports MG"
+            "description": "MRD1 1.0 mm before; 5.0 mm after (improvement 4.0 mm).",
+            "site": "Left upper eyelid"
           }
         ],
-        "impression": "Ice-pack test: a cold pack applied to the more ptotic eyelid for two minutes, with the margin-reflex distance measured before and after. Improvement of ptosis after 2 minutes of cooling supports MG.",
+        "impression": "Positive ice pack test: MRD1 improved by 4 mm in both eyes after 5 minutes of cooling (positive threshold 2 mm).",
         "quantitative_data": {
-          "protocol": "2 minutes of cooling, margin-reflex distance before and after"
+          "left_MRD1_after": "5.0 mm",
+          "left_MRD1_before": "1.0 mm",
+          "right_MRD1_after": "4.5 mm",
+          "right_MRD1_before": "0.5 mm"
         },
         "recommended_actions": [],
         "test_type": "ice_pack_test"
       },
       "tool_name": "order_specialized_test",
       "trigger_action": "request_ice_pack_test"
+    },
+    {
+      "output": {
+        "findings": [
+          {
+            "reference_range": ">=80% predicted",
+            "result": "3.08 L (88% predicted; 43 mL/kg)",
+            "test": "FVC"
+          },
+          {
+            "reference_range": "more negative than -60 cmH2O",
+            "result": "-64 cmH2O",
+            "test": "MIP (NIF)"
+          },
+          {
+            "reference_range": ">=60 cmH2O",
+            "result": "82 cmH2O",
+            "test": "MEP"
+          },
+          {
+            "reference_range": ">=25",
+            "result": "34",
+            "test": "Single-breath count"
+          }
+        ],
+        "impression": "FVC 3.08 L (88% predicted, 43 mL/kg), MIP -64 cmH2O and MEP 82 cmH2O within reference limits. Normal respiratory muscle function.",
+        "quantitative_data": {
+          "FVC": "3.08 L (88% predicted; 43 mL/kg; weight 72 kg)",
+          "MEP": "82 cmH2O",
+          "MIP": "-64 cmH2O",
+          "single_breath_count": "34"
+        },
+        "recommended_actions": [],
+        "test_type": "respiratory_function"
+      },
+      "tool_name": "order_specialized_test",
+      "trigger_action": "request_respiratory_function"
     }
   ],
   "ground_truth": {
@@ -263,8 +215,6 @@
             "required_arguments": {
               "panels": [
                 "anti_AChR",
-                "anti_MuSK",
-                "anti_LRP4",
                 "TSH"
               ]
             },
@@ -272,14 +222,13 @@
           }
         ],
         "citations": [
-          "[Wolfe_2016]",
-          "Wolfe_2016"
+          "[Punga_2022]"
         ],
         "criterion_id": "action-1-interpret-labs",
-        "expected_evidence": "AChR antibody positive; TSH evaluates for comorbid thyroid disease",
+        "expected_evidence": "AChR binding antibody 4.8 nmol/L with elevated blocking antibody; MuSK negative; TSH and free T4 normal on levothyroxine; TRAb negative",
         "importance": "required",
-        "label": "Order serologies: anti-AChR (binding, blocking, modulating), anti-MuSK, anti-LRP4, and TSH/free-T4 for thyroid autoimmunity",
-        "rationale": "Order serologies: anti-AChR (binding, blocking, modulating), anti-MuSK, anti-LRP4, and TSH/free-T4 for thyroid autoimmunity"
+        "label": "Order AChR binding antibody and thyroid function",
+        "rationale": "Fluctuating vertical diplopia now with fatigable ptosis, jaw fatigue and nasal speech after a mechanical diagnosis that never fitted the imaging: AChR binding antibody is the first-line test; thyroid function and antibodies are indicated in a woman with treated hypothyroidism whose eye restriction raises thyroid eye disease (Jacob S et al., Pract Neurol 2025; Evoli A et al., Neurol Sci 2019)."
       },
       {
         "alternatives": [
@@ -290,118 +239,12 @@
             "tool_name": "order_specialized_test"
           }
         ],
-        "citations": [
-          "[Wolfe_2016]",
-          "Wolfe_2016"
-        ],
+        "citations": [],
         "criterion_id": "action-2-order-specialized-test",
-        "expected_evidence": "Decrement >10% in symptomatic muscles supports postsynaptic NMJ disorder",
+        "expected_evidence": "Decrement of 11-18% in orbicularis oculi, trapezius and deltoid with normal baseline CMAPs and no facilitation",
         "importance": "required",
-        "label": "Order repetitive nerve stimulation (RNS) at 2-3 Hz across proximal and facial muscles",
-        "rationale": "Order repetitive nerve stimulation (RNS) at 2-3 Hz across proximal and facial muscles"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "test_type": "emg_single_fiber"
-            },
-            "tool_name": "order_specialized_test"
-          }
-        ],
-        "citations": [
-          "[Wolfe_2016]",
-          "Wolfe_2016"
-        ],
-        "criterion_id": "action-3-order-specialized-test",
-        "expected_evidence": "Increased jitter and blocking on extensor digitorum communis or orbicularis oculi confirms NMJ transmission failure",
-        "importance": "recommended",
-        "label": "Order single-fiber EMG (gold standard >95% sensitivity)",
-        "rationale": "Order single-fiber EMG (gold standard >95% sensitivity)"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "contrast": true,
-              "study": "mediastinum_CT"
-            },
-            "tool_name": "order_body_imaging"
-          }
-        ],
-        "citations": [
-          "[Wolfe_2016]",
-          "Wolfe_2016"
-        ],
-        "criterion_id": "action-4-order-body-imaging",
-        "expected_evidence": "No thymoma; thymic involution appropriate for age",
-        "importance": "required",
-        "label": "Order CT chest with contrast for thymoma screening",
-        "rationale": "Order CT chest with contrast for thymoma screening"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "query": "myasthenia gravis MGFA classification treatment thymectomy"
-            },
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[Sanders_2016]",
-          "Sanders_2016"
-        ],
-        "criterion_id": "action-5-search-medical-literature",
-        "expected_evidence": "MGFA classification stages disease severity; thymectomy benefits AChR+ generalized MG (MGTX); IVIG/PLEX for crisis",
-        "importance": "required",
-        "label": "Review MGFA classification and current treatment guidance (pyridostigmine, prednisone, steroid-sparing, IVIG/PLEX, thymectomy)",
-        "rationale": "Review MGFA classification and current treatment guidance (pyridostigmine, prednisone, steroid-sparing, IVIG/PLEX, thymectomy)"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "drug": "pyridostigmine",
-              "screen_for": [
-                "aminoglycosides",
-                "fluoroquinolones",
-                "telithromycin",
-                "magnesium_IV",
-                "neuromuscular_blockers"
-              ]
-            },
-            "tool_name": "check_drug_interactions"
-          }
-        ],
-        "citations": [
-          "[Wolfe_2016]",
-          "Wolfe_2016"
-        ],
-        "criterion_id": "action-6-check-drug-interactions",
-        "expected_evidence": "Flag aminoglycosides, fluoroquinolones, IV magnesium, telithromycin, NMBs as contraindicated or use-with-caution in MG",
-        "importance": "required",
-        "label": "Check drug interactions for MG-exacerbating agents (aminoglycosides, fluoroquinolones, telithromycin, IV magnesium, neuromuscular blockers, procainamide)",
-        "rationale": "Check drug interactions for MG-exacerbating agents (aminoglycosides, fluoroquinolones, telithromycin, IV magnesium, neuromuscular blockers, procainamide)"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "test_type": "respiratory_function"
-            },
-            "tool_name": "order_specialized_test"
-          }
-        ],
-        "citations": [
-          "[Sanders_2016]",
-          "Sanders_2016"
-        ],
-        "criterion_id": "action-7-order-specialized-test",
-        "expected_evidence": "Baseline FVC/NIF to assess crisis risk in patients with bulbar or limb involvement",
-        "importance": "recommended",
-        "label": "Bedside respiratory function testing (FVC, MIP/MEP, NIF) \u2014 repeat q4h in crisis",
-        "rationale": "Bedside respiratory function testing (FVC, MIP/MEP, NIF) \u2014 repeat q4h in crisis"
+        "label": "Order repetitive nerve stimulation at 3 Hz including facial and proximal muscles",
+        "rationale": "Bulbar and neck flexor involvement make RNS of facial, trapezius and deltoid muscles likely to show the transmission defect (Jacob S et al., Pract Neurol 2025)."
       },
       {
         "alternatives": [
@@ -412,32 +255,132 @@
             "tool_name": "order_specialized_test"
           }
         ],
-        "citations": [
-          "[Wolfe_2016]",
-          "Wolfe_2016"
-        ],
+        "citations": [],
         "criterion_id": "action-8-order-specialized-test",
-        "expected_evidence": "Improvement of ptosis after 2 minutes of cooling supports MG",
+        "expected_evidence": "MRD1 improved by 4 mm in both eyes after 5 minutes of ice",
         "importance": "recommended",
-        "label": "Bedside ice-pack test for ptosis (cheap, ~80% sensitive for ocular MG)",
-        "rationale": "Bedside ice-pack test for ptosis (cheap, ~80% sensitive for ocular MG)"
+        "label": "Perform the ice pack test on the ptotic eyelids",
+        "rationale": "Bilateral ptosis on examination: an MRD1 improvement of at least 2 mm after 2-5 minutes of cooling supports a neuromuscular transmission disorder at the bedside."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "contrast": true,
+              "study": "mediastinum_CT"
+            },
+            "tool_name": "order_body_imaging"
+          },
+          {
+            "required_arguments": {
+              "contrast": true,
+              "study": "chest_CT"
+            },
+            "tool_name": "order_body_imaging"
+          },
+          {
+            "required_arguments": {
+              "contrast": true,
+              "study": "mediastinum_MRI"
+            },
+            "tool_name": "order_body_imaging"
+          }
+        ],
+        "citations": [
+          "[Wolfe_2016]"
+        ],
+        "criterion_id": "action-4-order-body-imaging",
+        "expected_evidence": "No anterior mediastinal mass; fatty thymic involution appropriate for age",
+        "importance": "required",
+        "label": "Order mediastinal CT with contrast to look for thymoma",
+        "rationale": "Thymic imaging is indicated in every patient with MG; at 47 with AChR-positive generalized MG it also decides thymectomy (Jacob S et al., Pract Neurol 2025; MGTX)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "respiratory_function"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "action-7-order-specialized-test",
+        "expected_evidence": "FVC 88% predicted (43 mL/kg), MIP -64 and MEP 82 cmH2O, all normal",
+        "importance": "recommended",
+        "label": "Measure baseline respiratory function (FVC, MIP, MEP)",
+        "rationale": "New bulbar symptoms and fatigable neck flexion: baseline FVC, MIP and MEP stage the respiratory risk before treatment changes (Lawn ND et al., Arch Neurol 2001)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "drug": "pyridostigmine"
+            },
+            "tool_name": "check_drug_interactions"
+          },
+          {
+            "required_arguments": {
+              "drug": "hydroxychloroquine"
+            },
+            "tool_name": "check_drug_interactions"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "action-6-check-drug-interactions",
+        "expected_evidence": "Hydroxychloroquine flagged as a drug of caution in MG; no pharmacokinetic interaction of pyridostigmine with the current medicines",
+        "importance": "recommended",
+        "label": "Review her current medicines against MG before starting pyridostigmine",
+        "rationale": "She takes hydroxychloroquine, a drug that can worsen MG, and methotrexate and prednisolone prescribed for the presumed Brown syndrome; the revised diagnosis changes which of them continue."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "emg_single_fiber"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "action-3-order-specialized-test",
+        "expected_evidence": "Increased jitter with blocking in extensor digitorum communis",
+        "importance": "optional",
+        "label": "Single-fiber EMG (not needed when RNS is diagnostic)",
+        "rationale": "RNS already shows a decrement in three muscles with positive AChR antibodies; single-fiber EMG adds no diagnostic information but is not wasteful."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "search_medical_literature"
+          }
+        ],
+        "citations": [
+          "[Sanders_2016]"
+        ],
+        "criterion_id": "action-5-search-medical-literature",
+        "expected_evidence": "General guidance on MG management",
+        "importance": "optional",
+        "label": "Review guidance on the management of generalized myasthenia gravis",
+        "rationale": "Background reading on management; not a clinical step in the work-up."
       }
     ],
     "assessment": {
       "prohibited_recommendations": [
-        "Do NOT prescribe aminoglycoside antibiotics (gentamicin, tobramycin, amikacin) \u2014 risk of precipitating myasthenic crisis",
-        "Do NOT prescribe fluoroquinolones (ciprofloxacin, levofloxacin, moxifloxacin) \u2014 FDA black-box warning for MG exacerbation",
-        "Do NOT prescribe telithromycin \u2014 contraindicated in MG",
-        "Do NOT administer IV magnesium for MG patients (e.g., for hypomagnesaemia, eclampsia prophylaxis) without alternative \u2014 blocks NMJ transmission",
-        "Do NOT use non-depolarizing neuromuscular blockers without anaesthesia/MG-aware dosing protocols",
-        "Do NOT initiate high-dose corticosteroids as sole outpatient therapy without hospitalization or pyridostigmine bridge \u2014 risk of paradoxical worsening at days 5-10",
-        "Do NOT attribute fluctuating fatigable weakness to a functional disorder before completing serology + RNS + single-fiber EMG workup"
+        "Do not start high-dose prednisone (above 20 mg/day) as an outpatient; start low and titrate, or start high dose only with inpatient monitoring, because initial steroid-induced worsening can precipitate crisis.",
+        "Avoid fluoroquinolones, aminoglycosides, macrolides and IV magnesium unless no alternative exists and the patient is monitored; use non-depolarising neuromuscular blockers only at reduced dose with quantitative monitoring.",
+        "Do not perform superior oblique tendon or other strabismus surgery for presumed Brown syndrome.",
+        "Do not stop prednisolone abruptly."
       ],
       "required_recommendations": [
-        "Confirm AChR antibody positivity \u2014 overturns Brown syndrome label",
-        "RNS and SFEMG to confirm NMJ pathology",
-        "CT chest for thymoma (here negative)",
-        "Initiate pyridostigmine; coordinate with ophthalmology"
+        "Revise the diagnosis to AChR antibody-positive generalized myasthenia gravis (ocular, bulbar and neck flexor involvement): fluctuating vertical diplopia with restricted elevation, fatigable ptosis with Cogan lid twitch, positive ice pack test, AChR binding antibody 4.8 nmol/L, 11-18% decrement on RNS; acquired Brown syndrome is withdrawn.",
+        "Start pyridostigmine 30 mg three to four times daily, titrating to effect up to 60 mg four to five times daily.",
+        "Do not continue the prednisolone taper to zero: keep prednisolone at the current dose (25 mg/day) and adjust to response under monitoring for steroid-induced worsening, with bone protection and glucose monitoring [Sanders_2016].",
+        "Stop hydroxychloroquine, which has no indication now and can worsen MG.",
+        "Plan a steroid-sparing agent for long-term immunosuppression, azathioprine as first line after TPMT testing, replacing methotrexate (weak evidence in MG; teratogenic, so contraception is needed while she takes it).",
+        "Refer for thymectomy: AChR-positive generalized MG at age 47 without thymoma (MGTX) [Wolfe_2016].",
+        "Coordinate with ophthalmology for the diplopia (prisms or occlusion) and advise against strabismus surgery while the MG is active."
       ]
     },
     "avoided_actions": [
@@ -448,11 +391,9 @@
             "tool_name": "analyze_eeg"
           }
         ],
-        "citations": [
-          "[Wolfe_2016]"
-        ],
+        "citations": [],
         "criterion_id": "avoid-waste-1-analyze-eeg",
-        "rationale": "MG is a peripheral neuromuscular junction disorder; EEG has no diagnostic role.",
+        "rationale": "EEG has no role in a disorder of the neuromuscular junction (Jacob S et al., Pract Neurol 2025).",
         "severity": "waste"
       },
       {
@@ -462,11 +403,9 @@
             "tool_name": "analyze_csf"
           }
         ],
-        "citations": [
-          "[Wolfe_2016]"
-        ],
+        "citations": [],
         "criterion_id": "avoid-waste-2-analyze-csf",
-        "rationale": "No CSF role in MG; LP risks complications without diagnostic yield.",
+        "rationale": "CSF has no role in MG (Jacob S et al., Pract Neurol 2025); the MS alternative was addressed by two normal brain MRIs.",
         "severity": "waste"
       },
       {
@@ -478,11 +417,9 @@
             "tool_name": "order_advanced_imaging"
           }
         ],
-        "citations": [
-          "[Wolfe_2016]"
-        ],
+        "citations": [],
         "criterion_id": "avoid-waste-3-order-advanced-imaging",
-        "rationale": "Advanced imaging (PET/MR spectroscopy/perfusion) is not indicated for MG diagnosis or staging; CT chest covers thymoma screening.",
+        "rationale": "FDG-PET is not indicated in MG; mediastinal CT covers thymoma screening (Jacob S et al., Pract Neurol 2025).",
         "severity": "waste"
       },
       {
@@ -492,11 +429,9 @@
             "tool_name": "order_echocardiogram"
           }
         ],
-        "citations": [
-          "[Wolfe_2016]"
-        ],
+        "citations": [],
         "criterion_id": "avoid-waste-4-order-echocardiogram",
-        "rationale": "Echocardiography is not indicated for MG unless a comorbid cardiac question exists.",
+        "rationale": "No cardiac question in this patient; echocardiography does not contribute to the diagnosis of MG.",
         "severity": "waste"
       },
       {
@@ -506,11 +441,9 @@
             "tool_name": "order_cardiac_monitoring"
           }
         ],
-        "citations": [
-          "[Wolfe_2016]"
-        ],
+        "citations": [],
         "criterion_id": "avoid-waste-5-order-cardiac-monitoring",
-        "rationale": "Cardiac monitoring is not indicated for MG unless arrhythmia or autonomic disease is independently suspected.",
+        "rationale": "No palpitations, syncope or arrhythmia; cardiac monitoring does not contribute to the diagnosis of MG.",
         "severity": "waste"
       }
     ],
@@ -532,43 +465,49 @@
     },
     "differential": [
       {
-        "diagnosis": "True acquired Brown syndrome (superior oblique tendon disorder)",
+        "diagnosis": "Acquired Brown syndrome (superior oblique tendon disorder)",
         "icd_code": "H50.61",
-        "key_features": "MRI here without orbital pathology; fatigable diurnal pattern not explained by mechanical tendon restriction.",
+        "key_features": "Limited elevation in adduction fitted it, but repeated orbital MRI shows no tendon abnormality, the deficit fluctuates, and ptosis, bulbar fatigue, positive AChR antibodies and an RNS decrement follow.",
         "likelihood": "low"
       },
       {
         "diagnosis": "Thyroid eye disease (restrictive ophthalmopathy)",
         "icd_code": "H06.2",
-        "key_features": "Hypothyroidism on levothyroxine; no proptosis; pattern is fatigable.",
+        "key_features": "Autoimmune hypothyroidism (anti-TPO positive), but TRAb negative, no proptosis or lid retraction, normal extraocular muscles on MRI, ptosis rather than retraction, and the deficit is fatigable.",
         "likelihood": "low"
       },
       {
-        "diagnosis": "Multiple sclerosis (INO)",
-        "icd_code": "G35",
-        "key_features": "MRI without demyelination; pattern incompatible.",
+        "diagnosis": "Drug-induced worsening of MG (hydroxychloroquine)",
+        "icd_code": "G70.1",
+        "key_features": "Hydroxychloroquine can unmask or worsen MG and may have contributed, but the diplopia preceded it and AChR antibodies are positive.",
         "likelihood": "low"
+      },
+      {
+        "diagnosis": "Multiple sclerosis with internuclear ophthalmoplegia",
+        "icd_code": "G35",
+        "key_features": "No INO pattern, two normal brain MRIs, and fatigable ptosis and bulbar weakness.",
+        "likelihood": "very_low"
       },
       {
         "diagnosis": "Lambert-Eaton myasthenic syndrome",
         "icd_code": "G70.80",
-        "key_features": "No baseline CMAP reduction; AChR positive.",
+        "key_features": "Normal baseline CMAPs, no post-exercise facilitation, preserved reflexes and positive AChR antibodies.",
         "likelihood": "very_low"
       },
       {
-        "diagnosis": "Mitochondrial ophthalmoplegia (CPEO)",
+        "diagnosis": "Chronic progressive external ophthalmoplegia",
         "icd_code": "H49.4",
-        "key_features": "Fluctuating pattern incompatible with CPEO.",
+        "key_features": "Fluctuating course with ice-pack-responsive ptosis and positive AChR antibodies is against a mitochondrial myopathy.",
         "likelihood": "very_low"
       }
     ],
     "key_clinical_evidence": [
-      "Fluctuating, fatigable weakness with diurnal pattern (worse evening) is the clinical hallmark of MG \u2014 fixed weakness suggests an alternative diagnosis.",
-      "Ocular involvement (ptosis, diplopia) is asymmetric and fatigable in MG; thyroid eye disease causes restrictive (not fatigable) ophthalmoplegia.",
-      "Single-fiber EMG (sensitivity >95%) is the most sensitive electrodiagnostic test \u2014 order when RNS is non-diagnostic or serology is negative.",
-      "All confirmed MG cases require CT chest for thymoma \u2014 present in roughly 10-15% of generalized MG; thymectomy (MGTX trial) improves long-term outcomes in non-thymoma AChR+ MG as well.",
-      "Aminoglycosides, fluoroquinolones, telithromycin, IV magnesium, and neuromuscular blockers can precipitate myasthenic crisis and must be screened against any new prescription.",
-      "Atypical strabismus patterns that fluctuate should always raise MG suspicion \u2014 vertical diplopia in MG is recognized but under-diagnosed."
+      "Vertical diplopia with limited elevation in adduction labelled acquired Brown syndrome, without a tendon abnormality on two orbital MRIs and without response to steroids, methotrexate or hydroxychloroquine.",
+      "New fatigable ptosis worse in the afternoon, Cogan lid twitch, positive SLURP test, jaw fatigue, nasal speech and fatigable neck flexion.",
+      "AChR binding antibody 4.8 nmol/L with elevated blocking antibody; MuSK negative; TSH and free T4 normal on levothyroxine, anti-TPO positive, TRAb negative.",
+      "RNS: 11-18% decrement in orbicularis oculi, trapezius and deltoid with normal CMAPs and no facilitation; ice pack test improves MRD1 by 4 mm bilaterally.",
+      "Mediastinal CT with contrast is indicated in every patient with MG to detect thymoma. Here it shows no thymoma, so thymectomy is indicated per MGTX at age 47.",
+      "Hydroxychloroquine can worsen MG and should be stopped now that the Brown syndrome label is withdrawn."
     ],
     "red_herrings": [
       {
@@ -581,45 +520,33 @@
       {
         "correct_interpretation": "Steroids also treat MG; partial steroid response is consistent with MG; bilateral onset in adults should trigger NMJ testing",
         "data_point": "Prior Brown syndrome diagnosis with partial steroid response",
-        "field_path": "",
+        "field_path": "patient.history_present_illness",
         "intended_effect": "Partial response to steroids and prior ophthalmology diagnosis creates anchoring bias toward connective tissue-related Brown syndrome",
-        "location": ""
+        "location": "history of present illness"
       },
       {
-        "correct_interpretation": "Anti-ds-DNA negative, C3/C4 normal, SLE criteria not met; ANA is non-specific in polyautoimmune patients",
+        "correct_interpretation": "ANA 1:160 with negative anti-dsDNA and anti-ENA and normal complement is nonspecific in a patient with autoimmune thyroid disease; rheumatology found no connective tissue disease.",
         "data_point": "ANA 1:160 with polyautoimmune background suggesting SLE",
-        "field_path": "",
+        "field_path": "patient.history_present_illness",
         "intended_effect": "Positive ANA + eye symptoms + joint involvement pattern could suggest SLE with ocular manifestations",
-        "location": ""
+        "location": "history of present illness"
       },
       {
-        "correct_interpretation": "Normal TSH on levothyroxine; ptosis (not lid retraction); no proptosis; no EOM enlargement on MRI \u2014 Graves' ophthalmopathy excluded",
-        "data_point": "Hypothyroidism and PCOS suggesting thyroid-related ophthalmopathy",
-        "field_path": "",
+        "correct_interpretation": "TSH and free T4 normal on levothyroxine and TRAb negative; ptosis rather than lid retraction, no proptosis and normal extraocular muscles on MRI exclude thyroid eye disease.",
+        "data_point": "Autoimmune hypothyroidism with a family history of Hashimoto thyroiditis suggesting thyroid eye disease",
+        "field_path": "patient.clinical_history.past_medical_history",
         "intended_effect": "Thyroid disease is strongly associated with Graves' ophthalmopathy",
-        "location": ""
+        "location": "past medical history"
       }
     ],
     "review_status": "draft",
-    "sequence_constraints": [
-      {
-        "after_criterion_id": "action-2-order-specialized-test",
-        "before_criterion_id": "action-1-interpret-labs",
-        "citations": [
-          "[Wolfe_2016]"
-        ],
-        "reason": "Order AChR/MuSK/LRP4 serologies first; reserve single-fiber EMG for seronegative or RNS-non-diagnostic cases (resource stewardship).",
-        "severity": "soft"
-      }
-    ],
+    "sequence_constraints": [],
     "stop_rule": {
-      "max_additional_actions": 0,
+      "max_additional_actions": 2,
       "required_before_assessment": [
         "action-1-interpret-labs",
         "action-2-order-specialized-test",
-        "action-4-order-body-imaging",
-        "action-5-search-medical-literature",
-        "action-6-check-drug-interactions"
+        "action-4-order-body-imaging"
       ]
     }
   },
@@ -629,7 +556,7 @@
       "contrast": true,
       "findings": [
         {
-          "description": "CT CHEST WITH CONTRAST\n\nIndication: New MG diagnosis; screen for thymoma\n\nFINDINGS: No anterior mediastinal mass. Thymus region shows fatty involution appropriate for age 47. No mediastinal or hilar adenopathy. No pulmonary masses.\n\nIMPRESSION: No thymoma. Normal chest CT.",
+          "description": "CT CHEST WITH CONTRAST\n\nIndication: Evaluation for thymoma\n\nFINDINGS: No anterior mediastinal mass. Thymus region shows fatty involution appropriate for age 47. No mediastinal or hilar adenopathy. No pulmonary masses.\n\nIMPRESSION: No thymoma. Normal chest CT.",
           "location": "mediastinum",
           "type": "additional_observation"
         }
@@ -638,42 +565,133 @@
       "measurements": null,
       "modality": "CT",
       "recommended_actions": [],
-      "region": "mediastinum"
+      "region": "chest/mediastinum"
     },
     "cardiac_monitoring": null,
     "csf": null,
     "ct": null,
+    "drug_interactions": {
+      "pyridostigmine": {
+        "alternatives": [],
+        "contraindications": [],
+        "formulary_status": "on formulary",
+        "interactions": [
+          "Hydroxychloroquine: may impair neuromuscular transmission and has been reported to worsen or unmask myasthenia gravis; avoid or use only with close monitoring in patients with a neuromuscular junction disorder. No pharmacokinetic interaction with pyridostigmine.",
+          "Methotrexate: no interaction with pyridostigmine.",
+          "Prednisolone: no pharmacokinetic interaction with pyridostigmine. Corticosteroids can cause transient worsening of myasthenic weakness when started or increased.",
+          "Levothyroxine, metformin: no interaction with pyridostigmine."
+        ],
+        "proposed": "pyridostigmine",
+        "summary": "Hydroxychloroquine is a drug of caution in myasthenia gravis. No pharmacokinetic interactions between pyridostigmine and the current medicines.",
+        "warnings": [
+          "Pyridostigmine: muscarinic adverse effects (diarrhea, cramps, hypersalivation, bradycardia); excessive doses can increase weakness.",
+          "Methotrexate is teratogenic; effective contraception is required during treatment and for at least 3 months after stopping (women of reproductive potential)."
+        ]
+      }
+    },
     "ecg": {
       "axis": "normal",
       "clinical_correlation": "",
       "findings": [
-        "ELECTROCARDIOGRAM\n\nRHYTHM: Sinus rhythm 72 bpm\nQTc: 418 ms\nINTERPRETATION: Normal. No arrhythmia.\nNOTE: Hydroxychloroquine can prolong QTc \u2014 currently 418 ms, within normal limits."
+        "ELECTROCARDIOGRAM\n\nRHYTHM: Sinus rhythm 78 bpm\nPR 150 ms, QRS 86 ms, QTc 418 ms\nNormal axis. No ST-T abnormality."
       ],
-      "interpretation": "Normal sinus rhythm; QTc normal (hydroxychloroquine monitoring)",
+      "interpretation": "Normal sinus rhythm. Normal intervals (QTc 418 ms).",
       "intervals": {
-        "PR": "162 ms",
-        "QRS": "88 ms",
+        "PR": "150 ms",
+        "QRS": "86 ms",
         "QTc": "418 ms"
       },
-      "rate": 72,
+      "rate": 78,
       "rhythm": "sinus rhythm"
     },
     "echo": null,
     "eeg": null,
     "labs": {
-      "abnormal_values_summary": [],
-      "interpretation": "All values within normal limits.",
+      "abnormal_values_summary": [
+        "AChR binding antibody 4.8 nmol/L (reference <=0.02 nmol/L)",
+        "AChR blocking antibody 31% (reference <=15%)",
+        "Anti-TPO antibody 186 IU/mL (reference <35 IU/mL)"
+      ],
+      "interpretation": "AChR binding antibody elevated (4.8 nmol/L) and AChR blocking antibody elevated (31%). MuSK antibody not detected. TSH and free T4 within reference ranges. Anti-TPO antibody elevated; TSH receptor antibody not detected. AChR binding antibodies are found in most patients with acquired autoimmune myasthenia gravis; clinical correlation recommended.",
       "panels": {
-        "Exclusion studies": [
+        "Acetylcholine_Receptor_Antibody_Panel": [
           {
-            "clinical_significance": "Ordered to exclude an alternative cause; the result does not support one, which is what this case's diagnosis rests on",
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "<=0.02 nmol/L",
+            "test": "AChR binding antibody (RIA)",
+            "unit": "nmol/L",
+            "value": "4.8"
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "<=15%",
+            "test": "AChR blocking antibody",
+            "unit": "%",
+            "value": "31"
+          },
+          {
+            "clinical_significance": null,
             "is_abnormal": false,
-            "reference_range": "",
+            "reference_range": "<=0.02 nmol/L",
+            "test": "Anti-MuSK antibody (RIA)",
+            "unit": "nmol/L",
+            "value": "<0.01"
+          }
+        ],
+        "Thyroid_function": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.4-4.0 mIU/L",
             "test": "TSH",
-            "unit": "",
-            "value": "Within reference range"
+            "unit": "mIU/L",
+            "value": "1.6"
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.8-1.8 ng/dL",
+            "test": "Free T4",
+            "unit": "ng/dL",
+            "value": "1.3"
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": true,
+            "reference_range": "<35 IU/mL",
+            "test": "Anti-TPO antibody",
+            "unit": "IU/mL",
+            "value": "186"
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "<1.75 IU/L",
+            "test": "TSH receptor antibody (TRAb)",
+            "unit": "IU/L",
+            "value": "<0.9"
           }
         ]
+      }
+    },
+    "literature_search": {
+      "myasthenia gravis": {
+        "query": "myasthenia gravis diagnosis and treatment guidance",
+        "results": [
+          {
+            "evidence_level": "consensus guideline",
+            "finding": "Consensus guidance recommends AChR antibody testing first, MuSK testing when AChR antibodies are absent, and electrodiagnostic confirmation by repetitive nerve stimulation or single-fiber EMG. Chest CT or MRI is recommended in all patients to detect thymoma.",
+            "source": "Sanders DB et al., Neurology 2016;87:419-425; Narayanaswami P et al., Neurology 2021;96:114-122"
+          },
+          {
+            "evidence_level": "randomized controlled trial",
+            "finding": "In the MGTX trial thymectomy improved outcomes over three years in non-thymomatous AChR-positive generalized MG aged 18-65.",
+            "source": "Wolfe GI et al., N Engl J Med 2016;375:511-522 (MGTX)"
+          }
+        ],
+        "summary": "Consensus guidance (Sanders 2016; update Narayanaswami 2021): AChR antibody testing first, MuSK when AChR antibodies are absent, RNS or single-fiber EMG for electrodiagnostic confirmation, chest CT or MRI in all patients for thymoma. MGTX (Wolfe 2016): thymectomy improved three-year outcomes in non-thymomatous AChR-positive generalized MG aged 18-65."
       }
     },
     "mri": {
@@ -691,18 +709,17 @@
     "citation_gap": [],
     "condition_name": "Generalized MG presenting as and initially misdiagnosed as acquired Brown syndrome",
     "criteria_pack_version": "1.0",
-    "difficulty_description": "Straightforward (despite delayed diagnosis): positive ice pack test, Cogan twitch, AChR antibody, and multi-muscle RNS decrement all confirm MG; key is recognizing bilateral adult Brown syndrome as a MG mimic",
-    "difficulty_rationale": "5 required tools, 1 red herrings, label-revision case with anchoring red herring",
+    "difficulty_description": "Moderate: an anchoring ophthalmological diagnosis (acquired Brown syndrome) must be revised; Cogan twitch, fatigable bulbar signs, AChR antibody and RNS decrement establish MG.",
+    "difficulty_rationale": "3 required actions (AChR serology with thyroid function, RNS, mediastinal CT), ice pack, respiratory function and medication review recommended; 4 red herrings (Brown syndrome label, partial steroid response, ANA 1:160, autoimmune hypothyroidism).",
     "expected_agent_confidence": 0.84,
     "fallback_tool_kinds": {
-      "advanced_imaging": "normal",
       "cardiac_monitoring": "normal",
       "csf": "normal",
       "echo": "normal",
       "eeg": "normal"
     },
     "generation_method": "real_case_seed",
-    "last_revised": "2026-08-08",
+    "last_revised": "2026-10-24",
     "policy_spec_status": "draft",
     "revision_reason": "per-case audit: baseline panels named by an optimal action and absent from the payload actually served (TSH). Reported as unremarkable only after checking that nothing in the case \u2014 no abnormal row, no interpretation, no expected_finding, no reasoning \u2014 states an abnormality for them",
     "source": "MedCaseReasoning",
@@ -714,7 +731,6 @@
     ]
   },
   "patient": {
-    "age": 47,
     "chief_complaint": "Binocular vertical diplopia and progressive limitation of eye elevation, initially treated as Brown syndrome",
     "clinical_history": {
       "allergies": [
@@ -740,25 +756,25 @@
           "dose": "25 mg",
           "drug": "Prednisolone",
           "frequency": "once daily (tapering)",
-          "indication": "Presumed Brown syndrome \u2014 under review"
+          "indication": "Presumed Brown syndrome (under review)"
         },
         {
           "dose": "10 mg",
           "drug": "Methotrexate",
           "frequency": "once weekly",
-          "indication": "Presumed Brown syndrome \u2014 under review"
+          "indication": "Presumed Brown syndrome (under review)"
         },
         {
           "dose": "200 mg",
           "drug": "Hydroxychloroquine",
           "frequency": "twice daily",
-          "indication": "Presumed Brown syndrome \u2014 under review"
+          "indication": "Presumed Brown syndrome (under review)"
         }
       ],
       "past_medical_history": [
         "Hypothyroidism (on levothyroxine)",
         "Polycystic ovarian syndrome (on metformin)",
-        "Acquired Brown syndrome \u2014 diagnosed 8 months ago (under revision)",
+        "Acquired Brown syndrome, diagnosed 8 months ago (under revision)",
         "No prior autoimmune rheumatic diagnosis"
       ],
       "social_history": {
@@ -768,15 +784,14 @@
     "demographics": {
       "age": 47,
       "bmi": 25.5,
+      "ethnicity": "White",
       "handedness": "right",
       "sex": "female"
     },
-    "ethnicity": "White",
-    "history_present_illness": "A 47-year-old woman with hypothyroidism and polycystic ovarian syndrome presented for re-evaluation of persistent and worsening binocular diplopia and restriction of eye elevation. Eight weeks prior to the current admission, she had noticed binocular vertical diplopia that was worst when looking to the right. Ophthalmology initially identified a left hypotropia of 4 prism diopters and mild limitation of elevation of the left eye in adduction, and made a diagnosis of acquired Brown syndrome (restriction of the superior oblique tendon sheath). She was started on ibuprofen 400 mg three times daily and later prednisolone 25 mg daily; she had some pain relief but persistent motility deficit.\n\nOver the following month, the motility deficit progressed to bilateral moderate limitation of elevation in adduction. Two repeat MRI studies of the brain and orbits showed no superior oblique hypertrophy, tendon inflammation, or trochlear attachment abnormality. Serological testing for SLE, rheumatoid arthritis, and mixed connective tissue disease was negative. She continued on oral prednisolone up to 50 mg daily and later methotrexate and hydroxychloroquine without significant improvement.\n\nNow, 8 months after the initial presentation, she has also developed bilateral upper eyelid ptosis (noticed by her husband over the past 3 weeks), increasing difficulty finishing a meal due to jaw fatigue, and a muffled nasal voice quality that worsens with prolonged speaking. She recalls that the ptosis seems more pronounced in the late afternoon. She has had no prior ophthalmic surgery or trauma. On examination, bilateral ptosis was now evident (right greater than left), along with bilateral restriction of elevation in adduction. The ice pack test applied for 5 minutes produced a 4 mm improvement in ptosis bilaterally. The SLURP test was positive for fatigable palate elevation.",
-    "hpi": "A 47-year-old woman with hypothyroidism and polycystic ovarian syndrome presented for re-evaluation of persistent and worsening binocular diplopia and restriction of eye elevation. Eight weeks prior to the current admission, she had noticed binocular vertical diplopia that was worst when looking to the right. Ophthalmology initially identified a left hypotropia of 4 prism diopters and mild limitation of elevation of the left eye in adduction, and made a diagnosis of acquired Brown syndrome (restriction of the superior oblique tendon sheath). She was started on ibuprofen 400 mg three times daily and later prednisolone 25 mg daily; she had some pain relief but persistent motility deficit.\n\nOver the following month, the motility deficit progressed to bilateral moderate limitation of elevation in adduction. Two repeat MRI studies of the brain and orbits showed no superior oblique hypertrophy, tendon inflammation, or trochlear attachment abnormality. Serological testing for SLE, rheumatoid arthritis, and mixed connective tissue disease was negative. She continued on oral prednisolone up to 50 mg daily and later methotrexate and hydroxychloroquine without significant improvement.\n\nNow, 8 months after the initial presentation, she has also developed bilateral upper eyelid ptosis (noticed by her husband over the past 3 weeks), increasing difficulty finishing a meal due to jaw fatigue, and a muffled nasal voice quality that worsens with prolonged speaking. She recalls that the ptosis seems more pronounced in the late afternoon. She has had no prior ophthalmic surgery or trauma. On examination, bilateral ptosis was now evident (right greater than left), along with bilateral restriction of elevation in adduction. The ice pack test applied for 5 minutes produced a 4 mm improvement in ptosis bilaterally. The SLURP test was positive for fatigable palate elevation.",
+    "history_present_illness": "A 47-year-old woman with hypothyroidism and polycystic ovarian syndrome presented for re-evaluation of persistent and worsening binocular diplopia and restriction of eye elevation. Eight months prior to the current admission, she had noticed binocular vertical diplopia that was worst when looking to the right. Ophthalmology initially identified a left hypotropia of 4 prism diopters and mild limitation of elevation of the left eye in adduction, and made a diagnosis of acquired Brown syndrome (restriction of the superior oblique tendon sheath). She was started on ibuprofen 400 mg three times daily and later prednisolone 25 mg daily; she had some pain relief but persistent motility deficit.\n\nOver the following month, the motility deficit progressed to bilateral moderate limitation of elevation in adduction. Two repeat MRI studies of the brain and orbits showed no superior oblique hypertrophy, tendon inflammation, or trochlear attachment abnormality. Rheumatology review found no connective tissue disease: ANA was positive at 1:160 (homogeneous pattern), with negative anti-dsDNA, anti-ENA, rheumatoid factor and anti-CCP, and normal C3 and C4. She continued on oral prednisolone up to 50 mg daily and later methotrexate and hydroxychloroquine without significant improvement.\n\nNow, 8 months after the initial presentation, she has also developed bilateral upper eyelid ptosis (noticed by her husband over the past 3 weeks), increasing difficulty finishing a meal due to jaw fatigue, and a muffled nasal voice quality that worsens with prolonged speaking. She recalls that the ptosis seems more pronounced in the late afternoon. She has had no prior ophthalmic surgery or trauma. On examination, bilateral ptosis was now evident (right greater than left), along with bilateral restriction of elevation in adduction. The SLURP test was positive for fatigable palate elevation.",
     "neurological_exam": {
       "coordination": "Coordination normal.",
-      "cranial_nerves": "Bilateral ptosis (right > left). Positive ice pack test (4 mm improvement bilaterally). Bilateral restriction of elevation in adduction (left -2, right -1). No pain on eye movement. Cover test: left hypotropia 4 PD. No proptosis. Fatigable palate on SLURP test (positive). Jaw fatigue on prolonged chewing test. Cogan lid twitch sign positive.",
+      "cranial_nerves": "Bilateral ptosis (right > left). Bilateral restriction of elevation in adduction (left -2, right -1). No pain on eye movement. Cover test: left hypotropia 4 PD. No proptosis. Fatigable palate on SLURP test (positive). Jaw fatigue on prolonged chewing test. Cogan lid twitch sign positive.",
       "gait": "Gait normal.",
       "mental_status": "Alert, oriented. No cognitive impairment.",
       "motor": "Neck flexor strength 4+/5 (fatigable). Limb strength 5/5. No fasciculations.",
@@ -785,20 +800,13 @@
     },
     "patient_id": "MG-RS13",
     "physical_exam": {
-      "abdomen": "Mild central adiposity (prednisolone effect); no organomegaly",
+      "abdomen": "Mild central adiposity; no organomegaly",
       "cardiovascular": "Regular rate and rhythm; no murmurs",
       "extremities": "No rash; no edema",
-      "general": "Well-appearing; bilateral ptosis visible; cushingoid features mild (from prednisolone)",
-      "neurological": "Bilateral ptosis (right > left). Positive ice pack test (4 mm improvement bilaterally). Bilateral restriction of elevation in adduction (left -2, right -1). No pain on eye movement. Cover test: left hypotropia 4 PD. No proptosis. Fatigable palate on SLURP test (positive). Jaw fatigue on prolonged chewing test. Cogan lid twitch sign positive. Neck flexor strength 4+/5 (fatigable). Limb strength 5/5. DTR 2+ symmetric. Sensation intact. No fasciculations.",
+      "general": "Well-appearing; bilateral ptosis visible; mild cushingoid features. Weight 72 kg, height 168 cm.",
+      "neurological": "Bilateral ptosis (right > left). Bilateral restriction of elevation in adduction (left -2, right -1). No pain on eye movement. Cover test: left hypotropia 4 PD. No proptosis. Fatigable palate on SLURP test (positive). Jaw fatigue on prolonged chewing test. Cogan lid twitch sign positive. Neck flexor strength 4+/5 (fatigable). Limb strength 5/5. DTR 2+ symmetric. Sensation intact. No fasciculations.",
       "respiratory": "Clear bilaterally"
     },
-    "pmh": [
-      "Hypothyroidism (on levothyroxine)",
-      "Polycystic ovarian syndrome (on metformin)",
-      "Acquired Brown syndrome \u2014 diagnosed 8 months ago (under revision)",
-      "No prior autoimmune rheumatic diagnosis"
-    ],
-    "sex": "female",
     "vitals": {
       "bp_diastolic": 72,
       "bp_systolic": 118,

@@ -1,0 +1,46 @@
+# MG-RS15
+Reviewer status: not reviewed (no MG notes file) | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| (none) | n/a | No reviewer notes for this case. Physician input applied: July 2026 tool guidance via plan MG.md (generalized AChR+ pathway, section 3.5). |
+
+## Own findings
+| dim (A schema, B consistency, C clinical, D leakage, E language) | severity (blocker/major/minor) | field path | finding | action (FIXED/FLAGGED) |
+| --- | --- | --- | --- | --- |
+| A | major | `followup_outputs[request_neostigmine_challenge]`, criterion `action-8-order-specialized-test` | Neostigmine challenge filed under a prose `test_type` (not orderable, H5); it answered the ice pack criterion (perfect-agent warning) in a woman without ptosis. | FIXED: neostigmine follow-up deleted; ice pack criterion deleted (no ptosis, fact 9); an ice pack order now gets the library normal (no ptosis), consistent with the exam. Neostigmine mentions removed from red herrings and metadata. |
+| A | major | criterion `action-3-order-specialized-test` | SFEMG recommended with no SFEMG report in the case (an order would get the library normal, contradicting the diagnosis). | FIXED: SFEMG optional (RNS diagnostic, plan 3.2) with a new report (frontalis MCD 46 microseconds, 45% pairs, 8% blocking). |
+| A | major | `followup_outputs[request_achr_musk_lrp4_antibodies]`, `initial_tool_outputs.labs` | Serology behind a TSH stub (H6, G); blocking in nmol/L; MuSK <0.4. | FIXED: initial labs AChR binding 1.11 nmol/L (kept), blocking 27%, MuSK <0.01 (Mayo-style), TSH 1.4, free T4 1.1; follow-up deleted. |
+| A | minor | `initial_tool_outputs.body_imaging` | `contrast: false` against the criterion (H4); "Newly suspected MG" indication with an em dash. | FIXED: contrast true, region chest/mediastinum, "Evaluation for thymoma". |
+| B | minor | `followup_outputs[request_respiratory_function]` | "meets threshold for adequate"; no litres, mL/kg or MEP. | FIXED: FVC 2.77 L (94%, 47 mL/kg), MIP -74, MEP 86 cmH2O, effective cough; weight 59 kg, height 158 cm in `physical_exam.general` (BMI 23.6 as stored); recommended (laryngeal weakness). |
+| B | minor | `followup_outputs[request_repetitive_nerve_stimulation]`, `initial_tool_outputs.mri`, `.ecg` | RNS without CMAPs or technique (en dash); brain MRI tool reporting "brain and spine" and a clinical inference; ECG template PR/QRS, rate 72 against HR 74. | FIXED: RNS technique, CMAPs, exercise check, decrements 13/11/4% kept; MRI "Normal MRI of the brain, including the brainstem"; ECG rate 74, PR 154, QRS 84. |
+| B | minor | `patient.history_present_illness` | "Neurological examination was entirely normal" followed by palatal weakness. | FIXED: "otherwise normal". |
+| D | major | `followup_outputs[search_hypophonia_mg]`, `[check_pyridostigmine_constipation]`, criteria `action-5`, `action-6` | Literature with a patient-steering summary ("neostigmine challenge and AChR antibody testing are key diagnostic steps"); drug check for psyllium and docusate, no interaction; both required. | FIXED: both outputs deleted; canonical initial literature output, literature optional; drug-check criterion deleted (plan RS15). The pyridostigmine effect on constipation is in the must. |
+| C | major | `ground_truth.assessment` | Musts were tests and "ENT/laryngoscopy (already considered)" (done in the history); no thymectomy must at 53. | FIXED: musts: diagnosis (MGFA IIb), pyridostigmine (bowel effect noted), low-dose prednisone and azathioprine after TPMT if needed, thymectomy per MGTX, speech and language therapy with red-flag advice. ENT must deleted (laryngoscopy is in the HPI). Prohibitions: canonical steroid, canonical drug, functional-dysphonia attribution. |
+| C | major | `ground_truth.differential` | Functional aphonia left moderate; Parkinson hypophonia raised by a red herring but absent; key features not tied to results. | FIXED: functional low; PD, vocal fold paralysis, ALS, MuSK MG, laryngeal lesion very_low with the excluding data (laryngeal lesion code D38.0). |
+| E | minor | criteria, `key_clinical_evidence`, `red_herrings`, `avoided_actions`, `sequence_constraints`, `stop_rule`, `patient` extra keys, `metadata` | Template text (labels equal rationales, Wolfe 2016, telithromycin), empty red-herring paths, wrong labs -> RNS constraint, stop rule with literature and drug check (max 0), duplicate keys, "0 red herrings". | FIXED: criteria per plan 3.2; constraint removed; stop rule labs, RNS, CT, max 2; case-specific evidence; red-herring paths; ethnicity to demographics; difficulty text updated. |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+
+AChR-positive MG presenting as isolated fatigable hypophonia in a 53-year-old woman after a normal laryngoscopy. The neostigmine challenge (not an orderable study) and the ice pack test (no ptosis) were removed. Required: AChR serology with thyroid function (AChR 1.11 nmol/L, blocking 27%, MuSK negative), RNS with facial muscles (13% nasalis, 11% orbicularis, none in ADM) and mediastinal CT with contrast (no thymoma); respiratory function recommended (normal); SFEMG (new report, abnormal frontalis jitter) and literature optional; the drug check was removed. Musts: pyridostigmine, low-dose prednisone and azathioprine if needed, thymectomy per MGTX at 53, speech and language therapy with red flags. Functional dysphonia is low and Parkinson hypophonia very low in the differential.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+
+- Text citations `[Jacob_2025]`, `[Evoli_2019]`, `[Lawn_2001]`, `[Narayanaswami_2021]` (plan CENTRAL 1).
+- `icd_codes[0]` G70.01 for a stable new diagnosis (plan CENTRAL 2).
+
+## Open questions for Andrea (judgment calls you could not settle)
+
+- The thymectomy must is added on plan fact 20 and class D (generalized AChR+ MG under 66 without thymoma); the per-case plan entry did not mention it. Bulbar-only MG is generalized in the MGFA classification.
+
+## Verification
+
+Verifier, 24 Oct 2026 (adversarial pass; no reviewer notes exist for MG, so the table check is the "no reviewer notes" row).
+
+Checked: neostigmine follow-up and ice pack criterion gone (no ptosis; probed: an ice pack order gets the library no-ptosis report); SFEMG report now exists for the optional criterion; serology in initial labs; laryngoscopy in the HPI so no ENT must; thymectomy must for bulbar (generalized, IIb) AChR+ MG at 53 is consistent with MGTX inclusion (class II-IV); FVC 2.77 L / 59 kg = 47 mL/kg.
+
+- Found (all six RS11-RS16, missed by the worker, PATTERNS 5 discriminators): `fallback_tool_outputs.echo` had no `echo_type` and `fallback_tool_outputs.advanced_imaging` carried a prose modality, so a normal report answered every echo and every advanced-imaging variant. Changed: echo fallback `echo_type: TTE` (its content is a normal TTE); advanced-imaging fallback set to null and `metadata.fallback_tool_kinds.advanced_imaging` removed, so the library answers per modality (probed: MR_angiography and TEE orders get their own library reports).
+- No other error found.
+
+Checks re-run after the edits: `perfect_agent.py -v` passes (only the known mediastinum_MRI alternative served by the library normal), `case_io.py check` clean for the case, `test_case_guards.py -k` passes, and the 24 Oct discriminator guard (run by hand; MG is not yet in `DISCRIMINATOR_CONDITIONS`) reports no defect.

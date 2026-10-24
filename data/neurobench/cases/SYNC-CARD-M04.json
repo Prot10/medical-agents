@@ -5,7 +5,50 @@
   "encounter_type": "emergency",
   "fallback_tool_outputs": {
     "advanced_imaging": null,
-    "cardiac_monitoring": null,
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "events": [
+        {
+          "description": "Sinus rhythm, rate 65-72 bpm, with QTc 520-545 ms and prominent precordial U waves throughout",
+          "type": "finding"
+        },
+        {
+          "description": "22:14: polymorphic ventricular tachycardia with twisting of the QRS axis around the baseline (torsades de pointes), rate about 230 bpm, 14 s, self-terminating; the patient reported to the nurse that she 'blacked out briefly'",
+          "type": "finding"
+        },
+        {
+          "description": "06:47: second run of torsades de pointes, rate about 210 bpm, 9 s, self-terminating, during sleep, with brief limb jerking observed by the nurse",
+          "type": "finding"
+        },
+        {
+          "description": "Each episode preceded by a short-long-short RR sequence",
+          "type": "finding"
+        },
+        {
+          "description": "No sustained ventricular tachycardia and no ventricular fibrillation",
+          "type": "finding"
+        },
+        {
+          "description": "No significant bradycardia, AV block or sinus pause between episodes",
+          "type": "finding"
+        }
+      ],
+      "findings": [
+        "Sinus rhythm with QTc 520-545 ms and prominent U waves",
+        "Two self-terminating episodes of torsades de pointes (14 s and 9 s)",
+        "Short-long-short RR sequence before each episode",
+        "No sustained VT, no VF, no AV block"
+      ],
+      "heart_rate_range": {
+        "average": 69,
+        "max": 230,
+        "min": 58
+      },
+      "impression": "Inpatient telemetry, 24 h. 1. Two self-terminating episodes of torsades de pointes (14 s and 9 s), each pause-dependent (short-long-short onset); the first coincided with a reported brief blackout and the second with observed limb jerking. 2. Sinus rhythm with QTc 520-545 ms and prominent U waves. 3. No VF, no AV block.",
+      "monitor_type": "telemetry",
+      "recommended_actions": [],
+      "rhythm_summary": "Sinus rhythm with markedly prolonged QTc; two self-terminating episodes of torsades de pointes"
+    },
     "csf": {
       "appearance": "clear and colourless",
       "cell_count": {
@@ -38,7 +81,25 @@
       "impression": "No acute intracranial abnormality. Small right occipital subgaleal hematoma consistent with fall. No intracranial hemorrhage, mass, or hydrocephalus.",
       "recommended_actions": []
     },
-    "drug_interactions": null,
+    "drug_interactions": {
+      "medication_list_review": {
+        "alternatives": [],
+        "contraindications": [],
+        "formulary_status": "on formulary",
+        "interactions": [
+          "Three drugs with a known risk of torsades de pointes (CredibleMeds): citalopram, azithromycin, ondansetron; their QT effects are additive.",
+          "Citalopram + omeprazole: CYP2C19 inhibition raises citalopram exposure.",
+          "Hydrochlorothiazide: renal potassium and magnesium loss, which increases drug-induced QT prolongation.",
+          "Omeprazole: long-term proton-pump inhibitor use can cause hypomagnesaemia."
+        ],
+        "proposed": "Review of the current medication list",
+        "summary": "Citalopram, azithromycin, ondansetron, hydrochlorothiazide, levothyroxine and omeprazole reviewed. Levothyroxine has no relevant interaction.",
+        "warnings": [
+          "Women have a longer baseline QTc and a higher risk of drug-induced torsades de pointes.",
+          "When QTc exceeds 500 ms or rises by 60 ms or more, QT-prolonging drugs should be stopped."
+        ]
+      }
+    },
     "ecg": null,
     "echo": null,
     "eeg": null,
@@ -86,12 +147,124 @@
   "followup_outputs": [
     {
       "output": {
+        "alternatives": [
+          "Doxycycline has no recognised QT effect (penicillin allergy noted)."
+        ],
+        "contraindications": [],
+        "formulary_status": "on formulary",
+        "interactions": [
+          "Azithromycin + citalopram [MAJOR]: both prolong ventricular repolarisation (IKr block); additive QTc prolongation and torsades de pointes risk.",
+          "Azithromycin + ondansetron [MAJOR]: both prolong the QT interval; additive effect.",
+          "Azithromycin with hypokalaemia or hypomagnesaemia: labelling advises avoiding azithromycin in patients with QT prolongation or uncorrected hypokalaemia or hypomagnesaemia."
+        ],
+        "proposed": "Azithromycin 250 mg once daily (day 5 of 5)",
+        "summary": "",
+        "warnings": [
+          "Known risk of torsades de pointes (CredibleMeds). If an antibacterial is still needed and the QTc is prolonged, choose one without QT effect."
+        ]
+      },
+      "tool_name": "check_drug_interactions",
+      "trigger_action": "check_azithromycin"
+    },
+    {
+      "output": {
+        "alternatives": [],
+        "contraindications": [],
+        "formulary_status": "on formulary",
+        "interactions": [
+          "Ondansetron + citalopram [MAJOR]: additive QTc prolongation; the combination also carries a risk of serotonin syndrome.",
+          "Ondansetron + azithromycin [MAJOR]: additive QTc prolongation."
+        ],
+        "proposed": "Ondansetron 4 mg every 8 hours as needed",
+        "summary": "",
+        "warnings": [
+          "Known risk of torsades de pointes (CredibleMeds); dose-dependent QT prolongation, greatest with intravenous use.",
+          "Labelling advises ECG monitoring when given with electrolyte abnormalities or other QT-prolonging drugs; correct hypokalaemia and hypomagnesaemia before use."
+        ]
+      },
+      "tool_name": "check_drug_interactions",
+      "trigger_action": "check_ondansetron"
+    },
+    {
+      "output": {
+        "alternatives": [
+          "Sertraline has a lower QT liability among SSRIs."
+        ],
+        "contraindications": [
+          "Labelling advises against citalopram with hypokalaemia, hypomagnesaemia or other QT-prolonging drugs."
+        ],
+        "formulary_status": "on formulary",
+        "interactions": [
+          "Citalopram + omeprazole [MAJOR]: omeprazole inhibits CYP2C19 and raises citalopram exposure; labelling sets a maximum of 20 mg daily with CYP2C19 inhibitors and in patients over 60.",
+          "Citalopram + azithromycin or ondansetron [MAJOR]: additive QTc prolongation.",
+          "Citalopram + ondansetron: risk of serotonin syndrome."
+        ],
+        "proposed": "Citalopram 40 mg once daily",
+        "summary": "",
+        "warnings": [
+          "Dose-dependent QTc prolongation (known risk of torsades de pointes, CredibleMeds)."
+        ]
+      },
+      "tool_name": "check_drug_interactions",
+      "trigger_action": "check_citalopram"
+    },
+    {
+      "output": {
+        "duration_hours": 24,
+        "events": [
+          {
+            "description": "Sinus rhythm, rate 65-72 bpm, with QTc 520-545 ms and prominent precordial U waves throughout",
+            "type": "finding"
+          },
+          {
+            "description": "22:14: polymorphic ventricular tachycardia with twisting of the QRS axis around the baseline (torsades de pointes), rate about 230 bpm, 14 s, self-terminating; the patient reported to the nurse that she 'blacked out briefly'",
+            "type": "finding"
+          },
+          {
+            "description": "06:47: second run of torsades de pointes, rate about 210 bpm, 9 s, self-terminating, during sleep, with brief limb jerking observed by the nurse",
+            "type": "finding"
+          },
+          {
+            "description": "Each episode preceded by a short-long-short RR sequence",
+            "type": "finding"
+          },
+          {
+            "description": "No sustained ventricular tachycardia and no ventricular fibrillation",
+            "type": "finding"
+          },
+          {
+            "description": "No significant bradycardia, AV block or sinus pause between episodes",
+            "type": "finding"
+          }
+        ],
+        "findings": [
+          "Sinus rhythm with QTc 520-545 ms and prominent U waves",
+          "Two self-terminating episodes of torsades de pointes (14 s and 9 s)",
+          "Short-long-short RR sequence before each episode",
+          "No sustained VT, no VF, no AV block"
+        ],
+        "heart_rate_range": {
+          "average": 69,
+          "max": 230,
+          "min": 58
+        },
+        "impression": "Inpatient telemetry, 24 h. 1. Two self-terminating episodes of torsades de pointes (14 s and 9 s), each pause-dependent (short-long-short onset); the first coincided with a reported brief blackout and the second with observed limb jerking. 2. Sinus rhythm with QTc 520-545 ms and prominent U waves. 3. No VF, no AV block.",
+        "monitor_type": "telemetry",
+        "recommended_actions": [],
+        "rhythm_summary": "Sinus rhythm with markedly prolonged QTc; two self-terminating episodes of torsades de pointes"
+      },
+      "tool_name": "order_cardiac_monitoring",
+      "trigger_action": "request_telemetry_holter_monitoring"
+    },
+    {
+      "output": {
         "chambers": {
           "LA": "normal size (3.6 cm)",
           "LV": "normal size and systolic function",
           "RA": "normal size",
-          "RV": "normal size and function"
+          "RV": "normal size and function, TAPSE 23 mm"
         },
+        "echo_type": "TTE",
         "ejection_fraction": 62.0,
         "findings": [
           "Left ventricular end-diastolic diameter: 4.7 cm (normal)",
@@ -101,141 +274,21 @@
           "No wall motion abnormality",
           "No intracardiac thrombus",
           "No pericardial effusion",
-          "Normal diastolic function (E/A 1.2, e' lateral 10 cm/s)"
+          "Normal diastolic function (E/A 1.2, e' lateral 10 cm/s)",
+          "LA volume index 26 mL/m2"
         ],
-        "impression": "Normal transthoracic echocardiogram. LVEF 62% with normal regional wall motion. No valvular disease of haemodynamic significance. No intracardiac mass, thrombus, or pericardial effusion. Structurally normal heart.",
+        "impression": "Normal transthoracic echocardiogram. LVEF 62% with normal regional wall motion and normal wall thickness. No significant valve disease. Normal RV function, PASP 26 mmHg. No intracardiac mass, thrombus or pericardial effusion.",
         "recommended_actions": [],
         "valves": {
           "Aortic valve": "Trileaflet, no stenosis, no regurgitation",
           "Mitral valve": "Structurally normal, trace physiologic regurgitation",
           "Pulmonic valve": "Normal",
-          "Tricuspid valve": "Normal, estimated RVSP 26 mmHg"
+          "Tricuspid valve": "Normal; estimated PASP 26 mmHg"
         },
         "wall_motion": "Normal wall motion throughout all myocardial segments"
       },
       "tool_name": "order_echocardiogram",
-      "trigger_action": "request_echocardiogram"
-    },
-    {
-      "output": {
-        "duration_hours": 24,
-        "events": [
-          {
-            "description": "Baseline sinus rhythm, rate 65-72 bpm, with persistently prolonged QTc ranging 520-545 ms throughout the monitoring period",
-            "type": "finding"
-          },
-          {
-            "description": "Prominent U waves in precordial leads throughout",
-            "type": "finding"
-          },
-          {
-            "description": "Episode 1 at 02:14: abrupt onset of polymorphic ventricular tachycardia with characteristic twisting of QRS axis around the isoelectric line (torsades de pointes morphology), rate approximately 230 bpm, duration 14 seconds, self-terminating with return to sinus rhythm; patient diary entry: 'felt like the room spun and I blacked out briefly'",
-            "type": "finding"
-          },
-          {
-            "description": "Episode 2 at 06:47: second run of polymorphic VT with torsades de pointes morphology, rate approximately 210 bpm, duration 9 seconds, self-terminating; patient was asleep and did not activate the event button, rhythm correlated with observed brief limb shaking noted by nursing staff",
-            "type": "finding"
-          },
-          {
-            "description": "Each torsades episode preceded by a short-long-short RR sequence (pause-dependent triggering)",
-            "type": "finding"
-          },
-          {
-            "description": "No episodes of sustained VT or degeneration to ventricular fibrillation",
-            "type": "finding"
-          },
-          {
-            "description": "No significant bradycardia between episodes, no AV block, no sinus pauses",
-            "type": "finding"
-          },
-          {
-            "description": "QTc shortened progressively from 540 ms on admission to 480 ms at 18 hours of monitoring, coinciding with electrolyte repletion and drug discontinuation",
-            "type": "finding"
-          }
-        ],
-        "findings": [
-          "Sinus rhythm with persistently prolonged QTc 520-545 ms at start of monitoring, trending toward 480 ms by 18 hours",
-          "Two episodes of polymorphic VT with torsades de pointes morphology (14 s and 9 s), both self-terminating",
-          "Pause-dependent (short-long-short) triggering pattern preceding each episode",
-          "Prominent U waves in precordial leads",
-          "No sustained VT, no VF, no AV block"
-        ],
-        "heart_rate_range": {
-          "average": 72,
-          "max": 172,
-          "min": 58
-        },
-        "impression": "24-hour inpatient telemetry demonstrates sinus rhythm with markedly prolonged QTc (peak 545 ms) and two captured episodes of polymorphic ventricular tachycardia with torsades de pointes morphology, each self-terminating within 14 seconds. Both episodes were pause-dependent. The second episode correlated with observed brief limb movements during sleep. QTc showed progressive shortening to 480 ms at 18 hours of monitoring. No degeneration to VF. No AV block or significant pauses between episodes.",
-        "monitor_type": "telemetry",
-        "recommended_actions": [],
-        "rhythm_summary": "Predominantly sinus rhythm with markedly prolonged QTc; two captured episodes of polymorphic ventricular tachycardia (torsades de pointes), both self-terminating"
-      },
-      "tool_name": "order_cardiac_monitoring",
-      "trigger_action": "request_cardiac_monitoring"
-    },
-    {
-      "output": {
-        "alternatives": [
-          "For nausea management in a patient requiring an antibiotic: metoclopramide or domperidone (verify local availability); if nausea is intractable, consider a non-QT-prolonging alternative after cardiologist guidance.",
-          "For antibiotic therapy in penicillin-allergic patients: doxycycline or respiratory fluoroquinolones may be considered, but fluoroquinolones also prolong QTc \u2014 avoid in this setting until QT is normalized. Azithromycin should be discontinued.",
-          "For depression management: after QTc normalizes, citalopram dose reduction below 40 mg should be discussed with the prescribing psychiatrist; alternative SSRIs with lower QT-prolongation risk (sertraline, fluoxetine) may be considered."
-        ],
-        "contraindications": [
-          "Citalopram dose \u226540 mg is associated with dose-dependent QTc prolongation; concurrent use with other QT-prolonging agents (azithromycin, ondansetron, antipsychotics, fluoroquinolones) is contraindicated or requires QTc monitoring and dose reduction.",
-          "Ondansetron is contraindicated in combination with other QT-prolonging drugs including SSRIs at high doses and macrolide antibiotics per current prescribing information.",
-          "Triple QT-prolonging combination (citalopram + azithromycin + ondansetron) together with thiazide-induced electrolyte depletion represents a high-risk additive QT prolongation scenario."
-        ],
-        "formulary_status": "All four medications listed are on formulary; interaction severity flags apply as above.",
-        "interactions": [
-          "Citalopram + azithromycin [CONTRAINDICATED]: Both prolong cardiac repolarization via hERG/IKr channel blockade. Combination produces additive QTc prolongation; torsades de pointes risk is substantially increased, particularly at citalopram doses \u226540 mg.",
-          "Citalopram + ondansetron [CONTRAINDICATED]: Ondansetron prolongs QTc via hERG channel blockade; co-administration with citalopram produces additive QTc prolongation. Combination is formally contraindicated per manufacturer labeling; markedly increased torsades de pointes risk.",
-          "Azithromycin + ondansetron [MAJOR]: Both independently prolong QTc via hERG blockade; the triple combination with citalopram compounds the additive repolarization delay further.",
-          "Hydrochlorothiazide \u2014 electrolyte interaction [MAJOR]: Thiazide diuretics cause renal potassium and magnesium wasting; hypokalemia and hypomagnesemia reduce the threshold for drug-induced QT prolongation and torsades de pointes, potentiating the cardiac toxicity of the concurrent QT-prolonging drug combination."
-        ],
-        "proposed": "Citalopram 40 mg daily + azithromycin 250 mg daily + ondansetron 4 mg every 8 hours + hydrochlorothiazide 25 mg daily",
-        "warnings": [
-          "Hypokalemia (K+ <3.5 mEq/L) and hypomagnesemia (Mg <1.7 mg/dL) independently prolong cardiac repolarization and substantially increase the risk of drug-induced torsades de pointes \u2014 correction of electrolytes is essential when managing drug-induced QT prolongation.",
-          "Women have a longer baseline QTc than men, which confers greater susceptibility to drug-induced QT prolongation and torsades de pointes.",
-          "Patients on thiazide diuretics who develop gastrointestinal illness with poor oral intake are at increased risk for electrolyte depletion, creating a vulnerability window for drug-induced long QT syndrome.",
-          "QTc should be monitored when combining any two or more QT-prolonging agents; if QTc exceeds 500 ms or increases \u226560 ms from baseline, all offending agents should be discontinued."
-        ]
-      },
-      "tool_name": "check_drug_interactions",
-      "trigger_action": "request_drug_interactions"
-    },
-    {
-      "output": {
-        "query": "acquired drug-induced long QT syndrome torsades de pointes management QT prolonging drugs",
-        "results": [
-          {
-            "authors": "Brignole M, Moya A, de Lange FJ, et al.",
-            "evidence_level": "Class I",
-            "finding": "Cardiac syncope due to arrhythmia requires ECG as the first-line test. Drug-induced QT prolongation is an identifiable and reversible cause of torsades de pointes; medication review is mandatory in any syncope evaluation. Check_drug_interactions and electrolyte assessment are integral components of the syncope work-up when QT prolongation is identified on ECG.",
-            "journal": "European Heart Journal",
-            "title": "2018 ESC Guidelines for the diagnosis and management of syncope",
-            "year": "2018"
-          },
-          {
-            "authors": "Shen WK, Sheldon RS, Benditt DG, et al.",
-            "evidence_level": "Class I",
-            "finding": "QT-prolonging medications should be identified and discontinued in any patient presenting with syncope and a prolonged QTc on ECG. Drug-induced long QT syndrome is the leading cause of acquired long QT and is both preventable and reversible through drug discontinuation and electrolyte correction.",
-            "journal": "Journal of the American College of Cardiology",
-            "title": "2017 ACC/AHA/HRS Guideline for the evaluation and management of patients with syncope",
-            "year": "2017"
-          },
-          {
-            "authors": "Drew BJ, Ackerman MJ, Funk M, et al.",
-            "evidence_level": "Level B",
-            "finding": "Intravenous magnesium sulfate is the first-line pharmacological treatment for torsades de pointes regardless of serum magnesium level. Potassium should be repleted to 4.0-4.5 mEq/L. All QT-prolonging drugs should be discontinued. Temporary pacing or isoproterenol can be used for pause-dependent torsades unresponsive to magnesium.",
-            "journal": "Circulation",
-            "title": "Management of drug-induced long QT syndrome",
-            "year": "2010"
-          }
-        ],
-        "summary": ""
-      },
-      "tool_name": "search_medical_literature",
-      "trigger_action": "request_literature_search"
+      "trigger_action": "request_transthoracic_echocardiogram"
     },
     {
       "output": {
@@ -281,6 +334,31 @@
       },
       "tool_name": "analyze_brain_mri",
       "trigger_action": "request_brain_mri"
+    },
+    {
+      "output": {
+        "query": "Management of drug-induced QT prolongation and torsades de pointes",
+        "results": [
+          {
+            "evidence_level": "Scientific statement",
+            "finding": "In torsades de pointes, QT-prolonging drugs are stopped and intravenous magnesium sulfate (2 g) is given whether or not serum magnesium is low; potassium is kept in the high-normal range (4.5-5.0 mmol/L).",
+            "source": "Drew BJ et al., Prevention of torsade de pointes in hospital settings: AHA/ACCF scientific statement. Circulation 2010;121:1047-1060"
+          },
+          {
+            "evidence_level": "Scientific statement",
+            "finding": "Recurrent pause-dependent torsades unresponsive to magnesium can be suppressed by temporary transvenous pacing or isoproterenol infusion; ECG monitoring continues until the QTc falls below 500 ms.",
+            "source": "Drew BJ et al., Prevention of torsade de pointes in hospital settings: AHA/ACCF scientific statement. Circulation 2010;121:1047-1060"
+          },
+          {
+            "evidence_level": "Guideline recommendation",
+            "finding": "In drug-induced long QT, the offending drugs are withdrawn and electrolyte abnormalities corrected; QT-prolonging drugs are avoided thereafter.",
+            "source": "Zeppenfeld K et al., 2022 ESC Guidelines for ventricular arrhythmias and the prevention of sudden cardiac death. Eur Heart J 2022;43:3997-4126"
+          }
+        ],
+        "summary": "Torsades de pointes is managed by stopping QT-prolonging drugs, intravenous magnesium, potassium repletion to the high-normal range, and pacing or isoproterenol for pause-dependent recurrence."
+      },
+      "tool_name": "search_medical_literature",
+      "trigger_action": "search_drug_induced_long_qt_torsades_management"
     }
   ],
   "ground_truth": {
@@ -293,57 +371,64 @@
           }
         ],
         "citations": [
-          "[ESC_2018]",
-          "ESC 2018 \u00a73.2"
+          "[ESC_2018]"
         ],
         "criterion_id": "action-1-analyze-ecg",
-        "expected_evidence": "Sinus rhythm with markedly prolonged QTc (540 ms) and prominent U waves \u2014 identifies the substrate for torsades de pointes",
+        "expected_evidence": "Sinus rhythm 68 bpm with a markedly prolonged QTc of 540 ms and prominent U waves in V2-V4",
         "importance": "required",
-        "label": "Obtain 12-lead ECG immediately on arrival",
-        "rationale": "Obtain 12-lead ECG immediately on arrival"
+        "label": "Obtain a 12-lead ECG on arrival",
+        "rationale": "The ECG is the first test in syncope; a QTc above 460 ms is a high-risk feature, and 540 ms with U waves directs the search to drugs and electrolytes (ESC 2018)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "drug": "azithromycin"
+            },
+            "tool_name": "check_drug_interactions"
+          },
+          {
+            "required_arguments": {
+              "drug": "ondansetron"
+            },
+            "tool_name": "check_drug_interactions"
+          },
+          {
+            "required_arguments": {
+              "drug": "citalopram"
+            },
+            "tool_name": "check_drug_interactions"
+          }
+        ],
+        "citations": [
+          "[ESC_2018]"
+        ],
+        "criterion_id": "action-3-check-drug-interactions",
+        "expected_evidence": "Citalopram, azithromycin and ondansetron each carry a known torsades risk with additive effect; omeprazole raises citalopram levels; the thiazide lowers potassium and magnesium",
+        "importance": "required",
+        "label": "Review the medication list for QT-prolonging drugs and interactions",
+        "rationale": "A prolonged QTc with syncope makes the medication review diagnostic: three drugs with a known torsades risk, a CYP2C19 interaction and a thiazide are the reversible cause (Drew 2010; ESC 2022)."
       },
       {
         "alternatives": [
           {
             "required_arguments": {
               "panels": [
-                "CBC",
                 "BMP",
-                "magnesium",
-                "troponin",
-                "TSH",
-                "beta-hCG"
+                "magnesium"
               ]
             },
             "tool_name": "interpret_labs"
           }
         ],
         "citations": [
-          "[ESC_2018]",
-          "ESC 2018 \u00a73.3"
+          "[ESC_2018]"
         ],
         "criterion_id": "action-2-interpret-labs",
-        "expected_evidence": "Hypokalemia (K 3.1 mEq/L) and hypomagnesemia (Mg 1.4 mg/dL) \u2014 both lower torsades threshold; troponin negative excluding ACS; TSH normal excluding thyroid cause of QTc prolongation; beta-hCG negative",
+        "expected_evidence": "Potassium 3.1 mEq/L and magnesium 1.4 mg/dL, both low; troponin I and TSH normal",
         "importance": "required",
-        "label": "Targeted laboratory studies: CBC, BMP (electrolytes and glucose), magnesium, troponin, TSH, beta-hCG",
-        "rationale": "Targeted laboratory studies: CBC, BMP (electrolytes and glucose), magnesium, troponin, TSH, beta-hCG"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "check_drug_interactions"
-          }
-        ],
-        "citations": [
-          "[ESC_2018]",
-          "ESC 2018 \u00a76"
-        ],
-        "criterion_id": "action-3-check-drug-interactions",
-        "expected_evidence": "Triple QT-prolonging combination (citalopram + azithromycin + ondansetron) identified as contraindicated; HCTZ-induced hypokalemia/hypomagnesemia identified as potentiating electrolyte contribution; management: discontinue all three QT-prolonging agents",
-        "importance": "required",
-        "label": "Check drug interactions for the complete medication list",
-        "rationale": "Check drug interactions for the complete medication list"
+        "label": "Electrolytes and magnesium (BMP, magnesium)",
+        "rationale": "Potassium and magnesium set the repletion targets that are part of torsades treatment (Drew 2010); TSH may be added given her treated hypothyroidism."
       },
       {
         "alternatives": [
@@ -352,17 +437,28 @@
               "monitor_type": "telemetry"
             },
             "tool_name": "order_cardiac_monitoring"
+          },
+          {
+            "required_arguments": {
+              "monitor_type": "holter_24h"
+            },
+            "tool_name": "order_cardiac_monitoring"
+          },
+          {
+            "required_arguments": {
+              "monitor_type": "holter_48h"
+            },
+            "tool_name": "order_cardiac_monitoring"
           }
         ],
         "citations": [
-          "[Locati_2014]",
-          "Locati 2014"
+          "[ESC_2018]"
         ],
         "criterion_id": "action-4-order-cardiac-monitoring",
-        "expected_evidence": "Captures self-terminating torsades de pointes episodes (pause-dependent polymorphic VT) correlating with syncopal symptoms; QTc trending toward normalization after drug discontinuation",
+        "expected_evidence": "Two self-terminating runs of pause-dependent torsades de pointes (14 s and 9 s), one with a reported blackout; QTc 520-545 ms throughout",
         "importance": "required",
-        "label": "Begin continuous inpatient telemetry",
-        "rationale": "Begin continuous inpatient telemetry"
+        "label": "Immediate continuous ECG monitoring (telemetry)",
+        "rationale": "QTc 540 ms after syncope is high risk: immediate in-hospital monitoring with a defibrillator at hand is Class I and shows whether torsades recurs (ESC 2018)."
       },
       {
         "alternatives": [
@@ -374,31 +470,13 @@
           }
         ],
         "citations": [
-          "[ESC_2018]",
-          "ESC 2018 \u00a74.1"
+          "[ESC_2018]"
         ],
         "criterion_id": "action-5-order-echocardiogram",
-        "expected_evidence": "Structurally normal heart with LVEF 62% \u2014 excludes cardiomyopathy or valvular disease as substrate; consistent with acquired (drug-induced) long QT rather than structural etiology",
+        "expected_evidence": "Structurally normal heart, LVEF 62%, no valve disease",
         "importance": "required",
-        "label": "Order transthoracic echocardiogram to exclude structural heart disease",
-        "rationale": "Order transthoracic echocardiogram to exclude structural heart disease"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[ACC_AHA_HRS_2017]",
-          "ACC/AHA/HRS 2017 \u00a75"
-        ],
-        "criterion_id": "action-6-search-medical-literature",
-        "expected_evidence": "IV magnesium sulfate as first-line for torsades de pointes; potassium repletion to 4.0-4.5 mEq/L; discontinuation of all QT-prolonging agents; temporary pacing for pause-dependent refractory torsades",
-        "importance": "required",
-        "label": "Search medical literature for acquired long QT / torsades management",
-        "rationale": "Search medical literature for acquired long QT / torsades management"
+        "label": "Transthoracic echocardiogram",
+        "rationale": "Ventricular arrhythmia with syncope: echocardiography excludes structural heart disease as the substrate (ESC 2018; ESC 2022)."
       },
       {
         "alternatives": [
@@ -408,31 +486,48 @@
           }
         ],
         "citations": [
-          "[ESC_2018]",
-          "ESC 2018 \u00a73.5"
+          "[ESC_2018]"
         ],
         "criterion_id": "action-8-analyze-eeg",
-        "expected_evidence": "Normal EEG \u2014 no epileptiform discharges, no electrographic seizures; supports convulsive syncope rather than epilepsy",
+        "expected_evidence": "Normal routine EEG, which does not change the arrhythmic diagnosis",
         "importance": "optional",
-        "label": "Perform EEG to exclude primary epileptic seizure (given the convulsive presentation)",
-        "rationale": "Perform EEG to exclude primary epileptic seizure (given the convulsive presentation)"
+        "label": "EEG only if epilepsy remains likely after the cardiac work-up (optional)",
+        "rationale": "EEG is not recommended in syncope (ESC 2018 Class III); it is optional only because the witness described the event as a seizure."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "search_medical_literature"
+          }
+        ],
+        "citations": [
+          "[ESC_2018]"
+        ],
+        "criterion_id": "action-6-search-medical-literature",
+        "expected_evidence": "General guideline evidence on torsades management; no decision depends on it",
+        "importance": "optional",
+        "label": "Guideline lookup on torsades management (optional)",
+        "rationale": "Guideline lookup is optional; the decision rests on the ECG, monitoring and imaging results already obtained (ESC 2018)."
       }
     ],
     "assessment": {
       "prohibited_recommendations": [
-        "Do not continue azithromycin, ondansetron, or citalopram \u2014 all three are QT-prolonging and constitute the causative drug combination; continuing any of them perpetuates the arrhythmic risk",
-        "Do not add any additional QT-prolonging agent (fluoroquinolones, antipsychotics, other macrolides, methadone, haloperidol, amiodarone) while the QTc remains prolonged",
-        "Do not misdiagnose as primary epileptic seizure and start an antiepileptic drug \u2014 the convulsive movements are syncope-related, the EEG is normal, and antiepileptics do not address the QT-prolonging drug substrate",
-        "Do not discharge home while the QTc remains markedly prolonged or before a definitive downward QTc trend is documented on telemetry",
-        "Do not perform lumbar puncture \u2014 no clinical indication"
+        "Do not continue azithromycin, ondansetron or citalopram",
+        "Do not add any QT-prolonging drug (fluoroquinolones, antipsychotics including haloperidol, other macrolides, methadone, amiodarone) while the QTc remains prolonged",
+        "Do not diagnose a primary epileptic seizure and start an antiseizure drug",
+        "Do not discharge while the QTc remains above 500 ms or torsades continues on telemetry"
       ],
       "required_recommendations": [
-        "Immediately discontinue all QT-prolonging agents (azithromycin, ondansetron, and citalopram) \u2014 remove the causative drugs",
-        "Administer IV magnesium sulfate as first-line pharmacotherapy for torsades de pointes, regardless of serum magnesium level",
-        "Replete potassium to 4.0-4.5 mEq/L IV \u2014 hypokalemia lowers the torsades threshold and must be corrected urgently",
-        "Place patient on continuous inpatient telemetry with defibrillator immediately available until QTc normalizes (<500 ms and trending down) and no further torsades episodes occur",
-        "Recognize that the witnessed brief convulsive shaking is convulsive syncope from torsades-induced cerebral hypoperfusion \u2014 NOT a primary epileptic seizure \u2014 and do not start antiepileptic drugs",
-        "Document the complete QT-prolonging drug combination in the medical record and update the patient allergy/alert profile to prevent recurrence"
+        "Stop azithromycin, ondansetron and citalopram immediately",
+        "Give intravenous magnesium sulfate 2 g for torsades de pointes, regardless of the serum magnesium level",
+        "Replete potassium to 4.5-5.0 mmol/L and correct the magnesium; hold hydrochlorothiazide while repleting",
+        "Continue telemetry with a defibrillator immediately available until the QTc is below 500 ms and no further torsades occurs",
+        "Use temporary transvenous pacing (or isoproterenol, no ischaemia here) if pause-dependent torsades recurs despite magnesium",
+        "Avoid all QT-prolonging drugs (CredibleMeds list) and record citalopram, azithromycin and ondansetron as having caused torsades",
+        "Recognise the witnessed limb shaking as convulsive syncope from torsades, not epilepsy, and do not start antiseizure medication",
+        "Repeat the 12-lead ECG after drug washout and electrolyte correction; a persistent QTc of 480 ms or more prompts evaluation for congenital long QT",
+        "Advise no driving until the QT-prolonging drugs are withdrawn, the QTc has normalised and no arrhythmia recurs"
       ]
     },
     "avoided_actions": [
@@ -444,10 +539,10 @@
           }
         ],
         "citations": [
-          "[ACC_AHA_HRS_2017]"
+          "[ESC_2018]"
         ],
         "criterion_id": "avoid-waste-1-analyze-brain-mri",
-        "rationale": "Brain MRI is not indicated for typical cardiac syncope with an identified arrhythmic substrate (drug-induced long QT / torsades); routine neuroimaging in cardiac syncope has no diagnostic yield and is not recommended by ESC or ACC/AHA syncope guidelines.",
+        "rationale": "Brain MRI is not indicated in syncope without focal signs (ESC 2018 Class III); the cause is drug-induced long QT with torsades de pointes.",
         "severity": "waste"
       },
       {
@@ -459,7 +554,7 @@
         ],
         "citations": [],
         "criterion_id": "avoid-waste-2-analyze-csf",
-        "rationale": "No meningismus, no fever, no encephalopathy \u2014 CSF analysis has no role in the evaluation of drug-induced cardiac syncope.",
+        "rationale": "No meningism, fever or encephalopathy: CSF has no role; the cause is drug-induced long QT with torsades de pointes.",
         "severity": "waste"
       },
       {
@@ -475,7 +570,21 @@
           "[ESC_2018]"
         ],
         "criterion_id": "avoid-waste-3-order-specialized-test",
-        "rationale": "Tilt-table testing is irrelevant when a definitive arrhythmic substrate (torsades de pointes on documented telemetry) has been identified; it would not alter management.",
+        "rationale": "Tilt testing does not confirm cardiac syncope and would not change management; drug-induced long QT with torsades de pointes is documented on the ECG and telemetry.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "order_ct_scan"
+          }
+        ],
+        "citations": [
+          "[ESC_2018]"
+        ],
+        "criterion_id": "avoid-waste-4-order-ct-scan",
+        "rationale": "Occipital scalp contusion at 60 with GCS 15, no vomiting, no focal deficit and no anticoagulant: no NICE NG232 criterion for head CT; the syncope is explained by drug-induced long QT with torsades de pointes.",
         "severity": "waste"
       }
     ],
@@ -498,13 +607,13 @@
       {
         "diagnosis": "Congenital (inherited) long QT syndrome",
         "icd_code": "I45.81",
-        "key_features": "No prior unexplained syncope, no family history of sudden cardiac death or arrhythmia, and the QTc normalizes progressively after drug discontinuation \u2014 pointing to acquired rather than congenital etiology; however, an unmasked congenital substrate cannot be fully excluded until QTc normalizes off all culprit drugs.",
+        "key_features": "No prior syncope and no family history of sudden death or arrhythmia, and three QT-prolonging drugs with low potassium and magnesium explain the QTc; an unmasked congenital substrate is excluded only by a repeat ECG off drugs.",
         "likelihood": "low"
       },
       {
         "diagnosis": "New-onset epileptic seizure",
         "icd_code": "G40.909",
-        "key_features": "Brief shaking movements (~15-20 s), no tongue bite, no urinary incontinence, and rapid full recovery within 30 s are characteristic of convulsive syncope from cerebral hypoperfusion during arrhythmia; EEG is normal; the torsades episodes on telemetry correlate directly with witnessed limb shaking.",
+        "key_features": "Shaking of 15-20 s with no tongue bite or incontinence and recovery within 30 s favours convulsive syncope; telemetry records torsades coinciding with a blackout and with observed limb jerking.",
         "likelihood": "low"
       },
       {
@@ -516,7 +625,7 @@
       {
         "diagnosis": "Vasovagal syncope",
         "icd_code": "R55",
-        "key_features": "No prodrome of nausea, diaphoresis, or visual graying; no identifiable vasovagal trigger; structurally normal heart does not explain prolonged QTc; telemetry shows polymorphic VT, not bradycardia.",
+        "key_features": "No prodrome or trigger; telemetry shows torsades de pointes, not reflex bradycardia or hypotension.",
         "likelihood": "very_low"
       },
       {
@@ -527,50 +636,67 @@
       }
     ],
     "key_clinical_evidence": [
-      "Acquired (drug-induced) long QT syndrome is caused by hERG/IKr channel blockade, which delays ventricular repolarization and creates a substrate for early afterdepolarizations triggering torsades de pointes; multiple QT-prolonging drugs have an additive effect on QTc prolongation",
-      "The triple QT-drug combination in this case (citalopram 40 mg + azithromycin + ondansetron) is a recognized high-risk polypharmacy scenario; each drug prolongs QTc independently, and their combination substantially elevates torsades risk above that of any single agent",
-      "Hypokalemia and hypomagnesemia \u2014 caused here by thiazide diuresis and poor oral intake during illness \u2014 independently prolong cardiac repolarization and markedly potentiate drug-induced QT prolongation, lowering the torsades threshold",
-      "Women have a longer baseline QTc than men (pharmacogenomic difference in IKr current density), conferring approximately twofold higher susceptibility to drug-induced long QT and torsades de pointes at equivalent drug exposures",
-      "The witnessed 15-20 seconds of limb shaking with rapid recovery, no tongue bite, no post-ictal confusion, and negative EEG are characteristic of convulsive syncope from transient cerebral hypoperfusion during torsades \u2014 not an epileptic seizure; the telemetry records the arrhythmic cause directly",
-      "Torsades de pointes is typically pause-dependent: the characteristic short-long-short RR sequence preceding each episode (visible on telemetry) is a hallmark distinguishing it from other forms of polymorphic VT"
+      "Drug-induced long QT results from IKr blockade; QT-prolonging drugs have additive effects",
+      "Citalopram 40 mg, azithromycin and ondansetron each carry a known torsades risk; omeprazole raises citalopram exposure through CYP2C19 inhibition",
+      "Hypokalaemia and hypomagnesaemia from the thiazide, diarrhoea and poor intake potentiate drug-induced QT prolongation",
+      "Women have a longer baseline QTc and a higher susceptibility to drug-induced torsades",
+      "Brief limb shaking with rapid recovery and no post-ictal confusion is convulsive syncope; telemetry records the arrhythmic cause directly",
+      "Pause-dependent onset (short-long-short) is the hallmark of torsades in acquired long QT"
     ],
     "red_herrings": [
       {
-        "correct_interpretation": "The shaking represents convulsive syncope from cerebral hypoperfusion during self-terminating torsades de pointes; confirmed by normal EEG and two captured torsades episodes on telemetry coinciding with witnessed limb movements",
+        "correct_interpretation": "Convulsive syncope from cerebral hypoperfusion during self-terminating torsades de pointes, which telemetry captures coinciding with a blackout and with limb jerking.",
         "data_point": "Witnessed rapid, irregular shaking movements of the limbs lasting 15-20 seconds, husband states it 'looked like a seizure'",
         "field_path": "patient.history_present_illness",
         "intended_effect": "Anchors clinician toward primary epilepsy work-up (EEG, neurology referral, antiepileptic drug initiation) and away from the ECG-driven cardiac diagnosis",
         "location": "history_present_illness"
       },
       {
-        "correct_interpretation": "The drug combination is the primary driver of acquired long QT; check_drug_interactions is required to flag the triple interaction and the additive electrolyte contribution of hydrochlorothiazide",
-        "data_point": "Triple QT-prolonging drug combination (citalopram + azithromycin + ondansetron) all present in patient.medications",
+        "correct_interpretation": "Each drug looks routine on its own; together, with the thiazide and omeprazole, they are the cause of the long QT, which a review of the whole medication list reveals.",
+        "data_point": "Citalopram 40 mg, azithromycin and ondansetron in the current medication list",
         "field_path": "patient.clinical_history.medications",
-        "intended_effect": "A clinician not specifically reviewing the medication list for QT-prolonging drug interactions \u2014 or one who considers each drug individually rather than their combined effect \u2014 may fail to identify the causative polypharmacy and attribute the prolonged QTc to a single agent or to a congenital cause",
+        "intended_effect": "A clinician who considers each drug on its own may miss the combined effect and attribute the QTc to a single agent or to a congenital cause.",
         "location": "patient.clinical_history.medications"
       }
     ],
     "review_status": "draft",
     "sequence_constraints": [
       {
-        "after_criterion_id": "action-4-order-cardiac-monitoring",
-        "before_criterion_id": "action-2-interpret-labs",
+        "after_criterion_id": "action-3-check-drug-interactions",
+        "before_criterion_id": "action-1-analyze-ecg",
         "citations": [
-          "[ROSE_2010]"
+          "[ESC_2018]"
         ],
-        "reason": "Troponin must be assessed to exclude ACS and electrolytes must be assessed to characterise the torsades risk before finalising monitoring strategy.",
-        "severity": "hard"
+        "reason": "The prolonged QTc on the ECG is what makes the medication review the diagnostic step (ESC 2018).",
+        "severity": "soft"
+      },
+      {
+        "after_criterion_id": "action-5-order-echocardiogram",
+        "before_criterion_id": "action-1-analyze-ecg",
+        "citations": [
+          "[ESC_2018]"
+        ],
+        "reason": "The 12-lead ECG sets the risk tier that selects the monitor and the urgency of imaging (ESC 2018).",
+        "severity": "soft"
+      },
+      {
+        "after_criterion_id": "action-4-order-cardiac-monitoring",
+        "before_criterion_id": "action-1-analyze-ecg",
+        "citations": [
+          "[ESC_2018]"
+        ],
+        "reason": "The 12-lead ECG sets the risk tier that selects the monitor and the urgency of imaging (ESC 2018).",
+        "severity": "soft"
       }
     ],
     "stop_rule": {
-      "max_additional_actions": 0,
+      "max_additional_actions": 2,
       "required_before_assessment": [
         "action-1-analyze-ecg",
-        "action-2-interpret-labs",
         "action-3-check-drug-interactions",
+        "action-2-interpret-labs",
         "action-4-order-cardiac-monitoring",
-        "action-5-order-echocardiogram",
-        "action-6-search-medical-literature"
+        "action-5-order-echocardiogram"
       ]
     }
   },
@@ -579,7 +705,25 @@
     "cardiac_monitoring": null,
     "csf": null,
     "ct": null,
-    "drug_interactions": null,
+    "drug_interactions": {
+      "medication_list_review": {
+        "alternatives": [],
+        "contraindications": [],
+        "formulary_status": "on formulary",
+        "interactions": [
+          "Three drugs with a known risk of torsades de pointes (CredibleMeds): citalopram, azithromycin, ondansetron; their QT effects are additive.",
+          "Citalopram + omeprazole: CYP2C19 inhibition raises citalopram exposure.",
+          "Hydrochlorothiazide: renal potassium and magnesium loss, which increases drug-induced QT prolongation.",
+          "Omeprazole: long-term proton-pump inhibitor use can cause hypomagnesaemia."
+        ],
+        "proposed": "Review of the current medication list",
+        "summary": "Citalopram, azithromycin, ondansetron, hydrochlorothiazide, levothyroxine and omeprazole reviewed. Levothyroxine has no relevant interaction.",
+        "warnings": [
+          "Women have a longer baseline QTc and a higher risk of drug-induced torsades de pointes.",
+          "When QTc exceeds 500 ms or rises by 60 ms or more, QT-prolonging drugs should be stopped."
+        ]
+      }
+    },
     "ecg": {
       "axis": "Normal axis (42 degrees)",
       "clinical_correlation": "",
@@ -587,7 +731,7 @@
         "Sinus rhythm at 68 bpm",
         "Normal PR interval (158 ms)",
         "Normal QRS duration (88 ms)",
-        "Markedly prolonged QTc interval of 540 ms (QT 500 ms at rate 68)",
+        "Markedly prolonged QTc interval of 540 ms (QT 506 ms at rate 68)",
         "Prominent U waves in leads V2 through V4",
         "No ST-segment elevation or depression",
         "No delta waves or pre-excitation",
@@ -598,7 +742,8 @@
       "intervals": {
         "PR": "158 ms",
         "QRS": "88 ms",
-        "QTc": "540 ms (markedly prolonged)"
+        "QT": "506 ms",
+        "QTc": "540 ms (Bazett)"
       },
       "rate": 68,
       "rhythm": "Sinus rhythm with markedly prolonged QTc"
@@ -610,7 +755,7 @@
         "Potassium: 3.1 mEq/L (L)",
         "Magnesium: 1.4 mg/dL (L)"
       ],
-      "interpretation": "Abnormal values: Potassium 3.1 mEq/L (L), Magnesium 1.4 mg/dL (L). Remaining indices within normal limits. Troponin negative. TSH within normal range. Beta-hCG negative.",
+      "interpretation": "Abnormal values: Potassium 3.1 mEq/L (L), Magnesium 1.4 mg/dL (L). Remaining indices within normal limits. Troponin I and TSH within reference ranges.",
       "panels": {
         "BMP": [
           {
@@ -762,14 +907,6 @@
             "test": "TSH",
             "unit": "mIU/L",
             "value": 2.6
-          },
-          {
-            "clinical_significance": null,
-            "is_abnormal": false,
-            "reference_range": "<5 (non-pregnant)",
-            "test": "Beta-hCG (serum)",
-            "unit": "mIU/mL",
-            "value": "<2"
           }
         ]
       }
@@ -784,7 +921,7 @@
     "citation_gap": [],
     "clinical_pearls": [
       "Acquired (drug-induced) long QT syndrome is the most common cause of QTc prolongation encountered in clinical practice; polypharmacy with multiple QT-prolonging agents carries additive risk that is often underappreciated when each drug is evaluated in isolation",
-      "The triple combination of a high-dose SSRI (citalopram \u226540 mg), a macrolide antibiotic (azithromycin), and a 5-HT3 antagonist (ondansetron) is a recognized high-risk QT-prolonging combination \u2014 each pair has a known interaction, and the triple combination is particularly hazardous",
+      "A high-dose SSRI (citalopram), a macrolide (azithromycin) and a 5-HT3 antagonist (ondansetron) are each QT-prolonging, and their combination is particularly hazardous",
       "Women have a longer baseline QTc than men due to sex-based differences in IKr (cardiac repolarizing potassium current) and are approximately twofold more susceptible to drug-induced torsades de pointes at equivalent drug concentrations",
       "Hypokalemia and hypomagnesemia are critical potentiating factors for drug-induced long QT; thiazide diuretics are a common cause of both electrolyte deficiencies, and illness-related poor oral intake can compound the deficit",
       "Torsades de pointes is characteristically pause-dependent (short-long-short RR triggering) and self-terminating in most cases, but can degenerate to ventricular fibrillation; IV magnesium sulfate is the first-line treatment regardless of serum magnesium level",
@@ -793,11 +930,13 @@
     "condition_category": "syncope",
     "created_by": "condition-expert:SYNC-CARD",
     "criteria_pack_version": "1.0",
-    "difficulty_rationale": "5 required tools; 2 grounded red herrings (convulsive presentation anchoring toward seizure; polypharmacy QT interaction requiring drug-list synthesis); requires integration of ECG QTc + electrolytes + drug interaction check to identify the reversible cause; check_drug_interactions and cardiac monitoring both load-bearing; EEG optional for seizure exclusion.",
+    "difficulty_rationale": "Five required actions (ECG, medication review, electrolytes, telemetry, TTE); two red herrings (seizure-like presentation, routine-looking polypharmacy); the agent must link the QTc, the electrolytes and the drug list to a reversible cause.",
     "expected_agent_confidence": 0.55,
     "fallback_tool_kinds": {
+      "cardiac_monitoring": "case_recording",
       "csf": "normal",
-      "ct": "normal"
+      "ct": "normal",
+      "drug_interactions": "medication_list_review"
     },
     "last_revised": "2026-06-17",
     "policy_spec_status": "draft",
@@ -833,7 +972,7 @@
           "dose": "4 mg",
           "drug": "Ondansetron",
           "frequency": "every 8 hours as needed",
-          "indication": "Nausea associated with azithromycin course, started 4 days ago"
+          "indication": "Nausea during the azithromycin course (started 3 days ago)"
         },
         {
           "dose": "25 mg",
@@ -877,9 +1016,9 @@
       "handedness": "right",
       "sex": "female"
     },
-    "history_present_illness": "Ms. Patricia Holloway is a 60-year-old woman with a history of major depressive disorder on citalopram, hypertension, hypothyroidism, and recent community-acquired pneumonia who presents to the emergency department after a sudden loss of consciousness at home approximately 45 minutes ago. Her husband witnessed the entire event. He reports that she was standing in the kitchen, appeared to briefly sway, then suddenly became unresponsive and fell to the floor, striking the back of her head. He states she immediately exhibited rapid, irregular shaking movements of her limbs \u2014 lasting approximately 15 to 20 seconds \u2014 which he likens to 'a seizure he once saw on television.' She did not make any sound prior to collapsing and there was no warning cry. During the event, she appeared gray and he could not palpate a pulse at the carotid for approximately 8 to 10 seconds. She then abruptly resumed spontaneous movement, gasped, and within 30 seconds was awake and asking what happened. She had no post-event confusion and did not bite her tongue. She denied urinary incontinence. The husband called 911 and EMS arrived within 6 minutes, at which point the patient was fully alert and conversational, describing only mild dizziness and 'feeling strange.' She has no prior history of seizures, no prior syncopal episodes, and no family history of sudden cardiac death or seizure disorder. She notes that she has been taking all her medications as prescribed. Approximately 5 days ago she started azithromycin for a pneumonia diagnosed by her primary care physician. Two to three days ago she also began taking ondansetron for nausea, which had been prescribed to her alongside the antibiotic. She has been on citalopram 40 mg daily for four years and hydrochlorothiazide for hypertension. She denies recent changes in her other medications, illicit drug use, or ingestion of herbal supplements. On further questioning she acknowledges that she had been eating poorly due to the illness and had experienced loose stools for two days prior to presentation, raising concern for possible electrolyte losses.",
+    "history_present_illness": "Ms. Patricia Holloway is a 60-year-old woman with a history of major depressive disorder on citalopram, hypertension, hypothyroidism, and recent community-acquired pneumonia who presents to the emergency department after a sudden loss of consciousness at home approximately 45 minutes ago. Her husband witnessed the entire event. He reports that she was standing in the kitchen, appeared to briefly sway, then suddenly became unresponsive and fell to the floor, striking the back of her head. He states she immediately exhibited rapid, irregular shaking movements of her limbs, lasting approximately 15 to 20 seconds, which he likens to 'a seizure he once saw on television.' She did not make any sound prior to collapsing and there was no warning cry. During the event, she appeared gray and he could not palpate a pulse at the carotid for approximately 8 to 10 seconds. She then abruptly resumed spontaneous movement, gasped, and within 30 seconds was awake and asking what happened. She had no post-event confusion and did not bite her tongue. She denied urinary incontinence. The husband called 911 and EMS arrived within 6 minutes, at which point the patient was fully alert and conversational, describing only mild dizziness and 'feeling strange.' She has no prior history of seizures, no prior syncopal episodes, and no family history of sudden cardiac death or seizure disorder. She notes that she has been taking all her medications as prescribed. Approximately 5 days ago she started azithromycin for a pneumonia diagnosed by her primary care physician. Two to three days ago she also began taking ondansetron for nausea, which had been prescribed to her alongside the antibiotic. She has been on citalopram 40 mg daily for four years and hydrochlorothiazide for hypertension. She denies recent changes in her other medications, illicit drug use, or ingestion of herbal supplements. On further questioning she acknowledges that she had been eating poorly due to the illness and had experienced loose stools for two days prior to presentation.",
     "neurological_exam": {
-      "additional": "No tongue laceration or lateral tongue bite marks. No evidence of urinary incontinence. Mild scalp contusion on the right occiput from striking the floor during the fall. No other injuries. No post-ictal confusion \u2014 patient was fully aware within 30 seconds of regaining consciousness and recalls no aura before the event.",
+      "additional": "No tongue laceration or lateral tongue bite marks. No evidence of urinary incontinence. Mild scalp contusion on the right occiput from striking the floor during the fall. No other injuries. No post-ictal confusion; she was fully aware within 30 seconds of regaining consciousness and recalls no aura before the event.",
       "coordination": "Finger-to-nose testing intact bilaterally without dysmetria. Heel-to-shin normal bilaterally. Rapid alternating movements intact.",
       "cranial_nerves": "CN II: Visual fields full to confrontation bilaterally. Pupils equal, round, reactive to light 3 mm to 2 mm bilaterally. No papilledema on fundoscopic exam. CN III/IV/VI: Extraocular movements intact, no nystagmus, no diplopia. CN V: Sensation intact in all three divisions bilaterally; masseter symmetric. CN VII: Face symmetric at rest and with activation. CN VIII: Hearing grossly intact to finger rub bilaterally. CN IX/X: Palate elevates symmetrically, gag intact bilaterally. CN XI: Sternocleidomastoid and trapezius 5/5 bilaterally. CN XII: Tongue protrudes midline, no atrophy or fasciculations.",
       "gait": "Steady gait with normal base. Tandem gait intact. Romberg negative.",
