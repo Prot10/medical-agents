@@ -7,8 +7,31 @@ lands.
 - Scorer: a mixed case can score both diagnoses only by recoding (it accepts a diagnosis on its
   ICD code alone). Consider a per-case "all of" diagnosis rule. (HEP-ENC-P04, 24 Oct)
 - Test: catch fallback outputs that can never be served. (HEP-ENC, 24 Oct)
+- Scorer: per-case rejected tokens, so a dementia case does not accept an MCI answer.
+  (ALZ-EARLY, 24 Oct)
+- Scorer: C71 codes the site, not the entity, so "glioblastoma, C71.1" still scores in an
+  IDH-mutant astrocytoma through the code. Needs a per-case label requirement or ICD-O-3
+  morphology codes; same root as the ICD-code-alone item above. (GLIO-HG, 24 Oct)
+- MockServer: a case's fallback is returned for any `test_type` or modality, so generic case
+  fallbacks answer studies they do not describe (GLIO-HG nulled them; check other conditions).
+- `case_io.py check` reports "1 error" when torch is missing (test_grpo_rollout.py fails to
+  collect); make it ignore that file.
+- Scorer: negation matching, so "non-aneurysmal SAH" does not score in an aneurysmal case (and
+  in general "non-X" / "not X" answers do not match X). (SAH, 24 Oct)
+- Library: imaging variants a case does not store (e.g. CT perfusion) get normal defaults that may
+  contradict the case. (SAH, 24 Oct)
+- Harness: a drug discriminator for `check_drug_interactions` stored outputs. (ALZ-EARLY, 24 Oct)
+- `perfect_agent.py`: a mode that tries every criterion alternative, not only the first.
+  (ALZ-EARLY, 24 Oct)
+- Library: normal amyloid PET, CSF AD-biomarker and FDG-PET defaults. (ALZ-EARLY, 24 Oct)
+- PD cases: `[McKeith_2017_DLB]` should become `[DLB_2017]` (batch 5).
 - `analyze_csf.source`: an EVD sample is billed as a lumbar puncture; only shunt/EVD criteria may
   name `source`. (vocabulary agent, 24 Oct)
+
+## Schema
+- Demographics lack `weight_kg` and `height_cm` (GBS respiratory mL/kg thresholds, BACT-MEN-RS04
+  dosing). A fallback respiratory report with FVC (L, % predicted, mL/kg), MIP and MEP then needs
+  the patient's weight. (GBS, 24 Oct)
 
 ## Prices to verify
 - The October 2026 terms' Medicare rates were recalled, not looked up in the fee schedule; four

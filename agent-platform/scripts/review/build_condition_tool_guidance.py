@@ -167,11 +167,17 @@ SPEC: list[dict[str, object]] = [
                   "OCB, infection PCR, autoimmune antibodies and prion assays are absent."),
     dict(cond="subarachnoid_hemorrhage", filed="order_advanced_imaging",
          tool="order_advanced_imaging", reviewer=2, tier="optional", status="applied",
-         response="Applied: TCD is optional in all 30 cases and is the sole routine advanced "
-                  "surveillance modality. PET, DaTscan, MIBG, perfusion/spectroscopy MRI, MRA "
-                  "and carotid duplex are removed. Three case-specific catheter-DSA actions are "
-                  "retained as recommended because CTA is occult/uncertain or definitive "
-                  "endovascular anatomy is required; catheter DSA is not a duplicate CTA/MRA."),
+         response="Applied: TCD is optional in all 30 cases, as an admission baseline, and is the "
+                  "sole routine advanced surveillance modality. PET, DaTscan, MIBG, "
+                  "perfusion/spectroscopy MRI and carotid duplex are scored as waste; MRA is waste "
+                  "after the CTA, except in the patient with a prior contrast rash, and an MRA "
+                  "order now returns a report that matches the case. Since the October 2026 "
+                  "review catheter DSA with 3D rotational angiography is in all 30 cases, after "
+                  "the CTA and before securing: recommended in the 29 aneurysmal cases, where the "
+                  "CTA has already shown the aneurysm, and required in the perimesencephalic "
+                  "case, where it is the study that excludes one. Every DSA report is diagnostic "
+                  "only (anatomy, neck, dome-to-neck ratio, branches), never a treatment result; "
+                  "catheter DSA is not a duplicate CTA/MRA."),
     dict(cond="subarachnoid_hemorrhage", filed="order_ct_scan", tool="order_ct_scan",
          reviewer=2, tier="required", status="applied",
          response="Applied. Every case has two explicitly discriminated required actions: "
@@ -368,7 +374,9 @@ SPEC: list[dict[str, object]] = [
          reviewer=2, tier="optional", status="applied",
          seg=("Item\nAdvanced imaging", None),
          response="Applied: amino_acid_PET was added with the tracers EANO names, and perfusion "
-                  "MRI plus MR spectroscopy are recommended actions in all 30 cases. FDG-PET is "
+                  "MRI plus MR spectroscopy are recommended actions in 29 of the 30 cases. In the "
+                  "intramedullary cervical glioblastoma (GLIO-HG-RM02) both are optional, because "
+                  "spinal cord perfusion and spectroscopy are not validated for grading. FDG-PET is "
                   "not among them, per your note."),
     dict(cond="brain_tumor_glioma", filed="analyze_ecg", tool="analyze_ecg",
          reviewer=2, tier="unchanged", status="no_change",
@@ -396,17 +404,22 @@ SPEC += [
     dict(cond="guillain_barre", filed="order_specialized_test", tool="order_body_imaging",
          reviewer=2, tier="optional", status="applied",
          seg=("Item\nSpinal and peripheral nerve imaging", None),
-         response="Applied: optional contrast spine MRI is now reachable in five cases with a "
-                  "specific cord/structural alternative in their own text: post-spinal anaesthesia, "
-                  "post-laminectomy, major trauma, leukaemia/infiltration and cervical sensory "
-                  "level with new urinary incontinence. Fifteen hidden reports previously sat on "
-                  "a brain-oriented tool; the ten generic reports were removed rather than making "
-                  "spine MRI routine in GBS. The trigger remains a sensory level, extensor plantar "
-                  "response, sphincter involvement, fever/structural concern at onset, or another "
-                  "case-specific compressive/myelopathic alternative."),
+         response="Applied: contrast spine MRI is reachable in eight cases, each with a specific "
+                  "cord or structural alternative in its own text, and is never routine in GBS. It "
+                  "is recommended in six (post-laminectomy pain and weakness, quadriparesis after a "
+                  "fall, a cervical sensory level with urinary incontinence, an apparent thoracic "
+                  "sensory level, urinary retention at onset with metastatic cancer, and known "
+                  "cervical stenosis with asymmetric hand symptoms) and optional in two, where the "
+                  "red flag is weak (recent spinal anaesthesia; leukaemia with negative CSF "
+                  "cytology). Fifteen hidden reports previously sat on a brain-oriented tool; the "
+                  "generic ones were removed. The trigger remains a sensory level, extensor "
+                  "plantar response, sphincter involvement, fever or a structural concern at onset, "
+                  "or another case-specific compressive or myelopathic alternative."),
     dict(cond="guillain_barre", filed="analyze_csf", tool="analyze_csf",
          reviewer=2, tier="unchanged", status="applied",
-         response="Applied: required in all 30, and 14-3-3/RT-QuIC are gone from this condition."),
+         response="Applied: required in 29 cases and recommended in one, where the puncture has "
+                  "to wait for an interval after apixaban in a patient on dual antiplatelet therapy "
+                  "after a coronary stent; 14-3-3/RT-QuIC are gone from this condition."),
     dict(cond="guillain_barre", filed="interpret_labs", tool="interpret_labs",
          reviewer=2, tier="unchanged", status="applied",
          response="Applied. The anti-GQ1b point also caught a routing defect elsewhere: a "
@@ -414,9 +427,15 @@ SPEC += [
                   "matcher treated the token 'anti' as identifying an antibody."),
     dict(cond="guillain_barre", filed="analyze_brain_mri", tool="analyze_brain_mri",
          reviewer=2, tier="unchanged", status="applied",
-         response="Applied in the strongest form: no Guillain-Barre case images the brain at all. "
-                  "The sweep this comment started moved 63 spine studies out of the brain-MRI "
-                  "tool across the whole dataset."),
+         response="Applied: brain MRI is waste wherever nothing in the case raises a central "
+                  "question, and is a criterion in 8 cases that do: recommended in seven (Miller "
+                  "Fisher syndrome and an anti-GQ1b ptosis case against a brainstem lesion, two "
+                  "pharyngeal-cervical-brachial cases, bifacial weakness, a wake-up asymmetric "
+                  "deficit in atrial fibrillation, and ophthalmoplegia with nystagmus and a "
+                  "cervicomedullary signal) and required in one with fever, neck stiffness and "
+                  "encephalopathy at onset. The October 2026 review round added these after the "
+                  "physician notes on unexcluded mimics. The sweep this comment started moved 63 "
+                  "spine studies out of the brain-MRI tool across the whole dataset."),
     dict(cond="guillain_barre", filed="analyze_ecg", tool="analyze_ecg",
          reviewer=2, tier="unchanged", status="no_change",
          response="No change requested. The ECG is a recommended baseline in all 30 cases, which "
@@ -633,7 +652,7 @@ SPEC += [
          seg=("1) structured cognitive", "2) non-contrast"),
          src_seg=("Source:", None),
          response="Applied: a structured cognitive assessment is a required action in all 30 "
-                  "cases, scored against the functional criterion, so the 10 mild-cognitive-"
+                  "cases, scored against the functional criterion, so the 6 mild-cognitive-"
                   "impairment cases are not required to have lost independence. This is one of "
                   "the four mandatory steps you named that had no tool behind them at all."),
     dict(cond="alzheimers_early", filed="analyze_brain_mri", tool="order_ct_scan",
@@ -649,9 +668,11 @@ SPEC += [
          seg=("3) FDG-PET", "Suggested diagnostic sequence"),
          src_seg=("Source:", None),
          response="Applied: all subtype studies are optional and occur only after the core "
-                  "assessment. Six atypical cases use FDG-PET and one exercises the newly "
-                  "priced perfusion-SPECT substitute. Amyloid PET is optional in 8 cases as "
-                  "the sole biomarker route, never paired with CSF."),
+                  "assessment. Seven atypical cases have an optional FDG-PET step, one of which "
+                  "(RP03) also accepts the newly priced perfusion-SPECT substitute; every case "
+                  "authors its own FDG-PET report, so an unanticipated order never returns a "
+                  "library normal scan. Amyloid PET is an alternative to CSF within one optional "
+                  "amyloid-status step in 29 cases (one conclusive test is enough)."),
     dict(cond="alzheimers_early", filed="interpret_labs", tool="interpret_labs",
          reviewer=1, tier="required", status="applied",
          response="Applied in all 30 cases: CBC, CMP, TSH, B12, folate, homocysteine, "
@@ -663,23 +684,30 @@ SPEC += [
                   "Two optional case-level exceptions remain for questions other than diagnosing "
                   "Alzheimer disease: RP04 tests for periodic complexes because CJD is active in a "
                   "rapidly progressive dementia, and RP05 records recurrent witnessed unresponsive "
-                  "spells to assess seizure. The other 28 cases expose no authored EEG result."),
+                  "spells to assess seizure. In the other 28 cases EEG is no criterion; an "
+                  "unindicated order returns a normal report."),
     dict(cond="alzheimers_early", filed="analyze_ecg", tool="analyze_ecg",
          reviewer=1, tier="remove", status="applied",
-         response="Removed completely from the Alzheimer diagnostic pathway: no case orders one "
-                  "and none exposes a case-authored ECG result."),
+         response="Removed from the Alzheimer diagnostic pathway: no case requires or recommends "
+                  "an ECG. Two cases (P04, RP02) carry an optional baseline ECG before donepezil "
+                  "because the patient takes escitalopram (QT prolongation); elsewhere an ECG is "
+                  "an avoided or unscored step and returns a normal report."),
     dict(cond="alzheimers_early", filed="analyze_csf", tool="analyze_csf",
          reviewer=1, tier="optional", status="applied",
          seg=(None, "Add amyloid PET"),
-         response="Applied: CSF Alzheimer biomarkers are optional in 21 cases. RP04 is the sole "
+         response="Applied: CSF Alzheimer biomarkers are optional in 29 cases, as one of two "
+                  "alternatives (with amyloid PET) of a single amyloid-status step. RP04 is the sole "
                   "required exception because the same lumbar puncture must answer the independent, "
-                  "high-stakes CJD differential with RT-QuIC and 14-3-3; it has no amyloid PET."),
+                  "high-stakes CJD differential with RT-QuIC and 14-3-3; there amyloid PET is not a "
+                  "criterion."),
     dict(cond="alzheimers_early", filed="analyze_csf", tool="order_advanced_imaging",
          reviewer=1, tier="optional", status="applied",
          seg=("Add amyloid PET", None),
-         response="Applied across actions, stored reports and SFT traces: 8 cases use optional "
-                  "amyloid PET as their sole biomarker route, 22 use CSF, and zero cases expose or "
-                  "order both. FDG-PET/perfusion SPECT remains a separate optional subtype question."),
+         response="Applied, following your ruling that PET is an alternative to CSF: in 29 cases "
+                  "one optional amyloid-status step accepts either CSF biomarkers or amyloid PET, "
+                  "one conclusive test is enough, and both return a concordant case-authored "
+                  "result. A second amyloid test is not required. FDG-PET/perfusion SPECT remains "
+                  "a separate optional subtype question."),
 
     # === frontotemporal dementia (reviewer 1) ===
     dict(cond="ftd", filed="interpret_labs", tool="interpret_labs",

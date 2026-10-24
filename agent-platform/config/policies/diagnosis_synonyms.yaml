@@ -18,7 +18,7 @@
 
 # Labels the table granted once and no longer grants; `--prune` strips them from every case.
 RETIRED:
-  retired_labels: [stroke, carotid stenosis stroke, internal carotid artery stenosis, large artery atherosclerotic stroke, perioperative stroke, postprocedural stroke]
+  retired_labels: [stroke, carotid stenosis stroke, internal carotid artery stenosis, large artery atherosclerotic stroke, perioperative stroke, postprocedural stroke, astrocytoma grade 4, spinal cord glioma, intramedullary glioma, cns lymphoma]
 
 G12.21:
   labels: [amyotrophic lateral sclerosis, ALS, motor neuron disease, motor neurone disease, MND]
@@ -37,14 +37,41 @@ Z15.89:
   cases: [ALS-P08]
   labels: [suspected ALS, prodromal ALS, possible ALS, suspected motor neuron disease, mild motor impairment]
 
+# ALZ-EARLY (October 2026 close-out). G30.0 (onset under 65) and G30.1 (onset 65 or later) do not
+# grant each other: the onset code is part of the label. The category grants the disease name and
+# the unspecified code; stage, onset and phenotype labels sit on scoped entries.
 G30:
-  labels: [alzheimer disease, alzheimer's disease, alzheimers disease, alzheimer dementia, dementia due to alzheimer]
-  codes: [G30.0, G30.1, G30.8, G30.9, F00]
+  labels: [alzheimer disease, alzheimer's disease, alzheimers disease]
+  codes: [G30.9]
+# Dementia-stage labels: every G30 case is staged mild dementia except ALZ-EARLY-P02 (lvPPA with
+# instrumental function preserved).
+G30+dementia:
+  except_cases: [ALZ-EARLY-P02]
+  labels: [alzheimer dementia, dementia due to alzheimer]
+  codes: [F00]
 G30.0:
-  labels: [posterior cortical atrophy, benson syndrome, early onset alzheimer]
+  labels: [early onset alzheimer]
+G30.1:
+  labels: [late onset alzheimer]
+# Atypical phenotypes, each only where the case is that phenotype (G30.8 is the code some coders
+# use for atypical presentations).
+G30.0+pca:
+  cases: [ALZ-EARLY-P01, ALZ-EARLY-RP01, ALZ-EARLY-RP02, ALZ-EARLY-RP03]
+  labels: [posterior cortical atrophy, benson syndrome]
+  codes: [G30.8]
+G30.0+lvppa:
+  cases: [ALZ-EARLY-P02]
+  labels: [logopenic variant primary progressive aphasia, logopenic progressive aphasia, logopenic aphasia, lvPPA]
+  codes: [G30.8]
+G30.0+frontal:
+  cases: [ALZ-EARLY-P03]
+  labels: [frontal variant alzheimer, behavioral variant alzheimer, behavioural variant alzheimer, dysexecutive alzheimer]
+  codes: [G30.8]
+# MCI due to AD (ALZ-EARLY M01-M04, RM04, S06): MCI labels only. A bare "alzheimer disease" label
+# is not granted (every "dementia due to Alzheimer disease" answer contains its tokens), nor are
+# dementia labels or G30 codes, so a dementia answer to an MCI case does not score.
 G31.84:
-  labels: [mild cognitive impairment, MCI, amnestic mild cognitive impairment, amnestic MCI, prodromal alzheimer, mild cognitive impairment due to alzheimer, alzheimer disease, alzheimer's disease]
-  codes: [G30.0, G30.1, G30.9]
+  labels: [mild cognitive impairment, MCI, amnestic mild cognitive impairment, amnestic MCI, prodromal alzheimer, mild cognitive impairment due to alzheimer]
 G31.09:
   labels: [frontotemporal dementia, FTD, behavioral variant frontotemporal dementia, behavioural variant frontotemporal dementia, bvFTD, frontotemporal lobar degeneration, pick disease, pick's disease]
   codes: [G31.0, G31.01]
@@ -96,16 +123,48 @@ A17.0:
 B45.1:
   labels: [cryptococcal meningitis, cryptococcal meningoencephalitis, cryptococcus meningitis]
 
+# High-grade glioma (GLIO-HG close-out, 24 Oct 2026). ICD-10 C71 codes the site, not the entity, so
+# the category carries only labels true of every high-grade glioma in the condition; entity names are
+# scoped so that glioblastoma is not accepted for an IDH-mutant astrocytoma or a diffuse midline
+# glioma (WHO CNS5), and a grade label is not accepted where the grade or the H3 status differs.
 C71:
-  labels: [glioblastoma, GBM, high grade glioma, glioma who grade 4, grade 4 glioma, malignant glioma, astrocytoma grade 4]
+  conditions: [brain_tumor_glioma]
+  labels: [high grade glioma, malignant glioma]
   codes: [C71.9]
-C71.0:
-  labels: [diffuse midline glioma, h3 k27m altered glioma]
+C71+glioblastoma:
+  conditions: [brain_tumor_glioma]
+  # IDH-mutant astrocytomas (M04, M05, RP03) and the H3 K27-altered diffuse midline glioma (P05)
+  except_cases: [GLIO-HG-M04, GLIO-HG-M05, GLIO-HG-RP03, GLIO-HG-P05]
+  labels: [glioblastoma, GBM, glioblastoma idh wildtype]
+C71+grade4:
+  conditions: [brain_tumor_glioma]
+  # not the grade 3 astrocytoma (M05), nor the H3-wildtype midline glioblastomas (RM01 pons, RM03
+  # cerebellum and vermis), where "diffuse midline glioma ... grade 4" is the wrong answer
+  except_cases: [GLIO-HG-M05, GLIO-HG-RM01, GLIO-HG-RM03]
+  labels: [grade 4 glioma, glioma who grade 4]
+C71+gliosarcoma:
+  cases: [GLIO-HG-RM04]
+  labels: [gliosarcoma]
+C71+astrocytoma-idh-mutant-4:
+  cases: [GLIO-HG-M04, GLIO-HG-RP03]
+  labels: [astrocytoma idh mutant grade 4]
+C71+astrocytoma-idh-mutant-3:
+  cases: [GLIO-HG-M05]
+  labels: [astrocytoma idh mutant grade 3]
+C71+diffuse-midline-glioma:
+  cases: [GLIO-HG-P05]
+  labels: [diffuse midline glioma, h3 k27 altered glioma, h3 k27m altered glioma]
 C72.0:
-  labels: [spinal cord glioblastoma, spinal cord glioma, intramedullary glioma]
+  conditions: [brain_tumor_glioma]
+  # RM02 is H3-wildtype: generic "spinal cord glioma" would accept a diffuse midline glioma answer
+  labels: [spinal cord glioblastoma, intramedullary glioblastoma, glioblastoma, GBM, high grade glioma, malignant glioma]
 C83.390:
-  labels: [primary cns lymphoma, PCNSL, cns lymphoma, primary central nervous system lymphoma]
+  # "cns lymphoma" alone would accept secondary CNS lymphoma, a different disease
+  labels: [primary cns lymphoma, PCNSL, primary central nervous system lymphoma, primary cns diffuse large b cell lymphoma]
   codes: [C83.39, C85.80]
+C83.390+hiv:
+  cases: [GLIO-HG-P02]
+  labels: [hiv associated cns lymphoma, aids related cns lymphoma, ebv positive diffuse large b cell lymphoma cns]
 
 G40:
   labels: [focal epilepsy, temporal lobe epilepsy, mesial temporal lobe epilepsy, mesial temporal sclerosis epilepsy, focal onset seizures, focal impaired awareness seizures, focal seizures, TLE, epilepsy temporal lobe]
@@ -163,7 +222,30 @@ G90.3:
   labels: [multiple system atrophy, MSA, MSA-P, multiple system atrophy parkinsonian type]
 
 G61.0:
-  labels: [guillain barre syndrome, guillain-barre syndrome, guillain-barré syndrome, GBS, acute inflammatory demyelinating polyneuropathy, AIDP, acute inflammatory demyelinating polyradiculoneuropathy, acute motor axonal neuropathy, AMAN, miller fisher syndrome]
+  labels: [guillain barre syndrome, guillain-barre syndrome, guillain-barré syndrome, GBS]
+# GBS variant and subtype labels scoped to the cases whose findings meet them (24 Oct 2026,
+# plans/GBS-decisions.md): an AIDP answer is wrong for Miller Fisher, PCB, bifacial, ptosis and
+# AMAN cases, and "Miller Fisher syndrome" is wrong for AIDP. The ICD code G61.0 still credits any
+# GBS-spectrum answer that submits it (ICD-10 files every variant under G61.0).
+G61.0+aidp:
+  conditions: [guillain_barre]
+  except_cases: [GBS-P01, GBS-RM12, GBS-RM15, GBS-RS11, GBS-RS15, GBS-RP16]
+  labels: [acute inflammatory demyelinating polyneuropathy, AIDP, acute inflammatory demyelinating polyradiculoneuropathy]
+G61.0+aman:
+  cases: [GBS-RP16]
+  labels: [acute motor axonal neuropathy, AMAN]
+G61.0+mfs:
+  cases: [GBS-P01]
+  labels: [miller fisher syndrome, fisher syndrome, MFS]
+G61.0+gq1b:
+  cases: [GBS-RM15]
+  labels: [anti gq1b syndrome, incomplete miller fisher syndrome]
+G61.0+pcb:
+  cases: [GBS-RM12, GBS-RS15]
+  labels: [pharyngeal cervical brachial]
+G61.0+bifacial:
+  cases: [GBS-RS11]
+  labels: [bifacial weakness with paraesthesias, bifacial weakness with paresthesias]
 
 G70:
   labels: [myasthenia gravis, MG, generalized myasthenia gravis, generalised myasthenia gravis, ocular myasthenia gravis, autoimmune myasthenia]
@@ -179,11 +261,18 @@ G91.0:
   labels: [normal pressure hydrocephalus, NPH, secondary normal pressure hydrocephalus, communicating hydrocephalus]
   codes: [G91.0, G91.2, G91.9]
 
+# I60 (24 Oct 2026, SAH close-out): the category serves the aneurysmal cases, so it no longer
+# grants I60.8 (other nontraumatic SAH, the non-aneurysmal code). SAH-P02 (perimesencephalic
+# non-aneurysmal SAH, I60.8) is excluded from the category: with token matching, a generic
+# "subarachnoid hemorrhage" or "SAH" label would credit an answer of aneurysmal rupture, which is
+# the error the case tests, and I60.9 or a location code would do the same through the code.
 I60:
+  except_cases: [SAH-P02]
   labels: [subarachnoid hemorrhage, subarachnoid haemorrhage, SAH, aneurysmal subarachnoid hemorrhage, aneurysmal subarachnoid haemorrhage, ruptured intracranial aneurysm, ruptured cerebral aneurysm]
-  codes: [I60.9, I60.7, I60.0, I60.1, I60.2, I60.3, I60.4, I60.5, I60.6, I60.8]
+  codes: [I60.9, I60.7, I60.0, I60.1, I60.2, I60.3, I60.4, I60.5, I60.6]
 I60.8:
-  labels: [perimesencephalic subarachnoid hemorrhage, perimesencephalic subarachnoid haemorrhage, non-aneurysmal subarachnoid hemorrhage]
+  cases: [SAH-P02]
+  labels: [perimesencephalic subarachnoid hemorrhage, perimesencephalic subarachnoid haemorrhage, perimesencephalic SAH, perimesencephalic hemorrhage, perimesencephalic haemorrhage, pretruncal subarachnoid hemorrhage, non-aneurysmal subarachnoid hemorrhage, non-aneurysmal subarachnoid haemorrhage, nonaneurysmal subarachnoid hemorrhage, non-aneurysmal SAH, angiogram negative subarachnoid hemorrhage]
 
 # I63 category: generic labels and the unspecified code only; mechanism labels (embolic,
 # lacunar, dissection, moyamoya) and the mechanism code families sit on the specific codes.
