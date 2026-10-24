@@ -927,41 +927,57 @@ SPEC += [
     # === temporal lobe epilepsy (reviewer 1) ===
     dict(cond="focal_epilepsy_temporal", filed="analyze_eeg", tool="analyze_eeg",
          reviewer=1, tier="required", status="applied",
-         response="Applied end to end. The previous answer was false: sleep_deprived had been added "
-                  "to the vocabulary but no case used it, ambulatory was absent, and 22 cases still "
-                  "carried video EEG. The audited cases now contain 23 routine recordings, 5 staged "
-                  "sleep-deprived studies, 2 ambulatory studies after non-diagnostic routine/sleep "
-                  "recordings, and 10 video studies limited to event capture, PNES or tertiary "
-                  "evaluation. RP01 is the single continuous-ICU exception because its presentation "
-                  "is non-convulsive status epilepticus, exactly the acute setting you named."),
+         response="Applied end to end in the October 2026 round. The pathway is staged: 24 routine "
+                  "recordings (required in 23; optional in RP01, where continuous EEG is the required "
+                  "study), 5 sleep-deprived studies, all recommended after a non-diagnostic or "
+                  "equivocal routine EEG, and 2 ambulatory studies (recommended in M03, required in "
+                  "RP02, where they capture the events). Video-EEG appears in 10 cases and is required "
+                  "only in 8: event capture against panic or PNES (P01, P03), seizure versus syncope "
+                  "(P05), the LGI1 encephalitis (P02) and presurgical evaluation (P04, RP04, RS01, "
+                  "RS04); it is recommended in M05 and RP05. RP01 is the single continuous-ICU "
+                  "recording, required, because its presentation is nonconvulsive status epilepticus, "
+                  "the acute setting you named."),
     dict(cond="focal_epilepsy_temporal", filed="analyze_brain_mri", tool="analyze_brain_mri",
          reviewer=1, tier="required", status="applied",
-         response="Applied: dedicated epilepsy-protocol MRI is required in 29 cases. The MRI-negative "
-                  "drug-resistant case P04 uses the reviewed non-contrast CT alternative because "
-                  "severe claustrophobia makes MRI unavailable; the report states CT's limitations."),
+         response="Applied: brain MRI is required in 29 cases, as the dedicated epilepsy protocol in "
+                  "26; RP01 (encephalitis after skull-base cancer) and RP03 (a growing metastasis) "
+                  "require contrast MRI, and P02 (LGI1 encephalitis) any MRI. Gadolinium is added "
+                  "only when a lesion, infection or tumor is suspected. P04 has no MRI criterion: her "
+                  "earlier 1.5T epilepsy-protocol MRI was normal, she could not tolerate the 3T study "
+                  "and declined anesthesia, so CT is optional there and her presurgical work-up rests "
+                  "on video-EEG and FDG-PET. CT is required only after the head injury in RM03 and "
+                  "recommended in RM01 (shunt) and RP05 (skull-base defect)."),
     dict(cond="focal_epilepsy_temporal", filed="interpret_labs", tool="interpret_labs",
          reviewer=1, tier="optional", status="applied",
-         response="Applied case by case: 23 cases retain optional targeted tests for acute metabolic "
-                  "provocation, antiseizure-drug levels or a concurrent emergency. Seven stable "
-                  "tertiary/recurrent cases have no lab action or authored report. Prolactin was "
-                  "removed from the routine template."),
+         response="Applied: 25 cases have a laboratory criterion, optional in 15. It is required only "
+                  "where the result is the case question (P02 serum LGI1 antibodies and sodium, RM03 "
+                  "the phenytoin level after a fall with head injury, RS02 the eclampsia screen at 33 "
+                  "weeks) and recommended in 7 with a named indication (an antiseizure medication "
+                  "level after a breakthrough seizure, renal function before acyclovir, glucose on "
+                  "metformin). Five cases have no laboratory criterion. The earlier claim that "
+                  "prolactin had left the template was not true at the time; it is now: only P05 "
+                  "keeps a level, drawn 22 minutes after a witnessed convulsion and read as evidence "
+                  "against a psychogenic event, not against syncope."),
     dict(cond="focal_epilepsy_temporal", filed="analyze_ecg", tool="analyze_ecg",
          reviewer=1, tier="optional", status="applied",
-         response="Applied using NICE NG217 rather than the previous arbitrary count: ECG is required "
-                  "in 21 first-suspected-seizure or transient-loss-of-consciousness assessments and "
-                  "absent from the 9 established/tertiary cases. It is framed as a cardiac-mimic test, "
-                  "not an epilepsy test."),
+         response="Applied as you asked. The previous answer (ECG required in 21 cases) did the "
+                  "opposite. The ECG is now optional in the 19 cases that store one at a first "
+                  "presentation, so ordering it is credited and never waste; it is required only in "
+                  "P05, where seizure versus syncope is the case question, and recommended in RP02 "
+                  "as part of the pulmonary embolism assessment. The 9 established or tertiary cases "
+                  "have no ECG criterion."),
     dict(cond="focal_epilepsy_temporal", filed="order_echocardiogram", tool="order_echocardiogram",
          reviewer=1, tier="remove", status="applied",
-         response="Removed from all 30 actions and authored reports. P05 already had a completed "
-                  "normal cardiac work-up in its history. RP02 has a genuine separate pulmonary-"
-                  "embolism emergency, but generic echo was the wrong substitute: it now orders "
-                  "the required chest CT angiogram through body imaging."),
+         response="Removed from all 30 action lists: no case has an echocardiography criterion, and "
+                  "ordering one is waste in 27 cases, each with its own rationale. P05 already had a "
+                  "normal cardiac work-up in its history, and RP02's pulmonary embolism is assessed "
+                  "with the required chest CT angiogram instead. Stored fallback reports are normal "
+                  "studies, so an agent that orders an echocardiogram anyway gets a coherent result."),
     dict(cond="focal_epilepsy_temporal", filed="order_cardiac_monitoring",
          tool="order_cardiac_monitoring", reviewer=1, tier="remove", status="applied",
-         response="Removed from all 30 actions and authored reports. P05's prior Holter was already "
-                  "normal, and RP02 requires urgent pulmonary vascular imaging rather than generic "
-                  "rhythm monitoring."),
+         response="Removed from all 30 action lists: no case has a rhythm-monitoring criterion, and "
+                  "ordering it is waste in 28 cases. P05's earlier Holter was already normal, and "
+                  "RP02 needs pulmonary vascular imaging rather than rhythm monitoring."),
 
     # === functional neurological disorder (reviewer 1) ===
     dict(cond="functional_neurological_disorder", filed="analyze_eeg", tool="analyze_eeg",

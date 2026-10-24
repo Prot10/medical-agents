@@ -164,7 +164,8 @@ class Banned:
 
     `pattern` must match the sentence; `unless`, when given, exempts a sentence it also matches
     (e.g. a criterion named as superseded); `tools`, when given, limits the row to the stored
-    outputs of those tools (initial, follow-up and fallback).
+    outputs of those tools (initial, follow-up and fallback); `except_cases` exempts named cases
+    (a phrase that is right in one case of the condition only).
     """
 
     condition: str
@@ -172,6 +173,7 @@ class Banned:
     pattern: str
     unless: str | None = None
     tools: tuple[str, ...] = ()
+    except_cases: tuple[str, ...] = ()
 
 
 BANNED: tuple[Banned, ...] = (
@@ -191,6 +193,20 @@ BANNED: tuple[Banned, ...] = (
            r"the finding the lumbar puncture is gated on"),
     Banned("HEP-ENC", "a CT report claiming restricted diffusion", r"restricted diffusion",
            tools=("order_ct_scan",)),
+    # FEPI-TEMP (24 Oct 2026 close-out): the fabricated "Glauser 2017" monotherapy review (the real
+    # one is Epilepsia 2013;54:551-563), FDA letter categories (retired 2015), Glauser 2013 Level A
+    # misstatements for adults, and prolactin outside the one case with a level drawn 22 minutes
+    # after the event (AAN 2005).
+    Banned("FEPI-TEMP", "the non-existent Glauser 2017 monotherapy review",
+           r"Glauser[^.;]{0,40}2017|2017\s*;\s*58\s*:\s*1235"),
+    Banned("FEPI-TEMP", "FDA pregnancy letter category", r"\bCategory X\b"),
+    Banned("FEPI-TEMP", "oxcarbazepine as Level A in adults (Glauser 2013: Level A in children only)",
+           r"oxcarbazepine[^.;]{0,80}\bLevel A\b|\bLevel A\b[^.;]{0,80}oxcarbazepine"),
+    Banned("FEPI-TEMP", "lamotrigine as Level A outside the elderly (Glauser 2013)",
+           r"lamotrigine[^.;]{0,80}\bLevel A\b|\bLevel A\b[^.;]{0,80}lamotrigine",
+           unless=r"elderly|older adult|aged 60|over 60"),
+    Banned("FEPI-TEMP", "prolactin outside FEPI-TEMP-P05", r"prolactin",
+           unless=r"\bremoved\b|\bdeleted\b", except_cases=("FEPI-TEMP-P05",)),
 )
 
 _TOOL_FIELDS = {"order_ct_scan": "ct"}
@@ -213,7 +229,7 @@ def banned_hits(case_id: str, case: dict[str, Any] | None = None) -> list[str]:
     case = case if case is not None else _raw(case_id)
     hits = []
     for row in BANNED:
-        if condition_of(case_id) != row.condition:
+        if condition_of(case_id) != row.condition or case_id in row.except_cases:
             continue
         for text in _scoped_strings(case, row.tools):
             for sentence in _SENTENCE.split(text):
@@ -245,6 +261,13 @@ def test_banned_table_rows_fire():
     assert banned_hits("HEP-ENC-S01", ct)
     assert not banned_hits("HEP-ENC-S01", {"initial_tool_outputs": {"mri": {"findings": "restricted diffusion"}}})
     assert not banned_hits("ISCH-STR-S01", case("AMX0035"))
+    assert banned_hits("FEPI-TEMP-S01", case("Glauser T et al., Epilepsia 2017;58:1235-1268."))
+    assert banned_hits("FEPI-TEMP-S01", case("Valproate is Category X in pregnancy."))
+    assert banned_hits("FEPI-TEMP-S01", case("Oxcarbazepine (Level A) is first line."))
+    assert banned_hits("FEPI-TEMP-S01", case("Lamotrigine has Level A evidence in adults."))
+    assert not banned_hits("FEPI-TEMP-S01", case("Lamotrigine reaches Level A only in the elderly."))
+    assert banned_hits("FEPI-TEMP-S01", case("Prolactin 31 ng/mL at 6 hours."))
+    assert not banned_hits("FEPI-TEMP-P05", case("Prolactin 48 ng/mL drawn 22 minutes after the event."))
 
 
 # ---------------------------------------------------------------------------------------
@@ -262,6 +285,7 @@ def test_banned_table_rows_fire():
 DISCRIMINATOR_CONDITIONS = frozenset({
     "ALS", "BACT-MEN", "ISCH-STR", "HEP-ENC", "GLIO-HG", "GBS", "ALZ-EARLY", "SAH", "SE",
     "VASC-DEM", "NMDAR-ENC", "MIG-AURA", "SYNC-CARD", "FTD", "MG", "NPH", "FND", "MS-RR",
+    "FEPI-TEMP",
 })
 
 # initial_tool_outputs / fallback_tool_outputs slot of each routed tool.

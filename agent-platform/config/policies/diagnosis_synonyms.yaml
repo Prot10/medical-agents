@@ -18,7 +18,7 @@
 
 # Labels the table granted once and no longer grants; `--prune` strips them from every case.
 RETIRED:
-  retired_labels: [stroke, carotid stenosis stroke, internal carotid artery stenosis, large artery atherosclerotic stroke, perioperative stroke, postprocedural stroke, astrocytoma grade 4, spinal cord glioma, intramedullary glioma, cns lymphoma, pyridoxine deficiency seizures, cholinergic toxidrome, migraine aura, PCA territory infarct, vascular cognitive impairment, cardiac syncope, arrhythmic syncope, bradyarrhythmia, tachyarrhythmia, conduction disease syncope, second degree av block, torsades de pointes, long qt syndrome, LQTS, brugada, cardiac tumor, cardiac tumour, central sleep apnea, central sleep apnoea, sleep apnea syncope, nocturnal asystole, sleep related bradyarrhythmia, sarcoid myocarditis, pick disease, pick's disease, MG, demyelinating disease]
+  retired_labels: [stroke, carotid stenosis stroke, internal carotid artery stenosis, large artery atherosclerotic stroke, perioperative stroke, postprocedural stroke, astrocytoma grade 4, spinal cord glioma, intramedullary glioma, cns lymphoma, pyridoxine deficiency seizures, cholinergic toxidrome, migraine aura, PCA territory infarct, vascular cognitive impairment, cardiac syncope, arrhythmic syncope, bradyarrhythmia, tachyarrhythmia, conduction disease syncope, second degree av block, torsades de pointes, long qt syndrome, LQTS, brugada, cardiac tumor, cardiac tumour, central sleep apnea, central sleep apnoea, sleep apnea syncope, nocturnal asystole, sleep related bradyarrhythmia, sarcoid myocarditis, pick disease, pick's disease, MG, demyelinating disease, focal seizures, focal onset seizures, focal impaired awareness seizures]
 
 G12.21:
   labels: [amyotrophic lateral sclerosis, ALS, motor neuron disease, motor neurone disease, MND]
@@ -100,7 +100,7 @@ G04.81:
   # "anti-LGI1 autoimmune encephalitis" or "seronegative autoimmune encephalitis", the alternatives
   # each case's work-up excludes; "autoimmune limbic encephalitis" is a different syndrome (Graus
   # 2016); G04.90 is unspecified encephalitis. The case's antibody is what the CSF order establishes.
-  except_cases: [NMDAR-ENC-M01, NMDAR-ENC-M02, NMDAR-ENC-M03, NMDAR-ENC-M04, NMDAR-ENC-M05, NMDAR-ENC-P01, NMDAR-ENC-P02, NMDAR-ENC-P03, NMDAR-ENC-P04, NMDAR-ENC-P05, NMDAR-ENC-P06, NMDAR-ENC-P07, NMDAR-ENC-P08, NMDAR-ENC-RM01, NMDAR-ENC-RM02, NMDAR-ENC-RM03, NMDAR-ENC-RP01, NMDAR-ENC-RP02, NMDAR-ENC-RP03, NMDAR-ENC-RS01, NMDAR-ENC-RS02, NMDAR-ENC-RS03, NMDAR-ENC-RS04, NMDAR-ENC-S01, NMDAR-ENC-S02, NMDAR-ENC-S03, NMDAR-ENC-S04, NMDAR-ENC-S06, NMDAR-ENC-S09, NMDAR-ENC-S10]
+  except_cases: [NMDAR-ENC-M01, NMDAR-ENC-M02, NMDAR-ENC-M03, NMDAR-ENC-M04, NMDAR-ENC-M05, NMDAR-ENC-P01, NMDAR-ENC-P02, NMDAR-ENC-P03, NMDAR-ENC-P04, NMDAR-ENC-P05, NMDAR-ENC-P06, NMDAR-ENC-P07, NMDAR-ENC-P08, NMDAR-ENC-RM01, NMDAR-ENC-RM02, NMDAR-ENC-RM03, NMDAR-ENC-RP01, NMDAR-ENC-RP02, NMDAR-ENC-RP03, NMDAR-ENC-RS01, NMDAR-ENC-RS02, NMDAR-ENC-RS03, NMDAR-ENC-RS04, NMDAR-ENC-S01, NMDAR-ENC-S02, NMDAR-ENC-S03, NMDAR-ENC-S04, NMDAR-ENC-S06, NMDAR-ENC-S09, NMDAR-ENC-S10, FEPI-TEMP-P02]
   labels: [autoimmune encephalitis, antibody mediated encephalitis, autoimmune limbic encephalitis]
   codes: [G04.8, G04.90]
 G04.81+nmdar:
@@ -189,13 +189,58 @@ C83.390+hiv:
   cases: [GLIO-HG-P02]
   labels: [hiv associated cns lymphoma, aids related cns lymphoma, ebv positive diffuse large b cell lymphoma cns]
 
+# FEPI-TEMP (24 Oct 2026 close-out, plans/FEPI-TEMP-decisions.md). The category grants the generic
+# epilepsy labels and the category codes only. The seizure-type labels (focal seizures, focal onset
+# seizures, focal impaired awareness seizures) are retired: an acute symptomatic seizure answer, or a
+# functional-seizure answer naming the seizure type it mimics, contains their tokens. The mesial
+# labels go only where the onset zone is mesial, the sclerosis label only where the MRI shows
+# hippocampal sclerosis, the intractable codes only in the four drug-resistant cases (Kwan 2010), and
+# the idiopathic G40.0 codes nowhere (every case is structural or of unknown cause).
 G40:
-  labels: [focal epilepsy, temporal lobe epilepsy, mesial temporal lobe epilepsy, mesial temporal sclerosis epilepsy, focal onset seizures, focal impaired awareness seizures, focal seizures, TLE, epilepsy temporal lobe]
-  codes: [G40.2, G40.209, G40.219, G40.1, G40.109, G40.119, G40.009, G40.019, G40.9, G40.909]
+  conditions: [focal_epilepsy_temporal]
+  labels: [focal epilepsy, temporal lobe epilepsy, TLE, epilepsy temporal lobe]
+  codes: [G40.2, G40.1, G40.9]
+G40+not-intractable:
+  conditions: [focal_epilepsy_temporal]
+  except_cases: [FEPI-TEMP-P04, FEPI-TEMP-RP04, FEPI-TEMP-RS01, FEPI-TEMP-RS04]
+  codes: [G40.209, G40.109, G40.909]
+G40+intractable:
+  cases: [FEPI-TEMP-P04, FEPI-TEMP-RP04, FEPI-TEMP-RS01, FEPI-TEMP-RS04]
+  codes: [G40.219, G40.119, G40.919]
+# Mesial onset zone: hippocampal sclerosis, a lesion in the amygdala or hippocampus (M05 cavernoma,
+# S02 and S03 DNET), mesial semiology with a mesial and lateral lesion (RP03) or with a normal MRI
+# (RP02). Not the lateral neocortical (M04, RM04), temporopolar or inferior temporal (P01, RP05, S06)
+# or MRI-negative anterior temporal (P04) cases.
+G40+mesial:
+  cases: [FEPI-TEMP-M01, FEPI-TEMP-M02, FEPI-TEMP-M03, FEPI-TEMP-M05, FEPI-TEMP-P05, FEPI-TEMP-RM01, FEPI-TEMP-RM02, FEPI-TEMP-RM03, FEPI-TEMP-RP02, FEPI-TEMP-RP03, FEPI-TEMP-RP04, FEPI-TEMP-RS01, FEPI-TEMP-RS02, FEPI-TEMP-RS03, FEPI-TEMP-RS04, FEPI-TEMP-RS05, FEPI-TEMP-S01, FEPI-TEMP-S02, FEPI-TEMP-S03, FEPI-TEMP-S04, FEPI-TEMP-S05]
+  labels: [mesial temporal lobe epilepsy, MTLE]
+# Hippocampal sclerosis on the epilepsy-protocol MRI.
+G40+hs:
+  cases: [FEPI-TEMP-M01, FEPI-TEMP-M02, FEPI-TEMP-M03, FEPI-TEMP-P05, FEPI-TEMP-RM01, FEPI-TEMP-RM02, FEPI-TEMP-RM03, FEPI-TEMP-RP04, FEPI-TEMP-RS01, FEPI-TEMP-RS02, FEPI-TEMP-RS03, FEPI-TEMP-RS04, FEPI-TEMP-RS05, FEPI-TEMP-S01, FEPI-TEMP-S04, FEPI-TEMP-S05]
+  labels: [mesial temporal sclerosis epilepsy]
+# FEPI-TEMP-RP01 (relabelled 24 Oct 2026): HSV-1 encephalitis with acute symptomatic NCSE, not
+# epilepsy (Beghi 2010). The encephalitis is what the case scores: "NCSE" or "acute symptomatic
+# seizures" alone, or an epilepsy code (G40.901), would credit the epilepsy answer the case tests.
+# No "herpes encephalitis" or "herpesviral encephalitis": their tokens occur in a VZV answer.
+B00.4:
+  cases: [FEPI-TEMP-RP01]
+  labels: [HSV encephalitis, HSV-1 encephalitis, herpes simplex encephalitis, herpes simplex virus encephalitis, HSE]
+# FEPI-TEMP-P02: anti-LGI1 encephalitis. The generic labels of the G04.81 entry are not granted:
+# their tokens occur in "anti-NMDAR autoimmune encephalitis" or "GAD65 autoimmune limbic
+# encephalitis", alternatives the case excludes.
+G04.81+lgi1:
+  cases: [FEPI-TEMP-P02]
+  labels: [LGI1 encephalitis, anti-LGI1 encephalitis, LGI1 antibody encephalitis, LGI1 limbic encephalitis, leucine rich glioma inactivated 1 encephalitis]
+# FEPI-TEMP-P03: functional seizures in a patient with controlled mesial TLE. No "non-epileptic
+# seizures" (its tokens occur in "focal non-motor epileptic seizures") and no F44.4 or F44.7 (motor
+# and mixed presentations).
+F44.5+fepi:
+  cases: [FEPI-TEMP-P03]
+  labels: [psychogenic non-epileptic seizures, psychogenic nonepileptic seizures, PNES, functional seizures, dissociative seizures, nonepileptic seizures]
 F44.5:
   # The three pure functional-seizure FND cases take their labels and codes from the FND entries
-  # below (F44.4 motor and F44.7 mixed name another presentation there).
-  except_cases: [FND-M04, FND-M06, FND-RP01]
+  # below (F44.4 motor and F44.7 mixed name another presentation there); FEPI-TEMP-P03 from F44.5+fepi.
+  except_cases: [FND-M04, FND-M06, FND-RP01, FEPI-TEMP-P03]
   labels: [psychogenic non-epileptic seizures, psychogenic nonepileptic seizures, PNES, functional seizures, dissociative seizures, non-epileptic seizures]
   codes: [F44.4, F44.7]
 # FND (24 Oct 2026 close-out, plans/FND-decisions.md): the category grants the generic labels and

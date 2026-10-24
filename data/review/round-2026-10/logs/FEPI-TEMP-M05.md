@@ -59,3 +59,10 @@ Condition auditor, 24 Oct 2026. Checked uniformity of the plan's decisions acros
 - Literature follow-up trigger `search_literature_cavernoma_epilepsy` renamed `search_literature_cavernoma_cavernous_malformation`: it names the case's lesion or concurrent finding, so it is served only to a query that names it.
 - `initial_tool_outputs.eeg.findings[0]`: sharp waves 40-70 ms (spike range) now 80-130 ms; "frequent" at 8-22 per hour is "occasional" by ACNS 2021 (frequent is at least 1 per minute).
 - Video-EEG follow-up (12-35 per hour) and both EEG criteria: "frequent" discharges now "occasional".
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (`plans/FEPI-TEMP-decisions.md`). What changed and why:
+
+- Diagnosis synonyms (`diagnosis_synonyms.yaml` G40 entries, re-applied with `--prune --conditions focal_epilepsy_temporal`): labels now focal epilepsy, temporal lobe epilepsy, TLE, epilepsy temporal lobe, mesial temporal lobe epilepsy, MTLE (added); removed mesial temporal sclerosis epilepsy (no hippocampal sclerosis on MRI); focal seizures; focal onset seizures; focal impaired awareness seizures (seizure-type labels, retired: their tokens occur in an acute symptomatic or functional-seizure answer). Codes: G40.2, G40.1, G40.9 plus G40.209, G40.109, G40.909 (not intractable); the idiopathic G40.009 and G40.019 removed and the intractable codes removed.
+- Checks: `perfect_agent.py -v` and `case_io.py check` clean; `test_case_guards.py -k FEPI-TEMP-` passes, now with the discriminator guard and the FEPI-TEMP banned strings.

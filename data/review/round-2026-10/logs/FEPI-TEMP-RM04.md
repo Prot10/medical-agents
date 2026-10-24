@@ -54,3 +54,12 @@ Condition auditor, 24 Oct 2026. Checked uniformity of the plan's decisions acros
 - `initial_tool_outputs.literature_search.general`: neutral focal-epilepsy block added (definition, classification, MRI protocol, first-line ASM, drug resistance), so a literature query that names no case-specific topic no longer receives a stored follow-up.
 - Literature follow-up trigger `search_ganglioglioma_temporal_epilepsy` renamed `search_ganglioglioma_glioneuronal`: it names the case's lesion or concurrent finding, so it is served only to a query that names it.
 - `initial_tool_outputs.ecg`: rate and intervals identical to M02 and S05 (76/min, PR 154, QRS 86, QTc 416) and 12 below the triage HR of 88; now 82/min, PR 146, QRS 94, QTc 410; ECG criterion evidence says 82/min.
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (`plans/FEPI-TEMP-decisions.md`). What changed and why:
+
+- Diagnosis synonyms (`diagnosis_synonyms.yaml` G40 entries, re-applied with `--prune --conditions focal_epilepsy_temporal`): labels now focal epilepsy, temporal lobe epilepsy, TLE, epilepsy temporal lobe; removed mesial temporal sclerosis epilepsy (no hippocampal sclerosis on MRI); mesial temporal lobe epilepsy (the onset zone is not mesial); focal seizures; focal onset seizures; focal impaired awareness seizures (seizure-type labels, retired: their tokens occur in an acute symptomatic or functional-seizure answer). Codes: G40.2, G40.1, G40.9 plus G40.209, G40.109, G40.909 (not intractable); the idiopathic G40.009 and G40.019 removed and the intractable codes removed.
+- Label (summary CENTRAL 6): "...secondary to left superior temporal gyrus ganglioglioma (WHO grade I)" -> "...due to a left superior temporal gyrus low-grade epilepsy-associated tumor (presumed ganglioglioma, CNS WHO grade 1)": no tissue (the MRI names ganglioglioma and DNET), and WHO 2021 grades are arabic. The family-history red herring's "WHO grade I" now reads "CNS WHO grade 1".
+- Sertraline drug-check follow-up: empty `summary` filled in report voice (auditor flag); leak guard clean.
+- Checks: `perfect_agent.py -v` and `case_io.py check` clean; `test_case_guards.py -k FEPI-TEMP-` passes, now with the discriminator guard and the FEPI-TEMP banned strings.

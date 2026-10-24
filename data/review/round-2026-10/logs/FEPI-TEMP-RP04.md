@@ -61,3 +61,12 @@ Condition auditor, 24 Oct 2026. Checked uniformity of the plan's decisions acros
 - `action-6-order-advanced-imaging.rationale`: engineering prefix or tier wording removed (was "Optional here: MRI and video-EEG already...").
 - `action-4-search-medical-literature.rationale`: engineering prefix or tier wording removed (was "Optional background; the diagnosis rests...").
 - Literature follow-up (served for any query): the query named "hippocampal sclerosis and temporopolar abnormality" and a result and summary line described FCD IIIa, i.e. this case's MRI and diagnosis; now drug-resistance definition and surgical trials only.
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (`plans/FEPI-TEMP-decisions.md`). What changed and why:
+
+- Diagnosis synonyms (`diagnosis_synonyms.yaml` G40 entries, re-applied with `--prune --conditions focal_epilepsy_temporal`): labels now focal epilepsy, temporal lobe epilepsy, TLE, epilepsy temporal lobe, mesial temporal lobe epilepsy, MTLE (added), mesial temporal sclerosis epilepsy; removed focal seizures; focal onset seizures; focal impaired awareness seizures (seizure-type labels, retired: their tokens occur in an acute symptomatic or functional-seizure answer). Codes: G40.2, G40.1, G40.9 plus G40.219, G40.119, G40.919 (drug-resistant, Kwan 2010); the idiopathic G40.009 and G40.019 removed and the not-intractable codes removed.
+- Label (summary CENTRAL 5): "dual pathology (left mesial temporal sclerosis and adjacent left temporal focal cortical dysplasia, FCD Type IIIa)" -> "left hippocampal sclerosis and an associated left temporopolar cortical abnormality (suspected FCD type IIIa)": HS with an associated cortical lesion is FCD IIIa, a histological diagnosis, not dual pathology (Blumcke 2011). Code unchanged (G40.219).
+- Soft MRI -> drug check constraint: citation `[ILAE_MRI_2019]` -> `[NICE_NG217_2025]`, as in the other cases (ASM choice is what the constraint is about; auditor flag).
+- Checks: `perfect_agent.py -v` and `case_io.py check` clean; `test_case_guards.py -k FEPI-TEMP-` passes, now with the discriminator guard and the FEPI-TEMP banned strings.

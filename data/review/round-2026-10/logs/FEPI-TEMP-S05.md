@@ -53,3 +53,10 @@ Condition auditor, 24 Oct 2026. Checked uniformity of the plan's decisions acros
 - `action-5-check-drug-interactions.rationale`: engineering prefix or tier wording removed (was "His only medicine is as-needed loratadin...").
 - `initial_tool_outputs.ecg`: rate and intervals identical to M02 and RM04 and below the triage HR of 88; now 86/min, PR 140, QRS 90, QTc 414; ECG criterion evidence updated.
 - `initial_tool_outputs.eeg.findings[0].morphology`: sharp-and-slow-wave discharge with a 35-60 ms sharp component (spike range); now 80-120 ms.
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (`plans/FEPI-TEMP-decisions.md`). What changed and why:
+
+- Diagnosis synonyms (`diagnosis_synonyms.yaml` G40 entries, re-applied with `--prune --conditions focal_epilepsy_temporal`): labels now focal epilepsy, temporal lobe epilepsy, TLE, epilepsy temporal lobe, mesial temporal lobe epilepsy, MTLE (added), mesial temporal sclerosis epilepsy; removed focal seizures; focal onset seizures; focal impaired awareness seizures (seizure-type labels, retired: their tokens occur in an acute symptomatic or functional-seizure answer). Codes: G40.2, G40.1, G40.9 plus G40.209, G40.109, G40.909 (not intractable); the idiopathic G40.009 and G40.019 removed and the intractable codes removed.
+- Checks: `perfect_agent.py -v` and `case_io.py check` clean; `test_case_guards.py -k FEPI-TEMP-` passes, now with the discriminator guard and the FEPI-TEMP banned strings.

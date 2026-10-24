@@ -51,3 +51,10 @@ Condition auditor, 24 Oct 2026. Checked uniformity of the plan's decisions acros
 - `fallback_tool_outputs.drug_interactions`: placeholder block deleted (unreachable behind the initial output; it held "(agent not specified...)" or "No directly applicable evidence").
 - `action-5-check-drug-interactions.rationale`: engineering prefix or tier wording removed (was "Optional: no change of antiseizure medic...").
 - `action-4-search-medical-literature.rationale`: engineering prefix or tier wording removed (was "Optional background; the diagnosis rests...").
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (`plans/FEPI-TEMP-decisions.md`). What changed and why:
+
+- Synonyms (F44.5 token hazard from the FND close-out): P03 excluded from the global F44.5 entry and given `F44.5+fepi`: "non-epileptic seizures" removed (its tokens occur in "focal non-motor epileptic seizures", so a breakthrough-epilepsy answer scored), "nonepileptic seizures" added, codes F44.4 (motor) and F44.7 (mixed) removed. Probed: no epilepsy answer or G40 code scores here; PNES, functional, dissociative and psychogenic nonepileptic seizure answers do.
+- Checks: `perfect_agent.py -v` and `case_io.py check` clean; `test_case_guards.py -k FEPI-TEMP-` passes, now with the discriminator guard and the FEPI-TEMP banned strings.

@@ -61,3 +61,10 @@ Condition auditor, 24 Oct 2026. Checked uniformity of the plan's decisions acros
 - Differential "Calcified tuberculomas or toxoplasmosis": ICD-10-CM A17.8 -> A17.81.
 - Differential "Hyponatremia or another metabolic provoked seizure": ICD-10-CM G93.49 -> E87.1.
 - Infectious serology panel (cysticercosis IgG, HIV, RPR, HBsAg, HCV, QuantiFERON) moved from the initial labs, where the first-line order received it unasked, to an `interpret_labs` follow-up (`request_cysticercosis_hiv_syphilis_hepatitis_quantiferon_serology`, first in the pathway, before the drug check and literature); red herring [1] path now `followup_outputs[0].output.panels.Infectious_Workup[0]`.
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (`plans/FEPI-TEMP-decisions.md`). What changed and why:
+
+- Diagnosis synonyms (`diagnosis_synonyms.yaml` G40 entries, re-applied with `--prune --conditions focal_epilepsy_temporal`): labels now focal epilepsy, temporal lobe epilepsy, TLE, epilepsy temporal lobe, mesial temporal lobe epilepsy, MTLE (added), mesial temporal sclerosis epilepsy; removed focal seizures; focal onset seizures; focal impaired awareness seizures (seizure-type labels, retired: their tokens occur in an acute symptomatic or functional-seizure answer). Codes: G40.2, G40.1, G40.9 plus G40.209, G40.109, G40.909 (not intractable); the idiopathic G40.009 and G40.019 removed and the intractable codes removed.
+- Checks: `perfect_agent.py -v` and `case_io.py check` clean; `test_case_guards.py -k FEPI-TEMP-` passes, now with the discriminator guard and the FEPI-TEMP banned strings.

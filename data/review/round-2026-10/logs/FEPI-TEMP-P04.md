@@ -56,3 +56,10 @@ Condition auditor, 24 Oct 2026. Checked uniformity of the plan's decisions acros
 - `action-6-order-ct-scan.rationale`: engineering prefix or tier wording removed (was "Optional: MRI is not tolerated; CT exclu...").
 - `action-3-search-medical-literature.rationale`: engineering prefix or tier wording removed (was "Optional background; the diagnosis rests...").
 - Video-EEG follow-up, criterion and KCE: "frequent" (12 per hour) and "rare" (2 per hour) discharges are "occasional" (ACNS 2021).
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (`plans/FEPI-TEMP-decisions.md`). What changed and why:
+
+- Diagnosis synonyms (`diagnosis_synonyms.yaml` G40 entries, re-applied with `--prune --conditions focal_epilepsy_temporal`): labels now focal epilepsy, temporal lobe epilepsy, TLE, epilepsy temporal lobe; removed mesial temporal sclerosis epilepsy (no hippocampal sclerosis on MRI); mesial temporal lobe epilepsy (the onset zone is not mesial); focal seizures; focal onset seizures; focal impaired awareness seizures (seizure-type labels, retired: their tokens occur in an acute symptomatic or functional-seizure answer). Codes: G40.2, G40.1, G40.9 plus G40.219, G40.119, G40.919 (drug-resistant, Kwan 2010); the idiopathic G40.009 and G40.019 removed and the not-intractable codes removed.
+- Checks: `perfect_agent.py -v` and `case_io.py check` clean; `test_case_guards.py -k FEPI-TEMP-` passes, now with the discriminator guard and the FEPI-TEMP banned strings.

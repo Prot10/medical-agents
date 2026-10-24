@@ -58,3 +58,10 @@ Condition auditor, 24 Oct 2026. Checked uniformity of the plan's decisions acros
 - `action-5-search-medical-literature.rationale`: engineering prefix or tier wording removed (was "Optional background; the diagnosis rests...").
 - Serum autoimmune encephalitis panel (LGI1 positive 1:320) moved from the initial labs, where any first labs order received it, to an `interpret_labs` follow-up (`request_autoimmune_encephalitis_lgi1_caspr2_antibodies`, after the video-EEG); LGI1 removed from the initial interpretation and abnormal summary. The required order `[autoimmune_encephalitis, sodium]` (and the BMP and CMP alternatives) still receives both panels.
 - Initial drug output (methylprednisolone and IVIG, served for any drug, so any first check revealed immunotherapy) moved to a follow-up `check_methylprednisolone_prednisolone_ivig_corticosteroid` before the literature; the initial block is now a review of his three current ASMs.
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (`plans/FEPI-TEMP-decisions.md`). What changed and why:
+
+- Synonyms: the generic G04.81 labels (autoimmune encephalitis, antibody mediated encephalitis, autoimmune limbic encephalitis) and codes G04.8, G04.90 removed (P02 added to the entry's `except_cases`): their tokens occur in "anti-NMDA receptor autoimmune encephalitis" and "GAD65 autoimmune limbic encephalitis", alternatives this case excludes. New `G04.81+lgi1` entry: LGI1 encephalitis, anti-LGI1 encephalitis, LGI1 antibody encephalitis, LGI1 limbic encephalitis, leucine rich glioma inactivated 1 encephalitis.
+- Checks: `perfect_agent.py -v` and `case_io.py check` clean; `test_case_guards.py -k FEPI-TEMP-` passes, now with the discriminator guard and the FEPI-TEMP banned strings.

@@ -60,3 +60,11 @@ Condition auditor, 24 Oct 2026. Checked uniformity of the plan's decisions acros
 - `initial_tool_outputs.literature_search.general`: neutral focal-epilepsy block added (definition, classification, MRI protocol, first-line ASM, drug resistance), so a literature query that names no case-specific topic no longer receives a stored follow-up.
 - Video-EEG follow-up and criterion: "rare" discharges at 2-8 per hour are "occasional" (ACNS 2021: rare is under 1 per hour).
 - Literature follow-up (served for any query): the FCD classification result with temporopolar blurring and the summary line on "subtle focal cortical dysplasia" pointed at this case's MRI finding; removed, MRI-protocol result now names HS and FCD together.
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (`plans/FEPI-TEMP-decisions.md`). What changed and why:
+
+- Diagnosis synonyms (`diagnosis_synonyms.yaml` G40 entries, re-applied with `--prune --conditions focal_epilepsy_temporal`): labels now focal epilepsy, temporal lobe epilepsy, TLE, epilepsy temporal lobe; removed mesial temporal sclerosis epilepsy (no hippocampal sclerosis on MRI); mesial temporal lobe epilepsy (the onset zone is not mesial); focal seizures; focal onset seizures; focal impaired awareness seizures (seizure-type labels, retired: their tokens occur in an acute symptomatic or functional-seizure answer). Codes: G40.2, G40.1, G40.9 plus G40.209, G40.109, G40.909 (not intractable); the idiopathic G40.009 and G40.019 removed and the intractable codes removed.
+- Label (summary CENTRAL 4): "drug-resistant" removed (no ASM ever given): accepted[0] "Focal epilepsy of right temporal lobe origin with suspected focal cortical dysplasia on 3T epilepsy-protocol MRI, misdiagnosed as refractory panic disorder"; icd_codes[0] G40.219 -> G40.209. The resolved AUDIT-FLAG removed from `metadata.case_body_concerns`.
+- Checks: `perfect_agent.py -v` and `case_io.py check` clean; `test_case_guards.py -k FEPI-TEMP-` passes, now with the discriminator guard and the FEPI-TEMP banned strings.

@@ -62,3 +62,12 @@ Condition auditor, 24 Oct 2026. Checked uniformity of the plan's decisions acros
 - `action-routine-eeg.rationale`: engineering prefix or tier wording removed (was "Optional: a routine recording shows the ...").
 - `action-5-search-medical-literature.rationale`: engineering prefix or tier wording removed (was "Optional background; the diagnosis rests...").
 - `initial_tool_outputs.drug_interactions.current_medications`: review of his current medicines added (zonisamide contraindicated by the sulfonamide allergy); the acyclovir follow-up (trigger renamed `check_acyclovir_aciclovir_antiviral`, the old `antiseizure` token matched any ASM check) is served only to a check that names acyclovir.
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (`plans/FEPI-TEMP-decisions.md`). What changed and why:
+
+- Label (summary CENTRAL 3): accepted[0] "Focal epilepsy of temporal lobe origin presenting as nonconvulsive status epilepticus, secondary to HSV-1 encephalitis..." -> "HSV-1 encephalitis with acute symptomatic nonconvulsive focal status epilepticus of right temporal onset, after skull-base tumor resection and radiochemotherapy"; icd_codes[0] G40.219 -> B00.4. Seizures during an active CNS infection are acute symptomatic, not epilepsy (Beghi 2010, the case's own KCE); right temporal onset per the continuous EEG; no exclusion clause in the label (FND close-out rule).
+- Synonyms: all epilepsy labels and G40 codes removed; new B00.4 entry scoped to this case: HSV encephalitis, HSV-1 encephalitis, herpes simplex encephalitis, herpes simplex virus encephalitis, HSE. Not granted: plain "nonconvulsive status epilepticus" and "acute symptomatic seizures" (they would credit "temporal lobe epilepsy with NCSE", the wrong answer the case tests), G40.901 (an epilepsy code that scores alone), "herpes encephalitis" and "herpesviral encephalitis" (tokens of a VZV answer).
+- `followup_outputs` acyclovir drug check: empty `summary` filled in report voice (auditor flag); leak guard clean.
+- Checks: `perfect_agent.py -v` and `case_io.py check` clean; `test_case_guards.py -k FEPI-TEMP-` passes, now with the discriminator guard and the FEPI-TEMP banned strings.

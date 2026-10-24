@@ -11,12 +11,15 @@ focal_epilepsy_temporal:
     age_range: [18, 60]
     sex_bias: null
   encounter_type: "inpatient"
-  # Independent application of the July 2026 review: staged EEG pathway (routine ->
-  # sleep-deprived -> ambulatory when still uncertain; video for event capture/tertiary work-up;
-  # continuous ICU only for NCSE), targeted optional labs in 23, ECG in 21 first-suspected/TLOC
-  # presentations, dedicated MRI in 29 and one CT alternative. Echo and rhythm monitoring removed.
+  # October 2026 round (criteria_packs/FEPI-TEMP.md is the authority): the first MRI is the
+  # dedicated epilepsy-protocol study (gadolinium only when a lesion, infection or tumor is
+  # suspected); staged EEG (routine, then sleep-deprived or ambulatory when non-diagnostic; video
+  # only for event capture, PNES, seizure versus syncope or presurgical work-up; continuous ICU only
+  # for NCSE); labs, ECG, drug check and literature optional unless the case names the indication;
+  # FDG-PET and neuropsychology only in presurgical or lesional cases; no prolactin unless drawn 10
+  # to 20 minutes after the event; echo and rhythm monitoring are waste.
   required_modalities: [EEG, MRI]
-  optional_modalities: [LABS, ECG, CT, specialized_test, body_imaging]
+  optional_modalities: [LABS, ECG, CT, CSF, advanced_imaging, specialized_test, body_imaging]
   key_findings:
     eeg:
       straightforward:
@@ -36,16 +39,17 @@ focal_epilepsy_temporal:
         - "Hippocampal sclerosis with volume loss and T2/FLAIR hyperintensity"
         - "OR: Low-grade tumor (DNET or ganglioglioma) in mesial temporal structures"
       moderate:
-        - "Subtle hippocampal asymmetry on volumetrics"
-        - "Equivocal FLAIR signal change, could be artifact"
+        - "Mild but definite hippocampal sclerosis on the epilepsy-protocol MRI (volume loss with T2/FLAIR signal) that an outside standard MRI missed"
+        - "Subtle temporal gray-white blurring suspicious for focal cortical dysplasia on 3T epilepsy-protocol MRI"
       diagnostic_puzzle:
-        - "Normal MRI (MRI-negative focal epilepsy)"
+        - "Normal epilepsy-protocol MRI (MRI-negative focal epilepsy)"
         - "Incidental non-specific white matter lesions (red herring)"
     labs:
       selected_cases_only:
         - "Glucose, sodium and calcium when an acute symptomatic seizure or mimic is plausible"
         - "Antiseizure medication level and organ function only when treatment exposure makes them relevant"
         - "Case-specific emergency studies, such as D-dimer/troponin/BNP in the concurrent pulmonary embolism case"
+        - "Prolactin only when drawn 10 to 20 minutes after the event; it argues against PNES and does not separate seizure from syncope"
   differential_diagnoses:
     - diagnosis: "Psychogenic non-epileptic seizures (PNES)"
       key_distinguishing: "No EEG correlate, atypical semiology, eyes closed during event"
@@ -55,15 +59,19 @@ focal_epilepsy_temporal:
       key_distinguishing: "Visual/sensory symptoms spread slowly (>5 min), followed by headache"
     - diagnosis: "Transient ischemic attack"
       key_distinguishing: "Negative symptoms (weakness, numbness), older patient, vascular risk factors"
+    - diagnosis: "Acute symptomatic seizures (encephalitis, metabolic, toxic)"
+      key_distinguishing: "Seizures during an acute brain insult are not epilepsy (ILAE 2010); fever, encephalopathy, CSF or metabolic abnormality"
+    - diagnosis: "LGI1 antibody encephalitis"
+      key_distinguishing: "Faciobrachial dystonic seizures, memory decline, hyponatremia; serum LGI1 antibodies"
   difficulty_variants:
     straightforward:
-      presentation: "Classic temporal aura (déjà vu, epigastric rising) → focal to bilateral tonic-clonic seizure, witnessed. Clear MRI lesion."
+      presentation: "Classic temporal aura (deja vu, epigastric rising) followed by a witnessed focal to bilateral tonic-clonic seizure. Imaging and EEG results belong in the tool outputs, not in the presentation."
       expected_agent_confidence: 0.85
     moderate:
-      presentation: "Recurrent episodes of altered awareness with automatisms, no clear aura recalled. Subtle MRI finding."
+      presentation: "Recurrent episodes of altered awareness with automatisms, no clear aura recalled. The structural finding is subtle and appears only in the ordered MRI report."
       expected_agent_confidence: 0.65
     diagnostic_puzzle:
-      presentation: "Episodes initially diagnosed as panic attacks — sudden fear, palpitations, depersonalization. Normal MRI, initially normal EEG."
+      presentation: "Episodes previously diagnosed as panic attacks: sudden fear, palpitations, depersonalization. No earlier EEG or MRI result is given in the history when the case scores ordering that study."
       expected_agent_confidence: 0.40
   common_followups:
     - trigger_action: "request_sleep_deprived_eeg"
@@ -75,18 +83,15 @@ focal_epilepsy_temporal:
     - trigger_action: "request_video_eeg"
       tool_name: "analyze_eeg"
       description: "Prolonged video-EEG only when habitual events must be captured, PNES differentiated, or presurgical localization performed"
-    - trigger_action: "request_mri_epilepsy_protocol"
-      tool_name: "analyze_brain_mri"
-      description: "3T MRI with epilepsy protocol (thin coronal cuts through temporal lobes)"
-    - trigger_action: "request_neuropsych_testing"
-      tool_name: "interpret_labs"
-      description: "Neuropsychological testing for lateralizing cognitive deficits"
-    - trigger_action: "request_pet_scan"
-      tool_name: "analyze_brain_mri"
-      description: "FDG-PET showing temporal hypometabolism"
+    - trigger_action: "request_neuropsych_battery"
+      tool_name: "order_specialized_test"
+      description: "Neuropsychological battery (test_type neuropsych_battery) for memory and language lateralization, in presurgical drug-resistant or lesional surgical cases only"
+    - trigger_action: "request_fdg_pet"
+      tool_name: "order_advanced_imaging"
+      description: "Interictal FDG-PET (modality FDG_PET) in presurgical evaluation of drug-resistant epilepsy, mainly when MRI is negative or discordant; never in pregnancy"
     - trigger_action: "request_aed_levels"
       tool_name: "interpret_labs"
-      description: "Antiepileptic drug serum levels"
+      description: "Antiseizure medication levels only when adherence, a breakthrough seizure, pregnancy or an interaction is the question"
 
 ischemic_stroke:
   name: "Acute ischemic stroke"

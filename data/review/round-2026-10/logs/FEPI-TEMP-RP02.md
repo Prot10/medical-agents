@@ -64,3 +64,12 @@ Condition auditor, 24 Oct 2026. Checked uniformity of the plan's decisions acros
 - Differential "Idiopathic generalized epilepsy (juvenile myoclonic epilepsy)": ICD-10-CM G40.309 -> G40.B09.
 - Ambulatory EEG follow-up: "rare" discharges at 1-2 per hour are "occasional" (ACNS 2021).
 - `initial_tool_outputs.drug_interactions.current_medications`: review of his current medicines added; the anticoagulant follow-up (trigger renamed `check_anticoagulant_doac_apixaban_rivaroxaban_edoxaban_dabigatran_warfarin_heparin_enoxaparin`) is now served only to a check that names an anticoagulant, so a levetiracetam check before the CTPA no longer reveals the PE treatment.
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (`plans/FEPI-TEMP-decisions.md`). What changed and why:
+
+- Diagnosis synonyms (`diagnosis_synonyms.yaml` G40 entries, re-applied with `--prune --conditions focal_epilepsy_temporal`): labels now focal epilepsy, temporal lobe epilepsy, TLE, epilepsy temporal lobe, mesial temporal lobe epilepsy, MTLE (added); removed mesial temporal sclerosis epilepsy (no hippocampal sclerosis on MRI); focal seizures; focal onset seizures; focal impaired awareness seizures (seizure-type labels, retired: their tokens occur in an acute symptomatic or functional-seizure answer). Codes: G40.2, G40.1, G40.9 plus G40.209, G40.109, G40.909 (not intractable); the idiopathic G40.009 and G40.019 removed and the intractable codes removed.
+- Soft MRI -> drug check constraint: citation `[ILAE_MRI_2019]` -> `[NICE_NG217_2025]`, as in the other cases (ASM choice is what the constraint is about; auditor flag).
+- Anticoagulant drug-check follow-up: empty `summary` filled in report voice (auditor flag); leak guard clean.
+- Checks: `perfect_agent.py -v` and `case_io.py check` clean; `test_case_guards.py -k FEPI-TEMP-` passes, now with the discriminator guard and the FEPI-TEMP banned strings.
