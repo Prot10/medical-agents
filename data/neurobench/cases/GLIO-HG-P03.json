@@ -255,14 +255,6 @@
             "result": "High-grade glial neoplasm with necrosis; no abscess wall or purulent material"
           },
           {
-            "assay": "Aspirate Gram stain",
-            "result": "No organisms; necrotic debris without neutrophil sheets"
-          },
-          {
-            "assay": "Aspirate aerobic and anaerobic culture",
-            "result": "No growth at 5 days"
-          },
-          {
             "assay": "Histology",
             "result": "High-grade astrocytic neoplasm with marked nuclear atypia, brisk mitotic activity (more than 10 mitoses per 10 HPF), microvascular proliferation and palisading necrosis"
           },
@@ -334,14 +326,6 @@
             "result": "High-grade glial neoplasm with necrosis; no abscess wall or purulent material"
           },
           {
-            "assay": "Cavity fluid Gram stain",
-            "result": "No organisms; necrotic debris without neutrophil sheets"
-          },
-          {
-            "assay": "Cavity fluid aerobic and anaerobic culture",
-            "result": "No growth at 5 days"
-          },
-          {
             "assay": "Extent of resection",
             "result": "Subtotal: about 90% of the enhancing volume removed; residual enhancing tumour in the insula"
           },
@@ -407,6 +391,39 @@
       },
       "tool_name": "obtain_tissue_diagnosis",
       "trigger_action": "request_resection"
+    },
+    {
+      "output": {
+        "cell_counts": null,
+        "collected_before_antimicrobials": true,
+        "findings": [
+          {
+            "result": "No organisms; necrotic debris without neutrophil sheets",
+            "test": "Gram stain"
+          },
+          {
+            "result": "No growth at 5 days",
+            "test": "Aerobic culture"
+          },
+          {
+            "result": "No growth at 5 days",
+            "test": "Anaerobic culture"
+          }
+        ],
+        "gram_stain": "No organisms; necrotic debris without neutrophil sheets",
+        "impression": "Brain lesion aspirate: Gram stain shows no organisms, necrotic debris without neutrophil sheets; no growth on aerobic or anaerobic culture at 5 days. Collected with no antimicrobial in the preceding 4 weeks.",
+        "organism": null,
+        "recommended_actions": [],
+        "specimen": "brain_aspirate",
+        "susceptibility": null,
+        "tests": [
+          "Gram stain",
+          "aerobic culture",
+          "anaerobic culture"
+        ]
+      },
+      "tool_name": "order_microbiology",
+      "trigger_action": "request_brain_aspirate_gram_stain_culture"
     },
     {
       "output": {
@@ -594,10 +611,28 @@
           "[WHO_2021]"
         ],
         "criterion_id": "action-10-obtain-tissue-diagnosis",
-        "expected_evidence": "Integrated diagnosis Glioblastoma, IDH-wildtype, CNS WHO grade 4, with IDH1 R132H negative and IDH1/IDH2 wildtype on sequencing, ATRX retained, MGMT unmethylated, TERT promoter mutation, EGFR amplification and +7/-10; aspirate Gram stain and culture negative",
+        "expected_evidence": "Integrated diagnosis Glioblastoma, IDH-wildtype, CNS WHO grade 4, with IDH1 R132H negative and IDH1/IDH2 wildtype on sequencing, ATRX retained, MGMT unmethylated, TERT promoter mutation, EGFR amplification and +7/-10",
         "importance": "required",
-        "label": "Obtain tissue by stereotactic aspiration and biopsy of the right frontotemporal lesion with frozen section, Gram stain and culture, or by resection, for an integrated histomolecular diagnosis with IDH1 R132H immunohistochemistry, IDH1/IDH2 sequencing, ATRX immunohistochemistry and MGMT promoter methylation; aspiration comes first because abscess remains possible and aspiration is diagnostic and therapeutic",
+        "label": "Obtain tissue by stereotactic aspiration and biopsy of the right frontotemporal lesion with frozen section, the aspirate going to microbiology, or by resection, for an integrated histomolecular diagnosis with IDH1 R132H immunohistochemistry, IDH1/IDH2 sequencing, ATRX immunohistochemistry and MGMT promoter methylation; aspiration comes first because abscess remains possible and aspiration is diagnostic and therapeutic",
         "rationale": "Aspiration with frozen section separates abscess from tumour and drains pus if present; once tumour is confirmed, surgery should be as extensive as safely possible (AIOM; EANO 2021). IDH sequencing is needed because the IHC is negative and the patient is under 55."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "specimen": "brain_aspirate"
+            },
+            "tool_name": "order_microbiology"
+          }
+        ],
+        "citations": [
+          "[ESCMID_BA_2024]"
+        ],
+        "criterion_id": "action-aspirate-microbiology",
+        "expected_evidence": "Gram stain with no organisms and no growth on aerobic or anaerobic culture",
+        "importance": "required",
+        "label": "Send the material aspirated from the lesion for Gram stain and aerobic and anaerobic culture, because a pyogenic brain abscess remains possible",
+        "rationale": "Gram stain and culture of the aspirate are the microbiological test of a brain abscess; with the histology they decide between abscess and necrotic tumour (ESCMID 2024)."
       },
       {
         "alternatives": [
@@ -762,6 +797,15 @@
         ],
         "reason": "Coagulation, platelets and type and screen must be known before a neurosurgical procedure",
         "severity": "hard"
+      },
+      {
+        "after_criterion_id": "action-aspirate-microbiology",
+        "before_criterion_id": "action-10-obtain-tissue-diagnosis",
+        "citations": [
+          "[ESCMID_BA_2024]"
+        ],
+        "reason": "The aspirate is obtained at the stereotactic procedure or the resection",
+        "severity": "soft"
       }
     ],
     "stop_rule": {
@@ -770,7 +814,8 @@
         "action-1-analyze-brain-mri",
         "action-2-interpret-labs",
         "action-performance-status",
-        "action-10-obtain-tissue-diagnosis"
+        "action-10-obtain-tissue-diagnosis",
+        "action-aspirate-microbiology"
       ]
     }
   },
@@ -1141,7 +1186,7 @@
     "clinical_complexity_notes": "Diagnostic puzzle featuring three competing diagnoses (glioblastoma, brain abscess, tumefactive MS) with red herrings from recent dental infection and prior optic neuritis. Requires advanced neuroimaging and systematic exclusion of mimics.",
     "created_by": "neurobench_generator",
     "criteria_pack_version": "1.0",
-    "difficulty_rationale": "3 required criteria (MRI, pre-operative labs, tissue), 2 red herrings (odontogenic abscess, prior optic neuritis); imaging favours tumour but cannot exclude abscess, so aspiration with frozen section and culture precedes resection",
+    "difficulty_rationale": "5 required criteria (MRI, pre-operative labs, performance status, tissue, aspirate Gram stain and culture), 2 red herrings (odontogenic abscess, prior optic neuritis); imaging favours tumour but cannot exclude abscess, so aspiration with frozen section and culture precedes resection",
     "educational_objectives": [
       "Differentiate ring-enhancing brain lesions using advanced MRI techniques",
       "Recognize limitations of conventional MRI diffusion-weighted imaging in distinguishing tumor from abscess",

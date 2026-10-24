@@ -60,3 +60,12 @@ Decisions in `plans/GLIO-HG-decisions.md` (Andrea, 24 Oct 2026: open points reso
 - AIOM question numbers removed from the text (edition 2026 numbering unverified) (Q1: AIOM cited as the 2026 update; Quesito numbering not verifiable)
 - fallback specialized_test (generic 'Study within normal limits.', test_type '') -> null; the library answers by test_type (auditor flag, S01 class: a case fallback is served for any order of the tool, whatever the test type)
 - Synonyms re-expanded from `diagnosis_synonyms.yaml` (`--prune --conditions brain_tumor_glioma`): removed ['astrocytoma grade 4']; added ['glioblastoma idh wildtype'] (entity, grade and H3 scoping; summary CENTRAL 2).
+
+## Central vocabulary wired (24 Oct 2026)
+
+Terms added by commit e19131d6 (batch-2 review vocabulary), wired as the plan and this log intended. The earlier CENTRAL vocabulary request in this log is resolved by them.
+
+- `action-9-obtain-tissue-diagnosis`: `TTF1_IHC`, `PAX8_IHC` and `thyroglobulin_IHC` added to the minimum assay list of both alternatives (metastasis exclusion after follicular thyroid carcinoma, as for the melanoma markers in RP04); label and rationale name them; expected evidence already stated them negative. Tissue reports: the existing TTF-1, PAX8 and thyroglobulin findings rows (all negative) are now also in `molecular_findings`.
+- Must 1: the clause "and ask pathology to add TTF-1, PAX8 and thyroglobulin immunostains..." removed, since the stains are now ordered by the criterion (plan Q9).
+
+Checks after the change: `perfect_agent.py GLIO-HG-RP01 -v` ok, `case_io.py check` (schema and synonym guard OK, no failure names the case), `test_case_guards.py -k "GLIO-HG- or ALZ-EARLY-"` 120 passed.

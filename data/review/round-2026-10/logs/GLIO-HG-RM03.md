@@ -70,3 +70,14 @@ Decisions in `plans/GLIO-HG-decisions.md` (Andrea, 24 Oct 2026: open points reso
 - AIOM question numbers removed from the text (edition 2026 numbering unverified) (Q1: AIOM cited as the 2026 update; Quesito numbering not verifiable)
 - fallback specialized_test (generic 'Minor non-specific finding.', test_type '') -> null; the library answers by test_type (auditor flag, S01 class: a case fallback is served for any order of the tool, whatever the test type)
 - Synonyms re-expanded from `diagnosis_synonyms.yaml` (`--prune --conditions brain_tumor_glioma`): removed ['glioma who grade 4', 'grade 4 glioma', 'astrocytoma grade 4']; added ['glioblastoma idh wildtype'] (entity, grade and H3 scoping; summary CENTRAL 2).
+
+## Central vocabulary wired (24 Oct 2026)
+
+Terms added by commit e19131d6 (batch-2 review vocabulary), wired as the plan and this log intended. The earlier CENTRAL vocabulary request in this log is resolved by them.
+
+- New recommended criterion `action-dna-methylation-profiling` (`obtain_tissue_diagnosis` with `DNA_methylation_profiling`, resection or stereotactic biopsy), after the tissue criterion. Reason: at 21, a cerebellar IDH- and H3-wildtype high-grade glioma may be a high-grade astrocytoma with piloid features or a diffuse paediatric-type high-grade glioma, H3- and IDH-wildtype, both defined by a methylation profile (WHO CNS5); recommended, not required, because TERT and EGFR already give the adult glioblastoma profile (the earlier log's judgment). Both tissue reports carry the result: methylation class glioblastoma, IDH-wildtype, subclass RTK II (calibrated score 0.95), no match to either entity, CNV EGFR amplification and +7/-10. Citations `[WHO_2021]`, `[Capper_2018]`.
+- Differential: HGAP low to very_low with the methylation result; new very_low entry "Diffuse paediatric-type high-grade glioma, H3-wildtype and IDH-wildtype" (the mimic this log raised).
+- Perfect-agent note: the methylation criterion is answered by the same stored tissue report as the tissue criterion (one specimen, one report).
+- CENTRAL: `[Capper_2018]` for the pack allow-list (see RM02).
+
+Checks after the change: `perfect_agent.py GLIO-HG-RM03 -v` ok, `case_io.py check` (schema and synonym guard OK, no failure names the case), `test_case_guards.py -k "GLIO-HG- or ALZ-EARLY-"` 120 passed.

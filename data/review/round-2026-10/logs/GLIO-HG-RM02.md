@@ -83,3 +83,15 @@ Decisions in `plans/GLIO-HG-decisions.md` (Andrea, 24 Oct 2026: open points reso
 - fallback specialized_test (generic 'Study within normal limits.', test_type '') -> null; the library answers by test_type (auditor flag, S01 class: a case fallback is served for any order of the tool, whatever the test type)
 - avoid-harm-1-analyze-csf: citation [Hollis_1986] added (LP below a spinal block); it had none
 - Synonyms re-expanded from `diagnosis_synonyms.yaml` (`--prune --conditions brain_tumor_glioma`): removed ['spinal cord glioma', 'intramedullary glioma']; added ['intramedullary glioblastoma', 'glioblastoma', 'GBM', 'high grade glioma', 'malignant glioma'] (entity, grade and H3 scoping; summary CENTRAL 2).
+
+## Central vocabulary wired (24 Oct 2026)
+
+Terms added by commit e19131d6 (batch-2 review vocabulary), wired as the plan and this log intended. The earlier CENTRAL vocabulary request in this log is resolved by them.
+
+- `action-10-obtain-tissue-diagnosis`: first alternative is now `open_biopsy` (the procedure the label, must and site always described); `resection` kept as the second alternative for a debulking where it can be done safely (both obtain diagnostic tissue; the choice is carried by the surgery must). Label and rationale updated. The tissue follow-up is now `procedure: open_biopsy` (trigger `request_open_biopsy_laminectomy`); a new follow-up `request_debulking_resection_laminectomy` (`procedure: resection`) has the same results with an "Extent of resection" row (subtotal debulking of the exophytic and enhancing C4-C5 component) so the second alternative is answered by the case.
+- New recommended criterion `action-dna-methylation-profiling` (`obtain_tissue_diagnosis` with `DNA_methylation_profiling`, open biopsy or resection), after the tissue criterion. Reason: in an adult with NF1, high-grade astrocytoma with piloid features is the WHO CNS5 alternative and its essential criterion is a methylation profile; recommended, not required, because TERT mutation and EGFR amplification already meet the glioblastoma criteria. Both tissue reports carry the result: methylation class glioblastoma, IDH-wildtype, subclass RTK II (calibrated score 0.93), no match to HGAP, CNV EGFR amplification and +7/-10 (consistent with the stored EGFR amplification). Citations `[WHO_2021]`, `[Capper_2018]`.
+- Differential: HGAP now very_low, with the methylation result in key features (was "DNA methylation profiling would settle it").
+- Perfect-agent note: the methylation criterion is answered by the same stored tissue report as the tissue criterion (expected: one specimen, one report; a real agent orders both in one call, which matches both criteria).
+- CENTRAL: pack group D ("scored as `resection` until an `open_biopsy` term exists") is obsolete; add `[Capper_2018]` (Capper D et al. DNA methylation-based classification of central nervous system tumours. Nature 2018;555:469-474) to the pack allow-list.
+
+Checks after the change: `perfect_agent.py GLIO-HG-RM02 -v` ok, `case_io.py check` (schema and synonym guard OK, no failure names the case), `test_case_guards.py -k "GLIO-HG- or ALZ-EARLY-"` 120 passed.

@@ -74,3 +74,13 @@ Decisions in `plans/GLIO-HG-decisions.md` (Andrea, 24 Oct 2026: open points reso
 - AIOM question numbers removed from the text (edition 2026 numbering unverified) (Q1: AIOM cited as the 2026 update; Quesito numbering not verifiable)
 - fallback specialized_test (generic 'Study within normal limits.', test_type '') -> null; the library answers by test_type (auditor flag, S01 class: a case fallback is served for any order of the tool, whatever the test type)
 - Synonyms re-expanded from `diagnosis_synonyms.yaml` (`--prune --conditions brain_tumor_glioma`): removed ['astrocytoma grade 4']; added ['glioblastoma idh wildtype'] (entity, grade and H3 scoping; summary CENTRAL 2).
+
+## Central vocabulary wired (24 Oct 2026)
+
+Terms added by commit e19131d6 (batch-2 review vocabulary), wired as the plan and this log intended. The earlier CENTRAL vocabulary request in this log is resolved by them.
+
+- New required criterion `action-aspirate-microbiology` (`order_microbiology` `{"specimen": "brain_aspirate"}`), after the tissue criterion, with a soft constraint tissue before it (the aspirate comes from the procedure) and added to the stop rule. Reason: the abscess is a live differential of this ring-enhancing mass until the aspirate is examined; Gram stain and culture of the aspirate are its microbiological test (ESCMID 2024, `[ESCMID_BA_2024]`, aspiration with microbiology strong). Blood cultures stay recommended (decision Q6).
+- New follow-up `request_brain_aspirate_gram_stain_culture` (specimen `brain_aspirate`, after the tissue follow-ups): no organisms, necrotic debris without neutrophil sheets; no growth on aerobic or anaerobic culture at 5 days; collected before empirical antimicrobials (none in the preceding 4 weeks). The Gram stain and culture rows were removed from both tissue reports (the tissue tool returns histology and molecular assays; the frozen section stays), and the tissue expected evidence no longer cites them; the tissue label now says the aspirate goes to microbiology.
+- `metadata.difficulty_rationale` updated to the 5 required criteria.
+
+Checks after the change: `perfect_agent.py GLIO-HG-P03 -v` ok, `case_io.py check` (schema and synonym guard OK, no failure names the case), `test_case_guards.py -k "GLIO-HG- or ALZ-EARLY-"` 120 passed.

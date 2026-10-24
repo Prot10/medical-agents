@@ -70,3 +70,12 @@ Decisions in `plans/GLIO-HG-decisions.md` (Andrea, 24 Oct 2026: open points reso
 - AIOM question numbers removed from the text (edition 2026 numbering unverified) (Q1: AIOM cited as the 2026 update; Quesito numbering not verifiable)
 - fallback specialized_test (generic 'Study within normal limits.', test_type '') -> null; the library answers by test_type (auditor flag, S01 class: a case fallback is served for any order of the tool, whatever the test type)
 - Synonyms re-expanded from `diagnosis_synonyms.yaml` (`--prune --conditions brain_tumor_glioma`): removed ['astrocytoma grade 4']; added ['glioblastoma idh wildtype'] (entity, grade and H3 scoping; summary CENTRAL 2).
+
+## Central vocabulary wired (24 Oct 2026)
+
+Terms added by commit e19131d6 (batch-2 review vocabulary), wired as the plan and this log intended. The earlier CENTRAL vocabulary request in this log is resolved by them.
+
+- `action-10-obtain-tissue-diagnosis`: `H3G34_status` added to the minimum assay list of both alternatives; label, rationale (a hemispheric IDH-wildtype glioma at 31 may be a diffuse hemispheric glioma, H3 G34-mutant, WHO CNS5) and expected evidence ("H3 G34 wildtype") updated. Tissue reports (both procedures): "H3F3A sequencing (H3 K27, G34)" row became "H3 G34 status (H3F3A sequencing): H3 G34R/V not detected; no H3 K27M mutation", also in `molecular_findings`.
+- Differential H3 G34 entry and the tissue item of `key_clinical_evidence` name the H3 G34 wildtype result.
+
+Checks after the change: `perfect_agent.py GLIO-HG-RS03 -v` ok, `case_io.py check` (schema and synonym guard OK, no failure names the case), `test_case_guards.py -k "GLIO-HG- or ALZ-EARLY-"` 120 passed.

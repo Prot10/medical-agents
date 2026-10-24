@@ -56,16 +56,17 @@ tissue near the end and the drug check last.
     tissue, and the choice is a management decision, ruling 4).
   - Group B (deep or eloquent, thalamus, brainstem): `stereotactic_biopsy` first.
   - Group C (multifocal, suspected lymphoma, unfit): biopsy, then cytoreduction where appropriate.
-  - Group D (intramedullary cord): open biopsy, scored as `resection` until an `open_biopsy` term exists.
+  - Group D (intramedullary cord): `open_biopsy` first, `resection` as the second alternative.
   - Assays [EANO_2021]: IDH1 R132H IHC in every diffuse glioma, with IDH1/IDH2 sequencing when the
     IHC is negative at 55 or under; ATRX in every diffuse glioma; MGMT promoter methylation in every
     glioblastoma (not required in diffuse midline glioma); H3 K27 in every midline tumour; CDKN2A/B in
     every IDH-mutant astrocytoma; 1p/19q only when the tumour is IDH-mutant; TERT, EGFR and +7/-10
     where the grade depends on them; BRAF V600E where epithelioid or giant cell histology raises it
     [vandenBent_2025]. Lymphoma: CD20 and EBER [EANO_PCNSL_2015]. Melanoma exclusion: SOX10 and
-    Melan-A/HMB-45. Markers outside the vocabulary (chromogranin, synaptophysin, PAX8, TTF-1,
-    thyroglobulin, H3 G34, methylation profiling) are stated in musts and findings rows, never in
-    `molecular_assays`.
+    Melan-A/HMB-45. Paraganglioma: chromogranin/synaptophysin IHC with plasma free metanephrines
+    before tissue [Lenders_2014]. Metastasis exclusion: PAX8, TTF-1 and thyroglobulin IHC. H3 G34 in
+    hemispheric tumours of young adults; DNA methylation profiling where the integrated diagnosis
+    stays uncertain [Capper_2018]. All are `molecular_assays` terms since the 24 October 2026 vocabulary.
 - Case-specific: HIV testing when lymphoma is suspected in an immunodeficient host (P02); systemic CT
   where a metastasis must be excluded before a primary brain tumour is diagnosed (RP04).
 
@@ -236,3 +237,8 @@ Every key cited in a GLIO-HG case is listed here. Checked on 24 October 2026.
   criteria for neuromyelitis optica spectrum disorders. Neurology 2015;85:177-189 (RM02 serology).
 - `[NCCN_CNS]`: NCCN Clinical Practice Guidelines in Oncology: Central Nervous System Cancers (current
   version). Pre-operative laboratory and staging claims only; waste rationales cite [EANO_2021].
+- `[Lenders_2014]`: Lenders JWM, Duh QY, Eisenhofer G, et al. Pheochromocytoma and paraganglioma: an
+  Endocrine Society clinical practice guideline. J Clin Endocrinol Metab 2014;99:1915-1942. Plasma
+  free metanephrines before tissue in a suspected paraganglioma (RS01).
+- `[Capper_2018]`: Capper D, Jones DTW, Sill M, et al. DNA methylation-based classification of
+  central nervous system tumours. Nature 2018;555:469-474 (RM02, RM03).
