@@ -8,6 +8,7 @@ from neuroagent_schemas import (
 from .base import ToolCall, ToolResult
 from .fallback_library import FallbackLibrary, default_library
 from .followup_matcher import match_followup, resolve_followup
+from .lab_matching import LabMatcher, mentions, split_sentences, tokens as lab_tokens
 from .vocabulary import (
     DOMAIN_PACKS,
     advanced_imaging_modalities,
@@ -40,6 +41,7 @@ class MockServer:
         # (a recorded `abdomen_xray`) is adjudicated like any other study.
         self.packs = DOMAIN_PACKS[case.domain]
         self.call_log: list[ToolCall] = []
+        self._labs = LabMatcher(self.library.analyte_tests)
         # Trigger slugs of follow-ups already served this session. Lets distinct
         # re-orders of the same tool escalate through distinct follow-ups.
         self._served_triggers: set[str] = set()
@@ -71,7 +73,45 @@ class MockServer:
         "order_cardiac_monitoring": (
             "monitor_type", lambda packs=(): by_type_values("order_cardiac_monitoring", packs=packs)
         ),
+        # Added 24 Oct 2026. A routine order received the case's stored video-EEG (FND, the
+        # habitual events captured on video) or its continuous ICU recording (SE), and with them
+        # what a 30-minute interictal recording would usually miss.
+        "analyze_eeg": ("eeg_type", eeg_types),
     }
+
+    # Discriminators whose omitted parameter names the schema default (`_ENUM_DEFAULTS`). An EEG
+    # order without `eeg_type` is billed, and placed, as a routine EEG, so it is routed as one.
+    # The other primary discriminators leave an omitted parameter unadjudicated, as before.
+    _DEFAULTED = frozenset({"analyze_eeg"})
+
+    # Terms of one discriminator that are the same study for routing. Continuous EEG in the ICU is
+    # a video-EEG recording (ACNS 2015 consensus on critical-care cEEG); the two terms differ in
+    # the unit and the indication, not in what the recording captures. SE and NMDAR-ENC policies
+    # accept either for one criterion, and with exact routing the second alternative received a
+    # normal library recording in a patient in status. Ambulatory EEG stays apart: it has no video.
+    _SAME_STUDY: dict[str, tuple[frozenset[str], ...]] = {
+        "analyze_eeg": (frozenset({"video", "continuous_icu"}),),
+    }
+
+    def _wanted(self, tool_name: str, parameters: dict[str, Any]) -> Any:
+        """The study the call orders by its primary discriminator (`None`: not stated)."""
+        spec = self._DISCRIMINATOR.get(tool_name)
+        if spec is None:
+            return None
+        value = parameters.get(spec[0])
+        if value is None and tool_name in self._DEFAULTED:
+            value = self._ENUM_DEFAULTS[tool_name][1]
+        return value
+
+    def _canonical(self, tool_name: str, value: Any) -> frozenset[str]:
+        folded = self._fold(value)
+        for group in self._SAME_STUDY.get(tool_name, ()):
+            if any(folded == self._fold(term) for term in group):
+                return frozenset({"|".join(sorted(group))})
+        return folded
+
+    def _same_study(self, tool_name: str, a: Any, b: Any) -> bool:
+        return self._canonical(tool_name, a) == self._canonical(tool_name, b)
 
     # A second routed parameter, read with its schema default (24 Oct 2026). The stored report says
     # which variant it is in the same field; a report that leaves the field empty is not
@@ -85,7 +125,24 @@ class MockServer:
         "analyze_csf": ("source", csf_sources, "lumbar_puncture"),
     }
 
+    # A boolean order flag and the report field that states it (24 Oct 2026). An omitted flag is
+    # false (the schema default), and a report that leaves the field None is not adjudicated. Only
+    # ALZ-EARLY-RS06 stores a non-contrast and a contrast MRI of one patient and states which is
+    # which; every other case stores one MRI study, so there is nothing to route to.
+    _FLAG_DISCRIMINATOR: dict[str, tuple[str, str]] = {
+        "analyze_brain_mri": ("contrast", "contrast_used"),
+    }
+
+    def _flag_answers(self, tool_name: str, parameters: dict[str, Any], output: Any) -> bool:
+        flag = self._FLAG_DISCRIMINATOR.get(tool_name)
+        if flag is None or not isinstance(output, BaseModel):
+            return True
+        got = getattr(output, flag[1], None)
+        return got is None or got is bool(parameters.get(flag[0]))
+
     def _secondary_answers(self, tool_name: str, parameters: dict[str, Any], output: Any) -> bool:
+        if not self._flag_answers(tool_name, parameters, output):
+            return False
         spec = self._SECONDARY_DISCRIMINATOR.get(tool_name)
         if spec is None or output is None:
             return True
@@ -105,10 +162,13 @@ class MockServer:
             default = self._ENUM_DEFAULTS.get(tool_name)
             if value is None and default is not None and default[0] == spec[0]:
                 value = default[1]
-            key.append(self._fold(value) if value is not None else None)
+            key.append(self._canonical(tool_name, value) if value is not None else None)
         secondary = self._SECONDARY_DISCRIMINATOR.get(tool_name)
         if secondary is not None:
             key.append(self._fold(parameters.get(secondary[0]) or secondary[2]))
+        flag = self._FLAG_DISCRIMINATOR.get(tool_name)
+        if flag is not None:
+            key.append(bool(parameters.get(flag[0])))
         return tuple(key)
 
     def _is_repeat_call(self, tool_name: str, parameters: dict[str, Any]) -> bool:
@@ -135,7 +195,6 @@ class MockServer:
     # term (followup_matcher.match_followup). Lab panels, CSF assays and molecular assays are
     # assay lists, not study names, and are left to the set-valued rule below.
     _ENUM_TERMS: dict[str, Any] = {
-        "analyze_eeg": eeg_types,
         "analyze_brain_mri": mri_protocols,
         "analyze_csf": csf_sources,
     }
@@ -160,7 +219,7 @@ class MockServer:
             return []
         got = getattr(initial, spec[0], None) if isinstance(initial, BaseModel) else None
         wanted = parameters[spec[0]]
-        return [str(wanted)] if got and self._fold(got) == self._fold(wanted) else []
+        return [str(wanted)] if got and self._same_study(tool_name, got, wanted) else []
 
     def _enum_terms(self, tool_name: str) -> list[str]:
         spec = self._DISCRIMINATOR.get(tool_name)
@@ -209,7 +268,7 @@ class MockServer:
         if spec is None or output is None:
             return True
         call_key, vocabulary = spec
-        wanted = parameters.get(call_key)
+        wanted = self._wanted(tool_name, parameters)
         if wanted is None:
             return True
         if tool_name == "order_body_imaging":
@@ -219,7 +278,7 @@ class MockServer:
         if tool_name == "order_cardiac_monitoring":
             return self._monitor_answers(str(wanted), got, output)
         if folded and folded in {self._fold(term) for term in vocabulary(packs=self.packs)}:
-            return folded == self._fold(wanted)
+            return self._same_study(tool_name, got, wanted)
         return True  # the report names the study in prose; not ours to adjudicate
 
     def _monitor_answers(self, wanted: str, got: Any, output: Any) -> bool:
@@ -349,11 +408,26 @@ class MockServer:
         requested = parameters.get(key)
         if isinstance(requested, str):
             requested = [requested]
-        if not isinstance(requested, (list, tuple, set)) or len(requested) < 2:
+        if not isinstance(requested, (list, tuple, set)) or not requested:
+            return False
+        if (tool_name == "interpret_labs" and isinstance(initial, LabResults)
+                and isinstance(candidate, LabResults)):
+            # 24 Oct 2026: a lab follow-up none of whose panels answers the order, while the initial
+            # payload does, is a token accident of the trigger (MS-RR-RM01: `NMDAR_IgG_cell_based`
+            # matched `request_aqp4_mog_cell_based_assay` on "cell" and "based").
+            def answered(payload: LabResults) -> int:
+                return sum(any(self._lab_answers(name, rows, assay) for name, rows in payload.panels.items())
+                           for assay in requested)
+            if answered(candidate) == 0 and answered(initial) > 0:
+                return True
+        if len(requested) < 2:
             return False
         return self._assays_named(initial, requested) > self._assays_named(candidate, requested)
 
-    def _match_by_discriminator(self, tool_name: str, parameters: dict[str, Any]) -> Any | None:
+    def _match_by_discriminator(
+        self, tool_name: str, parameters: dict[str, Any], initial: Any = None,
+        is_repeat_call: bool = False,
+    ) -> Any | None:
         """The follow-up whose stored report IS the study this call names, if there is one.
 
         A candidate must also pass the full guard (`_answers_the_question`, which includes the
@@ -361,25 +435,69 @@ class MockServer:
         order skips the stored post-tap reassessment instead of stopping at it. A tool routed by a
         secondary parameter alone (`analyze_csf.source`) matches here only when the call names a
         non-default value that a stored report carries exactly (the lumbar drain).
+
+        When the stored initial output already is the study named (its own field says so), the
+        first order of it gets the initial output, and a repeat order the first stored follow-up of
+        that study not yet served (24 Oct 2026). Before, the discriminator served the follow-up on
+        the first order: SE's index cEEG order received the recording made after the
+        benzodiazepine trial or the sedation wean (SE CENTRAL: `request_continuous_eeg_monitoring`
+        capturing the index `continuous_icu` order). An exact term is preferred over a same-study
+        term (`_SAME_STUDY`).
         """
+        flag = self._FLAG_DISCRIMINATOR.get(tool_name)
+        if flag is not None:
+            return self._match_by_flag(tool_name, parameters, flag, initial, is_repeat_call)
         spec = self._DISCRIMINATOR.get(tool_name)
         secondary = self._SECONDARY_DISCRIMINATOR.get(tool_name)
         if spec is not None:
-            if parameters.get(spec[0]) is None:
+            wanted = self._wanted(tool_name, parameters)
+            if wanted is None:
                 return None
-            key, wanted = spec[0], parameters[spec[0]]
+            key = spec[0]
         elif secondary is not None and parameters.get(secondary[0]) not in (None, secondary[2]):
             key, wanted = secondary[0], parameters[secondary[0]]
         else:
             return None
+        got = getattr(initial, key, "") if isinstance(initial, BaseModel) else ""
+        if got and self._same_study(tool_name, got, wanted) and self._answers_the_question(
+            tool_name, parameters, initial
+        ):
+            if not is_repeat_call:
+                return None
+        else:
+            is_repeat_call = False  # the initial output is another study: serve in stored order
+        exact, same = [], []
         for followup in self.case.followup_outputs or []:
             if followup.tool_name != tool_name:
                 continue
-            if self._fold(getattr(followup.output, key, "")) != self._fold(wanted):
+            stored = getattr(followup.output, key, "")
+            if not stored or not self._same_study(tool_name, stored, wanted):
                 continue
             if self._answers_the_question(tool_name, parameters, followup.output):
-                return followup
-        return None
+                (exact if self._fold(stored) == self._fold(wanted) else same).append(followup)
+        candidates = exact + same
+        if is_repeat_call:
+            unserved = [fu for fu in candidates if fu.trigger_action not in self._served_triggers]
+            candidates = unserved or candidates
+        return candidates[0] if candidates else None
+
+    def _match_by_flag(
+        self, tool_name: str, parameters: dict[str, Any], flag: tuple[str, str], initial: Any,
+        is_repeat_call: bool,
+    ) -> Any | None:
+        """`_match_by_discriminator` for a boolean flag: the follow-up that states the value ordered."""
+        wanted = bool(parameters.get(flag[0]))
+        if isinstance(initial, BaseModel) and getattr(initial, flag[1], None) is wanted and not is_repeat_call:
+            return None
+        hits = [
+            followup for followup in self.case.followup_outputs or []
+            if followup.tool_name == tool_name
+            and getattr(followup.output, flag[1], None) is wanted
+            and self._answers_the_question(tool_name, parameters, followup.output)
+        ]
+        if is_repeat_call:
+            hits = [fu for fu in hits if fu.trigger_action not in self._served_triggers] or hits
+        return hits[0] if hits else None
 
     def get_output(self, tool_name: str, parameters: dict[str, Any]) -> ToolResult:
         # Whether this study was already ordered BEFORE this call (a re-order; see _is_repeat_call).
@@ -399,7 +517,7 @@ class MockServer:
         # not discriminating — a call for `FDG_PET` scored equally against `request_amyloid_pet`
         # and `request_fdg_pet` and could take the wrong one while the right report sat in the
         # same case. The discriminator is not a heuristic, so it goes first.
-        followup = self._match_by_discriminator(tool_name, parameters)
+        followup = self._match_by_discriminator(tool_name, parameters, initial, is_repeat_call)
         if followup is None:
             # Candidates that do not describe the study ordered are dropped before the choice,
             # not after it: SE-M05's pelvic ultrasound order tied between its MRI and ultrasound
@@ -431,14 +549,18 @@ class MockServer:
         if followup is not None:
             self._served_triggers.add(followup.trigger_action)
             output = self._merge_lab_order(tool_name, parameters, followup.output, followup, initial)
+            output = self._complete_lab_order(tool_name, parameters, output)
             return ToolResult(
                 tool_name=tool_name, success=True,
                 output=output.model_dump() if isinstance(output, BaseModel) else output,
             )
 
-        # Initial tool output (first, parameter-light order on the pathway).
+        # Initial tool output (first, parameter-light order on the pathway). A laboratory order
+        # receives only the stored panels that answer what it names (`_lab_order_from`); when none
+        # does, the order falls through to the fallback tiers like any unstored study.
+        if initial is not None and tool_name == "interpret_labs":
+            initial = self._lab_order_from(parameters, initial, pathway=True)
         if initial is not None:
-            initial = self._merge_lab_order(tool_name, parameters, initial, None, initial)
             return ToolResult(
                 tool_name=tool_name, success=True,
                 output=initial.model_dump() if isinstance(initial, BaseModel) else initial,
@@ -454,6 +576,8 @@ class MockServer:
         output = self._match_fallback_output(tool_name, parameters)
         if output is not None and not self._answers_the_question(tool_name, parameters, output):
             output = None
+        if output is not None and tool_name == "interpret_labs":
+            output = self._lab_order_from(parameters, output, pathway=False)
         if output is not None:
             return ToolResult(
                 tool_name=tool_name, success=True, from_fallback=True,
@@ -533,13 +657,13 @@ class MockServer:
         ]
         contributed: set[int] = set()
         for assay in requested:
-            if any(self._panel_names(name, rows, assay) for name, rows in panels.items()):
+            if any(self._lab_answers(name, rows, assay) for name, rows in panels.items()):
                 continue
             source = None
             if isinstance(initial, LabResults) and initial is not served and any(
-                self._panel_names(name, rows, assay) for name, rows in initial.panels.items()
+                self._lab_answers(name, rows, assay) for name, rows in initial.panels.items()
             ):
-                source = initial
+                source = self._filter_lab_payload(initial, [assay])
             else:
                 hit = match_followup(tool_name, {"panels": [assay]}, followups, self._served_triggers)
                 if hit is not None:
@@ -548,14 +672,15 @@ class MockServer:
             if source is None:
                 continue
             added = {name: rows for name, rows in source.panels.items()
-                     if name not in panels and self._panel_names(name, rows, assay)}
+                     if name not in panels and self._lab_answers(name, rows, assay)}
             if not added:
                 continue
             panels.update(added)
             if id(source) not in contributed:
                 contributed.add(id(source))
-                if source.interpretation:
-                    interpretations.append(source.interpretation)
+                for sentence in split_sentences(source.interpretation or ""):
+                    if sentence not in " ".join(interpretations):
+                        interpretations.append(sentence)
             tests = [row.test.lower() for rows in added.values() for row in rows]
             summary += [line for line in source.abnormal_values_summary
                         if line not in summary and any(test[:8] in line.lower() for test in tests)]
@@ -563,6 +688,109 @@ class MockServer:
             return served
         return LabResults(panels=panels, interpretation=" ".join(interpretations),
                           abnormal_values_summary=summary)
+
+    # ------------------------------------------------------------------ laboratory orders
+    #
+    # 24 Oct 2026. The first `interpret_labs` order received the whole stored initial payload,
+    # whatever it named: MS-RR's AQP4/MOG-IgG, stored with the first-line panels, reached a basic
+    # labs order, and an order for an assay the case does not store got the first-line labs again
+    # instead of a result for that assay. Now an order receives the stored panels that answer what it
+    # names (`tools/lab_matching.py`), and each assay no stored panel answers gets the case's own
+    # fallback panel for it, else the library normal, or, in a recorded case, a "not available" line.
+
+    def _lab_answers(self, name: str, rows: list[LabValue], assay: Any) -> bool:
+        """Does this stored panel answer the ordered assay (by components, by name, or by tokens)?"""
+        return self._labs.panel_answers(name, rows, str(assay)) or self._panel_names(name, rows, assay)
+
+    @staticmethod
+    def _requested_assays(parameters: dict[str, Any]) -> list[str]:
+        requested = parameters.get("panels")
+        if isinstance(requested, str):
+            requested = [requested]
+        return [str(item) for item in requested] if isinstance(requested, (list, tuple)) else []
+
+    def _filter_lab_payload(self, payload: LabResults, requested: list[str]) -> LabResults:
+        """The panels of a stored payload that answer the order, with the prose about them.
+
+        A sentence of the interpretation (or a line of the abnormal-values summary) is dropped when
+        it names a test of a dropped panel and none of a kept one, so a result the order did not
+        ask for is not read out in the prose either. A payload whose panels all answer is returned
+        unchanged.
+        """
+        kept = {name: rows for name, rows in payload.panels.items()
+                if any(self._lab_answers(name, rows, assay) for assay in requested)}
+        if kept.keys() == payload.panels.keys():
+            return payload
+        dropped = [row.test for name, rows in payload.panels.items() if name not in kept for row in rows]
+        dropped += [name for name in payload.panels if name not in kept and len(lab_tokens(name)) >= 2]
+        kept_tests = [row.test for rows in kept.values() for row in rows]
+
+        def keep(text: str) -> bool:
+            return any(mentions(text, test) for test in kept_tests) or not any(
+                mentions(text, test) for test in dropped
+            )
+
+        interpretation = " ".join(s for s in split_sentences(payload.interpretation) if keep(s))
+        return LabResults(
+            panels=kept,
+            interpretation=interpretation or "Results of the requested assays are listed.",
+            abnormal_values_summary=[line for line in payload.abnormal_values_summary if keep(line)],
+        )
+
+    def _lab_order_from(self, parameters: dict[str, Any], payload: Any, pathway: bool) -> Any | None:
+        """A stored laboratory payload cut to the order; `None` when no panel of it answers."""
+        requested = self._requested_assays(parameters)
+        if not requested or not isinstance(payload, LabResults):
+            return payload  # an order naming nothing receives the first-line labs, as before
+        served = self._filter_lab_payload(payload, requested)
+        if pathway:
+            # A first order naming an assay stored only in a follow-up still receives it.
+            served = self._merge_lab_order("interpret_labs", parameters, served, None, None)
+        if not served.panels:
+            return None
+        return self._complete_lab_order("interpret_labs", parameters, served, case_fallback=pathway)
+
+    def _complete_lab_order(
+        self, tool_name: str, parameters: dict[str, Any], served: Any, case_fallback: bool = True,
+    ) -> Any:
+        """Add a result for every ordered assay the served payload does not answer."""
+        if tool_name != "interpret_labs" or not isinstance(served, LabResults):
+            return served
+        missing = [assay for assay in self._requested_assays(parameters)
+                   if not any(self._lab_answers(name, rows, assay) for name, rows in served.panels.items())]
+        if not missing:
+            return served
+        fallback = self.case.fallback_tool_outputs.labs if (
+            case_fallback and self.case.fallback_tool_outputs is not None
+        ) else None
+        panels = dict(served.panels)
+        normal: list[str] = []
+        unavailable: list[str] = []
+        interpretation = [served.interpretation] if served.interpretation else []
+        for assay in missing:
+            if isinstance(fallback, LabResults):
+                own = self._filter_lab_payload(fallback, [assay])
+                if own.panels:
+                    panels.update({name: rows for name, rows in own.panels.items() if name not in panels})
+                    if own.interpretation not in " ".join(interpretation):
+                        interpretation.append(own.interpretation)
+                    continue
+            if self.case.provenance == "record":
+                unavailable.append(assay)
+                continue
+            library = self.library.resolve(tool_name, {"panels": [assay]})
+            if isinstance(library, LabResults) and library.panels:
+                panels.update({name: rows for name, rows in library.panels.items() if name not in panels})
+                normal.append(assay)
+        if normal:
+            interpretation.append(f"{', '.join(normal)}: within the reference ranges.")
+        if unavailable:
+            interpretation.append(
+                f"Not available: {', '.join(unavailable)} was not performed during this recorded "
+                "encounter, so there is no result."
+            )
+        return LabResults(panels=panels, interpretation=" ".join(interpretation),
+                          abnormal_values_summary=list(served.abnormal_values_summary))
 
     def _study_label(self, tool_name: str, parameters: dict[str, Any]) -> str:
         """`order_body_imaging (study=abdomen_xray)`: the tool, and the study the call names."""

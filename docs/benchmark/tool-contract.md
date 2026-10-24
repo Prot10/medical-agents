@@ -79,7 +79,7 @@ legal order is answered in every case.
 
 The MockServer (`tools/mock_server.py`, with `tools/followup_matcher.py`) never answers one study
 with another study's report. Where a stored report names its study with a vocabulary term (the
-discriminator field: `specimen`, `modality`, `echo_type`, `test_type`, `procedure`,
+discriminator field: `specimen`, `modality`, `echo_type`, `eeg_type`, `test_type`, `procedure`,
 `assessment_type`, `monitor_type`; region and modality for `order_body_imaging`), it answers only
 an order for that study. This holds for initial outputs, follow-ups and, since the October 2026
 review, the case's own `fallback_tool_outputs`: a case fallback written as an `amino_acid_PET`
@@ -94,9 +94,21 @@ should write the term.
   study identities. A trigger token belonging to a term the call does not name never counts, so
   free text recalling another study of the same tool does not route to it; a term the call
   implies through the schema default counts only when the trigger names it whole; a term named
-  explicitly counts unless the initial output already is that study. EEG reports carry no
-  `eeg_type`, so for EEG a follow-up trigger must not repeat the index study's term
-  (`request_continuous_eeg_monitoring` when the index recording is `continuous_icu`).
+  explicitly counts unless the initial output already is that study.
+- `analyze_eeg` is routed by `eeg_type` (24 Oct 2026), read with its schema default: an order
+  without it is a routine EEG, so a routine order is not answered with a stored video-EEG or ICU
+  recording. `video` and `continuous_icu` are one study for routing (`MockServer._SAME_STUDY`,
+  prolonged video-EEG monitoring per the ACNS 2015 consensus). When the initial output is the
+  study named, the first order gets it and a repeat order the follow-up of that study, so a
+  trigger repeating the index term (`request_continuous_eeg_monitoring` behind a `continuous_icu`
+  index) no longer captures the index order. Every stored EEG report and EEG case fallback names
+  its `eeg_type` (`test_case_guards.py`); a fallback that cannot name one recording is null.
+- `analyze_brain_mri.contrast` defaults to false: gadolinium is given on an indication. A report
+  stating `contrast_used` answers only an order with that value (`MockServer._FLAG_DISCRIMINATOR`);
+  `None`, the default, is not adjudicated. Only ALZ-EARLY-RS06 states it, because it is the one
+  case storing both a non-contrast and a contrast MRI; elsewhere there is one stored MRI and no
+  other study to route a mismatched order to. Library MRI reports set it from the order and drop
+  their post-gadolinium sentences for a plain order.
 - `order_cardiac_monitoring` routes by tier: hours to a week (telemetry, Holter), weeks (event
   monitors), months (loop recorder). A stored recording answers an order of its own tier or a
   longer one, never a shorter one: a Holter order is not answered by a 30-day monitor or a loop
@@ -113,6 +125,15 @@ should write the term.
 - A plain re-order follow-up escalates past the initial output only on a repeat order of the same
   study (same routed parameters, defaults resolved). A first order of one study after another
   study of the same tool is not a repeat (NPH R5).
+- An `interpret_labs` order receives only the stored panels that answer the assays it names
+  (24 Oct 2026, `tools/lab_matching.py`): a panel answers an assay when its name is the assay or
+  one of its rows is a component the library reports for it (`CBC` is WBC, haemoglobin,
+  platelets...); urinalysis, blood gas, BAL and protein electrophoresis answer by name only.
+  Interpretation sentences and summary lines that name only dropped tests are dropped with them.
+  An ordered assay no stored panel answers gets the case fallback's panel, else the library
+  normal, or a "not available" sentence in a recorded case; it never gets the first-line labs
+  again. A criterion therefore sees only the panels its own order names: its
+  `expected_evidence` should not cite a result of a panel the order does not name.
 - One `interpret_labs` order naming assays stored in different payloads receives each of them:
   the served payload, plus the panels of the initial output or of the follow-up whose trigger
   names that assay alone, for every ordered assay the served payload does not name in its panel

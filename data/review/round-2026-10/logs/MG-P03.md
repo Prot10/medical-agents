@@ -58,3 +58,11 @@ Accepted as logged: drug check `recommended` (a real natalizumab-immunosuppressi
 - `accepted[0]` relabelled to "Myasthenia gravis, AChR antibody-positive, generalized (MGFA Class IIb), with thymoma, concurrent with relapsing-remitting multiple sclerosis on natalizumab": the mediastinal CT shows a 2.8 cm thymoma and the musts send her for thymectomy, so the MG is thymoma-associated; the speculative "possible drug-associated autoimmunity" (left open by the worker under ruling 3) is removed.
 - Synonyms (G70 entries rescoped): "ocular myasthenia gravis" removed (this is generalized MG); "generalized MG" and "generalised MG" added; bare "MG" retired (a one-token label matched any text mentioning MG).
 - Result: accepted = ['myasthenia gravis', 'autoimmune myasthenia', 'generalized myasthenia gravis', 'generalised myasthenia gravis', 'generalized MG', 'generalised MG']; icd_codes = ['G70.00', 'G70.0', 'G70.01']. Applied with `apply_diagnosis_synonyms.py --prune --conditions myasthenia_gravis`; `--check` clean; perfect-agent and case guards pass.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.

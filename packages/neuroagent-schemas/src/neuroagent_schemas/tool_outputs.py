@@ -17,6 +17,11 @@ class EEGFinding(BaseModel):
 
 
 class EEGReport(BaseModel):
+    # routine, sleep_deprived, ambulatory, video, continuous_icu: the recording this report is
+    # (`analyze_eeg.eeg_type`). The MockServer's discriminator reads it, so a routine order is not
+    # answered with a stored video-EEG or ICU recording. Missing until 24 Oct 2026 (FND,
+    # FEPI-TEMP-RP04 and RS01, SE): values written into case outputs were dropped on load.
+    eeg_type: str = ""
     classification: Literal["normal", "abnormal"]
     background: dict[str, str] = {}  # pdr, sleep_features, overall
     findings: list[EEGFinding] = []
@@ -37,6 +42,11 @@ class MRIFinding(BaseModel):
 
 
 class MRIReport(BaseModel):
+    # Whether gadolinium was given (`analyze_brain_mri.contrast`). None means not stated, which the
+    # MockServer does not adjudicate: the stored studies do not state it, and all but one case
+    # (ALZ-EARLY-RS06) store a single MRI, so there is no other study to route a mismatched order
+    # to. The library's normal reports set it from the order (24 Oct 2026).
+    contrast_used: bool | None = None
     findings: list[MRIFinding] = []
     volumetrics: dict[str, str] | None = None
     additional_observations: list[str] = []

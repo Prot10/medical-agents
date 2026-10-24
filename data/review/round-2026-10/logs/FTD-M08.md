@@ -71,3 +71,11 @@ Decisions in `plans/FTD-decisions.md`. Changes:
 - Citations: the HIV viral load and CD4, CSF HIV RNA, CSF JCV/cryptococcal and Biktarvy drug-check criteria had `citations: []`; they now cite `[EACS_2025]` (EACS Guidelines version 13.0, 2025: HIV-associated neurocognitive impairment, CSF escape, antiretroviral interactions), registered in the pack (summary CENTRAL 2, optional `[EACS_2023]`; 13.0 is the current version).
 
 Checks: `perfect_agent.py` and `case_io.py check` clean; `test_case_guards.py -k FTD-` passes, including `test_routed_outputs_name_their_study`.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.

@@ -62,3 +62,11 @@ Condition close-out per `plans/VASC-DEM-decisions.md`.
 - Lipid must: "Intensify lipid lowering from simvastatin 40 mg to a high-intensity statin, aiming at LDL below 70 mg/dL (current 122 mg/dL) given the carotid atherosclerosis [AHA_ASA_2021_secondary]" -> "Intensify lipid lowering from simvastatin 40 mg to a high-intensity statin, aiming at LDL below 55 mg/dL (current 122 mg/dL): very high risk after ischaemic strokes at 76 with hypertension and carotid atherosclerosis; add ezetimibe if the goal is not reached [ACC_AHA_dyslipidemia_2026]" Reason: the 2026 ACC/AHA multisociety dyslipidemia guideline (supersedes the 2018 cholesterol guideline on which the AHA 2021 LDL-below-70 figure rests) sets LDL below 55 mg/dL for clinical ASCVD at very high risk (two major ASCVD events, or one plus two or more high-risk conditions).
 
 Checks after the close-out: `perfect_agent.py` and `case_io.py check` clean for this case; `test_case_guards -k VASC-DEM-` clean; `apply_diagnosis_synonyms.py --check --conditions vascular_dementia` clean.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, named in the report's own text.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.

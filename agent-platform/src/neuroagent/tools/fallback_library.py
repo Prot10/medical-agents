@@ -15,6 +15,7 @@ molecular assays each get their normal entry.
 from __future__ import annotations
 
 import copy
+import re
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
@@ -25,6 +26,8 @@ from pydantic import BaseModel
 from neuroagent_schemas import tool_outputs as T
 
 from .vocabulary import normalize_analyte
+
+_POST_CONTRAST = re.compile(r"gadolinium|enhanc", re.IGNORECASE)
 
 DEFAULT_LIBRARY_PATH = Path(__file__).resolve().parents[3] / "config" / "tools" / "fallback_library.yaml"
 
@@ -123,11 +126,28 @@ class FallbackLibrary:
                 output["molecular_findings"] = dict(requested)
         elif tool == "order_ct_scan":
             output["contrast_used"] = bool(parameters.get("contrast"))
+        elif tool == "analyze_brain_mri":
+            # A non-contrast order gets no post-gadolinium sentences (24 Oct 2026).
+            output["contrast_used"] = bool(parameters.get("contrast"))
+            if not output["contrast_used"]:
+                output["additional_observations"] = [
+                    line for line in output.get("additional_observations", [])
+                    if not _POST_CONTRAST.search(line)
+                ]
         elif tool == "search_medical_literature":
             output["query"] = str(parameters.get("query", ""))
         elif tool == "check_drug_interactions":
             output["proposed"] = str(parameters.get("drug", ""))
         return OUTPUT_MODELS[tool].model_validate(output)
+
+    def analyte_tests(self, name: str) -> list[str]:
+        """The row tests the library reports for one assay (`[]` when it has no entry).
+
+        The MockServer reads them as the components of the assay, to tell which stored panel
+        answers an order (`tools/lab_matching.py`).
+        """
+        hit = self._analytes.get(normalize_analyte(name))
+        return [row["test"] for row in hit[1]] if hit else []
 
     def _labs(self, parameters: dict[str, Any]) -> T.LabResults:
         entry = self.tools["interpret_labs"]

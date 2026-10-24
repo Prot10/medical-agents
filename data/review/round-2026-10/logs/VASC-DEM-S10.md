@@ -53,3 +53,11 @@ Condition close-out per `plans/VASC-DEM-decisions.md`.
 - `[ADA_2025_older_adults]` -> `[ADA_older_adults_2026]` in the HbA1c must (same target below about 8.0%; superseded edition, as in ALZ-EARLY).
 
 Checks after the close-out: `perfect_agent.py` and `case_io.py check` clean for this case; `test_case_guards -k VASC-DEM-` clean; `apply_diagnosis_synonyms.py --check --conditions vascular_dementia` clean.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, named in the report's own text.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.

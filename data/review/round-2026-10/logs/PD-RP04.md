@@ -66,3 +66,11 @@ After the edits: `perfect_agent.py` 30/30 PD pass; every stored follow-up of the
 Decisions in `plans/PD-decisions.md`.
 
 - Accepted codes are now G20.B2 (primary), G20 and G20.B1 (dyskinesia without mention of fluctuations); G20.A1 and G20.A2 ("without dyskinesia", contradicted by the peak-dose dyskinesia) and G20.C (parkinsonism, unspecified) are no longer accepted.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.

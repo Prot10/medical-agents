@@ -45,9 +45,23 @@ lands.
 - MockServer: prose `test_type` follow-ups in a tool with no initial output are served for any
   test type (MG-RS15's `Neostigmine challenge` answers an `emg_ncs` or audiometry order). Write
   the vocabulary term in stored `test_type`.
-- Schema: `EEGReport` has no `eeg_type`, so a follow-up trigger that repeats the index study's
-  term (`request_continuous_eeg_monitoring` with a `continuous_icu` index) can still capture the
-  index order. The SE generator must not emit such triggers, or add `eeg_type` as for echo.
+- Labs evidence (24 Oct, needs Andrea): `interpret_labs` now serves only the panels an order
+  names. 143 required/recommended criteria (SAH 28, SE 26, GLIO-HG 16, HEP-ENC 15, ISCH-STR 11,
+  NMDAR-ENC 11, ALZ-EARLY 8, SYNC-CARD 6, ALS 5, FEPI-TEMP 5, MS-RR 5, MG 3, FND 2, PD 2) cite in
+  `expected_evidence` an abnormal result of a stored panel their order does not name (HEP-ENC
+  CRP as the infection precipitant, GLIO-HG HbA1c, ISCH-STR LDL). Scoring is unchanged (the
+  reward does not read the evidence), but an agent following the policy no longer sees that
+  result. Either add the assay to the criterion's order or trim the evidence; per criterion, not
+  in bulk. List: `notes/labs-evidence-unserved-2026-10-24.txt` (case, criterion, order, unserved
+  abnormal rows, evidence).
+- Library (24 Oct): with EEG routed by type, a routine order in SE gets the library's normal
+  routine EEG while the patient is in NCSE (the case stores only the cEEG), and MIG-AURA-RM11's
+  video-EEG alternative gets a library normal. Same root as the SAH library item below.
+- MRI contrast (24 Oct): `contrast` defaults to false and `MRIReport.contrast_used` exists, but
+  only ALZ-EARLY-RS06 states it. 575 cases store one MRI study, about 260 of them a contrast study
+  by their text, so a non-contrast order receives post-gadolinium findings. Routing needs a
+  non-contrast variant (or a "not performed" answer) per case where the criteria allow a plain
+  study, then `contrast_used` on every stored MRI and a guard.
 - Scorer: negation matching, so "non-aneurysmal SAH" does not score in an aneurysmal case (and
   in general "non-X" / "not X" answers do not match X). (SAH, 24 Oct)
 - Library: imaging variants a case does not store (e.g. CT perfusion) get normal defaults that may

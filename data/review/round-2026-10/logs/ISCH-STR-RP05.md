@@ -78,3 +78,11 @@ Discriminator fixes. The MockServer now routes stored reports by their discrimin
 - `fallback_tool_outputs.specialized_test` set to null: a generic report (test_type '', impression 'Study within normal limits.') that names no one study and so answered every variant; the benchmark library now answers each study with its own normal report.
 
 Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg` set to null: it describes no single recording, so it cannot be typed; an off-pathway EEG order now gets the library normal of the type ordered.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.

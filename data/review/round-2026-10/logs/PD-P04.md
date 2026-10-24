@@ -62,3 +62,11 @@ Decisions in `plans/PD-decisions.md`.
 
 - Accepted codes are now G20.A1 (PD without dyskinesia, without mention of fluctuations; also PD NOS) and G20; G20.A2, G20.B1, G20.B2 (motor complications the case does not have) and G20.C ("Parkinsonism, unspecified", not PD) are no longer accepted. Labels unchanged.
 - Wilson guideline recited from `[EASL_Wilson_2012]` (superseded) to `[EASL_ERN_Wilson_2025]` (EASL-ERN Clinical Practice Guidelines on Wilson's disease, J Hepatol 2025;82:690-728) in the labs criterion, the must and the key evidence; the labs rationale drops the 2012 age window "from age 3 to 55" and names the first-line tests (ceruloplasmin, 24-hour urinary copper, slit-lamp search for Kayser-Fleischer rings). `metadata.citation_gap` cleared (both keys are in the pack now).
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.

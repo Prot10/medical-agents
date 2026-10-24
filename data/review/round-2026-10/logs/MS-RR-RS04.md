@@ -70,3 +70,11 @@ Condition close-out (`plans/MS-RR-decisions.md`). What changed and why:
 - `followup_outputs`: added the negative AQP4-IgG / MOG-IgG cell-based-assay follow-up (`interpret_labs`, trigger `request_aqp4_mog_cell_based_assay`, panel `Neuroimmunology`, after the spine MRI), as in the other 25 cases. The case has no AQP4/MOG criterion (no red flag, no optic neuritis or myelitis), so scoring is unchanged; before, an agent that ordered the assay received the first-line labs again with no antibody result (summary CENTRAL 5, open question 3). MockServer probe: all three alternatives, alone or with the mimic panel and in either order, receive the rows; the mimic panel alone does not.
 - `ground_truth.differential` NMOSD and MOGAD `key_features`: "AQP4-IgG was not tested (no red flag)" and "MOG-IgG was not tested" -> "... testing is not indicated without a red flag", since a result is now stored.
 - Checks: `perfect_agent.py` pass, `case_io.py check` clean for the case, `test_case_guards.py -k MS-RR-` passes with MS-RR now in `DISCRIMINATOR_CONDITIONS`.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.

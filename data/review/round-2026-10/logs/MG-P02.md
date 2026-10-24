@@ -69,3 +69,11 @@ Checks after the change: `perfect_agent.py MG-P02 -v` passes, `case_io.py check`
 
 - LEMS synonyms: "paraneoplastic lambert eaton myasthenic syndrome" and "LEMS with small cell lung cancer" added (G73.1 entry; summary CENTRAL 3). Codes unchanged (G73.1, G70.80). LEMS stays in the MG condition as its classic mimic (plans/MG-decisions.md, Q1).
 - Result: accepted = ['lambert eaton myasthenic syndrome', 'lambert-eaton myasthenic syndrome', 'LEMS', 'lambert eaton syndrome', 'paraneoplastic lambert eaton myasthenic syndrome', 'LEMS with small cell lung cancer']; icd_codes = ['G73.1', 'G70.80']. Applied with `apply_diagnosis_synonyms.py --prune --conditions myasthenia_gravis`; `--check` clean; perfect-agent and case guards pass.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.

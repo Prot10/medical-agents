@@ -181,6 +181,10 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
             },
             "contrast": {
                 "type": "boolean",
+                # Gadolinium is given on an indication, not by default (ACR Manual on Contrast
+                # Media): an order that does not ask for it is a non-contrast study, as the
+                # scorer and the cost model already read it (24 Oct 2026).
+                "default": False,
                 "description": "Whether gadolinium contrast is needed (e.g., for tumor, MS, infection).",
             },
         },

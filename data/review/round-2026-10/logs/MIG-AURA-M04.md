@@ -65,3 +65,11 @@ Condition close-out (plans/MIG-AURA-decisions.md). Changes and reasons:
 - synonyms: generic and typical-aura labels removed (brainstem aura is ICHD-3 1.2.2, not typical aura, and the triptan decision depends on it); "migraine with brainstem aura", "basilar migraine", "basilar type migraine" added. The primary code G43.109 still credits a code-only generic answer (ICD-10-CM has no brainstem-aura code).
 - Citation [AAN_2000] retired: Silberstein 2000 covers treatment, not neuroimaging; imaging statements now cite Evans 2020 [AHS_neuroimaging_2020], test-waste statements [ICHD_3] (diagnosis is clinical).
 Checks after the change: `perfect_agent.py` pass, `case_io.py check` clean for the case, `test_case_guards.py -k MIG-AURA-` 60/60.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.

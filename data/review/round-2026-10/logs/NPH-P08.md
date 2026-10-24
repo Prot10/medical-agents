@@ -71,3 +71,11 @@ Central vocabulary (timing discriminator, NPH R4; decisions Q2 and CENTRAL C2). 
 Scoring change for re-review: the post-tap reassessment is now required and is credited only by a call with `timing: post_intervention`; the baseline order is answered by the baseline report and the reassessment order by the post-tap report (MockServer secondary discriminator).
 
 The drainage follow-up's trigger `repeat_csf_analysis` -> `request_extended_lumbar_drainage`: it answers its own order now (`source: lumbar_drain`), not a repeat CSF order. The rename of plan C16 is no longer needed: the source discriminator refuses it for a tap order, and "lumbar" no longer routes a lumbar-puncture order (it counts only with the whole `lumbar_puncture` term or an explicit `lumbar_drain`). Checked: a bare repeat CSF order gets the tap report again.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.

@@ -59,3 +59,11 @@ perfect_agent passes; case_io check clean for this case.
 
 - Synonyms (G70 entries rescoped): "generalized/generalised myasthenia gravis" removed (this is ocular MG, MGFA class I); "ocular myasthenia" and "ocular MG" added; bare "MG" retired.
 - Result: accepted = ['myasthenia gravis', 'autoimmune myasthenia', 'ocular myasthenia gravis', 'ocular myasthenia', 'ocular MG']; icd_codes = ['G70.00', 'G70.0', 'G70.01']. Applied with `apply_diagnosis_synonyms.py --prune --conditions myasthenia_gravis`; `--check` clean; perfect-agent and case guards pass.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.

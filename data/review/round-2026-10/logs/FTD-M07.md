@@ -78,3 +78,11 @@ New `interpret_labs` panel `CDT` (FTD decisions CENTRAL 1; summary item 8). The 
 | `ground_truth.action_criteria[action-cdt-alcohol-biomarker]` | new optional criterion `interpret_labs {panels: [CDT]}`, placed after the baseline labs |
 
 The value is new (the removed value was not recorded in the log): 3.4% is consistent with 8 to 10 drinks a day by the wife's estimate, GGT 148 and MCV 101. Optional, so the score of a complete work-up does not change; a combined baseline order that names CDT now also receives it (MockServer lab-order merging).
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.

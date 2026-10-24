@@ -87,3 +87,11 @@ Decisions in `plans/FTD-decisions.md`. Changes:
 - Synonyms (`diagnosis_synonyms.yaml`, new scoped entry `G31.09+mnd`, applied with `--prune --conditions ftd`): the generic bvFTD labels and the codes G31.0 and G31.01 are no longer granted, so a bvFTD-only answer (missing the motor neuron disease that drives EMG, riluzole and NIV) no longer scores by label; FTD-MND / ALS-FTD / ALS-FTSD labels that name both components are accepted. G12.21 not added (an ALS-only answer would score through it). Residual: an answer coded G31.09 still scores through the code alone (scorer CENTRAL).
 
 Checks: `perfect_agent.py` and `case_io.py check` clean; `test_case_guards.py -k FTD-` passes, including `test_routed_outputs_name_their_study`.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.

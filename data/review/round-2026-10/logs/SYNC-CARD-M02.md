@@ -90,3 +90,12 @@ Central vocabulary (batch 4: orthostatic_blood_pressure, electrophysiology_study
 | `ground_truth.action_criteria` | no electrophysiology criterion: the documented AV block (or VT) already settles the device decision; the stored report only keeps a library normal from contradicting the case |
 
 Scoring change for re-review: new criteria are recommended or optional, so no required work-up changed.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `initial_tool_outputs.eeg`: `eeg_type` set to `routine`, named in the report's own text.
+- follow-up EEG `request_prolonged_eeg`: `eeg_type` set to `ambulatory`, decided by reading the report.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.

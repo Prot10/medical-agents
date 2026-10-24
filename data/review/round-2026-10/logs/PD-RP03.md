@@ -61,3 +61,11 @@ Checks after the verification: `perfect_agent.py -v` ok, `case_io.py check` no f
 Decisions in `plans/PD-decisions.md`.
 
 - Stays in condition parkinsons with its case id as a PD-mimic case (ruling 3); `metadata.case_body_concerns` and `citation_gap` cleared. Primary code stays G90.3. Synonyms: G23.2 and G23.3 added (WHO ICD-10 / ICD-10-GM MSA-P and MSA-C; the case has both parkinsonian and cerebellar features), labels "striatonigral degeneration", "MSA-C" and "multiple system atrophy cerebellar type" added. No PD label or G20 code is accepted.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.

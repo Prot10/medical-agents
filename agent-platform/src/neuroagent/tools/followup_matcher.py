@@ -40,8 +40,9 @@ Matching, in words:
         initial output already IS that study (its own discriminator field says so):
         then only a trigger naming the whole term overrides it. That is the SE
         defect, ``request_continuous_eeg_monitoring`` capturing the index
-        ``continuous_icu`` order. EEG reports carry no ``eeg_type`` yet, so for
-        EEG this last clause cannot fire and the trigger wording is the guard.
+        ``continuous_icu`` order. Since 24 Oct 2026 EEG reports carry ``eeg_type``
+        and EEG is routed by the MockServer's discriminator ahead of this matcher,
+        which serves the index recording to the first order of its type.
   * ``accepts`` (the MockServer's "does this stored report describe the study
     ordered") filters candidates BEFORE the choice. Choosing first and checking
     after let a sibling that loses the check win a tie, and the call fell to the

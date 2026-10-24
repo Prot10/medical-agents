@@ -56,3 +56,11 @@ No error found; nothing changed. Noted for CENTRAL (already in the log): "ocular
 - `icd_codes[0]` G70.01 kept (exacerbation or crisis). G70.00 ("without exacerbation") is no longer accepted; crisis and exacerbation labels added (myasthenic crisis, myasthenic exacerbation, impending myasthenic crisis, MG crisis, MG exacerbation): the case is an impending or established crisis and its differential rates crisis high.
 - Synonyms (G70 entries rescoped): "ocular myasthenia gravis" removed (this is generalized MG); "generalized MG" and "generalised MG" added; bare "MG" retired (a one-token label matched any text mentioning MG).
 - Result: accepted = ['myasthenia gravis', 'autoimmune myasthenia', 'myasthenic crisis', 'myasthenic exacerbation', 'impending myasthenic crisis', 'MG crisis', 'MG exacerbation', 'generalized myasthenia gravis', 'generalised myasthenia gravis', 'generalized MG', 'generalised MG']; icd_codes = ['G70.01', 'G70.0']. Applied with `apply_diagnosis_synonyms.py --prune --conditions myasthenia_gravis`; `--check` clean; perfect-agent and case guards pass.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.

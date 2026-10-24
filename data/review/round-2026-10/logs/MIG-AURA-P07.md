@@ -65,3 +65,11 @@ Condition close-out (plans/MIG-AURA-decisions.md). Changes and reasons:
 - synonyms: generic stroke labels, "embolic stroke" (would credit paradoxical embolism through the small PFO), "lacunar stroke", "lacunar infarct", plain "stroke" and "PCA territory infarct" (would credit migrainous infarction) removed; mechanism labels kept or added (cardioembolic stroke/infarct/infarction, atrial fibrillation stroke/infarct); codes now I63.4, I63.43, I63.431 (I63.432 is the left PCA; I63.5, I63.3, I63.2, I63.0, I63.1, I63.8, I63.81, I63.89 and I63.9 name other or unspecified mechanisms).
 - Citation [AAN_2000] retired: Silberstein 2000 covers treatment, not neuroimaging; imaging statements now cite Evans 2020 [AHS_neuroimaging_2020], test-waste statements [ICHD_3] (diagnosis is clinical).
 Checks after the change: `perfect_agent.py` pass, `case_io.py check` clean for the case, `test_case_guards.py -k MIG-AURA-` 60/60.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.

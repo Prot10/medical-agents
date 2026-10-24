@@ -298,6 +298,7 @@ _ROUTED_SLOTS = {
     "obtain_tissue_diagnosis": "tissue_diagnosis",
     "perform_clinical_assessment": "clinical_assessment",
     "order_cardiac_monitoring": "cardiac_monitoring",
+    "analyze_eeg": "eeg",  # 24 Oct 2026
 }
 
 
