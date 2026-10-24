@@ -57,3 +57,10 @@ Decisions in `plans/GBS-decisions.md` (Andrea, 24 Oct 2026: resolve open points 
 - Synonyms (`diagnosis_synonyms.yaml` G61.0 split into scoped entries, expanded with `--prune`): now accepts the generic GBS labels plus "miller fisher syndrome", "fisher syndrome" and "MFS"; the AIDP and AMAN labels it used to accept are removed (wrong subtype for MFS).
 - MFS no-treatment statements re-cited: must 1 `[EAN_PNS_2023]` -> `[Leonhard_2019]`; literature result 1 source `[EAN_PNS_2023]` -> `[Leonhard_2019]` with evidence_level "review"; literature summary `[EAN_PNS_2023, Wakerley_2014]` -> `[Leonhard_2019, Wakerley_2014]`. EAN/PNS 2023 does not address MFS treatment (read in full text 24 Oct 2026); Leonhard 2019 states treatment is generally not recommended in pure MFS.
 - Checks: `perfect_agent.py` pass; `case_io.py check` clean for this case; GBS guards pass; synonym `--check` clean.
+
+## Central vocabulary wired (24 Oct 2026)
+Terms added in commit e19131d6 (`interpret_labs` `anti_GQ1b_IgG`, `anti_GT1a_IgG`, `botulinum_toxin_assay`; `analyze_csf` `CMV_PCR`), wired per plan C2/C3/C9 and GBS-decisions CENTRAL 1-3. Checks after the change: `perfect_agent.py -v` pass, `case_io.py check` clean for this case, `test_case_guards -k GBS-` 60 passed; optional criteria probed against the MockServer (served the case's own report, not a fallback).
+
+- New `action-11-interpret-labs-anti-gq1b` (recommended; `interpret_labs` `{panels: [anti_GQ1b_IgG]}`), placed after the CSF, answered by the existing follow-up `request_anti_gq1b_gt1a_ganglioside_panel` (GQ1b IgG 1:6400). Recommended, not required: MFS is defined by the clinical triad and EAN/PNS 2023 advises the antibody when MFS is suspected as support only.
+- Must "Send serum anti-GQ1b IgG (not a broad ganglioside panel) ..." deleted: the order is now a scored criterion and the prohibition "Do not delay admission and monitoring while waiting for the anti-GQ1b result" keeps the management point.
+- Resolves the BLOCKED part of note ee1e4f06 and CENTRAL 1.

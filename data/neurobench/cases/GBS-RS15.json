@@ -202,6 +202,26 @@
     },
     {
       "output": {
+        "abnormal_values_summary": [],
+        "interpretation": "Botulinum neurotoxin not detected in serum (types A, B, E and F; reference laboratory). A negative serum assay does not exclude botulism on its own. Clinical correlation recommended.",
+        "panels": {
+          "Botulinum_Toxin": [
+            {
+              "clinical_significance": null,
+              "is_abnormal": false,
+              "reference_range": "not detected",
+              "test": "Botulinum neurotoxin, serum (types A, B, E, F)",
+              "unit": "",
+              "value": "Not detected"
+            }
+          ]
+        }
+      },
+      "tool_name": "interpret_labs",
+      "trigger_action": "request_botulinum_toxin_assay"
+    },
+    {
+      "output": {
         "findings": [
           {
             "flag": "",
@@ -385,6 +405,48 @@
           {
             "required_arguments": {
               "panels": [
+                "anti_GT1a_IgG"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          }
+        ],
+        "citations": [
+          "[EAN_PNS_2023]",
+          "[Wakerley_2014]"
+        ],
+        "criterion_id": "action-14-interpret-labs-anti-gt1a",
+        "expected_evidence": "Anti-GT1a IgG positive (1:160), anti-GQ1b negative: supports the PCB variant without Miller Fisher overlap; a send-out result that does not delay treatment",
+        "importance": "recommended",
+        "label": "Serum anti-GT1a IgG (with anti-GQ1b) for the pharyngeal-cervical-brachial variant",
+        "rationale": "Anti-GT1a IgG, often with anti-GQ1b, is the antibody of the pharyngeal-cervical-brachial variant (Wakerley 2014); anti-GQ1b on the same request looks for a Miller Fisher overlap. EAN/PNS 2023 restricts ganglioside testing to the MFS spectrum and its regional variants."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "panels": [
+                "botulinum_toxin_assay"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          }
+        ],
+        "citations": [
+          "[Leonhard_2019]",
+          "[Wakerley_2014]"
+        ],
+        "criterion_id": "action-15-interpret-labs-botulinum-toxin",
+        "expected_evidence": "Botulinum neurotoxin not detected in serum",
+        "importance": "optional",
+        "label": "Optional serum botulinum toxin assay for the descending bulbar mimic",
+        "rationale": "Botulism is the descending bulbar mimic of the PCB variant; normal pupils and eye movements, areflexia in the weak arms, raised CSF protein and no food, wound or injection exposure already make it very unlikely, so the reference-laboratory assay is optional."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "panels": [
                 "CBC",
                 "CMP",
                 "CK"
@@ -531,13 +593,13 @@
     "assessment": {
       "prohibited_recommendations": [
         "Do not treat with corticosteroids: oral corticosteroids are strongly advised against and IV methylprednisolone is not recommended [EAN_PNS_2023].",
-        "Do not start IVIg without checking renal function."
+        "Do not start IVIg without checking renal function.",
+        "Do not delay IVIg while waiting for the send-out anti-GT1a and anti-GQ1b result."
       ],
       "required_recommendations": [
         "Admit to ICU-level (high-dependency) monitoring because of bulbar weakness with a weak cough and silent aspiration: nil by mouth with nasogastric feeding, aspiration precautions and suction, and FVC, MIP, MEP and cough every 4-6 hours; intubate for airway protection if secretions cannot be cleared or aspiration recurs, or if FVC falls below 20 mL/kg (about 1.4 L at 70.7 kg), MIP becomes weaker than -30 cmH2O or MEP falls below 40 cmH2O [EAN_PNS_2023, Lawn_2001].",
         "Start IVIg 0.4 g/kg/day for 5 days (2 g/kg total, about 28 g/day at 70.7 kg) now, at the end of the 2-week window, because of progressive bulbar and neck weakness with aspiration; plasma exchange (200-250 mL/kg over 5 sessions, within 4 weeks of onset) is an equivalent alternative [EAN_PNS_2023].",
         "Treat the right lower lobe aspiration pneumonia with antibiotics according to local guidance for aspiration pneumonia.",
-        "Send serum anti-GT1a and anti-GQ1b IgG (send-out) without delaying treatment for the result.",
         "Continuous cardiac telemetry with blood pressure monitoring while weakness progresses.",
         "Speech and language therapy reassessment of swallowing before any oral intake resumes."
       ]
@@ -609,7 +671,7 @@
       {
         "diagnosis": "Botulism",
         "icd_code": "A05.1",
-        "key_features": "Descending bulbar palsy, but pupils and eye movements are normal, there is no food, wound or injection exposure, and areflexia confined to the weak arms with raised CSF protein is not botulism.",
+        "key_features": "Descending bulbar palsy, but pupils and eye movements are normal, there is no food, wound or injection exposure, and areflexia confined to the weak arms with raised CSF protein is not botulism; the serum botulinum toxin assay, if sent, is negative.",
         "likelihood": "very_low"
       },
       {

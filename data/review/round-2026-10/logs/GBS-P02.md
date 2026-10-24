@@ -56,3 +56,12 @@ Decisions in `plans/GBS-decisions.md` (Andrea, 24 Oct 2026: resolve open points 
 - Synonyms (`diagnosis_synonyms.yaml` G61.0 split into scoped entries, expanded with `--prune`): now accepts the generic GBS labels and the three AIDP labels (its NCS is demyelinating); "acute motor axonal neuropathy", "AMAN" and "miller fisher syndrome" are no longer accepted (wrong subtype or variant for this case).
 - `accepted[0]` "Guillain-Barré syndrome, AIDP — HIV-associated (with CSF pleocytosis)" -> "Guillain-Barré syndrome, AIDP, HIV-associated, with CSF pleocytosis" (em dash removed; same diagnosis).
 - Checks: `perfect_agent.py` pass; `case_io.py check` clean for this case; GBS guards pass; synonym `--check` clean.
+
+## Central vocabulary wired (24 Oct 2026)
+Terms added in commit e19131d6 (`interpret_labs` `anti_GQ1b_IgG`, `anti_GT1a_IgG`, `botulinum_toxin_assay`; `analyze_csf` `CMV_PCR`), wired per plan C2/C3/C9 and GBS-decisions CENTRAL 1-3. Checks after the change: `perfect_agent.py -v` pass, `case_io.py check` clean for this case, `test_case_guards -k GBS-` 60 passed; optional criteria probed against the MockServer (served the case's own report, not a fallback).
+
+- `action-3-analyze-csf` now requires `{special_tests: [cytology, CMV_PCR]}` (label and expected_evidence updated; rationale unchanged): one LP sample tests both mimics the pleocytosis prompts in HIV (lymphoma, CMV polyradiculitis). Chosen over a separate CMV criterion, which the perfect-agent check flagged as a second criterion answered by the same LP report.
+- CSF follow-up `analyze_csf_gbs`: `special_tests['CMV PCR'] = 'Not detected'` and "CMV PCR not detected." in the interpretation.
+- Differential 'Opportunistic CMV polyradiculitis': "CSF CMV PCR is still sent." -> "CSF CMV PCR is not detected.", likelihood low -> very_low (excluded by the work-up, ruling 7).
+- Must 4 -> "Exclude CMV polyradiculitis before attributing the pleocytosis to GBS: CSF CMV PCR not detected, with CD4 368, an undetectable viral load and a lymphocytic, not neutrophilic, CSF with normal glucose." Red herring 1 correct_interpretation: "the CSF CMV PCR is sent to close the question" -> "the CSF CMV PCR is not detected".
+- Resolves the BLOCKED part of note 24f4abe2 and CENTRAL 4.

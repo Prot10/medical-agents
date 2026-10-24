@@ -56,3 +56,8 @@ Decisions in `plans/GBS-decisions.md` (Andrea, 24 Oct 2026: resolve open points 
 - `accepted[0]` "... AIDP (post-lung transplant, likely immune dysregulation)" -> "Guillain-Barré syndrome, AIDP, after lung transplantation" (speculative mechanism removed).
 - Respiratory follow-up: MIP -34 -> -46 cmH2O (still flagged L against the -80 reference), so a case designed as a monitored-bed case does not sit in the band where EAN/PNS 2023 (MIP <40) would call for considering elective ventilation; escalation must now "MIP becomes weaker than -40 cmH2O".
 - Checks: `perfect_agent.py` pass; `case_io.py check` clean for this case; GBS guards pass; synonym `--check` clean.
+
+## Central vocabulary wired (24 Oct 2026)
+Terms added in commit e19131d6 (`interpret_labs` `anti_GQ1b_IgG`, `anti_GT1a_IgG`, `botulinum_toxin_assay`; `analyze_csf` `CMV_PCR`), wired per plan C2/C3/C9 and GBS-decisions CENTRAL 1-3. Checks after the change: `perfect_agent.py -v` pass, `case_io.py check` clean for this case, `test_case_guards -k GBS-` 60 passed; optional criteria probed against the MockServer (served the case's own report, not a fallback).
+
+- New `action-9-analyze-csf-cmv-pcr` (optional; `{special_tests: [CMV_PCR]}`), after the CSF criterion, answered by the stored CSF report (CMV PCR not detected). Optional: valganciclovir prophylaxis, a negative blood CMV PCR and 2 cells/mm3 already make CMV polyradiculitis very unlikely, but in a transplant recipient the order is reasonable and must not count as unjustified. Closes CENTRAL 4 for this case.

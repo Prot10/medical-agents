@@ -55,3 +55,9 @@ Decisions in `plans/GBS-decisions.md` (Andrea, 24 Oct 2026: resolve open points 
 - Synonyms (`diagnosis_synonyms.yaml` G61.0 split into scoped entries, expanded with `--prune`): now accepts the generic GBS labels plus "anti gq1b syndrome" and "incomplete miller fisher syndrome" (Wakerley 2014: acute ptosis is an incomplete MFS form); AIDP, AMAN and plain Miller Fisher labels removed.
 - MFS-spectrum no-treatment statements re-cited from `[EAN_PNS_2023]` to `[Leonhard_2019]` (must 1 now `[Leonhard_2019, Wakerley_2014]`, KCE 4, literature result 1 with evidence_level "review", literature summary). Reason as in P01.
 - Checks: `perfect_agent.py` pass; `case_io.py check` clean for this case; GBS guards pass; synonym `--check` clean.
+
+## Central vocabulary wired (24 Oct 2026)
+Terms added in commit e19131d6 (`interpret_labs` `anti_GQ1b_IgG`, `anti_GT1a_IgG`, `botulinum_toxin_assay`; `analyze_csf` `CMV_PCR`), wired per plan C2/C3/C9 and GBS-decisions CENTRAL 1-3. Checks after the change: `perfect_agent.py -v` pass, `case_io.py check` clean for this case, `test_case_guards -k GBS-` 60 passed; optional criteria probed against the MockServer (served the case's own report, not a fallback).
+
+- New `action-13-interpret-labs-anti-gq1b` (REQUIRED; `{panels: [anti_GQ1b_IgG]}`), after the CSF, answered by `request_anti_gq1b_gt1a_ganglioside_panel` (GQ1b IgG 1:320, GT1a negative); added to `stop_rule.required_before_assessment`. Required because acute bilateral ptosis with areflexia is an incomplete MFS form only with the antibody (Wakerley 2014): the label 'anti-GQ1b antibody syndrome' cannot be reached responsibly without it, and it is the result that separates the case from ocular myasthenia.
+- Resolves the BLOCKED part of note e89ffe81 and CENTRAL 1. Musts unchanged (none asked for the test).

@@ -63,3 +63,8 @@ Decisions in `plans/GBS-decisions.md` (Andrea, 24 Oct 2026: resolve open points 
 - Synonyms (`diagnosis_synonyms.yaml` G61.0 split into scoped entries, expanded with `--prune`): now accepts the generic GBS labels plus "bifacial weakness with paraesthesias/paresthesias"; AIDP, AMAN and Miller Fisher labels removed.
 - Escalation must: "MIP becomes weaker than -30 cmH2O" -> "-40 cmH2O" (EAN/PNS 2023 MIP <40).
 - Checks: `perfect_agent.py` pass; `case_io.py check` clean for this case; GBS guards pass; synonym `--check` clean.
+
+## Central vocabulary wired (24 Oct 2026)
+Terms added in commit e19131d6 (`interpret_labs` `anti_GQ1b_IgG`, `anti_GT1a_IgG`, `botulinum_toxin_assay`; `analyze_csf` `CMV_PCR`), wired per plan C2/C3/C9 and GBS-decisions CENTRAL 1-3. Checks after the change: `perfect_agent.py -v` pass, `case_io.py check` clean for this case, `test_case_guards -k GBS-` 60 passed; optional criteria probed against the MockServer (served the case's own report, not a fallback).
+
+- New `action-13-interpret-labs-anti-gq1b` (optional; `{panels: [anti_GQ1b_IgG]}`), after Lyme serology, answered by `request_anti_gq1b_gt1a_ganglioside_panel` (GQ1b negative). Optional: no ophthalmoplegia or ataxia, so EAN/PNS 2023 does not advise it; the criterion keeps the order from counting as unjustified. Closes CENTRAL 1 for this case.

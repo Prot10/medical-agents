@@ -58,3 +58,11 @@ Decisions in `plans/GBS-decisions.md` (Andrea, 24 Oct 2026: resolve open points 
 
 - Synonyms (`diagnosis_synonyms.yaml` G61.0 split into scoped entries, expanded with `--prune`): now accepts the generic GBS labels plus "pharyngeal cervical brachial"; AIDP, AMAN and Miller Fisher labels removed.
 - Checks: `perfect_agent.py` pass; `case_io.py check` clean for this case; GBS guards pass; synonym `--check` clean.
+
+## Central vocabulary wired (24 Oct 2026)
+Terms added in commit e19131d6 (`interpret_labs` `anti_GQ1b_IgG`, `anti_GT1a_IgG`, `botulinum_toxin_assay`; `analyze_csf` `CMV_PCR`), wired per plan C2/C3/C9 and GBS-decisions CENTRAL 1-3. Checks after the change: `perfect_agent.py -v` pass, `case_io.py check` clean for this case, `test_case_guards -k GBS-` 60 passed; optional criteria probed against the MockServer (served the case's own report, not a fallback).
+
+- New `action-14-interpret-labs-anti-gt1a` (recommended; `{panels: [anti_GT1a_IgG]}`), after the myasthenia antibodies, answered by `request_anti_gq1b_gt1a_ganglioside_panel` (GT1a 1:160, GQ1b negative, both on one request; GQ1b checks the MFS overlap). The criterion credits the GT1a order, the variant's antibody.
+- New `action-15-interpret-labs-botulinum-toxin` (optional; `{panels: [botulinum_toxin_assay]}`) with a new follow-up `request_botulinum_toxin_assay` (not detected) after the ganglioside follow-up. Optional for the same clinical reasons as the differential (very_low). Differential 'Botulism' key_features add "the serum botulinum toxin assay, if sent, is negative".
+- Must 4 "Send serum anti-GT1a and anti-GQ1b IgG (send-out) without delaying treatment for the result." deleted (now scored); new prohibition "Do not delay IVIg while waiting for the send-out anti-GT1a and anti-GQ1b result."
+- Resolves the BLOCKED criterion of the ganglioside finding (CENTRAL 1) and CENTRAL 3.
