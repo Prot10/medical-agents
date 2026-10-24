@@ -4,14 +4,7 @@
   "difficulty": "moderate",
   "encounter_type": "inpatient",
   "fallback_tool_outputs": {
-    "advanced_imaging": {
-      "findings": [],
-      "impression": "No abnormality identified.",
-      "modality": "MRI_brain_functional",
-      "quantitative_data": null,
-      "recommended_actions": [],
-      "tracer_or_protocol": null
-    },
+    "advanced_imaging": null,
     "cardiac_monitoring": {
       "duration_hours": 24,
       "events": [],
@@ -45,16 +38,8 @@
       "additional_observations": [],
       "angiography_findings": null,
       "contrast_used": false,
-      "findings": [
-        {
-          "density": "hyperdense",
-          "description": "calcified focus consistent with an old, benign granuloma",
-          "location": "right frontal lobe",
-          "size": "3 mm",
-          "type": "calcification"
-        }
-      ],
-      "impression": "No acute intracranial abnormality. Small calcified granuloma noted; no associated mass effect or enhancement.",
+      "findings": [],
+      "impression": "No acute intracranial abnormality. No hemorrhage, mass, hydrocephalus or large-territory infarct.",
       "recommended_actions": []
     },
     "drug_interactions": null,
@@ -80,6 +65,7 @@
         "RA": "normal size",
         "RV": "normal size and function"
       },
+      "echo_type": "TTE",
       "ejection_fraction": 63.0,
       "findings": [
         "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
@@ -97,90 +83,35 @@
     "eeg": null,
     "labs": null,
     "literature_search": null,
-    "mri": null,
-    "specialized_test": {
-      "findings": [],
-      "impression": "Study within normal limits.",
-      "quantitative_data": null,
+    "mri": {
+      "additional_observations": [
+        "Left hippocampus normal",
+        "No new lesion",
+        "Normal ventricles; no midline shift"
+      ],
+      "findings": [
+        {
+          "borders": null,
+          "location": "Right hippocampus",
+          "mass_effect": "None",
+          "signal_characteristics": {
+            "DWI": "No restricted diffusion",
+            "T1": "Reduced right hippocampal volume with loss of internal architecture",
+            "T2_FLAIR": "Increased right hippocampal T2/FLAIR signal"
+          },
+          "size": null,
+          "type": "Mesial temporal sclerosis"
+        }
+      ],
+      "impression": "Right mesial temporal sclerosis, unchanged compared with the MRI of 3 years ago. No new intracranial abnormality.",
       "recommended_actions": [],
-      "test_type": "neuropsych_battery"
-    }
-  },
-  "followup_outputs": [
-    {
-      "output": {
-        "alternatives": [
-          "Lamotrigine as alternative AED with mood-stabilizing benefit"
-        ],
-        "contraindications": [],
-        "formulary_status": "Sertraline available",
-        "interactions": [
-          "Levetiracetam is known to cause irritability, depression, and behavioral changes in 5-15% of patients. This may be contributing to mood symptoms.",
-          "Sertraline + levetiracetam: no pharmacokinetic interaction. Safe combination."
-        ],
-        "proposed": "Consider adding SSRI for depression",
-        "warnings": [
-          "If mood side effects from levetiracetam are prominent, consider switching to alternative AED (lamotrigine has mood-stabilizing properties and is a good alternative for temporal lobe epilepsy)",
-          "Do not discontinue levetiracetam abruptly \u2014 seizure risk"
-        ]
-      },
-      "tool_name": "check_drug_interactions",
-      "trigger_action": "levetiracetam_mood_effects"
+      "volumetrics": null
     },
-    {
-      "output": {
-        "query": "mixed epilepsy PNES co-occurrence diagnosis management",
-        "results": [
-          {
-            "journal": "Lancet Neurology",
-            "pmid": "26276867",
-            "title": "PNES in patients with epilepsy: management and outcomes",
-            "year": "2015"
-          }
-        ],
-        "summary": ""
-      },
-      "tool_name": "search_medical_literature",
-      "trigger_action": "mixed_epilepsy_pnes_literature"
-    }
-  ],
+    "specialized_test": null
+  },
+  "followup_outputs": [],
   "ground_truth": {
     "action_criteria": [
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "query": "functional neurological disorder diagnosis treatment"
-            },
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[Nielsen_2015]",
-          "FND criteria pack \u2014 treatment evidence"
-        ],
-        "criterion_id": "action-1-search-medical-literature",
-        "expected_evidence": "Confirms multidisciplinary CBT + physiotherapy is the evidence-based treatment for FND",
-        "importance": "recommended",
-        "label": "Search current literature on FND diagnostic signs and evidence-based treatment (CBT for PNES, specialized physiotherapy for functional motor symptoms)",
-        "rationale": "Search current literature on FND diagnostic signs and evidence-based treatment (CBT for PNES, specialized physiotherapy for functional motor symptoms)"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "check_drug_interactions"
-          }
-        ],
-        "citations": [
-          "FND criteria pack \u2014 medication review"
-        ],
-        "criterion_id": "action-2-check-drug-interactions",
-        "expected_evidence": "Identification of medication contributors that should be tapered or discontinued",
-        "importance": "recommended",
-        "label": "Review current medications for agents that may exacerbate symptoms (e.g., benzodiazepines, dopamine-blocking antipsychotics, AEDs initiated for PNES)",
-        "rationale": "Review current medications for agents that may exacerbate symptoms (e.g., benzodiazepines, dopamine-blocking antipsychotics, AEDs initiated for PNES)"
-      },
       {
         "alternatives": [
           {
@@ -191,14 +122,14 @@
           }
         ],
         "citations": [
-          "[AAN_Functional_Seizures_2025]",
-          "positive FND signs; AAN functional seizures guideline 2025"
+          "[Avbersek_2010]",
+          "[AAN_Functional_Seizures_2025]"
         ],
         "criterion_id": "action-3-perform-clinical-assessment",
-        "expected_evidence": "Positive rule-in signs establish FND; symptoms are real and involuntary, and psychological stress is not a required diagnostic criterion",
+        "expected_evidence": "Normal interictal examination, and reported semiology of the new events that differs from his documented temporal lobe seizures",
         "importance": "required",
-        "label": "Perform and document a positive FND examination: internal inconsistency/incongruity, Hoover sign, entrainment/distractibility or positive functional-seizure semiology as appropriate",
-        "rationale": "Perform and document a positive FND examination: internal inconsistency/incongruity, Hoover sign, entrainment/distractibility or positive functional-seizure semiology as appropriate"
+        "label": "Examine and document the semiology of the new events against his known seizures",
+        "rationale": "With established epilepsy, the history of how the new events differ from his documented seizures (witness account) and a normal interictal examination guide the diagnosis, which the recording then settles (Avbersek 2010; AAN 2025)."
       },
       {
         "alternatives": [
@@ -210,57 +141,86 @@
           }
         ],
         "citations": [
-          "[AAN_Functional_Seizures_2025]",
-          "positive FND signs; AAN functional seizures guideline 2025"
+          "[ILAE_PNES_2013]",
+          "[Kutlubaev_2018]",
+          "[AAN_Functional_Seizures_2025]"
         ],
         "criterion_id": "action-4-analyze-eeg",
-        "expected_evidence": "Typical clinical event without an epileptic ictal correlate, interpreted together with semiology; interictal normality alone is insufficient",
-        "importance": "optional",
-        "label": "Consider video-EEG capture of a typical event when epilepsy versus functional seizure remains ambiguous",
-        "rationale": "Consider video-EEG capture of a typical event when epilepsy versus functional seizure remains ambiguous"
+        "expected_evidence": "New-type habitual event recorded on video without ictal change, alongside persistent right temporal interictal discharges",
+        "importance": "required",
+        "label": "Video-EEG to record a new-type event",
+        "rationale": "In a patient with established right temporal lobe epilepsy, only a recorded habitual new event can separate a seizure recurrence from functional seizures; about one in five patients with functional seizures also has epilepsy (LaFrance 2013; Kutlubaev 2018; AAN 2025)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "check_drug_interactions"
+          }
+        ],
+        "citations": [
+          "[AAN_Functional_Seizures_2025]"
+        ],
+        "criterion_id": "action-2-check-drug-interactions",
+        "expected_evidence": "Levetiracetam mood and behavioural effects and the risk of abrupt withdrawal noted; no interaction with the diabetes medicines",
+        "importance": "recommended",
+        "label": "Review levetiracetam and his other medicines",
+        "rationale": "Levetiracetam continues for his epilepsy; its mood and behavioural effects matter in a distressed patient, and it must not be stopped abruptly (AAN 2025)."
       },
       {
         "alternatives": [
           {
             "required_arguments": {
-              "panels": [
-                "CMP",
-                "AED_levels"
-              ]
+              "test_type": "neuropsych_battery"
             },
-            "tool_name": "interpret_labs"
+            "tool_name": "order_specialized_test"
           }
         ],
         "citations": [
-          "[AAN_Functional_Seizures_2025]",
-          "positive FND signs; AAN functional seizures guideline 2025"
+          "[Espay_2018]"
         ],
-        "criterion_id": "action-5-interpret-labs",
-        "expected_evidence": "Answer the specific alternative diagnosis; normal blood tests do not establish FND",
+        "criterion_id": "action-neuropsych-battery",
+        "expected_evidence": "Profile of the comorbid symptoms that treatment will target; it does not make the diagnosis",
         "importance": "optional",
-        "label": "Consider only case-targeted blood tests for the named metabolic, inflammatory, nutritional or treatment-related mimic",
-        "rationale": "Consider only case-targeted blood tests for the named metabolic, inflammatory, nutritional or treatment-related mimic"
+        "label": "Neuropsychological assessment of comorbidity (optional)",
+        "rationale": "A battery with performance-validity measures can quantify his mood, anxiety and distress to plan treatment; it costs more than any other step on this pathway and adds nothing to the diagnosis, which rests on the examination."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "query": "functional neurological disorder diagnosis treatment"
+            },
+            "tool_name": "search_medical_literature"
+          }
+        ],
+        "citations": [
+          "[Espay_2018]"
+        ],
+        "criterion_id": "action-1-search-medical-literature",
+        "expected_evidence": "Background reading only; no result in it changes this patient's diagnosis or plan",
+        "importance": "optional",
+        "label": "Literature search on FND diagnosis and treatment (background, not a clinical step)",
+        "rationale": "General evidence on the positive diagnosis and treatment of functional neurological disorder; it is not part of this patient's diagnostic pathway and earns no credit (round ruling 5)."
       }
     ],
     "assessment": {
       "prohibited_recommendations": [
-        "Do not pursue ever-expanding negative investigations \u2014 per Stone 2018, repeated negative workups reinforce illness conviction and worsen prognosis",
-        "Do not frame the diagnosis as 'all in your head', 'nothing wrong', or 'we couldn't find anything' \u2014 this damages the therapeutic alliance and is the most common avoidable harm in FND",
-        "Do not perform invasive testing (lumbar puncture, nerve biopsy, muscle biopsy, cerebral angiography) when positive rule-in signs are present and there is no clinical indication",
-        "Do not order EMG/NCS, muscle biopsy, or nerve biopsy as part of an FND workup \u2014 these invasive tests reinforce the somatic illness model per Stone 2018",
-        "Do not start or continue long-term anti-epileptic drugs for functional (psychogenic non-epileptic) seizures \u2014 AEDs are ineffective for PNES and expose the patient to side effects",
-        "Do not give benzodiazepines as abortive therapy for witnessed PNES events (no benefit and risk of respiratory depression)",
-        "Do not give gadolinium without a specific indication \u2014 contrast adds cost and risk and answers no question that positive functional signs have not already answered",
-        "Do not repeat the brain MRI, the laboratory panel or the lumbar puncture once a first normal study and positive rule-in signs are documented: each repetition strengthens the patient's belief that something organic has been missed"
+        "Order further investigations once the positive diagnosis is established, without a new specific clinical question (repeat MRI, CT, lumbar puncture, EMG or nerve conduction studies, evoked potentials, PET).",
+        "Tell the patient the symptoms are imagined, feigned, 'all in your head', or that nothing is wrong.",
+        "Perform invasive testing without a specific indication (lumbar puncture, nerve or muscle biopsy, catheter angiography).",
+        "Add or escalate antiseizure medication for the new functional events.",
+        "Give benzodiazepines or intubate for a typical functional event.",
+        "Give gadolinium contrast without a specific indication.",
+        "Stop or taper levetiracetam because the new events are functional."
       ],
       "required_recommendations": [
-        "Document the event semiology and the features atypical for an epileptic seizure; the diagnosis is established by capturing a habitual event on video-EEG, not by a limb sign",
-        "Obtain video-EEG capturing a habitual event with normal interictal EEG to confirm PNES",
-        "Communicate the diagnosis transparently using positive language and the rule-in signs as the basis",
-        "Refer for FND-informed physiotherapy and CBT / psychological therapy",
-        "Order a comprehensive neuropsychological battery to characterize comorbid depression, anxiety, somatization, and trauma exposure \u2014 informs treatment planning (criteria-pack 'recommended' tier)",
-        "Communicate the diagnosis transparently using positive language anchored on the rule-in signs; explicitly state the diagnosis is FND, the symptoms are real and involuntary, and there is an evidence-based treatment plan",
-        "Refer to specialized FND-informed physiotherapy (for functional motor symptoms) and to CBT / psychological therapy (for PNES and comorbid mood / anxiety)"
+        "Make a positive diagnosis of functional neurological disorder (functional seizures coexisting with established right temporal lobe epilepsy) based on the semiology of the new events and the habitual new event recorded on video-EEG without ictal change, and not by exclusion of other disease.",
+        "Continue levetiracetam at the current dose for the established right temporal lobe epilepsy, and do not escalate antiseizure treatment for the new functional events.",
+        "Explain the diagnosis to the patient, and with consent to the family, as a common and genuine disorder of nervous system functioning that can improve, show the positive signs, and give written information.",
+        "Refer for psychological therapy by a clinician experienced in FND (CBT-informed), and assess and treat any comorbid anxiety or depression.",
+        "Give the patient, family and ward a written plan for typical events: keep safe, do not restrain, wait for the event to end, and do not give emergency benzodiazepines or intubate for a typical functional seizure; rescue medication only for an event with the semiology of his known epileptic seizures.",
+        "Advise on commercial driving under the applicable regulations given the established epilepsy and the new events, and document it."
       ]
     },
     "avoided_actions": [
@@ -272,10 +232,10 @@
           }
         ],
         "citations": [
-          "[Stone_2018]"
+          "[Espay_2018]"
         ],
         "criterion_id": "avoid-waste-1-analyze-ecg",
-        "rationale": "ECG has no diagnostic role in FND; cardiac etiology is not on the differential for the presenting neurological deficit.",
+        "rationale": "The new events are long, with eyes closed and immediate recovery, and no palpitations or syncope; an ECG answers no question.",
         "severity": "waste"
       },
       {
@@ -286,10 +246,10 @@
           }
         ],
         "citations": [
-          "[Stone_2018]"
+          "[Espay_2018]"
         ],
         "criterion_id": "avoid-waste-2-order-echocardiogram",
-        "rationale": "Echocardiography has no role in FND; no structural cardiac question is raised by the presentation.",
+        "rationale": "No murmur, cardiac symptom or embolic question; echocardiography answers nothing about his events.",
         "severity": "waste"
       },
       {
@@ -300,10 +260,10 @@
           }
         ],
         "citations": [
-          "[Stone_2018]"
+          "[Espay_2018]"
         ],
         "criterion_id": "avoid-waste-3-order-cardiac-monitoring",
-        "rationale": "Cardiac rhythm monitoring is not indicated; the events are non-syncopal and the rule-in signs point to FND.",
+        "rationale": "Events of 2-5 minutes of shaking with back arching and rapid recovery are not syncopal; rhythm monitoring answers no question.",
         "severity": "waste"
       },
       {
@@ -317,7 +277,7 @@
           "[Espay_2018]"
         ],
         "criterion_id": "avoid-waste-4-order-ct-scan",
-        "rationale": "Non-contrast head CT adds no information beyond MRI for an FND workup and contributes diagnostic noise plus radiation exposure.",
+        "rationale": "His structural substrate (right mesial temporal sclerosis) is known from MRI and the examination is normal; a CT adds radiation and no answer.",
         "severity": "waste"
       },
       {
@@ -328,10 +288,10 @@
           }
         ],
         "citations": [
-          "[Stone_2018]"
+          "[Stone_2016]"
         ],
         "criterion_id": "avoid-waste-5-analyze-csf",
-        "rationale": "Lumbar puncture is not indicated in typical FND; invasive testing reinforces somatic illness model and adds iatrogenic risk without changing management.",
+        "rationale": "No fever, meningism, encephalopathy or inflammatory question; a lumbar puncture is invasive and answers nothing about the new events.",
         "severity": "waste"
       },
       {
@@ -347,7 +307,7 @@
           "[Espay_2018]"
         ],
         "criterion_id": "avoid-waste-6-order-advanced-imaging",
-        "rationale": "Advanced PET imaging has no indication in FND; standard MRI is the appropriate structural workup.",
+        "rationale": "His epilepsy is already localized (right temporal discharges, mesial temporal sclerosis) and he is seizure-free on treatment; PET has no question to answer.",
         "severity": "waste"
       },
       {
@@ -360,10 +320,10 @@
           }
         ],
         "citations": [
-          "[Stone_2018]"
+          "[Stone_2016]"
         ],
         "criterion_id": "avoid-waste-7-order-specialized-test",
-        "rationale": "Nerve conduction studies and EMG have no role once positive functional signs are documented: the deficit is not neuromuscular, the study is uncomfortable, and a normal result reinforces the patient's search for an organic cause \u2014 the principal iatrogenic harm in this condition",
+        "rationale": "Strength, reflexes and sensation are normal; EMG has no question to answer.",
         "severity": "waste"
       },
       {
@@ -376,10 +336,10 @@
           }
         ],
         "citations": [
-          "[Stone_2018]"
+          "[Stone_2016]"
         ],
         "criterion_id": "avoid-waste-8-order-specialized-test",
-        "rationale": "Somatosensory evoked potentials answer a question about a lesion in the somatosensory pathway; a midline-splitting, non-anatomical sensory deficit is not that question",
+        "rationale": "Sensation is normal; evoked potentials have no question to answer.",
         "severity": "waste"
       }
     ],
@@ -409,54 +369,52 @@
     },
     "differential": [
       {
-        "diagnosis": "Epileptic seizures",
-        "icd_code": "G40.909",
-        "key_features": "Witnessed convulsive-appearing events; ictal video-EEG showing absence of electrographic correlate during a captured habitual event is the key differentiator.",
-        "likelihood": "high"
-      },
-      {
-        "diagnosis": "Structural CNS lesion (tumor, demyelination, stroke)",
-        "icd_code": null,
-        "key_features": "Focal complaints warrant imaging; normal brain MRI without lesion, mass, or enhancement effectively excludes a structural cause for the presenting deficit.",
+        "diagnosis": "Recurrence of known right temporal lobe epilepsy (new seizure type)",
+        "icd_code": "G40.209",
+        "key_features": "His epilepsy is established and interictal right temporal discharges persist, but the habitual new event was recorded without ictal change or post-event slowing, and its semiology lacks his aura, automatisms and postictal confusion.",
         "likelihood": "low"
       },
       {
-        "diagnosis": "Autoimmune or paraneoplastic encephalitis",
-        "icd_code": "G04.81",
-        "key_features": "Episodic neurological symptoms can occur in autoimmune encephalitis; normal MRI, normal EEG background, and (when obtained) negative antibody panel render this very unlikely.",
-        "likelihood": "very_low"
+        "diagnosis": "Frontal lobe (hypermotor) seizures",
+        "icd_code": null,
+        "key_features": "Hypermotor seizures can lack a scalp EEG correlate, but they are usually brief, stereotyped and arise from sleep; his events last 2-5 minutes, occur awake with eyes closed, and the posterior dominant rhythm persisted during the recorded event.",
+        "likelihood": "low"
       },
       {
         "diagnosis": "Malingering or factitious disorder",
         "icd_code": "F68.10",
-        "key_features": "FND is involuntary; preserved effort on symptom-validity testing and absence of clear secondary gain argue against feigning. The rule-in signs do not distinguish FND from malingering by themselves, but the clinical context does not support a feigning explanation.",
-        "likelihood": "very_low"
+        "key_features": "Feigning is conscious and cannot be separated from FND by examination signs; a disability claim is noted, but his wife's independent account of the new events and his distress over the loss of his licence argue against it.",
+        "likelihood": "low"
       }
     ],
     "key_clinical_evidence": [
-      "FND is a positive diagnosis based on rule-in signs (Hoover, tremor entrainment, give-way weakness, non-dermatomal sensory loss with midline split) \u2014 not a diagnosis of exclusion (Espay 2018, Stone 2018).",
-      "Brain MRI and basic laboratory testing are OPTIONAL here, not due diligence: the diagnosis rests on the positive signs, and each additional negative study is a cost and an iatrogenic harm rather than a confirmation. Where imaging is recommended in this case it is for one specific alternative question, once.",
-      "Over-investigation is the principal iatrogenic harm in FND; every additional negative test reinforces the patient's illness conviction and worsens prognosis (Stone 2018).",
-      "Psychiatric comorbidity (anxiety, depression, trauma) is common and informs treatment planning but is NOT required for the diagnosis and does not 'explain' the symptoms in a reductive sense.",
-      "Diagnostic communication matters: using positive language anchored on the rule-in signs is associated with better engagement and outcomes (Stone 2018).",
-      "Evidence-based treatment is multidisciplinary \u2014 CBT for PNES and FND-informed physiotherapy for functional motor symptoms (Nielsen 2015).",
-      "Video-EEG capturing a habitual event with normal interictal EEG is diagnostic for PNES (ILAE PNES Task Force 2013); routine EEG alone is insufficient.",
-      "Interim composition decision, August 2026: FND remains only to keep the frozen dataset at 20 conditions/600 cases. The positive functional-neurological examination is the sole required diagnostic act; every instrumental test is optional and case-targeted. DLB remains the preferred future replacement when composition work resumes."
+      "The new events (bilateral shaking with back arching and eyes closed for 2-5 minutes, immediate recovery without confusion) differ from his documented seizures (deja vu aura, oral automatisms, postictal confusion).",
+      "The video-EEG recorded a habitual new event without ictal change or post-event slowing, while right temporal interictal discharges persisted.",
+      "Established right temporal lobe epilepsy with mesial temporal sclerosis, seizure-free on levetiracetam for 4 years with a therapeutic level, coexists with the functional seizures.",
+      "The interictal neurological examination is normal; there is no limb sign.",
+      "The suspended commercial licence and a disability claim are context; they neither make the diagnosis nor show feigning."
     ],
     "red_herrings": [
       {
-        "correct_interpretation": "Family history of epilepsy does not establish the patient's events as epileptic. Video-EEG capturing the habitual event without ictal correlate is the gold standard.",
-        "data_point": "Family history of epilepsy in a relative",
+        "correct_interpretation": "A father with epilepsy does not make the new events epileptic; the recorded habitual event decides it.",
+        "data_point": "Father with childhood epilepsy",
         "field_path": "patient.clinical_history.family_history",
         "intended_effect": "Anchor on an epileptic etiology and pursue prolonged AED trials before confirming PNES with video-EEG",
         "location": "Family history"
       },
       {
-        "correct_interpretation": "Many organic conditions (MS, migraine, epilepsy) also flare with stress. Stress at onset is supportive context, not a diagnostic substitute for the positive rule-in signs.",
-        "data_point": "Symptom onset coincident with a major psychosocial stressor",
-        "field_path": "patient.history_present_illness",
-        "intended_effect": "Conclude prematurely that stress 'caused' the symptoms and that the workup can be abbreviated",
-        "location": "History of present illness"
+        "correct_interpretation": "A stressor is supportive context, neither required nor sufficient, and an incentive does not show feigning; the semiology and the recorded event make the diagnosis.",
+        "data_point": "Licence suspended, loss of income and a disability claim",
+        "field_path": "patient.clinical_history.social_history.recent_stressor",
+        "intended_effect": "Conclude that stress caused the events, or that an external incentive means they are feigned",
+        "location": "Social history"
+      },
+      {
+        "correct_interpretation": "About one in five patients with functional seizures also has epilepsy. Interictal discharges show the known epilepsy, not the nature of the new events; the recorded new event had no ictal change.",
+        "data_point": "Established right temporal lobe epilepsy with mesial temporal sclerosis, and right temporal interictal discharges on the video-EEG",
+        "field_path": "patient.clinical_history.past_medical_history",
+        "intended_effect": "Attribute the new events to a recurrence of his epilepsy and escalate antiseizure treatment",
+        "location": "Past medical history"
       }
     ],
     "review_status": "draft",
@@ -464,7 +422,8 @@
     "stop_rule": {
       "max_additional_actions": 0,
       "required_before_assessment": [
-        "action-3-perform-clinical-assessment"
+        "action-3-perform-clinical-assessment",
+        "action-4-analyze-eeg"
       ]
     }
   },
@@ -474,76 +433,103 @@
     "clinical_assessment": {
       "assessment_type": "functional_neuro_signs",
       "criteria_met": {
-        "diagnosis_made_by_exclusion_only": false,
-        "positive_clinical_sign_present": false,
-        "psychological_stressor_required_for_diagnosis": false,
-        "symptoms_inconsistent_with_organic_disease": true
+        "distractibility_of_deficit": false,
+        "drift_without_pronation": false,
+        "functional_seizure_semiology_observed": false,
+        "give_way_weakness": false,
+        "hip_abductor_sign_positive": false,
+        "hoover_sign_positive": false,
+        "inconsistency_between_examination_and_function": false,
+        "tremor_entrainment_positive": false
       },
       "findings": [
         {
-          "result": "The new episodes are distinctly different: they consist of bilateral whole-body shaking with arched back (opisthotonus-like posturing), closed eyes, 2-5 minute duration, no post-ictal confusion, and immediate full recovery.",
-          "sign": "Arched-back (opisthotonus-like) posturing during events"
+          "result": "Interictal examination normal: strength 5/5, normal reflexes, sensation, coordination and gait; no functional limb sign.",
+          "sign": "Motor and sensory examination"
+        },
+        {
+          "result": "Bilateral whole-body shaking with back arching and eyes closed for 2-5 minutes, with immediate recovery and no postictal confusion; different from his documented seizures (deja vu and epigastric aura, oral automatisms for 60-90 seconds, postictal confusion for 5-10 minutes).",
+          "sign": "Reported semiology of the new events (witness account)"
         }
       ],
-      "impression": "The phenotype is paroxysmal rather than motor, so limb rule-in signs do not apply. The semiological features documented are: Arched-back (opisthotonus-like) posturing during events. Semiology is suggestive but not sufficient: for this phenotype the positive diagnostic act is a recorded habitual event without EEG correlate, which is why video-EEG is required in this case rather than optional.",
+      "impression": "No motor or sensory functional sign; neurological examination otherwise normal. No event was observed. The reported semiology of the new events (eyes closed, back arching, 2-5 minutes, rapid recovery without confusion) differs from his documented seizures and is typical of functional seizures; the examination does not by itself exclude epileptic seizures.",
       "pre_post_comparison": null,
       "recommended_actions": [],
       "scores": {
-        "distribution_consistent_with_a_single_lesion": "no",
-        "internal_inconsistency": "present",
-        "positive_rule_in_signs_documented": "0 unequivocal limb signs"
+        "distribution_consistent_with_a_single_lesion": "not applicable",
+        "internal_inconsistency": "absent",
+        "positive_rule_in_signs_documented": "0"
       }
     },
     "csf": null,
+    "drug_interactions": {
+      "general": {
+        "alternatives": [],
+        "contraindications": [],
+        "formulary_status": "",
+        "interactions": [
+          "Metformin + empagliflozin: additive glucose lowering with a low risk of hypoglycemia; empagliflozin adds volume depletion and rare euglycemic ketoacidosis.",
+          "Levetiracetam with metformin or empagliflozin: no clinically significant interaction."
+        ],
+        "proposed": "Levetiracetam 1000 mg twice daily; Metformin 1000 mg twice daily; Empagliflozin 10 mg once daily",
+        "summary": "No clinically significant interaction between levetiracetam and the diabetes medicines. Levetiracetam carries mood and behavioural adverse effects and must not be stopped abruptly; weekend binge drinking is a caution with metformin and empagliflozin.",
+        "warnings": [
+          "Levetiracetam: irritability, aggression, low mood and anxiety are recognised adverse effects. Do not stop abruptly in established epilepsy: withdrawal can provoke seizures.",
+          "Alcohol (4-6 drinks at weekends): binge drinking raises the risk of lactic acidosis with metformin and of ketoacidosis with empagliflozin, and lowers the seizure threshold."
+        ]
+      }
+    },
     "ecg": null,
     "echo": null,
     "eeg": {
-      "activating_procedures": {},
-      "artifacts": [],
+      "activating_procedures": {
+        "hyperventilation": "3 minutes; no change in background and no event provoked.",
+        "photic_stimulation": "Normal photic driving; no photoparoxysmal response."
+      },
+      "artifacts": [
+        {
+          "description": "During the event; posterior channels remained interpretable between bursts.",
+          "location": "Diffuse",
+          "type": "Movement artifact"
+        }
+      ],
       "background": {
-        "description": "Slightly increased theta activity over right temporal region (F8, T4, T8) \u2014 consistent with right MTS substrate. Otherwise normal background."
+        "continuity": "Continuous throughout the 48-hour recording",
+        "focal_slowing": "Intermittent right temporal theta slowing (F8, T4/T8)",
+        "posterior_dominant_rhythm": "10 Hz alpha, symmetric, reactive to eye opening",
+        "sleep_features": "Normal sleep architecture with vertex waves, sleep spindles and K-complexes"
       },
       "classification": "abnormal",
       "findings": [
         {
           "clinical_correlation": "",
-          "frequency": "",
-          "location": "generalized",
-          "morphology": "No ictal pattern during the entire clinical episode. Right temporal interictal sharp-and-slow-wave activity continues unchanged. No ictal evolution, no spread, and no post-ictal electrodecrement. The captured event had no ictal EEG correlate.",
-          "state": "awake",
-          "type": "Whole-body shaking episode \u2014 3 min 12 sec (the new episode type)"
+          "frequency": "Intermittent, about 6 per hour, awake and asleep, more frequent in sleep",
+          "location": "Right anterior temporal (F8, T4/T8)",
+          "morphology": "Sharp-and-slow-wave complexes with maximum at F8/T4, unchanged in character from the prior study.",
+          "state": "Awake and sleep",
+          "type": "Right anterior temporal sharp-and-slow-wave discharges"
+        },
+        {
+          "clinical_correlation": "",
+          "frequency": "Day 2, 14:05; duration 3 minutes 12 seconds",
+          "location": "Generalized (clinical)",
+          "morphology": "Eyes closed, bilateral whole-body shaking with back arching, then immediate recovery. No ictal pattern, no evolution, no post-event slowing or attenuation; the posterior dominant rhythm was visible between bursts of movement artifact, and the right temporal interictal discharges continued unchanged before and after the event.",
+          "state": "Awake",
+          "type": "Clinical event - bilateral shaking with back arching"
         }
       ],
-      "impression": "This is an ABNORMAL EEG. Right temporal interictal sharp-and-slow-wave discharges, unchanged in character from prior study. One clinical event captured during the recording showed no ictal EEG correlate; normal background maintained throughout the event and post-event period. No post-event slowing recorded",
-      "limitations": "",
+      "impression": "This is an ABNORMAL video-EEG due to: 1. Intermittent right anterior temporal sharp-and-slow-wave discharges, unchanged from the prior study. 2. Intermittent right temporal theta slowing. One habitual event of the new type (eyes closed, bilateral shaking with back arching, 3 minutes 12 seconds) was recorded without ictal EEG change before, during or after the event; the posterior dominant rhythm persisted during the event. No electrographic seizures.",
+      "limitations": "Movement artifact during the event partially obscured the frontal and temporal channels; posterior channels remained interpretable.",
       "recommended_actions": []
     },
     "labs": {
       "abnormal_values_summary": [
-        "HbA1c 7.1% (mildly elevated)",
-        "Fasting glucose 128 mg/dL (elevated \u2014 diabetic baseline)"
+        "HbA1c 7.1% (high)",
+        "Fasting glucose 128 mg/dL (high)"
       ],
-      "interpretation": "Abnormal values: HbA1c 7.1 % (H), Fasting glucose 128 mg/dL (H).",
+      "interpretation": "HbA1c 7.1% (high) and fasting glucose 128 mg/dL (high). Levetiracetam level 34 mcg/mL, within the reference range. Remaining results within reference ranges.",
       "panels": {
-        "Baseline workup": [
-          {
-            "clinical_significance": "Ordered as part of the baseline workup; no abnormality that alters the diagnosis, which is what this case's diagnosis rests on",
-            "is_abnormal": false,
-            "reference_range": "",
-            "test": "TSH",
-            "unit": "",
-            "value": "Within reference range"
-          },
-          {
-            "clinical_significance": "Ordered as part of the baseline workup; no abnormality that alters the diagnosis, which is what this case's diagnosis rests on",
-            "is_abnormal": false,
-            "reference_range": "",
-            "test": "B12",
-            "unit": "",
-            "value": "Within reference range"
-          }
-        ],
-        "Epilepsy_Management_Workup": [
+        "Antiseizure drug level": [
           {
             "clinical_significance": null,
             "is_abnormal": false,
@@ -551,7 +537,27 @@
             "test": "Levetiracetam level",
             "unit": "mcg/mL",
             "value": 34
+          }
+        ],
+        "Basic": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "4.5-11.0",
+            "test": "WBC",
+            "unit": "K/uL",
+            "value": 7.2
           },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "136-145",
+            "test": "Sodium",
+            "unit": "mEq/L",
+            "value": 138
+          }
+        ],
+        "Glucose and HbA1c": [
           {
             "clinical_significance": null,
             "is_abnormal": true,
@@ -567,30 +573,79 @@
             "test": "Fasting glucose",
             "unit": "mg/dL",
             "value": 128
-          },
-          {
-            "is_abnormal": false,
-            "reference_range": "4.5-11.0",
-            "test": "CBC WBC",
-            "unit": "K/uL",
-            "value": 7.2
-          },
-          {
-            "is_abnormal": false,
-            "reference_range": "136-145",
-            "test": "Sodium",
-            "unit": "mEq/L",
-            "value": 138
-          },
+          }
+        ],
+        "Prolactin": [
           {
             "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "2-18 ng/mL (men)",
-            "test": "Prolactin (post-new-episode)",
+            "test": "Prolactin (20 minutes after a new-type event)",
             "unit": "ng/mL",
             "value": 9.1
           }
+        ],
+        "Thyroid and vitamins": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.4-4.0",
+            "test": "TSH",
+            "unit": "mIU/L",
+            "value": 2.4
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "200-900",
+            "test": "Vitamin B12",
+            "unit": "pg/mL",
+            "value": 438
+          }
         ]
+      }
+    },
+    "literature_search": {
+      "functional neurological disorder diagnosis treatment": {
+        "query": "functional neurological disorder diagnosis treatment",
+        "results": [
+          {
+            "evidence_level": "narrative review",
+            "finding": "Diagnosis of functional neurological disorder rests on positive clinical features such as the Hoover sign, tremor entrainment and functional seizure semiology, not on the exclusion of other disease; treatment combines explanation, physiotherapy and psychological therapy.",
+            "source": "Espay AJ et al. JAMA Neurol 2018;75:1132-1141"
+          },
+          {
+            "evidence_level": "systematic review",
+            "finding": "Motor signs such as the Hoover sign, hip abductor sign, drift without pronation and dragging gait have high specificity; sensory signs such as midline splitting have low specificity.",
+            "source": "Daum C et al. J Neurol Neurosurg Psychiatry 2014;85:180-190"
+          },
+          {
+            "evidence_level": "ILAE consensus",
+            "finding": "Defines levels of certainty for psychogenic nonepileptic seizures; the documented level requires a typical event recorded on video-EEG without ictal EEG change.",
+            "source": "LaFrance WC Jr et al. Epilepsia 2013;54:2005-2018"
+          },
+          {
+            "evidence_level": "AAN evidence-based guideline",
+            "finding": "For functional seizures: assess for co-occurring epilepsy and psychiatric disorders, taper antiseizure medication without another indication, avoid benzodiazepines, and offer psychological therapy, which is possibly effective.",
+            "source": "Tolchin B et al. Neurology 2026;106:e214466"
+          },
+          {
+            "evidence_level": "randomised controlled trial",
+            "finding": "CBT added to standardised medical care did not reduce dissociative seizure frequency at 12 months; several secondary outcomes favoured CBT.",
+            "source": "Goldstein LH et al. Lancet Psychiatry 2020;7:491-505"
+          },
+          {
+            "evidence_level": "randomised controlled trial",
+            "finding": "Specialist physiotherapy for functional motor disorder was not superior to community neurological physiotherapy on physical function at 12 months; several secondary outcomes favoured it.",
+            "source": "Nielsen G et al. Lancet Neurol 2024;23:675-686"
+          },
+          {
+            "evidence_level": "systematic review",
+            "finding": "About 4% of patients diagnosed with conversion symptoms since 1970 later received another diagnosis.",
+            "source": "Stone J et al. BMJ 2005;331:989"
+          }
+        ],
+        "summary": "Guideline and trial evidence supports a positive clinical diagnosis of functional neurological disorder, video-EEG confirmation of functional seizures, tapering of unneeded antiseizure drugs and benzodiazepines, and physiotherapy and psychological treatment whose trial effects on primary outcomes were modest."
       }
     },
     "mri": null,
@@ -601,20 +656,19 @@
     "case_body_concerns": [],
     "citation_gap": [],
     "criteria_pack_version": "1.0",
-    "difficulty_rationale": "Mixed motor and/or seizure phenotype with at least one prominent comorbidity or compelling red herring (family history of MS, antipsychotic exposure, comorbid SLE). Standard FND workup (MRI + basic labs + video-EEG when seizure phenotype) plus disciplined diagnostic communication.",
+    "difficulty_rationale": "Functional seizures in a man with established right temporal lobe epilepsy and an abnormal interictal EEG. The new events differ from his known seizures, and the video-EEG records one without ictal change. The agent must diagnose the dual condition, keep levetiracetam for the epilepsy without escalating it, and address commercial driving, despite a disability claim and a suspended licence.",
     "fallback_tool_kinds": {
-      "advanced_imaging": "normal",
       "cardiac_monitoring": "normal",
       "csf": "normal",
-      "ct": "incidental",
+      "ct": "normal",
       "ecg": "normal",
       "echo": "normal",
-      "specialized_test": "normal"
+      "mri": "case"
     },
-    "last_revised": "2026-08-10",
+    "last_revised": "2026-10-24",
     "notes": "Moderate FND \u2014 PNES superimposed on established right TLE. Classic mixed epilepsy + PNES. Video-EEG essential in known epilepsy patients.",
     "policy_spec_status": "draft",
-    "revision_reason": "FND interim reviewer option: positive clinical diagnosis required; every instrumental test optional and selected for explicit red flags",
+    "revision_reason": "October 2026 review round: video-EEG required; criteria, outputs and assessment rebuilt to the FND criteria pack tiers with the dual-diagnosis variants.",
     "version": "policy-v1",
     "vocab_gap": []
   },
@@ -667,7 +721,7 @@
       "handedness": "right",
       "sex": "male"
     },
-    "history_present_illness": "Mr. F is a 42-year-old truck driver with established right temporal lobe epilepsy, seizure-free on levetiracetam for 4 years, who presents with 2-month history of new episodes that he and his wife describe as different from his prior seizures. His prior epileptic seizures consisted of right temporal aura (d\u00e9j\u00e0 vu, rising epigastric sensation), followed by unresponsiveness with oral automatisms (lip smacking, swallowing) lasting 60-90 seconds, and post-ictal confusion for 5-10 minutes. The new episodes are distinctly different: they consist of bilateral whole-body shaking with arched back (opisthotonus-like posturing), closed eyes, 2-5 minute duration, no post-ictal confusion, and immediate full recovery. His wife is convinced these are different from his prior seizures. His driving license was suspended when he reported new episodes, creating significant financial and psychological stress as trucking is his sole income source. He is desperate to have the episodes attributed to epilepsy (which is treatable and would support his disability claim) rather than to a functional cause. Levetiracetam level was checked by his PCP and was therapeutic. He has been compliant with medications. Prior MRI from 3 years ago showed right mesial temporal sclerosis (MTS). His diabetes is well-controlled. He has not had any prior PNES episodes.",
+    "history_present_illness": "Mr. F is a 42-year-old truck driver with established right temporal lobe epilepsy, seizure-free on levetiracetam for 4 years, who presents with 2-month history of new episodes that he and his wife describe as different from his prior seizures. His prior epileptic seizures consisted of right temporal aura (d\u00e9j\u00e0 vu, rising epigastric sensation), followed by unresponsiveness with oral automatisms (lip smacking, swallowing) lasting 60-90 seconds, and post-ictal confusion for 5-10 minutes. The new episodes are distinctly different: they consist of bilateral whole-body shaking with arched back (opisthotonus-like posturing), closed eyes, 2-5 minute duration, no post-ictal confusion, and immediate full recovery. His wife is convinced these are different from his prior seizures. His driving license was suspended when he reported new episodes, creating significant financial and psychological stress as trucking is his sole income source. He has applied for disability benefits and is desperate for an explanation of the episodes. Levetiracetam level was checked by his PCP and was therapeutic. He has been compliant with medications. Prior MRI from 3 years ago showed right mesial temporal sclerosis (MTS). His diabetes is well-controlled. He has had no episodes of this kind before.",
     "neurological_exam": {
       "additional": "Interictal examination is normal. The new episodes described by the patient and his wife differ in semiology from his prior documented epileptic seizures (bilateral whole-body shaking with arched-back posturing and closed eyes, no post-ictal confusion, vs his prior right temporal aura with oral automatisms and post-ictal confusion).",
       "coordination": "Normal.",

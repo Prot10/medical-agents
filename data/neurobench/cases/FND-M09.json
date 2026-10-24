@@ -4,14 +4,7 @@
   "difficulty": "moderate",
   "encounter_type": "inpatient",
   "fallback_tool_outputs": {
-    "advanced_imaging": {
-      "findings": [],
-      "impression": "No abnormality identified.",
-      "modality": "MRI_brain_functional",
-      "quantitative_data": null,
-      "recommended_actions": [],
-      "tracer_or_protocol": null
-    },
+    "advanced_imaging": null,
     "cardiac_monitoring": {
       "duration_hours": 24,
       "events": [],
@@ -42,7 +35,7 @@
           "type": "calcification"
         }
       ],
-      "impression": "No acute intracranial abnormality. Small calcified granuloma noted; no associated mass effect or enhancement.",
+      "impression": "No acute intracranial abnormality. Small calcified granuloma in the right frontal lobe without mass effect or surrounding edema.",
       "recommended_actions": []
     },
     "drug_interactions": null,
@@ -68,6 +61,7 @@
         "RA": "normal size",
         "RV": "normal size and function"
       },
+      "echo_type": "TTE",
       "ejection_fraction": 64.0,
       "findings": [
         "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
@@ -84,81 +78,13 @@
     },
     "eeg": null,
     "labs": null,
-    "literature_search": {
-      "general": {
-        "query": "general",
-        "results": [],
-        "summary": "No directly applicable, high-quality evidence was retrieved for this query. Recommend correlating with current society guidelines."
-      }
-    },
+    "literature_search": null,
     "mri": null,
-    "specialized_test": {
-      "findings": [],
-      "impression": "Study within normal limits.",
-      "quantitative_data": null,
-      "recommended_actions": [],
-      "test_type": "neuropsych_battery"
-    }
+    "specialized_test": null
   },
-  "followup_outputs": [
-    {
-      "output": {
-        "alternatives": [
-          "Ocrelizumab (next highest efficacy, no PML risk)",
-          "Ofatumumab",
-          "Extended-interval natalizumab dosing"
-        ],
-        "contraindications": [],
-        "formulary_status": "Natalizumab covered",
-        "interactions": [],
-        "proposed": "Continue natalizumab vs switch to alternative DMT",
-        "warnings": [
-          "JC antibody index 2.8 \u2014 annual PML risk on natalizumab: approximately 1:100 after 2 years with JC positive index >1.5. Risk-benefit discussion required.",
-          "Options: (1) Continue natalizumab with 3-monthly MRI surveillance and JC PCR at any new symptom; (2) Switch to ocrelizumab or other high-efficacy DMT with lower PML risk; (3) Extend natalizumab dosing interval to 6-8 weeks (reduces PML risk ~94%)",
-          "DMT modification decisions for PML risk can be made on a non-urgent basis once the cause of the current symptom episode is established"
-        ]
-      },
-      "tool_name": "check_drug_interactions",
-      "trigger_action": "natalizumab_pml_risk_management"
-    }
-  ],
+  "followup_outputs": [],
   "ground_truth": {
     "action_criteria": [
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "query": "functional neurological disorder diagnosis treatment"
-            },
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[Nielsen_2015]",
-          "FND criteria pack \u2014 treatment evidence"
-        ],
-        "criterion_id": "action-1-search-medical-literature",
-        "expected_evidence": "Confirms multidisciplinary CBT + physiotherapy is the evidence-based treatment for FND",
-        "importance": "recommended",
-        "label": "Search current literature on FND diagnostic signs and evidence-based treatment (CBT for PNES, specialized physiotherapy for functional motor symptoms)",
-        "rationale": "Search current literature on FND diagnostic signs and evidence-based treatment (CBT for PNES, specialized physiotherapy for functional motor symptoms)"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "check_drug_interactions"
-          }
-        ],
-        "citations": [
-          "FND criteria pack \u2014 medication review"
-        ],
-        "criterion_id": "action-2-check-drug-interactions",
-        "expected_evidence": "Identification of medication contributors that should be tapered or discontinued",
-        "importance": "recommended",
-        "label": "Review current medications for agents that may exacerbate symptoms (e.g., benzodiazepines, dopamine-blocking antipsychotics, AEDs initiated for PNES)",
-        "rationale": "Review current medications for agents that may exacerbate symptoms (e.g., benzodiazepines, dopamine-blocking antipsychotics, AEDs initiated for PNES)"
-      },
       {
         "alternatives": [
           {
@@ -169,34 +95,34 @@
           }
         ],
         "citations": [
-          "[AAN_Functional_Seizures_2025]",
-          "positive FND signs; AAN functional seizures guideline 2025"
+          "[Espay_2018]",
+          "[DSM5_FND]",
+          "Daum C et al. J Neurol Neurosurg Psychiatry 2014;85:180-190"
         ],
         "criterion_id": "action-3-perform-clinical-assessment",
-        "expected_evidence": "Positive rule-in signs establish FND; symptoms are real and involuntary, and psychological stress is not a required diagnostic criterion",
+        "expected_evidence": "Hoover sign and dragging gait in the right leg; spasticity, reflexes and ataxia unchanged from her MS baseline",
         "importance": "required",
-        "label": "Perform and document a positive FND examination: internal inconsistency/incongruity, Hoover sign, entrainment/distractibility or positive functional-seizure semiology as appropriate",
-        "rationale": "Perform and document a positive FND examination: internal inconsistency/incongruity, Hoover sign, entrainment/distractibility or positive functional-seizure semiology as appropriate"
+        "label": "Examine for positive functional signs",
+        "rationale": "The examination makes the diagnosis and frames the imaging question: new pyramidal or cerebellar signs would point to a relapse or PML, while positive functional signs with an unchanged baseline point to functional weakness."
       },
       {
         "alternatives": [
           {
             "required_arguments": {
-              "contrast": false,
-              "protocol": "standard"
+              "contrast": true
             },
             "tool_name": "analyze_brain_mri"
           }
         ],
         "citations": [
-          "[AAN_Functional_Seizures_2025]",
-          "positive FND signs; AAN functional seizures guideline 2025"
+          "McGuigan C et al. J Neurol Neurosurg Psychiatry 2016;87:117-125",
+          "[Espay_2018]"
         ],
         "criterion_id": "action-4-analyze-brain-mri",
-        "expected_evidence": "Exclude the named structural mimic; a normal scan does not itself diagnose FND",
-        "importance": "optional",
-        "label": "Consider MRI only for the explicit first focal deficit, acute red flag or competing organic neurological disease in this case",
-        "rationale": "Consider MRI only for the explicit first focal deficit, acute red flag or competing organic neurological disease in this case"
+        "expected_evidence": "Lesion load unchanged from 6 months earlier, nothing enhancing, no PML pattern on FLAIR or diffusion",
+        "importance": "required",
+        "label": "Brain MRI with gadolinium for relapse and PML",
+        "rationale": "A new deficit on natalizumab with a JC virus index of 2.8 after 4 years needs MRI with FLAIR, DWI and gadolinium to answer two questions the examination cannot: a new or enhancing MS lesion and PML. Expert consensus places her in the high-risk stratum, in which any new symptom is imaged."
       },
       {
         "alternatives": [
@@ -211,32 +137,97 @@
           }
         ],
         "citations": [
-          "[AAN_Functional_Seizures_2025]",
-          "positive FND signs; AAN functional seizures guideline 2025"
+          "[Espay_2018]"
         ],
         "criterion_id": "action-5-interpret-labs",
-        "expected_evidence": "Answer the specific alternative diagnosis; normal blood tests do not establish FND",
+        "expected_evidence": "Normal blood count and chemistry, which neither support nor refute the diagnosis",
         "importance": "optional",
-        "label": "Consider only case-targeted blood tests for the named metabolic, inflammatory, nutritional or treatment-related mimic",
-        "rationale": "Consider only case-targeted blood tests for the named metabolic, inflammatory, nutritional or treatment-related mimic"
+        "label": "Blood count and metabolic panel",
+        "rationale": "Defensible as routine monitoring on natalizumab; no blood test bears on the cause of the new weakness."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "study": "spine_MRI"
+            },
+            "tool_name": "order_body_imaging"
+          }
+        ],
+        "citations": [
+          "[Espay_2018]"
+        ],
+        "criterion_id": "action-spine-mri",
+        "expected_evidence": "No new cord lesion; it does not change the diagnosis made on examination",
+        "importance": "optional",
+        "label": "Spine MRI",
+        "rationale": "A cord relapse would not show on the brain MRI; unchanged reflexes and tone, positive functional signs and normal walking when unobserved argue against one, so a spine MRI is defensible but earns no credit."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "check_drug_interactions"
+          }
+        ],
+        "citations": [
+          "[Espay_2018]"
+        ],
+        "criterion_id": "action-2-check-drug-interactions",
+        "expected_evidence": "No interaction that alters management; sedation from lorazepam noted",
+        "importance": "optional",
+        "label": "Medication review",
+        "rationale": "Natalizumab and as-needed lorazepam do not interact; lorazepam can worsen balance, but nothing in the list changes the diagnosis or plan."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "neuropsych_battery"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[Espay_2018]"
+        ],
+        "criterion_id": "action-neuropsych-battery",
+        "expected_evidence": "Profile of comorbid mood, anxiety and somatic symptom burden to guide therapy; no bearing on the diagnosis",
+        "importance": "optional",
+        "label": "Neuropsychological assessment of mood, anxiety and dissociation",
+        "rationale": "A battery with performance-validity measures can characterise the comorbidity that treatment will target; it does not make the diagnosis and is the most expensive item on this pathway (criteria pack, optional tier)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "query": "functional neurological disorder diagnosis treatment"
+            },
+            "tool_name": "search_medical_literature"
+          }
+        ],
+        "citations": [
+          "[Espay_2018]"
+        ],
+        "criterion_id": "action-1-search-medical-literature",
+        "expected_evidence": "Background evidence only; the diagnosis and plan for this patient do not depend on a literature result",
+        "importance": "optional",
+        "label": "Search the literature on functional neurological disorder",
+        "rationale": "General evidence on positive diagnosis and treatment can inform the explanation and the referral; no step of the diagnostic work-up depends on it (round ruling 5)."
       }
     ],
     "assessment": {
       "prohibited_recommendations": [
-        "Do not pursue ever-expanding negative investigations \u2014 per Stone 2018, repeated negative workups reinforce illness conviction and worsen prognosis",
-        "Do not frame the diagnosis as 'all in your head', 'nothing wrong', or 'we couldn't find anything' \u2014 this damages the therapeutic alliance and is the most common avoidable harm in FND",
-        "Do not perform invasive testing (lumbar puncture, nerve biopsy, muscle biopsy, cerebral angiography) when positive rule-in signs are present and there is no clinical indication",
-        "Do not order EMG/NCS, muscle biopsy, or nerve biopsy as part of an FND workup \u2014 these invasive tests reinforce the somatic illness model per Stone 2018",
-        "Do not give gadolinium without a specific indication \u2014 contrast adds cost and risk and answers no question that positive functional signs have not already answered",
-        "Do not repeat the brain MRI, the laboratory panel or the lumbar puncture once a first normal study and positive rule-in signs are documented: each repetition strengthens the patient's belief that something organic has been missed"
+        "Order further investigations once the positive diagnosis is established, without a new specific clinical question (repeat MRI, CT, lumbar puncture, EMG or nerve conduction studies, evoked potentials, PET).",
+        "Tell the patient the symptoms are imagined, feigned, 'all in your head', or that nothing is wrong.",
+        "Perform invasive testing without a specific indication (lumbar puncture, nerve or muscle biopsy, catheter angiography).",
+        "Treat the episode as an MS relapse with high-dose corticosteroids."
       ],
       "required_recommendations": [
-        "Do NOT make the diagnosis by exclusion: document at least one positive rule-in sign, which is the act that establishes it",
-        "Communicate the diagnosis transparently using positive language and the rule-in signs as the basis",
-        "Refer for FND-informed physiotherapy and CBT / psychological therapy",
-        "Order a comprehensive neuropsychological battery to characterize comorbid depression, anxiety, somatization, and trauma exposure \u2014 informs treatment planning (criteria-pack 'recommended' tier)",
-        "Communicate the diagnosis transparently using positive language anchored on the rule-in signs; explicitly state the diagnosis is FND, the symptoms are real and involuntary, and there is an evidence-based treatment plan",
-        "Refer to specialized FND-informed physiotherapy (for functional motor symptoms) and to CBT / psychological therapy (for PNES and comorbid mood / anxiety)"
+        "Make a positive diagnosis of functional neurological disorder (functional right leg weakness coexisting with stable relapsing-remitting MS) based on the right Hoover sign and dragging monoplegic gait with an unchanged MS baseline and a stable gadolinium MRI, and not by exclusion of other disease.",
+        "Explain the diagnosis to the patient, and with consent to the family, as a common and genuine disorder of nervous system functioning that can improve, show the positive signs, and give written information.",
+        "Refer for physiotherapy with expertise in functional motor disorder (motor retraining, Nielsen 2015 consensus).",
+        "Do not change her disease-modifying therapy for the functional weakness; refer the PML risk back to her MS team, since a JC virus index of 2.8 after 4 years of natalizumab calls for a risk-benefit review (extended-interval dosing or a switch) and 3- to 4-monthly MRI surveillance while she remains on it."
       ]
     },
     "avoided_actions": [
@@ -248,10 +239,10 @@
           }
         ],
         "citations": [
-          "[Stone_2018]"
+          "[Espay_2018]"
         ],
         "criterion_id": "avoid-waste-1-analyze-ecg",
-        "rationale": "ECG has no diagnostic role in FND; cardiac etiology is not on the differential for the presenting neurological deficit.",
+        "rationale": "No syncope, palpitations or abnormal vital signs; an ECG answers no question raised by a leg weakness with positive functional signs.",
         "severity": "waste"
       },
       {
@@ -262,10 +253,10 @@
           }
         ],
         "citations": [
-          "[Stone_2018]"
+          "[Espay_2018]"
         ],
         "criterion_id": "avoid-waste-2-order-echocardiogram",
-        "rationale": "Echocardiography has no role in FND; no structural cardiac question is raised by the presentation.",
+        "rationale": "No embolic or structural cardiac question: the deficit has positive functional signs and the MRI shows no new lesion.",
         "severity": "waste"
       },
       {
@@ -276,10 +267,10 @@
           }
         ],
         "citations": [
-          "[Stone_2018]"
+          "[Espay_2018]"
         ],
         "criterion_id": "avoid-waste-3-order-cardiac-monitoring",
-        "rationale": "Cardiac rhythm monitoring is not indicated; the events are non-syncopal and the rule-in signs point to FND.",
+        "rationale": "There are no events of altered awareness or syncope to correlate with a rhythm.",
         "severity": "waste"
       },
       {
@@ -293,7 +284,7 @@
           "[Espay_2018]"
         ],
         "criterion_id": "avoid-waste-4-order-ct-scan",
-        "rationale": "Non-contrast head CT adds no information beyond MRI for an FND workup and contributes diagnostic noise plus radiation exposure.",
+        "rationale": "The questions on natalizumab (relapse, PML) need MRI with gadolinium; a CT answers neither and adds radiation.",
         "severity": "waste"
       },
       {
@@ -309,7 +300,7 @@
           "[Espay_2018]"
         ],
         "criterion_id": "avoid-waste-5-order-advanced-imaging",
-        "rationale": "Advanced PET imaging has no indication in FND; standard MRI is the appropriate structural workup.",
+        "rationale": "FDG-PET has no role in a functional deficit or in the relapse and PML questions, which the MRI answers.",
         "severity": "waste"
       },
       {
@@ -322,10 +313,10 @@
           }
         ],
         "citations": [
-          "[Stone_2018]"
+          "[Stone_2016]"
         ],
         "criterion_id": "avoid-waste-6-order-specialized-test",
-        "rationale": "Nerve conduction studies and EMG have no role once positive functional signs are documented: the deficit is not neuromuscular, the study is uncomfortable, and a normal result reinforces the patient's search for an organic cause \u2014 the principal iatrogenic harm in this condition",
+        "rationale": "Her weakness is central with positive functional signs; EMG and nerve conduction studies answer no question and a normal result reinforces the search for an organic cause.",
         "severity": "waste"
       },
       {
@@ -338,10 +329,10 @@
           }
         ],
         "citations": [
-          "[Stone_2018]"
+          "[Espay_2018]"
         ],
         "criterion_id": "avoid-waste-7-order-specialized-test",
-        "rationale": "Somatosensory evoked potentials answer a question about a lesion in the somatosensory pathway; a midline-splitting, non-anatomical sensory deficit is not that question",
+        "rationale": "Evoked potentials add nothing to a known MS diagnosis and cannot explain non-dermatomal sensory loss.",
         "severity": "waste"
       }
     ],
@@ -368,60 +359,71 @@
     },
     "differential": [
       {
-        "diagnosis": "Multiple sclerosis (demyelinating disease)",
+        "diagnosis": "Multiple sclerosis relapse",
         "icd_code": "G35",
-        "key_features": "Sensorimotor symptoms in a young adult raise demyelinating disease; brain (and when indicated spine) MRI without T2/FLAIR lesions or enhancement argues against an active demyelinating process.",
-        "likelihood": "moderate"
-      },
-      {
-        "diagnosis": "Structural CNS lesion (tumor, demyelination, stroke)",
-        "icd_code": null,
-        "key_features": "Focal complaints warrant imaging; normal brain MRI without lesion, mass, or enhancement effectively excludes a structural cause for the presenting deficit.",
+        "key_features": "Stable for 4 years on natalizumab; the new weakness shows the Hoover sign and a dragging gait, with no new pyramidal sign or reflex change, and the gadolinium MRI shows no new or enhancing lesion. A cord relapse is not imaged but is argued against by unchanged tone and reflexes and normal walking when unobserved.",
         "likelihood": "low"
       },
       {
-        "diagnosis": "Peripheral neuropathy or radiculopathy",
-        "icd_code": "G62.9",
-        "key_features": "Non-dermatomal sensory loss, normal reflexes, and (when obtained) normal EMG/NCS argue against peripheral nerve or root pathology.",
+        "diagnosis": "Progressive multifocal leukoencephalopathy",
+        "icd_code": "A81.2",
+        "key_features": "A JC virus index of 2.8 after 4 years of natalizumab is a high-risk stratum, but the MRI shows no new FLAIR or diffusion lesion and the deficit has positive functional signs.",
         "likelihood": "low"
-      },
-      {
-        "diagnosis": "Autoimmune or paraneoplastic encephalitis",
-        "icd_code": "G04.81",
-        "key_features": "Episodic neurological symptoms can occur in autoimmune encephalitis; normal MRI, normal EEG background, and (when obtained) negative antibody panel render this very unlikely.",
-        "likelihood": "very_low"
       },
       {
         "diagnosis": "Malingering or factitious disorder",
         "icd_code": "F68.10",
-        "key_features": "FND is involuntary; preserved effort on symptom-validity testing and absence of clear secondary gain argue against feigning. The rule-in signs do not distinguish FND from malingering by themselves, but the clinical context does not support a feigning explanation.",
-        "likelihood": "very_low"
+        "key_features": "Feigning is conscious and cannot be separated from FND by examination signs; her ongoing medical leave is noted, but she herself says the episode is unlike her relapses and is distressed by it, which argues against it.",
+        "likelihood": "low"
       }
     ],
     "key_clinical_evidence": [
-      "FND is a positive diagnosis based on rule-in signs (Hoover, tremor entrainment, give-way weakness, non-dermatomal sensory loss with midline split) \u2014 not a diagnosis of exclusion (Espay 2018, Stone 2018).",
-      "Brain MRI and basic laboratory testing are OPTIONAL here, not due diligence: the diagnosis rests on the positive signs, and each additional negative study is a cost and an iatrogenic harm rather than a confirmation. Where imaging is recommended in this case it is for one specific alternative question, once.",
-      "Over-investigation is the principal iatrogenic harm in FND; every additional negative test reinforces the patient's illness conviction and worsens prognosis (Stone 2018).",
-      "Psychiatric comorbidity (anxiety, depression, trauma) is common and informs treatment planning but is NOT required for the diagnosis and does not 'explain' the symptoms in a reductive sense.",
-      "Diagnostic communication matters: using positive language anchored on the rule-in signs is associated with better engagement and outcomes (Stone 2018).",
-      "Evidence-based treatment is multidisciplinary \u2014 CBT for PNES and FND-informed physiotherapy for functional motor symptoms (Nielsen 2015).",
-      "Interim composition decision, August 2026: FND remains only to keep the frozen dataset at 20 conditions/600 cases. The positive functional-neurological examination is the sole required diagnostic act; every instrumental test is optional and case-targeted. DLB remains the preferred future replacement when composition work resumes."
+      "Positive signs of functional right leg weakness: Hoover sign (hip extension 2/5 directly, 4/5 with contralateral hip flexion) and a dragging monoplegic gait.",
+      "Her MS baseline (right leg spasticity, hyperreflexia, heel-shin ataxia) is unchanged and no new pathological reflex is present.",
+      "The gadolinium MRI shows a stable lesion load, no enhancing lesion and no features of PML, the two questions natalizumab raises.",
+      "A JC virus index of 2.8 after 4 years on natalizumab is why imaging is required here and is a matter for her MS team; it does not make the weakness organic.",
+      "She says the episode is unlike her relapses; onset after a night of caregiving is context, neither required nor sufficient for the diagnosis."
     ],
     "red_herrings": [
       {
-        "correct_interpretation": "Psychiatric comorbidity neither establishes nor refutes FND. Diagnosis requires positive rule-in signs on examination; psychiatric history is relevant for treatment planning, not for diagnosis.",
-        "data_point": "Pre-existing psychiatric diagnosis (anxiety or depression) in the past medical history",
+        "correct_interpretation": "FND commonly coexists with MS; the new weakness has positive functional signs, the baseline signs are unchanged and the MRI shows no new or enhancing lesion.",
+        "data_point": "Established relapsing-remitting MS with right leg signs from prior lesions",
         "field_path": "patient.clinical_history.past_medical_history",
-        "intended_effect": "Premature anchoring on a 'psychosomatic' label without obtaining positive rule-in signs; conversely, dismissing FND as a serious diagnosis because the patient is 'just anxious'",
+        "intended_effect": "Attributing any new deficit to an MS relapse and treating it with steroids",
+        "location": "Past medical history and neurological examination"
+      },
+      {
+        "correct_interpretation": "The index sets PML risk; it is not evidence that the current symptom is PML. The MRI with FLAIR, DWI and gadolinium answers the question.",
+        "data_point": "JC virus antibody index 2.8 on natalizumab",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Anchoring on PML and pursuing a lumbar puncture for JC virus PCR despite a stable MRI",
+        "location": "History of present illness"
+      },
+      {
+        "correct_interpretation": "Psychiatric comorbidity neither establishes nor refutes FND; the diagnosis rests on the positive signs.",
+        "data_point": "Anxiety disorder treated with as-needed lorazepam",
+        "field_path": "patient.clinical_history.past_medical_history",
+        "intended_effect": "Premature anchoring on a psychological label without positive signs, or dismissing the weakness because she is anxious",
         "location": "Past medical history"
       }
     ],
     "review_status": "draft",
-    "sequence_constraints": [],
+    "sequence_constraints": [
+      {
+        "after_criterion_id": "action-4-analyze-brain-mri",
+        "before_criterion_id": "action-3-perform-clinical-assessment",
+        "citations": [
+          "[Espay_2018]"
+        ],
+        "reason": "The examination comes first and frames what the MRI must answer: relapse or PML if new signs are found, a functional deficit if positive functional signs are found (Espay 2018).",
+        "severity": "soft"
+      }
+    ],
     "stop_rule": {
       "max_additional_actions": 0,
       "required_before_assessment": [
-        "action-3-perform-clinical-assessment"
+        "action-3-perform-clinical-assessment",
+        "action-4-analyze-brain-mri"
       ]
     }
   },
@@ -431,36 +433,39 @@
     "clinical_assessment": {
       "assessment_type": "functional_neuro_signs",
       "criteria_met": {
-        "diagnosis_made_by_exclusion_only": false,
-        "positive_clinical_sign_present": true,
-        "psychological_stressor_required_for_diagnosis": false,
-        "symptoms_inconsistent_with_organic_disease": true
+        "distractibility_of_deficit": true,
+        "drift_without_pronation": false,
+        "give_way_weakness": false,
+        "hip_abductor_sign_positive": false,
+        "hoover_sign_positive": true,
+        "inconsistency_between_examination_and_function": true,
+        "tremor_entrainment_positive": false
       },
       "findings": [
         {
-          "result": "POSITIVE Hoover sign right leg.",
+          "result": "Right hip extension 2/5 on direct testing, returning to 4/5 during contralateral hip flexion against resistance.",
           "sign": "Hoover sign"
         },
         {
-          "result": "Right leg strength 4/5 on distracted examination.",
-          "sign": "Improvement with attentional distraction"
-        },
-        {
-          "result": "Right leg sensory loss \u2014 non-anatomical, inconsistent with prior MS distribution.",
-          "sign": "Non-anatomical sensory loss"
-        },
-        {
-          "result": "Dragging right leg worse than baseline.",
+          "result": "The right leg is dragged behind with the foot kept on the floor, worse than her baseline spastic gait.",
           "sign": "Dragging monoplegic gait"
+        },
+        {
+          "result": "Mild right leg spasticity, right leg hyperreflexia and right heel-shin ataxia unchanged from her documented baseline; no new pathological reflexes.",
+          "sign": "Baseline MS signs"
+        },
+        {
+          "result": "Non-dermatomal right leg sensory loss unlike her prior MS sensory pattern, and walking at her usual pace in the corridor when unaware of being observed; not counted as rule-in signs.",
+          "sign": "Supportive features (low specificity)"
         }
       ],
-      "impression": "Positive functional signs elicited and documented: Hoover sign, Improvement with attentional distraction, Non-anatomical sensory loss, Dragging monoplegic gait. Functional neurological disorder is a rule-in diagnosis under DSM-5 and the criterion satisfied here is clinical incompatibility, not the absence of another disease. No further investigation is required to make the diagnosis; whatever imaging or laboratory testing is performed is for a separate, specific question.",
+      "impression": "Positive signs of functional weakness: Hoover sign and dragging monoplegic gait on the right. The new weakness is inconsistent with a structural lesion; her baseline MS signs are unchanged.",
       "pre_post_comparison": null,
       "recommended_actions": [],
       "scores": {
         "distribution_consistent_with_a_single_lesion": "no",
         "internal_inconsistency": "present",
-        "positive_rule_in_signs_documented": "4"
+        "positive_rule_in_signs_documented": "2"
       }
     },
     "csf": null,
@@ -471,9 +476,10 @@
         "formulary_status": "",
         "interactions": [],
         "proposed": "Natalizumab 300 mg IV every 4 weeks; Lorazepam 0.5 mg as needed for acute anxiety",
-        "summary": "Current medications reviewed for interactions: Natalizumab 300 mg IV every 4 weeks; Lorazepam 0.5 mg as needed for acute anxiety.",
+        "summary": "No clinically significant interaction between natalizumab and lorazepam. Natalizumab carries a PML boxed warning; lorazepam sedates and impairs balance.",
         "warnings": [
-          "Interaction review performed against the current medication list above. Clinical relevance \u2014 which agents to taper, and in what order \u2014 is a prescribing decision, not an output of this check."
+          "Natalizumab: boxed warning for progressive multifocal leukoencephalopathy; risk rises with treatment beyond 2 years, prior immunosuppressant use and a higher anti-JC virus antibody index. Concomitant immunosuppressants add to the risk; none is listed.",
+          "Lorazepam: sedation, impaired balance and falls; dependence with regular use."
         ]
       }
     },
@@ -481,50 +487,15 @@
     "echo": null,
     "eeg": null,
     "labs": {
-      "abnormal_values_summary": [
-        "JC antibody index 2.8 (high risk for PML)"
-      ],
-      "interpretation": "Abnormal values: JC antibody index 2.8 index (H).",
+      "abnormal_values_summary": [],
+      "interpretation": "All results are within reference ranges.",
       "panels": {
-        "Baseline workup": [
-          {
-            "clinical_significance": "Ordered as part of the baseline workup; no abnormality that alters the diagnosis, which is what this case's diagnosis rests on",
-            "is_abnormal": false,
-            "reference_range": "",
-            "test": "CMP",
-            "unit": "",
-            "value": "Within reference range"
-          },
-          {
-            "clinical_significance": "Ordered as part of the baseline workup; no abnormality that alters the diagnosis, which is what this case's diagnosis rests on",
-            "is_abnormal": false,
-            "reference_range": "",
-            "test": "TSH",
-            "unit": "",
-            "value": "Within reference range"
-          },
-          {
-            "clinical_significance": "Ordered as part of the baseline workup; no abnormality that alters the diagnosis, which is what this case's diagnosis rests on",
-            "is_abnormal": false,
-            "reference_range": "",
-            "test": "B12",
-            "unit": "",
-            "value": "Within reference range"
-          }
-        ],
-        "Natalizumab_Monitoring": [
+        "CBC": [
           {
             "clinical_significance": null,
-            "is_abnormal": true,
-            "reference_range": "<0.9 low risk, 0.9-1.5 intermediate, >1.5 high risk",
-            "test": "JC antibody index",
-            "unit": "index",
-            "value": 2.8
-          },
-          {
             "is_abnormal": false,
             "reference_range": "4.5-11.0",
-            "test": "CBC WBC",
+            "test": "WBC",
             "unit": "K/uL",
             "value": 6.4
           },
@@ -537,11 +508,178 @@
             "value": 1.4
           },
           {
+            "clinical_significance": null,
             "is_abnormal": false,
-            "reference_range": "Therapeutic",
-            "test": "Natalizumab level",
-            "unit": "qualitative",
-            "value": "Therapeutic (infusion 3 weeks ago)"
+            "reference_range": "12.0-15.5",
+            "test": "Hemoglobin",
+            "unit": "g/dL",
+            "value": 13.4
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "36-46",
+            "test": "Hematocrit",
+            "unit": "%",
+            "value": 40.2
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "4.0-5.2",
+            "test": "RBC",
+            "unit": "M/uL",
+            "value": 4.52
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "80-100",
+            "test": "MCV",
+            "unit": "fL",
+            "value": 89
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "150-400",
+            "test": "Platelets",
+            "unit": "K/uL",
+            "value": 248
+          }
+        ],
+        "CMP": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "135-145",
+            "test": "Sodium",
+            "unit": "mEq/L",
+            "value": 139
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "3.5-5.1",
+            "test": "Potassium",
+            "unit": "mEq/L",
+            "value": 4.2
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "98-107",
+            "test": "Chloride",
+            "unit": "mEq/L",
+            "value": 103
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "22-29",
+            "test": "Bicarbonate",
+            "unit": "mEq/L",
+            "value": 25
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "7-20",
+            "test": "BUN",
+            "unit": "mg/dL",
+            "value": 13
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.5-1.1",
+            "test": "Creatinine",
+            "unit": "mg/dL",
+            "value": 0.78
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "70-99",
+            "test": "Glucose",
+            "unit": "mg/dL",
+            "value": 92
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "8.5-10.5",
+            "test": "Calcium",
+            "unit": "mg/dL",
+            "value": 9.4
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "3.5-5.0",
+            "test": "Albumin",
+            "unit": "g/dL",
+            "value": 4.3
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "6.0-8.3",
+            "test": "Total protein",
+            "unit": "g/dL",
+            "value": 7.1
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "7-35",
+            "test": "ALT",
+            "unit": "U/L",
+            "value": 22
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "10-35",
+            "test": "AST",
+            "unit": "U/L",
+            "value": 19
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "35-104",
+            "test": "Alkaline phosphatase",
+            "unit": "U/L",
+            "value": 71
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.2-1.2",
+            "test": "Total bilirubin",
+            "unit": "mg/dL",
+            "value": 0.6
+          }
+        ],
+        "Thyroid": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.4-4.0",
+            "test": "TSH",
+            "unit": "mIU/L",
+            "value": 1.8
+          }
+        ],
+        "Vitamins": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "200-900",
+            "test": "Vitamin B12",
+            "unit": "pg/mL",
+            "value": 512
           }
         ]
       }
@@ -551,33 +689,51 @@
         "query": "functional neurological disorder diagnosis treatment",
         "results": [
           {
-            "evidence_level": "guideline recommendation",
-            "finding": "Confirms multidisciplinary CBT + physiotherapy is the evidence-based treatment for FND",
-            "source": "Nielsen_2015"
+            "evidence_level": "narrative review",
+            "finding": "Diagnosis of functional neurological disorder rests on positive clinical features such as the Hoover sign, tremor entrainment and functional seizure semiology, not on the exclusion of other disease; treatment combines explanation, physiotherapy and psychological therapy.",
+            "source": "Espay AJ et al. JAMA Neurol 2018;75:1132-1141"
+          },
+          {
+            "evidence_level": "systematic review",
+            "finding": "Motor signs such as the Hoover sign, hip abductor sign, drift without pronation and dragging gait have high specificity; sensory signs such as midline splitting have low specificity.",
+            "source": "Daum C et al. J Neurol Neurosurg Psychiatry 2014;85:180-190"
+          },
+          {
+            "evidence_level": "randomised controlled trial",
+            "finding": "Specialist physiotherapy for functional motor disorder was not superior to community neurological physiotherapy on physical function at 12 months; several secondary outcomes favoured it.",
+            "source": "Nielsen G et al. Lancet Neurol 2024;23:675-686"
+          },
+          {
+            "evidence_level": "systematic review",
+            "finding": "About 4% of patients diagnosed with conversion symptoms since 1970 later received another diagnosis.",
+            "source": "Stone J et al. BMJ 2005;331:989"
           }
         ],
-        "summary": "Confirms multidisciplinary CBT + physiotherapy is the evidence-based treatment for FND"
+        "summary": "Guideline and trial evidence supports a positive clinical diagnosis of functional neurological disorder, video-EEG confirmation of functional seizures, tapering of unneeded antiseizure drugs and benzodiazepines, and physiotherapy and psychological treatment whose trial effects on primary outcomes were modest."
       }
     },
     "mri": {
       "additional_observations": [
-        "No large irregular non-enhancing T2 white matter lesions; no new asymmetric cortical or subcortical lesions in the frontal, parietal, or temporal regions",
-        "No new confluent white matter signal abnormality",
-        "Normal diffusion; no restricted diffusion"
+        "Technique: T1, T2, FLAIR, DWI/ADC and SWI, with T1 after intravenous gadolinium. Comparison: brain MRI 6 months ago.",
+        "No new or enlarging T2/FLAIR lesion.",
+        "No new subcortical or juxtacortical FLAIR lesion, no new diffusion abnormality and no punctate T2 lesions.",
+        "No mass, hemorrhage or hydrocephalus."
       ],
       "findings": [
         {
           "borders": null,
-          "location": "Periventricular and right corticospinal tract (prior MS lesions)",
+          "location": "Periventricular and juxtacortical white matter, left corona radiata along the corticospinal tract, right middle cerebellar peduncle (known MS lesions)",
           "mass_effect": null,
           "signal_characteristics": {
-            "T2": "Stable \u2014 no change from prior MRI 6 months ago"
+            "DWI": "No restricted diffusion",
+            "T1_post_gadolinium": "No enhancement",
+            "T2_FLAIR": "Hyperintense; number and size unchanged from the MRI 6 months ago"
           },
           "size": null,
-          "type": "Known T2 lesions"
+          "type": "white_matter_lesion"
         }
       ],
-      "impression": "Stable brain MRI. No new T2 lesions and no enhancing lesions compared to prior study. No asymmetric large non-enhancing white matter lesions. Known prior demyelinating lesion burden unchanged",
+      "impression": "1. Stable demyelinating lesion burden compared with the MRI 6 months ago: no new or enlarging T2/FLAIR lesion and no gadolinium-enhancing lesion. 2. No imaging features of progressive multifocal leukoencephalopathy. 3. No acute intracranial abnormality.",
       "recommended_actions": [],
       "volumetrics": null
     },
@@ -588,20 +744,17 @@
     "case_body_concerns": [],
     "citation_gap": [],
     "criteria_pack_version": "1.0",
-    "difficulty_rationale": "Mixed motor and/or seizure phenotype with at least one prominent comorbidity or compelling red herring (family history of MS, antipsychotic exposure, comorbid SLE). Standard FND workup (MRI + basic labs + video-EEG when seizure phenotype) plus disciplined diagnostic communication.",
+    "difficulty_rationale": "Functional weakness in a patient with established MS on natalizumab and a high JC virus index: the agent must make the positive diagnosis from the signs and still answer the relapse and PML questions with one gadolinium MRI, without further testing.",
     "fallback_tool_kinds": {
-      "advanced_imaging": "normal",
       "cardiac_monitoring": "normal",
       "ct": "incidental",
       "ecg": "normal",
-      "echo": "normal",
-      "literature_search": "normal",
-      "specialized_test": "normal"
+      "echo": "normal"
     },
-    "last_revised": "2026-08-10",
-    "notes": "Moderate FND \u2014 functional weakness in established RRMS patient on natalizumab. JC PCR mandatory for PML exclusion. FND superimposed on stable MS.",
+    "last_revised": "2026-10-24",
+    "notes": "Functional right leg weakness superimposed on stable RRMS on natalizumab; gadolinium MRI excludes a new or enhancing lesion and PML.",
     "policy_spec_status": "draft",
-    "revision_reason": "FND interim reviewer option: positive clinical diagnosis required; every instrumental test optional and selected for explicit red flags",
+    "revision_reason": "October 2026 review round: criteria, outputs and policy rebuilt per plans/FND.md",
     "version": "policy-v1",
     "vocab_gap": []
   },
@@ -647,7 +800,7 @@
       "handedness": "right",
       "sex": "female"
     },
-    "history_present_illness": "Ms. N is a 47-year-old middle school teacher with established relapsing-remitting MS, stable on natalizumab for 4 years (EDSS 2.0), who presents with 10-day history of worsening right leg weakness beyond her established baseline. She has been on natalizumab for 4 years and understands her MS symptoms well. She reports this episode feels different from her prior MS relapses \u2014 her prior relapses typically involved sensory symptoms or brief worsening of balance. The current episode started abruptly one morning after a particularly difficult night of caring for her mother who has early dementia. She is on medical leave from her teaching position for MS monitoring appointments. She herself states the episode does not feel like her typical MS relapse. Her last natalizumab infusion was 3 weeks ago. Her last MRI was 6 months ago \u2014 stable. Natalizumab is the MS disease-modifying therapy with the highest PML risk, and her JC virus antibody index was 2.8 on last check.",
+    "history_present_illness": "Ms. N is a 47-year-old middle school teacher with relapsing-remitting MS diagnosed 8 years ago, stable on natalizumab for 4 years (EDSS 2.0), who presents with a 10-day history of right leg weakness beyond her established baseline. She reports that this episode feels different from her prior MS relapses, which typically involved sensory symptoms or brief worsening of balance. The weakness started abruptly one morning after a particularly difficult night caring for her mother, who has early dementia. She is on medical leave from her teaching position for MS monitoring appointments. Her last natalizumab infusion was 3 weeks ago. Her last brain MRI, 6 months ago, was stable. Her JC virus antibody index at her routine check 3 months ago was 2.8.",
     "neurological_exam": {
       "additional": "Right leg weakness worse than her documented MS baseline, variable with distraction; baseline right leg spasticity, hyperreflexia, and mild heel-shin ataxia from prior MS are unchanged. No new pathological reflexes.",
       "coordination": "Baseline mild right heel-shin ataxia (from prior MS lesion) \u2014 no change.",

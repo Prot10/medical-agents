@@ -1,0 +1,49 @@
+# FND-RS01
+Reviewer status: R1 none, R2 none (FND was never reviewed; no notes file) | Approved before this round: no
+
+## Reviewer notes
+No reviewer notes for this case.
+
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| (none) | - | - |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| A | major | `ground_truth.action_criteria` | Template criteria (plan A): literature and drug check `recommended`, video-EEG and labs `optional`, labels equal to rationales, template citations. | FIXED: order exam (required), labs `["CMP","magnesium","phosphate","thiamine_B1"]` (recommended), video-EEG (required), drug check (required), new optional `action-neuropsych-battery`, literature (optional, last); case-specific labels, rationales, expected evidence, citations. |
+| A | major | `ground_truth.stop_rule` | Only the exam although video-EEG and drug check are now required. | FIXED: exam, video-EEG, drug check; `max_additional_actions` 0. No sequence constraint (plan 3.3 limits video-EEG before drug check to the taper cases). |
+| C | major | `followup_outputs[1]` (drug check) | Proposed sertraline, which she does not take; claimed metoclopramide "increases serotonin levels"; metoclopramide's real risks (extrapyramidal reactions, tardive dyskinesia, EMA dose and duration limit, epilepsy contraindication, QT) absent (plan C). | FIXED: deleted; `initial_tool_outputs.drug_interactions.general` lists her three medicines verbatim with those metoclopramide warnings and contraindications; no new drug or dose. |
+| D | minor | `followup_outputs[0]` (literature) | Case-agnostic follow-up with paraphrased results and a summary echoing the policy (plan B). | FIXED: deleted; canonical `initial_tool_outputs.literature_search`. |
+| B | major | `initial_tool_outputs.eeg` | Report did not describe the captured events (only a "Movement artifact" finding); impression not canonical and with an em dash; nothing marked it as a video recording. | FIXED: two event findings with times, durations, video semiology and the persisting posterior rhythm; canonical video-EEG impression; `background.continuity` added. Activating procedures, background and limitations kept. |
+| D | major | `initial_tool_outputs.clinical_assessment` | Meta keys in `criteria_met`; non-dermatomal sensory loss and sensory inconsistency counted as rule-in signs; observed events not reported; key-leak impression. | FIXED: canonical shape; 3 validated signs (bilateral Hoover, collapsing weakness, distractibility); sensory findings and astasia-abasia supportive; observed event row; event-based impression; wasting and reflexes reported. |
+| D | major | `initial_tool_outputs.labs` | Management text in `clinical_significance` and `interpretation` ("replace", "replace empirically before glucose", "not Wernicke encephalopathy"); magnesium omitted from the interpretation; phosphate, which the refeeding question needs and the criterion names, absent. | FIXED: `clinical_significance` null; plain interpretation; panels renamed (Magnesium_phosphate_thiamine, Prolactin); phosphorus 2.8 mg/dL (normal) added, the same value as the source-patient twin RP02. Other values unchanged. |
+| B | minor | `patient.history_present_illness` | "Laboratory screening for infectious, metabolic, and autoimmune causes was non-revealing" against a current low magnesium, and a result of the scored labs. | FIXED: "Screening for infectious and autoimmune causes at the regional hospitals was reported as non-revealing." |
+| C | major | `ground_truth.assessment.required_recommendations` | Template musts; no thiamine, refeeding, eating-disorder or metoclopramide action. | FIXED: M-DX (mixed), M-COMM (interpreter, father), M-PHYSIO, M-PSY (depression), M-RESCUE, thiamine before glucose with magnesium replacement and refeeding monitoring, eating-disorder assessment, stop metoclopramide. |
+| C | major | `ground_truth.assessment.prohibited_recommendations` | "per Stone 2018"; "start or continue" AEDs. | FIXED: P1 (naming repeat CT and spine MRI), P2, P3, P5, P6, P7, "Give glucose-containing fluids before thiamine", "Continue metoclopramide". |
+| C | major | `ground_truth.differential` | Epileptic seizures `moderate` after recorded events; MS and structural rows citing a brain MRI not in the case; neuropathy citing an avoided EMG; encephalitis and malingering template rows; the drug, nutritional and referral mimics missing. | FIXED: epileptic seizures `low` (canonical), metoclopramide-induced movement disorder `low`, thiamine deficiency `low`, malnutrition myopathy `low`, spinal cord lesion `low`, early-onset psychosis `low`, eating disorder possibly coexisting `moderate`. |
+| B | major | `ground_truth.red_herrings[0]` | "Family history of epilepsy" while the family history says "No family history of epilepsy". | FIXED: deleted; red herrings now the psychosis referral, wasting with reduced reflexes, and the depressive context. |
+| A | minor | `ground_truth.avoided_actions` | No repeat-study waste although a spinal cord MRI was normal (plan L). | FIXED: added `avoid-waste-repeat-spine-mri`; existing items cite `[Espay_2018]`/`[Stone_2016]` with patient-specific rationales. |
+| E | major | `ground_truth.key_clinical_evidence` | Template items with the "Interim composition decision" leak, OPTIONAL item and Stone 2018. | FIXED: 5 case-specific items. |
+| B | minor | `fallback_tool_outputs` | specialized_test and advanced_imaging untyped with the leak sentence; echo without `echo_type`. | FIXED: nulled and removed from `fallback_tool_kinds`; echo `echo_type: TTE`. |
+| E | minor | `metadata.difficulty_description`, `.difficulty_rationale` | "Normal investigations support the diagnosis" (diagnosis by exclusion) and template rationale. | FIXED: rewritten for the case; `last_revised` 2026-10-24. |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+
+The pathway is the functional-signs examination, then magnesium, phosphate, thiamine and electrolytes (recommended), the video-EEG of the habitual events (required) and the medication review (required), with optional neuropsychology and literature last. The examination report counts the bilateral Hoover sign, collapsing leg weakness and distractibility, lists the sensory findings and astasia-abasia as supportive, describes the two events seen during the examination and records the wasting with 1+ leg reflexes. The video-EEG now reports the two events (60 and 75 seconds, closed eyes, asynchronous shaking) with the posterior rhythm persisting and no ictal change. The labs keep their values, lose the management text, and add a normal phosphorus (2.8 mg/dL) so the refeeding question is answerable. The drug check now addresses the real problem: metoclopramide 10 mg three times daily, a dopamine antagonist with extrapyramidal and tardive dyskinesia risk, an EMA weight-based ceiling she exceeds, an epilepsy contraindication and QT effects; the sertraline output for a drug she does not take is gone. Musts add an event plan, thiamine before glucose with magnesium replacement and refeeding monitoring, an eating-disorder assessment and stopping metoclopramide; prohibitions add continuing metoclopramide and glucose before thiamine. The differential (all low except a possibly coexisting eating disorder) now includes metoclopramide-induced movement disorder and the referral diagnosis of psychosis. A repeat spine MRI is scored as waste.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+
+- New citation keys per plan 1.1: `[Daum_2014]`, `[Stone_2016]`. Free-text: "NICE CG32 Nutrition support for adults", "Metoclopramide SmPC and EMA 2013 restriction".
+- EEG routing (plan CENTRAL 3): a `routine` EEG order receives the stored video-EEG with its events.
+
+## Open questions for Andrea (judgment calls you could not settle)
+
+None open. Decisions taken:
+- Phosphorus 2.8 mg/dL was added to the stored labs (the only new value): the recommended criterion names phosphate per plan 3.2, the refeeding must needs it, and the value matches the source-patient twin RP02 so the two cases do not diverge (plan 6.3).
+- RS01 and RP02 already differ in history (mother's death 7 years vs 6 months ago, medication lists); per plan 6.3 I kept the existing data and invented nothing further.
+- The plan's RS01 musts are "as RP02 plus RESCUE and stop metoclopramide"; RP02's primary-amenorrhea must does not apply because RS01 records no amenorrhea.
+
+## Verification
+
+`perfect_agent.py FND-RS01 -v`: ok; the lab call gets the stored panel with magnesium, phosphorus and thiamine, `eeg_type: video` gets the stored video-EEG, the drug check gets `initial_tool_outputs.drug_interactions.general`. `case_io.py check FND-RS01`: schema and synonym guard OK; the only FND failures are the literature leaks of FND-P08 and S10 (other workers' cases). `test_case_guards.py -k FND-RS01`: 2 passed.

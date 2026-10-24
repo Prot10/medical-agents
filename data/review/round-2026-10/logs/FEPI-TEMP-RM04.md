@@ -1,0 +1,44 @@
+# FEPI-TEMP-RM04
+Reviewer status: no reviewer notes for FEPI-TEMP (R1 and R2 never reviewed this condition in a notes round) | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| (none) | n/a | No reviewer notes for this case. Physician input is the July 2026 tool guidance (plan 1.3), applied through the condition plan. |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| B | major | `patient.clinical_history.past_medical_history[0]` | "Sertraline (now tapered off)" while the medication list and HPI have sertraline 50 mg. | FIXED: "in remission for 2 years on sertraline, tapered from 100 to 50 mg daily six weeks ago". |
+| D | major | `initial_tool_outputs.labs` | Prolactin 52.4 at an unstated interval after the convulsion (class M), reused by the Holter rationale and the migraine differential. | FIXED: row and summary entry deleted; every mention removed (`avoided_actions`, `differential`). |
+| D | minor | `initial_tool_outputs.labs.interpretation` | Routine-panel interpretation named diagnoses ("consistent with iron deficiency", "confirms ongoing iron deficiency"). | FIXED: plain recital of the abnormal values. |
+| C | major | `ground_truth.assessment`, `key_clinical_evidence`, `red_herrings[0]` | Iron-deficiency anemia persisting after 8 months of oral iron in an adult man was dismissed as a pre-existing distraction; it needs gastrointestinal evaluation (comorbid contributor class). | FIXED: must for GI evaluation; KCE and red herring interpretation say it does not explain the seizures but needs its own work-up. |
+| D | minor | `initial_tool_outputs.eeg.limitations` | "Sleep-deprived or prolonged video-EEG monitoring would provide greater yield" (class K). | FIXED: the recording's own limits; impression final period. |
+| D | minor | `initial_tool_outputs.ecg` | Removed `clinical_correlation` key; interpretation "no cardiac substrate identified to explain transient loss of consciousness" (cross-modality). | FIXED: key dropped; "Normal sinus rhythm, 76/min. Normal axis and intervals. Normal ECG."; criterion optional (class T). |
+| A | minor | `initial_tool_outputs.mri` | No technique line; asymmetry index "3.1%" does not follow (L-R)/(L+R) (3.1 and 3.2 cm3 give 0.02). | FIXED: 3T epilepsy-protocol technique with the post-contrast sentence (class E, tumor case); index 0.02. |
+| B | minor | `ground_truth.action_criteria[action-3-analyze-brain-mri].expected_evidence` | Evidence said "most consistent with ganglioglioma" while the report lists ganglioglioma and DNET as leading considerations. | FIXED: evidence follows the report. |
+| D | major | `followup_outputs` (literature) | Literature required and first in the pathway; sources unverifiable or fabricated (Luyken Neurosurgery 2004, Blumcke Epilepsia 2014, Glauser 2017) (classes A, O). | FIXED: optional and last; Blumcke 2017 NEJM, Engel 2003, NICE NG217, SANAD II; general evidence only; leak guard passes. |
+| C | minor | `followup_outputs` (drug check) | "Mild serotonergic potentiation" with lamotrigine (unsupported; the reported issue is raised lamotrigine levels), unverified "60-70%" sertraline reduction, inducer avoidance filed as a contraindication, irrelevant penicillin warning; ferrous sulfate not addressed. | FIXED: rewritten against his real list (sertraline, ferrous sulfate); recommended (class B); evidence names the inducer effect on sertraline and levetiracetam mood effects. |
+| C | major | `ground_truth.assessment` | Gadolinium MRI and presurgical video-EEG process musts; a diagnostic insight filed as a must; no driving, SUDEP or valproate line; surgical referral without language-mapping caveat for a posterior STG lesion in a left-hander. | FIXED: musts are first-line non-inducing ASM (lamotrigine preferred for mood, or levetiracetam with mood monitoring), epilepsy surgery referral with language lateralization and mapping before resection, driving, SUDEP, GI evaluation of the anemia, sertraline taper with psychiatry. Prohibitions: inducers, canonical valproate line, "do not attribute to depression or migraine"; the LP prohibition removed (CSF is waste). |
+| C | major | `ground_truth.differential` | High-grade glioma `moderate` after MRI without enhancement, diffusion restriction or edema; LGI1 coded `G06.9` (intracranial abscess); the case's own psychiatric explanation of the sounds absent (class P). | FIXED: high-grade glioma `low`; DNET stays `moderate` (only histology separates it), coded `D33.0`; LGI1 `G04.81`; depression with auditory hallucinations added `very_low`. |
+| E | minor | `ground_truth.key_clinical_evidence` | Engineering lines (class G), a line instructing the agent not to be distracted. | FIXED: six case-specific items. |
+| B | minor | `fallback_tool_outputs.ecg`, `.ct`, `.echo` | Unused fallback ECG at 86/min contradicted the stored ECG (76/min); fallback CT impression described a lesion with no finding; echo without `echo_type`. | FIXED: ECG fallback null (and removed from `fallback_tool_kinds`); CT finding added; `echo_type: TTE`. |
+| E | minor | criteria and avoided-action `citations`, `rationale`, `label` | Keys listed twice, rationale repeating the label (class H). | FIXED: one bracketed key each, case-specific rationales. |
+| C | minor | `ground_truth.sequence_constraints`, `stop_rule` | Template reason; literature and drug check in the stop rule, `max_additional_actions: 0` (classes C, D). | FIXED: canonical MRI -> drug check reason; stop rule MRI and EEG, max 2. |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+
+A 34-year-old left-handed man has five months of stereotyped auditory auras (music or voices from the right) evolving to impaired awareness, right head version and right-hand automatisms, and a first focal to bilateral tonic-clonic seizure. Required: the epilepsy-protocol MRI (now with a technique line) showing a cystic left posterior superior temporal gyrus lesion with a non-enhancing nodule and normal hippocampi, and the routine EEG with left T3/T5 sharp waves maximal at T5. Labs and ECG are optional, the drug check (sertraline) recommended, literature optional and last. Prolactin is removed everywhere. Musts: lamotrigine or levetiracetam (lamotrigine preferred for his depression history, or mood monitoring on levetiracetam), epilepsy surgery referral for resection and tissue diagnosis with language mapping first (posterior STG, left-handed), no driving, SUDEP counselling, gastrointestinal evaluation of iron deficiency that persists after eight months of oral iron, and the sertraline taper coordinated with psychiatry; no inducers, no valproate. High-grade glioma is now low; DNET remains moderate.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+
+- Label (`ground_truth.diagnosis.accepted[0]`): it names "ganglioglioma (WHO grade I)", a histological diagnosis the case cannot establish (no tissue; the MRI keeps ganglioglioma and DNET as leading considerations), and uses the pre-2021 roman grade. Proposed: "Focal epilepsy of left temporal lobe origin (lateral neocortical TLE with auditory aura) due to a left superior temporal gyrus low-grade epilepsy-associated tumor (presumed ganglioglioma, CNS WHO grade 1)". Workers do not edit labels.
+- Synonyms (plan CENTRAL 6): "mesial temporal lobe epilepsy" and "mesial temporal sclerosis epilepsy" are wrong for this lateral neocortical case with normal hippocampi; the idiopathic `G40.009`/`G40.019` codes do not fit.
+- Citation keys used that are not in the pack allow-list yet (plan CENTRAL 2): `[ILAE_MRI_2019]`, `[IFCN_ILAE_EEG_2023]`, `[NICE_NG217_2025]`, `[Blumcke_2017]`.
+
+## Open questions for Andrea (judgment calls you could not settle)
+
+None open. Decisions taken and their reasons:
+- MRI substance kept (cyst with a non-enhancing nodule): it supports a low-grade epilepsy-associated tumor, which is all imaging can establish; the label issue goes to CENTRAL rather than making the scan more "typical" of ganglioglioma.
+- No functional MRI criterion was added: language lateralization belongs to the surgical center's presurgical work-up after referral, and is written into the referral must as a planning step, not as a study the agent must order now.
+- No FDG-PET waste line added (the plan does not list RM04 for class J and the case stores no PET).

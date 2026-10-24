@@ -4,14 +4,7 @@
   "difficulty": "diagnostic_puzzle",
   "encounter_type": "inpatient",
   "fallback_tool_outputs": {
-    "advanced_imaging": {
-      "findings": [],
-      "impression": "No abnormality identified.",
-      "modality": "MRI_brain_functional",
-      "quantitative_data": null,
-      "recommended_actions": [],
-      "tracer_or_protocol": null
-    },
+    "advanced_imaging": null,
     "cardiac_monitoring": {
       "duration_hours": 24,
       "events": [],
@@ -41,30 +34,9 @@
       "protein": "38 mg/dL",
       "special_tests": {}
     },
-    "ct": {
-      "additional_observations": [],
-      "angiography_findings": null,
-      "contrast_used": false,
-      "findings": [],
-      "impression": "No acute intracranial abnormality. No haemorrhage, mass, hydrocephalus, or large-territory infarct.",
-      "recommended_actions": []
-    },
+    "ct": null,
     "drug_interactions": null,
-    "ecg": {
-      "axis": "normal",
-      "clinical_correlation": "",
-      "findings": [
-        "Normal sinus rhythm. Normal axis and intervals. No acute ST-T changes."
-      ],
-      "interpretation": "Normal ECG",
-      "intervals": {
-        "PR": "152 ms",
-        "QRS": "84 ms",
-        "QTc": "434 ms"
-      },
-      "rate": 63,
-      "rhythm": "normal sinus rhythm"
-    },
+    "ecg": null,
     "echo": {
       "chambers": {
         "LA": "normal size",
@@ -72,6 +44,7 @@
         "RA": "normal size",
         "RV": "normal size and function"
       },
+      "echo_type": "TTE",
       "ejection_fraction": 59.0,
       "findings": [
         "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
@@ -88,45 +61,30 @@
     },
     "eeg": null,
     "labs": null,
-    "literature_search": {
-      "general": {
-        "query": "general",
-        "results": [],
-        "summary": "No directly applicable, high-quality evidence was retrieved for this query. Recommend correlating with current society guidelines."
-      }
-    },
+    "literature_search": null,
     "mri": null,
-    "specialized_test": {
-      "findings": [
-        {
-          "test": "study performed",
-          "value": "no contributory abnormality"
-        }
-      ],
-      "impression": "The study was performed and is normal. It does not contribute to the diagnosis in this presentation, and the negative result is itself a harm in a functional disorder: it reinforces the search for an organic cause the positive signs have already answered.",
-      "quantitative_data": null,
-      "recommended_actions": [],
-      "test_type": ""
-    }
+    "specialized_test": null
   },
   "followup_outputs": [
     {
       "output": {
-        "alternatives": [],
-        "contraindications": [],
-        "formulary_status": "Current regimen appropriate",
-        "interactions": [
-          "Sertraline: minimal effect on glucose metabolism \u2014 no adjustment needed"
+        "additional_observations": [
+          "Technique: CT angiography of the head and neck after intravenous iodinated contrast."
         ],
-        "proposed": "No medication changes \u2014 review insulin pump settings and CGM alarm thresholds",
-        "warnings": [
-          "Ensure CGM low glucose alarm is set at \u226570 mg/dL to detect hypoglycemia before neurological symptoms",
-          "Review sick-day rules with diabetes educator \u2014 stress can cause insulin resistance and glucose fluctuations",
-          "Provide patient with glucagon emergency kit for severe hypoglycemia"
-        ]
+        "angiography_findings": {
+          "ACA": "Patent bilaterally",
+          "MCA": "Patent bilaterally, including M2 branches",
+          "cervical_carotid_and_vertebral": "Patent, no stenosis or dissection",
+          "intracranial_ICA": "Patent bilaterally",
+          "vertebrobasilar": "Patent"
+        },
+        "contrast_used": true,
+        "findings": [],
+        "impression": "Normal CT angiography of the head and neck. No large-vessel occlusion, stenosis or dissection.",
+        "recommended_actions": []
       },
-      "tool_name": "check_drug_interactions",
-      "trigger_action": "insulin_pump_cgm_education"
+      "tool_name": "order_ct_scan",
+      "trigger_action": "request_ct_angiography"
     }
   ],
   "ground_truth": {
@@ -135,36 +93,22 @@
         "alternatives": [
           {
             "required_arguments": {
-              "query": "functional neurological disorder diagnosis treatment"
+              "panels": [
+                "glucose"
+              ]
             },
-            "tool_name": "search_medical_literature"
+            "tool_name": "interpret_labs"
           }
         ],
         "citations": [
-          "[Nielsen_2015]",
-          "FND criteria pack \u2014 treatment evidence"
+          "[AHA_ASA_Stroke_2026]",
+          "[Espay_2018]"
         ],
-        "criterion_id": "action-1-search-medical-literature",
-        "expected_evidence": "Confirms multidisciplinary CBT + physiotherapy is the evidence-based treatment for FND",
-        "importance": "recommended",
-        "label": "Search current literature on FND diagnostic signs and evidence-based treatment (CBT for PNES, specialized physiotherapy for functional motor symptoms)",
-        "rationale": "Search current literature on FND diagnostic signs and evidence-based treatment (CBT for PNES, specialized physiotherapy for functional motor symptoms)"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "check_drug_interactions"
-          }
-        ],
-        "citations": [
-          "FND criteria pack \u2014 medication review"
-        ],
-        "criterion_id": "action-2-check-drug-interactions",
-        "expected_evidence": "Identification of medication contributors that should be tapered or discontinued",
-        "importance": "recommended",
-        "label": "Review current medications for agents that may exacerbate symptoms (e.g., benzodiazepines, dopamine-blocking antipsychotics, AEDs initiated for PNES)",
-        "rationale": "Review current medications for agents that may exacerbate symptoms (e.g., benzodiazepines, dopamine-blocking antipsychotics, AEDs initiated for PNES)"
+        "criterion_id": "action-5-interpret-labs",
+        "expected_evidence": "Glucose of 92 mg/dL, so hypoglycemia does not explain the deficit",
+        "importance": "required",
+        "label": "Fingerstick glucose on arrival",
+        "rationale": "A focal deficit 3 hours after an insulin bolus is hypoglycemia until the glucose is known; a capillary glucose comes before imaging on every acute stroke pathway (AHA/ASA 2026)."
       },
       {
         "alternatives": [
@@ -176,77 +120,56 @@
           }
         ],
         "citations": [
-          "[AAN_Functional_Seizures_2025]",
-          "positive FND signs; AAN functional seizures guideline 2025"
+          "[Espay_2018]",
+          "[DSM5_FND]",
+          "Daum C et al. J Neurol Neurosurg Psychiatry 2014;85:180-190"
         ],
         "criterion_id": "action-3-perform-clinical-assessment",
-        "expected_evidence": "Positive rule-in signs establish FND; symptoms are real and involuntary, and psychological stress is not a required diagnostic criterion",
+        "expected_evidence": "Downward drift with the palm supinated, arm held up despite 2/5 testing, dragging left leg, normal reflexes",
         "importance": "required",
-        "label": "Perform and document a positive FND examination: internal inconsistency/incongruity, Hoover sign, entrainment/distractibility or positive functional-seizure semiology as appropriate",
-        "rationale": "Perform and document a positive FND examination: internal inconsistency/incongruity, Hoover sign, entrainment/distractibility or positive functional-seizure semiology as appropriate"
+        "label": "Examine for positive functional signs",
+        "rationale": "With glucose normal, the examination looks for positive signs while the stroke question is answered: drift without pronation and an arm held against gravity despite 2/5 testing are functional signs, while upward drift would point to a parietal lesion."
       },
       {
         "alternatives": [
           {
-            "required_arguments": {
-              "contrast": false,
-              "protocol": "standard"
-            },
+            "required_arguments": {},
             "tool_name": "analyze_brain_mri"
+          },
+          {
+            "required_arguments": {
+              "contrast": false
+            },
+            "tool_name": "order_ct_scan"
           }
         ],
         "citations": [
-          "[AAN_Functional_Seizures_2025]",
-          "positive FND signs; AAN functional seizures guideline 2025"
+          "[AHA_ASA_Stroke_2026]"
         ],
         "criterion_id": "action-4-analyze-brain-mri",
-        "expected_evidence": "Exclude the named structural mimic; a normal scan does not itself diagnose FND",
-        "importance": "optional",
-        "label": "Consider MRI only for the explicit first focal deficit, acute red flag or competing organic neurological disease in this case",
-        "rationale": "Consider MRI only for the explicit first focal deficit, acute red flag or competing organic neurological disease in this case"
+        "expected_evidence": "No infarct, hemorrhage or structural lesion on emergency imaging",
+        "importance": "required",
+        "label": "Emergency brain imaging",
+        "rationale": "A sudden hemiparesis within 3 hours of onset needs emergency brain imaging whatever the examination shows; MRI with DWI answers the infarct question best, and a non-contrast CT excludes hemorrhage. No gadolinium is needed."
       },
       {
         "alternatives": [
           {
             "required_arguments": {
-              "panels": [
-                "glucose",
-                "CMP"
-              ]
+              "angiography": true
             },
-            "tool_name": "interpret_labs"
+            "tool_name": "order_ct_scan"
           }
         ],
         "citations": [
-          "[AAN_Functional_Seizures_2025]",
-          "positive FND signs; AAN functional seizures guideline 2025"
+          "[AHA_ASA_Stroke_2026]"
         ],
-        "criterion_id": "action-5-interpret-labs",
-        "expected_evidence": "Answer the specific alternative diagnosis; normal blood tests do not establish FND",
+        "criterion_id": "action-ct-angiography",
+        "expected_evidence": "Patent intracranial and cervical vessels",
         "importance": "optional",
-        "label": "Consider only case-targeted blood tests for the named metabolic, inflammatory, nutritional or treatment-related mimic",
-        "rationale": "Consider only case-targeted blood tests for the named metabolic, inflammatory, nutritional or treatment-related mimic"
-      }
-    ],
-    "assessment": {
-      "prohibited_recommendations": [
-        "Do not pursue ever-expanding negative investigations \u2014 per Stone 2018, repeated negative workups reinforce illness conviction and worsen prognosis",
-        "Do not frame the diagnosis as 'all in your head', 'nothing wrong', or 'we couldn't find anything' \u2014 this damages the therapeutic alliance and is the most common avoidable harm in FND",
-        "Do not perform invasive testing (lumbar puncture, nerve biopsy, muscle biopsy, cerebral angiography) when positive rule-in signs are present and there is no clinical indication",
-        "Do not order EMG/NCS, muscle biopsy, or nerve biopsy as part of an FND workup \u2014 these invasive tests reinforce the somatic illness model per Stone 2018",
-        "Do not give gadolinium without a specific indication \u2014 contrast adds cost and risk and answers no question that positive functional signs have not already answered",
-        "Do not repeat the brain MRI, the laboratory panel or the lumbar puncture once a first normal study and positive rule-in signs are documented: each repetition strengthens the patient's belief that something organic has been missed"
-      ],
-      "required_recommendations": [
-        "Do NOT make the diagnosis by exclusion: document at least one positive rule-in sign, which is the act that establishes it",
-        "Communicate the diagnosis transparently using positive language and the rule-in signs as the basis",
-        "Refer for FND-informed physiotherapy and CBT / psychological therapy",
-        "Order a comprehensive neuropsychological battery to characterize comorbid depression, anxiety, somatization, and trauma exposure \u2014 informs treatment planning (criteria-pack 'recommended' tier)",
-        "Communicate the diagnosis transparently using positive language anchored on the rule-in signs; explicitly state the diagnosis is FND, the symptoms are real and involuntary, and there is an evidence-based treatment plan",
-        "Refer to specialized FND-informed physiotherapy (for functional motor symptoms) and to CBT / psychological therapy (for PNES and comorbid mood / anxiety)"
-      ]
-    },
-    "avoided_actions": [
+        "label": "CT angiography",
+        "rationale": "Vessel imaging is part of the acute stroke pathway when thrombectomy could be considered; with positive functional signs and normal parenchymal imaging it is defensible but earns no credit."
+      },
       {
         "alternatives": [
           {
@@ -255,12 +178,82 @@
           }
         ],
         "citations": [
-          "[Stone_2018]"
+          "[AHA_ASA_Stroke_2026]"
         ],
-        "criterion_id": "avoid-waste-1-analyze-ecg",
-        "rationale": "ECG has no diagnostic role in FND; cardiac etiology is not on the differential for the presenting neurological deficit.",
-        "severity": "waste"
+        "criterion_id": "action-ecg",
+        "expected_evidence": "Sinus tachycardia without another abnormality",
+        "importance": "optional",
+        "label": "12-lead ECG",
+        "rationale": "A baseline ECG belongs to the acute stroke pathway and her heart rate is 108; it does not bear on the functional diagnosis."
       },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "check_drug_interactions"
+          }
+        ],
+        "citations": [
+          "[Espay_2018]"
+        ],
+        "criterion_id": "action-2-check-drug-interactions",
+        "expected_evidence": "A minor SSRI-insulin glucose interaction only",
+        "importance": "optional",
+        "label": "Medication review",
+        "rationale": "Insulin and sertraline have only a minor glucose interaction; nothing in the list changes the diagnosis or plan."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "neuropsych_battery"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[Espay_2018]"
+        ],
+        "criterion_id": "action-neuropsych-battery",
+        "expected_evidence": "Profile of comorbid mood, anxiety and somatic symptom burden to guide therapy; no bearing on the diagnosis",
+        "importance": "optional",
+        "label": "Neuropsychological assessment of mood, anxiety and dissociation",
+        "rationale": "A battery with performance-validity measures can characterise the comorbidity that treatment will target; it does not make the diagnosis and is the most expensive item on this pathway (criteria pack, optional tier)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "query": "functional neurological disorder diagnosis treatment"
+            },
+            "tool_name": "search_medical_literature"
+          }
+        ],
+        "citations": [
+          "[Espay_2018]"
+        ],
+        "criterion_id": "action-1-search-medical-literature",
+        "expected_evidence": "Background evidence only; the diagnosis and plan for this patient do not depend on a literature result",
+        "importance": "optional",
+        "label": "Search the literature on functional neurological disorder",
+        "rationale": "General evidence on positive diagnosis and treatment can inform the explanation and the referral; no step of the diagnostic work-up depends on it (round ruling 5)."
+      }
+    ],
+    "assessment": {
+      "prohibited_recommendations": [
+        "Order further investigations once the positive diagnosis is established, without a new specific clinical question (repeat MRI, CT, lumbar puncture, EMG or nerve conduction studies, evoked potentials, PET).",
+        "Tell the patient the symptoms are imagined, feigned, 'all in your head', or that nothing is wrong.",
+        "Perform invasive testing without a specific indication (lumbar puncture, nerve or muscle biopsy, catheter angiography).",
+        "Give gadolinium contrast without a specific indication."
+      ],
+      "required_recommendations": [
+        "Make a positive diagnosis of functional neurological disorder (functional left arm weakness) based on drift without pronation, an arm held against gravity despite 2/5 testing and a dragging left leg, with a normal glucose and normal emergency imaging, and not by exclusion of other disease.",
+        "Manage as a suspected acute stroke until assessed: fingerstick glucose first, then emergency brain imaging; with positive functional signs and no infarct on diffusion-weighted MRI, thrombolysis is not indicated.",
+        "Explain the diagnosis to the patient, and with consent to the family, as a common and genuine disorder of nervous system functioning that can improve, show the positive signs, and give written information.",
+        "Refer for physiotherapy with expertise in functional motor disorder (motor retraining, Nielsen 2015 consensus)."
+      ]
+    },
+    "avoided_actions": [
       {
         "alternatives": [
           {
@@ -269,10 +262,10 @@
           }
         ],
         "citations": [
-          "[Stone_2018]"
+          "[Espay_2018]"
         ],
         "criterion_id": "avoid-waste-2-order-echocardiogram",
-        "rationale": "Echocardiography has no role in FND; no structural cardiac question is raised by the presentation.",
+        "rationale": "With normal emergency imaging and positive functional signs there is no infarct and no embolic source to look for.",
         "severity": "waste"
       },
       {
@@ -283,24 +276,10 @@
           }
         ],
         "citations": [
-          "[Stone_2018]"
-        ],
-        "criterion_id": "avoid-waste-3-order-cardiac-monitoring",
-        "rationale": "Cardiac rhythm monitoring is not indicated; the events are non-syncopal and the rule-in signs point to FND.",
-        "severity": "waste"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "order_ct_scan"
-          }
-        ],
-        "citations": [
           "[Espay_2018]"
         ],
-        "criterion_id": "avoid-waste-4-order-ct-scan",
-        "rationale": "Non-contrast head CT adds no information beyond MRI for an FND workup and contributes diagnostic noise plus radiation exposure.",
+        "criterion_id": "avoid-waste-3-order-cardiac-monitoring",
+        "rationale": "No infarct, syncope or palpitations; her tachycardia is sinus. A rhythm recording answers no question.",
         "severity": "waste"
       },
       {
@@ -311,10 +290,10 @@
           }
         ],
         "citations": [
-          "[Stone_2018]"
+          "[Stone_2016]"
         ],
         "criterion_id": "avoid-waste-5-analyze-csf",
-        "rationale": "Lumbar puncture is not indicated in typical FND; invasive testing reinforces somatic illness model and adds iatrogenic risk without changing management.",
+        "rationale": "Nothing suggests infection or inflammation; a lumbar puncture is invasive and answers no question.",
         "severity": "waste"
       },
       {
@@ -330,7 +309,7 @@
           "[Espay_2018]"
         ],
         "criterion_id": "avoid-waste-6-order-advanced-imaging",
-        "rationale": "Advanced PET imaging has no indication in FND; standard MRI is the appropriate structural workup.",
+        "rationale": "FDG-PET has no role in an acute deficit with positive functional signs and normal imaging.",
         "severity": "waste"
       },
       {
@@ -343,10 +322,10 @@
           }
         ],
         "citations": [
-          "[Stone_2018]"
+          "[Stone_2016]"
         ],
         "criterion_id": "avoid-waste-7-order-specialized-test",
-        "rationale": "Nerve conduction studies and EMG have no role once positive functional signs are documented: the deficit is not neuromuscular, the study is uncomfortable, and a normal result reinforces the patient's search for an organic cause \u2014 the principal iatrogenic harm in this condition",
+        "rationale": "The weakness has positive functional signs and normal reflexes; EMG and nerve conduction studies answer no question and a normal result reinforces the search for an organic cause.",
         "severity": "waste"
       },
       {
@@ -359,10 +338,10 @@
           }
         ],
         "citations": [
-          "[Stone_2018]"
+          "[Espay_2018]"
         ],
         "criterion_id": "avoid-waste-8-order-specialized-test",
-        "rationale": "Somatosensory evoked potentials answer a question about a lesion in the somatosensory pathway; a midline-splitting, non-anatomical sensory deficit is not that question",
+        "rationale": "Evoked potentials cannot explain a hemisensory loss accompanying functional weakness and answer no question here.",
         "severity": "waste"
       }
     ],
@@ -389,61 +368,73 @@
     },
     "differential": [
       {
-        "diagnosis": "Multiple sclerosis (demyelinating disease)",
-        "icd_code": "G35",
-        "key_features": "Sensorimotor symptoms in a young adult raise demyelinating disease; brain (and when indicated spine) MRI without T2/FLAIR lesions or enhancement argues against an active demyelinating process.",
+        "diagnosis": "Hypoglycemia with focal deficit",
+        "icd_code": "E16.2",
+        "key_features": "Onset 3 hours after an insulin bolus, but the capillary glucose on arrival is 92 mg/dL.",
         "likelihood": "low"
       },
       {
-        "diagnosis": "Acute ischemic stroke / TIA",
+        "diagnosis": "Acute ischemic stroke or other structural lesion",
         "icd_code": "I63.9",
-        "key_features": "Sudden focal deficit raises stroke; non-anatomical weakness pattern with positive Hoover sign, normal MRI/DWI, and intact reflexes argue against vascular etiology.",
+        "key_features": "A sudden hemiparesis at 24 is treated as a stroke until imaged; drift without pronation, an arm held against gravity despite 2/5 testing, normal reflexes and normal emergency imaging argue against it.",
         "likelihood": "low"
-      },
-      {
-        "diagnosis": "Structural CNS lesion (tumor, demyelination, stroke)",
-        "icd_code": null,
-        "key_features": "Focal complaints warrant imaging; normal brain MRI without lesion, mass, or enhancement effectively excludes a structural cause for the presenting deficit.",
-        "likelihood": "low"
-      },
-      {
-        "diagnosis": "Autoimmune or paraneoplastic encephalitis",
-        "icd_code": "G04.81",
-        "key_features": "Episodic neurological symptoms can occur in autoimmune encephalitis; normal MRI, normal EEG background, and (when obtained) negative antibody panel render this very unlikely.",
-        "likelihood": "very_low"
       }
     ],
     "key_clinical_evidence": [
-      "FND is a positive diagnosis based on rule-in signs (Hoover, tremor entrainment, give-way weakness, non-dermatomal sensory loss with midline split) \u2014 not a diagnosis of exclusion (Espay 2018, Stone 2018).",
-      "Brain MRI and basic laboratory testing are OPTIONAL here, not due diligence: the diagnosis rests on the positive signs, and each additional negative study is a cost and an iatrogenic harm rather than a confirmation. Where imaging is recommended in this case it is for one specific alternative question, once.",
-      "Over-investigation is the principal iatrogenic harm in FND; every additional negative test reinforces the patient's illness conviction and worsens prognosis (Stone 2018).",
-      "Psychiatric comorbidity (anxiety, depression, trauma) is common and informs treatment planning but is NOT required for the diagnosis and does not 'explain' the symptoms in a reductive sense.",
-      "Diagnostic communication matters: using positive language anchored on the rule-in signs is associated with better engagement and outcomes (Stone 2018).",
-      "Evidence-based treatment is multidisciplinary \u2014 CBT for PNES and FND-informed physiotherapy for functional motor symptoms (Nielsen 2015).",
-      "Interim composition decision, August 2026: FND remains only to keep the frozen dataset at 20 conditions/600 cases. The positive functional-neurological examination is the sole required diagnostic act; every instrumental test is optional and case-targeted. DLB remains the preferred future replacement when composition work resumes."
+      "Sudden left arm weakness 3 hours after an insulin bolus: the capillary glucose on arrival is 92 mg/dL.",
+      "Positive signs: the left arm drifts downward without pronation and is held against gravity despite 2/5 strength on testing; the left leg drags.",
+      "Reflexes are normal and symmetric with no pathological reflexes.",
+      "Emergency imaging shows no infarct, hemorrhage or structural lesion.",
+      "The rejected thesis 2 weeks earlier is context, neither required nor sufficient for the diagnosis."
     ],
     "red_herrings": [
       {
-        "correct_interpretation": "Psychiatric comorbidity neither establishes nor refutes FND. Diagnosis requires positive rule-in signs on examination; psychiatric history is relevant for treatment planning, not for diagnosis.",
-        "data_point": "Pre-existing psychiatric diagnosis (anxiety or depression) in the past medical history",
+        "correct_interpretation": "It makes the fingerstick glucose the first step; a glucose of 92 mg/dL answers the question, and the positive signs make the diagnosis.",
+        "data_point": "Insulin bolus 3 hours before onset",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Attributing the deficit to hypoglycemia without checking, or stopping the work-up at the glucose",
+        "location": "History of present illness"
+      },
+      {
+        "correct_interpretation": "The neurological complications of celiac disease (ataxia, neuropathy) do not cause a sudden hemiparesis; nothing needs testing for it.",
+        "data_point": "Celiac disease",
         "field_path": "patient.clinical_history.past_medical_history",
-        "intended_effect": "Premature anchoring on a 'psychosomatic' label without obtaining positive rule-in signs; conversely, dismissing FND as a serious diagnosis because the patient is 'just anxious'",
+        "intended_effect": "Pursuing celiac neurological complications with serology and vitamin levels",
         "location": "Past medical history"
       },
       {
-        "correct_interpretation": "Many organic conditions (MS, migraine, epilepsy) also flare with stress. Stress at onset is supportive context, not a diagnostic substitute for the positive rule-in signs.",
-        "data_point": "Symptom onset coincident with a major psychosocial stressor",
+        "correct_interpretation": "Psychiatric comorbidity neither establishes nor refutes FND; an acute hemiparesis still needs glucose and emergency imaging.",
+        "data_point": "Anxiety treated with sertraline",
+        "field_path": "patient.clinical_history.past_medical_history",
+        "intended_effect": "Premature anchoring on a psychological label and skipping glucose and imaging",
+        "location": "Past medical history"
+      },
+      {
+        "correct_interpretation": "Stress at onset is supportive context, not a substitute for the positive signs or the acute stroke assessment.",
+        "data_point": "Rejected thesis defense 2 weeks before onset",
         "field_path": "patient.history_present_illness",
-        "intended_effect": "Conclude prematurely that stress 'caused' the symptoms and that the workup can be abbreviated",
+        "intended_effect": "Concluding that stress caused the symptoms and abbreviating the acute assessment",
         "location": "History of present illness"
       }
     ],
     "review_status": "draft",
-    "sequence_constraints": [],
+    "sequence_constraints": [
+      {
+        "after_criterion_id": "action-4-analyze-brain-mri",
+        "before_criterion_id": "action-5-interpret-labs",
+        "citations": [
+          "[AHA_ASA_Stroke_2026]"
+        ],
+        "reason": "A fingerstick glucose comes before imaging in an acute deficit on insulin.",
+        "severity": "soft"
+      }
+    ],
     "stop_rule": {
       "max_additional_actions": 0,
       "required_before_assessment": [
-        "action-3-perform-clinical-assessment"
+        "action-5-interpret-labs",
+        "action-3-perform-clinical-assessment",
+        "action-4-analyze-brain-mri"
       ]
     }
   },
@@ -453,22 +444,37 @@
     "clinical_assessment": {
       "assessment_type": "functional_neuro_signs",
       "criteria_met": {
-        "diagnosis_made_by_exclusion_only": false,
-        "positive_clinical_sign_present": true,
-        "psychological_stressor_required_for_diagnosis": false,
-        "symptoms_inconsistent_with_organic_disease": true
+        "distractibility_of_deficit": false,
+        "drift_without_pronation": true,
+        "give_way_weakness": false,
+        "hip_abductor_sign_positive": false,
+        "hoover_sign_positive": false,
+        "inconsistency_between_examination_and_function": true,
+        "tremor_entrainment_positive": false
       },
       "findings": [
         {
-          "result": "Left arm drift test: the arm drifts upward rather than downward, which is not consistent with the gravity-dependent downward drift of organic upper-motor-neuron weakness.",
-          "sign": "Arm-drop test: upward drift"
+          "result": "The outstretched left arm drifts slowly downward with the palm remaining supinated.",
+          "sign": "Drift without pronation"
         },
         {
-          "result": "Left leg mild dragging.",
+          "result": "Mild dragging of the left leg.",
           "sign": "Dragging monoplegic gait"
+        },
+        {
+          "result": "The left arm is 2/5 on formal testing yet is held outstretched against gravity.",
+          "sign": "Inconsistency"
+        },
+        {
+          "result": "Normal and symmetric; no pathological reflexes.",
+          "sign": "Reflexes"
+        },
+        {
+          "result": "Left hemisensory loss; not counted as a rule-in sign.",
+          "sign": "Supportive features (low specificity)"
         }
       ],
-      "impression": "Positive functional signs elicited and documented: Arm-drop test: upward drift, Dragging monoplegic gait. Functional neurological disorder is a rule-in diagnosis under DSM-5 and the criterion satisfied here is clinical incompatibility, not the absence of another disease. No further investigation is required to make the diagnosis; whatever imaging or laboratory testing is performed is for a separate, specific question.",
+      "impression": "Positive signs of functional weakness: drift without pronation and a dragging left leg, with the arm held against gravity despite 2/5 strength on testing. The pattern is inconsistent with a structural lesion.",
       "pre_post_comparison": null,
       "recommended_actions": [],
       "scores": {
@@ -478,30 +484,51 @@
       }
     },
     "csf": null,
-    "ecg": null,
+    "ct": {
+      "additional_observations": [
+        "Technique: non-contrast CT of the head."
+      ],
+      "angiography_findings": null,
+      "contrast_used": false,
+      "findings": [],
+      "impression": "No acute intracranial abnormality. No hemorrhage, mass, hydrocephalus or loss of gray-white differentiation.",
+      "recommended_actions": []
+    },
+    "drug_interactions": {
+      "general": {
+        "alternatives": [],
+        "contraindications": [],
+        "formulary_status": "",
+        "interactions": [
+          "Insulin aspart + sertraline: SSRIs may enhance the glucose-lowering effect of insulin; monitor glucose (minor)."
+        ],
+        "proposed": "Insulin aspart via pump (basal 0.7 u/h, bolus per carbohydrate ratio); Sertraline 50 mg once daily",
+        "summary": "One minor interaction: sertraline may add to the glucose-lowering effect of insulin.",
+        "warnings": []
+      }
+    },
+    "ecg": {
+      "axis": "normal",
+      "clinical_correlation": "",
+      "findings": [
+        "Sinus tachycardia. Normal axis and intervals. No acute ST-T changes."
+      ],
+      "interpretation": "Sinus tachycardia, rate 106. Otherwise normal ECG.",
+      "intervals": {
+        "PR": "152 ms",
+        "QRS": "84 ms",
+        "QTc": "434 ms"
+      },
+      "rate": 106,
+      "rhythm": "sinus tachycardia"
+    },
     "echo": null,
     "eeg": null,
     "labs": {
       "abnormal_values_summary": [],
-      "interpretation": "All values within normal limits.",
+      "interpretation": "All results are within reference ranges.",
       "panels": {
-        "T1DM_Celiac_Neurology_Workup": [
-          {
-            "clinical_significance": null,
-            "is_abnormal": false,
-            "reference_range": "70-180 (in-hospital for T1DM)",
-            "test": "Fingerstick glucose (admission)",
-            "unit": "mg/dL",
-            "value": 92
-          },
-          {
-            "clinical_significance": null,
-            "is_abnormal": false,
-            "reference_range": "<7.5% for T1DM",
-            "test": "HbA1c",
-            "unit": "%",
-            "value": 7.2
-          },
+        "Celiac serology": [
           {
             "clinical_significance": null,
             "is_abnormal": false,
@@ -517,7 +544,39 @@
             "test": "Anti-gliadin antibody IgG",
             "unit": "U/mL",
             "value": "3.2 U/mL"
-          },
+          }
+        ],
+        "Diabetes": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "<7.5% for T1DM",
+            "test": "HbA1c",
+            "unit": "%",
+            "value": 7.2
+          }
+        ],
+        "Point of care": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "70-180 (in-hospital target for T1DM)",
+            "test": "Capillary glucose (on arrival)",
+            "unit": "mg/dL",
+            "value": 92
+          }
+        ],
+        "Thyroid": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "0.4-4.0",
+            "test": "TSH",
+            "unit": "mIU/L",
+            "value": 2.0
+          }
+        ],
+        "Vitamins": [
           {
             "clinical_significance": null,
             "is_abnormal": false,
@@ -533,13 +592,6 @@
             "test": "Vitamin E",
             "unit": "mg/L",
             "value": 12.8
-          },
-          {
-            "is_abnormal": false,
-            "reference_range": "0.4-4.0",
-            "test": "TSH",
-            "unit": "mIU/L",
-            "value": 2.0
           }
         ]
       }
@@ -549,24 +601,38 @@
         "query": "functional neurological disorder diagnosis treatment",
         "results": [
           {
-            "evidence_level": "guideline recommendation",
-            "finding": "Confirms multidisciplinary CBT + physiotherapy is the evidence-based treatment for FND",
-            "source": "Nielsen_2015"
+            "evidence_level": "narrative review",
+            "finding": "Diagnosis of functional neurological disorder rests on positive clinical features such as the Hoover sign, tremor entrainment and functional seizure semiology, not on the exclusion of other disease; treatment combines explanation, physiotherapy and psychological therapy.",
+            "source": "Espay AJ et al. JAMA Neurol 2018;75:1132-1141"
+          },
+          {
+            "evidence_level": "systematic review",
+            "finding": "Motor signs such as the Hoover sign, hip abductor sign, drift without pronation and dragging gait have high specificity; sensory signs such as midline splitting have low specificity.",
+            "source": "Daum C et al. J Neurol Neurosurg Psychiatry 2014;85:180-190"
+          },
+          {
+            "evidence_level": "randomised controlled trial",
+            "finding": "Specialist physiotherapy for functional motor disorder was not superior to community neurological physiotherapy on physical function at 12 months; several secondary outcomes favoured it.",
+            "source": "Nielsen G et al. Lancet Neurol 2024;23:675-686"
+          },
+          {
+            "evidence_level": "systematic review",
+            "finding": "About 4% of patients diagnosed with conversion symptoms since 1970 later received another diagnosis.",
+            "source": "Stone J et al. BMJ 2005;331:989"
           }
         ],
-        "summary": "Confirms multidisciplinary CBT + physiotherapy is the evidence-based treatment for FND"
+        "summary": "Guideline and trial evidence supports a positive clinical diagnosis of functional neurological disorder, video-EEG confirmation of functional seizures, tapering of unneeded antiseizure drugs and benzodiazepines, and physiotherapy and psychological treatment whose trial effects on primary outcomes were modest."
       }
     },
     "mri": {
       "additional_observations": [
-        "Normal brain MRI",
-        "DWI: No acute ischemia",
-        "No posterior or parieto-occipital white matter signal abnormality",
-        "No parenchymal hemosiderin deposits",
-        "Normal"
+        "Technique: T1, T2, FLAIR, DWI/ADC and SWI without intravenous contrast.",
+        "No restricted diffusion.",
+        "No white matter signal abnormality, including the parieto-occipital white matter.",
+        "No hemorrhage or hemosiderin deposition. No mass."
       ],
       "findings": [],
-      "impression": "Normal brain MRI. No acute ischemia, no abnormal white matter signal, and no structural lesion identified",
+      "impression": "Normal brain MRI. No acute infarct, hemorrhage or structural lesion.",
       "recommended_actions": [],
       "volumetrics": null
     },
@@ -577,21 +643,16 @@
     "case_body_concerns": [],
     "citation_gap": [],
     "criteria_pack_version": "1.0",
-    "difficulty_rationale": "Disabling, multi-region or refractory functional symptoms \u2014 often with comorbid organic disease (e.g., established MS, post-stroke deficit, prior epilepsy) or extensive prior workup. Differentiating new functional symptoms from organic progression requires careful synthesis of rule-in signs against negative imaging and EEG, plus discriminating communication.",
+    "difficulty_rationale": "An acute hemiparesis 3 hours after an insulin bolus: the agent must check glucose first, image as for a stroke, find the positive functional signs, and stop there without echocardiography, monitoring or further tests.",
     "fallback_tool_kinds": {
-      "advanced_imaging": "normal",
       "cardiac_monitoring": "normal",
       "csf": "normal",
-      "ct": "normal",
-      "ecg": "normal",
-      "echo": "normal",
-      "literature_search": "normal",
-      "specialized_test": "normal"
+      "echo": "normal"
     },
-    "last_revised": "2026-08-10",
-    "notes": "Diagnostic puzzle FND \u2014 functional left hemimotor in T1DM + celiac patient. Glucose check immediate priority. Arm drifts UPWARD \u2014 pathognomonic FND. Celiac neurological panel needed.",
+    "last_revised": "2026-10-24",
+    "notes": "Functional left arm weakness on an acute stroke pathway in type 1 diabetes; glucose 92 mg/dL, normal imaging.",
     "policy_spec_status": "draft",
-    "revision_reason": "FND interim reviewer option: positive clinical diagnosis required; every instrumental test optional and selected for explicit red flags",
+    "revision_reason": "October 2026 review round: criteria, outputs and policy rebuilt per plans/FND.md",
     "version": "policy-v1",
     "vocab_gap": []
   },
@@ -637,14 +698,14 @@
       "handedness": "right",
       "sex": "female"
     },
-    "history_present_illness": "Ms. K is a 24-year-old final-year undergraduate with Type 1 diabetes on an insulin pump and celiac disease who presents with 3-hour history of sudden left arm weakness and hemisensory loss. She received a regular insulin bolus 3 hours ago. Her thesis defense was rejected for resubmission 2 weeks ago, creating significant stress. She is otherwise healthy and her diabetes has been well-controlled. She has celiac disease managed with gluten-free diet. On examination, the affected arm drifts upward rather than downward on the arm-drop test.",
+    "history_present_illness": "Ms. K is a 24-year-old final-year undergraduate with type 1 diabetes on an insulin pump and celiac disease (gluten-free diet, stable) who presents with a 3-hour history of sudden left arm weakness and left-sided numbness. She received a regular insulin bolus 3 hours before onset. Her diabetes has been well controlled. Her thesis defense was rejected for resubmission 2 weeks ago, which has caused her significant stress.",
     "neurological_exam": {
-      "additional": "Left arm apparent weakness with upward arm drift and left hemisensory loss, as above. Capillary glucose was checked at presentation.",
+      "additional": "Left arm weakness with drift without pronation, and left hemisensory loss, as above.",
       "coordination": "Normal right. Cannot assess left.",
       "cranial_nerves": "Normal.",
       "gait": "Left leg mild dragging.",
       "mental_status": "Alert and oriented x4. Distressed.",
-      "motor": "Left arm apparent weakness 2/5. Left arm drift test: the arm drifts upward rather than downward, which is not consistent with the gravity-dependent downward drift of organic upper-motor-neuron weakness.",
+      "motor": "Left arm weakness 2/5 on formal testing, yet she holds the left arm outstretched against gravity; it drifts slowly downward without pronation. Left leg strength full on testing.",
       "reflexes": "Normal. No pathological reflexes.",
       "sensory": "Left hemisensory loss."
     },

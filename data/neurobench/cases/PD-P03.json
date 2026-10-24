@@ -7,21 +7,21 @@
     "advanced_imaging": {
       "findings": [
         {
-          "interpretation": "Midbrain tegmental hypometabolism, indicating regional neurodegeneration",
+          "interpretation": "Regional hypometabolism",
           "region": "Midbrain and subthalamic nucleus",
           "signal": "Reduced FDG uptake in the midbrain tegmentum and subthalamic nucleus bilaterally"
         },
         {
-          "interpretation": "Frontal cortical hypometabolism, indicating frontal-subcortical dysfunction",
+          "interpretation": "Regional hypometabolism",
           "region": "Frontal and prefrontal cortex",
           "signal": "Mild bilateral frontal cortical hypometabolism"
         }
       ],
-      "impression": "FDG-PET demonstrates midbrain and subthalamic hypometabolism with mild bilateral frontal cortical involvement. This is a subcortical-predominant pattern of metabolic reduction with frontal extension, distinct from the temporoparietal pattern seen in an Alzheimer-type process",
-      "modality": "FDG-PET",
+      "impression": "1. Bilateral hypometabolism of the midbrain tegmentum and subthalamic region. 2. Mild bilateral frontal cortical hypometabolism. Clinical correlation recommended.",
+      "modality": "FDG_PET",
       "quantitative_data": null,
       "recommended_actions": [],
-      "tracer_or_protocol": "Fluorodeoxyglucose (FDG) brain PET"
+      "tracer_or_protocol": "18F-FDG PET"
     },
     "cardiac_monitoring": {
       "duration_hours": 24,
@@ -62,18 +62,7 @@
       "impression": "No acute intracranial abnormality. Age-related cerebral involutional change.",
       "recommended_actions": []
     },
-    "drug_interactions": {
-      "general": {
-        "alternatives": [],
-        "contraindications": [],
-        "formulary_status": "on formulary",
-        "interactions": [],
-        "proposed": "(agent not specified on this case's pathway)",
-        "warnings": [
-          "Non-specific interaction check; verify against a current formulary or interaction reference before prescribing."
-        ]
-      }
-    },
+    "drug_interactions": null,
     "ecg": null,
     "echo": {
       "chambers": {
@@ -82,9 +71,10 @@
         "RA": "normal size",
         "RV": "normal size and function"
       },
+      "echo_type": "TTE",
       "ejection_fraction": 63.0,
       "findings": [
-        "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
+        "Normal left ventricular size and function, EF 63%, no significant valve disease. No pericardial effusion."
       ],
       "impression": "Normal transthoracic echocardiogram.",
       "recommended_actions": [],
@@ -98,17 +88,48 @@
     },
     "eeg": null,
     "labs": null,
-    "literature_search": {
-      "general": {
-        "query": "general",
-        "results": [],
-        "summary": "No directly applicable, high-quality evidence was retrieved for this query. Recommend correlating with current society guidelines."
-      }
-    },
+    "literature_search": null,
     "mri": null,
     "specialized_test": null
   },
   "followup_outputs": [
+    {
+      "output": {
+        "findings": [
+          {
+            "region": "Right putamen",
+            "signal": "Reduced dopamine transporter binding (SBR 1.0; normal above 1.5)"
+          },
+          {
+            "region": "Left putamen",
+            "signal": "Reduced dopamine transporter binding (SBR 1.1; normal above 1.5)"
+          },
+          {
+            "region": "Right caudate",
+            "signal": "Reduced dopamine transporter binding (SBR 1.6; normal above 2.5)"
+          },
+          {
+            "region": "Left caudate",
+            "signal": "Reduced dopamine transporter binding (SBR 1.7; normal above 2.5)"
+          }
+        ],
+        "impression": "Abnormal DaTscan: bilateral, relatively symmetric reduction of striatal dopamine transporter binding involving putamen and caudate. Presynaptic dopaminergic deficit.",
+        "modality": "DaTscan",
+        "quantitative_data": {
+          "left caudate SBR": "1.7",
+          "left putamen SBR": "1.1",
+          "right caudate SBR": "1.6",
+          "right putamen SBR": "1.0"
+        },
+        "recommended_actions": [],
+        "tracer_or_protocol": "123I-ioflupane SPECT"
+      },
+      "tool_name": "order_advanced_imaging",
+      "tool_parameters": {
+        "modality": "DaTscan"
+      },
+      "trigger_action": "request_datscan"
+    },
     {
       "output": {
         "findings": [
@@ -156,7 +177,7 @@
           },
           {
             "abnormal": "no",
-            "reference_range": "9-16",
+            "reference_range": "9-16 words",
             "test": "CVLT-3 Long Delay Free Recall",
             "value": "11/16 words"
           },
@@ -167,7 +188,7 @@
             "value": "55/60 correct"
           }
         ],
-        "impression": "Abnormal values: Verbal Fluency - Phonemic (FAS) 8 total words (L), Trail Making Test Part B Discontinued at 300 seconds (H), Stroop Color-Word Interference -2.8 z-score (H), Frontal Assessment Battery (FAB) 8/18 points (H), Apathy Evaluation Scale - Informant 42 points (H).",
+        "impression": "Impaired executive function (Frontal Assessment Battery 8/18, Stroop interference z -2.8, Trail Making B discontinued) and phonemic fluency (FAS 8 words), with preserved delayed verbal recall (CVLT-3 11/16), naming (Boston 55/60), visuoconstruction (Rey copy 45th percentile) and clock drawing; dysexecutive profile of frontal-subcortical type. Informant apathy scale elevated (42).",
         "quantitative_data": {
           "Apathy Evaluation Scale - Informant": "42 points",
           "Boston Naming Test": "55/60 correct",
@@ -186,7 +207,7 @@
       "tool_parameters": {
         "test_type": "neuropsych_battery"
       },
-      "trigger_action": "request_optional_neuropsych_for_active_cognitive_question"
+      "trigger_action": "request_neuropsych_testing"
     }
   ],
   "ground_truth": {
@@ -194,60 +215,19 @@
       {
         "alternatives": [
           {
-            "required_arguments": {
-              "contrast": false,
-              "protocol": "standard"
-            },
+            "required_arguments": {},
             "tool_name": "analyze_brain_mri"
           }
         ],
         "citations": [
-          "[Schwarz_2014]",
-          "Schwarz_2014"
+          "[Hoglinger_2017]",
+          "[Postuma_2015]"
         ],
         "criterion_id": "action-1-analyze-brain-mri",
-        "expected_evidence": "Midbrain atrophy with hummingbird/penguin sign supportive of PSP",
+        "expected_evidence": "Selective midbrain atrophy (hummingbird and morning glory signs, midbrain-to-pons diameter ratio 0.47) with preserved pons, cerebellum and putamina; mild frontal atrophy; Fazekas 1",
         "importance": "required",
-        "label": "Obtain structural brain MRI to exclude a secondary or atypical parkinsonian syndrome; do not use MRI itself to diagnose idiopathic Parkinson disease",
-        "rationale": "Obtain structural brain MRI to exclude a secondary or atypical parkinsonian syndrome; do not use MRI itself to diagnose idiopathic Parkinson disease"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "drug": "carbidopa-levodopa trial reassessment"
-            },
-            "tool_name": "check_drug_interactions"
-          }
-        ],
-        "citations": [
-          "[Postuma_2015]",
-          "Postuma_2015"
-        ],
-        "criterion_id": "action-2-check-drug-interactions",
-        "expected_evidence": "No active DA antagonists; document poor levodopa response as supportive of PSP",
-        "importance": "recommended",
-        "label": "Check drug interactions and review past dopaminergic trial",
-        "rationale": "Check drug interactions and review past dopaminergic trial"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "query": "progressive supranuclear palsy MDS clinical diagnostic criteria Hoglinger"
-            },
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[Tolosa_2021]",
-          "Tolosa_2021"
-        ],
-        "criterion_id": "action-3-search-medical-literature",
-        "expected_evidence": "MDS PSP criteria emphasize vertical supranuclear gaze palsy, early postural instability with backward falls, and axial rigidity",
-        "importance": "recommended",
-        "label": "Search medical literature on MDS PSP diagnostic criteria (H\u00f6glinger 2017)",
-        "rationale": "Search medical literature on MDS PSP diagnostic criteria (H\u00f6glinger 2017)"
+        "label": "Brain MRI to exclude a structural, vascular or atypical-parkinsonism cause",
+        "rationale": "MRI excludes vascular lesions, NPH and mass, and shows the midbrain atrophy that supports PSP and the pontine and putaminal signs of MSA; midbrain atrophy is supportive, not required, for PSP [Hoglinger_2017]"
       },
       {
         "alternatives": [
@@ -259,30 +239,40 @@
           }
         ],
         "citations": [
-          "[NICE_NG71]",
-          "NICE_NG71"
+          "[Hoglinger_2017]"
         ],
         "criterion_id": "action-4-order-specialized-test",
-        "expected_evidence": "Characterize the cognitive profile and functional implications",
+        "expected_evidence": "Dysexecutive profile: FAB 8/18, Stroop z -2.8, Trail Making B discontinued, FAS 8 words, with preserved recall (CVLT-3 11/16), naming and visuoconstruction; apathy scale 42",
         "importance": "optional",
-        "label": "Consider formal neuropsychological testing because cognitive impairment is clinically active in this case",
-        "rationale": "Consider formal neuropsychological testing because cognitive impairment is clinically active in this case"
+        "label": "Neuropsychological battery to characterize the frontal cognitive and behavioural change",
+        "rationale": "Personality change, an applause sign and MoCA 20/30 raise frontal cognitive dysfunction; a battery documents the dysexecutive profile and gives a baseline [Hoglinger_2017]"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "check_drug_interactions"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "action-2-check-drug-interactions",
+        "expected_evidence": "Additive hypotension of amlodipine with levodopa (lying and standing blood pressure at each step); calcium carbonate reduces levothyroxine absorption",
+        "importance": "optional",
+        "label": "Medication review before increasing levodopa",
+        "rationale": "Amlodipine adds to levodopa's hypotensive effect in a patient who falls, and her calcium and levothyroxine doses must be separated; no dopamine antagonist is on the list"
       }
     ],
     "assessment": {
       "prohibited_recommendations": [
-        "Do not prescribe metoclopramide, prochlorperazine, or promethazine for nausea in a patient with parkinsonism",
-        "Do not prescribe typical antipsychotics (haloperidol, fluphenazine) or most atypical antipsychotics (risperidone, olanzapine, aripiprazole) \u2014 restrict pharmacotherapy of psychosis to quetiapine, clozapine, or pimavanserin",
-        "Do not prescribe centrally acting anticholinergics (trihexyphenidyl, benztropine) in older adults or in any patient with cognitive impairment",
-        "Avoid sedating agents and anticholinergics that worsen fall risk"
+        "Do not prescribe metoclopramide, prochlorperazine, haloperidol or other centrally acting D2-blocking antiemetics or antipsychotics; if an antipsychotic is needed, use quetiapine or clozapine",
+        "Do not prescribe sedating drugs that add to fall risk (benzodiazepines, sedating antihistamines, centrally acting anticholinergics such as trihexyphenidyl)"
       ],
       "required_recommendations": [
-        "Apply MDS 2015 clinical diagnostic criteria for Parkinson's disease (bradykinesia plus rest tremor or rigidity, supportive features, no absolute exclusion criteria)",
-        "Document temporal sequence of motor and non-motor (REM sleep behavior disorder, hyposmia, constipation, orthostatic intolerance) features",
-        "Review the full medication list for dopamine receptor antagonists (metoclopramide, prochlorperazine, antipsychotics) and any other agents that can mimic or worsen parkinsonism",
-        "Document vertical supranuclear gaze palsy and early postural instability with backward falls",
-        "Coordinate multidisciplinary care: PT for gait/falls, OT for safety, SLP for dysarthria/dysphagia, palliative care planning",
-        "Empirically retry levodopa at adequate doses to confirm poor response; modest benefit in some PSP patients"
+        "Diagnose probable PSP-RS (MDS 2017): O1 vertical supranuclear gaze palsy (downgaze about 10 and upgaze about 15 degrees, full vertical oculocephalic range) with P1 repeated unprovoked backward falls within 3 years (8 falls in 18 months); levodopa resistance, dysarthria and dysphagia are supportive, and the midbrain atrophy is a supportive imaging feature [Hoglinger_2017]",
+        "Refer to speech and language therapy for a swallowing assessment (instrumental study if needed) and texture modification of liquids, because she coughs and chokes on thin liquids",
+        "Fall prevention: physiotherapy for balance and gait with a suitable walking aid, a home safety assessment, and review of bone protection given her osteoporosis",
+        "Complete an adequate levodopa trial: increase to up to 1000 mg/day as tolerated for 4 to 8 weeks, with lying and standing blood pressure at each step, and taper it if there is no benefit",
+        "Discuss the diagnosis, prognosis and advance care planning (including future decisions on feeding) with the patient and her husband, and offer palliative care involvement"
       ]
     },
     "avoided_actions": [
@@ -294,10 +284,10 @@
           }
         ],
         "citations": [
-          "[Postuma_2015]"
+          "[Hoglinger_2017]"
         ],
         "criterion_id": "avoid-waste-1-analyze-csf",
-        "rationale": "Not part of routine PSP workup",
+        "rationale": "CSF analysis has no role in the diagnosis of PSP and would not change management here",
         "severity": "waste"
       },
       {
@@ -307,11 +297,9 @@
             "tool_name": "order_echocardiogram"
           }
         ],
-        "citations": [
-          "[Postuma_2015]"
-        ],
+        "citations": [],
         "criterion_id": "avoid-waste-2-order-echocardiogram",
-        "rationale": "No cardiac indication",
+        "rationale": "No cardiac symptom or sign; the falls are backward falls from postural instability, without loss of consciousness",
         "severity": "waste"
       },
       {
@@ -321,11 +309,53 @@
             "tool_name": "order_cardiac_monitoring"
           }
         ],
-        "citations": [
-          "[Postuma_2015]"
-        ],
+        "citations": [],
         "criterion_id": "avoid-waste-3-order-cardiac-monitoring",
-        "rationale": "No arrhythmia concern",
+        "rationale": "No syncope or palpitations; rhythm monitoring would not explain the backward falls",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "modality": "DaTscan"
+            },
+            "tool_name": "order_advanced_imaging"
+          }
+        ],
+        "citations": [
+          "[Marshall_2009]"
+        ],
+        "criterion_id": "avoid-waste-datscan",
+        "rationale": "A DaTscan does not separate PD from MSA or PSP [Marshall_2009]",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "autonomic_testing"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "avoid-waste-autonomic-testing",
+        "rationale": "Formal autonomic testing is not part of the PSP work-up; bedside orthostatic blood pressure is normal",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "tilt_table"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "avoid-waste-tilt-table",
+        "rationale": "Tilt testing is not part of the PSP work-up; bedside orthostatic blood pressure is normal and the falls are not syncopal",
         "severity": "waste"
       }
     ],
@@ -343,50 +373,63 @@
     "differential": [
       {
         "diagnosis": "Parkinson's disease",
-        "key_features": "Initially considered, but vertical supranuclear gaze palsy, axial-predominant rigidity, early backward falls, and poor levodopa response are inconsistent with PD",
-        "likelihood": "moderate"
+        "key_features": "Downward vertical supranuclear gaze palsy is an MDS absolute exclusion; no tremor, symmetric axial-predominant rigidity, early unprovoked backward falls and no benefit from 600 mg/day levodopa",
+        "likelihood": "low"
       },
       {
         "diagnosis": "Corticobasal syndrome",
-        "key_features": "Asymmetric apraxia, cortical sensory loss, alien limb \u2014 not described here",
+        "key_features": "No asymmetric apraxia, cortical sensory loss, alien limb or limb dystonia; symmetric signs",
+        "likelihood": "low"
+      },
+      {
+        "diagnosis": "Behavioural-variant frontotemporal dementia",
+        "key_features": "Personality change and disinhibition fit, but vertical supranuclear gaze palsy, early backward falls and midbrain atrophy define PSP; frontal atrophy is mild",
         "likelihood": "low"
       },
       {
         "diagnosis": "Dementia with Lewy bodies",
-        "key_features": "No prominent visual hallucinations or cognitive fluctuations",
+        "key_features": "No visual hallucinations, cognitive fluctuations or dream enactment",
         "likelihood": "low"
       },
       {
         "diagnosis": "Multiple system atrophy",
-        "key_features": "Cerebellar features and severe early dysautonomia would be required",
+        "key_features": "No orthostatic hypotension (148/88 to 142/84), no urinary failure or cerebellar signs; pons, cerebellar peduncles and putamina preserved on MRI",
         "likelihood": "low"
       },
       {
         "diagnosis": "Vascular parkinsonism",
-        "key_features": "No significant vascular burden in basal ganglia / brainstem to explain phenotype",
+        "key_features": "Only Fazekas 1 periventricular change; no basal ganglia or brainstem infarcts",
         "likelihood": "very_low"
       }
     ],
     "key_clinical_evidence": [
-      "Vertical supranuclear gaze palsy, axial-predominant rigidity, early backward falls, and poor levodopa response are MDS PSP-RS hallmarks",
-      "Midbrain atrophy on MRI (hummingbird sign) is supportive but not required",
-      "Fall prevention is the dominant management priority",
-      "Tier per the July 2026 clinical review: Parkinson's disease is a clinical diagnosis under the MDS criteria; laboratory testing excludes a mimic when one is suspected.",
-      "July 2026 review applied: PD remains a clinical diagnosis; no fixed routine laboratory panel, EEG, ECG, formal autonomic or tilt-table testing is part of the PD diagnostic pathway."
+      "Vertical supranuclear gaze palsy, downgaze more than upgaze (O1), with a full vertical oculocephalic range and square-wave jerks",
+      "Repeated unprovoked backward falls beginning 18 months ago (P1), with no compensatory step on the pull test",
+      "Symmetric axial-predominant rigidity with retrocollis, no tremor, and no clear benefit from 600 mg/day levodopa for 4 weeks (levodopa resistance, supportive)",
+      "Frontal behavioural change (irritability, loss of empathy, impulsivity), applause sign, spastic dysarthria and dysphagia to thin liquids",
+      "MRI midbrain atrophy (hummingbird and morning glory signs, midbrain-to-pons diameter ratio 0.47) is supportive, not required [Hoglinger_2017]",
+      "Fall prevention and dysphagia management are the main management priorities"
     ],
     "red_herrings": [
       {
-        "correct_interpretation": "Vertical supranuclear gaze palsy and backward falls are absolute exclusion criteria for clinically established PD",
+        "correct_interpretation": "Downward vertical supranuclear gaze palsy is an MDS absolute exclusion for PD, and repeated unprovoked falls within 3 years are a PSP core feature (P1): probable PSP-RS",
         "data_point": "Prior 'atypical Parkinson disease' label",
         "field_path": "patient.history_present_illness",
         "intended_effect": "Anchor toward repeating a levodopa trial as if PD",
+        "location": "history_present_illness"
+      },
+      {
+        "correct_interpretation": "Orthostatic testing was negative and the exam shows 148/88 to 142/84 mmHg; the falls are backward falls from postural instability",
+        "data_point": "Falls initially attributed to amlodipine-related orthostatic hypotension",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Attribute the falls to a medication side effect",
         "location": "history_present_illness"
       }
     ],
     "review_status": "draft",
     "sequence_constraints": [],
     "stop_rule": {
-      "max_additional_actions": 0,
+      "max_additional_actions": 2,
       "required_before_assessment": [
         "action-1-analyze-brain-mri"
       ]
@@ -398,32 +441,26 @@
       "general": {
         "alternatives": [],
         "contraindications": [],
-        "formulary_status": "",
-        "interactions": [],
-        "proposed": "",
-        "summary": "No active DA antagonists; document poor levodopa response as supportive of PSP",
-        "warnings": []
-      }
-    },
-    "literature_search": {
-      "progressive supranuclear palsy MDS clinical diagnostic criteria Hoglinger": {
-        "query": "progressive supranuclear palsy MDS clinical diagnostic criteria Hoglinger",
-        "results": [
-          {
-            "evidence_level": "guideline recommendation",
-            "finding": "MDS PSP criteria emphasize vertical supranuclear gaze palsy, early postural instability with backward falls, and axial rigidity",
-            "source": "Tolosa_2021"
-          }
+        "formulary_status": "on formulary",
+        "interactions": [
+          "Amlodipine lowers standing blood pressure and levodopa can lower it further: measure lying and standing blood pressure at each levodopa dose step.",
+          "Calcium carbonate reduces levothyroxine absorption: take levothyroxine at least 4 hours apart from calcium."
         ],
-        "summary": "MDS PSP criteria emphasize vertical supranuclear gaze palsy, early postural instability with backward falls, and axial rigidity"
+        "proposed": "Carbidopa-levodopa (dose increase proposed)",
+        "summary": "No interacting dopamine antagonist on the list. Amlodipine with levodopa: additive hypotension. Calcium carbonate with levothyroxine: separate doses.",
+        "warnings": [
+          "Benzodiazepines, sedating antihistamines and centrally acting anticholinergics add sedation, confusion and fall risk in older patients.",
+          "Levodopa: nausea and postural hypotension are the common dose-limiting effects at higher doses."
+        ]
       }
     },
+    "literature_search": null,
     "mri": {
       "additional_observations": [
-        "No acute infarcts on DWI sequences",
-        "No mass lesions or pathological enhancement post-gadolinium",
+        "No acute infarct on diffusion-weighted imaging",
+        "No mass lesion",
         "No ventriculomegaly out of proportion to sulcal atrophy",
-        "Third ventricle mildly enlarged, reflecting midbrain atrophy"
+        "Third ventricle mildly enlarged"
       ],
       "findings": [
         {
@@ -431,54 +468,64 @@
           "location": "Midbrain",
           "mass_effect": "None",
           "signal_characteristics": {
-            "T1_axial": "'Morning glory sign' on axial view \u2014 concavity of the lateral midbrain margin due to selective tegmental atrophy",
-            "T1_sagittal": "Midbrain atrophy with 'hummingbird sign' (penguin sign) on midsagittal view \u2014 the superior midbrain (tegmentum) is selectively atrophied while the pons is relatively preserved, creating the characteristic silhouette",
-            "T2_FLAIR": "Mild periventricular white matter hyperintensities, Fazekas grade 1"
+            "T1_axial": "Concave lateral margins of the midbrain tegmentum ('morning glory' sign)",
+            "T1_sagittal": "Selective atrophy of the midbrain tegmentum with relative preservation of the pons ('hummingbird' configuration on the midsagittal image); midbrain-to-pons diameter ratio 0.47 (normal above 0.52)",
+            "T2": "No midbrain signal abnormality"
           },
           "size": null,
           "type": "Atrophy"
         },
         {
           "borders": null,
-          "location": "Pons, cerebellum",
+          "location": "Pons, middle cerebellar peduncles, cerebellum",
           "mass_effect": "None",
           "signal_characteristics": {
-            "T1": "Pontine volume relatively preserved. No hot cross bun sign. Cerebellar volume within normal limits.",
-            "T2": "No pontine signal abnormality"
+            "T1": "Pontine and middle cerebellar peduncle volumes preserved. Cerebellar volume within normal limits.",
+            "T2": "No pontine cruciform hyperintensity. No signal abnormality."
           },
           "size": null,
           "type": "Normal"
         },
         {
           "borders": null,
-          "location": "Bilateral frontal lobes, mild",
+          "location": "Bilateral frontal lobes",
           "mass_effect": "None",
           "signal_characteristics": {
-            "T1": "Mild frontal cortical atrophy, mildly beyond expected for age"
+            "T1": "Mild frontal cortical atrophy, slightly beyond that expected for age"
           },
           "size": null,
           "type": "Atrophy"
         },
         {
           "borders": null,
-          "location": "Hippocampi, basal ganglia, putamina",
+          "location": "Periventricular white matter",
           "mass_effect": "None",
           "signal_characteristics": {
-            "SWI": "No abnormal iron deposition in putamina",
-            "T1": "Hippocampal volumes within normal limits. Putaminal volumes within normal limits. No putaminal rim sign."
+            "T2_FLAIR": "Mild periventricular white matter hyperintensities, Fazekas grade 1"
+          },
+          "size": null,
+          "type": "White matter hyperintensity"
+        },
+        {
+          "borders": null,
+          "location": "Hippocampi, basal ganglia",
+          "mass_effect": "None",
+          "signal_characteristics": {
+            "SWI": "No abnormal putaminal iron deposition",
+            "T1": "Hippocampal and putaminal volumes within normal limits. No putaminal rim."
           },
           "size": null,
           "type": "Normal"
         }
       ],
-      "impression": "Brain MRI demonstrates selective midbrain atrophy with the 'hummingbird sign' on sagittal imaging and 'morning glory sign' on axial imaging. The midbrain-to-pons ratio is reduced at 0.47 (normal >0.52). The pons, cerebellum, putamina, and hippocampi are preserved. Mild frontal atrophy is present",
+      "impression": "1. Selective midbrain atrophy with a 'hummingbird' configuration on the midsagittal image and a 'morning glory' sign on axial images; midbrain-to-pons diameter ratio 0.47 (normal above 0.52); mild third ventricle enlargement. 2. Pons, middle cerebellar peduncles, cerebellum, putamina and hippocampi preserved. 3. Mild frontal atrophy, slightly beyond that expected for age. 4. Mild periventricular white matter hyperintensities (Fazekas 1).",
       "recommended_actions": [],
       "volumetrics": {
         "frontal_volume": "Mildly reduced",
         "hippocampal_volume": "Within normal limits",
-        "midbrain_area": "0.85 cm\u00b2 (normal >1.1 cm\u00b2) \u2014 REDUCED",
-        "midbrain_to_pons_ratio": "0.47 (normal >0.52) \u2014 REDUCED",
-        "pontine_area": "Within normal limits at 3.2 cm\u00b2",
+        "midbrain_area": "0.62 cm2 on the midsagittal image (reduced)",
+        "midbrain_to_pons_diameter_ratio": "0.47 (normal above 0.52)",
+        "pontine_area": "4.8 cm2 (within normal limits)",
         "putaminal_volume": "Within normal limits"
       }
     }
@@ -494,21 +541,18 @@
     ],
     "citation_gap": [
       {
-        "concern": "Primary diagnosis is off the PD criteria pack (Progressive supranuclear palsy, Richardson syndrome (PSP-RS)); pack does not include MDS criteria citations for MSA (Gilman 2008, Wenning 2022), DLB (McKeith 2017), or PSP (H\u00f6glinger 2017)",
+        "concern": "Primary diagnosis is off the PD criteria pack (PSP-RS); the MDS 2017 PSP criteria are cited as [Hoglinger_2017], not yet in the PD pack",
         "proposed_citations": [
-          "[Gilman_2008_MSA]",
-          "[McKeith_2017_DLB]",
-          "[Hoglinger_2017_PSP]",
-          "[Wenning_2022_MSA]"
+          "[Hoglinger_2017]"
         ],
-        "rationale": "Used Postuma/Tolosa citations from PD pack as the closest available; recommend extending the pack or routing this case to the dedicated MSA/DLB/PSP expert agent"
+        "rationale": "Plan PD R1 adds [Hoglinger_2017] to the PD pack"
       }
     ],
     "condition_category": "movement_disorders",
     "created_by": "neurobench_generator",
     "criteria_pack_version": "1.0",
     "diagnostic_challenge": "Differentiating progressive supranuclear palsy from Parkinson disease in a patient referred with 'atypical PD' after poor levodopa response, requiring recognition of vertical gaze palsy, early falls, and characteristic imaging",
-    "difficulty_rationale": "1 required tool actions after the independent reviewer audit; remaining optional studies are case-specific",
+    "difficulty_rationale": "Referred as atypical PD after a failed levodopa trial, the patient meets probable PSP-RS on examination: the agent must recognise the vertical supranuclear gaze palsy and the early unprovoked backward falls, and not blame the falls on amlodipine. One required criterion (MRI).",
     "educational_value": "Teaches recognition of PSP-Richardson syndrome cardinal features including vertical supranuclear gaze palsy, early backward falls, axial-predominant rigidity, poor levodopa response, and the hummingbird sign on MRI",
     "expected_agent_confidence": 0.35,
     "fallback_tool_kinds": {
@@ -516,13 +560,11 @@
       "cardiac_monitoring": "normal",
       "csf": "normal",
       "ct": "incidental",
-      "drug_interactions": "normal",
-      "echo": "normal",
-      "literature_search": "normal"
+      "echo": "normal"
     },
-    "last_revised": "2026-08-10",
+    "last_revised": "2026-10-24",
     "policy_spec_status": "draft",
-    "revision_reason": "independent end-to-end Parkinson tool review: case-targeted labs only; EEG/ECG and autonomic/tilt removed; cognition, RBD, genetics and advanced imaging narrowed to live questions",
+    "revision_reason": "October 2026 review round: plans/PD.md. Literature criterion deleted; medication review optional and rebuilt (amlodipine, calcium with levothyroxine); levodopa arithmetic corrected; MMSE and MoCA items made to sum; examiner comparisons with PD removed from the exam; MRI restructured; symmetric DaTscan stored as waste; neuropsychology impression rewritten; PSP musts and differential rewritten.",
     "teaching_points": [
       "Vertical supranuclear gaze palsy (especially downgaze) is the hallmark of PSP-Richardson syndrome",
       "Early backward falls within the first 18 months should trigger consideration of PSP over PD",
@@ -574,10 +616,10 @@
           "indication": "Hypothyroidism"
         },
         {
-          "dose": "25/100 mg",
+          "dose": "25/100 mg, two tablets (600 mg/day levodopa)",
           "drug": "Carbidopa-Levodopa",
           "frequency": "three times daily",
-          "indication": "Parkinsonism (started by PCP 3 months ago, no clear improvement)"
+          "indication": "Parkinsonism (started by PCP 3 months ago at one tablet three times daily, increased 4 weeks ago; no clear improvement)"
         }
       ],
       "past_medical_history": [
@@ -603,14 +645,14 @@
       "handedness": "right",
       "sex": "female"
     },
-    "history_present_illness": "Dr. Priya Sharma is a 72-year-old right-handed retired university professor of comparative literature who is referred to the neurology movement disorders clinic by her primary care physician for evaluation of 'atypical Parkinson's disease' after failing to respond to levodopa therapy. Her husband, who accompanies her, provides a detailed history. Approximately 18 months ago, she began having recurrent falls. The falls have been predominantly BACKWARD \u2014 she falls straight back when standing from a chair, when turning around, or when bumped slightly from the front. She has had 8 falls in total, 3 of which required emergency department evaluation. Fortunately, she has not sustained fractures, but she did require stitches for a scalp laceration from one backward fall. Her PCP initially attributed the falls to orthostatic hypotension related to her amlodipine, but orthostatic testing was negative. Around the same time, she began having difficulty looking down. She cannot see the food on her plate without tilting her entire head down, has great difficulty navigating stairs because she cannot look at her feet, and struggles to read a book in her lap. Her husband notes that her eyes seem 'stuck' and she has to move her whole head to look at things rather than moving her eyes. Her speech has become progressively slow, harsh, and strained over the past year \u2014 different from the quiet voice she has heard in friends with Parkinson's disease. She has had increasing difficulty swallowing thin liquids, with frequent coughing and choking when drinking water or coffee. Her husband has noticed personality changes \u2014 she has become more irritable, less empathetic (she showed no emotional response when their grandson was hospitalized), and more impulsive (interrupts conversations, makes rude comments). She has never had any tremor. Her PCP started carbidopa-levodopa 25/100 TID three months ago with no improvement. The dose was increased to 25/250 TID (600 mg/day levodopa total) for the past 4 weeks, again with no clear benefit. The lack of response prompted referral to neurology. She denies visual hallucinations, urinary incontinence, or significant memory complaints (though her husband notes she sometimes forgets recent conversations).",
+    "history_present_illness": "Dr. Priya Sharma is a 72-year-old right-handed retired university professor of comparative literature who is referred to the neurology movement disorders clinic by her primary care physician for evaluation of 'atypical Parkinson's disease' after failing to respond to levodopa therapy. Her husband, who accompanies her, provides a detailed history. Approximately 18 months ago, she began having recurrent falls. The falls have been predominantly BACKWARD \u2014 she falls straight back when standing from a chair, when turning around, or when bumped slightly from the front. She has had 8 falls in total, 3 of which required emergency department evaluation. Fortunately, she has not sustained fractures, but she did require stitches for a scalp laceration from one backward fall. Her PCP initially attributed the falls to orthostatic hypotension related to her amlodipine, but orthostatic testing was negative. Around the same time, she began having difficulty looking down. She cannot see the food on her plate without tilting her entire head down, has great difficulty navigating stairs because she cannot look at her feet, and struggles to read a book in her lap. Her husband notes that her eyes seem 'stuck' and she has to move her whole head to look at things rather than moving her eyes. Her speech has become progressively slow, harsh, and strained over the past year \u2014 different from the quiet voice she has heard in friends with Parkinson's disease. She has had increasing difficulty swallowing thin liquids, with frequent coughing and choking when drinking water or coffee. Her husband has noticed personality changes \u2014 she has become more irritable, less empathetic (she showed no emotional response when their grandson was hospitalized), and more impulsive (interrupts conversations, makes rude comments). She has never had any tremor. Her PCP started carbidopa-levodopa 25/100 TID three months ago with no improvement. The dose was increased to two tablets of 25/100 three times daily (600 mg/day levodopa) for the past 4 weeks, again with no clear benefit. The lack of response prompted referral to neurology. She denies visual hallucinations, urinary incontinence, or significant memory complaints (though her husband notes she sometimes forgets recent conversations).",
     "neurological_exam": {
-      "additional": "Posture is notably ERECT with retrocollis (neck extension) \u2014 opposite of PD's flexed posture. No orthostatic hypotension (BP supine 148/88, standing 142/84). No inspiratory stridor. Levodopa trial: patient has been on carbidopa-levodopa 25/100 TID for 3 months. Husband reports no noticeable improvement. PCP subsequently increased to 25/250 TID (600 mg/day levodopa) for an additional 4 weeks \u2014 still no clear improvement.",
+      "additional": "No orthostatic hypotension (BP supine 148/88, standing 142/84). No inspiratory stridor.",
       "coordination": "Finger-to-nose testing intact bilaterally without dysmetria. Heel-to-shin mildly slow bilaterally. Rapid alternating movements moderately slowed bilaterally, symmetric.",
-      "cranial_nerves": "Pupils equal, round, and reactive to light. EXTRAOCULAR MOVEMENTS: Square-wave jerks present on primary gaze. Voluntary vertical gaze severely restricted \u2014 DOWNGAZE limited to approximately 10 degrees, UPGAZE limited to approximately 15 degrees. Horizontal saccades are slow but achieve full range. OCULOCEPHALIC REFLEX (doll's eyes): Full vertical range of eye movement is preserved when the head is passively rotated \u2014 confirms the gaze palsy is SUPRANUCLEAR (brainstem nuclei and pathways intact). Blepharospasm present. Facial expression: 'procerus sign' \u2014 deeply furrowed brow giving a characteristic worried/astonished expression. Hearing intact bilaterally. Palate elevates symmetrically but patient coughs when drinking water during exam (suggesting mild dysphagia). Tongue midline without fasciculations.",
-      "gait": "ERECT posture (NOT stooped \u2014 distinct from PD). Gait is slow and stiff-legged with wide base. Reduced stride length. Arms held rigidly at sides with minimal swing. Pronounced postural instability on pull test \u2014 falls BACKWARD without any compensatory stepping (examiner must catch her). Turns require 6-8 steps, en bloc. No freezing of gait. Cannot perform tandem gait.",
-      "mental_status": "Alert and oriented to person, place, and situation. Oriented to month and year but not exact date (3 days off). MMSE 25/30 \u2014 lost 2 points on serial sevens (3 errors), lost 1 point on recall (2/3 words, retrieved third with category cue), lost 1 point on sentence writing (wrote only 3 words), lost 1 point on figure copy. MoCA 20/30 \u2014 deficits in trail-making (0/1), verbal fluency (3 F-words in 60 seconds), abstraction (0/2), delayed recall (2/5, 1 with cue), and clock drawing (2/3). Speech is slow, harsh, and strained (spastic dysarthria \u2014 different from the hypophonic speech of PD). Personality change noted by husband \u2014 more irritable, impatient, less empathetic, occasional impulsive responses. Applause sign positive (clapped 8 times, unable to stop at 3). Motor impersistence on tongue protrusion (could not maintain for 15 seconds).",
-      "motor": "Normal bulk throughout. Tone: prominent AXIAL rigidity (neck and trunk) with relatively mild appendicular rigidity at wrists. Retrocollis present (neck held in extension \u2014 opposite of PD's anterocollis). Bradykinesia present bilaterally, approximately symmetric, on finger tapping and hand opening-closing. NO resting tremor observed during 20-minute observation. NO action tremor. Strength 5/5 throughout all extremities. No pronator drift.",
+      "cranial_nerves": "Pupils equal, round, and reactive to light. Extraocular movements: square-wave jerks on primary gaze. Voluntary vertical gaze severely restricted: downgaze limited to approximately 10 degrees, upgaze to approximately 15 degrees. Horizontal saccades are slow but achieve full range. Oculocephalic manoeuvre (doll's eyes): full vertical range of eye movement when the head is passively flexed and extended. Blepharospasm present. Procerus sign: deeply furrowed brow with a fixed, astonished expression. Hearing intact bilaterally. Palate elevates symmetrically but patient coughs when drinking water during exam (suggesting mild dysphagia). Tongue midline without fasciculations.",
+      "gait": "Erect posture, not stooped. Gait is slow and stiff-legged with wide base. Reduced stride length. Arms held rigidly at sides with minimal swing. Pronounced postural instability on pull test: falls backward without any compensatory stepping (examiner must catch her). Turns require 6-8 steps, en bloc. No freezing of gait. Cannot perform tandem gait.",
+      "mental_status": "Alert and oriented to person, place, and situation. Oriented to month and year but not exact date (3 days off). MMSE 25/30: lost 2 points on serial sevens (2 errors), 1 point on recall (2/3 words, third retrieved with category cue), 1 point on orientation (date) and 1 point on the pentagon copy. MoCA 20/30: visuospatial/executive 3/5 (trail-making 0/1, cube 1/1, clock 2/3), naming 3/3, attention 5/6 (serial 7s with 2 errors), language 2/3 (3 F-words in 60 seconds), abstraction 0/2, delayed recall 2/5 (1 more with cue), orientation 5/6 (date). Speech is slow, harsh, and strained (spastic dysarthria). Personality change noted by husband: more irritable, impatient, less empathetic, occasional impulsive responses. Applause sign positive (clapped 8 times, unable to stop at 3). Motor impersistence on tongue protrusion (could not maintain for 15 seconds).",
+      "motor": "Normal bulk throughout. Tone: prominent axial rigidity (neck and trunk) with relatively mild appendicular rigidity at wrists. Retrocollis present (neck held in extension). Bradykinesia present bilaterally, approximately symmetric, on finger tapping and hand opening-closing. No resting tremor observed during 20-minute observation. No action tremor. Strength 5/5 throughout all extremities. No pronator drift.",
       "reflexes": "3+ at patellar bilaterally, 2+ elsewhere. Plantar responses flexor bilaterally. Palmomental reflex present bilaterally. Grasp reflexes present bilaterally. No Hoffmann sign.",
       "sensory": "Light touch and pinprick intact throughout. Vibration sense intact at great toes bilaterally. Proprioception intact. No cortical sensory deficits (no alien limb, no asymmetric apraxia, no cortical sensory loss)."
     },

@@ -47,15 +47,15 @@
       "axis": "normal",
       "clinical_correlation": "",
       "findings": [
-        "Normal sinus rhythm. Normal axis and intervals. No acute ST-T changes."
+        "Sinus rhythm 74/min, normal axis and intervals, no ST change."
       ],
-      "interpretation": "Normal ECG",
+      "interpretation": "Normal ECG: sinus rhythm 74/min.",
       "intervals": {
         "PR": "184 ms",
         "QRS": "89 ms",
         "QTc": "429 ms"
       },
-      "rate": 61,
+      "rate": 74,
       "rhythm": "normal sinus rhythm"
     },
     "echo": {
@@ -65,9 +65,10 @@
         "RA": "normal size",
         "RV": "normal size and function"
       },
+      "echo_type": "TTE",
       "ejection_fraction": 63.0,
       "findings": [
-        "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
+        "Normal left ventricular size and function, EF 63%, no significant valve disease."
       ],
       "impression": "Normal transthoracic echocardiogram.",
       "recommended_actions": [],
@@ -101,61 +102,51 @@
   "followup_outputs": [
     {
       "output": {
-        "alternatives": [
-          "Domperidone (peripheral dopamine antagonist, does not cross BBB \u2014 not FDA-approved but available in some countries)",
-          "Ondansetron 4 mg as needed for nausea (5-HT3 antagonist, no dopaminergic effect)",
-          "Erythromycin 250 mg TID as prokinetic (motilin agonist)",
-          "Prucalopride 2 mg daily (5-HT4 agonist prokinetic)"
+        "assessment_type": "orthostatic_blood_pressure",
+        "findings": [
+          {
+            "observation": "Mild light-headedness on standing that settled within a minute; no presyncope"
+          }
         ],
-        "contraindications": [
-          "Metoclopramide is contraindicated in patients with Parkinson's disease due to its dopamine-blocking mechanism",
-          "FDA black box warning: risk of tardive dyskinesia with prolonged use (>12 weeks); this patient has been on metoclopramide for 18 months"
-        ],
-        "formulary_status": "Available \u2014 but FDA black box warning for prolonged use",
-        "interactions": [
-          "Metoclopramide is a dopamine D2 receptor antagonist that can induce or worsen parkinsonian symptoms",
-          "Concomitant use with levodopa/carbidopa would be pharmacologically antagonistic \u2014 metoclopramide blocks dopamine receptors while levodopa increases dopamine"
-        ],
-        "proposed": "Metoclopramide 10 mg TID (current medication)",
-        "warnings": [
-          "Extended use beyond 12 weeks increases risk of tardive dyskinesia, which may be irreversible",
-          "Drug-induced parkinsonism from metoclopramide can mimic or exacerbate idiopathic Parkinson's disease",
-          "Must discontinue metoclopramide before reliable assessment of underlying parkinsonian severity"
-        ]
+        "impression": "Fall of 12/6 mmHg at 3 minutes with a heart-rate rise of 8/min: no orthostatic hypotension by consensus criteria.",
+        "recommended_actions": [],
+        "scores": {
+          "standing 1 minute": "118/72 mmHg, HR 80/min",
+          "standing 3 minutes": "116/70 mmHg, HR 82/min",
+          "supine (5 minutes)": "128/76 mmHg, HR 74/min"
+        }
       },
-      "tool_name": "check_drug_interactions",
-      "trigger_action": "request_drug_interaction_check_metoclopramide"
+      "tool_name": "perform_clinical_assessment",
+      "tool_parameters": {
+        "assessment_type": "orthostatic_blood_pressure"
+      },
+      "trigger_action": "request_orthostatic_bp"
     },
     {
       "output": {
-        "query": "Differentiating idiopathic Parkinson's disease from drug-induced parkinsonism",
-        "results": [
+        "findings": [
           {
-            "authors": "Shin HW, Chung SJ",
-            "journal": "J Clin Neurol",
-            "key_finding": "Drug-induced parkinsonism (DIP) accounts for 20-40% of parkinsonism cases in elderly populations. Metoclopramide is the second most common cause after antipsychotics. Symmetric presentation and absence of rest tremor favor DIP, though asymmetry does not exclude it.",
-            "title": "Drug-Induced Parkinsonism: A Review",
-            "year": "2012"
-          },
-          {
-            "authors": "Tinazzi M et al.",
-            "journal": "Mov Disord",
-            "key_finding": "DaTscan (I-123 ioflupane SPECT) reliably differentiates drug-induced parkinsonism (normal scan) from neurodegenerative parkinsonism (abnormal scan). A subset of patients on dopamine-blocking agents have abnormal DaTscans, suggesting underlying preclinical PD unmasked by the offending drug.",
-            "title": "DaTscan in Drug-Induced Versus Degenerative Parkinsonism",
-            "year": "2014"
-          },
-          {
-            "authors": "Postuma RB et al.",
-            "journal": "Lancet Neurol",
-            "key_finding": "Over 80% of patients with isolated RBD eventually convert to a synucleinopathy (PD, DLB, or MSA) over 10-15 years. Presence of RBD in a patient with parkinsonism strongly supports an underlying neurodegenerative etiology over drug-induced parkinsonism.",
-            "title": "REM Sleep Behavior Disorder as a Biomarker for Neurodegenerative Disease",
-            "year": "2019"
+            "description": "Reduced striatal dopamine transporter binding, asymmetric, more marked in the right posterior putamen, with relative caudate sparing",
+            "region": "Striatum",
+            "signal": "Specific binding ratio: right putamen 1.08, left putamen 1.32 (normal >1.50); right caudate 2.41, left caudate 2.58 (normal)"
           }
         ],
-        "summary": ""
+        "impression": "Abnormal DaTscan: reduced striatal dopamine transporter binding, asymmetric, more marked in the right posterior putamen, with relative caudate sparing. Presynaptic dopaminergic deficit.",
+        "modality": "DaTscan",
+        "quantitative_data": {
+          "SBR left caudate": "2.58",
+          "SBR left putamen": "1.32 (normal >1.50)",
+          "SBR right caudate": "2.41",
+          "SBR right putamen": "1.08 (normal >1.50)"
+        },
+        "recommended_actions": [],
+        "tracer_or_protocol": "123I-ioflupane SPECT"
       },
-      "tool_name": "search_medical_literature",
-      "trigger_action": "search_parkinsons_vs_drug_induced"
+      "tool_name": "order_advanced_imaging",
+      "tool_parameters": {
+        "modality": "DaTscan"
+      },
+      "trigger_action": "request_datscan"
     },
     {
       "output": {
@@ -163,55 +154,63 @@
           {
             "abnormal": "yes",
             "reference_range": ">360 minutes typical",
-            "test": "Total Sleep Time",
+            "test": "Total sleep time",
             "value": "312 minutes"
           },
           {
             "abnormal": "yes",
             "reference_range": ">85%",
-            "test": "Sleep Efficiency",
+            "test": "Sleep efficiency",
             "value": "72%"
           },
           {
             "abnormal": "no",
-            "reference_range": "90-120 minutes",
-            "test": "REM Sleep Latency",
+            "reference_range": "70-120 minutes",
+            "test": "REM sleep latency",
             "value": "102 minutes"
           },
           {
             "abnormal": "yes",
-            "reference_range": "<5%",
-            "test": "REM without Atonia (%)",
+            "reference_range": "<27% of REM epochs (SINBAR)",
+            "test": "REM sleep without atonia (chin and limb EMG)",
             "value": "42% of REM epochs"
           },
           {
             "abnormal": "yes",
-            "reference_range": "<5 normal, 5-15 mild",
-            "test": "AHI (Apnea-Hypopnea Index)",
+            "reference_range": "None",
+            "test": "Video during REM sleep",
+            "value": "Two episodes of arm flailing with vocalization"
+          },
+          {
+            "abnormal": "yes",
+            "reference_range": "<5 events/hour",
+            "test": "Apnea-hypopnea index",
             "value": "5.8 events/hour"
           },
           {
             "abnormal": "yes",
-            "reference_range": "<15",
-            "test": "PLMI (Periodic Limb Movement Index)",
-            "value": "18 events/hour"
+            "reference_range": ">90%",
+            "test": "SpO2 nadir",
+            "value": "88%"
           },
           {
             "abnormal": "yes",
-            "reference_range": "None",
-            "test": "Dream enactment behaviors observed",
-            "value": "Yes \u2014 two episodes of arm flailing and vocalizations during REM"
+            "reference_range": "<15 events/hour",
+            "test": "Periodic limb movement index",
+            "value": "18 events/hour"
           }
         ],
-        "impression": "Abnormal values: Total Sleep Time 312 minutes (L), Sleep Efficiency 72% (H), REM without Atonia (%) 42% of REM epochs (H), AHI (Apnea-Hypopnea Index) 5.8 events/hour (H), PLMI (Periodic Limb Movement Index) 18 events/hour (H), Dream enactment behaviors observed Yes \u2014 two episodes of arm flailing and vocalizations during REM (H).",
+        "impression": "REM sleep without atonia (42% of REM epochs) with dream-enactment behavior on video, meeting the polysomnographic criterion for REM sleep behavior disorder; AHI 5.8/h: mild obstructive sleep apnea; PLMI 18/h. Clinical correlation recommended.",
         "quantitative_data": {
-          "AHI (Apnea-Hypopnea Index)": "5.8 events/hour",
-          "Dream enactment behaviors observed": "Yes \u2014 two episodes of arm flailing and vocalizations during REM",
-          "PLMI (Periodic Limb Movement Index)": "18 events/hour",
-          "REM Sleep Latency": "102 minutes",
-          "REM without Atonia (%)": "42% of REM epochs",
-          "Sleep Efficiency": "72%",
-          "Total Sleep Time": "312 minutes"
+          "Apnea-hypopnea index": "5.8 events/hour",
+          "Periodic limb movement index": "18 events/hour",
+          "REM sleep latency": "102 minutes",
+          "REM sleep without atonia (chin and limb EMG)": "42% of REM epochs",
+          "Sleep efficiency": "72%",
+          "SpO2 nadir": "88%",
+          "Total sleep time": "312 minutes",
+          "Video during REM sleep": "Two episodes of arm flailing with vocalization",
+          "channels": "EEG, EOG, chin and four-limb EMG, ECG, airflow, effort, oximetry, synchronized video"
         },
         "recommended_actions": [],
         "test_type": "polysomnography"
@@ -220,28 +219,100 @@
       "tool_parameters": {
         "test_type": "polysomnography"
       },
-      "trigger_action": "request_optional_psg_for_reported_dream_enactment"
+      "trigger_action": "request_sleep_study"
     },
     {
       "output": {
         "findings": [
           {
-            "description": "Reduced dopamine transporter uptake",
-            "region": "Bilateral posterior putamina, more pronounced on the right",
-            "signal": "DAT_binding_ratio_right_putamen: 1.08 (reduced, normal >1.50); DAT_binding_ratio_left_putamen: 1.32 (reduced, normal >1.50); DAT_binding_ratio_right_caudate: 2.41 (normal); DAT_binding_ratio_left_caudate: 2.58 (normal)"
+            "abnormal": "yes",
+            "reference_range": ">=26/30",
+            "test": "MoCA",
+            "value": "25/30"
+          },
+          {
+            "abnormal": "no",
+            "reference_range": "z > -1.5",
+            "test": "Trail Making Test A",
+            "value": "48 seconds (z -0.4)"
+          },
+          {
+            "abnormal": "yes",
+            "reference_range": "z > -1.5",
+            "test": "Trail Making Test B",
+            "value": "168 seconds (z -1.7)"
+          },
+          {
+            "abnormal": "yes",
+            "reference_range": "z > -1.5",
+            "test": "Phonemic fluency (FAS)",
+            "value": "21 words (z -1.5)"
+          },
+          {
+            "abnormal": "no",
+            "reference_range": "z > -1.5",
+            "test": "Category fluency (animals)",
+            "value": "15 words (z -0.6)"
+          },
+          {
+            "abnormal": "no",
+            "reference_range": "z > -1.5",
+            "test": "RAVLT delayed free recall",
+            "value": "5/15 (z -1.0)"
+          },
+          {
+            "abnormal": "no",
+            "reference_range": ">=12/15",
+            "test": "RAVLT recognition",
+            "value": "13/15"
+          },
+          {
+            "abnormal": "no",
+            "reference_range": "z > -1.5",
+            "test": "Digit span backward",
+            "value": "4 (z -0.5)"
+          },
+          {
+            "abnormal": "no",
+            "reference_range": ">=25/30",
+            "test": "Boston Naming Test (30-item)",
+            "value": "27/30"
+          },
+          {
+            "abnormal": "no",
+            "reference_range": ">=21/30",
+            "test": "Judgement of Line Orientation",
+            "value": "24/30"
+          },
+          {
+            "abnormal": "no",
+            "reference_range": "<5/15",
+            "test": "Geriatric Depression Scale (15-item)",
+            "value": "3/15"
           }
         ],
-        "impression": "Abnormal \u2014 reduced striatal dopamine transporter uptake, bilateral and asymmetric, more pronounced on the right, predominantly affecting the posterior putamina. Caudate uptake is relatively preserved",
-        "modality": "DaTscan",
-        "quantitative_data": null,
+        "impression": "Impaired executive function (Trail Making B) and phonemic fluency, with low-average delayed free recall that normalizes on recognition, and preserved attention span, naming and visuospatial function; profile of mild cognitive impairment of frontal-subcortical type. Geriatric Depression Scale 3/15, not in the depressed range.",
+        "quantitative_data": {
+          "Boston Naming Test (30-item)": "27/30",
+          "Category fluency (animals)": "15 words (z -0.6)",
+          "Digit span backward": "4 (z -0.5)",
+          "Geriatric Depression Scale (15-item)": "3/15",
+          "Judgement of Line Orientation": "24/30",
+          "MoCA": "25/30",
+          "Phonemic fluency (FAS)": "21 words (z -1.5)",
+          "RAVLT delayed free recall": "5/15 (z -1.0)",
+          "RAVLT recognition": "13/15",
+          "Trail Making Test A": "48 seconds (z -0.4)",
+          "Trail Making Test B": "168 seconds (z -1.7)"
+        },
         "recommended_actions": [],
-        "tracer_or_protocol": null
+        "test_type": "neuropsych_battery"
       },
-      "tool_name": "order_advanced_imaging",
+      "tool_name": "order_specialized_test",
       "tool_parameters": {
-        "modality": "DaTscan"
+        "test_type": "neuropsych_battery"
       },
-      "trigger_action": "request_optional_datscan_for_live_degenerative_differential"
+      "trigger_action": "request_neuropsych_testing"
     }
   ],
   "ground_truth": {
@@ -249,82 +320,36 @@
       {
         "alternatives": [
           {
-            "required_arguments": {
-              "contrast": false,
-              "protocol": "standard"
-            },
+            "required_arguments": {},
             "tool_name": "analyze_brain_mri"
           }
         ],
         "citations": [
-          "[Schwarz_2014]",
-          "Schwarz_2014"
+          "[Postuma_2015]"
         ],
         "criterion_id": "action-1-analyze-brain-mri",
-        "expected_evidence": "Mild age-appropriate changes; no vascular, NPH, or pontine/cerebellar features incompatible with PD",
+        "expected_evidence": "Scattered punctate periventricular T2/FLAIR foci (Fazekas 1); ventricles proportionate to sulci (Evans index 0.28, callosal angle 112 degrees); normal midbrain, pons and putamina; no mass, hemorrhage or infarct",
         "importance": "required",
-        "label": "Obtain structural brain MRI to exclude a secondary or atypical parkinsonian syndrome; do not use MRI itself to diagnose idiopathic Parkinson disease",
-        "rationale": "Obtain structural brain MRI to exclude a secondary or atypical parkinsonian syndrome; do not use MRI itself to diagnose idiopathic Parkinson disease"
+        "label": "Brain MRI to exclude a structural, vascular or atypical-parkinsonism cause",
+        "rationale": "PD is a clinical diagnosis; MRI is normal in PD and excludes vascular lesions, NPH, mass and the midbrain, pontine and putaminal signs of PSP and MSA [Postuma_2015]"
       },
       {
         "alternatives": [
           {
             "required_arguments": {
-              "current_medications": [
-                "metoclopramide"
-              ],
-              "drug": "carbidopa-levodopa"
+              "assessment_type": "orthostatic_blood_pressure"
             },
-            "tool_name": "check_drug_interactions"
+            "tool_name": "perform_clinical_assessment"
           }
         ],
         "citations": [
-          "[Postuma_2015]",
-          "Postuma_2015"
+          "[Postuma_2015]"
         ],
-        "criterion_id": "action-2-check-drug-interactions",
-        "expected_evidence": "Metoclopramide flagged as DA-antagonist with FDA black-box warning beyond 12 weeks; pharmacological antagonism with levodopa noted; alternatives include ondansetron, erythromycin, prucalopride, or domperidone",
-        "importance": "required",
-        "label": "Check drug interactions and flag metoclopramide as a dopamine D2 receptor antagonist that can cause or worsen parkinsonism",
-        "rationale": "Check drug interactions and flag metoclopramide as a dopamine D2 receptor antagonist that can cause or worsen parkinsonism"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "query": "drug-induced parkinsonism metoclopramide DaTscan Parkinson disease"
-            },
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[Marshall_2009]",
-          "Marshall_2009"
-        ],
-        "criterion_id": "action-3-search-medical-literature",
-        "expected_evidence": "DaTscan is the key differentiator; RBD favors neurodegenerative synucleinopathy over DIP",
-        "importance": "required",
-        "label": "Search medical literature on distinguishing PD from drug-induced parkinsonism",
-        "rationale": "Search medical literature on distinguishing PD from drug-induced parkinsonism"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "test_type": "polysomnography"
-            },
-            "tool_name": "order_specialized_test"
-          }
-        ],
-        "citations": [
-          "[NICE_NG71]",
-          "NICE_NG71"
-        ],
-        "criterion_id": "action-4-order-specialized-test",
-        "expected_evidence": "Document REM sleep without atonia if the clinical RBD question remains unresolved",
+        "criterion_id": "orthostatic-bp",
+        "expected_evidence": "Supine 128/76 mmHg with HR 74/min, 116/70 mmHg with HR 82/min at 3 minutes standing: fall of 12/6 mmHg, no orthostatic hypotension",
         "importance": "optional",
-        "label": "Consider video-polysomnography because the history reports dream enactment; this is not routine PD testing",
-        "rationale": "Consider video-polysomnography because the history reports dream enactment; this is not routine PD testing"
+        "label": "Measure lying and standing blood pressure and heart rate (supine 5 minutes, then 1 and 3 minutes standing)",
+        "rationale": "He reports light-headedness on standing while taking tamsulosin and lisinopril; measured orthostatic hypotension would be an autonomic red flag and would shape levodopa titration [Postuma_2015]"
       },
       {
         "alternatives": [
@@ -336,32 +361,61 @@
           }
         ],
         "citations": [
-          "[NICE_NG71]",
-          "NICE_NG71"
+          "[Marshall_2009]"
         ],
         "criterion_id": "action-5-order-advanced-imaging",
-        "expected_evidence": "Abnormal striatal uptake supports nigrostriatal degeneration but does not distinguish PD from MSA or PSP",
+        "expected_evidence": "Reduced putaminal DAT binding, right 1.08 and left 1.32 (normal >1.50), worse on the right opposite the worse left side, with preserved caudate binding: presynaptic dopaminergic deficit",
+        "importance": "required",
+        "label": "Order a DaTscan (123I-ioflupane SPECT) to separate pure drug-induced parkinsonism from an underlying presynaptic dopaminergic deficit",
+        "rationale": "Current metoclopramide exposure makes drug-induced parkinsonism a live alternative: the scan is normal in pure drug-induced parkinsonism and abnormal when a degenerative deficit has been unmasked [Marshall_2009]"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "polysomnography"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[Berg_2015]"
+        ],
+        "criterion_id": "action-4-order-specialized-test",
+        "expected_evidence": "REM sleep without atonia in 42% of REM epochs and two arm-flailing episodes with vocalization on video; AHI 5.8/h (mild sleep apnea); PLMI 18/h",
         "importance": "optional",
-        "label": "Consider presynaptic dopamine-transporter imaging only because this case has a live degenerative-versus-nondegenerative parkinsonism differential",
-        "rationale": "Consider presynaptic dopamine-transporter imaging only because this case has a live degenerative-versus-nondegenerative parkinsonism differential"
+        "label": "Consider video-polysomnography for the reported dream enactment",
+        "rationale": "His wife describes talking, arm movements and striking her in sleep; REM sleep without atonia on video-PSG would confirm REM sleep behavior disorder, a synucleinopathy marker that a D2 blocker does not cause [Berg_2015]"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "check_drug_interactions"
+          }
+        ],
+        "citations": [
+          "[Postuma_2015]"
+        ],
+        "criterion_id": "action-2-check-drug-interactions",
+        "expected_evidence": "Metoclopramide flagged as a central D2 antagonist that opposes levodopa, with prokinetic options free of central D2 blockade; tamsulosin and lisinopril flagged for the standing blood pressure",
+        "importance": "required",
+        "label": "Review the medication list for dopamine-blocking drugs and drugs that lower standing blood pressure",
+        "rationale": "Metoclopramide is a current dopamine-receptor blocker, an MDS absolute exclusion while it continues, and tamsulosin may explain his light-headedness on standing; both change management before levodopa [Postuma_2015]"
       }
     ],
     "assessment": {
       "prohibited_recommendations": [
-        "Do not prescribe metoclopramide, prochlorperazine, or promethazine for nausea in a patient with parkinsonism",
-        "Do not prescribe typical antipsychotics (haloperidol, fluphenazine) or most atypical antipsychotics (risperidone, olanzapine, aripiprazole) \u2014 restrict pharmacotherapy of psychosis to quetiapine, clozapine, or pimavanserin",
-        "Do not prescribe centrally acting anticholinergics (trihexyphenidyl, benztropine) in older adults or in any patient with cognitive impairment",
-        "Do not continue metoclopramide in a patient with parkinsonism",
-        "Do not start levodopa while metoclopramide remains in the regimen"
+        "Do not prescribe metoclopramide, prochlorperazine, haloperidol or other centrally acting D2-blocking antiemetics or antipsychotics; if an antipsychotic is needed, use quetiapine or clozapine",
+        "Do not start levodopa while metoclopramide remains in the regimen",
+        "Do not prescribe centrally acting anticholinergics (trihexyphenidyl, benztropine) in older adults or in any patient with cognitive impairment"
       ],
       "required_recommendations": [
-        "Apply MDS 2015 clinical diagnostic criteria for Parkinson's disease (bradykinesia plus rest tremor or rigidity, supportive features, no absolute exclusion criteria)",
-        "Document temporal sequence of motor and non-motor (REM sleep behavior disorder, hyposmia, constipation, orthostatic intolerance) features",
-        "Review the full medication list for dopamine receptor antagonists (metoclopramide, prochlorperazine, antipsychotics) and any other agents that can mimic or worsen parkinsonism",
-        "Identify metoclopramide as a dopamine D2 receptor antagonist and discontinue it; substitute ondansetron, prucalopride, erythromycin, or (where available) domperidone",
-        "Recognize that premotor features (RBD, constipation, hyposmia) preceding metoclopramide use point to underlying idiopathic PD rather than pure DIP",
-        "Use DaTscan to differentiate underlying neurodegenerative PD (abnormal scan) from pure DIP (normal scan)",
-        "Do not start levodopa while the patient remains on metoclopramide because of pharmacological antagonism"
+        "Diagnose Parkinson's disease unmasked by metoclopramide: current D2-blocker exposure is an MDS absolute exclusion while it continues, but the abnormal DaTscan shows a presynaptic dopaminergic deficit that pure drug-induced parkinsonism does not cause, and RBD is not a drug effect; confirm that the parkinsonism persists after withdrawal [Postuma_2015][Marshall_2009]",
+        "Stop metoclopramide and manage the gastroparesis without central D2 blockade: domperidone where available after an ECG for the QTc, or short courses of erythromycin, with ondansetron for nausea if needed",
+        "Reassess after withdrawal: drug-induced signs can take weeks to months to resolve; the abnormal DaTscan shows an underlying presynaptic deficit that withdrawal will not reverse [Marshall_2009]",
+        "Once metoclopramide is stopped, if the parkinsonism persists and limits function, start carbidopa-levodopa 25/100 mg, half a tablet three times daily with food, increasing over 2 to 4 weeks to one tablet three times daily (300 mg/day levodopa), review the response after 2 to 3 months, and measure lying and standing blood pressure at each step because tamsulosin and lisinopril add to orthostatic falls [NICE_NG71]",
+        "Advise bedroom safety for the dream enactment (protect the bed partner, remove sharp objects, pad the bedside); if treatment is needed prefer melatonin, since clonazepam adds sedation and fall risk and can worsen sleep apnea"
       ]
     },
     "avoided_actions": [
@@ -376,7 +430,7 @@
           "[Postuma_2015]"
         ],
         "criterion_id": "avoid-waste-1-analyze-eeg",
-        "rationale": "EEG has no role in PD/DIP differentiation",
+        "rationale": "No seizure, encephalopathy or episodic confusion: EEG does not separate PD from drug-induced parkinsonism",
         "severity": "waste"
       },
       {
@@ -390,7 +444,7 @@
           "[Postuma_2015]"
         ],
         "criterion_id": "avoid-waste-2-analyze-csf",
-        "rationale": "CSF not indicated",
+        "rationale": "No inflammatory, infectious or rapidly progressive feature: CSF has no role in this parkinsonism",
         "severity": "waste"
       },
       {
@@ -404,7 +458,7 @@
           "[Postuma_2015]"
         ],
         "criterion_id": "avoid-waste-3-order-echocardiogram",
-        "rationale": "No cardiac indication",
+        "rationale": "No murmur, heart failure or cardiac symptom: an echocardiogram does not inform the parkinsonism",
         "severity": "waste"
       },
       {
@@ -418,7 +472,7 @@
           "[Postuma_2015]"
         ],
         "criterion_id": "avoid-waste-4-order-cardiac-monitoring",
-        "rationale": "No arrhythmia concern",
+        "rationale": "No palpitations or syncope; the light-headedness is postural: rhythm monitoring is not indicated",
         "severity": "waste"
       },
       {
@@ -432,7 +486,39 @@
           "[NICE_NG71]"
         ],
         "criterion_id": "avoid-waste-5-analyze-ecg",
-        "rationale": "ECG is not a diagnostic test for Parkinson disease",
+        "rationale": "No cardiac symptom and no QT-prolonging drug started at this visit; an ECG is needed only if domperidone is chosen",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "autonomic_testing"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[Postuma_2015]"
+        ],
+        "criterion_id": "avoid-waste-autonomic-testing",
+        "rationale": "Formal autonomic testing is not part of the PD work-up; bedside orthostatic measurement suffices",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "tilt_table"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[Postuma_2015]"
+        ],
+        "criterion_id": "avoid-waste-tilt-table",
+        "rationale": "Formal autonomic testing is not part of the PD work-up; bedside orthostatic measurement suffices",
         "severity": "waste"
       }
     ],
@@ -459,63 +545,68 @@
       {
         "diagnosis": "Drug-induced parkinsonism (metoclopramide)",
         "icd_code": "G21.19",
-        "key_features": "Active metoclopramide use exceeding the 12-week FDA limit; symmetric features and gradual onset could fit DIP",
-        "likelihood": "high"
+        "key_features": "Coexisting contributor: metoclopramide can worsen the signs, but the abnormal asymmetric DaTscan shows a presynaptic deficit that pure drug-induced parkinsonism does not produce, and dream enactment is not a drug effect; persistence after withdrawal confirms",
+        "likelihood": "low"
       },
       {
         "diagnosis": "Vascular parkinsonism",
         "icd_code": "G21.4",
-        "key_features": "Periventricular white-matter changes and gait predominance support this consideration; need MRI burden assessment",
-        "likelihood": "moderate"
+        "key_features": "Only scattered punctate periventricular foci (Fazekas 1); asymmetric upper-limb bradykinesia and rigidity, no stepwise course, and an asymmetric presynaptic deficit on DaTscan",
+        "likelihood": "low"
       },
       {
         "diagnosis": "Multiple system atrophy (MSA-P)",
         "icd_code": "G90.3",
-        "key_features": "Mild autonomic and gait features without cerebellar findings or characteristic MRI signature argue against MSA",
+        "key_features": "No cerebellar signs and no urinary incontinence; light-headedness on standing while on tamsulosin; normal putamina, pons and cerebellar peduncles on MRI",
+        "likelihood": "low"
+      },
+      {
+        "diagnosis": "Dementia with Lewy bodies",
+        "icd_code": "G31.83",
+        "key_features": "Dream enactment and parkinsonism, but independent in daily activities (MoCA 25/30) with no fluctuations or visual hallucinations: no dementia",
         "likelihood": "low"
       },
       {
         "diagnosis": "Normal pressure hydrocephalus",
         "icd_code": "G91.2",
-        "key_features": "Need to inspect Evans index, callosal angle, and DESH pattern; gait apraxia and urinary symptoms would shift toward NPH",
+        "key_features": "Evans index 0.28, callosal angle 112 degrees and proportionate sulci on MRI; no urinary incontinence; upper-limb parkinsonism",
         "likelihood": "low"
       },
       {
         "diagnosis": "Progressive supranuclear palsy",
         "icd_code": "G23.1",
-        "key_features": "Absent vertical gaze palsy and absent early backward falls argue against PSP",
+        "key_features": "Full vertical eye movements, no falls, normal midbrain on MRI",
         "likelihood": "low"
       },
       {
         "diagnosis": "Essential tremor",
         "icd_code": "G25.0",
-        "key_features": "Bradykinesia and rigidity exclude pure ET",
+        "key_features": "No postural or action tremor; bradykinesia with decrement and rigidity are not features of ET",
         "likelihood": "very_low"
       }
     ],
     "key_clinical_evidence": [
-      "Symmetric onset in a patient on metoclopramide creates diagnostic overlap between idiopathic PD and pure drug-induced parkinsonism",
-      "Premotor non-motor features that predate metoclopramide initiation point to underlying synucleinopathy",
-      "DaTscan is the critical differentiator: abnormal scan supports underlying neurodegenerative PD",
-      "RBD on polysomnography is a strong synucleinopathy biomarker and not caused by metoclopramide",
-      "Mother / family history of essential tremor (if present) is a red herring \u2014 ET and PD are distinct diseases",
-      "Metoclopramide has an FDA black-box warning against use beyond 12 weeks because of tardive dyskinesia risk",
-      "Tier per the July 2026 clinical review: Parkinson's disease is a clinical diagnosis under the MDS criteria; laboratory testing excludes a mimic when one is suspected.",
-      "July 2026 review applied: PD remains a clinical diagnosis; no fixed routine laboratory panel, EEG, ECG, formal autonomic or tilt-table testing is part of the PD diagnostic pathway."
+      "Mildly asymmetric, left-predominant bradykinesia with decrement and cogwheel rigidity, hypomimia, hypophonia and micrographia, without rest tremor: parkinsonism by the MDS entry criterion [Postuma_2015]",
+      "Metoclopramide 10 mg three times daily for 18 months, started before the 12-month motor history: current D2-blocker exposure is an MDS absolute exclusion while it continues [Postuma_2015]",
+      "DaTscan with reduced putaminal binding, right 1.08 and left 1.32 (normal >1.50), opposite the worse left side, with caudate sparing: a presynaptic deficit that pure drug-induced parkinsonism does not cause [Marshall_2009]",
+      "Wife-witnessed dream enactment (talking, arm movements, striking her): a prodromal synucleinopathy marker that a D2 blocker does not cause [Berg_2015]",
+      "MRI with only scattered punctate periventricular foci and proportionate ventricles (Evans 0.28): no vascular, NPH or atypical-parkinsonism signature",
+      "Constipation is not evidence of a prodrome here: gastroparesis and diabetes confound it",
+      "Metoclopramide carries an FDA boxed warning for tardive dyskinesia with use beyond 12 weeks"
     ],
     "red_herrings": [
       {
-        "correct_interpretation": "Premotor features (RBD, constipation, hyposmia) preceding metoclopramide and an abnormal DaTscan establish underlying PD; metoclopramide unmasks rather than causes the syndrome",
-        "data_point": "Active metoclopramide use for gastroparesis predating most motor symptoms",
-        "field_path": "patient.clinical_history.medications",
+        "correct_interpretation": "Metoclopramide can worsen parkinsonism, but the abnormal asymmetric DaTscan shows an underlying presynaptic deficit and dream enactment is not a drug effect: the drug unmasks rather than explains the syndrome",
+        "data_point": "Metoclopramide 10 mg three times daily for gastroparesis for 18 months",
+        "field_path": "patient.clinical_history.medications[2]",
         "intended_effect": "Anchor toward pure drug-induced parkinsonism and away from a neurodegenerative diagnosis",
         "location": "medications and history_present_illness"
       },
       {
-        "correct_interpretation": "ET and PD are distinct conditions; PD diagnosis is established by motor and supportive criteria irrespective of family ET",
-        "data_point": "Family member with essential tremor",
-        "field_path": "patient.clinical_history.family_history",
-        "intended_effect": "Suggest familial tremor pattern",
+        "correct_interpretation": "He has no postural or action tremor; ET does not cause bradykinesia with decrement and rigidity",
+        "data_point": "Mother had essential tremor",
+        "field_path": "patient.clinical_history.family_history[1]",
+        "intended_effect": "Suggest a familial tremor disorder",
         "location": "family_history"
       }
     ],
@@ -525,31 +616,56 @@
         "after_criterion_id": "action-5-order-advanced-imaging",
         "before_criterion_id": "action-1-analyze-brain-mri",
         "citations": [
-          "[Schwarz_2014]"
+          "[Postuma_2015]"
         ],
-        "reason": "Exclude vascular/NPH/structural mimics on MRI before committing to DaTscan-based PD confirmation",
+        "reason": "Exclude structural and vascular causes on MRI before interpreting a DaTscan [Postuma_2015]",
         "severity": "soft"
       }
     ],
     "stop_rule": {
-      "max_additional_actions": 0,
+      "max_additional_actions": 2,
       "required_before_assessment": [
         "action-1-analyze-brain-mri",
-        "action-2-check-drug-interactions",
-        "action-3-search-medical-literature"
+        "action-5-order-advanced-imaging",
+        "action-2-check-drug-interactions"
       ]
     }
   },
   "initial_tool_outputs": {
     "csf": null,
-    "drug_interactions": null,
+    "drug_interactions": {
+      "general": {
+        "alternatives": [
+          "Domperidone 10 mg up to three times daily for the shortest possible time, where available, after an ECG",
+          "Erythromycin in short courses (motilin agonist)",
+          "Ondansetron for nausea (5-HT3 antagonist, no dopamine blockade)"
+        ],
+        "contraindications": [
+          "Metoclopramide with levodopa or a dopamine agonist: contraindicated in the EU product information (mutual antagonism); metoclopramide is also contraindicated in Parkinson's disease."
+        ],
+        "formulary_status": "",
+        "interactions": [
+          "Metoclopramide is a central dopamine D2 receptor antagonist: it causes and worsens parkinsonism and opposes levodopa. For gastroparesis use a prokinetic without central D2 blockade, such as domperidone where available after an ECG for the QTc, or short-term erythromycin.",
+          "Tamsulosin (alpha-1 blocker) lowers standing blood pressure and adds to the orthostatic fall; levodopa can lower it further. Review the need for each and measure lying and standing blood pressure at each levodopa dose step.",
+          "Lisinopril lowers blood pressure and can add to the orthostatic effect of levodopa."
+        ],
+        "proposed": "Carbidopa-levodopa (proposed)",
+        "summary": "",
+        "warnings": [
+          "Metoclopramide: FDA boxed warning for tardive dyskinesia with treatment beyond 12 weeks.",
+          "Domperidone: QT prolongation; avoid with strong CYP3A4 inhibitors and in cardiac conduction disease.",
+          "Erythromycin: QT prolongation and CYP3A4 inhibition; tachyphylaxis limits it to short courses.",
+          "Metformin, omeprazole and acetaminophen: no clinically relevant interaction with levodopa."
+        ]
+      }
+    },
     "literature_search": null,
     "mri": {
       "additional_observations": [
         "No acute intracranial hemorrhage",
         "No basal ganglia signal abnormality or calcification",
         "No mass lesion or midline shift",
-        "Sulcal prominence proportional to ventricular size, arguing against NPH",
+        "Sulcal prominence proportional to ventricular size; no disproportionately enlarged subarachnoid space",
         "Midbrain and pontine contour normal, no hummingbird sign, no hot cross bun sign",
         "Putaminal volume and signal normal bilaterally"
       ],
@@ -562,7 +678,7 @@
             "T1": "Isointense to hypointense",
             "T2_FLAIR": "Hyperintense"
           },
-          "size": "Scattered punctate foci",
+          "size": "Scattered punctate foci (Fazekas grade 1)",
           "type": "White matter changes"
         },
         {
@@ -571,7 +687,7 @@
           "mass_effect": "None",
           "signal_characteristics": {},
           "size": null,
-          "type": "Mild ventricular enlargement"
+          "type": "Ventricles proportionate to sulci"
         },
         {
           "borders": null,
@@ -582,10 +698,10 @@
           "type": "Age-appropriate cortical atrophy"
         }
       ],
-      "impression": "Mild generalized volume loss appropriate for age. Subtle ventricular enlargement with Evans index at the upper limit of normal (0.31); sulcal prominence is proportional. Normal midbrain and pontine morphology. No mass, hemorrhage, acute infarct, or basal ganglia signal abnormality",
+      "impression": "1. Scattered punctate periventricular white matter T2/FLAIR hyperintensities (Fazekas grade 1). 2. Mild generalized volume loss appropriate for age, with ventricles proportionate to sulci (Evans index 0.28). 3. Normal midbrain, pontine and putaminal morphology and signal. No mass, hemorrhage or acute infarct.",
       "recommended_actions": [],
       "volumetrics": {
-        "Evans_index": "0.31 (upper limit of normal)",
+        "Evans_index": "0.28",
         "callosal_angle": "112 degrees",
         "midbrain_area": "Normal",
         "pontine_area": "Normal"
@@ -599,7 +715,7 @@
     "condition_category": "movement_disorders",
     "created_by": "neurobench_generator",
     "criteria_pack_version": "1.0",
-    "difficulty_rationale": "3 required tool actions after the independent reviewer audit; remaining optional studies are case-specific",
+    "difficulty_rationale": "Current metoclopramide exposure makes pure drug-induced parkinsonism a live alternative that only the DaTscan resolves; 3 required criteria (MRI, DaTscan, medication review)",
     "expected_agent_confidence": 0.55,
     "fallback_tool_kinds": {
       "cardiac_monitoring": "normal",
@@ -608,10 +724,10 @@
       "echo": "normal"
     },
     "key_confounding_factor": "metoclopramide use creating diagnostic overlap between drug-induced and idiopathic parkinsonism",
-    "last_revised": "2026-08-10",
+    "last_revised": "2026-10-24",
     "policy_spec_status": "draft",
     "requires_followup_reasoning": true,
-    "revision_reason": "independent end-to-end Parkinson tool review: case-targeted labs only; EEG/ECG and autonomic/tilt removed; cognition, RBD, genetics and advanced imaging narrowed to live questions",
+    "revision_reason": "October 2026 review round: plans/PD.md. Literature step deleted; DaTscan required; medication review simplified to one output; MRI Evans index 0.28; PSG rewritten; orthostatic blood pressure and neuropsychological reports added; musts, differential and evidence rewritten",
     "version": "policy-v1",
     "vocab_gap": []
   },
@@ -689,7 +805,7 @@
       "handedness": "right",
       "sex": "male"
     },
-    "history_present_illness": "Mr. Harold Jennings is a 70-year-old right-handed man who presents to the neurology outpatient clinic accompanied by his wife with a chief complaint of progressive difficulty walking and generalized slowness that has been worsening over the past 12 months. His wife first noticed that he was walking more slowly and seemed to shuffle his feet approximately one year ago. She also reports that his facial expressions have become less animated, and his voice has become quieter, to the point where she sometimes has difficulty hearing him during conversation. The patient himself attributes his gait difficulties to his knee arthritis, but acknowledges that the unsteadiness feels different from his prior knee pain. He describes a sensation of being 'off balance,' particularly when turning, and has had two near-falls in the past three months, though no completed falls. He denies any clear tremor in his hands, and his wife confirms she has not noticed shaking at rest. He reports increasing difficulty with fine motor tasks such as buttoning his shirt and using a fork, which he has noticed over the past six months. His handwriting has become smaller, which he initially attributed to age. He has also experienced worsening constipation over the past two years, which led to his gastroparesis diagnosis, and he reports occasional episodes of lightheadedness when standing quickly. His sleep has been disrupted, with his wife reporting that he has begun talking and moving his arms during sleep several times per week, occasionally striking her. He was started on metoclopramide 10 mg three times daily approximately 18 months ago for gastroparesis with nausea, and he feels it has moderately helped his nausea. He denies any exposure to antipsychotic medications or other dopamine-blocking agents aside from metoclopramide. He denies visual hallucinations, cognitive complaints beyond occasional word-finding pauses, and denies any urinary incontinence.",
+    "history_present_illness": "Mr. Harold Jennings is a 70-year-old right-handed man who presents to the neurology outpatient clinic accompanied by his wife with a chief complaint of progressive difficulty walking and generalized slowness that has been worsening over the past 12 months. His wife first noticed that he was walking more slowly and seemed to shuffle his feet approximately one year ago. She also reports that his facial expressions have become less animated, and his voice has become quieter, to the point where she sometimes has difficulty hearing him during conversation. The patient himself attributes his gait difficulties to his knee arthritis, but acknowledges that the unsteadiness feels different from his prior knee pain. He describes a sensation of being 'off balance,' particularly when turning, and has had two near-falls in the past three months, though no completed falls. He denies any clear tremor in his hands, and his wife confirms she has not noticed shaking at rest. He reports increasing difficulty with fine motor tasks such as buttoning his shirt and using a fork, which he has noticed over the past six months. His handwriting has become smaller, which he initially attributed to age. He has also had worsening constipation over the past two years, gastroparesis with nausea was diagnosed in the same period, and he reports occasional episodes of lightheadedness when standing quickly. His sleep has been disrupted, with his wife reporting that he has begun talking and moving his arms during sleep several times per week, occasionally striking her. He was started on metoclopramide 10 mg three times daily approximately 18 months ago for gastroparesis with nausea, and he feels it has moderately helped his nausea. He denies any exposure to antipsychotic medications or other dopamine-blocking agents aside from metoclopramide. He denies visual hallucinations, cognitive complaints beyond occasional word-finding pauses, and denies any urinary incontinence.",
     "neurological_exam": {
       "additional": "Glabellar reflex positive (Myerson sign \u2014 fails to habituate after 10 taps). No myoclonus. No rest tremor elicited with distraction maneuvers (mental subtraction). Mild seborrheic dermatitis noted on forehead and nasolabial folds.",
       "coordination": "Finger-to-nose testing intact bilaterally without dysmetria. Heel-to-shin testing intact. No dysdiadochokinesia beyond that attributable to bradykinesia. No cerebellar ataxia.",

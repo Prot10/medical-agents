@@ -4,14 +4,7 @@
   "difficulty": "straightforward",
   "encounter_type": "inpatient",
   "fallback_tool_outputs": {
-    "advanced_imaging": {
-      "findings": [],
-      "impression": "No abnormality identified.",
-      "modality": "",
-      "quantitative_data": null,
-      "recommended_actions": [],
-      "tracer_or_protocol": null
-    },
+    "advanced_imaging": null,
     "cardiac_monitoring": {
       "duration_hours": 24,
       "events": [],
@@ -49,18 +42,7 @@
       "impression": "No acute intracranial abnormality. No haemorrhage, mass, hydrocephalus, or large-territory infarct.",
       "recommended_actions": []
     },
-    "drug_interactions": {
-      "general": {
-        "alternatives": [],
-        "contraindications": [],
-        "formulary_status": "on formulary",
-        "interactions": [],
-        "proposed": "(agent not specified on this case's pathway)",
-        "warnings": [
-          "Non-specific interaction check; verify against a current formulary or interaction reference before prescribing."
-        ]
-      }
-    },
+    "drug_interactions": null,
     "ecg": {
       "axis": "normal",
       "clinical_correlation": "",
@@ -83,6 +65,7 @@
         "RA": "normal size",
         "RV": "normal size and function"
       },
+      "echo_type": "TTE",
       "ejection_fraction": 64.0,
       "findings": [
         "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
@@ -99,60 +82,13 @@
     },
     "eeg": null,
     "labs": null,
-    "literature_search": {
-      "general": {
-        "query": "general",
-        "results": [],
-        "summary": "No directly applicable, high-quality evidence was retrieved for this query. Recommend correlating with current society guidelines."
-      }
-    },
+    "literature_search": null,
     "mri": null,
-    "specialized_test": {
-      "findings": [],
-      "impression": "Study within normal limits.",
-      "quantitative_data": null,
-      "recommended_actions": [],
-      "test_type": ""
-    }
+    "specialized_test": null
   },
   "followup_outputs": [],
   "ground_truth": {
     "action_criteria": [
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "query": "functional neurological disorder diagnosis treatment"
-            },
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[Nielsen_2015]",
-          "FND criteria pack \u2014 treatment evidence"
-        ],
-        "criterion_id": "action-1-search-medical-literature",
-        "expected_evidence": "Confirms multidisciplinary CBT + physiotherapy is the evidence-based treatment for FND",
-        "importance": "recommended",
-        "label": "Search current literature on FND diagnostic signs and evidence-based treatment (CBT for PNES, specialized physiotherapy for functional motor symptoms)",
-        "rationale": "Search current literature on FND diagnostic signs and evidence-based treatment (CBT for PNES, specialized physiotherapy for functional motor symptoms)"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "check_drug_interactions"
-          }
-        ],
-        "citations": [
-          "FND criteria pack \u2014 medication review"
-        ],
-        "criterion_id": "action-2-check-drug-interactions",
-        "expected_evidence": "Identification of medication contributors that should be tapered or discontinued",
-        "importance": "recommended",
-        "label": "Review current medications for agents that may exacerbate symptoms (e.g., benzodiazepines, dopamine-blocking antipsychotics, AEDs initiated for PNES)",
-        "rationale": "Review current medications for agents that may exacerbate symptoms (e.g., benzodiazepines, dopamine-blocking antipsychotics, AEDs initiated for PNES)"
-      },
       {
         "alternatives": [
           {
@@ -163,34 +99,33 @@
           }
         ],
         "citations": [
-          "[AAN_Functional_Seizures_2025]",
-          "positive FND signs; AAN functional seizures guideline 2025"
+          "[DSM5_FND]",
+          "[Daum_2014]",
+          "[Espay_2018]"
         ],
         "criterion_id": "action-3-perform-clinical-assessment",
-        "expected_evidence": "Positive rule-in signs establish FND; symptoms are real and involuntary, and psychological stress is not a required diagnostic criterion",
+        "expected_evidence": "Hoover sign, collapsing weakness and distractible tremor on the right; sensory splitting supportive only",
         "importance": "required",
-        "label": "Perform and document a positive FND examination: internal inconsistency/incongruity, Hoover sign, entrainment/distractibility or positive functional-seizure semiology as appropriate",
-        "rationale": "Perform and document a positive FND examination: internal inconsistency/incongruity, Hoover sign, entrainment/distractibility or positive functional-seizure semiology as appropriate"
+        "label": "Examine for positive functional signs",
+        "rationale": "The diagnosis is made at the bedside: a positive Hoover sign, collapsing weakness and a distractible tremor are signs of clinical incompatibility (DSM-5 criterion B; Daum 2014)."
       },
       {
         "alternatives": [
           {
             "required_arguments": {
-              "contrast": false,
-              "protocol": "standard"
+              "contrast": false
             },
             "tool_name": "analyze_brain_mri"
           }
         ],
         "citations": [
-          "[AAN_Functional_Seizures_2025]",
-          "positive FND signs; AAN functional seizures guideline 2025"
+          "[Espay_2018]"
         ],
         "criterion_id": "action-4-analyze-brain-mri",
-        "expected_evidence": "Exclude the named structural mimic; a normal scan does not itself diagnose FND",
-        "importance": "optional",
-        "label": "Consider MRI only for the explicit first focal deficit, acute red flag or competing organic neurological disease in this case",
-        "rationale": "Consider MRI only for the explicit first focal deficit, acute red flag or competing organic neurological disease in this case"
+        "expected_evidence": "No T2/FLAIR lesion or restricted diffusion to account for the right leg weakness",
+        "importance": "recommended",
+        "label": "Non-contrast brain MRI, once",
+        "rationale": "Acute right leg weakness with a remitting episode in the same limb two years ago raises demyelination or a structural lesion; one non-contrast MRI with DWI answers that question, and gadolinium adds nothing without a known demyelinating disease (Espay 2018)."
       },
       {
         "alternatives": [
@@ -202,35 +137,84 @@
           }
         ],
         "citations": [
+          "[ILAE_PNES_2013]",
           "[AAN_Functional_Seizures_2025]",
-          "positive FND signs; AAN functional seizures guideline 2025"
+          "[Avbersek_2010]"
         ],
         "criterion_id": "action-5-analyze-eeg",
-        "expected_evidence": "Typical clinical event without an epileptic ictal correlate, interpreted together with semiology; interictal normality alone is insufficient",
+        "expected_evidence": "Habitual events recorded on video with no EEG change and a normal interictal record",
+        "importance": "required",
+        "label": "Video-EEG to capture a habitual event",
+        "rationale": "The events have one feature that favours epileptic seizures (eyes open with upward gaze), so the semiology alone cannot settle them; a habitual event recorded on video-EEG without ictal change reaches the ILAE documented level and lets co-occurring epilepsy be assessed (LaFrance 2013; AAN 2025)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "check_drug_interactions"
+          }
+        ],
+        "citations": [
+          "[AAN_Functional_Seizures_2025]"
+        ],
+        "criterion_id": "action-2-check-drug-interactions",
+        "expected_evidence": "No interaction between sertraline and dicyclomine that alters the plan",
         "importance": "optional",
-        "label": "Consider video-EEG capture of a typical event when epilepsy versus functional seizure remains ambiguous",
-        "rationale": "Consider video-EEG capture of a typical event when epilepsy versus functional seizure remains ambiguous"
+        "label": "Review the medication list",
+        "rationale": "Sertraline and PRN dicyclomine carry no interaction that changes management and no benzodiazepine or antiseizure drug is prescribed; the review is defensible but not needed for the diagnosis."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "neuropsych_battery"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[Espay_2018]"
+        ],
+        "criterion_id": "action-neuropsych-battery",
+        "expected_evidence": "Quantifies mood, anxiety and symptom burden to guide therapy; does not make the diagnosis",
+        "importance": "optional",
+        "label": "Neuropsychological assessment of the comorbidity",
+        "rationale": "Generalized anxiety disorder is a treatment target; a battery can quantify it but does not make the diagnosis and is not needed before treatment (Espay 2018)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "query": "functional neurological disorder diagnosis treatment"
+            },
+            "tool_name": "search_medical_literature"
+          }
+        ],
+        "citations": [
+          "[Espay_2018]"
+        ],
+        "criterion_id": "action-1-search-medical-literature",
+        "expected_evidence": "General evidence on positive signs and treatment trials in FND",
+        "importance": "optional",
+        "label": "Search the literature on FND diagnosis and treatment",
+        "rationale": "Background reading only; the diagnosis and the plan rest on this patient's examination and recorded data, not on a search (ROUND_POLICY ruling 5)."
       }
     ],
     "assessment": {
       "prohibited_recommendations": [
-        "Do not pursue ever-expanding negative investigations \u2014 per Stone 2018, repeated negative workups reinforce illness conviction and worsen prognosis",
-        "Do not frame the diagnosis as 'all in your head', 'nothing wrong', or 'we couldn't find anything' \u2014 this damages the therapeutic alliance and is the most common avoidable harm in FND",
-        "Do not perform invasive testing (lumbar puncture, nerve biopsy, muscle biopsy, cerebral angiography) when positive rule-in signs are present and there is no clinical indication",
-        "Do not order EMG/NCS, muscle biopsy, or nerve biopsy as part of an FND workup \u2014 these invasive tests reinforce the somatic illness model per Stone 2018",
-        "Do not start or continue long-term anti-epileptic drugs for functional (psychogenic non-epileptic) seizures \u2014 AEDs are ineffective for PNES and expose the patient to side effects",
-        "Do not give benzodiazepines as abortive therapy for witnessed PNES events (no benefit and risk of respiratory depression)",
-        "Do not give gadolinium without a specific indication \u2014 contrast adds cost and risk and answers no question that positive functional signs have not already answered",
-        "Do not repeat the brain MRI, the laboratory panel or the lumbar puncture once a first normal study and positive rule-in signs are documented: each repetition strengthens the patient's belief that something organic has been missed"
+        "Order further investigations once the positive diagnosis is established, without a new specific clinical question (repeat MRI, CT, lumbar puncture, EMG or nerve conduction studies, evoked potentials, PET).",
+        "Tell the patient the symptoms are imagined, feigned, 'all in your head', or that nothing is wrong.",
+        "Perform invasive testing without a specific indication (lumbar puncture, nerve or muscle biopsy, catheter angiography).",
+        "Start or escalate antiseizure medication for the functional seizures.",
+        "Give benzodiazepines or intubate for a typical functional seizure.",
+        "Give gadolinium contrast without a specific indication."
       ],
       "required_recommendations": [
-        "Do NOT make the diagnosis by exclusion: document at least one positive rule-in sign, which is the act that establishes it",
-        "Obtain video-EEG capturing a habitual event with normal interictal EEG to confirm PNES",
-        "Communicate the diagnosis transparently using positive language and the rule-in signs as the basis",
-        "Refer for FND-informed physiotherapy and CBT / psychological therapy",
-        "Order a comprehensive neuropsychological battery to characterize comorbid depression, anxiety, somatization, and trauma exposure \u2014 informs treatment planning (criteria-pack 'recommended' tier)",
-        "Communicate the diagnosis transparently using positive language anchored on the rule-in signs; explicitly state the diagnosis is FND, the symptoms are real and involuntary, and there is an evidence-based treatment plan",
-        "Refer to specialized FND-informed physiotherapy (for functional motor symptoms) and to CBT / psychological therapy (for PNES and comorbid mood / anxiety)"
+        "Make a positive diagnosis of functional neurological disorder (mixed: functional seizures and functional right leg weakness) based on the Hoover sign, collapsing weakness and distractible tremor and the habitual event recorded on video-EEG without ictal change, and not by exclusion of other disease.",
+        "Explain the diagnosis to the patient, and with consent to the family, as a common and genuine disorder of nervous system functioning that can improve, show the positive signs, and give written information.",
+        "Refer for physiotherapy with expertise in functional motor disorder (motor retraining, Nielsen 2015 consensus).",
+        "Refer for psychological therapy by a clinician experienced in FND (CBT-informed) and treat the comorbid anxiety.",
+        "Give the patient, family and ward a written plan for typical events: keep safe, do not restrain, wait for the event to end, and do not give emergency benzodiazepines or intubate for a typical functional seizure."
       ]
     },
     "avoided_actions": [
@@ -242,10 +226,10 @@
           }
         ],
         "citations": [
-          "[Stone_2018]"
+          "[Stone_2016]"
         ],
         "criterion_id": "avoid-waste-1-analyze-ecg",
-        "rationale": "ECG has no diagnostic role in FND; cardiac etiology is not on the differential for the presenting neurological deficit.",
+        "rationale": "The events last 2-3 minutes with shaking and preserved responsiveness to command and no syncopal prodrome; no cardiac question is raised.",
         "severity": "waste"
       },
       {
@@ -256,10 +240,10 @@
           }
         ],
         "citations": [
-          "[Stone_2018]"
+          "[Stone_2016]"
         ],
         "criterion_id": "avoid-waste-2-order-echocardiogram",
-        "rationale": "Echocardiography has no role in FND; no structural cardiac question is raised by the presentation.",
+        "rationale": "No murmur, embolic or structural cardiac question in a 28-year-old with functional weakness and events.",
         "severity": "waste"
       },
       {
@@ -270,10 +254,10 @@
           }
         ],
         "citations": [
-          "[Stone_2018]"
+          "[Stone_2016]"
         ],
         "criterion_id": "avoid-waste-3-order-cardiac-monitoring",
-        "rationale": "Cardiac rhythm monitoring is not indicated; the events are non-syncopal and the rule-in signs point to FND.",
+        "rationale": "The events are not syncopal: 2-3 minutes of bilateral shaking without pallor, not a brief collapse; rhythm monitoring answers no question here.",
         "severity": "waste"
       },
       {
@@ -287,7 +271,7 @@
           "[Espay_2018]"
         ],
         "criterion_id": "avoid-waste-4-order-ct-scan",
-        "rationale": "Non-contrast head CT adds no information beyond MRI for an FND workup and contributes diagnostic noise plus radiation exposure.",
+        "rationale": "Three days into the weakness, with no thrombolysis question, a head CT adds radiation and answers nothing the single MRI does not.",
         "severity": "waste"
       },
       {
@@ -298,10 +282,10 @@
           }
         ],
         "citations": [
-          "[Stone_2018]"
+          "[Stone_2016]"
         ],
         "criterion_id": "avoid-waste-5-analyze-csf",
-        "rationale": "Lumbar puncture is not indicated in typical FND; invasive testing reinforces somatic illness model and adds iatrogenic risk without changing management.",
+        "rationale": "No fever, meningism or encephalopathy; a lumbar puncture is invasive and answers no question once positive signs are documented.",
         "severity": "waste"
       },
       {
@@ -317,7 +301,7 @@
           "[Espay_2018]"
         ],
         "criterion_id": "avoid-waste-6-order-advanced-imaging",
-        "rationale": "Advanced PET imaging has no indication in FND; standard MRI is the appropriate structural workup.",
+        "rationale": "PET has no role in functional weakness or functional seizures.",
         "severity": "waste"
       },
       {
@@ -330,10 +314,10 @@
           }
         ],
         "citations": [
-          "[Stone_2018]"
+          "[Stone_2016]"
         ],
         "criterion_id": "avoid-waste-7-order-specialized-test",
-        "rationale": "Nerve conduction studies and EMG have no role once positive functional signs are documented: the deficit is not neuromuscular, the study is uncomfortable, and a normal result reinforces the patient's search for an organic cause \u2014 the principal iatrogenic harm in this condition",
+        "rationale": "Reflexes are normal and the weakness has positive functional signs; nerve conduction studies and EMG answer no question and a normal study reinforces the search for an organic cause.",
         "severity": "waste"
       },
       {
@@ -346,10 +330,10 @@
           }
         ],
         "citations": [
-          "[Stone_2018]"
+          "[Stone_2016]"
         ],
         "criterion_id": "avoid-waste-8-order-specialized-test",
-        "rationale": "Somatosensory evoked potentials answer a question about a lesion in the somatosensory pathway; a midline-splitting, non-anatomical sensory deficit is not that question",
+        "rationale": "Sensory loss splitting the midline at the groin is not a somatosensory pathway question; evoked potentials add nothing.",
         "severity": "waste"
       }
     ],
@@ -378,72 +362,69 @@
       {
         "diagnosis": "Epileptic seizures",
         "icd_code": "G40.909",
-        "key_features": "Witnessed convulsive-appearing events; ictal video-EEG showing absence of electrographic correlate during a captured habitual event is the key differentiator.",
-        "likelihood": "moderate"
+        "key_features": "Eyes open during the events favour epileptic seizures, but she followed a command during bilateral shaking and recovered at once. A habitual event recorded on video-EEG without ictal change; co-occurring epilepsy remains possible in about one in five patients with functional seizures.",
+        "likelihood": "low"
       },
       {
-        "diagnosis": "Multiple sclerosis (demyelinating disease)",
+        "diagnosis": "Multiple sclerosis",
         "icd_code": "G35",
-        "key_features": "Sensorimotor symptoms in a young adult raise demyelinating disease; brain (and when indicated spine) MRI without T2/FLAIR lesions or enhancement argues against an active demyelinating process.",
+        "key_features": "A remitting episode of right leg weakness two years ago raises demyelination, but the Hoover sign and collapsing weakness with normal reflexes and flexor plantars are incompatible with a central lesion, and the non-contrast MRI shows no white matter lesion.",
         "likelihood": "low"
       },
       {
-        "diagnosis": "Structural CNS lesion (tumor, demyelination, stroke)",
-        "icd_code": null,
-        "key_features": "Focal complaints warrant imaging; normal brain MRI without lesion, mass, or enhancement effectively excludes a structural cause for the presenting deficit.",
+        "diagnosis": "Ischemic stroke or other structural brain lesion",
+        "icd_code": "I63.9",
+        "key_features": "Weakness developed over 3 days rather than abruptly; positive functional signs, normal reflexes and a normal MRI without restricted diffusion or mass argue against it.",
         "likelihood": "low"
-      },
-      {
-        "diagnosis": "Peripheral neuropathy or radiculopathy",
-        "icd_code": "G62.9",
-        "key_features": "Non-dermatomal sensory loss, normal reflexes, and (when obtained) normal EMG/NCS argue against peripheral nerve or root pathology.",
-        "likelihood": "low"
-      },
-      {
-        "diagnosis": "Autoimmune or paraneoplastic encephalitis",
-        "icd_code": "G04.81",
-        "key_features": "Episodic neurological symptoms can occur in autoimmune encephalitis; normal MRI, normal EEG background, and (when obtained) negative antibody panel render this very unlikely.",
-        "likelihood": "very_low"
-      },
-      {
-        "diagnosis": "Malingering or factitious disorder",
-        "icd_code": "F68.10",
-        "key_features": "FND is involuntary; preserved effort on symptom-validity testing and absence of clear secondary gain argue against feigning. The rule-in signs do not distinguish FND from malingering by themselves, but the clinical context does not support a feigning explanation.",
-        "likelihood": "very_low"
       }
     ],
     "key_clinical_evidence": [
-      "FND is a positive diagnosis based on rule-in signs (Hoover, tremor entrainment, give-way weakness, non-dermatomal sensory loss with midline split) \u2014 not a diagnosis of exclusion (Espay 2018, Stone 2018).",
-      "Brain MRI and basic laboratory testing are OPTIONAL here, not due diligence: the diagnosis rests on the positive signs, and each additional negative study is a cost and an iatrogenic harm rather than a confirmation. Where imaging is recommended in this case it is for one specific alternative question, once.",
-      "Over-investigation is the principal iatrogenic harm in FND; every additional negative test reinforces the patient's illness conviction and worsens prognosis (Stone 2018).",
-      "Psychiatric comorbidity (anxiety, depression, trauma) is common and informs treatment planning but is NOT required for the diagnosis and does not 'explain' the symptoms in a reductive sense.",
-      "Diagnostic communication matters: using positive language anchored on the rule-in signs is associated with better engagement and outcomes (Stone 2018).",
-      "Evidence-based treatment is multidisciplinary \u2014 CBT for PNES and FND-informed physiotherapy for functional motor symptoms (Nielsen 2015).",
-      "Video-EEG capturing a habitual event with normal interictal EEG is diagnostic for PNES (ILAE PNES Task Force 2013); routine EEG alone is insufficient.",
-      "Interim composition decision, August 2026: FND remains only to keep the frozen dataset at 20 conditions/600 cases. The positive functional-neurological examination is the sole required diagnostic act; every instrumental test is optional and case-targeted. DLB remains the preferred future replacement when composition work resumes."
+      "Positive signs of functional weakness and tremor: right Hoover sign, collapsing weakness of the right leg and a right hand tremor that stops with serial 7s; midline-splitting sensory loss and normal walking when unobserved are supportive only.",
+      "Event semiology: bilateral arm shaking for 2-3 minutes with no incontinence, no postictal confusion and immediate recovery; the open eyes are an atypical feature, so the semiology alone does not settle the events.",
+      "Video-EEG recorded one habitual event, confirmed as typical by the roommate, with no EEG change and responsiveness to command during the shaking; the interictal record is normal.",
+      "A single non-contrast brain MRI, indicated by the prior remitting right leg episode, shows no white matter lesion or other structural cause.",
+      "The recent divorce and custody dispute and her generalized anxiety are supportive context and a treatment target; a stressor is neither required nor sufficient for the diagnosis."
     ],
     "red_herrings": [
       {
-        "correct_interpretation": "Psychiatric comorbidity neither establishes nor refutes FND. Diagnosis requires positive rule-in signs on examination; psychiatric history is relevant for treatment planning, not for diagnosis.",
-        "data_point": "Pre-existing psychiatric diagnosis (anxiety or depression) in the past medical history",
+        "correct_interpretation": "Psychiatric comorbidity neither establishes nor refutes FND; the diagnosis rests on the positive signs and the recorded event, and the anxiety is a treatment target.",
+        "data_point": "Generalized anxiety disorder treated with sertraline",
         "field_path": "patient.clinical_history.past_medical_history",
-        "intended_effect": "Premature anchoring on a 'psychosomatic' label without obtaining positive rule-in signs; conversely, dismissing FND as a serious diagnosis because the patient is 'just anxious'",
+        "intended_effect": "Anchoring on a 'psychosomatic' label without eliciting positive signs, or dismissing the symptoms as anxiety",
         "location": "Past medical history"
       },
       {
-        "correct_interpretation": "Many organic conditions (MS, migraine, epilepsy) also flare with stress. Stress at onset is supportive context, not a diagnostic substitute for the positive rule-in signs.",
-        "data_point": "Symptom onset coincident with a major psychosocial stressor",
+        "correct_interpretation": "A stressor is supportive context only; it is neither required nor sufficient for the diagnosis.",
+        "data_point": "Divorce finalized 3 weeks ago with a custody dispute",
         "field_path": "patient.history_present_illness",
-        "intended_effect": "Conclude prematurely that stress 'caused' the symptoms and that the workup can be abbreviated",
+        "intended_effect": "Concluding that stress 'caused' the symptoms and skipping the examination and the event recording",
+        "location": "History of present illness"
+      },
+      {
+        "correct_interpretation": "Open eyes are more frequent in epileptic seizures, but no single semiological feature is diagnostic; the habitual event recorded without ictal EEG change decides.",
+        "data_point": "Eyes open and rolled back during the episodes",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Treating the events as epileptic and starting antiseizure medication",
         "location": "History of present illness"
       }
     ],
     "review_status": "draft",
-    "sequence_constraints": [],
+    "sequence_constraints": [
+      {
+        "after_criterion_id": "action-4-analyze-brain-mri",
+        "before_criterion_id": "action-3-perform-clinical-assessment",
+        "citations": [
+          "[Espay_2018]"
+        ],
+        "reason": "The examination comes first: its positive signs decide whether imaging has a specific question to answer (Espay 2018).",
+        "severity": "soft"
+      }
+    ],
     "stop_rule": {
       "max_additional_actions": 0,
       "required_before_assessment": [
-        "action-3-perform-clinical-assessment"
+        "action-3-perform-clinical-assessment",
+        "action-5-analyze-eeg"
       ]
     }
   },
@@ -453,36 +434,44 @@
     "clinical_assessment": {
       "assessment_type": "functional_neuro_signs",
       "criteria_met": {
-        "diagnosis_made_by_exclusion_only": false,
-        "positive_clinical_sign_present": true,
-        "psychological_stressor_required_for_diagnosis": false,
-        "symptoms_inconsistent_with_organic_disease": true
+        "distractibility_of_deficit": true,
+        "drift_without_pronation": false,
+        "functional_seizure_semiology_observed": false,
+        "give_way_weakness": true,
+        "hip_abductor_sign_positive": false,
+        "hoover_sign_positive": true,
+        "inconsistency_between_examination_and_function": true,
+        "tremor_entrainment_positive": false
       },
       "findings": [
         {
-          "result": "However, Hoover sign POSITIVE: right hip extension returns to full 5/5 strength when examiner's hand is under left heel during contralateral left leg flexion.",
+          "result": "Right hip extension absent on direct testing, full strength during contralateral left hip flexion against resistance.",
           "sign": "Hoover sign"
         },
         {
-          "result": "Right leg sensory loss splitting the midline exactly at the groin crease.",
-          "sign": "Midline-splitting sensory loss"
-        },
-        {
-          "result": "Give-way weakness during testing.",
+          "result": "Right leg strength collapses suddenly after a brief normal effort on each tested movement.",
           "sign": "Collapsing (give-way) weakness"
         },
         {
-          "result": "Tremor in right hand resolves with distraction (asking patient to do serial 7s).",
-          "sign": "Improvement with attentional distraction"
+          "result": "Right hand tremor stops while she performs serial 7s and returns when the task ends.",
+          "sign": "Distractibility"
+        },
+        {
+          "result": "Right leg sensory loss splitting the midline at the groin; normal walking in the hallway when unaware of being observed; not counted as rule-in signs.",
+          "sign": "Supportive features (low specificity)"
+        },
+        {
+          "result": "Reflexes 2+ and symmetric; plantar responses flexor.",
+          "sign": "Reflexes and plantar responses"
         }
       ],
-      "impression": "Positive functional signs elicited and documented: Hoover sign, Midline-splitting sensory loss, Collapsing (give-way) weakness, Improvement with attentional distraction. Functional neurological disorder is a rule-in diagnosis under DSM-5 and the criterion satisfied here is clinical incompatibility, not the absence of another disease. No further investigation is required to make the diagnosis; whatever imaging or laboratory testing is performed is for a separate, specific question.",
+      "impression": "Positive signs of functional weakness and tremor: Hoover sign, collapsing weakness of the right leg and distractible right hand tremor. The pattern is inconsistent with a structural lesion. No event was observed during the examination.",
       "pre_post_comparison": null,
       "recommended_actions": [],
       "scores": {
         "distribution_consistent_with_a_single_lesion": "no",
         "internal_inconsistency": "present",
-        "positive_rule_in_signs_documented": "4"
+        "positive_rule_in_signs_documented": "3"
       }
     },
     "csf": null,
@@ -493,19 +482,28 @@
         "formulary_status": "",
         "interactions": [],
         "proposed": "Sertraline 50 mg once daily; Dicyclomine 10 mg as needed up to 3 times daily",
-        "summary": "Current medications reviewed for interactions: Sertraline 50 mg once daily; Dicyclomine 10 mg as needed up to 3 times daily.",
+        "summary": "No clinically significant interactions among the current medicines.",
         "warnings": [
-          "Interaction review performed against the current medication list above. Clinical relevance \u2014 which agents to taper, and in what order \u2014 is a prescribing decision, not an output of this check."
+          "Dicyclomine: anticholinergic effects (dizziness, blurred vision, drowsiness) at higher or repeated doses."
         ]
       }
     },
     "ecg": null,
     "echo": null,
     "eeg": {
-      "activating_procedures": {},
-      "artifacts": [],
+      "activating_procedures": {
+        "hyperventilation": "No abnormality",
+        "photic_stimulation": "No photoparoxysmal response"
+      },
+      "artifacts": [
+        {
+          "description": "Myogenic artifact during the event, without underlying rhythmic evolution",
+          "type": "muscle"
+        }
+      ],
       "background": {
-        "description": "Normal 10 Hz posterior dominant rhythm. Normal throughout monitoring period."
+        "description": "Well-organized 10 Hz posterior dominant rhythm, reactive to eye opening. Normal sleep architecture with vertex waves and spindles.",
+        "recording": "48-hour inpatient video-EEG, wake and sleep, 10-20 electrode placement"
       },
       "classification": "normal",
       "findings": [
@@ -513,12 +511,12 @@
           "clinical_correlation": "",
           "frequency": "",
           "location": "generalized",
-          "morphology": "NO EEG CHANGE \u2014 identical to previous event. No ictal activity. Patient responsive to voice during event (squeezed examiner's hand on command mid-event).",
+          "morphology": "Day 1, 15:42, duration 2 min 35 s: bilateral asynchronous arm shaking of waxing and waning amplitude, eyes open with upward gaze, no speech; she squeezed the technologist's hand on command midway through the event and returned to baseline immediately afterwards. The roommate confirmed on video review that the event was typical. Posterior dominant rhythm visible between bursts of muscle artifact throughout; no evolving rhythmic activity, no postictal slowing or attenuation.",
           "state": "awake",
-          "type": "Second clinical event captured \u2014 right leg shaking and unresponsiveness"
+          "type": "Habitual clinical event"
         }
       ],
-      "impression": "This is a NORMAL EEG. One additional clinical event of right leg shaking with unresponsiveness was captured. The EEG showed continuous normal background activity throughout with no ictal correlate, no electrodecrement, and no post-event slowing. No interictal epileptiform discharges",
+      "impression": "This is a NORMAL video-EEG. One habitual event was recorded (bilateral asynchronous arm shaking with eyes open, lasting 2 min 35 s) without ictal EEG change before, during or after the event; the posterior dominant rhythm persisted during the event. No interictal epileptiform discharges. No electrographic seizures.",
       "limitations": "",
       "recommended_actions": []
     },
@@ -528,24 +526,54 @@
         "query": "functional neurological disorder diagnosis treatment",
         "results": [
           {
-            "evidence_level": "guideline recommendation",
-            "finding": "Confirms multidisciplinary CBT + physiotherapy is the evidence-based treatment for FND",
-            "source": "Nielsen_2015"
+            "evidence_level": "narrative review",
+            "finding": "Diagnosis of functional neurological disorder rests on positive clinical features such as the Hoover sign, tremor entrainment and functional seizure semiology, not on the exclusion of other disease; treatment combines explanation, physiotherapy and psychological therapy.",
+            "source": "Espay AJ et al. JAMA Neurol 2018;75:1132-1141"
+          },
+          {
+            "evidence_level": "systematic review",
+            "finding": "Motor signs such as the Hoover sign, hip abductor sign, drift without pronation and dragging gait have high specificity; sensory signs such as midline splitting have low specificity.",
+            "source": "Daum C et al. J Neurol Neurosurg Psychiatry 2014;85:180-190"
+          },
+          {
+            "evidence_level": "ILAE consensus",
+            "finding": "Defines levels of certainty for psychogenic nonepileptic seizures; the documented level requires a typical event recorded on video-EEG without ictal EEG change.",
+            "source": "LaFrance WC Jr et al. Epilepsia 2013;54:2005-2018"
+          },
+          {
+            "evidence_level": "AAN evidence-based guideline",
+            "finding": "For functional seizures: assess for co-occurring epilepsy and psychiatric disorders, taper antiseizure medication without another indication, avoid benzodiazepines, and offer psychological therapy, which is possibly effective.",
+            "source": "Tolchin B et al. Neurology 2026;106:e214466"
+          },
+          {
+            "evidence_level": "randomised controlled trial",
+            "finding": "CBT added to standardised medical care did not reduce dissociative seizure frequency at 12 months; several secondary outcomes favoured CBT.",
+            "source": "Goldstein LH et al. Lancet Psychiatry 2020;7:491-505"
+          },
+          {
+            "evidence_level": "randomised controlled trial",
+            "finding": "Specialist physiotherapy for functional motor disorder was not superior to community neurological physiotherapy on physical function at 12 months; several secondary outcomes favoured it.",
+            "source": "Nielsen G et al. Lancet Neurol 2024;23:675-686"
+          },
+          {
+            "evidence_level": "systematic review",
+            "finding": "About 4% of patients diagnosed with conversion symptoms since 1970 later received another diagnosis.",
+            "source": "Stone J et al. BMJ 2005;331:989"
           }
         ],
-        "summary": "Confirms multidisciplinary CBT + physiotherapy is the evidence-based treatment for FND"
+        "summary": "Guideline and trial evidence supports a positive clinical diagnosis of functional neurological disorder, video-EEG confirmation of functional seizures, tapering of unneeded antiseizure drugs and benzodiazepines, and physiotherapy and psychological treatment whose trial effects on primary outcomes were modest."
       }
     },
     "mri": {
       "additional_observations": [
-        "No T2/FLAIR white matter lesions",
-        "No structural lesion",
-        "No cortical abnormality",
-        "Normal ventricular system",
-        "Normal posterior fossa"
+        "Technique: sagittal T1, axial T2, axial and sagittal FLAIR, DWI with ADC, SWI; no contrast administered",
+        "No T2/FLAIR white matter lesion; no periventricular, juxtacortical, infratentorial or callosal lesion",
+        "No restricted diffusion",
+        "No hemorrhage or susceptibility artifact",
+        "Normal ventricles and posterior fossa"
       ],
       "findings": [],
-      "impression": "Normal brain MRI without and with contrast. No acute intracranial abnormality. No restricted diffusion, no T2/FLAIR signal abnormality, no abnormal enhancement, no mass effect",
+      "impression": "Normal non-contrast brain MRI. No white matter lesion, restricted diffusion, mass or hemorrhage.",
       "recommended_actions": [],
       "volumetrics": null
     },
@@ -556,27 +584,23 @@
     "case_body_concerns": [],
     "citation_gap": [],
     "criteria_pack_version": "1.0",
-    "difficulty_rationale": "Clear positive rule-in signs (Hoover sign and/or distractible tremor and/or non-dermatomal sensory loss with midline split) with normal MRI and supportive normal labs. Workup is hygiene-level; the diagnostic challenge is communication, not investigation.",
+    "difficulty_rationale": "Clear positive signs of functional right leg weakness and tremor, but the events include an atypical feature (eyes open), so the diagnosis of the events needs the video-EEG capture; one non-contrast MRI answers the demyelination question raised by the prior remitting episode.",
     "fallback_tool_kinds": {
-      "advanced_imaging": "normal",
       "cardiac_monitoring": "normal",
       "csf": "normal",
       "ct": "normal",
-      "drug_interactions": "normal",
       "ecg": "normal",
-      "echo": "normal",
-      "literature_search": "normal",
-      "specialized_test": "normal"
+      "echo": "normal"
     },
-    "last_revised": "2026-08-10",
+    "last_revised": "2026-10-24",
     "notes": "Straightforward FND with PNES and functional right leg weakness. Hoover sign and video-EEG are diagnostic.",
     "policy_spec_status": "draft",
-    "revision_reason": "FND interim reviewer option: positive clinical diagnosis required; every instrumental test optional and selected for explicit red flags",
+    "revision_reason": "October 2026 review round: criteria rebuilt to the pack tiers (exam and video-EEG required, MRI recommended), non-contrast MRI, canonical literature and medication outputs, case-specific differential, evidence and assessment.",
     "version": "policy-v1",
     "vocab_gap": []
   },
   "patient": {
-    "chief_complaint": "Sudden onset right leg weakness and two episodes of unresponsiveness",
+    "chief_complaint": "Right leg weakness over 3 days and two episodes of unresponsiveness",
     "clinical_history": {
       "allergies": [
         "NKDA"
@@ -619,12 +643,12 @@
     },
     "history_present_illness": "Ms. L is a 28-year-old elementary school teacher who was brought to the emergency department by ambulance after two witnessed episodes of unresponsiveness at home this morning. The episodes were described by her roommate as lasting 2-3 minutes with bilateral arm shaking, eyes open and rolled back, no post-ictal confusion, and immediate return to baseline after each episode. She also reports complete right leg weakness developing over the past 3 days, making it impossible for her to walk. She has no prior history of seizures or epilepsy. She is being admitted for monitoring and workup. On further history, she reports that her divorce was finalized 3 weeks ago following a contentious 18-month separation, with ongoing custody dispute for her 4-year-old daughter. She denies any head trauma, fever, or recent illness. She notes a similar episode of weakness affecting the right leg approximately 2 years ago, which her previous doctor attributed to stress and which resolved over several weeks without treatment. She denies headache, vision changes, or speech difficulty. She is currently prescribed sertraline for anxiety, which was started 6 months ago. She is not on any anticonvulsants. She denies illicit drug use. Collateral from roommate confirms no incontinence during episodes and rapid complete recovery.",
     "neurological_exam": {
-      "additional": "Give-way weakness during testing. Tremor in right hand resolves with distraction (asking patient to do serial 7s). History of similar episode 2 years ago that resolved spontaneously.",
+      "additional": "Collapsing (give-way) weakness of the right leg on testing. Mild right hand tremor that stops while she performs serial 7s.",
       "coordination": "Normal bilateral upper extremities. Unable to assess right leg due to apparent weakness.",
       "cranial_nerves": "Normal. No facial asymmetry. EOMI intact.",
       "gait": "Unable to weight-bear on right leg in room; observed walking normally in hallway when unaware of being observed.",
       "mental_status": "Alert and oriented x4. Distressed and tearful. Cooperative but anxious.",
-      "motor": "Right leg apparent weakness 0/5 on formal testing. However, Hoover sign POSITIVE: right hip extension returns to full 5/5 strength when examiner's hand is under left heel during contralateral left leg flexion. Left leg full strength 5/5.",
+      "motor": "Right leg 0/5 on formal testing. Hoover sign positive: right hip extension is absent on direct testing but returns to full strength, felt under the right heel, during contralateral left hip flexion against resistance. Left leg 5/5.",
       "reflexes": "Normal 2+ symmetric throughout. No Babinski. No Hoffman.",
       "sensory": "Right leg sensory loss splitting the midline exactly at the groin crease."
     },

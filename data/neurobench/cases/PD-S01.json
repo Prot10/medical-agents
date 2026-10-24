@@ -47,15 +47,15 @@
       "axis": "normal",
       "clinical_correlation": "",
       "findings": [
-        "Normal sinus rhythm. Normal axis and intervals. No acute ST-T changes."
+        "Sinus rhythm 71/min, normal axis and intervals, no ST change."
       ],
-      "interpretation": "Normal ECG",
+      "interpretation": "Normal ECG: sinus rhythm 71/min.",
       "intervals": {
-        "PR": "190 ms",
-        "QRS": "94 ms",
-        "QTc": "432 ms"
+        "PR": "176 ms",
+        "QRS": "92 ms",
+        "QTc": "428 ms"
       },
-      "rate": 70,
+      "rate": 71,
       "rhythm": "normal sinus rhythm"
     },
     "echo": {
@@ -65,9 +65,10 @@
         "RA": "normal size",
         "RV": "normal size and function"
       },
-      "ejection_fraction": 65.0,
+      "echo_type": "TTE",
+      "ejection_fraction": 61.0,
       "findings": [
-        "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
+        "Normal left ventricular size and function, EF 61%, no significant valve disease."
       ],
       "impression": "Normal transthoracic echocardiogram.",
       "recommended_actions": [],
@@ -101,58 +102,29 @@
   "followup_outputs": [
     {
       "output": {
-        "query": "Parkinson's disease initial treatment levodopa dopamine agonist",
-        "results": [
+        "findings": [
           {
-            "source": "Verschuur et al., N Engl J Med 2019;380(4):315-324",
-            "summary": "Early versus delayed levodopa initiation did not affect the rate of disease progression in early PD. Levodopa provided sustained symptomatic benefit without accelerating neurodegeneration.",
-            "title": "Levodopa and the Progression of Parkinson's Disease (LEAP Trial)"
-          },
-          {
-            "source": "Gray et al., Lancet 2014;384(9949):1196-1205",
-            "summary": "Levodopa-based therapy was associated with better patient-rated quality of life compared to initial treatment with dopamine agonists or MAO-B inhibitors in early PD.",
-            "title": "PD MED Trial - Long-term results of initiating levodopa, dopamine agonists, or MAO-B inhibitors"
-          },
-          {
-            "source": "Fox et al., Mov Disord 2018;33(5):697-715",
-            "summary": "Levodopa is the most effective symptomatic treatment for PD. MAO-B inhibitors and dopamine agonists are alternatives for mild symptoms. Amantadine is efficacious for dyskinesia management in later stages.",
-            "title": "Movement Disorder Society Evidence-Based Review of Treatments for Parkinson's Disease"
+            "description": "Reduced striatal dopamine transporter binding, asymmetric, more marked in the left posterior putamen, with relative caudate sparing",
+            "region": "Striatum",
+            "signal": "Specific binding ratio: left putamen 1.16, right putamen 1.44 (normal >1.50); left caudate 2.39, right caudate 2.55 (normal)"
           }
         ],
-        "summary": ""
+        "impression": "Abnormal DaTscan: reduced striatal dopamine transporter binding, asymmetric, more marked in the left posterior putamen, with relative caudate sparing. Presynaptic dopaminergic deficit.",
+        "modality": "DaTscan",
+        "quantitative_data": {
+          "SBR left caudate": "2.39",
+          "SBR left putamen": "1.16 (normal >1.50)",
+          "SBR right caudate": "2.55",
+          "SBR right putamen": "1.44 (normal >1.50)"
+        },
+        "recommended_actions": [],
+        "tracer_or_protocol": "123I-ioflupane SPECT"
       },
-      "tool_name": "search_medical_literature",
-      "trigger_action": "search_literature_parkinsons_treatment"
-    },
-    {
-      "output": {
-        "alternatives": [
-          "Rasagiline 1 mg daily (MAO-B inhibitor, for mild symptoms)",
-          "Pramipexole 0.125 mg three times daily, titrate gradually (dopamine agonist)",
-          "Ropinirole 0.25 mg three times daily, titrate gradually (dopamine agonist)",
-          "Rotigotine transdermal patch 2 mg/24 hours (dopamine agonist, once daily patch)"
-        ],
-        "contraindications": [
-          "Non-selective MAO inhibitors (phenelzine, tranylcypromine) - risk of hypertensive crisis; must be discontinued at least 2 weeks before starting levodopa"
-        ],
-        "formulary_status": "On formulary, no prior authorization required",
-        "interactions": [
-          "No significant interactions with lisinopril",
-          "No significant interactions with atorvastatin",
-          "No significant interactions with tamsulosin",
-          "No significant interactions with acetaminophen"
-        ],
-        "proposed": "Carbidopa-levodopa 25/100 mg three times daily",
-        "warnings": [
-          "Iron supplements and high-protein meals may reduce levodopa absorption; advise taking 30-60 minutes before meals",
-          "May cause orthostatic hypotension, particularly in combination with tamsulosin (both can lower blood pressure); monitor BP after initiation",
-          "Nausea is common at initiation; taking with a small carbohydrate snack may help, though high-protein foods should be avoided",
-          "Monitor for impulse control disorders (more common with dopamine agonists but can occur with levodopa)",
-          "May cause vivid dreams or hallucinations, particularly at higher doses or in elderly patients"
-        ]
+      "tool_name": "order_advanced_imaging",
+      "tool_parameters": {
+        "modality": "DaTscan"
       },
-      "tool_name": "check_drug_interactions",
-      "trigger_action": "check_drug_interactions_carbidopa_levodopa"
+      "trigger_action": "request_datscan"
     }
   ],
   "ground_truth": {
@@ -160,81 +132,47 @@
       {
         "alternatives": [
           {
-            "required_arguments": {
-              "contrast": false,
-              "protocol": "standard"
-            },
+            "required_arguments": {},
             "tool_name": "analyze_brain_mri"
           }
         ],
         "citations": [
-          "[Schwarz_2014]",
-          "Schwarz_2014"
+          "[Postuma_2015]"
         ],
         "criterion_id": "action-1-analyze-brain-mri",
-        "expected_evidence": "No vascular, structural, or NPH features; substantia nigra changes (loss of swallow-tail sign) supportive but not required for diagnosis",
+        "expected_evidence": "Normal MRI for age with minimal punctate small-vessel white matter change; Evans index 0.28; normal basal ganglia, midbrain and pons; no infarct, mass, hydrocephalus or NPH features",
         "importance": "required",
-        "label": "Obtain structural brain MRI to exclude a secondary or atypical parkinsonian syndrome; do not use MRI itself to diagnose idiopathic Parkinson disease",
-        "rationale": "Obtain structural brain MRI to exclude a secondary or atypical parkinsonian syndrome; do not use MRI itself to diagnose idiopathic Parkinson disease"
+        "label": "Brain MRI to exclude a structural, vascular or atypical-parkinsonism cause",
+        "rationale": "PD is a clinical diagnosis; MRI is normal in PD and excludes vascular lesions, NPH, mass and the midbrain, pontine and putaminal signs of PSP and MSA [Postuma_2015]"
       },
       {
         "alternatives": [
           {
-            "required_arguments": {
-              "current_medications": [
-                "lisinopril",
-                "atorvastatin",
-                "tamsulosin",
-                "acetaminophen"
-              ],
-              "drug": "carbidopa-levodopa"
-            },
+            "required_arguments": {},
             "tool_name": "check_drug_interactions"
           }
         ],
         "citations": [
-          "[Postuma_2015]",
-          "Postuma_2015"
+          "[Postuma_2015]"
         ],
         "criterion_id": "action-2-check-drug-interactions",
-        "expected_evidence": "No dopamine receptor antagonists in current regimen; tamsulosin and lisinopril interactions with levodopa reviewed (orthostatic risk)",
-        "importance": "required",
-        "label": "Review medications for dopamine receptor antagonists and check interactions before starting dopaminergic therapy",
-        "rationale": "Review medications for dopamine receptor antagonists and check interactions before starting dopaminergic therapy"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "query": "Parkinson disease MDS clinical diagnostic criteria levodopa initial treatment"
-            },
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[Postuma_2015]",
-          "Postuma_2015"
-        ],
-        "criterion_id": "action-3-search-medical-literature",
-        "expected_evidence": "MDS 2015 criteria support clinically established PD; carbidopa-levodopa or dopamine agonists are first-line",
-        "importance": "required",
-        "label": "Search medical literature for MDS diagnostic criteria and first-line therapy options",
-        "rationale": "Search medical literature for MDS diagnostic criteria and first-line therapy options"
+        "expected_evidence": "No dopamine receptor blocker on the list; the alpha-blocker and the ACE inhibitor flagged for standing blood pressure during titration",
+        "importance": "optional",
+        "label": "Review the medication list before starting dopaminergic treatment",
+        "rationale": "No dopamine-blocking drug is on his list, but tamsulosin and lisinopril can add to orthostatic falls once levodopa is started [Postuma_2015]"
       }
     ],
     "assessment": {
       "prohibited_recommendations": [
-        "Do not prescribe metoclopramide, prochlorperazine, or promethazine for nausea in a patient with parkinsonism",
-        "Do not prescribe typical antipsychotics (haloperidol, fluphenazine) or most atypical antipsychotics (risperidone, olanzapine, aripiprazole) \u2014 restrict pharmacotherapy of psychosis to quetiapine, clozapine, or pimavanserin",
-        "Do not prescribe centrally acting anticholinergics (trihexyphenidyl, benztropine) in older adults or in any patient with cognitive impairment"
+        "Do not prescribe metoclopramide, prochlorperazine, haloperidol or other centrally acting D2-blocking antiemetics or antipsychotics; if an antipsychotic is needed, use quetiapine or clozapine",
+        "Do not start a centrally acting anticholinergic (trihexyphenidyl, benztropine) for the tremor: confusion and memory impairment at his age, and urinary retention with his prostatic hyperplasia"
       ],
       "required_recommendations": [
-        "Apply MDS 2015 clinical diagnostic criteria for Parkinson's disease (bradykinesia plus rest tremor or rigidity, supportive features, no absolute exclusion criteria)",
-        "Document temporal sequence of motor and non-motor (REM sleep behavior disorder, hyposmia, constipation, orthostatic intolerance) features",
-        "Review the full medication list for dopamine receptor antagonists (metoclopramide, prochlorperazine, antipsychotics) and any other agents that can mimic or worsen parkinsonism",
-        "Confirm asymmetric onset with rest tremor and re-emergent tremor on posture \u2014 classic for idiopathic PD",
-        "Counsel on motor and non-motor course and initiate carbidopa-levodopa or a dopamine agonist as first-line therapy",
-        "Arrange physical therapy, occupational therapy, and speech-language pathology referral (LSVT-LOUD/BIG)"
+        "Diagnose clinically probable PD (MDS 2015): bradykinesia with decrement and right-predominant rest tremor and cogwheel rigidity, no absolute exclusion, no red flag; the response to levodopa may add a supportive criterion [Postuma_2015]",
+        "Start carbidopa-levodopa 25/100 mg, half a tablet three times daily with food, increasing over 2 to 4 weeks to one tablet three times daily (300 mg/day levodopa), and review the response after 2 to 3 months [NICE_NG71]",
+        "If a dopamine agonist is used, warn about impulse control disorders and excessive daytime sleepiness and ask about them at every visit [NICE_NG71]",
+        "Measure lying and standing blood pressure during levodopa titration, since tamsulosin and lisinopril add to orthostatic falls",
+        "Refer to physiotherapy for gait and the two recent near-falls, occupational therapy for fine-motor tasks (buttoning, his woodworking), and speech and language therapy for the hypophonia [NICE_NG71]"
       ]
     },
     "avoided_actions": [
@@ -249,7 +187,7 @@
           "[Postuma_2015]"
         ],
         "criterion_id": "avoid-waste-1-analyze-eeg",
-        "rationale": "EEG has no role in diagnosing idiopathic PD; non-specific in this clinical picture",
+        "rationale": "No seizure, episodic confusion or encephalopathy: EEG does not inform this parkinsonism",
         "severity": "waste"
       },
       {
@@ -263,7 +201,7 @@
           "[Postuma_2015]"
         ],
         "criterion_id": "avoid-waste-2-analyze-csf",
-        "rationale": "CSF analysis is not part of routine PD workup; \u03b1-synuclein seed amplification remains a research tool",
+        "rationale": "No inflammatory, infectious or rapidly progressive feature: CSF has no role in this typical parkinsonism",
         "severity": "waste"
       },
       {
@@ -277,7 +215,7 @@
           "[Postuma_2015]"
         ],
         "criterion_id": "avoid-waste-3-order-echocardiogram",
-        "rationale": "No cardiac indication; not part of PD evaluation",
+        "rationale": "No murmur, heart failure or cardiac symptom: an echocardiogram does not inform the parkinsonism",
         "severity": "waste"
       },
       {
@@ -291,7 +229,7 @@
           "[Postuma_2015]"
         ],
         "criterion_id": "avoid-waste-4-order-cardiac-monitoring",
-        "rationale": "No syncope, palpitations, or arrhythmia concern documented",
+        "rationale": "No syncope or palpitations; the near-falls were on turning and stepping off a curb without light-headedness: rhythm monitoring is not indicated",
         "severity": "waste"
       },
       {
@@ -302,10 +240,59 @@
           }
         ],
         "citations": [
-          "[NICE_NG71]"
+          "[Postuma_2015]"
         ],
         "criterion_id": "avoid-waste-5-analyze-ecg",
-        "rationale": "ECG is not a diagnostic test for Parkinson disease",
+        "rationale": "No cardiac symptom, syncope or QT-relevant drug planned: an ECG does not inform the parkinsonism",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "modality": "DaTscan"
+            },
+            "tool_name": "order_advanced_imaging"
+          }
+        ],
+        "citations": [
+          "[NICE_NG71]",
+          "[Marshall_2009]"
+        ],
+        "criterion_id": "avoid-waste-datscan",
+        "rationale": "DaT SPECT is indicated when tremor cannot be clinically separated from parkinsonism; here the clinical diagnosis is clear and the scan would not change management [NICE_NG71]",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "autonomic_testing"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[Postuma_2015]"
+        ],
+        "criterion_id": "avoid-waste-autonomic-testing",
+        "rationale": "Formal autonomic testing is not part of the PD work-up; bedside orthostatic measurement suffices",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "tilt_table"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[Postuma_2015]"
+        ],
+        "criterion_id": "avoid-waste-tilt-table",
+        "rationale": "Formal autonomic testing is not part of the PD work-up; bedside orthostatic measurement suffices",
         "severity": "waste"
       }
     ],
@@ -332,8 +319,8 @@
       {
         "diagnosis": "Essential tremor",
         "icd_code": "G25.0",
-        "key_features": "Sister with ET and pre-existing 'tremor' phenotype, but rest tremor with re-emergent pattern, micrographia, and unilateral bradykinesia argue strongly against pure ET",
-        "likelihood": "moderate"
+        "key_features": "Rest tremor with re-emergence on posture, no action tremor, bradykinesia with decrement, rigidity and micrographia; his sister's ET is a separate condition",
+        "likelihood": "low"
       },
       {
         "diagnosis": "Drug-induced parkinsonism",
@@ -344,53 +331,75 @@
       {
         "diagnosis": "Vascular parkinsonism",
         "icd_code": "G21.4",
-        "key_features": "Asymmetric upper-limb predominant onset rather than lower-body, and MRI without significant vascular burden",
+        "key_features": "Asymmetric upper-limb onset rather than lower-body predominance, no stepwise course, and only minimal small-vessel change on MRI",
         "likelihood": "low"
       },
       {
         "diagnosis": "Multiple system atrophy (MSA-P)",
         "icd_code": "G90.3",
-        "key_features": "No early or severe dysautonomia, no cerebellar findings, no pontine/putaminal MRI signature",
+        "key_features": "No dysautonomia, no cerebellar signs, rest tremor present, and normal pons and putamina on MRI",
         "likelihood": "low"
       },
       {
         "diagnosis": "Progressive supranuclear palsy",
         "icd_code": "G23.1",
-        "key_features": "No vertical supranuclear gaze palsy, no early backward falls, no axial-predominant rigidity",
+        "key_features": "Full vertical eye movements, no early falls (two near-falls only, pull test one step with self-correction), limb more than axial rigidity, and normal midbrain on MRI",
         "likelihood": "very_low"
       }
     ],
     "key_clinical_evidence": [
-      "Asymmetric rest tremor, re-emergent tremor on posture, cogwheel rigidity, bradykinesia, and micrographia satisfy MDS 2015 motor criteria for clinically established PD",
-      "No absolute exclusion criteria are present: no vertical supranuclear gaze palsy, no cerebellar signs, no cortical sensory loss, no drug exposure",
-      "Family history of ET in a sister and BPH-related tamsulosin use are not relevant exclusionary features",
-      "Baseline labs and a structural MRI suffice as the minimum workup; baseline neuropsych is good practice for PD-MCI surveillance",
-      "Tier per the July 2026 clinical review: Parkinson's disease is a clinical diagnosis under the MDS criteria; laboratory testing excludes a mimic when one is suspected.",
-      "July 2026 review applied: PD remains a clinical diagnosis; no fixed routine laboratory panel, EEG, ECG, formal autonomic or tilt-table testing is part of the PD diagnostic pathway."
+      "Right-predominant bradykinesia with decrement on finger tapping, 4-5 Hz pill-rolling rest tremor with re-emergence on posture, cogwheel rigidity, micrographia, hypophonia and hypomimia: MDS 2015 parkinsonism",
+      "Rest tremor is the one supportive criterion before any levodopa trial; no red flag and no absolute exclusion: clinically probable PD",
+      "No vertical gaze palsy, cerebellar sign, cortical sensory loss or dopamine-blocker exposure",
+      "Two near-falls without a fall, and a pull test of one step with self-correction: no early-falls red flag",
+      "MRI normal for age with minimal small-vessel change: no vascular, structural, NPH or atypical-parkinsonism features",
+      "Tamsulosin and lisinopril add orthostatic risk once levodopa is started"
     ],
     "red_herrings": [
       {
-        "correct_interpretation": "Family ET is a separate condition; this patient's rest tremor, micrographia, and unilateral bradykinesia clearly fit idiopathic PD",
-        "data_point": "Sister with essential tremor and former 10 pack-year smoking history",
-        "field_path": "patient.clinical_history.family_history",
-        "intended_effect": "Anchor toward essential tremor or a non-degenerative tremor etiology",
-        "location": "family_history and social_history"
+        "correct_interpretation": "His sister's ET is a separate condition: he has no action tremor, and his rest tremor with re-emergence, decrement and rigidity are parkinsonian",
+        "data_point": "Sister, age 62, with essential tremor",
+        "field_path": "patient.clinical_history.family_history[3]",
+        "intended_effect": "Anchor toward essential tremor",
+        "location": "family_history"
       }
     ],
     "review_status": "draft",
     "sequence_constraints": [],
     "stop_rule": {
-      "max_additional_actions": 0,
+      "max_additional_actions": 2,
       "required_before_assessment": [
-        "action-1-analyze-brain-mri",
-        "action-2-check-drug-interactions",
-        "action-3-search-medical-literature"
+        "action-1-analyze-brain-mri"
       ]
     }
   },
   "initial_tool_outputs": {
     "csf": null,
-    "drug_interactions": null,
+    "drug_interactions": {
+      "general": {
+        "alternatives": [
+          "Rasagiline 1 mg daily (MAO-B inhibitor) for mild symptoms",
+          "Pramipexole, ropinirole or rotigotine (dopamine agonists), titrated gradually"
+        ],
+        "contraindications": [
+          "Non-selective MAO inhibitors (phenelzine, tranylcypromine) with levodopa: risk of hypertensive crisis; stop them at least 2 weeks before levodopa. Not on the current list."
+        ],
+        "formulary_status": "On formulary, no prior authorization required",
+        "interactions": [
+          "Tamsulosin (alpha-1 blocker) lowers standing blood pressure and adds to the orthostatic fall; levodopa can lower it further. Review the need for each and measure lying and standing blood pressure at each levodopa dose step.",
+          "Lisinopril lowers blood pressure and can add to the orthostatic effect of levodopa."
+        ],
+        "proposed": "Carbidopa-levodopa (proposed)",
+        "summary": "",
+        "warnings": [
+          "Atorvastatin and acetaminophen: no clinically relevant interaction with levodopa.",
+          "Iron salts and high-protein meals reduce levodopa absorption; if fluctuations develop later, separate doses from protein-rich meals.",
+          "Nausea is common at initiation; taking the dose with a small carbohydrate snack helps.",
+          "Dopamine agonists, and less often levodopa, can cause impulse control disorders and excessive daytime sleepiness.",
+          "Vivid dreams and hallucinations can occur, more often at higher doses and in older patients."
+        ]
+      }
+    },
     "literature_search": null,
     "mri": {
       "additional_observations": [
@@ -399,7 +408,7 @@
         "No hydrocephalus features to suggest NPH",
         "Mild age-appropriate cortical atrophy",
         "No cerebellar or pontine atrophy",
-        "Normal midbrain morphology without hummingbird sign or hot cross bun sign"
+        "Normal midbrain morphology without hummingbird sign; no hot cross bun sign in the pons"
       ],
       "findings": [
         {
@@ -408,7 +417,7 @@
           "mass_effect": "None",
           "signal_characteristics": {
             "DWI": "No restricted diffusion.",
-            "FLAIR": "No periventricular or deep white matter hyperintensities beyond minimal age-appropriate changes.",
+            "FLAIR": "No confluent periventricular or deep white matter hyperintensity.",
             "T1": "Normal gray-white matter differentiation throughout. No focal signal abnormalities in the basal ganglia or substantia nigra.",
             "T2": "No focal or confluent signal abnormalities. Normal signal in the putamen and caudate bilaterally."
           },
@@ -426,7 +435,7 @@
           "type": "Age-appropriate changes"
         }
       ],
-      "impression": "Normal brain MRI for age. Minimal chronic small vessel ischemic changes. Normal basal ganglia signal and volume. Normal midbrain morphology. No mass, hemorrhage, acute infarct, or hydrocephalus",
+      "impression": "Normal brain MRI for age. Minimal chronic small vessel ischemic changes. Normal basal ganglia signal and volume. Normal midbrain and pons. No mass, hemorrhage, acute infarct, or hydrocephalus.",
       "recommended_actions": [],
       "volumetrics": null
     }
@@ -438,7 +447,7 @@
     "clinical_domain": "Movement Disorders",
     "created_by": "neurobench_generator",
     "criteria_pack_version": "1.0",
-    "difficulty_rationale": "3 required tool actions after the independent reviewer audit; remaining optional studies are case-specific",
+    "difficulty_rationale": "Classic asymmetric tremor-onset parkinsonism; the only distractors are a sister with ET and two near-falls; 1 required criterion (MRI)",
     "estimated_complexity": "Straightforward - classic presentation with asymmetric resting tremor, rigidity, and bradykinesia",
     "fallback_tool_kinds": {
       "cardiac_monitoring": "normal",
@@ -447,9 +456,9 @@
       "echo": "normal"
     },
     "generation_date": "2026-03-13",
-    "last_revised": "2026-08-10",
+    "last_revised": "2026-10-24",
     "policy_spec_status": "draft",
-    "revision_reason": "independent end-to-end Parkinson tool review: case-targeted labs only; EEG/ECG and autonomic/tilt removed; cognition, RBD, genetics and advanced imaging narrowed to live questions",
+    "revision_reason": "October 2026 review round: plans/PD.md. Literature step deleted; medication review optional with one stored output; MRI arguments relaxed and report reconciled; DaTscan stored and marked waste; probable rather than established PD; musts, differential, evidence and red herring rewritten",
     "sub_domain": "Parkinson's disease",
     "version": "policy-v1",
     "vocab_gap": []

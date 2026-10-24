@@ -1,0 +1,41 @@
+# PD-S06
+Reviewer status: R1 none, R2 none (PD has no notes file; only the July 2026 tool review, `condition_tool_guidance.yaml` key `parkinsons`) | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| (none) | - | No physician note exists for PD. The case was corrected against plans/PD.md (classes C1 to C23, per-case entry PD-S06) and the July 2026 tool review (MRI required, CT as the alternative here; ECG, EEG, autonomic and tilt testing removed; labs, neuropsychology and genetics optional and targeted). |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| A | major | `ground_truth.action_criteria[action-2-search-medical-literature]`, `followup_outputs[1]` | Required literature criterion with an exact `query` string; output cited a "Tolosa, Wenning, Poewe, Lancet Neurol 2006" paper under a title that does not match it (C1, ruling 5). | FIXED: criterion and follow-up deleted, removed from the stop rule; initial and fallback literature null. |
+| A | major | `action-1-check-drug-interactions`, `followup_outputs[0]` | Required drug check with exact `drug` and `current_medications` strings, listed first; output claimed calcium-rich meals compete with levodopa absorption (it is iron that chelates levodopa) and carried em dashes (C2). | FIXED: `check_drug_interactions {}`, tier `optional`, moved after the imaging; one stored output `initial_tool_outputs.drug_interactions.general` (lisinopril orthostatic sentence; non-selective MAOI contraindication; alendronate, calcium, vitamin D3, atorvastatin no relevant interaction; iron not calcium; nausea, protein, sleep attacks, ICD warnings); follow-up deleted, fallback null. |
+| A | major | `action-3-order-ct-scan` | `{"contrast": false}` argument too narrow (C5); listed third; bare duplicate key; rationale copied from label (C3). | FIXED: `order_ct_scan {}`, placed first; plan S06 rationale; `[Postuma_2015]`; expected_evidence restates the report. Stays `required` with its `panel_required_exemptions.analyze_brain_mri`. |
+| D | major | `initial_tool_outputs.ct.additional_observations`, `.impression` | Report contained history ("MRI was not completed because severe claustrophobia persisted...") and an impression about "the parkinsonian syndrome" with a meta sentence on its own sensitivity. | FIXED: history sentence deleted; within-modality limitation line kept; impression "No acute intracranial abnormality. Mild age-appropriate volume loss without disproportionate ventriculomegaly. No basal ganglia infarct, mass or hydrocephalus." |
+| B | minor | `fallback_tool_outputs.mri` | An agent ordering the MRI the patient declined received the library "Normal MRI of the brain". | FIXED: case fallback "MRI not performed: no diagnostic images acquired." (examination abandoned, claustrophobia, sedation declined), following the SYNC-CARD "not performed" precedent. |
+| D | major | `followup_outputs` DaTscan | Interpretive report ("period or dot pattern"), em dash impression, `quantitative_data` null (C8). | FIXED: C8 binary report: right posterior putamen SBR 1.02, left 1.37 (normal >1.50), caudates 2.26 and 2.42, contralateral to the left-sided signs; trigger kept. |
+| C | minor | `action-4-order-advanced-imaging` | Optional DaTscan with generic label, rationale and shared expected_evidence (C3, C8). | FIXED: stays `optional`; case-specific label, rationale (mother's tremor and postural tremor raise ET; PD clinically likely) [NICE_NG71], expected_evidence restating the figures; soft CT-before-DaTscan constraint added (the canonical MRI-before-DaTscan constraint, with CT as this case's structural study). |
+| D | major | `ground_truth.key_clinical_evidence` | Two "July 2026" engineering sentences (C4); "DaTscan laterality is mandatory" built on an optional study (C8 rule 6); self-reported hyposmia counted as a prodromal support; em dashes. | FIXED: six case-specific lines; hyposmia called self-reported. |
+| C | major | `ground_truth.assessment.required_recommendations` | Generic musts; "hypomimia and asymmetry are supportive features" (they are not, F1); "hyposmia support a synucleinopathy prodrome" from a self-report; em dashes (C6, C16). | FIXED: four musts: probable-PD diagnostic must, canonical levodopa start, lying and standing BP during titration (lisinopril), PT (with fall prevention given osteoporosis and a previous fall-related wrist fracture), OT and SLT. No agonist must (age 71). |
+| C | minor | `ground_truth.assessment.prohibited_recommendations` | Generic prohibitions with em dashes. | FIXED: canonical D2-blocker prohibition; anticholinergic prohibition at 71. |
+| C | major | `ground_truth.differential[Essential tremor]` | ET `high` (C13); MSA and PSP features cited an MRI that does not exist ("no pontine atrophy on MRI", "midbrain atrophy"). | FIXED: ET `low` with the excluding exam; MSA and PSP rewritten on clinical data only. |
+| B | minor | `ground_truth.red_herrings[0].correct_interpretation` | Em dashes; counted self-reported hyposmia as incompatible with ET. | FIXED: rewritten on the motor findings. |
+| C | minor | `fallback_tool_outputs.advanced_imaging`, `avoided_actions` | Amyloid PET fallback that "does not resolve the current diagnostic question" (C11); generic avoided-action rationales; no autonomic or tilt guard. | FIXED: amyloid fallback null (library negative); case-specific rationales; autonomic and tilt waste added. |
+| A | minor | `fallback_tool_outputs.ecg`, `.echo` | ECG rate 65 against HR 67; echo without `echo_type` (C17). | FIXED: ECG "Sinus rhythm 67/min, normal axis and intervals, no ST change."; echo `TTE`, EF 60%. |
+| E | minor | `patient.history_present_illness`, `.clinical_history.family_history[0]`, `.social_history.alcohol`, `neurological_exam.gait`, `.motor` | Em and en dashes in patient text. | FIXED: replaced by commas, semicolons or hyphens; wording otherwise unchanged. |
+| B | minor | `ground_truth.stop_rule` | Drug and literature ids; `max_additional_actions` 0 (C20). | FIXED: CT only; 2. |
+| E | minor | `metadata.estimated_complexity`, `.difficulty_rationale`, `.revision_reason`, `.last_revised` | Em dash; shared engineering metadata (C19). | FIXED. |
+| - | check | plan 3.6 | perfect_agent ok (CT from the initial output); case_io check: no failure names PD-S06; test_case_guards pass; discriminator_defects empty. Routing: DaTscan returns the case report; MRI returns the case "not performed" fallback; PSG and battery library normals (no dream enactment, MoCA 28/30); amyloid, MIBG, FDG library; `drug: levodopa` and `drug: rasagiline` return the case output. | - |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+
+This 71-year-old woman has a 2.5-year left-sided tremor-onset parkinsonism (pill-rolling rest tremor that re-emerges at rest, decrement, cogwheel rigidity, micrographia, hypophonia), self-reported smell loss, constipation and a mother with undiagnosed "shaky hands"; she declined MRI for severe claustrophobia. She is now clinically probable PD (rest tremor the only supportive criterion; hypomimia and asymmetry are not supportive criteria). The policy is a non-contrast head CT first (required, any arguments; the report no longer narrates the MRI history), an optional DaTscan for the familial tremor question (binary report, right putamen 1.02, after the CT) and an optional medication review naming lisinopril; the literature step is gone, and the false calcium-levodopa interaction is removed. An MRI order now returns "not performed" instead of a library normal MRI. The musts are the probable-PD diagnosis, levodopa titrated to 300 mg/day, lying and standing BP during titration, and PT with fall prevention (osteoporosis, previous fall fracture), OT and SLT. ET is now low.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+
+- Plan R1: `[NICE_NG71]` (DaTscan criterion, levodopa and therapy musts) is not yet in the PD criteria pack.
+
+## Open questions for Andrea (judgment calls you could not settle)
+
+- None specific to this case (plan Q1 to Q6 apply). The "MRI not performed" case fallback is a small addition outside the plan, made so that the agent is not told a declined MRI was normal.
