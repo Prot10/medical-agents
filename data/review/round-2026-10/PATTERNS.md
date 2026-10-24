@@ -89,6 +89,12 @@ reviewed yet. The counts are notes / cases where the reviewers raised them.
 
 - Internal engineering notes inside clinical text ("DVT imaging tool is not in the 12-tool set,
   document in metadata.vocab_gap"), placeholders, mixed languages, duplicated sentences.
+- Discriminator fields (24 Oct 2026): the MockServer now routes stored outputs by their
+  discriminating field, so every stored output and case fallback must carry the exact vocabulary
+  value, never prose or empty: `monitor_type` on cardiac monitoring (holter / telemetry /
+  event_monitor / loop_recorder / device_interrogation), `echo_type` on echo, `modality` on
+  advanced imaging, `test_type` on specialized tests, `study` on body imaging. A fallback that
+  cannot name one study should be null rather than answer every variant.
 - Scoring-key leakage in any-query outputs (Andrea, 24 Oct 2026): a stored
   `search_medical_literature` or `check_drug_interactions` output (initial, followup or fallback)
   is served for any query or drug, so it must not repeat the `expected_evidence` of any action
