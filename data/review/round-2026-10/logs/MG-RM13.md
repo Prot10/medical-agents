@@ -57,3 +57,8 @@ Accepted as logged: FDG-PET required (CT deliberately equivocal), node biopsy re
 
 - required_recommendations[1] and initial_tool_outputs.drug_interactions.amifampridine.warnings[1]: ECG 'after titration' replaced by 'at initiation and yearly thereafter' (EU SmPC 4.4), as in P02. FIXED.
 - `perfect_agent.py` and `case_io.py check` re-run on all 30 MG cases after the changes; the hand-run discriminator guard reports 0 defects in the 30 MG cases.
+
+## Close-out (24 Oct 2026)
+
+- LEMS synonyms: "paraneoplastic lambert eaton myasthenic syndrome" and "LEMS with small cell lung cancer" added (G73.1 entry; summary CENTRAL 3). Codes unchanged (G73.1, G70.80). LEMS stays in the MG condition as its classic mimic (plans/MG-decisions.md, Q1).
+- Result: accepted = ['lambert eaton myasthenic syndrome', 'lambert-eaton myasthenic syndrome', 'LEMS', 'lambert eaton syndrome', 'paraneoplastic lambert eaton myasthenic syndrome', 'LEMS with small cell lung cancer']; icd_codes = ['G73.1', 'G70.80']. Applied with `apply_diagnosis_synonyms.py --prune --conditions myasthenia_gravis`; `--check` clean; perfect-agent and case guards pass.

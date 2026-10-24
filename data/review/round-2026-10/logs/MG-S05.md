@@ -54,3 +54,8 @@ perfect_agent passes; case_io check clean for this case.
 - initial_tool_outputs.body_imaging.region 'mediastinum' -> 'chest, anterior mediastinum' so the chest_CT alternative gets the case's own CT chest report (as S01-S04). FIXED.
   Why: perfect_agent warned that chest_CT fell back to a library normal report for this case.
 - `perfect_agent.py` and `case_io.py check` re-run on all 30 MG cases after the changes; the hand-run discriminator guard reports 0 defects in the 30 MG cases.
+
+## Close-out (24 Oct 2026)
+
+- Synonyms (G70 entries rescoped): "generalized/generalised myasthenia gravis" removed (this is ocular MG, MGFA class I); "ocular myasthenia" and "ocular MG" added; bare "MG" retired.
+- Result: accepted = ['myasthenia gravis', 'autoimmune myasthenia', 'ocular myasthenia gravis', 'ocular myasthenia', 'ocular MG']; icd_codes = ['G70.00', 'G70.0', 'G70.01']. Applied with `apply_diagnosis_synonyms.py --prune --conditions myasthenia_gravis`; `--check` clean; perfect-agent and case guards pass.

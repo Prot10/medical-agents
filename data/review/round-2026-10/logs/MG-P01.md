@@ -60,3 +60,9 @@ Checks: `perfect_agent.py MG-P01 -v` passes, `case_io.py check` clean for the ca
 
 - patient.neurological_exam.cranial_nerves: right eye adduction lag tested on 'rightward gaze' (the right eye abducts there); now leftward gaze. FIXED.
 - `perfect_agent.py` and `case_io.py check` re-run on all 30 MG cases after the changes; the hand-run discriminator guard reports 0 defects in the 30 MG cases.
+
+## Close-out (24 Oct 2026)
+
+- Synonyms (G70 entries rescoped): "ocular myasthenia gravis" removed (this is generalized MG); "generalized MG" and "generalised MG" added; bare "MG" retired (a one-token label matched any text mentioning MG).
+- Scoped subtype synonyms added: seronegative and double seronegative labels.
+- Result: accepted = ['myasthenia gravis', 'autoimmune myasthenia', 'generalized myasthenia gravis', 'generalised myasthenia gravis', 'generalized MG', 'generalised MG', 'seronegative myasthenia gravis', 'seronegative MG', 'double seronegative myasthenia gravis', 'double seronegative MG']; icd_codes = ['G70.00', 'G70.0', 'G70.01']. Applied with `apply_diagnosis_synonyms.py --prune --conditions myasthenia_gravis`; `--check` clean; perfect-agent and case guards pass.

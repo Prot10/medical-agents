@@ -51,3 +51,10 @@ Found and fixed:
 - B minor, `initial_tool_outputs.mri.additional_observations[3]` and `.impression`: "No brainstem ... abnormality" contradicted the right MLF (brainstem) lesion reported in the same study. Reworded to "No new brainstem lesion; no oculomotor nerve or cavernous sinus abnormality" and the impression likewise.
 
 Accepted as logged: drug check `recommended` (a real natalizumab-immunosuppression PML interaction), thymoma-associated MG stated in key evidence rather than the differential, label and G70.01 left for CENTRAL. `perfect_agent.py MG-P03 -v` passes, `case_io.py check` reports no failure naming the case, case guards pass.
+
+## Close-out (24 Oct 2026)
+
+- `ground_truth.diagnosis.icd_codes[0]` G70.01 -> G70.00. ICD-10-CM G70.01 is myasthenia gravis with (acute) exacerbation, including crisis; this is a new or stable presentation, not an exacerbation. G70.01 stays accepted as a secondary code (plans/MG-decisions.md, Q2).
+- `accepted[0]` relabelled to "Myasthenia gravis, AChR antibody-positive, generalized (MGFA Class IIb), with thymoma, concurrent with relapsing-remitting multiple sclerosis on natalizumab": the mediastinal CT shows a 2.8 cm thymoma and the musts send her for thymectomy, so the MG is thymoma-associated; the speculative "possible drug-associated autoimmunity" (left open by the worker under ruling 3) is removed.
+- Synonyms (G70 entries rescoped): "ocular myasthenia gravis" removed (this is generalized MG); "generalized MG" and "generalised MG" added; bare "MG" retired (a one-token label matched any text mentioning MG).
+- Result: accepted = ['myasthenia gravis', 'autoimmune myasthenia', 'generalized myasthenia gravis', 'generalised myasthenia gravis', 'generalized MG', 'generalised MG']; icd_codes = ['G70.00', 'G70.0', 'G70.01']. Applied with `apply_diagnosis_synonyms.py --prune --conditions myasthenia_gravis`; `--check` clean; perfect-agent and case guards pass.

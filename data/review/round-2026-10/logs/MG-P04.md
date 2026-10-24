@@ -50,3 +50,10 @@ Found and fixed:
 - C minor, `ground_truth.sequence_constraints`: the two soft constraints that put the repeat AChR/MuSK panel before LRP4 and before SFEMG were removed. Their premise (negative AChR and MuSK antibodies) is already documented in the HPI from the outside laboratory, so an agent that goes straight to the extended cell-based panel or SFEMG is doing the right thing and should not lose sequence credit. This departs from the plan's per-case line ("labs -> SFEMG keep; add labs -> LRP4"); the reason is the documented prior serology. `RNS -> SFEMG` (soft) is kept.
 
 Accepted as logged: the repeat AChR/MuSK with thyroid function stays required (reference-laboratory confirmation including modulating antibodies, and thyroid function never checked), drug check and literature optional. `perfect_agent.py MG-P04 -v` passes, `case_io.py check` reports no failure naming the case, case guards pass.
+
+## Close-out (24 Oct 2026)
+
+- `metadata.citation_gap` emptied: the note was stale (the MG pack now lists [Higuchi_2011] and [Zisimopoulou_2014]) and wrong (it gave Higuchi 2011 as Muscle Nerve, it is Ann Neurol 2011;69:418-422, and Zhang 2012 as Nature Communications, it is Arch Neurol).
+- Synonyms (G70 entries rescoped): "ocular myasthenia gravis" removed (this is generalized MG); "generalized MG" and "generalised MG" added; bare "MG" retired (a one-token label matched any text mentioning MG).
+- Scoped subtype synonyms added: double seronegative and LRP4 labels.
+- Result: accepted = ['myasthenia gravis', 'autoimmune myasthenia', 'generalized myasthenia gravis', 'generalised myasthenia gravis', 'generalized MG', 'generalised MG', 'double seronegative myasthenia gravis', 'double seronegative MG', 'LRP4 myasthenia gravis', 'LRP4 antibody positive myasthenia gravis', 'LRP4 MG']; icd_codes = ['G70.00', 'G70.0', 'G70.01']. Applied with `apply_diagnosis_synonyms.py --prune --conditions myasthenia_gravis`; `--check` clean; perfect-agent and case guards pass.

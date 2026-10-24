@@ -49,3 +49,10 @@ Checked: the HPI no longer lists the admission work-up or a prior AChR result; M
 - Found: one British spelling in new patient text ("fibre atrophy" in the HPI) against the case's American spelling. Changed to "fiber atrophy".
 
 Checks re-run after the edits: `perfect_agent.py -v` passes (only the known mediastinum_MRI alternative served by the library normal), `case_io.py check` clean for the case, `test_case_guards.py -k` passes, and the 24 Oct discriminator guard (run by hand; MG is not yet in `DISCRIMINATOR_CONDITIONS`) reports no defect.
+
+## Close-out (24 Oct 2026)
+
+- `ground_truth.diagnosis.icd_codes[0]` G70.01 -> G70.00. ICD-10-CM G70.01 is myasthenia gravis with (acute) exacerbation, including crisis; this is a new or stable presentation, not an exacerbation. G70.01 stays accepted as a secondary code (plans/MG-decisions.md, Q2).
+- Synonyms (G70 entries rescoped): "ocular myasthenia gravis" removed (this is generalized MG); "generalized MG" and "generalised MG" added; bare "MG" retired (a one-token label matched any text mentioning MG).
+- Scoped subtype synonyms added: MuSK labels (MuSK myasthenia gravis, MuSK MG, ...).
+- Result: accepted = ['myasthenia gravis', 'autoimmune myasthenia', 'generalized myasthenia gravis', 'generalised myasthenia gravis', 'generalized MG', 'generalised MG', 'MuSK myasthenia gravis', 'MuSK antibody positive myasthenia gravis', 'anti-MuSK myasthenia gravis', 'MuSK MG']; icd_codes = ['G70.00', 'G70.0', 'G70.01']. Applied with `apply_diagnosis_synonyms.py --prune --conditions myasthenia_gravis`; `--check` clean; perfect-agent and case guards pass.

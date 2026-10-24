@@ -61,3 +61,9 @@ Re-ran `perfect_agent.py MG-RM15 -v` (pass, no warnings), `case_io.py check` (no
   Why: a fallback with an empty modality answers every advanced-imaging study with one generic report; the benchmark library now serves the normal report for the study actually ordered.
 - metadata.actions_withdrawn: stale ice-pack entry ('recommended here') removed; no ice-pack criterion in a ventilated crisis. FIXED.
 - `perfect_agent.py` and `case_io.py check` re-run on all 30 MG cases after the changes; the hand-run discriminator guard reports 0 defects in the 30 MG cases.
+
+## Close-out (24 Oct 2026)
+
+- `icd_codes[0]` G70.01 kept (exacerbation or crisis). G70.00 ("without exacerbation") is no longer accepted; crisis and exacerbation labels added (myasthenic crisis, myasthenic exacerbation, impending myasthenic crisis, MG crisis, MG exacerbation): the case is an impending or established crisis and its differential rates crisis high.
+- Synonyms (G70 entries rescoped): "ocular myasthenia gravis" removed (this is generalized MG); "generalized MG" and "generalised MG" added; bare "MG" retired (a one-token label matched any text mentioning MG).
+- Result: accepted = ['myasthenia gravis', 'autoimmune myasthenia', 'myasthenic crisis', 'myasthenic exacerbation', 'impending myasthenic crisis', 'MG crisis', 'MG exacerbation', 'generalized myasthenia gravis', 'generalised myasthenia gravis', 'generalized MG', 'generalised MG']; icd_codes = ['G70.01', 'G70.0']. Applied with `apply_diagnosis_synonyms.py --prune --conditions myasthenia_gravis`; `--check` clean; perfect-agent and case guards pass.

@@ -53,3 +53,8 @@ Checked: every own-finding row against the file (HPI no longer names MG or the i
 - No other error found.
 
 Checks re-run after the edits: `perfect_agent.py -v` passes (only the known mediastinum_MRI alternative served by the library normal), `case_io.py check` clean for the case, `test_case_guards.py -k` passes, and the 24 Oct discriminator guard (run by hand; MG is not yet in `DISCRIMINATOR_CONDITIONS`) reports no defect.
+
+## Close-out (24 Oct 2026)
+
+- Synonyms (G70 entries rescoped): "generalized/generalised myasthenia gravis" removed (this is ocular MG, MGFA class I); "ocular myasthenia" and "ocular MG" added; bare "MG" retired.
+- Result: accepted = ['myasthenia gravis', 'autoimmune myasthenia', 'ocular myasthenia gravis', 'ocular myasthenia', 'ocular MG']; icd_codes = ['G70.00', 'G70.0', 'G70.01']. Applied with `apply_diagnosis_synonyms.py --prune --conditions myasthenia_gravis`; `--check` clean; perfect-agent and case guards pass.
