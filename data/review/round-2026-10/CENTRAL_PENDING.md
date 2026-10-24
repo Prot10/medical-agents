@@ -39,19 +39,12 @@ lands.
   DNA_methylation_profiling, and one more marked in costs.yaml). Check them against the 2024 MPFS
   / CLFS before any cost result is reported.
 
-## Batch-2 cases waiting on vocabulary (terms added 24 Oct)
-- GBS: anti_GQ1b_IgG (P01, RM15, RS15, RS11/RS18 optional), anti_GT1a_IgG (RM12, RS15),
-  botulinum_toxin_assay (RM12, RS15), CSF CMV_PCR (P02, RM16, RP15, RS18).
-- GLIO-HG: plasma_free_metanephrines and chromogranin_A_synaptophysin_IHC, H3G34_status (RS01),
-  PAX8/TTF1/thyroglobulin IHC (RP01), brain_aspirate (P04), open_biopsy and
-  DNA_methylation_profiling (RM02; methylation also RM03), H3G34_status (RS03).
-- ALZ-EARLY: speech_language_evaluation (P02).
-
-## Guidance claims
-- `test_guidance_claims`: the ALZ-EARLY (CSF, amyloid PET, FDG) and GBS (brain MRI) claims fail
-  until those conditions finish; update the response in
-  `agent-platform/scripts/review/build_condition_tool_guidance.py`, regenerate with `--write`,
-  and update the claim table in the same change. (24 Oct)
+## Close-out recipe per batch (what batches 1 and 2 did)
+1. Workflow `bin/round-v2.js` (plan, fix, verify, audit; args `[{cond, cases}]`). 2. One close-out agent per condition
+(synonyms, pack, generator block, guidance claims via `build_condition_tool_guidance.py --write`
+and the claim table, open questions decided; brief `CLOSEOUT_BRIEF.md` with COND replaced, the batch-2 decisions
+files show the result) plus one vocabulary agent for the
+batch's CENTRAL terms. 3. One agent per condition wires the new terms into the cases.
 
 ## Vocabulary follow-ups
 - Other conditions citing "WHO 2025 Annex A.4" should read "section A.4" (the guideline has no
@@ -61,7 +54,6 @@ lands.
 - `apply_diagnosis_synonyms --prune` would change MIG-AURA-P03, MIG-AURA-P07, SE-P04 (lose "stroke"
   and mechanism labels) and SE-P07 (loses "hepatic coma", K72.91); `--check` adds I63.5/I63.51 to
   SE-P04. Apply when those conditions run.
-- ALZ-EARLY prune diffs predate the batch-1 synonym change.
 
 ## For the physicians at re-review
 - ISCH-STR-RS02: thrombolysis reversed to "give" (its CTA excludes aortic extension, R2's own
@@ -73,6 +65,6 @@ lands.
   coded as Wilson disease.
 
 ## Guard failures left in later batches (24 Oct)
-- Leak guard: VASC-DEM 30, GBS 25, NMDAR-ENC 18, MIG-AURA 13, SE 10, SYNC-CARD 10, NPH 9, SAH 7,
-  FTD 6, MG 6, FND 5, GLIO-HG 5, MS-RR 4, FEPI-TEMP 3, PD 2. Follow-up guard: GBS 4, FTD 1.
+- Leak guard: VASC-DEM 30, NMDAR-ENC 18, MIG-AURA 13, SE 10, SYNC-CARD 10, NPH 9, FTD 6, MG 6,
+  FND 5, MS-RR 4, FEPI-TEMP 3, PD 2. Follow-up guard: FTD 1. (Batches 1-2 are clean.)
   Workers see the rule in PATTERNS.md section 5.
