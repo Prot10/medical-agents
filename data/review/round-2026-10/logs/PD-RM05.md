@@ -42,3 +42,10 @@ This 58-year-old woman has 4 years of left-onset PD with a documented response o
 ## Open questions for Andrea (judgment calls you could not settle)
 
 - None specific to this case (plan Q1 to Q6 apply).
+
+## Verification (adversarial verifier, 24 Oct 2026)
+Read the log, the diff against master and the whole final case. Checked: MoCA arithmetic (3+1+1+1 = 6, 24/30), established-PD supportive criteria (documented >50% response with predictable wearing-off, rest tremor; self-reported hyposmia not counted), OFF arithmetic (four doses, four OFF windows), thyroid labs and the levothyroxine must, prochlorperazine time course, DaTscan laterality and binary report, gene panel rationale (first-degree relative), drug output facts (ondansetron with apomorphine, sumatriptan and MAO-A, omeprazole and levothyroxine), routing of TSH, free_T4 and thyroid panels.
+Found and fixed:
+- `assessment.required_recommendations[2]`: "shorten the interval to less than the 2.5 hours ... (for example ... about every 2.5 hours)" contradicted itself. Now "shorten the levodopa dosing interval to the 2.5 hours each dose lasts (for example 25/100 mg every 2.5 hours while awake, five or six doses a day)".
+- `avoided_actions[avoid-waste-5-analyze-ecg]` deleted: its own rationale ("an ECG is needed only if domperidone is chosen") and must [1] (domperidone "after an ECG for the QTc") make the ECG a conditional pre-treatment check of a recommended option, so scoring it as waste contradicted the must (PATTERNS: an avoided action the policy itself calls for). The ECG stays unscored; the case fallback answers it (sinus rhythm 76/min).
+Checks after the verification: `perfect_agent.py -v` ok, `case_io.py check` no failure names the case (the one suite failure is elsewhere), `test_case_guards` pass; MockServer routing re-checked by hand for the stored outputs named above.

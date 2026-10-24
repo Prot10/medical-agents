@@ -45,3 +45,10 @@ This 58-year-old woman with 9 years of left-onset PD, 3 to 4 hours of OFF a day 
 ## Open questions for Andrea (judgment calls you could not settle)
 
 - None needing Andrea. Decided and recorded: genetics (GBA1 status bears on cognitive outcome after STN-DBS, onset at 49, an aunt with a "Parkinson-like" tremor) was not added as a criterion, because the plan limits genetics to P04 and RM05 and the library's negative panel does not contradict the case; the B12 of 248 pg/mL is flagged, not turned into a must (labs are optional); the reduced MIBG and the PSG were stored beyond the plan's list to keep the library from contradicting the case.
+
+## Verification (adversarial verifier, 24 Oct 2026)
+Read the log, the diff against master and the whole final case. Checked: MoCA arithmetic (2+1+1+1 = 5, 25/30), three supportive criteria, pramipexole 1.5 mg three times daily = 4.5 mg/day, OFF-time arithmetic, iron studies (transferrin saturation 44/398 = 11%), battery flags against ranges and the PD-MCI impression, nigrosome and DaTscan laterality (right for left-sided signs), orthostatic report (fall 12/4, HR rise 10), drug output (iron, rasagiline, ondansetron with apomorphine, abrupt-withdrawal warning), musts against prohibitions, stop rule (MRI, battery, medication review).
+Found and fixed:
+- `action_criteria[action-4-interpret-labs].citations` and `avoided_actions[avoid-waste-7-analyze-ecg].citations` cited `[NICE_NG71]` for claims NICE NG71 does not make (iron studies before surgery; ECG not informing candidacy). Both now `[Postuma_2015]`, the pack key for baseline and pre-medication labs and the key the worker used for the same ECG fix in RM04.
+For the close-out (not changed): "Walks with a cane indoors" (social history) beside "Uses a quad-cane outdoors" (gait) is original text and not contradictory; B12 248 pg/mL stays flagged in the worker's log.
+Checks after the verification: `perfect_agent.py -v` ok, `case_io.py check` no failure names the case (the one suite failure is elsewhere), `test_case_guards` pass; MockServer routing re-checked by hand for the stored outputs named above.

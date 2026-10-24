@@ -42,3 +42,11 @@ This 63-year-old retired dentist with an ablated WPW pathway and paroxysmal AF (
 
 - PSG: the plan's per-case entry does not mention a PSG for RP02, but its C9 rule (dream enactment reported, not PSG-confirmed) applies, so an optional PSG criterion was added. Decided; listed only so the lead can confirm the count in the guidance answers (plan R9).
 - Plan Q2 applies (data fixed to PD rather than relabelling MSA-P).
+
+## Verification (adversarial verifier, 24 Oct 2026)
+Read the log, the diff against master and the whole final case. Checked: the C21 data fix (right decrement and rest tremor, one fall and two near-falls, pull test 3 steps with recovery, no freezing, normal MRI with nigrosome loss left more than right), red flag (42/30 mmHg) counterbalanced by rest tremor and reduced MIBG, orthostatic report against the exam (36/26 at 1 minute, 42/30 at 3 minutes), DaTscan laterality (left putamen for right signs), the metoclopramide red herring gone, domperidone with flecainide, no serotonin-syndrome claim for levodopa, ECG fallback (no pre-excitation after ablation), PSG optional criterion justified by the history (RBD diagnosed from the wife's report only).
+Found and fixed:
+- `differential[MSA].key_features` asserted "no urinary incontinence" with no urinary data in the patient block. HPI now states that he denies urinary urgency, incontinence or difficulty emptying his bladder; key feature "no urinary urgency or incontinence".
+- `avoided_actions` autonomic and tilt rationales said the bedside measurement documents "neurogenic" orthostatic hypotension, while `key_clinical_evidence[1]` and the HPI say metoprolol makes the heart-rate response uninterpretable. Now "already documents the orthostatic hypotension".
+For the close-out (not changed): cardiac MIBG is read in a man on sertraline with paroxysmal AF; neither is a recognised major cause of a reduced H/M ratio, so the report stands, but a reviewer may ask.
+Checks after the verification: `perfect_agent.py -v` ok, `case_io.py check` no failure names the case (the one suite failure is elsewhere), `test_case_guards` pass; MockServer routing re-checked by hand for the stored outputs named above.

@@ -43,3 +43,9 @@ This 73-year-old man has two years of left-sided parkinsonism (lost arm swing, t
 ## Open questions for Andrea (judgment calls you could not settle)
 
 - None specific to this case (plan Q1 to Q6 apply).
+
+## Verification (adversarial verifier, 24 Oct 2026)
+Read the log, the diff against master and the whole final case. Checked: MoCA item arithmetic (1+1+1+1+2 = 6, 24/30), pull test (2 steps with unaided recovery is MDS-UPDRS 3.12 score 0), orthostatic report against the vitals (supine 134/80 equals the vitals; fall 14/6, HR rise 8), DaTscan laterality (right putamen worse for left-sided signs), PSG and battery flags against their ranges, musts against prohibitions and avoided actions, differential against the final evidence, no claim of a levodopa response or validated smell test, no literature output, drug output names only his own medicines, fallbacks (amyloid null, echo TTE, ECG rate equal to the vitals). Every log claim matches the file.
+Found: no error. Remaining em dashes in the HPI are original text, not new.
+Changed: nothing.
+Checks after the verification: `perfect_agent.py -v` ok, `case_io.py check` no failure names the case (the one suite failure is elsewhere), `test_case_guards` pass; MockServer routing re-checked by hand for the stored outputs named above.
