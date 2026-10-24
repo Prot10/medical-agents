@@ -51,3 +51,14 @@ None open. Decisions taken:
 ## Verification
 
 `perfect_agent.py FND-RM03 -v`: ok; the exam gets the clinical assessment, the lab call gets the stored panel with the osmolalities, `eeg_type: video` gets the stored video-EEG, the drug check gets `initial_tool_outputs.drug_interactions.general`. `case_io.py check FND-RM03`: schema and synonym guard OK; the only failures naming FND are the literature leaks of FND-M09, P08, S06 and S10 (other workers' cases). `test_case_guards.py -k FND-RM03`: 2 passed. No new em or en dashes (the only one left is in `diagnosis.accepted[0]`, not edited per ruling 3).
+
+## Condition audit
+
+2026-10-24, FND condition auditor.
+
+- `action-neuropsych-battery.rationale`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+- `action-1-search-medical-literature.rationale`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+- `ground_truth.differential[2].key_features`: "loss of all sensory modalities" contradicted the examination, which preserves proprioception; now lists the modalities lost.
+- `initial_tool_outputs.clinical_assessment` finding: "Loss of all sensory modalities ... with proprioception preserved" was self-contradictory; now names the modalities lost.
+
+After the edit: `perfect_agent.py` 30/30 FND pass; `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k FND` 60 passed.

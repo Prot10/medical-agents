@@ -54,3 +54,13 @@ Found and changed:
 - `initial_tool_outputs.literature_search...summary`: same mismatch as in M09; replaced with a summary of the four motor rows returned.
 
 Left as is (already in the log's CENTRAL): `accepted[0]` names "celiac neurological complications excluded"; the stored celiac serology supports it and any lab order returns it. Checks re-run after the changes: `perfect_agent.py -v` ok, `case_io.py check` clean for this case (schema, synonym guard, no failing test names it), `test_case_guards.py -k` passed. The diagnosis label, `icd_codes` and synonyms are unchanged from before the round; no new em dashes or `Stone_2018` strings.
+
+## Condition audit
+
+2026-10-24, FND condition auditor.
+
+- `action-ct-angiography.rationale`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+- `action-neuropsych-battery.rationale`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+- `action-1-search-medical-literature.rationale`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+
+After the edit: `perfect_agent.py` 30/30 FND pass; `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k FND` 60 passed.

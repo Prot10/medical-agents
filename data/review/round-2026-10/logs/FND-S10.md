@@ -46,3 +46,12 @@ Adversarial verifier, 24 Oct 2026. Read the log, the diff and the whole final ca
 - Confirmed: Hoover wording with weak direct hip extension; three validated signs, sensory midline split and unobserved walking supportive; non-contrast MRI with DWI; one stroke or dissection row `low`; musts DX, COMM, PHYSIO, PSY (social anxiety) and prohibitions P1-P3, P7 as planned; Holter fallback names its incidental finding; diagnosis unchanged.
 - Found and fixed: `key_clinical_evidence[1]` claimed that face and tongue sparing with normal reflexes "does not fit a hemiparesis from a single brain lesion", an overstatement (face can be spared by some brain lesions and reflexes are often normal two days after a stroke). Rewritten as a supportive feature that does not by itself exclude a brain lesion.
 - Checks after my edits: `perfect_agent.py -v` ok (each required and recommended call served by the case's own stored report, not a fallback; the "<- ?" source label is a dump-format artefact, confirmed by executing the calls through the environment); `case_io.py check` schema and synonym guard OK, no test failure names the case; `test_case_guards.py -k` pass; discriminator guard (FND not yet enabled) run by hand: clean.
+
+## Condition audit
+
+2026-10-24, FND condition auditor.
+
+- `action-1-search-medical-literature.rationale`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+- `initial_tool_outputs.literature_search`: the summary still named video-EEG confirmation of functional seizures and psychological-treatment trials whose rows this motor-only output omits; set to the motor-only output of M09, P07, P08 and RM02 (Espay, Daum, Nielsen 2024, Stone 2005, motor summary); the functional-seizure guideline row (Tolchin 2026) was dropped with it, as the patient has no seizures.
+
+After the edit: `perfect_agent.py` 30/30 FND pass; `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k FND` 60 passed.

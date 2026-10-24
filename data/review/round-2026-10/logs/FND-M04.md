@@ -45,3 +45,13 @@ Found and fixed:
 - (C, minor) M-COMM (`ground_truth.assessment.required_recommendations[1]`) said "show the positive signs", but this patient has none. Now "show how the recorded event and the normal EEG support it".
 - (B, minor) `ground_truth.red_herrings[1].correct_interpretation` said "Diagnosis requires positive rule-in signs on examination", contradicting the case (diagnosis rests on the recorded event). Now: "The diagnosis rests on the habitual event recorded on video-EEG without ictal change; the anxiety is a treatment target."
 Left as is: `red_herrings[0]` combines the febrile convulsions (past medical history) and the aunt (family history) under the family-history field path; the schema allows one path, and the content is correct.
+
+## Condition audit
+
+2026-10-24, FND condition auditor.
+
+- `action-2-check-drug-interactions.label`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+- `action-neuropsych-battery.label`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+- `action-1-search-medical-literature.rationale`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+
+After the edit: `perfect_agent.py` 30/30 FND pass; `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k FND` 60 passed.

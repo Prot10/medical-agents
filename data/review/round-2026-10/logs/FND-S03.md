@@ -54,3 +54,12 @@ Found and fixed:
 Checked and accepted: the worker's taper-variant deviation (levetiracetam restored to the list, drug check required, soft video-EEG before drug-check constraint, M-ASM, P5 "or stop it abruptly") is clinically right: the HPI records an empirical levetiracetam start she is still taking, which is the plan's own M02 situation (AAN 2025; Oto 2005). Constraint ids exist and the stop rule lists all three required criteria. "Her psychiatrist" is kept here (prior psychiatric notes are documented).
 
 After the edits: `perfect_agent.py -v` passes, `case_io.py check` shows no failure naming the case, and the case guards pass.
+
+## Condition audit
+
+2026-10-24, FND condition auditor.
+
+- `action-4-analyze-brain-mri.rationale`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+- `action-neuropsych-battery.expected_evidence`: was empty; set to the wording the other optional batteries use.
+
+After the edit: `perfect_agent.py` 30/30 FND pass; `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k FND` 60 passed.

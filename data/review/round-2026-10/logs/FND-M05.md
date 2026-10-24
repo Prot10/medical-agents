@@ -45,3 +45,14 @@ None. Two additions beyond the plan's M05 entry, both decided for dataset qualit
 Checked the log against the file (worker edits are in commit b8be2153; diffed against its parent): read the whole final case, the patient-block diff, criteria tiers and order against plan 3.2 and the case entry in plan 4, sequence constraints and stop rule, musts and prohibitions against avoided actions, differential against the returned results, lab arithmetic and ranges, laterality, leak guard. No reviewer notes exist for FND, so there is no note id to account for. perfect_agent.py -v, case_io.py check and test_case_guards pass after my changes.
 The targeted panel holds the assays the recommended criterion orders (anticardiolipin, anti-beta-2 glycoprotein I, lupus anticoagulant, C3, C4, anti-dsDNA), all normal; CBC consistent (4.38 x 88.8 / 10 = 38.9, MCHC 32.9); MRI non-contrast without enhancement statements; the HPI no longer gives the prior complement and anti-dsDNA results; the drug output no longer recommends the ECG that the case marks as waste; the rheumatology consult is a must. The two additions beyond the plan (M-PSY for treated depression, the prohibition of steroids or immunosuppression for presumed NPSLE) are clinically sound.
 No error found; no change.
+
+## Condition audit
+
+2026-10-24, FND condition auditor.
+
+- `action-2-check-drug-interactions.label`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+- `action-neuropsych-battery.label`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+- `action-1-search-medical-literature.rationale`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+- `initial_tool_outputs.literature_search`: the summary still named video-EEG confirmation of functional seizures and psychological-treatment trials whose rows this motor-only output omits; set to the motor-only output of M09, P07, P08 and RM02 (Espay, Daum, Nielsen 2024, Stone 2005, motor summary).
+
+After the edit: `perfect_agent.py` 30/30 FND pass; `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k FND` 60 passed.

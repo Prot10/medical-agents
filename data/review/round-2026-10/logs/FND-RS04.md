@@ -55,3 +55,11 @@ Found and fixed:
 Checked and accepted: dexamethasone is not on the current list, so the "Continue or restart empirical corticosteroids" prohibition (rather than a "Stop dexamethasone" must) is the right reading of the plan; a 2-day course needs no taper. MRI routing that ignores `contrast` stays under the worker's CENTRAL note.
 
 After the edits: `perfect_agent.py -v` passes, `case_io.py check` shows no failure naming the case, and the case guards pass.
+
+## Condition audit
+
+2026-10-24, FND condition auditor.
+
+- `action-neuropsych-battery.expected_evidence`: was empty; set to the wording the other optional batteries use.
+
+After the edit: `perfect_agent.py` 30/30 FND pass; `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k FND` 60 passed.

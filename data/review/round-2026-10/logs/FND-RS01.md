@@ -47,3 +47,12 @@ None open. Decisions taken:
 ## Verification
 
 `perfect_agent.py FND-RS01 -v`: ok; the lab call gets the stored panel with magnesium, phosphorus and thiamine, `eeg_type: video` gets the stored video-EEG, the drug check gets `initial_tool_outputs.drug_interactions.general`. `case_io.py check FND-RS01`: schema and synonym guard OK; the only FND failures are the literature leaks of FND-P08 and S10 (other workers' cases). `test_case_guards.py -k FND-RS01`: 2 passed.
+
+## Condition audit
+
+2026-10-24, FND condition auditor.
+
+- `action-neuropsych-battery.rationale`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+- `action-1-search-medical-literature.rationale`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+
+After the edit: `perfect_agent.py` 30/30 FND pass; `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k FND` 60 passed.

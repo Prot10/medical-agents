@@ -46,3 +46,15 @@ The stored EEG is now the inpatient video-EEG with two events and no post-event 
 Found and fixed:
 - (C, minor) `ground_truth.differential[0].key_features` did not address the case's own epileptic red flag: the prodrome of a rising chest sensation with fear resembles a mesial temporal aura. Added: in both recorded events it was followed by bilateral asynchronous shaking with forced eye closure and preserved responsiveness without ictal change, which argues against a focal seizure with bilateral motor spread.
 - (B, minor) `initial_tool_outputs.labs.panels.Other[0]` prolactin reference range 3.0-27.0 is a female range in a man; now 2.0-18.0 (value 13.2 stays normal).
+
+## Condition audit
+
+2026-10-24, FND condition auditor.
+
+- `action-2-check-drug-interactions.label`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+- `action-6-interpret-labs.rationale`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+- `action-6-interpret-labs.label`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+- `action-neuropsych-battery.label`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+- `action-1-search-medical-literature.rationale`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+
+After the edit: `perfect_agent.py` 30/30 FND pass; `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k FND` 60 passed.

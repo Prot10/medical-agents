@@ -48,3 +48,13 @@ Adversarial verifier, 24 Oct 2026. Read the log, the diff and the whole final ca
 - Found and fixed: the malingering row argued against feigning because "the symptoms began before the denial", but the HPI dates onset to when the claim process intensified, so the incentive predates the symptoms; the row now says timing does not separate them and rests on the absence of evidence of deception and the PTSD setting. The alcohol withdrawal row and its red herring said the episodes "recur regardless of drinking", which the HPI does not state; both now say they "recur(red) over 3 months while he continues to drink daily" (HPI: drinks 2-4 beers daily).
 - Checks after my edits: `perfect_agent.py -v` ok (each required and recommended call served by the case's own stored report, not a fallback; the "<- ?" source label is a dump-format artefact, confirmed by executing the calls through the environment); `case_io.py check` schema and synonym guard OK, no test failure names the case; `test_case_guards.py -k` pass; discriminator guard (FND not yet enabled) run by hand: clean.
 - Flagged for the condition lead (not changed, plan class L governs all 30): ECG kept as `waste` in event cases. NICE CG109 and NG217 advise a 12-lead ECG after a first transient loss of consciousness or suspected first seizure; where the events are unrecorded before admission the lead may prefer to drop the ECG avoided action rather than penalize it.
+
+## Condition audit
+
+2026-10-24, FND condition auditor.
+
+- `action-5-interpret-labs.rationale`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+- `action-brain-mri.rationale`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+- `action-1-search-medical-literature.rationale`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+
+After the edit: `perfect_agent.py` 30/30 FND pass; `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k FND` 60 passed.

@@ -49,3 +49,11 @@ Adversarial verifier, 24 Oct 2026. Read the log, the diff and the whole final ca
 - Found and fixed: `action-4-analyze-brain-mri.rationale` called it "a first presentation" while citing the remitting episode two years earlier (now "Acute right leg weakness with a remitting episode..."); `avoid-waste-3-order-cardiac-monitoring.rationale` read "no pallor or collapse with rapid recovery", which seemed to deny her rapid recovery (now "2-3 minutes of bilateral shaking without pallor, not a brief collapse").
 - Checks after my edits: `perfect_agent.py -v` ok (each required and recommended call served by the case's own stored report, not a fallback; the "<- ?" source label is a dump-format artefact, confirmed by executing the calls through the environment); `case_io.py check` schema and synonym guard OK, no test failure names the case; `test_case_guards.py -k` pass; discriminator guard (FND not yet enabled) run by hand: clean.
 - Flagged for the condition lead (not changed, plan class L governs all 30): ECG kept as `waste` in event cases. NICE CG109 and NG217 advise a 12-lead ECG after a first transient loss of consciousness or suspected first seizure; where the events are unrecorded before admission the lead may prefer to drop the ECG avoided action rather than penalize it.
+
+## Condition audit
+
+2026-10-24, FND condition auditor.
+
+- `action-1-search-medical-literature.rationale`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+
+After the edit: `perfect_agent.py` 30/30 FND pass; `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k FND` 60 passed.

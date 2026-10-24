@@ -48,3 +48,14 @@ None open. Decisions taken:
 ## Verification
 
 `perfect_agent.py FND-RP01 -v`: ok; the exam gets the clinical assessment, `eeg_type: video` gets the stored video-EEG, the drug check (after the EEG) gets `initial_tool_outputs.drug_interactions.general`. `case_io.py check FND-RP01`: schema and synonym guard OK; the only FND failures are the literature leaks of FND-P08 and S10 (other workers' cases). `test_case_guards.py -k FND-RP01`: 2 passed. No new dashes (the only one left is the hyphen in `diagnosis.accepted[0]`, not edited per ruling 3).
+
+## Condition audit
+
+2026-10-24, FND condition auditor.
+
+- `action-neuropsych-battery.rationale`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+- `action-1-search-medical-literature.rationale`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+- M-COMM must: "show the positive signs" became "show how the recorded events support it"; the examination between events has no positive sign, so the explanation rests on the recorded events (as in M04 and M06).
+- `patient.clinical_history.past_medical_history`: "Mild obesity (BMI 26.7)" became "Overweight (BMI 26.7)"; a BMI of 25 to 29.9 is overweight, not obesity.
+
+After the edit: `perfect_agent.py` 30/30 FND pass; `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k FND` 60 passed.

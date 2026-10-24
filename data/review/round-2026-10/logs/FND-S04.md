@@ -51,3 +51,12 @@ Found and fixed:
 Checked and accepted: the sertraline boxed warning under 25 years is correct and worded differently from the criterion's expected evidence; PTSD in M-PSY follows the plan (witnessed death, intrusions and nightmares for 8 weeks); the hemicord mention in the MS or structural row is consistent with the abdominal midline sensory boundary; entrainment by foot tapping during bilateral arm shaking is a feasible test.
 
 After the edits: `perfect_agent.py -v` passes, `case_io.py check` shows no failure naming the case, and the case guards pass.
+
+## Condition audit
+
+2026-10-24, FND condition auditor.
+
+- `action-4-analyze-brain-mri.rationale`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+- `action-neuropsych-battery.expected_evidence`: was empty; set to the wording the other optional batteries use.
+
+After the edit: `perfect_agent.py` 30/30 FND pass; `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k FND` 60 passed.

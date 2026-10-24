@@ -50,3 +50,13 @@ None open. Decisions taken:
 ## Verification
 
 `perfect_agent.py FND-RP03 -v`: ok; the exam gets the clinical assessment, the lab and MRI calls get the stored reports, `eeg_type: video` gets the stored video-EEG, the drug check (after the EEG) gets `initial_tool_outputs.drug_interactions.general`. `case_io.py check FND-RP03`: schema and synonym guard OK; no test failure names this case. `test_case_guards.py -k FND-RP03`: 2 passed. No em or en dashes left in the case.
+
+## Condition audit
+
+2026-10-24, FND condition auditor.
+
+- `action-neuropsych-battery.rationale`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+- `action-1-search-medical-literature.rationale`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+- `action-4-analyze-brain-mri.alternatives[0].required_arguments`: dropped `protocol: standard`, which the plan does not set and which fails an MRI order that omits the parameter; `{contrast: false}` remains, as in the other FND MRI criteria.
+
+After the edit: `perfect_agent.py` 30/30 FND pass; `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k FND` 60 passed.

@@ -46,3 +46,13 @@ None open. Decisions taken:
 ## Verification
 
 `perfect_agent.py FND-RP02 -v`: ok; the lab call gets the stored panel (BMP, magnesium, phosphorus, thiamine), the drug check gets `initial_tool_outputs.drug_interactions.general`. `case_io.py check FND-RP02`: schema and synonym guard OK; the only FND failures are the literature leaks of FND-P08 and S10 (other workers' cases). `test_case_guards.py -k FND-RP02`: 2 passed. Lab values compared with the original: none changed (Hct/Hb 3.07, MCHC 32.5; calcium corrected for albumin 9.2).
+
+## Condition audit
+
+2026-10-24, FND condition auditor.
+
+- `action-neuropsych-battery.rationale`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+- `action-1-search-medical-literature.rationale`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+- `initial_tool_outputs.literature_search`: the summary still named video-EEG confirmation of functional seizures and psychological-treatment trials whose rows this motor-only output omits; set to the motor-only output of M09, P07, P08 and RM02 (Espay, Daum, Nielsen 2024, Stone 2005, motor summary); the functional-seizure guideline row (Tolchin 2026) was dropped with it, as the patient has no seizures.
+
+After the edit: `perfect_agent.py` 30/30 FND pass; `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k FND` 60 passed.

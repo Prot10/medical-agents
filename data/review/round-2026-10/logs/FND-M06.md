@@ -45,3 +45,12 @@ None. M-PSY reads "assess and treat any comorbid anxiety or depression" because 
 Checked the log against the file (worker edits are in commit b8be2153; diffed against its parent): read the whole final case, the patient-block diff, criteria tiers and order against plan 3.2 and the case entry in plan 4, sequence constraints and stop rule, musts and prohibitions against avoided actions, differential against the returned results, lab arithmetic and ranges, laterality, leak guard. No reviewer notes exist for FND, so there is no note id to account for. perfect_agent.py -v, case_io.py check and test_case_guards pass after my changes.
 Dual diagnosis handled consistently: M-EPI, the M06 wording of P5, P6 and M-RESCUE, the added prohibition of stopping levetiracetam, the abnormal EEG with the new-type event without ictal change, the case MRI fallback showing the known right MTS, malingering low with the disability claim named. The removal of the labs criterion matches the plan (level already in the HPI).
 Found and fixed (C, minor): M-COMM (`ground_truth.assessment.required_recommendations[2]`) said "show the positive signs", but he has no functional sign and no event was observed at the bedside. Now "explain how the recorded new event differs from his epileptic seizures".
+
+## Condition audit
+
+2026-10-24, FND condition auditor.
+
+- `action-neuropsych-battery.label`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+- `action-1-search-medical-literature.rationale`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+
+After the edit: `perfect_agent.py` 30/30 FND pass; `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k FND` 60 passed.

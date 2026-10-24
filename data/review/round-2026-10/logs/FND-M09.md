@@ -55,3 +55,13 @@ Found and changed:
 - `initial_tool_outputs.literature_search...summary`: the canonical summary claims guideline evidence for video-EEG confirmation and for tapering antiseizure drugs and benzodiazepines, but this motor-only output carries no LaFrance, Tolchin or Goldstein row, so the summary stated what none of its results says. Replaced with a summary of the four rows it actually returns (positive diagnosis from specific motor signs, physiotherapy with a modest primary-outcome effect, rare later revision of the diagnosis). It matches no `expected_evidence`. The same mismatch exists in the other motor-only FND cases whose output lacks those rows (M05, and in part RP02, S07, S10, which keep Tolchin but not LaFrance); flagged to the lead.
 
 Nothing else found. Checks re-run after the changes: `perfect_agent.py -v` ok, `case_io.py check` clean for this case (schema, synonym guard, no failing test names it), `test_case_guards.py -k` passed. The diagnosis label, `icd_codes` and synonyms are unchanged from before the round; no new em dashes or `Stone_2018` strings.
+
+## Condition audit
+
+2026-10-24, FND condition auditor.
+
+- `action-spine-mri.rationale`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+- `action-neuropsych-battery.rationale`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+- `action-1-search-medical-literature.rationale`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+
+After the edit: `perfect_agent.py` 30/30 FND pass; `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k FND` 60 passed.

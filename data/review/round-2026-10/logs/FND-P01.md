@@ -45,3 +45,12 @@ None open. Decisions taken and their reasons:
 Adversarial check (24 Oct 2026) of the log against the case and against the pre-round version (`b8be2153^`). What I checked: the patient block (unchanged, as the log implies); the deleted MRI criterion and the two new repeat-study wastes against the history (normal outpatient brain and spine MRI and NCS) and against the stop rule (no MRI left in it); the stored non-contrast MRI against the contrast reaction; P1 naming the repeat MRI and NCS; the EEG (72-hour recording, two events with times and durations, canonical impression, no "functional" or "PNES" in the report); the signs count (3: collapsing weakness, entrainment, distractibility; Hoover equivocal and not counted; midline split, vibration split and the bilateral non-patterned gait supportive), which matches the exam text; the drug output against the medication list verbatim and fact 16 (serotonergic triad, sedative pair, SNRI-NSAID bleeding); musts against prohibitions (no contradiction); the differential (epileptic seizures low after the recorded events; MS/myelopathy, MND and organic tremor low with this case's findings); every log claim marked FIXED.
 
 Found: nothing that needed a change. One wording note left as is: the M-DX must counts the 2-minute hand-tremor episode among the "two habitual events"; the 7-minute shaking event alone reaches the ILAE documented level, so the must stays correct. No change. Checks re-run after the changes: `perfect_agent.py -v` ok, `case_io.py check` clean for this case (schema, synonym guard, no failing test names it), `test_case_guards.py -k` passed. The diagnosis label, `icd_codes` and synonyms are unchanged from before the round; no new em dashes or `Stone_2018` strings.
+
+## Condition audit
+
+2026-10-24, FND condition auditor.
+
+- `action-neuropsych-battery.rationale`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+- `action-1-search-medical-literature.rationale`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+
+After the edit: `perfect_agent.py` 30/30 FND pass; `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k FND` 60 passed.

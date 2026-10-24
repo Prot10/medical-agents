@@ -47,3 +47,14 @@ Adversarial verifier, 24 Oct 2026. Read the log, the diff and the whole final ca
 - Confirmed: spine MRI split into `initial_tool_outputs.body_imaging` (region spine, modality MRI) and served to `order_body_imaging {study: spine_MRI}`; brain MRI brain-only and optional; drug check removed (no medicines; the panel does not require it); disguised family-meeting follow-up gone; bilateral Hoover wording correct; GBS row backed by the HPI (no illness, no sensory symptoms or pain); CSF avoided action and fallback were already absent at HEAD; diagnosis unchanged.
 - Found and fixed: the added hypokalemic periodic paralysis row argued "the arms are spared without fluctuation", which does not count against a periodic paralysis (attacks are often leg-predominant); now it rests on preserved reflexes, full involuntary hip extension on Hoover testing and normal walking when unobserved. The transverse myelitis row stated as a rule that myelitis "would give a sensory level and bladder involvement within 24 hours"; softened to "a myelitis severe enough to cause paraplegia is expected to give...".
 - Checks after my edits: `perfect_agent.py -v` ok (each required and recommended call served by the case's own stored report, not a fallback; the "<- ?" source label is a dump-format artefact, confirmed by executing the calls through the environment); `case_io.py check` schema and synonym guard OK, no test failure names the case; `test_case_guards.py -k` pass; discriminator guard (FND not yet enabled) run by hand: clean.
+
+## Condition audit
+
+2026-10-24, FND condition auditor.
+
+- `action-spine-mri.rationale`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+- `action-4-analyze-brain-mri.rationale`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+- `action-1-search-medical-literature.rationale`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+- `initial_tool_outputs.literature_search`: the summary still named video-EEG confirmation of functional seizures and psychological-treatment trials whose rows this motor-only output omits; set to the motor-only output of M09, P07, P08 and RM02 (Espay, Daum, Nielsen 2024, Stone 2005, motor summary); the functional-seizure guideline row (Tolchin 2026) was dropped with it, as the patient has no seizures.
+
+After the edit: `perfect_agent.py` 30/30 FND pass; `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k FND` 60 passed.

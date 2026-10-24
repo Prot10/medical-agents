@@ -52,3 +52,12 @@ Found and fixed:
 Checked and accepted: the worker's added optional `action-brain-mri` (a deviation from plan 3.2, flagged for the lead): optional criteria carry no credit and no stop-rule penalty, the prohibition list does not forbid a first MRI, and there is no prior MRI, so it is clinically defensible. The convulsive-syncope row correctly cites the ECG channel stored in the video-EEG. The midline split of a whole-leg sensory loss is left as written (not anatomically impossible; supportive only).
 
 After the edits: `perfect_agent.py -v` passes, `case_io.py check` shows no failure naming the case, and the case guards pass.
+
+## Condition audit
+
+2026-10-24, FND condition auditor.
+
+- `action-brain-mri.rationale`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+- `action-neuropsych-battery.expected_evidence`: was empty; set to the wording the other optional batteries use.
+
+After the edit: `perfect_agent.py` 30/30 FND pass; `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k FND` 60 passed.

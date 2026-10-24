@@ -53,3 +53,12 @@ Found and changed:
 - `initial_tool_outputs.literature_search...summary`: same mismatch as in M09 (summary claims video-EEG and antiseizure-taper evidence that none of the four motor rows carries); replaced with a summary of the rows returned.
 
 Left as is: the left arm weakness (3/5) has no arm-specific rule-in sign; the functional diagnosis rests on the entraining, distractible tremor and the dragging monoplegic gait on the same side, which the M-DX must states. Checks re-run after the changes: `perfect_agent.py -v` ok, `case_io.py check` clean for this case (schema, synonym guard, no failing test names it), `test_case_guards.py -k` passed. The diagnosis label, `icd_codes` and synonyms are unchanged from before the round; no new em dashes or `Stone_2018` strings.
+
+## Condition audit
+
+2026-10-24, FND condition auditor.
+
+- `action-neuropsych-battery.rationale`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+- `action-1-search-medical-literature.rationale`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+
+After the edit: `perfect_agent.py` 30/30 FND pass; `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k FND` 60 passed.
