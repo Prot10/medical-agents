@@ -49,3 +49,11 @@ Adversarial verifier, 24 Oct 2026. Read the log, the full diff and the whole fin
 ## Condition audit (24 Oct 2026)
 Condition auditor, after the worker and the verifier. Changes made through case_io; `perfect_agent.py` and `case_io.py check` re-run clean for all 30 GBS cases afterwards, and `test_case_guards.py -k GBS` passes.
 - E, minor: `fallback_tool_outputs.drug_interactions.general.proposed` read "(agent not specified on this case's pathway)", an engineering note served to any off-pathway interaction check (PATTERNS 5). Now "Medication list review", as in S01-S03 and RS18.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/GBS-decisions.md` (Andrea, 24 Oct 2026: resolve open points for dataset quality).
+
+- Synonyms (`diagnosis_synonyms.yaml` G61.0 split into scoped entries, expanded with `--prune`): now accepts the generic GBS labels plus "miller fisher syndrome", "fisher syndrome" and "MFS"; the AIDP and AMAN labels it used to accept are removed (wrong subtype for MFS).
+- MFS no-treatment statements re-cited: must 1 `[EAN_PNS_2023]` -> `[Leonhard_2019]`; literature result 1 source `[EAN_PNS_2023]` -> `[Leonhard_2019]` with evidence_level "review"; literature summary `[EAN_PNS_2023, Wakerley_2014]` -> `[Leonhard_2019, Wakerley_2014]`. EAN/PNS 2023 does not address MFS treatment (read in full text 24 Oct 2026); Leonhard 2019 states treatment is generally not recommended in pure MFS.
+- Checks: `perfect_agent.py` pass; `case_io.py check` clean for this case; GBS guards pass; synonym `--check` clean.

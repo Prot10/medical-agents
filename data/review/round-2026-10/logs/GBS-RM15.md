@@ -47,3 +47,11 @@ Checks re-run after the verifier's edits: `perfect_agent.py -v` ok (each criteri
 Condition auditor, after the worker and the verifier. Changes made through case_io; `perfect_agent.py` and `case_io.py check` re-run clean for all 30 GBS cases afterwards, and `test_case_guards.py -k GBS` passes.
 - B, minor: `action-7-analyze-ecg` expected_evidence was the condition template ("Sinus tachycardia or bradycardia; conduction or repolarisation abnormalities reflecting autonomic involvement") and the rationale repeated the label, while the ECG shows normal sinus rhythm 84 bpm with QTc 418 ms. Rewritten to what the ECG shows, with the rationale used in RP12, RP14-RP16 (the RP12 verifier had flagged this template in this case).
 - E, minor: `fallback_tool_outputs.drug_interactions.general.proposed` read "(agent not specified on this case's pathway)", an engineering note served to any off-pathway interaction check (PATTERNS 5). Now "Medication list review", as in S01-S03 and RS18.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/GBS-decisions.md` (Andrea, 24 Oct 2026: resolve open points for dataset quality).
+
+- Synonyms (`diagnosis_synonyms.yaml` G61.0 split into scoped entries, expanded with `--prune`): now accepts the generic GBS labels plus "anti gq1b syndrome" and "incomplete miller fisher syndrome" (Wakerley 2014: acute ptosis is an incomplete MFS form); AIDP, AMAN and plain Miller Fisher labels removed.
+- MFS-spectrum no-treatment statements re-cited from `[EAN_PNS_2023]` to `[Leonhard_2019]` (must 1 now `[Leonhard_2019, Wakerley_2014]`, KCE 4, literature result 1 with evidence_level "review", literature summary). Reason as in P01.
+- Checks: `perfect_agent.py` pass; `case_io.py check` clean for this case; GBS guards pass; synonym `--check` clean.

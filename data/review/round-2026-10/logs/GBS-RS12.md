@@ -45,3 +45,10 @@ Adversarial verifier, 24 Oct 2026. Approved case: read the log, the diff and the
 - Arithmetic: FVC 1.8 and 1.6 L give 69% and 62% of a 2.6 L predicted, 29 and 26 mL/kg at 62 kg, an 11% fall; IVIg 0.4 g/kg x 62 kg = 25 g/day; BMI 24.2 agrees; glucose ratio 60/86 = 0.70. ECG rate 92 = vitals.
 - No errors found; no change made.
 - perfect_agent.py GBS-RS12 -v passes; case_io.py check clean for the case.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/GBS-decisions.md` (Andrea, 24 Oct 2026: resolve open points for dataset quality).
+
+- Synonyms (`diagnosis_synonyms.yaml` G61.0 split into scoped entries, expanded with `--prune`): now accepts the generic GBS labels and the three AIDP labels (its NCS is demyelinating); "acute motor axonal neuropathy", "AMAN" and "miller fisher syndrome" are no longer accepted (wrong subtype or variant for this case).
+- Checks: `perfect_agent.py` pass; `case_io.py check` clean for this case; GBS guards pass; synonym `--check` clean.

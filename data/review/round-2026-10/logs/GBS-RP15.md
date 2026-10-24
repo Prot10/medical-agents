@@ -47,3 +47,12 @@ Found and fixed:
 - B, minor: a7 expected_evidence and rationale were the template while the ECG is normal sinus rhythm 86 with QTc 442 ms. Rewritten to what the ECG shows.
 
 Checks run after the edits: `perfect_agent.py -v` passes (every required and recommended criterion served by its own report), `case_io.py check` clean for the case (schema, synonym guard, no test failure naming it), `test_case_guards.py` leak, follow-up and banned-string guards pass.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/GBS-decisions.md` (Andrea, 24 Oct 2026: resolve open points for dataset quality).
+
+- Synonyms (`diagnosis_synonyms.yaml` G61.0 split into scoped entries, expanded with `--prune`): now accepts the generic GBS labels and the three AIDP labels (its NCS is demyelinating); "acute motor axonal neuropathy", "AMAN" and "miller fisher syndrome" are no longer accepted (wrong subtype or variant for this case).
+- `accepted[0]` "... AIDP (post-lung transplant, likely immune dysregulation)" -> "Guillain-Barré syndrome, AIDP, after lung transplantation" (speculative mechanism removed).
+- Respiratory follow-up: MIP -34 -> -46 cmH2O (still flagged L against the -80 reference), so a case designed as a monitored-bed case does not sit in the band where EAN/PNS 2023 (MIP <40) would call for considering elective ventilation; escalation must now "MIP becomes weaker than -40 cmH2O".
+- Checks: `perfect_agent.py` pass; `case_io.py check` clean for this case; GBS guards pass; synonym `--check` clean.

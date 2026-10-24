@@ -60,3 +60,11 @@ Adversarial check, 24 Oct 2026. Read the log, the diff and the whole final case.
   2. `ground_truth.differential` Botulism: "no food or wound exposure" removed; the HPI documents no food or wound history, so the claim was unsupported.
 - Left as is: the DDI output keeps short monitoring cautions (QTc, creatinine, ACE inhibitor before albumin exchange); they are category-level interaction-reference content, not prescriptions, and the leak guards pass.
 - Re-ran `perfect_agent.py GBS-RS17 -v` (pass) and `case_io.py check GBS-RS17` (no failure names the case); `test_case_guards.py -k GBS-RS17` passes.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/GBS-decisions.md` (Andrea, 24 Oct 2026: resolve open points for dataset quality).
+
+- Synonyms (`diagnosis_synonyms.yaml` G61.0 split into scoped entries, expanded with `--prune`): now accepts the generic GBS labels and the three AIDP labels (its NCS is demyelinating); "acute motor axonal neuropathy", "AMAN" and "miller fisher syndrome" are no longer accepted (wrong subtype or variant for this case).
+- `ground_truth.diagnosis.accepted[0]`: spelling normalised to "Guillain-Barré"; content unchanged.
+- Checks: `perfect_agent.py` pass; `case_io.py check` clean for this case; GBS guards pass; synonym `--check` clean.

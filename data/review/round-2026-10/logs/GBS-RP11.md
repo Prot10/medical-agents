@@ -50,3 +50,11 @@ Found and fixed:
 Left as is: `diagnosis.accepted[0]` em dash (ruling 3, already under CENTRAL).
 
 Checks run after the edits: `perfect_agent.py -v` passes (every required and recommended criterion served by its own report), `case_io.py check` clean for the case (schema, synonym guard, no test failure naming it), `test_case_guards.py` leak, follow-up and banned-string guards pass.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/GBS-decisions.md` (Andrea, 24 Oct 2026: resolve open points for dataset quality).
+
+- Synonyms (`diagnosis_synonyms.yaml` G61.0 split into scoped entries, expanded with `--prune`): now accepts the generic GBS labels and the three AIDP labels (its NCS is demyelinating); "acute motor axonal neuropathy", "AMAN" and "miller fisher syndrome" are no longer accepted (wrong subtype or variant for this case).
+- `accepted[0]` "Guillain-Barré syndrome, immune checkpoint inhibitor-related (pembrolizumab-induced) — irAE" -> "Guillain-Barré syndrome related to an immune checkpoint inhibitor (pembrolizumab)" (summary CENTRAL 6 wording; em dash and redundant "irAE" removed). Methylprednisolone doses in the must confirmed against ASCO 2021 (2-4 mg/kg/day; pulse 1 g/day for 5 days may be considered in grade 3-4, with IVIg or PE): no change.
+- Checks: `perfect_agent.py` pass; `case_io.py check` clean for this case; GBS guards pass; synonym `--check` clean.

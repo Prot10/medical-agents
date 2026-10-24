@@ -43,3 +43,10 @@ Adversarial check, 24 Oct 2026 (approved case). Read the log, the diff and the f
 - Arm strength added per plan; respiratory values pre-intubation; telemetry 24 h without pacing or nitroprusside.
 - Noted, not changed: the NCS output has no needle EMG line, unlike the other cases of this batch; the criterion's expected evidence does not need it and the case is approved, so no change.
 - `perfect_agent.py GBS-S03 -v` passes; `case_io.py check` and `test_case_guards.py -k GBS-S03` clean for the case.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/GBS-decisions.md` (Andrea, 24 Oct 2026: resolve open points for dataset quality).
+
+- Synonyms (`diagnosis_synonyms.yaml` G61.0 split into scoped entries, expanded with `--prune`): now accepts the generic GBS labels and the three AIDP labels (its NCS is demyelinating); "acute motor axonal neuropathy", "AMAN" and "miller fisher syndrome" are no longer accepted (wrong subtype or variant for this case).
+- Checks: `perfect_agent.py` pass; `case_io.py check` clean for this case; GBS guards pass; synonym `--check` clean.

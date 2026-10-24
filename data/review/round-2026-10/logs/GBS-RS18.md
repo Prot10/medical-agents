@@ -58,3 +58,12 @@ Adversarial check, 24 Oct 2026 (approved case: changed only for a real error). R
 ## Condition audit (24 Oct 2026)
 Condition auditor, after the worker and the verifier. Changes made through case_io; `perfect_agent.py` and `case_io.py check` re-run clean for all 30 GBS cases afterwards, and `test_case_guards.py -k GBS` passes.
 - B, minor (approved case, real error): CSF `special_tests["Bacterial cultures"]` and interpretation reported "No growth at 48 hours" for the lumbar puncture ordered at the day 3 assessment, a result from the future. Now "No growth to date". Nothing else changed.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/GBS-decisions.md` (Andrea, 24 Oct 2026: resolve open points for dataset quality).
+
+- Synonyms (`diagnosis_synonyms.yaml` G61.0 split into scoped entries, expanded with `--prune`): now accepts the generic GBS labels and the three AIDP labels (its NCS is demyelinating); "acute motor axonal neuropathy", "AMAN" and "miller fisher syndrome" are no longer accepted (wrong subtype or variant for this case).
+- `accepted[0]` "Guillain-Barré syndrome, severe AIDP, seronegative — with cervicomedullary T2 MRI finding; preceding unilateral facial palsy as cranial-nerve manifestation" -> "Guillain-Barré syndrome, severe AIDP, seronegative, with cranial nerve involvement and a cervicomedullary T2 MRI signal change" (em dash removed, same content).
+- `patient.history_present_illness`: "left lower facial weakness in an LMN distribution" -> "left facial weakness in a lower motor neuron distribution, involving the forehead," (the HPI and cranial-nerve exam both state forehead involvement; "lower facial" contradicted them; auditor flag). Approved case: re-review.
+- Checks: `perfect_agent.py` pass; `case_io.py check` clean for this case; GBS guards pass; synonym `--check` clean.

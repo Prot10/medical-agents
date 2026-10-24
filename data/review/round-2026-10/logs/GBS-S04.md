@@ -44,3 +44,10 @@ Adversarial check, 24 Oct 2026 (approved case). Read the log, the diff and the f
 - Arithmetic checked: BMI 27.5; FVC 1.6 L = 20.9 mL/kg and 42% of 3.8 L, 1.4 L = 18.3 mL/kg and 37%, fall 13%; predicted 3.8 L matches reference equations for a 68-year-old man of 167 cm; MIP and MEP lower limits (-52, 61 cmH2O) match Evans and Whitelaw; CSF:serum glucose 92/148 = 0.62; IVIg 30.5 g/day at 76.7 kg.
 - a6 required is justified (metoprolol with autonomic bradycardia on telemetry, metformin before IVIg, tamsulosin before PE); the soft a1 before a6 constraint names existing ids. The DDI output's short cautions are category-level, and the leak guard passes. Nothing changed.
 - `perfect_agent.py GBS-S04 -v` passes; `case_io.py check` and `test_case_guards.py -k GBS-S04` clean for the case.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/GBS-decisions.md` (Andrea, 24 Oct 2026: resolve open points for dataset quality).
+
+- Synonyms (`diagnosis_synonyms.yaml` G61.0 split into scoped entries, expanded with `--prune`): now accepts the generic GBS labels and the three AIDP labels (its NCS is demyelinating); "acute motor axonal neuropathy", "AMAN" and "miller fisher syndrome" are no longer accepted (wrong subtype or variant for this case).
+- Checks: `perfect_agent.py` pass; `case_io.py check` clean for this case; GBS guards pass; synonym `--check` clean.

@@ -40,3 +40,10 @@ Adversarial check, 24 Oct 2026 (approved case). Read the log, the diff and the f
 - Arithmetic checked: BMI 26.2; FVC 1.6 L = 22.7 mL/kg and 52% of 3.1 L, 1.4 L = 19.9 mL/kg and 45%, fall 13%; MIP and MEP lower limits (-40, 70 cmH2O) match Evans and Whitelaw for a 44-year-old woman; CSF:serum glucose 60/88 = 0.68; IVIg 28 g/day at 70.5 kg. The penicillin allergy is not contradicted by any must.
 - Deletion of the day-10 repeat NCS is correct (future study; guard failure). Nothing changed.
 - `perfect_agent.py GBS-S02 -v` passes; `case_io.py check` and `test_case_guards.py -k GBS-S02` clean for the case.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/GBS-decisions.md` (Andrea, 24 Oct 2026: resolve open points for dataset quality).
+
+- Synonyms (`diagnosis_synonyms.yaml` G61.0 split into scoped entries, expanded with `--prune`): now accepts the generic GBS labels and the three AIDP labels (its NCS is demyelinating); "acute motor axonal neuropathy", "AMAN" and "miller fisher syndrome" are no longer accepted (wrong subtype or variant for this case).
+- Checks: `perfect_agent.py` pass; `case_io.py check` clean for this case; GBS guards pass; synonym `--check` clean.

@@ -53,3 +53,10 @@ Adversarial verifier, 24 Oct 2026. Read the log, the diff, the whole final case 
 ## Condition audit (24 Oct 2026)
 Condition auditor, after the worker and the verifier. Changes made through case_io; `perfect_agent.py` and `case_io.py check` re-run clean for all 30 GBS cases afterwards, and `test_case_guards.py -k GBS` passes.
 - C, major: `action-3-analyze-csf` was required and in the stop rule, so a perfect agent had to perform the lumbar puncture before submitting, while must 3 (rewritten by the verifier) says the puncture is done only after an agreed interval from the last apixaban dose, with aspirin and ticagrelor that cannot be interrupted after the stent; the stored anti-Xa level (112 ng/mL) is in the on-treatment range. The policy contradicted its own must and scored an unsafe act. a3 is now `recommended` and removed from `stop_rule.required_before_assessment` (five required criteria); the hard constraints a1 -> a3 and a6 -> a3 stay, so an LP that is done still follows the labs and the medication review. a3 rationale rewritten; KCE 1 now states Brighton level 2 on the clinical picture and NCS, level 1 once the CSF is obtained (Brighton 2011); `metadata.difficulty_rationale` updated. The diagnosis does not depend on the CSF (typical clinical picture, demyelinating NCS) and IVIg is not delayed for it (EAN/PNS 2023). CSF remains a criterion, so the panel-required tool is present.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/GBS-decisions.md` (Andrea, 24 Oct 2026: resolve open points for dataset quality).
+
+- Synonyms (`diagnosis_synonyms.yaml` G61.0 split into scoped entries, expanded with `--prune`): now accepts the generic GBS labels and the three AIDP labels (its NCS is demyelinating); "acute motor axonal neuropathy", "AMAN" and "miller fisher syndrome" are no longer accepted (wrong subtype or variant for this case).
+- Checks: `perfect_agent.py` pass; `case_io.py check` clean for this case; GBS guards pass; synonym `--check` clean.

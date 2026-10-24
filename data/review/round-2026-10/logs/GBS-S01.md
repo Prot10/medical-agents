@@ -45,3 +45,10 @@ Adversarial check, 24 Oct 2026 (approved case). Read the log, the diff and the f
 - Arithmetic checked: BMI 24.2; FVC 1.8 L = 22.0 mL/kg and 32% of 5.6 L, 1.4 L = 17.1 mL/kg and 25%, fall 22%; MIP and MEP lower limits (-57, 88 cmH2O) match Evans and Whitelaw for a 35-year-old man; CSF:serum glucose 62/90 = 0.69; IVIg 33 g/day at 82 kg. Timeline (diarrhoea day -14, tingling day -5) consistent with the chief complaint.
 - Musts, prohibitions and avoided actions do not contradict each other; differential consistent with the final evidence. Nothing changed.
 - `perfect_agent.py GBS-S01 -v` passes; `case_io.py check` and `test_case_guards.py -k GBS-S01` clean for the case.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/GBS-decisions.md` (Andrea, 24 Oct 2026: resolve open points for dataset quality).
+
+- Synonyms (`diagnosis_synonyms.yaml` G61.0 split into scoped entries, expanded with `--prune`): now accepts the generic GBS labels and the three AIDP labels (its NCS is demyelinating); "acute motor axonal neuropathy", "AMAN" and "miller fisher syndrome" are no longer accepted (wrong subtype or variant for this case).
+- Checks: `perfect_agent.py` pass; `case_io.py check` clean for this case; GBS guards pass; synonym `--check` clean.
