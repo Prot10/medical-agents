@@ -53,3 +53,11 @@ Found and fixed:
 - `avoid-waste-2-order-echocardiogram.rationale` cited "no murmur", but the case has no physical examination: reworded to rest on the seizure features and the normal ECG.
 - `action-6-analyze-eeg.rationale` said the EEG was done "after recovery" while the stored report is a post-ictal recording: now "in the post-ictal period".
 Nothing left for close-out beyond the log's CENTRAL items. perfect_agent, case_io check and the case guards are clean.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026. Checked uniformity of the plan's decisions across the 30 cases and the FND and MS-RR audit classes (engineering text, any-query outputs, second-tier labs, copied numbers, sharp-wave durations, differential codes). After the changes below, `perfect_agent.py` and `case_io.py check` are clean for all 30 cases and `test_case_guards.py -k FEPI-TEMP` passes.
+
+- `initial_tool_outputs.literature_search.general`: neutral focal-epilepsy block added (definition, classification, MRI protocol, first-line ASM, drug resistance), so a literature query that names no case-specific topic no longer receives a stored follow-up.
+- Literature follow-up trigger `search_encephalocraniocutaneous_lipomatosis_epilepsy` renamed `search_encephalocraniocutaneous_lipomatosis_eccl`: it names the case's lesion or concurrent finding, so it is served only to a query that names it.
+- Differential "Nonconvulsive status epilepticus after the convulsion": ICD-10-CM G41.8 -> G40.201.

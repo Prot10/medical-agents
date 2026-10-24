@@ -51,3 +51,10 @@ Found and fixed:
 - `followup_outputs` literature, SANAD II finding: "neither levetiracetam nor zonisamide was non-inferior for 12-month remission" misstates the trial (zonisamide was non-inferior in the intention-to-treat analysis, not per protocol). Corrected.
 - `followup_outputs` drug check: "mild CYP3A4 induction" was attributed to carbamazepine as well as oxcarbazepine; carbamazepine is a strong inducer. Reworded.
 - `initial_tool_outputs.ecg`: PR 154, QRS 86, QTc 416 at 76/min were identical to RP05 (and M02, RM04, S05), and 76/min was 10 beats below the triage rate of 86. Now 84/min, PR 168, QRS 92, QTc 428; the ECG criterion `expected_evidence` says 84/min.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026. Checked uniformity of the plan's decisions across the 30 cases and the FND and MS-RR audit classes (engineering text, any-query outputs, second-tier labs, copied numbers, sharp-wave durations, differential codes). After the changes below, `perfect_agent.py` and `case_io.py check` are clean for all 30 cases and `test_case_guards.py -k FEPI-TEMP` passes.
+
+- `initial_tool_outputs.literature_search.general`: neutral focal-epilepsy block added (definition, classification, MRI protocol, first-line ASM, drug resistance), so a literature query that names no case-specific topic no longer receives a stored follow-up.
+- `action-4-search-medical-literature.label`: "Optional" prefix removed.

@@ -54,3 +54,14 @@ Found and fixed:
 - `initial_tool_outputs.ecg` and `fallback_tool_outputs.ecg`: PR 154, QRS 86, QTc 416 at 76/min were identical to RS05 (and M02, RM04, S05); intervals changed to PR 148, QRS 84, QTc 422 in both blocks (rate kept at the triage 76).
 
 Left for the close-out: the identical ECG intervals in FEPI-TEMP M02, RM04 and S05, and the surname Reyes, used in eight cases of other conditions (CENTRAL request 9).
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026. Checked uniformity of the plan's decisions across the 30 cases and the FND and MS-RR audit classes (engineering text, any-query outputs, second-tier labs, copied numbers, sharp-wave durations, differential codes). After the changes below, `perfect_agent.py` and `case_io.py check` are clean for all 30 cases and `test_case_guards.py -k FEPI-TEMP` passes.
+
+- `initial_tool_outputs.literature_search.general`: neutral focal-epilepsy block added (definition, classification, MRI protocol, first-line ASM, drug resistance), so a literature query that names no case-specific topic no longer receives a stored follow-up.
+- Literature follow-up trigger `search_temporal_lobe_epilepsy_normal_standard_mri` renamed `search_encephalocele_skull_base_defect`: it names the case's lesion or concurrent finding, so it is served only to a query that names it.
+- `action-10-interpret-labs.rationale`: engineering prefix or tier wording removed (was "There is no provoking clue in this chron...").
+- `action-10-interpret-labs.label`: "Optional" prefix removed.
+- `action-11-analyze-ecg.label`: "Optional" prefix removed.
+- `action-4-search-medical-literature.label`: "Optional" prefix removed.

@@ -52,3 +52,11 @@ Adversarial check, 24 Oct 2026 (uncommitted diff read in full against fa1d22e6).
 - Checked: rename (Montoya) and occupation agree; the MRI now shows the suspected right temporopolar FCD with normal hippocampi (index -0.015 matches 3.2/3.3 cm3) and no contrast; video-EEG counts (3 focal aware + 2 focal impaired-awareness = 5) agree across the findings, impression, criterion evidence and differential; penicillin "rash" is consistent; no drug-resistance, presurgical or SUDEP must; lamotrigine must matches the drug output and titration; the lorazepam taper and the panic re-evaluation are present; differential tiers reflect video-EEG; red herrings hold; tiers and stop rule per plan; the label stays for CENTRAL 4.
 - Found: the FDG-PET uptake ratio 0.84 duplicated M03's fallback PET (0.84), although both logs claimed their value was unique; `metadata.last_revised` (2026-08-10) and `revision_reason` were not updated.
 - Changed: PET uptake ratio 0.83 in `followup_outputs[1]` (finding and impression) and in `action-6-order-advanced-imaging.expected_evidence`; `metadata.last_revised` 2026-10-24 with a revision reason for this round. `perfect_agent.py -v` and `case_io.py check` clean; case guards pass.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026. Checked uniformity of the plan's decisions across the 30 cases and the FND and MS-RR audit classes (engineering text, any-query outputs, second-tier labs, copied numbers, sharp-wave durations, differential codes). After the changes below, `perfect_agent.py` and `case_io.py check` are clean for all 30 cases and `test_case_guards.py -k FEPI-TEMP` passes.
+
+- `initial_tool_outputs.literature_search.general`: neutral focal-epilepsy block added (definition, classification, MRI protocol, first-line ASM, drug resistance), so a literature query that names no case-specific topic no longer receives a stored follow-up.
+- Video-EEG follow-up and criterion: "rare" discharges at 2-8 per hour are "occasional" (ACNS 2021: rare is under 1 per hour).
+- Literature follow-up (served for any query): the FCD classification result with temporopolar blurring and the summary line on "subtle focal cortical dysplasia" pointed at this case's MRI finding; removed, MRI-protocol result now names HS and FCD together.

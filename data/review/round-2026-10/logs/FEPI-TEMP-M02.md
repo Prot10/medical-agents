@@ -50,3 +50,10 @@ Adversarial check, 24 Oct 2026 (case committed in b8be2153; read in full).
 - Checked: MRI volumetry (2.2/3.0 cm3 = 27% smaller, index 0.15), CBC (Hct 36.4, MCHC 33.5), prolactin gone, PET only as fallback with the waste avoided action, both EEG reports internally consistent (no 48-hour or captured-event text), drug check content matches the medication list (sertraline, sumatriptan, ibuprofen) and the latex allergy is no longer a drug contraindication, HLA-B*15:02 must present (East Asian), new GGE differential and red herrings point at existing fields with matching data points, tiers and stop rule per plan, criteria evidence equals stored values (ECG 76/min, labs 83/138/9.2).
 - Found: as in M01, the last C row misreads the sign: left-hand automatisms with a right temporal focus are ipsilateral and therefore concordant (fact 12); the HPI needed no change. A stored `fallback_tool_outputs.ecg` differs from the initial ECG; it is never served while the initial ECG exists, so it was left.
 - Changed: nothing in the case. Checks clean for this case.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026. Checked uniformity of the plan's decisions across the 30 cases and the FND and MS-RR audit classes (engineering text, any-query outputs, second-tier labs, copied numbers, sharp-wave durations, differential codes). After the changes below, `perfect_agent.py` and `case_io.py check` are clean for all 30 cases and `test_case_guards.py -k FEPI-TEMP` passes.
+
+- `initial_tool_outputs.literature_search.general`: neutral focal-epilepsy block added (definition, classification, MRI protocol, first-line ASM, drug resistance), so a literature query that names no case-specific topic no longer receives a stored follow-up.
+- `initial_tool_outputs.ecg`: rate and intervals (76/min, PR 154, QRS 86, QTc 416) were identical to RM04 and S05; now 72/min (triage HR 73), PR 158, QRS 80, QTc 434; ECG criterion evidence updated.

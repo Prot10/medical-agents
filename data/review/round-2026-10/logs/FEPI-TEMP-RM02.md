@@ -47,3 +47,11 @@ None. Departure from the plan: TSH 4.8 mIU/L with normal free T4 was kept as an 
 
 Adversarial check, 24 Oct 2026. Read the log, the diff and the whole final case. Checked: tuber and hippocampal sclerosis are separate lesions in findings, impression, criterion evidence, KCE and label; volumetric arithmetic (0.60/5.10 = 0.12, 1 - 2.25/2.85 = 21%) is right, with the index definition written out (R - L) for the left-sided lesion; the post-contrast line is the class E canonical text for a lesional case; no ECG sentence remains and no ECG criterion exists (no ECG stored); valproate 38 mcg/mL matches labs, criterion and KCE; the drug output agrees with facts 7 to 9 and the sulfonamide allergy (zonisamide contraindicated and prohibited); pregnancy prevention, contraception, TSC surveillance (Northrup 2021) and EXIST-3 figures are correct; differential is the assessment-time view; FDG-PET follow-up gone with FDG_PET waste added; "15 seizure-free years" fits seizure-free since 14 at age 29.
 Found and fixed: class H not finished: the labs criterion listed `[NICE_NG217_2025]` and the unbracketed `NICE_NG217_2025`; the duplicate removed. Checks pass after the edit.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026. Checked uniformity of the plan's decisions across the 30 cases and the FND and MS-RR audit classes (engineering text, any-query outputs, second-tier labs, copied numbers, sharp-wave durations, differential codes). After the changes below, `perfect_agent.py` and `case_io.py check` are clean for all 30 cases and `test_case_guards.py -k FEPI-TEMP` passes.
+
+- `initial_tool_outputs.literature_search.general`: neutral focal-epilepsy block added (definition, classification, MRI protocol, first-line ASM, drug resistance), so a literature query that names no case-specific topic no longer receives a stored follow-up.
+- `action-4-search-medical-literature.rationale`: engineering prefix or tier wording removed (was "Optional background; the diagnosis rests...").
+- Differential "Subependymal giant cell astrocytoma": ICD-10-CM D33.0 -> D43.0.

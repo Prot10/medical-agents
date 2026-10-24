@@ -47,3 +47,11 @@ Found and fixed:
 - `metadata.fallback_tool_kinds.ct` still said `normal` after the worker rewrote the CT fallback to show the hypothalamic lesion: set to `case_specific`.
 
 Noted, not changed: the case stores no routine EEG, so a routine EEG order gets the library's normal report although the patient has frequent left temporal sharp waves (true before this round; a routine EEG may be normal). `metadata.case_body_concerns` keeps a stale note about an up-front ECG the case does not have (metadata only).
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026. Checked uniformity of the plan's decisions across the 30 cases and the FND and MS-RR audit classes (engineering text, any-query outputs, second-tier labs, copied numbers, sharp-wave durations, differential codes). After the changes below, `perfect_agent.py` and `case_io.py check` are clean for all 30 cases and `test_case_guards.py -k FEPI-TEMP` passes.
+
+- `initial_tool_outputs.literature_search.general`: neutral focal-epilepsy block added (definition, classification, MRI protocol, first-line ASM, drug resistance), so a literature query that names no case-specific topic no longer receives a stored follow-up.
+- `action-4-search-medical-literature.label`: "Optional" prefix removed.
+- Differential "Lennox-Gastaut syndrome": ICD-10-CM G40.812 -> G40.814.

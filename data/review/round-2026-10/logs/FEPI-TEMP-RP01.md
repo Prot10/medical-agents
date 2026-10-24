@@ -52,3 +52,13 @@ Adversarial verifier, 24 Oct 2026. Read the log, the diff against master and the
 Found and fixed:
 - Continuous EEG arithmetic was impossible: "up to 10 seizures per hour in the first 6 hours" with ictal activity above 20% of each hour needs at least 8 seizures of 90 s per hour (48 or more in 6 h), against 26 seizures in 24 h. Rewritten: 19 of the 26 in the first 2 hours (9 and 10 per hour, mostly 80-90 s, above 20% of each of those two 60-minute epochs), 7 over the remaining 22 h; state line, impression ("two consecutive 60-minute epochs") and `action-7-analyze-eeg.expected_evidence` updated to match. The ACNS 2021 electrographic status criterion is still met.
 Left for close-out: label correction (plan CENTRAL 3), already in the log. perfect_agent, case_io check and the case guards are clean.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026. Checked uniformity of the plan's decisions across the 30 cases and the FND and MS-RR audit classes (engineering text, any-query outputs, second-tier labs, copied numbers, sharp-wave durations, differential codes). After the changes below, `perfect_agent.py` and `case_io.py check` are clean for all 30 cases and `test_case_guards.py -k FEPI-TEMP` passes.
+
+- `initial_tool_outputs.literature_search.general`: neutral focal-epilepsy block added (definition, classification, MRI protocol, first-line ASM, drug resistance), so a literature query that names no case-specific topic no longer receives a stored follow-up.
+- Literature follow-up trigger `search_hsv_encephalitis_status_epilepticus` renamed `search_encephalitis_hsv_herpes_simplex`: it names the case's lesion or concurrent finding, so it is served only to a query that names it.
+- `action-routine-eeg.rationale`: engineering prefix or tier wording removed (was "Optional: a routine recording shows the ...").
+- `action-5-search-medical-literature.rationale`: engineering prefix or tier wording removed (was "Optional background; the diagnosis rests...").
+- `initial_tool_outputs.drug_interactions.current_medications`: review of his current medicines added (zonisamide contraindicated by the sulfonamide allergy); the acyclovir follow-up (trigger renamed `check_acyclovir_aciclovir_antiviral`, the old `antiseizure` token matched any ASM check) is served only to a check that names acyclovir.

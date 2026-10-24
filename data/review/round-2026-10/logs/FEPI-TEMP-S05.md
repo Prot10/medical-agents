@@ -43,3 +43,13 @@ Adversarial check (24 Oct 2026) of the final case against this log, `git diff` a
 - Confirmed: the HPI change to left-hand automatisms is correct and needed (the same right hand cannot show both automatisms and dystonic posturing; manual automatisms are usually ipsilateral, dystonia contralateral, fact 12); red herring path and data point match the rewritten HPI sentence; prolactin gone; index 0.26 from 2.0 vs 3.4 cm3; no gadolinium; EEG wording; ECG report voice; literature (Fisher 2014, Fisher 2017, Krumholz 2015, SANAD II) correctly summarized; tiers, stop rule (MRI, EEG, max 1), no constraint; CT avoided action deletion defensible under fact 3 (residual word-finding hesitation at four hours) and logged; differential includes both mimics the history raises; case guards pass. The stored `fallback_tool_outputs.ecg` (84/min) is pre-existing and only answers a repeat ECG.
 - Found: nothing to change.
 - `perfect_agent.py -v` and `case_io.py check` clean for the case.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026. Checked uniformity of the plan's decisions across the 30 cases and the FND and MS-RR audit classes (engineering text, any-query outputs, second-tier labs, copied numbers, sharp-wave durations, differential codes). After the changes below, `perfect_agent.py` and `case_io.py check` are clean for all 30 cases and `test_case_guards.py -k FEPI-TEMP` passes.
+
+- `initial_tool_outputs.literature_search.general`: neutral focal-epilepsy block added (definition, classification, MRI protocol, first-line ASM, drug resistance), so a literature query that names no case-specific topic no longer receives a stored follow-up.
+- `action-7-interpret-labs.rationale`: engineering prefix or tier wording removed (was "A first convulsion warrants a check for ...").
+- `action-5-check-drug-interactions.rationale`: engineering prefix or tier wording removed (was "His only medicine is as-needed loratadin...").
+- `initial_tool_outputs.ecg`: rate and intervals identical to M02 and RM04 and below the triage HR of 88; now 86/min, PR 140, QRS 90, QTc 414; ECG criterion evidence updated.
+- `initial_tool_outputs.eeg.findings[0].morphology`: sharp-and-slow-wave discharge with a 35-60 ms sharp component (spike range); now 80-120 ms.

@@ -52,3 +52,12 @@ Found and fixed:
 - Video-EEG interictal "sharp waves" had a duration of 60-100 ms, which starts in the spike range (sharp waves are 70-200 ms): now 80-120 ms.
 - ERSET literature summary ("fewer seizures over two years") misstated the outcome: now the trial's result, 11 of 15 surgical and 0 of 23 medical patients free of disabling seizures in year 2 (Engel 2012).
 Left for close-out: label wording (plan CENTRAL 5) and the `analyze_eeg` routing by `eeg_type` (a routine EEG order receives the video-EEG report), both already in the log's CENTRAL list. perfect_agent, case_io check and the case guards are clean.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026. Checked uniformity of the plan's decisions across the 30 cases and the FND and MS-RR audit classes (engineering text, any-query outputs, second-tier labs, copied numbers, sharp-wave durations, differential codes). After the changes below, `perfect_agent.py` and `case_io.py check` are clean for all 30 cases and `test_case_guards.py -k FEPI-TEMP` passes.
+
+- `initial_tool_outputs.literature_search.general`: neutral focal-epilepsy block added (definition, classification, MRI protocol, first-line ASM, drug resistance), so a literature query that names no case-specific topic no longer receives a stored follow-up.
+- `action-6-order-advanced-imaging.rationale`: engineering prefix or tier wording removed (was "Optional here: MRI and video-EEG already...").
+- `action-4-search-medical-literature.rationale`: engineering prefix or tier wording removed (was "Optional background; the diagnosis rests...").
+- Literature follow-up (served for any query): the query named "hippocampal sclerosis and temporopolar abnormality" and a result and summary line described FCD IIIa, i.e. this case's MRI and diagnosis; now drug-resistance definition and surgical trials only.

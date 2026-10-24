@@ -43,3 +43,13 @@ Adversarial check (24 Oct 2026) of the final case against this log, `git diff` a
 - Confirmed: name kept per plan; HPI unchanged per class N; ECG now distinct; "occasional" at 10-12/h; prolactin gone; canonical post-contrast line; lesion volume 0.8 cm3 matches 14 x 11 x 10 mm; red herring path still holds the size; literature (Blumcke 2017, SANAD II, EURAP 2018) real; drug check optional with correct content (no hormonal contraception), HLA warning and must for a South Asian patient; tiers, stop rule (MRI, EEG, max 1), no constraint; FDG_PET waste; differential matches the results; case guards pass.
 - Found: `ground_truth.key_clinical_evidence[2]` said manual automatisms are usually ipsilateral and then concluded that the right-hand picking "does not localize", which contradicts itself and fact 12 (a usually-ipsilateral sign points right). Changed it to: right-hand picking is a weak, discordant sign that does not outweigh the concordant left temporal EEG focus and lesion; tongue-bite side does not lateralize [Lateralization_2005].
 - `perfect_agent.py -v` and `case_io.py check` clean for the case.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026. Checked uniformity of the plan's decisions across the 30 cases and the FND and MS-RR audit classes (engineering text, any-query outputs, second-tier labs, copied numbers, sharp-wave durations, differential codes). After the changes below, `perfect_agent.py` and `case_io.py check` are clean for all 30 cases and `test_case_guards.py -k FEPI-TEMP` passes.
+
+- `initial_tool_outputs.literature_search.general`: neutral focal-epilepsy block added (definition, classification, MRI protocol, first-line ASM, drug resistance), so a literature query that names no case-specific topic no longer receives a stored follow-up.
+- Literature follow-up trigger `search_literature_epilepsy_associated_tumors_and_asm_choice` renamed `search_literature_dysembryoplastic_glioneuronal_dnet`: it names the case's lesion or concurrent finding, so it is served only to a query that names it.
+- `action-7-interpret-labs.rationale`: engineering prefix or tier wording removed (was "A first convulsion warrants a check for ...").
+- `action-5-check-drug-interactions.rationale`: engineering prefix or tier wording removed (was "Her only medicine is as-needed loratadin...").
+- `red_herrings[0].intended_effect`: "A naive agent" reworded.

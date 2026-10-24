@@ -40,3 +40,14 @@ None. Departure from the plan: the deleted drug block was replaced by a short re
 ## Verification
 
 Adversarial check, 24 Oct 2026. Read the log, the diff against master (edit committed in the batch-5 checkpoint) and the patient block. Checked: the sulfonamide statement in the new drug output matches `allergies` ("Sulfonamides (rash)"); the trauma history the CBT must cites is in the past medical history; lamotrigine 200 mg twice daily matches the medication list; volumetric arithmetic (index 0.9/5.7 = 0.16, 1 - 2.4/3.3 = 27%) is right; the video-EEG impression, finding fields and criterion evidence agree (seven events, no EEG change, F8 sharp waves); the differential is the post-video-EEG view; discriminator fallbacks removed (class Q), echo fallback typed; no sequence constraint involves an optional criterion; LaFrance 2013 and CODES (Goldstein 2020) are described correctly (CODES missed its primary outcome). Nothing wrong found; no change made.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026. Checked uniformity of the plan's decisions across the 30 cases and the FND and MS-RR audit classes (engineering text, any-query outputs, second-tier labs, copied numbers, sharp-wave durations, differential codes). After the changes below, `perfect_agent.py` and `case_io.py check` are clean for all 30 cases and `test_case_guards.py -k FEPI-TEMP` passes.
+
+- `initial_tool_outputs.literature_search.general`: neutral focal-epilepsy block added (definition, classification, MRI protocol, first-line ASM, drug resistance), so a literature query that names no case-specific topic no longer receives a stored follow-up.
+- Initial literature output ("psychogenic nonepileptic seizures coexisting with epilepsy diagnosis and treatment", served for any query) moved to the last follow-up `search_literature_psychogenic_nonepileptic_pnes`.
+- `fallback_tool_outputs.literature_search`: placeholder block deleted (unreachable behind the initial output; it held "(agent not specified...)" or "No directly applicable evidence").
+- `fallback_tool_outputs.drug_interactions`: placeholder block deleted (unreachable behind the initial output; it held "(agent not specified...)" or "No directly applicable evidence").
+- `action-5-check-drug-interactions.rationale`: engineering prefix or tier wording removed (was "Optional: no change of antiseizure medic...").
+- `action-4-search-medical-literature.rationale`: engineering prefix or tier wording removed (was "Optional background; the diagnosis rests...").

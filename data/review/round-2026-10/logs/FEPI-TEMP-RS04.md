@@ -47,3 +47,10 @@ Adversarial verifier, 24 Oct 2026. Checked the log against the case file and `gi
 
 Found and fixed:
 - `ground_truth.assessment.required_recommendations` (polytherapy must): "replace valproate with a non-teratogenic ASM such as levetiracetam or lacosamide" overstated the evidence (no ASM is proven non-teratogenic; lacosamide pregnancy data are limited). Reworded to an ASM of lower teratogenic risk, with levetiracetam as the best-supported choice and lacosamide as an option with limited pregnancy data.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026. Checked uniformity of the plan's decisions across the 30 cases and the FND and MS-RR audit classes (engineering text, any-query outputs, second-tier labs, copied numbers, sharp-wave durations, differential codes). After the changes below, `perfect_agent.py` and `case_io.py check` are clean for all 30 cases and `test_case_guards.py -k FEPI-TEMP` passes.
+
+- `initial_tool_outputs.literature_search.general`: neutral focal-epilepsy block added (definition, classification, MRI protocol, first-line ASM, drug resistance), so a literature query that names no case-specific topic no longer receives a stored follow-up.
+- `action-4-search-medical-literature.label`: "Optional" prefix removed.

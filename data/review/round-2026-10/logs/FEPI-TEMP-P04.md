@@ -47,3 +47,12 @@ None. Departures from the plan: the driving must was added (canonical class L te
 ## Verification
 
 Adversarial check, 24 Oct 2026. Read the log, the diff and the whole final case. Checked: the semiology rewrite is coherent in all four fields and in the video-EEG (right-hand automatisms ipsilateral, left arm dystonia and late leftward version contralateral to the right temporal onset, fact 12); the video-EEG counts (four focal aware plus two focal impaired awareness = six) match the impression and the criterion evidence; the PET ratio 0.81 matches impression and evidence; neuropsychology T-scores match evidence; the MRI exemption, the HPI and the "not completed" MRI fallback agree, and no MRI criterion or MRI-dependent constraint remains; the CT impression is CT findings only; the drug output and musts agree with fact 8 (ethinylestradiol halves lamotrigine, dose reduction if the pill stops) and with the sulfonamide allergy (zonisamide contraindicated and prohibited); HLA-B*15:02 must present (South Asian, never exposed); no prolactin anywhere; Carne 2004 with the plan's citation; tiers, stop rule (video-EEG, PET, drug check; max 2) per plan; red herrings point at existing paths. Nothing wrong found; no change made.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026. Checked uniformity of the plan's decisions across the 30 cases and the FND and MS-RR audit classes (engineering text, any-query outputs, second-tier labs, copied numbers, sharp-wave durations, differential codes). After the changes below, `perfect_agent.py` and `case_io.py check` are clean for all 30 cases and `test_case_guards.py -k FEPI-TEMP` passes.
+
+- `initial_tool_outputs.literature_search.general`: neutral focal-epilepsy block added (definition, classification, MRI protocol, first-line ASM, drug resistance), so a literature query that names no case-specific topic no longer receives a stored follow-up.
+- `action-6-order-ct-scan.rationale`: engineering prefix or tier wording removed (was "Optional: MRI is not tolerated; CT exclu...").
+- `action-3-search-medical-literature.rationale`: engineering prefix or tier wording removed (was "Optional background; the diagnosis rests...").
+- Video-EEG follow-up, criterion and KCE: "frequent" (12 per hour) and "rare" (2 per hour) discharges are "occasional" (ACNS 2021).

@@ -52,3 +52,10 @@ Adversarial check, 24 Oct 2026 (case committed in b8be2153; read in full).
 - Checked: rename (Barlow) consistent across the HPI; MRI volumetry (2.7/3.4 cm3 = 21%, index 0.11); sleep-deprived EEG `classification: normal` matches its impression and red herring; ambulatory EEG is 72 h with the seizure on day 3, onset and spread consistent across findings, impression and criterion evidence; lab arithmetic (anion gap 11, male CBC ranges, MCHC 33.6) and abnormal summary match the flags; zonisamide prohibition agrees with the sulfonamide allergy and the drug output; OSA differential and red herring hold; tiers, order and stop rule per plan.
 - Found: the FDG-PET fallback ratio 0.84 is now unique again (P01, which also used 0.84, was changed to 0.83 in this pass). Right-hand automatisms with a right temporal focus are contralateral (a weak sign) and "slightly slurred" postictal speech is dysarthria, not aphasia; no field uses either for localization, so nothing was changed.
 - Changed: nothing in the case. Checks clean for this case.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026. Checked uniformity of the plan's decisions across the 30 cases and the FND and MS-RR audit classes (engineering text, any-query outputs, second-tier labs, copied numbers, sharp-wave durations, differential codes). After the changes below, `perfect_agent.py` and `case_io.py check` are clean for all 30 cases and `test_case_guards.py -k FEPI-TEMP` passes.
+
+- `initial_tool_outputs.literature_search.general`: neutral focal-epilepsy block added (definition, classification, MRI protocol, first-line ASM, drug resistance), so a literature query that names no case-specific topic no longer receives a stored follow-up.
+- Literature follow-up trigger `search_literature_temporal_epilepsy_subtle_mts` renamed `search_literature_subtle_hippocampal_sclerosis_volumetry`: it names the case's lesion or concurrent finding, so it is served only to a query that names it.

@@ -45,3 +45,12 @@ Adversarial check, 24 Oct 2026 (case committed in b8be2153; read in full).
 - Checked: KCE lateralization rewritten per fact 12 (no "contralateral" claim; left-handed, probable dominance only); MRI is non-contrast with the lesion in the posterior superior temporal gyrus, index 0.02 matches 3.1/3.0 cm3; prolactin absent; ECG values match the criterion; PET follow-up optional with within-modality wording; literature uses Bernasconi A 2019, Blumcke 2011 and Glauser 2013 with the correct Level A statement; HLA-B*15:02 must (South Asian); MRI-negative and MTS differentials `low`; tiers and stop rule per plan.
 - Found: no error. The low-grade tumor stays `moderate`; the MRI itself leaves it open and only histology settles it, so this is consistent with ruling 7. Em dashes in the HPI, the PMH and the red herring are original text, not new text.
 - Changed: nothing. Checks clean for this case.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026. Checked uniformity of the plan's decisions across the 30 cases and the FND and MS-RR audit classes (engineering text, any-query outputs, second-tier labs, copied numbers, sharp-wave durations, differential codes). After the changes below, `perfect_agent.py` and `case_io.py check` are clean for all 30 cases and `test_case_guards.py -k FEPI-TEMP` passes.
+
+- `initial_tool_outputs.literature_search.general`: neutral focal-epilepsy block added (definition, classification, MRI protocol, first-line ASM, drug resistance), so a literature query that names no case-specific topic no longer receives a stored follow-up.
+- Literature follow-up trigger `search_literature_fcd_temporal_epilepsy_mri_protocol` renamed `search_literature_cortical_dysplasia_fcd`: it names the case's lesion or concurrent finding, so it is served only to a query that names it.
+- Differential "Low-grade epilepsy-associated tumor (DNET or ganglioglioma)": ICD-10-CM D43.2 -> D43.0.
+- `initial_tool_outputs.eeg` (finding and impression): "sharp waves" with duration 50-70 ms (spike range); now 80-120 ms.

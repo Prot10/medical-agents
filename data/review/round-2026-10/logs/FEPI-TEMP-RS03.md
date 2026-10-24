@@ -49,3 +49,10 @@ Adversarial verifier, 24 Oct 2026. Checked the log against the case file and `gi
 
 Found and fixed:
 - `initial_tool_outputs.eeg.findings[0]`: "Sharp waves" with "duration 50-80 ms" (largely spike range); now 80-140 ms. The finding and impression were also word for word the RS02 report ("Phase reversal at F8 with field extending to T4 and F4"); this report now has its own field (phase reversal at T4, field to F8 and T6), with the impression and the EEG criterion `expected_evidence` updated to match.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026. Checked uniformity of the plan's decisions across the 30 cases and the FND and MS-RR audit classes (engineering text, any-query outputs, second-tier labs, copied numbers, sharp-wave durations, differential codes). After the changes below, `perfect_agent.py` and `case_io.py check` are clean for all 30 cases and `test_case_guards.py -k FEPI-TEMP` passes.
+
+- `initial_tool_outputs.literature_search.general`: neutral focal-epilepsy block added (definition, classification, MRI protocol, first-line ASM, drug resistance), so a literature query that names no case-specific topic no longer receives a stored follow-up.
+- `action-4-search-medical-literature.label`: "Optional" prefix removed.

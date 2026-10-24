@@ -48,3 +48,12 @@ None. Departures from the plan: the prolactin must was deleted rather than rewor
 
 Adversarial check, 24 Oct 2026. Read the log, the diff and the whole final case. Checked: the rewritten convulsive episode (leftward version, left-predominant jerking) is concordant with the right temporal focus in HPI, exam, KCE and red herring [0]; PR 194 ms is called upper-normal with no AV block in the ECG, its criterion and red herring [1] (path still holds that finding); the prolactin row is the only one kept, timed at 22 minutes, and every mention says it argues against PNES and does not separate seizure from syncope (fact 11, Chen 2005); volumetric index 1.0/5.6 = 0.18 is right; video-EEG ECG channel, impression and evidence agree; the drug output matches lisinopril and atorvastatin; differential is the post-video-EEG view; the literature output states Brignole 2018, Chen 2005 and SANAD II correctly.
 Found and fixed: (1) class H not finished: the labs and ECG criteria still listed `[NICE_NG217_2025]` and the unbracketed `NICE_NG217_2025`; the unbracketed duplicates removed. (2) The CT waste rationale said "no head injury" in a man whose history has a head injury at 38; now "no recent head injury". `perfect_agent.py -v`, `case_io.py check` and the case guards pass after the edit.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026. Checked uniformity of the plan's decisions across the 30 cases and the FND and MS-RR audit classes (engineering text, any-query outputs, second-tier labs, copied numbers, sharp-wave durations, differential codes). After the changes below, `perfect_agent.py` and `case_io.py check` are clean for all 30 cases and `test_case_guards.py -k FEPI-TEMP` passes.
+
+- `initial_tool_outputs.literature_search.general`: neutral focal-epilepsy block added (definition, classification, MRI protocol, first-line ASM, drug resistance), so a literature query that names no case-specific topic no longer receives a stored follow-up.
+- `action-8-interpret-labs.rationale`: engineering prefix or tier wording removed (was "Optional: nothing in the history suggest...").
+- `action-4-search-medical-literature.rationale`: engineering prefix or tier wording removed (was "Optional background; the diagnosis rests...").
+- Routine and video-EEG and the EEG criterion: "frequent" discharges at 8-22 per hour are "occasional" (ACNS 2021).

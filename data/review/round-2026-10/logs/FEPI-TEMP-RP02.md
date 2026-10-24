@@ -53,3 +53,14 @@ Found and fixed (timeline):
 - `assessment.required_recommendations[0]` called the long car trip "the only risk factor, a minor transient one", but the HPI puts the left calf pain two months ago, the day before the first seizure and six weeks before the trip two weeks ago, and his father had a DVT at 55. The must now says the event is not clearly explained by a transient risk factor, which per ESC 2019 favors considering extended anticoagulation.
 - `key_clinical_evidence` (CTPA line) and `action-11-order-body-imaging.rationale` placed the calf pain "after" the car trip: now "two months of left calf pain and a recent 20-hour car trip".
 perfect_agent, case_io check and the case guards are clean.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026. Checked uniformity of the plan's decisions across the 30 cases and the FND and MS-RR audit classes (engineering text, any-query outputs, second-tier labs, copied numbers, sharp-wave durations, differential codes). After the changes below, `perfect_agent.py` and `case_io.py check` are clean for all 30 cases and `test_case_guards.py -k FEPI-TEMP` passes.
+
+- `initial_tool_outputs.literature_search.general`: neutral focal-epilepsy block added (definition, classification, MRI protocol, first-line ASM, drug resistance), so a literature query that names no case-specific topic no longer receives a stored follow-up.
+- Literature follow-up trigger `search_seizures_pulmonary_embolism_anticoagulation` renamed `search_pulmonary_embolism_anticoagulation`: it names the case's lesion or concurrent finding, so it is served only to a query that names it.
+- `action-4-search-medical-literature.rationale`: engineering prefix or tier wording removed (was "Optional background; the diagnosis rests...").
+- Differential "Idiopathic generalized epilepsy (juvenile myoclonic epilepsy)": ICD-10-CM G40.309 -> G40.B09.
+- Ambulatory EEG follow-up: "rare" discharges at 1-2 per hour are "occasional" (ACNS 2021).
+- `initial_tool_outputs.drug_interactions.current_medications`: review of his current medicines added; the anticoagulant follow-up (trigger renamed `check_anticoagulant_doac_apixaban_rivaroxaban_edoxaban_dabigatran_warfarin_heparin_enoxaparin`) is now served only to a check that names an anticoagulant, so a levetiracetam check before the CTPA no longer reveals the PE treatment.

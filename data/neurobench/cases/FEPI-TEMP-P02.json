@@ -23,18 +23,7 @@
     },
     "csf": null,
     "ct": null,
-    "drug_interactions": {
-      "general": {
-        "alternatives": [],
-        "contraindications": [],
-        "formulary_status": "on formulary",
-        "interactions": [],
-        "proposed": "(agent not specified on this case's pathway)",
-        "warnings": [
-          "Non-specific interaction check; verify against a current formulary or interaction reference before prescribing."
-        ]
-      }
-    },
+    "drug_interactions": null,
     "ecg": null,
     "echo": {
       "chambers": {
@@ -60,13 +49,7 @@
     },
     "eeg": null,
     "labs": null,
-    "literature_search": {
-      "general": {
-        "query": "general",
-        "results": [],
-        "summary": "No directly applicable, high-quality evidence was retrieved for this query. Recommend correlating with current society guidelines."
-      }
-    },
+    "literature_search": null,
     "mri": null,
     "specialized_test": null
   },
@@ -124,6 +107,68 @@
         "eeg_type": "video"
       },
       "trigger_action": "request_video_eeg"
+    },
+    {
+      "output": {
+        "abnormal_values_summary": [
+          "LGI1 IgG (serum, cell-based assay): positive, titer 1:320"
+        ],
+        "interpretation": "Serum LGI1 IgG positive by cell-based assay (titer 1:320). CASPR2, NMDA receptor, GABA-B receptor and AMPA receptor antibodies negative; GAD65 antibody below 5 IU/mL.",
+        "panels": {
+          "Autoimmune_encephalitis_serum": [
+            {
+              "clinical_significance": null,
+              "is_abnormal": true,
+              "reference_range": "Negative",
+              "test": "LGI1 IgG (serum, cell-based assay)",
+              "unit": "titer",
+              "value": "Positive, titer 1:320"
+            },
+            {
+              "clinical_significance": null,
+              "is_abnormal": false,
+              "reference_range": "Negative",
+              "test": "CASPR2 IgG (serum, cell-based assay)",
+              "unit": "titer",
+              "value": "Negative"
+            },
+            {
+              "clinical_significance": null,
+              "is_abnormal": false,
+              "reference_range": "Negative",
+              "test": "NMDA receptor IgG (serum, cell-based assay)",
+              "unit": "titer",
+              "value": "Negative"
+            },
+            {
+              "clinical_significance": null,
+              "is_abnormal": false,
+              "reference_range": "Negative",
+              "test": "GABA-B receptor IgG (serum)",
+              "unit": "titer",
+              "value": "Negative"
+            },
+            {
+              "clinical_significance": null,
+              "is_abnormal": false,
+              "reference_range": "Negative",
+              "test": "AMPA receptor IgG (serum)",
+              "unit": "titer",
+              "value": "Negative"
+            },
+            {
+              "clinical_significance": null,
+              "is_abnormal": false,
+              "reference_range": "<5",
+              "test": "GAD65 antibody (serum)",
+              "unit": "IU/mL",
+              "value": "<5"
+            }
+          ]
+        }
+      },
+      "tool_name": "interpret_labs",
+      "trigger_action": "request_autoimmune_encephalitis_lgi1_caspr2_antibodies"
     },
     {
       "output": {
@@ -203,6 +248,51 @@
       },
       "tool_name": "order_body_imaging",
       "trigger_action": "request_chest_ct_tumor_screen"
+    },
+    {
+      "output": {
+        "alternatives": [
+          "Non-inducing antiseizure medicines (levetiracetam, lacosamide) have no relevant interaction with corticosteroids."
+        ],
+        "contraindications": [],
+        "formulary_status": "All agents on formulary",
+        "interactions": [
+          "Carbamazepine + methylprednisolone or prednisolone: carbamazepine induces CYP3A4 and increases corticosteroid clearance; corticosteroid exposure may be reduced. Monitor clinical response; a higher steroid dose or a non-inducing antiseizure medicine may be needed.",
+          "Carbamazepine + lacosamide: additive sodium-channel effects; dizziness, diplopia and ataxia more frequent, and both prolong the PR interval. Baseline ECG and monitoring advised.",
+          "Levetiracetam + corticosteroids: no pharmacokinetic interaction.",
+          "IVIG: no pharmacokinetic interaction with antiseizure medicines."
+        ],
+        "proposed": "Methylprednisolone IV, with or without IVIG, added to levetiracetam, carbamazepine and lacosamide",
+        "summary": "Carbamazepine is the only current medicine with a relevant pharmacokinetic interaction (CYP3A4 induction of corticosteroids); it also lowers sodium. Lacosamide with carbamazepine has additive PR and neurotoxic effects.",
+        "warnings": [
+          "Carbamazepine causes dose-related hyponatremia (SIADH-like); monitor serum sodium closely when sodium is already low.",
+          "High-dose corticosteroids: hyperglycemia, hypertension, insomnia, mood change and psychosis; monitor glucose and blood pressure, consider gastric protection.",
+          "IVIG: risk of thrombosis (hydrate, avoid in hyperviscosity), aseptic meningitis, renal impairment with sucrose-containing products; IgA deficiency increases the risk of anaphylaxis.",
+          "Levetiracetam: irritability and behavioral change are recognized adverse effects."
+        ]
+      },
+      "tool_name": "check_drug_interactions",
+      "trigger_action": "check_methylprednisolone_prednisolone_ivig_corticosteroid"
+    },
+    {
+      "output": {
+        "query": "LGI1 antibody encephalitis faciobrachial dystonic seizures diagnosis and treatment",
+        "results": [
+          {
+            "evidence_level": "expert consensus criteria",
+            "finding": "Definite autoimmune limbic encephalitis requires subacute (under 3 months) working memory deficits, seizures or psychiatric symptoms, bilateral T2/FLAIR abnormality restricted to the medial temporal lobes, CSF pleocytosis or temporal EEG abnormality, and reasonable exclusion of alternatives; detection of a neuronal surface antibody allows the diagnosis when one of the first three is missing. Antibody testing should include serum and CSF.",
+            "source": "Graus F et al., Lancet Neurol 2016;15:391-404 | A clinical approach to diagnosis of autoimmune encephalitis"
+          },
+          {
+            "evidence_level": "observational cohort",
+            "finding": "Faciobrachial dystonic seizures (very frequent, brief, unilateral arm and face dystonia) preceded the onset of amnesia and confusion in most patients with LGI1 antibodies; they responded poorly to antiepileptic drugs and better to corticosteroids and other immunotherapies, and hyponatremia was common.",
+            "source": "Irani SR et al., Ann Neurol 2011;69:892-900 | Faciobrachial dystonic seizures precede Lgi1 antibody limbic encephalitis"
+          }
+        ],
+        "summary": "Consensus criteria (Graus 2016) define autoimmune limbic encephalitis by subacute limbic symptoms, bilateral medial temporal MRI change and CSF or EEG evidence of inflammation, with antibody testing in serum and CSF. In the cohort of Irani 2011, faciobrachial dystonic seizures preceded LGI1 antibody encephalitis and responded better to immunotherapy than to antiepileptic drugs."
+      },
+      "tool_name": "search_medical_literature",
+      "trigger_action": "search_literature_lgi1_faciobrachial_autoimmune_encephalitis"
     }
   ],
   "ground_truth": {
@@ -294,7 +384,7 @@
         "expected_evidence": "Normal sinus rhythm, 72/min; PR 162 ms, QRS 84 ms, QTc 408 ms; no conduction abnormality.",
         "importance": "optional",
         "label": "Obtain a 12-lead ECG",
-        "rationale": "Optional baseline: he takes lacosamide and carbamazepine, which both prolong the PR interval; the episodes themselves are not a syncope question."
+        "rationale": "A baseline ECG is reasonable: he takes lacosamide and carbamazepine, which both prolong the PR interval; the episodes themselves are not a syncope question."
       },
       {
         "alternatives": [
@@ -332,7 +422,7 @@
         "expected_evidence": "Bilateral mesial temporal FDG hypermetabolism, left greater than right.",
         "importance": "optional",
         "label": "Order FDG-PET of the brain",
-        "rationale": "Optional: mesial temporal hypermetabolism supports active limbic inflammation when MRI is equivocal; here the MRI already shows it."
+        "rationale": "Mesial temporal hypermetabolism supports active limbic inflammation when MRI is equivocal; here the MRI already shows it."
       },
       {
         "alternatives": [
@@ -394,7 +484,7 @@
         "expected_evidence": "General evidence on LGI1 antibody encephalitis and faciobrachial dystonic seizures; not required for the diagnosis.",
         "importance": "optional",
         "label": "Search the literature on LGI1 antibody encephalitis",
-        "rationale": "Optional background; the diagnosis rests on the semiology, MRI and serum antibody."
+        "rationale": "Background only; the diagnosis rests on the semiology, MRI and serum antibody."
       }
     ],
     "assessment": {
@@ -541,24 +631,22 @@
   "initial_tool_outputs": {
     "csf": null,
     "drug_interactions": {
-      "methylprednisolone": {
+      "current_medications": {
         "alternatives": [
-          "Non-inducing antiseizure medicines (levetiracetam, lacosamide) have no relevant interaction with corticosteroids."
+          "Non-inducing antiseizure medicines (levetiracetam, lacosamide, lamotrigine) have fewer pharmacokinetic interactions."
         ],
         "contraindications": [],
-        "formulary_status": "All agents on formulary",
+        "formulary_status": "All current medicines on formulary",
         "interactions": [
-          "Carbamazepine + methylprednisolone or prednisolone: carbamazepine induces CYP3A4 and increases corticosteroid clearance; corticosteroid exposure may be reduced. Monitor clinical response; a higher steroid dose or a non-inducing antiseizure medicine may be needed.",
-          "Carbamazepine + lacosamide: additive sodium-channel effects; dizziness, diplopia and ataxia more frequent, and both prolong the PR interval. Baseline ECG and monitoring advised.",
-          "Levetiracetam + corticosteroids: no pharmacokinetic interaction.",
-          "IVIG: no pharmacokinetic interaction with antiseizure medicines."
+          "Carbamazepine with lacosamide: additive sodium-channel effects; dizziness, diplopia and ataxia are more frequent, and both prolong the PR interval.",
+          "Carbamazepine with levetiracetam: no clinically relevant pharmacokinetic interaction.",
+          "Carbamazepine induces CYP3A4 and UGT enzymes, lowers the exposure of many co-administered drugs and autoinduces its own metabolism."
         ],
-        "proposed": "Methylprednisolone IV, with or without IVIG, added to levetiracetam, carbamazepine and lacosamide",
-        "summary": "Carbamazepine is the only current medicine with a relevant pharmacokinetic interaction (CYP3A4 induction of corticosteroids); it also lowers sodium. Lacosamide with carbamazepine has additive PR and neurotoxic effects.",
+        "proposed": "Review of current medicines: levetiracetam 1500 mg twice daily, carbamazepine 400 mg twice daily, lacosamide 200 mg twice daily",
+        "summary": "Carbamazepine is the only current medicine with relevant pharmacokinetic effects (enzyme induction); with lacosamide it adds PR prolongation and neurotoxic effects, and it can lower sodium.",
         "warnings": [
-          "Carbamazepine causes dose-related hyponatremia (SIADH-like); monitor serum sodium closely when sodium is already low.",
-          "High-dose corticosteroids: hyperglycemia, hypertension, insomnia, mood change and psychosis; monitor glucose and blood pressure, consider gastric protection.",
-          "IVIG: risk of thrombosis (hydrate, avoid in hyperviscosity), aseptic meningitis, renal impairment with sucrose-containing products; IgA deficiency increases the risk of anaphylaxis.",
+          "Carbamazepine causes dose-related hyponatremia; check sodium.",
+          "Lacosamide with carbamazepine: obtain a baseline ECG for PR prolongation.",
           "Levetiracetam: irritability and behavioral change are recognized adverse effects."
         ]
       }
@@ -583,10 +671,9 @@
     "labs": {
       "abnormal_values_summary": [
         "Sodium: 126 mEq/L (L)",
-        "Chloride: 94 mEq/L (L)",
-        "LGI1 IgG (serum, cell-based assay): positive, titer 1:320"
+        "Chloride: 94 mEq/L (L)"
       ],
-      "interpretation": "Sodium 126 mEq/L (low) and chloride 94 mEq/L (low). Serum LGI1 IgG positive (titer 1:320); CASPR2, NMDA receptor, GABA-B receptor, AMPA receptor and GAD65 antibodies negative. Carbamazepine level within the therapeutic range. Remaining values within normal limits. LGI1 IgG is found in a subset of patients with autoimmune limbic encephalitis; results should be interpreted with the clinical picture. Clinical correlation recommended.",
+      "interpretation": "Sodium 126 mEq/L (low) and chloride 94 mEq/L (low). Carbamazepine level within the therapeutic range. Remaining values within normal limits.",
       "panels": {
         "AED_Levels": [
           {
@@ -596,56 +683,6 @@
             "test": "Carbamazepine level",
             "unit": "mcg/mL",
             "value": 8.2
-          }
-        ],
-        "Autoimmune_encephalitis_serum": [
-          {
-            "clinical_significance": null,
-            "is_abnormal": true,
-            "reference_range": "Negative",
-            "test": "LGI1 IgG (serum, cell-based assay)",
-            "unit": "titer",
-            "value": "Positive, titer 1:320"
-          },
-          {
-            "clinical_significance": null,
-            "is_abnormal": false,
-            "reference_range": "Negative",
-            "test": "CASPR2 IgG (serum, cell-based assay)",
-            "unit": "titer",
-            "value": "Negative"
-          },
-          {
-            "clinical_significance": null,
-            "is_abnormal": false,
-            "reference_range": "Negative",
-            "test": "NMDA receptor IgG (serum, cell-based assay)",
-            "unit": "titer",
-            "value": "Negative"
-          },
-          {
-            "clinical_significance": null,
-            "is_abnormal": false,
-            "reference_range": "Negative",
-            "test": "GABA-B receptor IgG (serum)",
-            "unit": "titer",
-            "value": "Negative"
-          },
-          {
-            "clinical_significance": null,
-            "is_abnormal": false,
-            "reference_range": "Negative",
-            "test": "AMPA receptor IgG (serum)",
-            "unit": "titer",
-            "value": "Negative"
-          },
-          {
-            "clinical_significance": null,
-            "is_abnormal": false,
-            "reference_range": "<5",
-            "test": "GAD65 antibody (serum)",
-            "unit": "IU/mL",
-            "value": "<5"
           }
         ],
         "BMP": [
@@ -777,21 +814,36 @@
       }
     },
     "literature_search": {
-      "LGI1 antibody encephalitis faciobrachial dystonic seizures diagnosis and treatment": {
-        "query": "LGI1 antibody encephalitis faciobrachial dystonic seizures diagnosis and treatment",
+      "general": {
+        "query": "focal epilepsy in adults: definition, classification, imaging and first-line treatment",
         "results": [
           {
-            "evidence_level": "expert consensus criteria",
-            "finding": "Definite autoimmune limbic encephalitis requires subacute (under 3 months) working memory deficits, seizures or psychiatric symptoms, bilateral T2/FLAIR abnormality restricted to the medial temporal lobes, CSF pleocytosis or temporal EEG abnormality, and reasonable exclusion of alternatives; detection of a neuronal surface antibody allows the diagnosis when one of the first three is missing. Antibody testing should include serum and CSF.",
-            "source": "Graus F et al., Lancet Neurol 2016;15:391-404 | A clinical approach to diagnosis of autoimmune encephalitis"
+            "evidence_level": "consensus definition",
+            "finding": "Epilepsy is present after at least two unprovoked seizures more than 24 hours apart, after one unprovoked seizure with a recurrence risk of at least 60% over the next 10 years, or when an epilepsy syndrome is diagnosed.",
+            "source": "Fisher RS et al., Epilepsia 2014;55:475-482 | ILAE official report: a practical clinical definition of epilepsy"
           },
           {
-            "evidence_level": "observational cohort",
-            "finding": "Faciobrachial dystonic seizures (very frequent, brief, unilateral arm and face dystonia) preceded the onset of amnesia and confusion in most patients with LGI1 antibodies; they responded poorly to antiepileptic drugs and better to corticosteroids and other immunotherapies, and hyponatremia was common.",
-            "source": "Irani SR et al., Ann Neurol 2011;69:892-900 | Faciobrachial dystonic seizures precede Lgi1 antibody limbic encephalitis"
+            "evidence_level": "consensus classification",
+            "finding": "Seizures are classified by onset as focal, generalized or unknown; focal seizures are described by awareness and by their first motor or non-motor feature, and may evolve to focal to bilateral tonic-clonic seizures.",
+            "source": "Fisher RS et al., Epilepsia 2017;58:522-530 | Operational classification of seizure types by the International League Against Epilepsy: position paper of the ILAE Commission for Classification and Terminology"
+          },
+          {
+            "evidence_level": "consensus guideline",
+            "finding": "A harmonized epilepsy MRI protocol (3D T1 and 3D FLAIR at about 1 mm isotropic resolution and high-resolution coronal T2) is recommended for adults with focal epilepsy; non-dedicated protocols miss subtle lesions.",
+            "source": "Bernasconi A et al., Epilepsia 2019;60:1054-1068 | Recommendations for the use of structural magnetic resonance imaging in the care of patients with epilepsy: a consensus report from the International League Against Epilepsy Neuroimaging Task Force"
+          },
+          {
+            "evidence_level": "guideline",
+            "finding": "Lamotrigine or levetiracetam is offered as first-line monotherapy for focal seizures, with carbamazepine, oxcarbazepine, zonisamide or lacosamide as further options.",
+            "source": "National Institute for Health and Care Excellence, NG217 2022 | Epilepsies in children, young people and adults"
+          },
+          {
+            "evidence_level": "consensus definition",
+            "finding": "Drug-resistant epilepsy is failure of adequate trials of two tolerated, appropriately chosen and used antiseizure medication schedules to achieve sustained seizure freedom.",
+            "source": "Kwan P et al., Epilepsia 2010;51:1069-1077 | Definition of drug resistant epilepsy: consensus proposal by the ad hoc Task Force of the ILAE Commission on Therapeutic Strategies"
           }
         ],
-        "summary": "Consensus criteria (Graus 2016) define autoimmune limbic encephalitis by subacute limbic symptoms, bilateral medial temporal MRI change and CSF or EEG evidence of inflammation, with antibody testing in serum and CSF. In the cohort of Irani 2011, faciobrachial dystonic seizures preceded LGI1 antibody encephalitis and responded better to immunotherapy than to antiepileptic drugs."
+        "summary": "Epilepsy is diagnosed after two unprovoked seizures more than 24 hours apart or one with a high recurrence risk, and focal seizures are classified by onset and awareness (ILAE 2014, 2017). A dedicated epilepsy-protocol MRI is the imaging of choice (ILAE 2019). Lamotrigine or levetiracetam is first-line monotherapy for focal seizures (NICE NG217), and drug resistance is failure of two appropriate medication schedules (ILAE 2010)."
       }
     },
     "mri": {

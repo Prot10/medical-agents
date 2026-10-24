@@ -46,3 +46,11 @@ Adversarial check (24 Oct 2026) of the final case against this log, `git diff` a
 - Confirmed: occupation; ethnicity Southeast Asian (Lao) fits the surname and keeps the HLA-B*15:02 indication (CPIC 2018); right-hand automatisms concordant; Hct 42.1 with Hb 14.2; volumes 1.8 vs 3.3 cm3 give 45% and index 0.29, 1.8 unique in the condition; no gadolinium lines; "occasional" at 15-20/h fits ACNS 2021; drug output now correct on ethinylestradiol and lamotrigine (fact 8); drug check required, soft MRI -> drug check, stop rule MRI, EEG, drug check, max 1; EURAP 2018 and Sabers 2003 figures correct; musts (contraception, folic acid, HLA, kitchen safety, driving, SUDEP) consistent with the penicillin allergy and medicines; case guards pass.
 - Found: the ECG (rate 80, PR 148, QRS 82 ms) was the same template as S02's. Changed `initial_tool_outputs.ecg.rate` to 76, `.intervals.PR` 136 ms, `.intervals.QRS` 88 ms, `.interpretation` "at 76 bpm", and the ECG criterion `expected_evidence` to match (triage HR 78 stays).
 - `perfect_agent.py -v` and `case_io.py check` clean for the case.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026. Checked uniformity of the plan's decisions across the 30 cases and the FND and MS-RR audit classes (engineering text, any-query outputs, second-tier labs, copied numbers, sharp-wave durations, differential codes). After the changes below, `perfect_agent.py` and `case_io.py check` are clean for all 30 cases and `test_case_guards.py -k FEPI-TEMP` passes.
+
+- `initial_tool_outputs.literature_search.general`: neutral focal-epilepsy block added (definition, classification, MRI protocol, first-line ASM, drug resistance), so a literature query that names no case-specific topic no longer receives a stored follow-up.
+- `action-7-interpret-labs.rationale`: engineering prefix or tier wording removed (was "A first convulsion warrants a check for ...").
+- Differential "Idiopathic generalized epilepsy (JME)": ICD-10-CM G40.319 -> G40.B09.

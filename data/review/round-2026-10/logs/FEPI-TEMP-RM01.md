@@ -52,3 +52,14 @@ None. Departures from the plan: the CT criterion is placed first in the criteria
 
 Adversarial check, 24 Oct 2026. Read the log, the diff and the whole final case. Checked: the right hemispheric lesion is consistent everywhere with the left hemiparesis (MRI, CT, both EEG asymmetries, breach rhythm over the right parietal burr hole, shunt palpable right parietal, KCE, differential); the Todd paresis is now the left arm and the forced version leftward; the MRI arithmetic (index 0.8/6.4 = 0.13, 1 - 2.8/3.6 = 22%) is right; the CT criterion is answered by the stored CT (no CT fallback); toxicology and glucose 102 in the labs match the labs criterion evidence; prolactin, CK, lactate and TSH rows are gone; Glauser 2013 Level A list and SANAD II are stated correctly; the valproate prohibition is canonical; no FDG-PET follow-up remains and FDG_PET waste is present.
 Found and fixed: (1) MoCA arithmetic still wrong: with "serial sevens (1 error)" four subtractions are correct, which scores the full 3 points, so the listed losses were 3 + 1 + 1 + 0 + 1 = 6 and the total 25/30, not 24/30; changed to "serial sevens (2 errors)" (3 correct = 2 points), so losses are 7 and 23 + 1 education point = 24/30 as stated, matching the log's own Own-findings line. (2) Class H: the labs criterion still had the unbracketed duplicate `NICE_NG217_2025`; removed. Checks pass after the edit.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026. Checked uniformity of the plan's decisions across the 30 cases and the FND and MS-RR audit classes (engineering text, any-query outputs, second-tier labs, copied numbers, sharp-wave durations, differential codes). After the changes below, `perfect_agent.py` and `case_io.py check` are clean for all 30 cases and `test_case_guards.py -k FEPI-TEMP` passes.
+
+- `initial_tool_outputs.literature_search.general`: neutral focal-epilepsy block added (definition, classification, MRI protocol, first-line ASM, drug resistance), so a literature query that names no case-specific topic no longer receives a stored follow-up.
+- `action-8-interpret-labs.rationale`: engineering prefix or tier wording removed (was "Optional: a first convulsion is routinel...").
+- `action-5-check-drug-interactions.rationale`: engineering prefix or tier wording removed (was "Optional: his medicines have no interact...").
+- `action-4-search-medical-literature.rationale`: engineering prefix or tier wording removed (was "Optional background; the diagnosis rests...").
+- Sleep-deprived EEG follow-up and criterion: "frequent" discharges at about 10 per hour are "occasional" (ACNS 2021).
+- Literature follow-up (served for any query): query and HS classification result named this case's MRI finding; now first-line ASM evidence only; criterion evidence updated.

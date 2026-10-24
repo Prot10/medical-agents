@@ -49,3 +49,13 @@ Adversarial check (24 Oct 2026) of the whole final case against this log, plan s
 - Confirmed: prolactin gone everywhere; volumetrics 2.1 vs 3.4 cm3 give 38% and index 0.24; no gadolinium line; sharp-wave duration and "frequent" at 1-2/min agree with ACNS 2021; tongue-bite contradiction resolved; HPI no longer denies the auras; KCE two-seizure criterion and first-line ASM per facts 1 and 6; tiers, criteria order, stop rule (MRI, EEG, max 1), no constraint with an optional drug check; FDG_PET waste and PET as fallback; echo_type; literature sources real and summaries correct (SANAD II, Wiebe 2001, ERSET 2012, Kwan 2010), no leakage (case guards pass); differential matches the results; musts and prohibitions consistent with the omeprazole-only medication list and the ACE-inhibitor allergy.
 - Found: the fallback FDG-PET ratio the worker chose (0.83) duplicates P01's ratio. Changed: `fallback_tool_outputs.advanced_imaging.findings[0].signal` and `.impression` to 0.77 (unused in the condition, consistent with "markedly reduced").
 - `perfect_agent.py -v` and `case_io.py check` clean for the case.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026. Checked uniformity of the plan's decisions across the 30 cases and the FND and MS-RR audit classes (engineering text, any-query outputs, second-tier labs, copied numbers, sharp-wave durations, differential codes). After the changes below, `perfect_agent.py` and `case_io.py check` are clean for all 30 cases and `test_case_guards.py -k FEPI-TEMP` passes.
+
+- `initial_tool_outputs.literature_search.general`: neutral focal-epilepsy block added (definition, classification, MRI protocol, first-line ASM, drug resistance), so a literature query that names no case-specific topic no longer receives a stored follow-up.
+- `action-7-interpret-labs.rationale`: engineering prefix or tier wording removed (was "A first convulsion in the emergency depa...").
+- `action-5-check-drug-interactions.rationale`: engineering prefix or tier wording removed (was "The only regular medicine is omeprazole,...").
+- Differential "Primary generalized epilepsy (JME)": ICD-10-CM G40.319 -> G40.B09.
+- Literature follow-up query named "mesial temporal sclerosis" (this case's MRI finding); now "temporal lobe epilepsy treatment outcomes".

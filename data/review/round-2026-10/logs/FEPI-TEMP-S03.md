@@ -45,3 +45,12 @@ Adversarial check (24 Oct 2026) of the whole final case against this log and pla
 - Confirmed: rename (Mosley) and occupation; right-hand automatisms concordant; allergy "iodinated CT contrast" (gadolinium MRI unaffected); male reference ranges and creatinine 0.94; prolactin gone; HLA prohibition removed (African American); valproate prohibition added; tiers, stop rule (MRI, EEG, max 1), no constraint; FDG_PET waste; panic attacks raised by the HPI now in the differential; literature sources real; case guards pass.
 - Found: (1) the MRI put the DNET "bright rim sign" on T2 ("Bright ring sign" in T2, "bright T2 rim" in the impression); the sign is a FLAIR finding (S02 and S06 already report it on FLAIR). Changed `initial_tool_outputs.mri.findings[0].signal_characteristics.T2` (sentence removed), `.FLAIR` ("thin hyperintense peripheral rim (bright rim sign)") and `.impression` ("bright FLAIR rim"). (2) The fallback FDG-PET ratio 0.84 duplicated M03; changed to 0.86 in `fallback_tool_outputs.advanced_imaging.findings[0].signal` and `.impression` (consistent with "moderately reduced").
 - `perfect_agent.py -v` and `case_io.py check` clean for the case.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026. Checked uniformity of the plan's decisions across the 30 cases and the FND and MS-RR audit classes (engineering text, any-query outputs, second-tier labs, copied numbers, sharp-wave durations, differential codes). After the changes below, `perfect_agent.py` and `case_io.py check` are clean for all 30 cases and `test_case_guards.py -k FEPI-TEMP` passes.
+
+- `initial_tool_outputs.literature_search.general`: neutral focal-epilepsy block added (definition, classification, MRI protocol, first-line ASM, drug resistance), so a literature query that names no case-specific topic no longer receives a stored follow-up.
+- Literature follow-up trigger `search_literature_dnet_epilepsy_surgery` renamed `search_literature_dnet_dysembryoplastic_neuroepithelial`: it names the case's lesion or concurrent finding, so it is served only to a query that names it.
+- `action-7-interpret-labs.rationale`: engineering prefix or tier wording removed (was "A first convulsion warrants a check for ...").
+- `action-5-check-drug-interactions.rationale`: engineering prefix or tier wording removed (was "The only regular medicine is vitamin D3,...").

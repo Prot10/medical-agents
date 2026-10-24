@@ -50,3 +50,14 @@ Adversarial verifier, 24 Oct 2026. Checked the log against the case file and `gi
 Found and fixed:
 - `initial_tool_outputs.eeg.findings[0].morphology`: discharges typed "Sharp waves" had "duration 40-60 ms", a spike duration (sharp waves last 70-200 ms); now 80-120 ms.
 - `metadata.fallback_tool_kinds.ct` still said `normal` after the CT fallback was rewritten with the calcifications: set to `case_specific`.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026. Checked uniformity of the plan's decisions across the 30 cases and the FND and MS-RR audit classes (engineering text, any-query outputs, second-tier labs, copied numbers, sharp-wave durations, differential codes). After the changes below, `perfect_agent.py` and `case_io.py check` are clean for all 30 cases and `test_case_guards.py -k FEPI-TEMP` passes.
+
+- `initial_tool_outputs.literature_search.general`: neutral focal-epilepsy block added (definition, classification, MRI protocol, first-line ASM, drug resistance), so a literature query that names no case-specific topic no longer receives a stored follow-up.
+- Literature follow-up trigger `search_literature_calcified_neurocysticercosis_pregnancy_asm` renamed `search_literature_neurocysticercosis_cysticerci_calcified`: it names the case's lesion or concurrent finding, so it is served only to a query that names it.
+- `action-4-search-medical-literature.label`: "Optional" prefix removed.
+- Differential "Calcified tuberculomas or toxoplasmosis": ICD-10-CM A17.8 -> A17.81.
+- Differential "Hyponatremia or another metabolic provoked seizure": ICD-10-CM G93.49 -> E87.1.
+- Infectious serology panel (cysticercosis IgG, HIV, RPR, HBsAg, HCV, QuantiFERON) moved from the initial labs, where the first-line order received it unasked, to an `interpret_labs` follow-up (`request_cysticercosis_hiv_syphilis_hepatitis_quantiferon_serology`, first in the pathway, before the drug check and literature); red herring [1] path now `followup_outputs[0].output.panels.Infectious_Workup[0]`.

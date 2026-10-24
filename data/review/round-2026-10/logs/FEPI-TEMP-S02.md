@@ -45,3 +45,11 @@ Adversarial check (24 Oct 2026) of the whole final case against this log and pla
 - Confirmed: occupation teacher in both fields; HPI head turn and manual automatisms right-sided (early non-forced version and manual automatisms usually ipsilateral, fact 12), concordant with the right lesion and F8 focus; prolactin gone; "occasional" at 8-10/h fits ACNS 2021; MRI distinct from S03 (21 x 15 x 13 mm, ellipsoid volume about 2.1 cm3 as stated), canonical post-contrast line, FLAIR bright rim, no impossible scalloping; drug check required with correct fact 8 content (ethinylestradiol halves lamotrigine; inducers make the pill unreliable), soft MRI -> drug check with the canonical reason; stop rule MRI, EEG, drug check, max 1; Hb 11.9 with Hct 39.6 and MCV 79.1 plausible for iron deficiency, PMH now "maintenance"; folic acid and contraception must; differential (ganglioglioma moderate, GGE low) matches the evidence; Blumcke 2017 figures correct; case guards pass.
 - Found: nothing to change.
 - `perfect_agent.py -v` and `case_io.py check` clean for the case.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026. Checked uniformity of the plan's decisions across the 30 cases and the FND and MS-RR audit classes (engineering text, any-query outputs, second-tier labs, copied numbers, sharp-wave durations, differential codes). After the changes below, `perfect_agent.py` and `case_io.py check` are clean for all 30 cases and `test_case_guards.py -k FEPI-TEMP` passes.
+
+- `initial_tool_outputs.literature_search.general`: neutral focal-epilepsy block added (definition, classification, MRI protocol, first-line ASM, drug resistance), so a literature query that names no case-specific topic no longer receives a stored follow-up.
+- Literature follow-up trigger `search_literature_dnet_epilepsy_surgery` renamed `search_literature_dnet_dysembryoplastic_neuroepithelial`: it names the case's lesion or concurrent finding, so it is served only to a query that names it.
+- `action-7-interpret-labs.rationale`: engineering prefix or tier wording removed (was "A first convulsion warrants a check for ...").

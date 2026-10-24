@@ -50,3 +50,11 @@ Found and fixed:
 - Pseudoprogression `key_features` claimed the lesion grew "mostly before immunotherapy", which no data supports (only the 4-month-old and current measurements exist): reworded to tripling over 4 months with symptomatic edema in a non-irradiated metastasis, managed as progression with follow-up imaging.
 - Drug output named trametinib among the drugs whose exposure inducers lower; trametinib is not CYP-metabolized. Now "CYP3A4-metabolized BRAF and MEK inhibitors (for example dabrafenib, encorafenib and cobimetinib)".
 perfect_agent, case_io check and the case guards are clean.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026. Checked uniformity of the plan's decisions across the 30 cases and the FND and MS-RR audit classes (engineering text, any-query outputs, second-tier labs, copied numbers, sharp-wave durations, differential codes). After the changes below, `perfect_agent.py` and `case_io.py check` are clean for all 30 cases and `test_case_guards.py -k FEPI-TEMP` passes.
+
+- `initial_tool_outputs.literature_search.general`: neutral focal-epilepsy block added (definition, classification, MRI protocol, first-line ASM, drug resistance), so a literature query that names no case-specific topic no longer receives a stored follow-up.
+- `action-10-analyze-ecg.rationale`: engineering prefix or tier wording removed (was "Optional baseline before lacosamide (PR)...").
+- `action-4-search-medical-literature.rationale`: engineering prefix or tier wording removed (was "Optional background; the diagnosis rests...").
