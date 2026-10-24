@@ -47,3 +47,11 @@ Found and fixed:
 - B minor, `ground_truth.differential[1].key_features` (dopa-responsive dystonia): "without diurnal fluctuation" asserted a history the case does not contain. Now "Onset at 41 with no dystonic posturing on examination (dopa-responsive dystonia usually begins in childhood with foot dystonia); ...".
 - B minor, `metadata.key_educational_points[2]`: said a degenerative-versus-functional differential "is active", contradicting the DaTscan criterion rationale (parkinsonism clinically clear, scan optional). Reworded to match the rationale.
 After the edit: perfect_agent ok; case_io check clean for PD-P04; test_case_guards pass; discriminator_defects empty.
+
+## Condition audit
+
+2026-10-24, PD condition auditor.
+
+- `followup_outputs[2].trigger_action`: `request_optional_counselled_young_onset_pd_genetics` carried a tier word; renamed `request_counselled_pd_gene_panel`. Routing is by `test_type` (`genetic_panel:PD`), unchanged; the probe serves the stored panel.
+
+After the edits: `perfect_agent.py` 30/30 PD pass; every stored follow-up of the 30 cases is served for its own discriminator (MockServer probe); `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k PD-` 60 passed.

@@ -48,3 +48,13 @@ Adversarial verifier, 24 Oct 2026. No PD notes file. Read the whole final case a
 
 Found and changed:
 - `avoid-waste-6-order-advanced-imaging` (FDG-PET) rationale said "DaTscan is the appropriate and indicated modality", contradicting the optional DaTscan and its rationale that the scan is not needed here. Rewritten: "FDG-PET has no role in separating PD from essential tremor; the examination already makes PD clinically clear". Checks after the verification edits: `perfect_agent.py -v` passes, `case_io.py check` names no failure for this case, `test_case_guards` pass.
+
+## Condition audit
+
+2026-10-24, PD condition auditor.
+
+- `action-6-order-advanced-imaging.rationale`: "so the scan is optional" was tier wording in clinical text; now "so the scan is not needed to make the diagnosis". Tier unchanged (optional).
+- `ground_truth.differential` "Enhanced physiologic tremor": ICD code G25.1 is drug-induced tremor; changed to G25.2 (other specified forms of tremor).
+- `fallback_tool_outputs.csf.glucose_ratio`: 0.65 did not match the stored serum glucose (CSF 65 / serum 96 mg/dL = 0.68); now 0.68.
+
+After the edits: `perfect_agent.py` 30/30 PD pass; every stored follow-up of the 30 cases is served for its own discriminator (MockServer probe); `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k PD-` 60 passed.

@@ -46,3 +46,11 @@ This 71-year-old man has a 2.5-year right-sided tremor-onset parkinsonism (pill-
 - Confirmed every row: literature removed; drug output names tamsulosin, amlodipine and naproxen with aspirin; MRA line gone; PSG rewritten in full with correct flag directions (efficiency 79% and TST 342 min abnormal, RSWA 36% above the SINBAR threshold, AHI 3.9 and PLMI 13 normal) and served for `polysomnography`; battery MoCA 27/30 matches the exam (letter-fluency point lost, phonemic fluency low-average); DaTscan left putamen worse; DLB added `very_low` on exam data only; key_educational_points[0] corrected.
 - Found and fixed one consistency error the worker left when editing the same field: `patient.neurological_exam.sensory` still began "Intact to ... vibration ... in all extremities" and then reported reduced vibration at both great toes. Now: "Intact to light touch, pinprick, temperature and proprioception in all extremities. Vibratory sense intact except mildly reduced at both great toes." No other field depends on it.
 - Musts do not depend on the optional PSG result (the RBD-safety must rests on the witnessed dream enactment in the HPI); melatonin-before-clonazepam at 71 is consistent with the AASM 2023 RBD guideline, where both are conditional and clonazepam carries sedation and fall risk.
+
+## Condition audit
+
+2026-10-24, PD condition auditor.
+
+- `followup_outputs[1].trigger_action`: `request_optional_psg_for_reported_dream_enactment` carried a tier word; renamed `request_sleep_study` (the name the other PD cases use). Routing by `test_type` `polysomnography`, unchanged.
+
+After the edits: `perfect_agent.py` 30/30 PD pass; every stored follow-up of the 30 cases is served for its own discriminator (MockServer probe); `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k PD-` 60 passed.

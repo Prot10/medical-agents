@@ -48,3 +48,11 @@ This 69-year-old man on lithium for bipolar disorder has an 18-month right-predo
 - Checked: medication list is RS01's own (lithium, lisinopril, metformin, atorvastatin, tamsulosin; no acetaminophen anywhere); drug output names only those drugs, lithium sentence canonical; lithium level 0.72 (1200 mg/day) with creatinine, TSH and free T4 normal in the stored panel, matching the lab criterion and the musts; brother (not sister) with ET and never smoker everywhere; dysmetria removed from the exam, no other cerebellar sign; DaTscan stored, left putamen deficit opposite the right-sided signs, optional, with the soft MRI-before-DaTscan constraint; PSG full report with RSWA 31%; orthostatic figures in the exam (138/82 to 134/80) consistent with differential and evidence; probable PD (one supportive criterion); MRI impression now names its Fazekas 1 foci; no swallow-tail claim.
 - No error found that needs a change. Nothing edited.
 - Checks re-run after verification: `perfect_agent.py -v` pass; `case_io.py check` schema OK, no failure names the case; `test_case_guards -k` pass; MockServer routing: DaTscan, MIBG and amyloid return their own modality (case or library), PSG and battery return the case report where stored, `check_drug_interactions` with `drug: levodopa` and `drug: rasagiline` return the case output, labs route to the stored panel where one exists; grep for established / gadolinium / "Abnormal values:" / Lewy / serotonin syndrome / Tier per / July 2026 / dashes: only allowed hits.
+
+## Condition audit
+
+2026-10-24, PD condition auditor.
+
+- `fallback_tool_outputs.csf`: CSF glucose 62 mg/dL with ratio 0.6 did not fit the stored serum glucose of 118 mg/dL (true ratio 0.53). Glucose now 71 mg/dL (ratio 0.6), interpretation states the CSF glucose is in proportion to the raised serum glucose.
+
+After the edits: `perfect_agent.py` 30/30 PD pass; every stored follow-up of the 30 cases is served for its own discriminator (MockServer probe); `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k PD-` 60 passed.

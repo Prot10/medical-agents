@@ -50,3 +50,11 @@ Found and fixed:
 - `avoided_actions` autonomic and tilt rationales said the bedside measurement documents "neurogenic" orthostatic hypotension, while `key_clinical_evidence[1]` and the HPI say metoprolol makes the heart-rate response uninterpretable. Now "already documents the orthostatic hypotension".
 For the close-out (not changed): cardiac MIBG is read in a man on sertraline with paroxysmal AF; neither is a recognised major cause of a reduced H/M ratio, so the report stands, but a reviewer may ask.
 Checks after the verification: `perfect_agent.py -v` ok, `case_io.py check` no failure names the case (the one suite failure is elsewhere), `test_case_guards` pass; MockServer routing re-checked by hand for the stored outputs named above.
+
+## Condition audit
+
+2026-10-24, PD condition auditor.
+
+- `patient.neurological_exam.mental_status`: MoCA 23/30 named three items. Now one point each on trail-making, clock drawing, serial subtraction and letter fluency, and three on delayed recall (23/30), agreeing with the battery (clock 8/10, slowed Trail Making B, reduced fluency and delayed recall) and the MMSE losses. The MoCA verbal fluency item is worth 1 point, abstraction 2, delayed recall 5, serial subtraction 3, clock 3 and trail-making 1, so the losses must be itemised within these maxima and add up to the stated total.
+
+After the edits: `perfect_agent.py` 30/30 PD pass; every stored follow-up of the 30 cases is served for its own discriminator (MockServer probe); `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k PD-` 60 passed.

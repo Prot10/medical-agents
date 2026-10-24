@@ -47,3 +47,12 @@ A 62-year-old man labelled essential tremor 3 years ago (bilateral action tremor
 ## Verification
 Adversarial verifier, 24 Oct 2026. Read the log, the working-tree diff and the whole final case. Checked: DaTscan deficit now left-predominant for right-sided signs; the deleted hand-knob, cervical MRI line and first dorsal interosseous wasting leave no trace elsewhere (exam strength 5/5, "No muscle wasting", differential and red herring for spondylosis rest on the normal exam); bilateral postural tremor fits the coexisting ET; MoCA 26 in exam (1+2+1 lost) and battery; ECG fallback 58/min matches the vitals on propranolol; diagnostic must probable PD with rest tremor the one supportive criterion and no red flag; drug output has no false pharmacology (only the canonical sertraline sentence mentions serotonin syndrome); propranolol must and prohibition consistent; routing serves the case DaTscan, PSG, battery and drug output.
 No defect found; no change made. perfect_agent ok; case_io check clean for PD-RM03; test_case_guards pass; discriminator_defects empty.
+
+## Condition audit
+
+2026-10-24, PD condition auditor.
+
+- `action-5-order-advanced-imaging.rationale`: "so the scan is optional" was tier wording; now "so the scan is not needed to make the diagnosis". Tier unchanged (optional).
+- `ground_truth.differential` "Cervical spondylotic radiculopathy or myelopathy": M47.2 is a non-billable category without the region; now M47.12 (cervical spondylosis with myelopathy), the code RM04 uses for the same entry.
+
+After the edits: `perfect_agent.py` 30/30 PD pass; every stored follow-up of the 30 cases is served for its own discriminator (MockServer probe); `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k PD-` 60 passed.

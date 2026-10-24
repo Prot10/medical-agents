@@ -52,3 +52,11 @@ Found and fixed:
 - `action_criteria[action-4-interpret-labs].citations` and `avoided_actions[avoid-waste-7-analyze-ecg].citations` cited `[NICE_NG71]` for claims NICE NG71 does not make (iron studies before surgery; ECG not informing candidacy). Both now `[Postuma_2015]`, the pack key for baseline and pre-medication labs and the key the worker used for the same ECG fix in RM04.
 For the close-out (not changed): "Walks with a cane indoors" (social history) beside "Uses a quad-cane outdoors" (gait) is original text and not contradictory; B12 248 pg/mL stays flagged in the worker's log.
 Checks after the verification: `perfect_agent.py -v` ok, `case_io.py check` no failure names the case (the one suite failure is elsewhere), `test_case_guards` pass; MockServer routing re-checked by hand for the stored outputs named above.
+
+## Condition audit
+
+2026-10-24, PD condition auditor.
+
+- `fallback_tool_outputs.csf.glucose_ratio`: 0.69 against CSF 64 / stored serum 92 mg/dL (0.696); now 0.70.
+
+After the edits: `perfect_agent.py` 30/30 PD pass; every stored follow-up of the 30 cases is served for its own discriminator (MockServer probe); `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k PD-` 60 passed.

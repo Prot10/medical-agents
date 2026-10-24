@@ -50,3 +50,12 @@ This case was a copy of RS03 (same surname, history, medicines and a subacute co
   - `ground_truth.differential` (DLB) `key_features` claimed "parkinsonism for 20 months before any cognitive complaint"; the HPI does not date the memory complaint, so the timing was unsupported. Reduced to what the case shows: no dementia (manages finances and medications), no fluctuations, hallucinations or dream enactment.
   - `initial_tool_outputs.mri.findings[0].signal_characteristics.T2` read "No focal or confluent signal abnormalities" while `findings[1]` reports punctate white matter hyperintensities (internal inconsistency). Now limited to the deep grey nuclei, brainstem and cerebellum.
 - Checks re-run after verification: `perfect_agent.py -v` pass; `case_io.py check` schema OK, no failure names the case; `test_case_guards -k` pass; MockServer routing: DaTscan, MIBG and amyloid return their own modality (case or library), PSG and battery return the case report where stored, `check_drug_interactions` with `drug: levodopa` and `drug: rasagiline` return the case output, labs route to the stored panel where one exists; grep for established / gadolinium / "Abnormal values:" / Lewy / serotonin syndrome / Tier per / July 2026 / dashes: only allowed hits.
+
+## Condition audit
+
+2026-10-24, PD condition auditor.
+
+- `fallback_tool_outputs.csf`: CSF glucose 62 mg/dL with ratio 0.6 did not fit the stored serum glucose of 156 mg/dL (true ratio 0.40). Glucose now 94 mg/dL (ratio 0.6), interpretation states the CSF glucose is in proportion to the raised serum glucose.
+- `initial_tool_outputs.drug_interactions.general.interactions[0]`: same fluoxetine sentence fix as RS03 (avoid with rasagiline, 5-week washout after fluoxetine).
+
+After the edits: `perfect_agent.py` 30/30 PD pass; every stored follow-up of the 30 cases is served for its own discriminator (MockServer probe); `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k PD-` 60 passed.

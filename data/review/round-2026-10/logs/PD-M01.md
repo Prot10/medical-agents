@@ -52,3 +52,11 @@ Found and changed:
 - `ground_truth.avoided_actions` `avoid-waste-5-analyze-ecg` (ECG as waste) contradicted the must "domperidone where available after an ECG for the QTc", and its own rationale ("an ECG is needed only if domperidone is chosen") admitted it: an agent ordering the baseline ECG for the recommended prokinetic would be penalised. Removed the entry (ECG is neither a criterion nor waste; the normal fallback ECG answers it). Same change in M02 and M03.
 
 Not changed: the diagnostic must keeps the plan's canonical "RBD is not a drug effect" although the PSG is optional; the dream enactment in the history is clinical probable RBD and the evidence lines describe it as such. Checks after the verification edits: `perfect_agent.py -v` passes, `case_io.py check` names no failure for this case, `test_case_guards` pass.
+
+## Condition audit
+
+2026-10-24, PD condition auditor.
+
+- `patient.neurological_exam.mental_status`: the MoCA losses (trail-making 1, delayed recall 2, verbal fluency 2) gave fluency 2 points, more than the item is worth. Now trail-making 1, letter fluency 1, abstraction 1 and delayed recall 2, which add up to 25/30 and match the battery (impaired Trail Making B and FAS, low-average recall, preserved visuospatial function). The MoCA verbal fluency item is worth 1 point, abstraction 2, delayed recall 5, serial subtraction 3, clock 3 and trail-making 1, so the losses must be itemised within these maxima and add up to the stated total.
+
+After the edits: `perfect_agent.py` 30/30 PD pass; every stored follow-up of the 30 cases is served for its own discriminator (MockServer probe); `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k PD-` 60 passed.

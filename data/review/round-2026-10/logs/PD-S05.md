@@ -46,3 +46,11 @@ This 67-year-old man has an 18-month right-predominant tremor-onset parkinsonism
 - Confirmed every row: all claims of a levodopa response and of validated hyposmia removed (grep for "established", "dramatic", "supportive" in clinical fields finds only the probable-PD wording); SWI nigrosome remark now on the left, contralateral to the right-sided signs, and restated in the MRI evidence with `[Schwarz_2014]`; DaTscan optional, binary report, left putamen 0.98, routed by modality despite its long trigger; soft MRI-before-DaTscan constraint with both ids present; ET `low`; both red herrings point to real fields; the only patient change is the em dash and the "though" wording in the HPI.
 - Key evidence and musts cite no optional result (the DaTscan laterality line is gone). Library battery (MoCA 28) agrees with the exam MMSE 29/30; library PSG agrees with the denial of dream enactment.
 - Found nothing to correct. No change made.
+
+## Condition audit
+
+2026-10-24, PD condition auditor.
+
+- `followup_outputs[0].trigger_action`: `request_optional_datscan_for_live_degenerative_differential` carried a tier word; renamed `request_datscan` (the name the other PD cases use). Routing by `modality` `DaTscan`, unchanged.
+
+After the edits: `perfect_agent.py` 30/30 PD pass; every stored follow-up of the 30 cases is served for its own discriminator (MockServer probe); `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k PD-` 60 passed.

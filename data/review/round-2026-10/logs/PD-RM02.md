@@ -48,3 +48,11 @@ The DaTscan now shows the deficit on the correct side, the right posterior putam
 ## Verification
 Adversarial verifier, 24 Oct 2026. Read the log, the checkpoint diff (b8be2153) and the whole final case. Checked: the laterality correction is right (left-predominant signs, right posterior putamen most reduced; the plan header "DaTscan asymmetric L>R" described the old, reversed report); DaTscan required and in the stop rule, soft MRI-before-DaTscan constraint valid; timeline (olanzapine stopped about 20 months ago, motor onset 10 to 12 months ago, RBD 24 months and constipation 36 months before, illness 18 months ago) consistent across HPI, must, differential, evidence and red herrings; MoCA 24 sums (1+1+1+1+2 lost) and matches the battery; valproate 72 and ammonia 58 consistent in labs, criterion, musts and evidence, ammonia flagged correctly; valproate and olanzapine ICD codes (G21.19, G21.11) correct; drug output uses the canonical sentences and only his own medicines; routing serves the case labs (valproate and ammonia orders), DaTscan, PSG, battery and drug output.
 No defect found; no change made. The two open questions in the log (labs recommended rather than required; no repeat-ammonia must) are sound defaults and stay as recorded.
+
+## Condition audit
+
+2026-10-24, PD condition auditor.
+
+- `fallback_tool_outputs.csf.glucose_ratio`: 0.6 against CSF 62 / stored serum 94 mg/dL; now 0.66.
+
+After the edits: `perfect_agent.py` 30/30 PD pass; every stored follow-up of the 30 cases is served for its own discriminator (MockServer probe); `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k PD-` 60 passed.

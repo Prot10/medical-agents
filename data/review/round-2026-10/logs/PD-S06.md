@@ -47,3 +47,11 @@ This 71-year-old woman has a 2.5-year left-sided tremor-onset parkinsonism (pill
   - `initial_tool_outputs.drug_interactions.general.warnings[1]` read "Iron salts (not calcium) chelate levodopa": the parenthesis answered the deleted calcium claim and is not report voice. Now "Iron salts chelate levodopa and reduce its absorption; give iron at least 2 hours apart from levodopa if it is ever added."
   - `ground_truth.avoided_actions[avoid-waste-4-order-cardiac-monitoring].rationale` said "No syncope, falls or palpitations", but PMH records a fall with wrist fracture 12 years ago (cited by the physiotherapy must). Now "No syncope or palpitations, and no fall since the remote wrist fracture 12 years ago: rhythm monitoring is not indicated".
   - `ground_truth.differential[Progressive supranuclear palsy].key_features` "no falls" became "no falls since onset" for the same reason.
+
+## Condition audit
+
+2026-10-24, PD condition auditor.
+
+- `followup_outputs[0].trigger_action`: `request_optional_datscan_for_live_degenerative_differential` carried a tier word; renamed `request_datscan`. Routing by `modality` `DaTscan`, unchanged.
+
+After the edits: `perfect_agent.py` 30/30 PD pass; every stored follow-up of the 30 cases is served for its own discriminator (MockServer probe); `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k PD-` 60 passed.

@@ -51,3 +51,11 @@ Found and fixed:
 - `differential[MSA].key_features` asserted "no urinary incontinence", which the patient block never stated (C15, absent data). HPI now adds: nocturia once or twice a night, unchanged since tamsulosin was started, and no urinary urgency or incontinence; the key feature reads "no urinary urgency or incontinence".
 - Sniffin' Sticks 6/12 was called "hyposmia": on the 12-item identification screen a score of 6 or less is in the functional anosmia range (Hummel et al. 2001 cut-offs), so the word was wrong though the MDS supportive criterion (olfactory loss on a validated test) stands. `neurological_exam.additional`, `key_clinical_evidence[1]`, `required_recommendations[0]`, the MSA key features, the MIBG rationale and `metadata.difficulty_description` now say "olfactory loss". The cranial-nerve line (bedside coffee test) is unchanged.
 Checks after the verification: `perfect_agent.py -v` ok, `case_io.py check` no failure names the case (the one suite failure is elsewhere), `test_case_guards` pass; MockServer routing re-checked by hand for the stored outputs named above.
+
+## Condition audit
+
+2026-10-24, PD condition auditor.
+
+- `patient.neurological_exam.mental_status`: MoCA 24/30 named three items worth at most 5 points. Now one point each on trail-making, clock drawing (hands mispositioned, kept), serial subtraction and letter fluency, and two on delayed recall (24/30), agreeing with the MMSE losses and the reduced HVLT-R recall. The MoCA verbal fluency item is worth 1 point, abstraction 2, delayed recall 5, serial subtraction 3, clock 3 and trail-making 1, so the losses must be itemised within these maxima and add up to the stated total.
+
+After the edits: `perfect_agent.py` 30/30 PD pass; every stored follow-up of the 30 cases is served for its own discriminator (MockServer probe); `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k PD-` 60 passed.

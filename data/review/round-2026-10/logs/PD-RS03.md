@@ -50,3 +50,13 @@ This case was labelled straightforward PD, but its data (4-month subacute course
   - `ground_truth.key_clinical_evidence[4]` asserted "B12 and copper normal", which comes from an optional lab criterion (plan C15: evidence restates patient data or required/recommended results only). Now restates the exam: no myelopathy or neuropathy signs, so no clinical picture of copper or B12 deficiency.
   - `ground_truth.key_clinical_evidence[3]` said Pisa syndrome "does not argue against" PD. An early postural deformity (Pisa) is a supportive MSA feature (MDS 2022), so the line now says Pisa occurs in PD and that MSA criteria are not met without urge incontinence, orthostatic hypotension or cerebellar signs. The MSA differential `key_features` now names the Pisa posture as the feature it weighs (likelihood stays `low`).
 - Checks re-run after verification: `perfect_agent.py -v` pass; `case_io.py check` schema OK, no failure names the case; `test_case_guards -k` pass; MockServer routing: DaTscan, MIBG and amyloid return their own modality (case or library), PSG and battery return the case report where stored, `check_drug_interactions` with `drug: levodopa` and `drug: rasagiline` return the case output, labs route to the stored panel where one exists; grep for established / gadolinium / "Abnormal values:" / Lewy / serotonin syndrome / Tier per / July 2026 / dashes: only allowed hits.
+
+## Condition audit
+
+2026-10-24, PD condition auditor.
+
+- `action-4-interpret-labs.rationale`: "so the check is optional" was tier wording; now "so the check does not change the diagnosis". Tier unchanged.
+- `fallback_tool_outputs.csf`: CSF glucose 62 mg/dL with ratio 0.6 did not fit the stored serum glucose of 142 mg/dL (true ratio 0.44, which would read as low). Glucose now 85 mg/dL (ratio 0.6), interpretation now states the CSF glucose is in proportion to the raised serum glucose.
+- `initial_tool_outputs.drug_interactions.general.interactions[0]`: the fluoxetine sentence said both "use the lowest dose and monitor" and "best avoided", which conflict for fluoxetine; now "serotonin syndrome is rare, but fluoxetine and fluvoxamine are best avoided with rasagiline; at least 5 weeks should pass between stopping fluoxetine and starting rasagiline" (rasagiline product information). The must to avoid adding an MAO-B inhibitor to fluoxetine is unchanged.
+
+After the edits: `perfect_agent.py` 30/30 PD pass; every stored follow-up of the 30 cases is served for its own discriminator (MockServer probe); `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k PD-` 60 passed.

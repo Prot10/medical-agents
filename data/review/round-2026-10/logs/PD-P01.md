@@ -51,3 +51,11 @@ Found and changed:
 - `initial_tool_outputs.mri.findings[1].signal_characteristics.T1_sagittal` said the cerebellar vermis and hemispheres "appear mildly reduced in volume", while the volumetrics (15th percentile), the impression and the MRI expected evidence say low normal, and the exam has no cerebellar sign. Rewritten "at the low end of normal volume".
 
 Noted, not changed: the ECG stays waste (near-syncope 6 months ago was already evaluated, no palpitations or cardiac history); the worker's open question on the medication-review tier stands as logged. Checks after the verification edits: `perfect_agent.py -v` passes, `case_io.py check` names no failure for this case, `test_case_guards` pass.
+
+## Condition audit
+
+2026-10-24, PD condition auditor.
+
+- `patient.neurological_exam.mental_status`: MoCA 25/30 named only two impaired items (trail-making B, phonemic fluency), worth 2 points at most. Now itemised: one point each on trail-making, serial subtraction, letter fluency, abstraction and delayed recall, which adds up to 25 and agrees with the MMSE losses (serial sevens, recall). The MoCA verbal fluency item is worth 1 point, abstraction 2, delayed recall 5, serial subtraction 3, clock 3 and trail-making 1, so the losses must be itemised within these maxima and add up to the stated total.
+
+After the edits: `perfect_agent.py` 30/30 PD pass; every stored follow-up of the 30 cases is served for its own discriminator (MockServer probe); `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k PD-` 60 passed.
