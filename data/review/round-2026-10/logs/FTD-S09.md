@@ -39,3 +39,8 @@ The case now deals with the patient's new heavy drinking (about 6 glasses of win
 
 ## Verification
 Adversarial verifier, 24 Oct 2026. Read the log, the diff and the whole final case. Checked: 4 of 6 features (empathy "not described" is defensible from the HPI, which reports lack of distress and insight, not loss of warmth) agree with `criteria_met`; MMSE 20/30 adds up (serial sevens -5, recall -1, orientation -2, command -1, sentence -1); onset age 59 consistent; eGFR 84 matches creatinine 0.8, female 61; sodium 138 on the thiazide; drug-check follow-ups probed: sertraline and trazodone each receive their own report, contents correct (thiazide plus SSRI hyponatraemia, trazodone orthostasis/QT/priapism, no doses, no ChEI text); alcohol mimic, must and red herring consistent with the social history and MRI (normal cerebellum); genetics absent and the counselling must correctly dropped (no family history); FDG/SPECT authored; KCE ChEI wording per C10. The em dash in `accepted[0]` is pre-existing and correctly left (rule 3). perfect_agent and case_io check clean; case guards pass. No errors found; no changes made.
+
+## Condition audit (FTD auditor, 24 Oct 2026)
+
+- E, minor, `initial_tool_outputs.literature_search[*].results[*].source`: the sources were citation keys (`[Rascovsky_2011]` or `Rascovsky_2011`), which a literature tool does not return, and the condition used three styles. They now give the full reference, as in M07-P02 (for example "Rascovsky K et al. Brain 2011;134:2456-2477 (FTDC criteria for bvFTD)"). Findings and summary are unchanged. FIXED.
+- `perfect_agent.py` and `case_io.py check` were re-run on all 30 FTD cases after the changes and are clean; `test_case_guards.py -k FTD` passes (60 tests).

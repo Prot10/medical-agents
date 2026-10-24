@@ -47,3 +47,13 @@ Adversarial verifier, 24 Oct 2026. Read the log, the plan (RM16 entry, facts 2, 
 Found and fixed: E minor, `metadata.difficulty_rationale` said 5 required tools; now 4 (labs, RNS, thymic imaging, drug check). No clinical change needed.
 
 Re-ran `perfect_agent.py MG-RM16 -v` (pass), `case_io.py check` (clean for the case) and the case guards (pass).
+
+## Condition audit (MG auditor, 24 Oct 2026)
+
+- fallback_tool_outputs.echo.echo_type set to TTE. FIXED.
+  Why: the discriminator guard (PATTERNS.md section 5) requires an exact vocabulary value on every case fallback; an empty echo_type answered every echo variant. The RS11-RS16 verifiers fixed this only in their own cases.
+- fallback_tool_outputs.advanced_imaging (empty modality) set to null; metadata.fallback_tool_kinds.advanced_imaging removed. FIXED.
+  Why: a fallback with an empty modality answers every advanced-imaging study with one generic report; the benchmark library now serves the normal report for the study actually ordered.
+- action-1-interpret-labs.citations: [Sanders_2016] (management guidance) -> [Punga_2022] (antibody biomarkers), plan 1.1. FIXED.
+  Why: plan 1.1 reserves [Sanders_2016] for management; antibody testing cites the biomarker key [Punga_2022].
+- `perfect_agent.py` and `case_io.py check` re-run on all 30 MG cases after the changes; the hand-run discriminator guard reports 0 defects in the 30 MG cases.

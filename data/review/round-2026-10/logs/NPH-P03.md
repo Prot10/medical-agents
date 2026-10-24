@@ -48,3 +48,16 @@ The patient block no longer gives the result of any scored step: the outside CT 
 ## Open questions for Andrea (judgment calls you could not settle)
 
 None. CSF protein 54 mg/dL was kept and given an age-adjusted reference (15-60 mg/dL over 60) rather than changed: mild elevation is common at 78 and with cervical canal disease, and it does not alter the probable-iNPH category.
+
+## Verification
+Adversarial verifier, 24 Oct 2026. No reviewer notes exist for NPH, so the table has no note ids to miss. Read the log, the flattened diff against the pre-round version (1fd43d22^) and the whole final case. Checked: tap figures (TUG 36/29/28 s = 19%/22%, 10-m 28/21 s = 25%, MoCA 21/23) identical in the CSF report, the post-tap follow-up, the criteria, the musts and the key evidence; MRI markers against plan C7 and the differential; spine MRI follow-up against criterion and red herring; MoCA subscores against the total and the exam (orientation 4/6 matches "oriented to person and place"); musts and prohibitions against plan C11/C12; sequence constraints and stop rule against plan 3.4/3.5; fallbacks against C18.
+Found and fixed:
+- `followup_outputs[request_moca_cognitive_screen].findings[Attention]`: "5/6: serial 7s with one error" does not score 5/6 (one serial-7 error still earns 3/3, so the item total would be 6/6). Now "5/6: two errors on letter tapping; serial 7s with one error"; MoCA total 21 unchanged.
+- `initial_tool_outputs.labs`: non-fasting glucose 112 mg/dL was flagged high against the fasting range 70-99 and the worker's interpretation called it "elevated". Reference now "70-140 (non-fasting)", `is_abnormal` false; abnormal summary keeps HbA1c 6.9% only; interpretation reworded. Value unchanged.
+- `fallback_tool_outputs.echo`: no `echo_type` (PATTERNS 5, discriminator fields; the other NPH cases carry it), so the fallback answered any echo variant. Set to "TTE".
+No other defect found. Checks run after the edits: `perfect_agent.py -v` passes (every required and recommended criterion served by a case output, no fallback or library answer); `case_io.py check` clean for the case; `test_case_guards -k` passes (leak, follow-up and banned-string guards); MockServer hijack sequence (cognitive screen, then baseline gait "before tap test", MRI, CSF "large-volume lumbar puncture", post-tap reassessment, second CSF call) returns the baseline, the tap report and the post-tap follow-up in the right places; patient-block grep for Evans, callosal, DESH, NPH, hydroceph, tap, shunt, TUG, MoCA finds only hits allowed by C3/C4.
+
+## Condition audit (NPH auditor, 24 Oct 2026)
+- `action-post-tap-gait-reassessment.rationale` was the template sentence shared verbatim by P03 to P07; now case-specific (tap volume and what the reassessment separates).
+- `patient.neurological_exam.sensory`: the interpretive clause "could reflect myelopathy or peripheral neuropathy" removed; now "Vibration reduced in both lower limbs up to the knees. Light touch intact." The exam stated the differential (myelopathy or neuropathy) that red herring 2 asks the agent to weigh.
+- Checks after the edits: `perfect_agent.py` passes for all 30 NPH cases, `case_io.py check` clean.

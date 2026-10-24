@@ -47,3 +47,15 @@ Adversarial verifier, 24 Oct 2026. No reviewer notes exist for SYNC-CARD. Checke
 Found: nothing that needed a change. No edits made.
 
 Re-run: perfect_agent clean, case_io check clean for this case.
+
+## Condition audit (24 Oct 2026)
+
+Condition auditor, cross-case pass over the 30 SYNC-CARD cases.
+
+Changed:
+- Added `initial_tool_outputs.literature_search.general` (the neutral syncope evaluation block already used in P02-P04 and RM01-RM03: ESC 2018 and ACC/AHA/HRS 2017 initial evaluation and risk stratification). Why: with no initial literature output, MockServer tier 2 answered any generic query (e.g. "syncope guidelines") with the case's disease-specific follow-up, which names the diagnosis. The block repeats no expected_evidence (leak guard passes).
+- Literature follow-up trigger `search_drug_induced_long_qt_torsades_management` renamed to `search_drug_induced_long_qt_torsades`. Why: the old trigger's meaningful tokens were generic (management, guidelines, diagnosis, syncope, literature), so a generic query hit the disease-specific report; the new tokens are the condition names, so only a query naming the condition reaches it.
+- Added avoided action `avoid-harm-5-exercise-stress-test` (order_specialized_test, test_type exercise_stress_test, severity harm). Why: recurrent pause-dependent torsades is uncontrolled symptomatic arrhythmia, an absolute contraindication to exercise testing (Fletcher 2013 AHA exercise standards); the library would otherwise have returned a normal exercise report. Added a matching "not performed" exercise follow-up before the literature follow-up.
+- red herring 0 `data_point` now quotes the HPI verbatim (the 15 to 20 second shaking likened to a seizure).
+
+Re-run after the change: perfect_agent 30/30 clean, case_io check clean for SYNC-CARD, test_case_guards for SYNC-CARD 60 passed, discriminator and hijack guards clean.

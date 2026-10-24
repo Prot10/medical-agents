@@ -41,3 +41,9 @@ The patient block keeps the Parkinson's diagnosis (the anchor) but no longer nam
 ## Open questions for Andrea (judgment calls you could not settle)
 
 - None specific to this case beyond plan Q1 (referral with counselling in copathology).
+
+## Verification
+Adversarial verifier, 24 Oct 2026. Read the log, the whole final case and its diff against fa1d22e6.
+- Checked: the MRI names no disease (SWI swallow-tail finding only, plan C8); DESH stated incomplete and no DESH argument remains in the differential, key evidence or musts; the authored DaTscan (left-predominant putaminal loss, contralateral to the right-hand tremor) is served for a DaTscan order (probe) while staying waste; the levodopa must, copathology counselling and "do not withhold referral because of PD" prohibition are present; medication state is stated as ON for baseline and both post-tap measures in every report. Figures identical (TUG 38 to 34 s = 11%, to 31 s = 18%; 10-metre walk 29 to 25 s = 14%); MoCA items sum to 20 (attention 1+0+0+2 = 3). Atypical-parkinsonism entry agrees with the MRI (normal midbrain, pons, putamina) and cranial nerves. MockServer probe: no leak.
+- Found: nothing that needed a change. Noted only: the labs omit platelets and glucose (optional criterion, nothing in the case quotes them).
+- No edits. perfect_agent -v ok, case_io check clean for the case, test_case_guards pass.

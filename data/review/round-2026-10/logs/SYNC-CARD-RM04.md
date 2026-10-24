@@ -51,3 +51,27 @@ None needing Andrea. Deviations from the lead plan, decided for clinical correct
 - Plan says hold metformin only for eGFR < 30 or AKI. The contrast rule is applied (no hold for contrast), but the must also withholds metformin while she is hypoxaemic with a lactate of 2.8 mmol/L, because tissue hypoxia is a labelled contraindication.
 - Plan C lists troponin and BNP; beta-hCG is also pinned (the plan's own RM04 entry requires it, and the record now states she is premenopausal).
 - Exercise testing added as harm (not in the plan's PE row) because the library returned a normal treadmill test for a walker-dependent patient with acute PE and DVT.
+
+## Verification
+
+Adversarial verification, 24 Oct 2026 (diff against fa1d22e6, the pre-round version; the batch-4 checkpoint commit already holds the worker's edit).
+
+Checked: no reviewer notes exist for SYNC-CARD, so the "(none)" row is correct. Every own-finding claim against the file: Wells 9 (DVT signs 3, PE most likely 3, HR > 100 1.5, surgery within 4 weeks 1.5); sPESI 1 or more from HR 118; intermediate-high risk (RV dysfunction on TTE and CT plus raised troponin, ESC 2019); TTE arithmetic (TR 3.3 m/s gives 44 mmHg, plus RA 15 gives RVSP 59); eGFR about 79 from creatinine 0.9 at 48 F (CKD-EPI 2021); lactate 2.8 present in the stored panel, so the metformin must is grounded; major surgery within 3 weeks is an absolute contraindication to fibrinolysis in ESC 2019 Table 10, so the deviation from the plan's "rescue thrombolysis" is correct; 3 months of anticoagulation for PE provoked by a major transient factor (ESC 2019 Class I) and no thrombophilia testing for provoked VTE (NICE NG158) are correct. Musts, prohibitions and avoided actions do not contradict each other (aspirin stopped in a must, combination prohibited; D-dimer waste and absent from the labs criterion; `D_dimer` and `D-dimer` are both vocabulary values). Telemetry fallback equals the follow-up; holter, tilt, exercise, chest CT and duplex orders are answered by case-consistent outputs (probed through the environment). Labs pin troponin, BNP and beta-hCG as the plan requires; sequence constraints are soft, stop rule lists the six required criteria; differential matches the final evidence; red herrings quote their fields; leak, follow-up and banned-string guards pass.
+
+Found and fixed:
+- `fallback_tool_outputs.eeg.activating_procedures.hyperventilation` said "hemodynamically unstable patient", contradicting the haemodynamically stable intermediate-high-risk PE in the musts. Now "Not performed (hypoxaemic patient on supplemental oxygen)."
+
+Left as is: a TEE order still receives the library's normal-RV TEE report (worker's CENTRAL note covers the library); TEE is not a plausible order in this case.
+
+perfect_agent.py SYNC-CARD-RM04 -v: ok. case_io.py check: schema, synonym guard and tests clean for this case.
+
+## Condition audit (24 Oct 2026)
+
+Condition auditor, cross-case pass over the 30 SYNC-CARD cases.
+
+Changed:
+- Added `initial_tool_outputs.literature_search.general` (the neutral syncope evaluation block already used in P02-P04 and RM01-RM03: ESC 2018 and ACC/AHA/HRS 2017 initial evaluation and risk stratification). Why: with no initial literature output, MockServer tier 2 answered any generic query (e.g. "syncope guidelines") with the case's disease-specific follow-up, which names the diagnosis. The block repeats no expected_evidence (leak guard passes).
+- Literature follow-up trigger `search_pulmonary_embolism_risk_stratification_management` renamed to `search_pulmonary_embolism`. Why: the old trigger's meaningful tokens were generic (management, guidelines, diagnosis, syncope, literature), so a generic query hit the disease-specific report; the new tokens are the condition names, so only a query naming the condition reaches it.
+- red herring 0 `data_point` now quotes the HPI verbatim ("like the room was closing in" and collapse within seconds).
+
+Re-run after the change: perfect_agent 30/30 clean, case_io check clean for SYNC-CARD, test_case_guards for SYNC-CARD 60 passed, discriminator and hijack guards clean.

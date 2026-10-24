@@ -45,3 +45,18 @@ None. Plan Q4 decided by the case data: the MRI shows normal white matter and th
 ## Verification
 
 `perfect_agent.py FTD-M08 -v`: ok; each required criterion receives its report (assessment, baseline labs and MRI from `initial_tool_outputs`; neuropsych, HIV labs and CSF from their follow-ups; drug review from `initial_tool_outputs.drug_interactions`). Probed: perfusion SPECT, RPR, serum cryptococcal antigen and a JCV-only CSF order reach their authored outputs; a combined labs order returns the baseline with the HIV panel; an HIV literature query reaches the HAND follow-up and other queries the canonical output; EMG reaches the library normal. `case_io.py check FTD-M08`: no failure names the case. `test_case_guards -k FTD-M08`: 2 passed.
+
+## Verification (adversarial verifier, 24 Oct 2026)
+
+Note: the section above was written by the worker as a self-check; this is the independent verification. Checked against the pre-round file, the plan (M08, Q4) and the whole final case: patient diff (timeline now 15 months throughout; CD4 out of the HPI; MoCA out of the exam), the new HIV viral load/CD4 criterion and its follow-up, the CSF criterion split (`[HIV_RNA]` required, JCV/cryptococcal antigen optional, justified by CD4 680 and normal white matter), the MRI -> CSF soft constraint, musts, prohibitions, differential (the AD entry cites the CSF Abeta42/tau that the required LP returns), KCE and literature sources (Antinori 2007; Canestri 2010; EACS 12.0). MockServer probes: baseline, targeted HIV and combined orders, CSF orders and the drug check all reach the intended outputs.
+
+Found and fixed:
+- C major, `initial_tool_outputs.drug_interactions.Biktarvy.contraindications`: carbamazepine, oxcarbazepine, phenytoin and phenobarbital were listed as contraindicated. The Biktarvy labels contraindicate rifampicin and St John's wort (EU) and dofetilide and rifampin (US); the anticonvulsant inducers are "co-administration not recommended". Contraindications now name rifampicin/St John's wort and dofetilide with their mechanism; the four anticonvulsant inducers moved to `interactions` as "not recommended". The metformin line was removed (she is not on metformin and has no diabetes; plan M08 says "metformin, if listed"). The criterion's expected evidence still matches.
+- B minor, clinical-assessment screen line and neuropsych `quantitative_data.MoCA`: the listed losses (trails, fluency, partial clock, recall 3/5, attention 5/6) gave 23-24, not 22/30. Now clock 1/3 (contour intact, as the neuropsychology states) and abstraction 1/2, totalling 8 = 22/30.
+
+Checked and left: the initial labs carry the HIV monitoring panel, so a baseline-only first order shows the viral load and CD4 without scoring the HIV criterion. This is the only layout in which a combined order also returns them (the MockServer serves the initial output when it names more of a set-valued order); the criterion still scores only when ordered. `perfect_agent.py FTD-M08 -v`: ok. `case_io.py check FTD-M08`: schema OK, no failure names the case. `test_case_guards -k FTD-M08`: passed.
+
+## Condition audit (FTD auditor, 24 Oct 2026)
+
+- C, minor, `ground_truth.sequence_constraints`: plan C15 asks for MRI before every CSF criterion, and it was missing for `action-csf-opportunistic-pcr`. Added soft `action-6-analyze-brain-mri` -> `action-csf-opportunistic-pcr`, cited `[NICE_NG97]`, with the plan C15 reason already used for `action-8-analyze-csf` (imaging excludes a mass lesion and shows whether white-matter disease makes JCV testing relevant). FIXED.
+- `perfect_agent.py` and `case_io.py check` were re-run on all 30 FTD cases after the changes and are clean; `test_case_guards.py -k FTD` passes (60 tests).

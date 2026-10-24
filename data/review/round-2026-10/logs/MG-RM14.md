@@ -39,3 +39,14 @@ A 55-year-old woman with AChR-positive generalised MG in remission on pyridostig
 ## Open questions for Andrea (judgment calls you could not settle)
 
 - None that need Andrea's information. Decisions recorded: (1) mediastinal CT is `optional` (plan 3.5 leaves M04 and RM14 to the worker): the history documents a CT without thymoma at diagnosis 2 years ago and the crisis has a clear drug trigger. (2) Today's urine culture shows no growth, because a culture taken on day 4 of an effective antibiotic would not grow a sensitive E. coli; the positive pre-treatment culture is history. (3) The musts call for elective intubation now rather than a trial of non-invasive ventilation, because hypercapnia (pCO2 52) predicts NIV failure in myasthenic crisis.
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. Read the log and the whole final case. No reviewer notes exist for MG. Checked each own-finding row against the file: NIF/FVC out of the patient block with the bedside picture kept; remission timeline (diagnosed 2 years ago, remission 18 months) consistent; respiratory values correct (FVC 1.2 L = 16.6 mL/kg at 72.4 kg, 38% of 3.2 L) and all flagged; BMI 28.3 matches; ABG coherent for acute hypercapnia (pH 7.34, pCO2 52, HCO3 27); urine culture on day 4 of ciprofloxacin is sterile and `collected_before_antimicrobials` false, with the pre-treatment culture as history; ciprofloxacin output in checker voice with the FDA boxed warning and MG-safe alternatives that match the reported susceptibilities; treatment-response follow-ups and the "Rule of 20-30" literature are gone; RNS and SFEMG are waste avoided actions; no must prescribes aspirin (listed intolerance); cholinergic crisis low at 180 mg/day without muscarinic signs, with the exam stating their absence; constraint respiratory before CT is soft.
+
+No error found; nothing changed. Noted for CENTRAL (already in the log): "ocular myasthenia gravis" and the missing "myasthenic crisis" synonym. `perfect_agent.py MG-RM14 -v` passes, `case_io.py check` reports no failure naming the case, case guards pass.
+
+## Condition audit (MG auditor, 24 Oct 2026)
+
+- action-1-interpret-labs: alternative panels [CBC, CMP, CRP] added (as M04 and RM15 accept CMP for BMP). FIXED.
+- `perfect_agent.py` and `case_io.py check` re-run on all 30 MG cases after the changes; the hand-run discriminator guard reports 0 defects in the 30 MG cases.

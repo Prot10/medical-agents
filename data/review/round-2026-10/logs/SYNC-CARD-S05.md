@@ -36,3 +36,25 @@ The 78-year-old man with exertional syncope and a classic aortic stenosis murmur
 ## Open questions for Andrea (judgment calls you could not settle)
 
 None.
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. No reviewer notes exist for SYNC-CARD. Read the full final case against the log and plan.
+- Checked: severe AS grading (AVA 0.7, mean 52, Vmax 4.6, SVi 44) consistent across echo, expected_evidence, musts and key evidence; no LVOT obstruction or SAM stated, as the HOCM differential now relies on it; normal telemetry consistent with the low arrhythmic differential; drug follow-ups and fallback match his four medications and the penicillin allergy; driving and exertion must already conditional on valve treatment; tilt and exercise harm, CT waste (slid down two steps, no head injury); leak guard passes.
+- Found and changed:
+  - Echo `chambers` gave "Left atrial diameter": "4.4" and "Left ventricular end-diastolic diameter": "4.6" without units; set to "4.4 cm" and "4.6 cm".
+  - The log says em dashes were removed from `metadata`, but `clinical_pearls[0]` still had two; reworded the clause without them ("each symptom of the classic triad (syncope, angina and heart failure) confers").
+- perfect_agent -v and case_io check clean after the changes.
+
+## Condition audit (24 Oct 2026)
+
+Condition auditor, cross-case pass over the 30 SYNC-CARD cases.
+
+Changed:
+- Added `initial_tool_outputs.literature_search.general` (the neutral syncope evaluation block already used in P02-P04 and RM01-RM03: ESC 2018 and ACC/AHA/HRS 2017 initial evaluation and risk stratification). Why: with no initial literature output, MockServer tier 2 answered any generic query (e.g. "syncope guidelines") with the case's disease-specific follow-up, which names the diagnosis. The block repeats no expected_evidence (leak guard passes).
+- Literature follow-up trigger `search_intervention_symptomatic_severe_aortic_stenosis` renamed to `search_aortic_stenosis_intervention_tavi`. Why: the old trigger's meaningful tokens were generic (management, guidelines, diagnosis, syncope, literature), so a generic query hit the disease-specific report; the new tokens are the condition names, so only a query naming the condition reaches it.
+- Drug follow-ups and the fallback medication review: removed, where present, wording that asserted results the agent has not obtained ("while AV conduction disease is unpaced", "meets the labelled dose", device-implantation warnings, the eGFR-specific metformin line, cefazolin "for device implantation"). Each is now a conditional rule (e.g. contraindicated in second- or third-degree AV block without a pacemaker; apixaban 5 mg unless two of age 80 or over, weight 60 kg or less, creatinine 1.5 mg/dL or more; anticoagulation advice if a device is implanted). Why: a drug check must not disclose the conduction diagnosis or the management decision.
+- `initial_tool_outputs.drug_interactions` set to the medication-list review (copy of the fallback). Why: without it, tier 2 answered an unrelated drug (probe: ibuprofen) with the first per-drug follow-up.
+- Added "not performed" follow-ups for `tilt_table` and `exercise_stress_test` (RM04/RP02 format, "Deferred by the clinical team"). Why: otherwise the library returned a normal tilt (HR 68) or a normal exercise test (10.4 METs) in a patient with high-grade AV block, contradicting the case; both orders stay penalised as in the plan.
+
+Re-run after the change: perfect_agent 30/30 clean, case_io check clean for SYNC-CARD, test_case_guards for SYNC-CARD 60 passed, discriminator and hijack guards clean.

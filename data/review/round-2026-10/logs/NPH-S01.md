@@ -37,3 +37,16 @@ The patient block now gives two years of progressive magnetic gait with falls, u
 ## Open questions for Andrea (judgment calls you could not settle)
 
 - None.
+
+## Verification (adversarial verifier, 24 Oct 2026)
+
+What I checked: Read the log and the whole final case; diffed it against the S02 to S05 outputs as a template check. MoCA subscores sum to 22. TUG, 10-m walk and MoCA figures agree across the baseline report, the tap report, the post-tap follow-up, the criteria and the referral must. Evans index, callosal angle and opening pressure agree across the MRI, the CT fallback (±0.01), the criteria, the must and the key evidence. Every log row was checked against the file and is accurate. No banned strings, dashes or engineering text. The patient block has only the prior MMSE 24/30, a different instrument, which C3/C4 allow. Checks run after the edits: `perfect_agent.py -v` ok (MRI and baseline gait show `<- ?` only because of null fields; a MockServer run confirmed both come from the case's own initial outputs, not the library), `case_io.py check` clean for the case, `test_case_guards -k` passes. Hijack check (cognitive screen, baseline gait "before tap test", MRI, tap, post-tap reassessment): every call served by the case's own output in the right order, no post-tap leak to the baseline. Discriminator note for the close-out: the post-tap follow-up's `assessment_type` "gait_and_balance_timed (post-tap reassessment)" is the plan's deliberate prose value (C6). It will fail `test_routed_outputs_name_their_study` once NPH joins `DISCRIMINATOR_CONDITIONS`. Renaming it to the bare term would let the discriminator serve it at the baseline call, so this needs plan CENTRAL R4, not a rename.
+
+Found and fixed:
+1. (C, minor) `ground_truth.key_clinical_evidence[0]` stated what probable iNPH "needs" [Relkin_2005] but left out the physiological criterion. Added "a CSF opening pressure of 5 to 18 mmHg (7 to 24.5 cmH2O)" (F3). In `[2]`, the 10% TUG criterion is cited to [Nakajima_2021] (F4); before, only [Marmarou_2005] was cited.
+
+Changed: Edited `key_clinical_evidence[0]` and `[2]` only. Nothing else changed: no labels, tiers, criteria, sequence or stop rule. Template numbers (baseline TUG 28 s, 10-m 22 s, also in S02 and P09) were flagged to the lead by the worker. They are plausible and were not changed here.
+
+## Condition audit (NPH auditor, 24 Oct 2026)
+- Lab rows RPR moved from the `Metabolic` panel to `Serology`; values unchanged.
+- Checks after the edits: `perfect_agent.py` passes for all 30 NPH cases, `case_io.py check` clean.

@@ -43,3 +43,16 @@ The patient block no longer names NPH or gives the scored results: the HPI keeps
 ## Open questions for Andrea (judgment calls you could not settle)
 
 - None specific to this case. The CSF biomarker reference limits are written as assay-specific (Lumipulse-type cut-offs); confirm if a particular platform should be named.
+
+## Verification (adversarial verifier, 24 Oct 2026)
+
+What I checked: Read the log and the whole final case. MoCA subscores sum to 17, and the month error matches the exam's orientation. The battery's FCSRT (free 16/48, total 43/48, recognition 16/16) and FAS 19 agree with the MoCA profile, the prohibitions and the musts. CSF Abeta42 640 / Abeta40 7050 gives the stated ratio 0.091. The AD-biomarker follow-up repeats the full tap report. Extra MockServer runs: a tap call that names [Abeta42_40_ratio, phospho_tau] gets the biomarker follow-up with the full tap data; a plain tap call gets the initial report without biomarkers; a later [Abeta42, phospho_tau] call gets the follow-up; the neuropsych battery is served by the case's own output. The differential is AD low, VCI moderate (Fazekas 2), others low, which fits the final evidence. No battery waste entry (plan C10). The red herrings are visible in the HPI and family history. Every log row checked. Checks run after the edits: `perfect_agent.py -v` ok (MRI and baseline gait show `<- ?` only because of null fields; a MockServer run confirmed both come from the case's own initial outputs, not the library), `case_io.py check` clean for the case, `test_case_guards -k` passes. Hijack check (cognitive screen, baseline gait "before tap test", MRI, tap, post-tap reassessment): every call served by the case's own output in the right order, no post-tap leak to the baseline. Discriminator note for the close-out: the post-tap follow-up's `assessment_type` "gait_and_balance_timed (post-tap reassessment)" is the plan's deliberate prose value (C6). It will fail `test_routed_outputs_name_their_study` once NPH joins `DISCRIMINATOR_CONDITIONS`. Renaming it to the bare term would let the discriminator serve it at the baseline call, so this needs plan CENTRAL R4, not a rename.
+
+Found and fixed:
+1. (B, minor) The rationale of `action-3-interpret-labs` said a thyroid and B12 screen "was never done before the Alzheimer's label was given", but the HPI does not say that (it says only that no neuroimaging was obtained). The rationale now gives the general reason (reversible contributors belong in any cognitive work-up) without that claim.
+
+Changed: Edited `action_criteria[action-3-interpret-labs].rationale` only. (The S-case key-evidence sentence is not in P09.) Nothing else changed: no labels, tiers, criteria, sequence or stop rule. 
+
+## Condition audit (NPH auditor, 24 Oct 2026)
+- Lab rows RPR, HIV Ag/Ab (4th generation) moved from the `Metabolic` panel to `Serology`; values unchanged.
+- Checks after the edits: `perfect_agent.py` passes for all 30 NPH cases, `case_io.py check` clean.

@@ -42,3 +42,26 @@ The 66-year-old woman with ischaemic cardiomyopathy after CABG and chronic atria
 ## Open questions for Andrea (judgment calls you could not settle)
 
 None needing Andrea. Deviations from the lead plan, decided for dataset quality: head CT recommended instead of avoided (NICE NG232); metformin and spironolactone added to the musts because her eGFR is about 27.
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. No reviewer notes exist for SYNC-CARD. Read the full final case against the log and plan.
+- Checked: eGFR about 27 (CKD-EPI 2021, female, 66, creatinine 2.0: recomputed 27); anion gap 16; echo LVEF 35% vs CMR 215/140 mL (35%); telemetry numbers distinct from S02; CRT-D, uninterrupted warfarin after CT, metformin stop and spironolactone review against the drug output; head CT recommended (NG232: warfarin, 66, loss of consciousness, parietal strike) consistent across HPI, exam and CT; red-herring quotes present in the ECG interpretation and HPI; leak guard passes.
+- Found and changed:
+  - CBC and creatinine used male reference ranges in a woman (Hb 13.5-17.5, Hct 38.3-48.6, creatinine 0.7-1.3). Set to 12.0-16.0, 36.0-46.0 and 0.6-1.1; all flags unchanged (Hb 10.9, Hct 34.2 and creatinine 2.0 remain abnormal).
+  - Echo aortic valve graded "moderate stenosis" with Vmax 2.8 m/s and mean gradient 18 mmHg, which are mild-range values (ESC/EACTS 2021 / EACVI-ASE: moderate is Vmax 3.0-3.9 m/s, mean 20-39 mmHg) while AVA 1.3 cm2 is moderate. Made the grading concordant: Vmax 3.1 m/s, peak 38 mmHg (4v2), mean 22 mmHg, AVA unchanged, in the valve field and the impression.
+  - Family history "Father died suddenly at age 58, presumed cardiac death" was S02's line copied (template carry-over), and together with "Brother with dilated cardiomyopathy and ICD" it raised a familial (lamin A/C) cardiomyopathy with conduction disease that the case never addressed (no differential entry, no genetic must), next to a CMR showing septal mid-wall enhancement. Replaced the two lines with "Father died of a myocardial infarction at age 70" and "Brother with coronary artery disease, coronary bypass surgery at age 64"; mother and paternal uncle lines kept. No other field referred to them.
+  - Head-CT criterion `action-9-order-ct-scan` cited [ESC_2018]; set to [] (NICE NG232 named in the rationale).
+- perfect_agent -v and case_io check clean after the changes.
+
+## Condition audit (24 Oct 2026)
+
+Condition auditor, cross-case pass over the 30 SYNC-CARD cases.
+
+Changed:
+- Added `initial_tool_outputs.literature_search.general` (the neutral syncope evaluation block already used in P02-P04 and RM01-RM03: ESC 2018 and ACC/AHA/HRS 2017 initial evaluation and risk stratification). Why: with no initial literature output, MockServer tier 2 answered any generic query (e.g. "syncope guidelines") with the case's disease-specific follow-up, which names the diagnosis. The block repeats no expected_evidence (leak guard passes).
+- Drug follow-ups and the fallback medication review: removed, where present, wording that asserted results the agent has not obtained ("while AV conduction disease is unpaced", "meets the labelled dose", device-implantation warnings, the eGFR-specific metformin line, cefazolin "for device implantation"). Each is now a conditional rule (e.g. contraindicated in second- or third-degree AV block without a pacemaker; apixaban 5 mg unless two of age 80 or over, weight 60 kg or less, creatinine 1.5 mg/dL or more; anticoagulation advice if a device is implanted). Why: a drug check must not disclose the conduction diagnosis or the management decision.
+- `initial_tool_outputs.drug_interactions` set to the medication-list review (copy of the fallback). Why: without it, tier 2 answered an unrelated drug (probe: ibuprofen) with the first per-drug follow-up.
+- Added "not performed" follow-ups for `tilt_table` and `exercise_stress_test` (RM04/RP02 format, "Deferred by the clinical team"). Why: otherwise the library returned a normal tilt (HR 68) or a normal exercise test (10.4 METs) in a patient with high-grade AV block, contradicting the case; both orders stay penalised as in the plan.
+
+Re-run after the change: perfect_agent 30/30 clean, case_io check clean for SYNC-CARD, test_case_guards for SYNC-CARD 60 passed, discriminator and hijack guards clean.

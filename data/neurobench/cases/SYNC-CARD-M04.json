@@ -337,6 +337,24 @@
     },
     {
       "output": {
+        "findings": [
+          {
+            "abnormal": "not performed",
+            "reference_range": "N/A",
+            "test": "Exercise stress test",
+            "value": "Test not performed; exercise test deferred by the clinical team"
+          }
+        ],
+        "impression": "Exercise test not performed. Deferred by the clinical team.",
+        "quantitative_data": {},
+        "recommended_actions": [],
+        "test_type": "exercise_stress_test"
+      },
+      "tool_name": "order_specialized_test",
+      "trigger_action": "request_exercise_stress_test"
+    },
+    {
+      "output": {
         "query": "Management of drug-induced QT prolongation and torsades de pointes",
         "results": [
           {
@@ -358,7 +376,7 @@
         "summary": "Torsades de pointes is managed by stopping QT-prolonging drugs, intravenous magnesium, potassium repletion to the high-normal range, and pacing or isoproterenol for pause-dependent recurrence."
       },
       "tool_name": "search_medical_literature",
-      "trigger_action": "search_drug_induced_long_qt_torsades_management"
+      "trigger_action": "search_drug_induced_long_qt_torsades"
     }
   ],
   "ground_truth": {
@@ -586,6 +604,20 @@
         "criterion_id": "avoid-waste-4-order-ct-scan",
         "rationale": "Occipital scalp contusion at 60 with GCS 15, no vomiting, no focal deficit and no anticoagulant: no NICE NG232 criterion for head CT; the syncope is explained by drug-induced long QT with torsades de pointes.",
         "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "exercise_stress_test"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "avoid-harm-5-exercise-stress-test",
+        "rationale": "Exercise testing is contraindicated while symptomatic arrhythmia is uncontrolled (Fletcher 2013 standards): adrenergic stress in drug-induced long QT with recurrent pause-dependent torsades de pointes can provoke further torsades, and the diagnosis is already established by the ECG, the medication list and telemetry.",
+        "severity": "harm"
       }
     ],
     "diagnosis": {
@@ -646,7 +678,7 @@
     "red_herrings": [
       {
         "correct_interpretation": "Convulsive syncope from cerebral hypoperfusion during self-terminating torsades de pointes, which telemetry captures coinciding with a blackout and with limb jerking.",
-        "data_point": "Witnessed rapid, irregular shaking movements of the limbs lasting 15-20 seconds, husband states it 'looked like a seizure'",
+        "data_point": "rapid, irregular shaking movements of her limbs, lasting approximately 15 to 20 seconds, which he likens to 'a seizure he once saw on television.'",
         "field_path": "patient.history_present_illness",
         "intended_effect": "Anchors clinician toward primary epilepsy work-up (EEG, neurology referral, antiepileptic drug initiation) and away from the ECG-driven cardiac diagnosis",
         "location": "history_present_illness"
@@ -911,7 +943,26 @@
         ]
       }
     },
-    "literature_search": null,
+    "literature_search": {
+      "general": {
+        "query": "syncope initial evaluation and risk stratification",
+        "results": [
+          {
+            "journal": "Eur Heart J",
+            "key_finding": "Initial evaluation comprises history, physical examination including supine and standing blood pressure, and a 12-lead ECG. High-risk features (syncope during exertion or supine, palpitations before the event, known structural or coronary disease, family history of sudden death under 40, high-risk ECG findings) call for early in-hospital evaluation with immediate ECG monitoring. Echocardiography is indicated when structural heart disease is known or suspected; EEG, brain imaging and routine laboratory panels are not recommended without a specific indication.",
+            "title": "2018 ESC Guidelines for the diagnosis and management of syncope (Brignole M et al., Eur Heart J 2018;39:1883-1948)",
+            "year": "2018"
+          },
+          {
+            "journal": "Circulation",
+            "key_finding": "Risk stratification at the initial evaluation separates patients needing in-hospital monitoring and cardiac testing from those suitable for outpatient evaluation; targeted rather than routine blood testing is advised.",
+            "title": "2017 ACC/AHA/HRS Guideline for the evaluation and management of patients with syncope (Shen WK et al.)",
+            "year": "2017"
+          }
+        ],
+        "summary": "Guidelines base syncope work-up on the initial evaluation (history, examination, orthostatic BP, 12-lead ECG) and risk stratification; high-risk patients receive in-hospital ECG monitoring and targeted cardiac testing."
+      }
+    },
     "mri": null,
     "specialized_test": null
   },

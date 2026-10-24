@@ -44,3 +44,18 @@ A 52-year-old man with fatigable asymmetric ptosis, diplopia, bulbar and proxima
 ## Open questions for Andrea (judgment calls you could not settle)
 
 None.
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. Read the log, the plan (M01 entry, classes A-N, 3.5 generalized AChR+ table), the diff against the pre-round version and the whole final case. No notes file exists for MG, so no note id can be missing. Every FIXED finding is in the file: one RNS report (initial, 3 Hz, nasalis 12%, deltoid 11%, no facilitation), the 50 Hz follow-up and MuSK/LRP4/VGCC follow-up gone, chest CT moved to `initial_tool_outputs.body_imaging` (CT, region "mediastinum chest", contrast true) with a consistent mediastinal MRI follow-up, titin row gone, NIF out of the exam, literature in canonical report voice (leak guard passes), drug check in checker voice without telithromycin, stop rule labs/RNS/imaging with max 2, `[Wolfe_2016]` only on the mediastinal criterion. Arithmetic: 3.20 L / 91 kg = 35 mL/kg; BMI 91/1.78^2 = 28.7; MRD1 changes match. Musts agree with the inpatient setting, the thymoma (thymectomy whatever the severity, pre-operative IVIG or PLEX for bulbar weakness) and his medicines; the differential is the assessment-time view. Discriminator check (not yet enforced for MG) passes for every routed output.
+
+Found and changed: `metadata.difficulty_rationale` still said "4 required tools" after the rebuild left three required criteria; corrected to 3.
+
+Noted, not changed: the HPI keeps "a mildly low TSH" from a primary care test without the number. TSH is part of the scored labs criterion, but the prior result is the red herring's background, not the diagnosis or its decisive test, and the scored first labs order is still needed for AChR; acceptable history.
+
+Checks after the change: `perfect_agent.py MG-M01 -v` passes, `case_io.py check` clean for the case, case guards pass.
+
+## Condition audit (MG auditor, 24 Oct 2026)
+
+- patient.neurological_exam.cranial_nerves: levator excursion replaced by MRD1 (left 1.0, right 2.5 mm), the measure the ice-pack report uses as its baseline. FIXED.
+- `perfect_agent.py` and `case_io.py check` re-run on all 30 MG cases after the changes; the hand-run discriminator guard reports 0 defects in the 30 MG cases.

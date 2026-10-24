@@ -45,3 +45,14 @@ Adversarial verifier, 24 Oct 2026. Read the log, the plan (seronegative pathway,
 Found: nothing requiring a change. The open question on plasma exchange versus IVIG in APS stands as logged.
 
 Re-ran `perfect_agent.py MG-RP14 -v` (pass), `case_io.py check` (clean for the case) and the case guards (pass).
+
+## Condition audit (MG auditor, 24 Oct 2026)
+
+- fallback_tool_outputs.advanced_imaging (empty modality) set to null; metadata.fallback_tool_kinds.advanced_imaging removed. FIXED.
+  Why: a fallback with an empty modality answers every advanced-imaging study with one generic report; the benchmark library now serves the normal report for the study actually ordered.
+- sequence constraint added: action-1-interpret-labs -> action-3-order-specialized-test (soft). FIXED.
+  Why: plan MG.md 3.3 sets soft labs -> SFEMG and RNS -> SFEMG wherever an SFEMG criterion exists; these were missing here and present in the sibling cases.
+- action-1-interpret-labs.citations: [Sanders_2016] (management guidance) -> [Punga_2022] (antibody biomarkers), plan 1.1. FIXED.
+  Why: plan 1.1 reserves [Sanders_2016] for management; antibody testing cites the biomarker key [Punga_2022].
+- action-3-order-specialized-test (SFEMG).citations: [Sanders_2016] removed (says nothing on SFEMG); Jacob 2025 in text. FIXED.
+- `perfect_agent.py` and `case_io.py check` re-run on all 30 MG cases after the changes; the hand-run discriminator guard reports 0 defects in the 30 MG cases.

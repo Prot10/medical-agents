@@ -37,3 +37,23 @@ The 40-year-old man with sudden syncope and a WPW pattern now has three required
 ## Open questions for Andrea (judgment calls you could not settle)
 
 None needing Andrea.
+
+## Verification
+
+Checked (24 Oct 2026, adversarial pass): the log against the diff from fa1d22e6 and the whole final case; ECG delta-wave polarity (negative I/aVL, positive V1 and inferior, right axis) is a left lateral pathway, consistent with the text; telemetry (orthodromic AVRT, retrograde P, no AF; fallback identical); exercise follow-up coherent; CMR arithmetic ((142-55)/142 = 61%); ESC 2019 SVT statements in the literature output (ablation Class I; IV amiodarone and AV-nodal blockers Class III in pre-excited AF; IIb non-invasive stratification); procainamide label and QRS-widening stop rule; plan tiers (exercise, CMR, drug check optional; hard TTE before exercise); differential per plan K.
+
+Found and changed:
+- Echo `wall_motion` said "subtle early septal activation consistent with pre-excitation", but the ECG places the pathway on the left lateral wall, which pre-excites the basal lateral LV, not the septum. Now "subtle early contraction of the basal lateral wall".
+- The hard TTE-before-exercise constraint carried the canonical reason "Exertional syncope requires ...", but this syncope happened standing at a desk, not on exertion. The reason now states the actual rationale for this case (unexplained syncope; obstructive HCM, which can coexist with pre-excitation, and severe AS excluded before exercise), same guideline references.
+
+perfect_agent clean, `case_io.py check` clean for this case, leak guard passes.
+
+## Condition audit (24 Oct 2026)
+
+Condition auditor, cross-case pass over the 30 SYNC-CARD cases.
+
+Changed:
+- Added `initial_tool_outputs.literature_search.general` (the neutral syncope evaluation block already used in P02-P04 and RM01-RM03: ESC 2018 and ACC/AHA/HRS 2017 initial evaluation and risk stratification). Why: with no initial literature output, MockServer tier 2 answered any generic query (e.g. "syncope guidelines") with the case's disease-specific follow-up, which names the diagnosis. The block repeats no expected_evidence (leak guard passes).
+- Literature follow-up trigger `search_wpw_syncope_management` renamed to `search_wpw_wolff_parkinson_white_accessory_pathway`. Why: the old trigger's meaningful tokens were generic (management, guidelines, diagnosis, syncope, literature), so a generic query hit the disease-specific report; the new tokens are the condition names, so only a query naming the condition reaches it.
+
+Re-run after the change: perfect_agent 30/30 clean, case_io check clean for SYNC-CARD, test_case_guards for SYNC-CARD 60 passed, discriminator and hijack guards clean.

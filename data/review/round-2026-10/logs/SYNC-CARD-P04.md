@@ -36,3 +36,20 @@ Reviewer status: R1 not reviewed, R2 not reviewed (no notes file for SYNC-CARD) 
 
 ## Open questions for Andrea (judgment calls you could not settle)
 None. Note for the lead: the plan keeps the exercise test recommended. I applied it, with the rationale that the resting QTc already establishes the diagnosis; some clinicians would defer exercise testing until on a beta-blocker in a patient with QTc above 500 ms and recent arrhythmic syncope, which is why it is not required.
+
+## Verification
+Adversarial verifier, 24 Oct 2026. Read the whole final case against the plan (P04 bullets, sections A-O) and the log.
+- Confirmed: PMH now agrees with the HPI (diagnosis after the swim-meet collapse); ECG QTc 510 ms with the 460 ms female limit; telemetry `telemetry` 48 h, PVC burden 84 / about 213,000 beats = 0.04%, same report as the fallback; exercise test QTc 512 to 535 ms then 505 ms at 4 min, peak 140 bpm; hard TTE before exercise test; labs recommended BMP only; exercise test recommended and EEG optional per the plan; drug criterion recommended with nadolol, propranolol, levetiracetam and one follow-up each; literature optional and last; stop rule = the three required criteria, max 3; KCNQ1 c.1781G>A gives p.Arg594Gln (codon 594 = c.1780-1782), consistent with the LQT1 phenotype (broad-based T waves, swimming and exertional triggers); differential all low with excluding results; musts match the plan (nadolol or propranolol Class I, QT-drug avoidance, K/Mg during illness, ICD not first-line, genetic and cascade testing, driving).
+- Found and fixed:
+  1. B, minor: the exercise-test impression and `reason_for_termination` said "Four-beat polymorphic VT at 140 bpm", confusing the sinus rate at onset with the VT rate (210 bpm in the findings). Both now read VT at 210 bpm arising at a sinus rate of 140 bpm.
+- Not changed, for the lead: the plan keeps the exercise test recommended. It is performed unmedicated after telemetry has already captured torsades with QTc above 500 ms, and the stored result provokes polymorphic VT with hypotension. The diagnosis is already established by the resting QTc, so the test adds phenotype detail but not a management change; I would make it optional. I left the plan's tier because the plan decides tiers, and the worker raised the same point.
+- Re-ran `perfect_agent.py SYNC-CARD-P04 -v` (ok), `case_io.py check` (clean for this case) and the case guards (pass).
+
+## Condition audit (24 Oct 2026)
+
+Condition auditor, cross-case pass over the 30 SYNC-CARD cases.
+
+Changed:
+- `action-7-order-specialized-test` (exercise test) moved from recommended to optional, rationale rewritten: resting QTc 510 ms already establishes the diagnosis and telemetry captured torsades, so exercise testing is deferred until beta-blockade is established (ESC 2022 ventricular arrhythmia guideline; Fletcher 2013). The hard TTE-before-exercise constraint is kept. Why: recommending a stress test in a patient with documented torsades and unprotected long QT is unsafe.
+
+Re-run after the change: perfect_agent 30/30 clean, case_io check clean for SYNC-CARD, test_case_guards for SYNC-CARD 60 passed, discriminator and hijack guards clean.

@@ -44,3 +44,9 @@ The patient block no longer calls the problem secondary NPH, quotes the Evans in
 ## Open questions for Andrea (judgment calls you could not settle)
 
 - Plan Q3 (72 h ASRA hold) applies.
+
+## Verification
+Adversarial verifier, 24 Oct 2026. Read the log, the whole final case and its diff against fa1d22e6.
+- Checked: the CHA2DS2-VASc correction from 4 to 2 is right (age 74 = 1, hypertension = 1; no heart failure, diabetes, stroke or vascular disease) and anticoagulation stays indicated; the plan's "4" is the error. Rivaroxaban must and prohibition follow F7. Burr holes and no residual or recurrent subdural collection in MRI and CT fallback; recurrent SDH added to the differential at low; the generic secondary-NPH entry replaced by iNPH low (plan M06); label, ICD order (G91.0 first) and "do not label idiopathic" prohibition agree. Xanthochromia removal and protein 41 mg/dL fit normal CSF content. Figures identical (TUG 26 to 20 s = 23%, to 18 s = 31%; 10-metre walk 20 to 14.5 s = 28%); MoCA items sum to 22. MockServer probe: no leak.
+- Found and fixed (C, minor, template carry-over): two avoided-action rationales (`avoid-waste-advanced-imaging`, `avoid-waste-neuropsych-battery`) said "the iNPH decision" in a secondary-NPH case; now "the shunt decision". The CSF criterion rationale said the tap would "confirm" shunt responsiveness, which overstates a test with PPV 73% to 100%; now "support".
+- perfect_agent -v ok, case_io check clean for the case, test_case_guards pass.

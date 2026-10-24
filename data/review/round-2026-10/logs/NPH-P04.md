@@ -41,3 +41,14 @@ The patient block keeps the bvFTD anchor and the Evans index of 0.27 at diagnosi
 ## Open questions for Andrea (judgment calls you could not settle)
 
 None left open. Two decisions recorded: (1) the PSP elements (slow upgaze, equivocal hummingbird sign, "area ratio 0.54") were treated as template carry-over from P07 and replaced by normal findings, because kept as written they meet MDS probable PSP-RS (slow vertical saccades plus falls and pull-test instability), which would make the labelled diagnosis incomplete; (2) genetic counselling for the possibly familial FTD (father) was not made a must: it belongs to the bvFTD care, not to the decision this case scores, and the deleted literature step was its only trace.
+
+## Verification
+Adversarial verifier, 24 Oct 2026. No reviewer notes exist for NPH. Read the log, the diff against the pre-round version and every clinical field of the final case. Checked: tap figures (TUG 38/34/31 s = 11%/18%, 10-m 30/25 s = 17%, MoCA 17/18) identical across the CSF report, post-tap follow-up, criteria, musts and key evidence; MoCA subscores sum to 17 and orientation 5/6 matches "oriented to person and approximate date"; MRI markers (Evans 0.35 vs 0.27 prior, DESH, callosal angle 80, temporal horns, Fazekas 1, MTA 2) match the differential, red herrings and must; FDG PET follow-up carries `modality: FDG_PET` and stays waste; timeline (MRI 16 months ago, repeat 6 months ago, new features 8 months) coherent.
+The worker's removal of the slow upgaze, the equivocal hummingbird sign and the "area ratio 0.54" was checked against the pre-round text: kept as written, slow vertical saccades plus repeated falls and a pull test "would fall if not caught" meet MDS-PSP probable PSP-RS (O2 with P1/P2), which the bvFTD-copathology case never addresses; the decision is sound and logged, and PSP now sits in the differential as low with the reason.
+Found and fixed:
+- `fallback_tool_outputs.echo`: no `echo_type` (PATTERNS 5). Set to "TTE".
+No other defect found. Checks run after the edits: `perfect_agent.py -v` passes (every required and recommended criterion served by a case output, no fallback or library answer); `case_io.py check` clean for the case; `test_case_guards -k` passes (leak, follow-up and banned-string guards); MockServer hijack sequence (cognitive screen, then baseline gait "before tap test", MRI, CSF "large-volume lumbar puncture", post-tap reassessment, second CSF call) returns the baseline, the tap report and the post-tap follow-up in the right places; patient-block grep for Evans, callosal, DESH, NPH, hydroceph, tap, shunt, TUG, MoCA finds only hits allowed by C3/C4.
+
+## Condition audit (NPH auditor, 24 Oct 2026)
+- `action-post-tap-gait-reassessment.rationale` was the template sentence shared verbatim by P03 to P07; now case-specific (tap volume and what the reassessment separates).
+- Checks after the edits: `perfect_agent.py` passes for all 30 NPH cases, `case_io.py check` clean.

@@ -44,3 +44,23 @@ A 72-year-old former heavy smoker with a resected squamous lung cancer, atrial f
 - The plan's per-case note says the CT shows a hilar mass, so PET would be recommended. In the case the CT is the planned red herring (no mass), so FDG_PET is required under the plan's own rule ("required only if the CT is negative or equivocal"). I kept the negative CT, made the node 8 mm (plausibly missed) and set PET required. Agree?
 - DELTA-P is in key evidence, not a must: with biopsy-proven SCLC the score no longer changes management. Should it be a must anyway?
 - Added `FDG_PET -> tissue` as a third soft constraint, because only PET identifies the node to sample.
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. Read the log, the plan (P02 entry, LEMS pathway 3.5, fact 24), the diff and the whole final case. No notes file exists for MG. Every FIXED finding is in the file: HPI without the EMG result and with the last surveillance CT 6 months ago; NIF out; exam shows post-exercise strength and reflex facilitation; labs P/Q VGCC 0.62 nmol/L and SOX1 positive, Hu/Yo/N-type removed; one consistent RNS (low CMAPs, 14% decrement, 152% and 142% post-exercise increment); contrast chest CT negative apart from an 8 mm hilar node, FDG-PET (`FDG_PET`) with the avid node, EBUS biopsy under `obtain_tissue_diagnosis` with TTF-1 and neuroendocrine markers; amifampridine check without the metoprolol-QT error; ECG in AF with QTc 438 ms and no PR; autonomic testing routed by `autonomic_testing` and not reporting HRV in AF; brain MRI no longer waste (SCLC staging). DELTA-P 3 (bulbar speech, erectile dysfunction, age at onset 50 or more; not smoking at onset, no weight loss recorded) is correct and gives a high SCLC probability.
+
+Found and changed:
+- Fact error: the ECG criterion rationale, the amifampridine must and the drug-check warning said the EU SmPC requires an ECG "after titration". The Firdapse SmPC (section 4.4) requires clinical and ECG monitoring at initiation and yearly thereafter, and an immediate ECG if arrhythmia is suspected. Rewrote `action-8-analyze-ecg.rationale`, the amifampridine must and `initial_tool_outputs.drug_interactions.amifampridine.warnings` accordingly.
+- Consistency: `fallback_tool_outputs.cardiac_monitoring` reported a normal Holter in sinus rhythm in a patient in atrial fibrillation (template carry-over). Rewritten as rate-controlled AF throughout, no significant pause or ventricular arrhythmia.
+- Language: the CT hilar-node finding read "unchanged in appearance from soft tissue around the hilar vessels" (unclear); reduced to "Left hilar lymph node 8 mm in short axis, not enlarged by size criteria."
+
+Open questions resolved (Andrea's rule): (1) Negative CT with FDG_PET required stays: it follows the plan's own rule (PET required when CT is negative) and the EFNS screening sequence. (2) DELTA-P stays in key evidence, not a must: with biopsy-proven SCLC it no longer changes management. (3) The FDG_PET -> tissue soft constraint stays (only the PET identifies the node to sample). Nothing is left for Andrea.
+
+For the lead (outside this case): MG-RM13 carries the same "ECG after titration" wording in a must and in its drug-check warning, and plan fact 24 states it; it should read "at initiation and yearly thereafter" per the EU SmPC.
+
+Checks after the change: `perfect_agent.py MG-P02 -v` passes, `case_io.py check` clean for the case, case guards and discriminator check pass.
+
+## Condition audit (MG auditor, 24 Oct 2026)
+
+- action_criteria citations: [Gilhus_2016] (an MG review) removed from 10 LEMS criteria; rationales cite Titulaer 2011, EFNS 2011, Oh 2005 and the EU SmPC in text (as RM13). FIXED.
+- `perfect_agent.py` and `case_io.py check` re-run on all 30 MG cases after the changes; the hand-run discriminator guard reports 0 defects in the 30 MG cases.

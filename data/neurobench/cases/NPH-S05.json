@@ -24,14 +24,22 @@
     "csf": null,
     "ct": {
       "additional_observations": [
-        "No acute intracranial haemorrhage, established infarct, mass, or midline shift.",
+        "Mild periventricular white matter hypodensity.",
         "Grey-white differentiation preserved; basal cisterns patent.",
         "Bone windows unremarkable."
       ],
       "angiography_findings": null,
       "contrast_used": false,
-      "findings": [],
-      "impression": "Non-contrast head CT without acute intracranial abnormality.",
+      "findings": [
+        {
+          "density": null,
+          "description": "Enlarged lateral and third ventricles (Evans index about 0.38).",
+          "location": "lateral and third ventricles",
+          "size": null,
+          "type": "ventriculomegaly"
+        }
+      ],
+      "impression": "Enlarged lateral and third ventricles (Evans index about 0.38), no mass, haemorrhage or midline shift.",
       "recommended_actions": []
     },
     "drug_interactions": null,
@@ -57,6 +65,7 @@
         "RA": "normal size",
         "RV": "normal size and function"
       },
+      "echo_type": "TTE",
       "ejection_fraction": 58.0,
       "findings": [
         "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
@@ -86,54 +95,87 @@
       "recommended_actions": []
     },
     "labs": null,
-    "literature_search": {
-      "general": {
-        "query": "general",
-        "results": [],
-        "summary": "No directly applicable, high-quality evidence was retrieved for this query. Recommend correlating with current society guidelines."
-      }
-    },
+    "literature_search": null,
     "mri": null,
     "specialized_test": null
   },
   "followup_outputs": [
     {
       "output": {
-        "alternatives": [],
-        "contraindications": [],
-        "formulary_status": "Available",
-        "interactions": [
-          "Alendronate \u2014 no relevant drug interactions with neurosurgical anesthesia"
+        "assessment_type": "cognitive_screen",
+        "criteria_met": null,
+        "findings": [
+          {
+            "observation": "Visuospatial and executive",
+            "result": "4/5: trail-making failed, cube copied, clock 3/3"
+          },
+          {
+            "observation": "Naming",
+            "result": "3/3"
+          },
+          {
+            "observation": "Attention",
+            "result": "4/6: digits forward correct, digits backward failed, letter tapping correct, serial 7s 2/3"
+          },
+          {
+            "observation": "Language",
+            "result": "2/3: sentence repetition intact, phonemic fluency 8 words in one minute"
+          },
+          {
+            "observation": "Abstraction",
+            "result": "1/2"
+          },
+          {
+            "observation": "Delayed recall",
+            "result": "2/5 free recall, 4/5 with category cues, 5/5 with multiple choice"
+          },
+          {
+            "observation": "Orientation",
+            "result": "5/6: date wrong by two days"
+          }
         ],
-        "proposed": "VP shunt surgery in patient on alendronate",
-        "warnings": [
-          "Hold alendronate on day of surgery per anesthesia protocol (aspiration risk with swallowing restrictions)",
-          "Resume alendronate once tolerating oral intake post-operatively"
-        ]
+        "impression": "MoCA 21/30 with deficits in trail-making, backward digit span, serial subtraction, phonemic fluency, abstraction and free delayed recall; recall improves with cues and multiple choice; naming preserved.",
+        "pre_post_comparison": null,
+        "recommended_actions": [],
+        "scores": {
+          "MoCA": "21/30"
+        }
       },
-      "tool_name": "check_drug_interactions",
-      "trigger_action": "request_osteoporosis_perioperative_management"
+      "tool_name": "perform_clinical_assessment",
+      "trigger_action": "request_moca_cognitive_screen"
+    },
+    {
+      "output": {
+        "assessment_type": "gait_and_balance_timed (post-tap reassessment)",
+        "criteria_met": null,
+        "findings": [
+          {
+            "observation": "Gait pattern at 24 hours",
+            "result": "Longer steps and better foot clearance; no freezing episodes observed"
+          }
+        ],
+        "impression": "TUG 33% faster and 10-metre walk 30% faster at 24 hours than at baseline; no freezing; MoCA 3 points higher.",
+        "pre_post_comparison": {
+          "10-metre walk": "20 s, 40 steps at baseline; 14 s, 29 steps at 24 hours (30% faster)",
+          "180-degree turn": "8 steps at baseline; 5 steps at 24 hours",
+          "MoCA": "21/30 at baseline; 24/30 at 24 hours",
+          "Timed Up and Go": "27 s at baseline; 20 s at 2 hours (26% faster); 18 s at 24 hours (33% faster)"
+        },
+        "recommended_actions": [],
+        "scores": {
+          "10-metre walk at 24 hours": "14 s, 29 steps",
+          "180-degree turn at 24 hours": "5 steps",
+          "MoCA at 24 hours": "24/30",
+          "Timed Up and Go at 2 hours": "20 s",
+          "Timed Up and Go at 24 hours": "18 s"
+        }
+      },
+      "tool_name": "perform_clinical_assessment",
+      "trigger_action": "request_post_reassessment"
     }
   ],
   "ground_truth": {
     "action_criteria": [
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[Williams_2016]",
-          "NPH_pack"
-        ],
-        "criterion_id": "action-1-search-medical-literature",
-        "expected_evidence": "Relkin 2005 INPH Study Group criteria; Tisell 2011 tap-test predictors; Williams 2016 review",
-        "importance": "recommended",
-        "label": "Literature review of iNPH diagnostic criteria and shunt-response predictors",
-        "rationale": "Literature review of iNPH diagnostic criteria and shunt-response predictors"
-      },
       {
         "alternatives": [
           {
@@ -143,54 +185,29 @@
         ],
         "citations": [
           "[Relkin_2005]",
-          "NPH_pack"
+          "[Nakajima_2021]"
         ],
         "criterion_id": "action-2-analyze-brain-mri",
-        "expected_evidence": "Ventriculomegaly with Evans index >0.3, DESH pattern (tight high-convexity sulci + widened Sylvian fissures), callosal angle <90\u00b0, periventricular transependymal signal; no mass effect or aqueductal obstruction",
+        "expected_evidence": "Evans index 0.39 with DESH (tight high-convexity and medial parietal sulci, enlarged Sylvian fissures), callosal angle 71 degrees, temporal horns enlarged out of proportion to the hippocampi (MTA 1), Fazekas 1 periventricular signal, patent aqueduct with flow void, no obstructing lesion",
         "importance": "required",
-        "label": "Brain MRI \u2014 measure Evans index, callosal angle, assess DESH pattern; exclude mass effect, hydrocephalus from secondary cause, and atrophy",
-        "rationale": "Brain MRI \u2014 measure Evans index, callosal angle, assess DESH pattern; exclude mass effect, hydrocephalus from secondary cause, and atrophy"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "panels": [
-                "TSH",
-                "B12",
-                "RPR",
-                "HIV"
-              ]
-            },
-            "tool_name": "interpret_labs"
-          }
-        ],
-        "citations": [
-          "[Relkin_2005]",
-          "NPH_pack"
-        ],
-        "criterion_id": "action-3-interpret-labs",
-        "expected_evidence": "TSH, B12, RPR, HIV negative or within normal range; reversible mimics excluded",
-        "importance": "optional",
-        "label": "Reversible-cause labs (TSH, B12, RPR, HIV) to exclude metabolic / infectious dementia mimics",
-        "rationale": "Reversible-cause labs (TSH, B12, RPR, HIV) to exclude metabolic / infectious dementia mimics"
+        "label": "Brain MRI for ventricular size, iNPH supportive features and an obstructing cause",
+        "rationale": "Her internist's CT reported enlarged ventricles, so an MRI must measure them, show the supportive features and exclude an obstruction before CSF is removed."
       },
       {
         "alternatives": [
           {
             "required_arguments": {},
-            "tool_name": "analyze_csf"
+            "tool_name": "interpret_labs"
           }
         ],
         "citations": [
-          "[Tisell_2011]",
-          "NPH_pack"
+          "[Williams_2016]"
         ],
-        "criterion_id": "action-4-analyze-csf",
-        "expected_evidence": "Opening pressure compatible with NPH criteria; 30-50 mL CSF removed; prespecified pre/post gait and cognitive measures show objective change relevant to shunt responsiveness",
-        "importance": "required",
-        "label": "Large-volume lumbar puncture (30-50 mL tap test) with opening pressure and prespecified pre/post objective gait and cognitive assessment",
-        "rationale": "Large-volume lumbar puncture (30-50 mL tap test) with opening pressure and prespecified pre/post objective gait and cognitive assessment"
+        "criterion_id": "action-3-interpret-labs",
+        "expected_evidence": "Normal blood count, electrolytes, calcium, creatinine and glucose; TSH, vitamin B12 and folate normal; RPR and HIV non-reactive",
+        "importance": "optional",
+        "label": "Targeted labs for reversible contributors",
+        "rationale": "Her word-finding and calculation complaints make thyroid, B12 and calcium worth checking, but they do not decide the iNPH question."
       },
       {
         "alternatives": [
@@ -202,29 +219,77 @@
           }
         ],
         "citations": [
-          "[Relkin_2005]",
-          "Relkin_2005"
+          "[Nakajima_2021]"
         ],
         "criterion_id": "action-6-perform-clinical-assessment",
-        "expected_evidence": "Baseline timed gait recorded before the tap and repeated after it, with the response interpreted from the prespecified objective change and the cognitive screen repeated alongside",
+        "expected_evidence": "TUG 27 s and 10-metre walk 20 s in 40 steps with a cane, 180-degree turn in 8 steps, start freezing, pull test 2 steps",
         "importance": "required",
-        "label": "Measure gait and balance objectively before the large-volume tap \u2014 timed-up-and-go, 10-metre walk, step length, falls risk \u2014 and repeat the same measures and the cognitive screen after it. The baseline must be recorded before the puncture or the post-tap change cannot be interpreted",
-        "rationale": "Measure gait and balance objectively before the large-volume tap \u2014 timed-up-and-go, 10-metre walk, step length, falls risk \u2014 and repeat the same measures and the cognitive screen after it. The baseline must be recorded before the puncture or the post-tap change cannot be interpreted"
+        "label": "Baseline timed gait assessment before the tap",
+        "rationale": "A two-year slowing of gait with freezing and a fall needs an objective baseline so that the post-tap change can be measured."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "assessment_type": "cognitive_screen"
+            },
+            "tool_name": "perform_clinical_assessment"
+          }
+        ],
+        "citations": [
+          "[Relkin_2005]"
+        ],
+        "criterion_id": "action-cognitive-screen",
+        "expected_evidence": "MoCA 21/30 with executive, attention, fluency, abstraction and free-recall deficits; recall improves with cues",
+        "importance": "optional",
+        "label": "Bedside cognitive screen",
+        "rationale": "She misplaces objects and repeats herself, so a MoCA documents whether the profile is dysexecutive or amnestic and sets the baseline for the tap."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_csf"
+          }
+        ],
+        "citations": [
+          "[Marmarou_2005]",
+          "[Nakajima_2021]"
+        ],
+        "criterion_id": "action-4-analyze-csf",
+        "expected_evidence": "Opening pressure 12 cmH2O, normal cells, protein and glucose; 40 mL removed; TUG 27 to 20 s at 2 hours and 18 s at 24 hours (33%), 10-metre walk 20 to 14 s, MoCA 21 to 24",
+        "importance": "required",
+        "label": "Lumbar tap test with opening pressure and CSF removal",
+        "rationale": "Normal-pressure CSF and an objective response to removing 30 to 50 mL make iNPH probable and predict shunt benefit."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "assessment_type": "gait_and_balance_timed"
+            },
+            "tool_name": "perform_clinical_assessment"
+          }
+        ],
+        "citations": [
+          "[Nakajima_2021]"
+        ],
+        "criterion_id": "action-post-tap-gait-reassessment",
+        "expected_evidence": "TUG 20 s at 2 hours and 18 s at 24 hours (33% faster); 10-metre walk 14 s at 24 hours (30% faster); no freezing; MoCA 24/30",
+        "importance": "recommended",
+        "label": "Post-tap timed gait reassessment",
+        "rationale": "Repeating the same timed measures at 2 and 24 hours after the tap turns her response into numbers that can be compared with the baseline."
       }
     ],
     "assessment": {
       "prohibited_recommendations": [
-        "Do not perform large-volume lumbar puncture before MRI excludes mass effect or obstructive hydrocephalus",
-        "Do not infer iNPH from ventriculomegaly alone \u2014 DESH, callosal angle <90\u00b0, and a clinical triad are required",
-        "Do not diagnose Alzheimer's disease in a patient with gait-predominant presentation and ventriculomegaly without first excluding NPH",
-        "Do not attribute the syndrome to 'normal ageing' or 'deconditioning' once the imaging criteria for ventriculomegaly are met"
+        "Do not perform the large-volume lumbar tap before brain MRI has excluded a mass or obstructive hydrocephalus",
+        "Do not diagnose iNPH from ventriculomegaly alone: the diagnosis needs the clinical syndrome (gait disturbance with cognitive or urinary symptoms) and supportive imaging, with no other cause explaining them [Relkin_2005]",
+        "Do not attribute the syndrome to normal ageing or deconditioning once the ventriculomegaly and the tap response are documented"
       ],
       "required_recommendations": [
-        "Obtain brain MRI before lumbar puncture to exclude mass effect or obstructive hydrocephalus",
-        "Document objective pre-tap gait (TUG and 10-metre walk) and a brief cognitive baseline so that pre/post-tap change can be quantified",
-        "Remove 30-50 mL of CSF during the tap test (a low-volume LP under-samples and biases the test toward false negative)",
-        "Re-assess gait and cognition 1-4 hours after the tap and again at 24 hours (the response window for tap-test prediction of shunt benefit)",
-        "Refer to neurosurgery for VP shunt evaluation when imaging, clinical, and tap-test criteria support iNPH"
+        "Refer to neurosurgery for CSF shunting with a programmable valve, on the basis of the tap-test improvement of 33% in TUG at 24 hours, the DESH MRI (Evans index 0.39, callosal angle 71 degrees) and normal-pressure CSF [Nakajima_2021]",
+        "Falls-prevention measures (physiotherapy, home assessment, walking aid) and continued osteoporosis treatment (alendronate, calcium and vitamin D) while awaiting surgery, given a fall with a wrist injury and her fracture risk"
       ]
     },
     "avoided_actions": [
@@ -237,7 +302,7 @@
         ],
         "citations": [],
         "criterion_id": "avoid-waste-1-analyze-eeg",
-        "rationale": "EEG is non-specific for NPH and does not distinguish from neurodegenerative alternatives in this chronic gait/cognitive presentation",
+        "rationale": "She has had no episodes suggesting seizures, so an EEG cannot help separate iNPH from its mimics.",
         "severity": "waste"
       },
       {
@@ -249,7 +314,7 @@
         ],
         "citations": [],
         "criterion_id": "avoid-waste-2-analyze-ecg",
-        "rationale": "ECG is unrelated to the diagnostic workup of chronic gait + cognitive + urinary triad once cardiogenic syncope is not on the differential",
+        "rationale": "Her only fall was a trip on uneven pavement without loss of consciousness, so an ECG does not inform the gait work-up.",
         "severity": "waste"
       },
       {
@@ -261,7 +326,7 @@
         ],
         "citations": [],
         "criterion_id": "avoid-waste-3-order-echocardiogram",
-        "rationale": "Echocardiography does not contribute to NPH evaluation in the absence of syncope or cardioembolic stroke workup",
+        "rationale": "There is no syncope, murmur or embolic event, so echocardiography has no role in this work-up.",
         "severity": "waste"
       },
       {
@@ -273,7 +338,7 @@
         ],
         "citations": [],
         "criterion_id": "avoid-waste-4-order-ct-scan",
-        "rationale": "Head CT is inferior to MRI for measuring Evans index and callosal angle and for excluding secondary causes; only justified if MRI is contraindicated",
+        "rationale": "She had a head CT three weeks ago; MRI measures the callosal angle, temporal horns and aqueduct better and is available.",
         "severity": "waste"
       },
       {
@@ -285,7 +350,81 @@
         ],
         "citations": [],
         "criterion_id": "avoid-waste-5-order-cardiac-monitoring",
-        "rationale": "Cardiac monitoring has no diagnostic role in NPH and is reserved for syncope or arrhythmia workup",
+        "rationale": "The fall was mechanical, not syncopal, so rhythm monitoring has no diagnostic role here.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "order_advanced_imaging"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "avoid-waste-advanced-imaging",
+        "rationale": "Molecular or advanced imaging does not change the iNPH decision, which rests on MRI and the tap test",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "neuropsych_battery"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "avoid-waste-neuropsych-battery",
+        "rationale": "A full neuropsychological battery is not needed for the iNPH decision; the bedside screen and timed gait measures are",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "special_tests": [
+                "14_3_3_protein"
+              ]
+            },
+            "tool_name": "analyze_csf"
+          },
+          {
+            "required_arguments": {
+              "special_tests": [
+                "RT_QuIC"
+              ]
+            },
+            "tool_name": "analyze_csf"
+          },
+          {
+            "required_arguments": {
+              "special_tests": [
+                "oligoclonal_bands"
+              ]
+            },
+            "tool_name": "analyze_csf"
+          },
+          {
+            "required_arguments": {
+              "special_tests": [
+                "meningitis_panel"
+              ]
+            },
+            "tool_name": "analyze_csf"
+          },
+          {
+            "required_arguments": {
+              "special_tests": [
+                "HSV_PCR"
+              ]
+            },
+            "tool_name": "analyze_csf"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "avoid-waste-generic-csf-assays",
+        "rationale": "A two-year afebrile gait syndrome with normal-pressure CSF and one white cell gives no indication for prion, inflammatory or infectious assays.",
         "severity": "waste"
       }
     ],
@@ -307,45 +446,49 @@
       {
         "diagnosis": "Vascular cognitive impairment / subcortical ischaemic vascular disease",
         "icd_code": "F01.50",
-        "key_features": "Small-vessel disease can produce gait apraxia and executive slowing, but ventriculomegaly out of proportion to white-matter burden and a positive tap test favour NPH",
-        "likelihood": "high"
+        "key_features": "Only thin Fazekas 1 periventricular caps with no deep lesions, far less than the ventriculomegaly, and the gait improves after the tap.",
+        "likelihood": "low"
       },
       {
         "diagnosis": "Parkinson's disease / atypical parkinsonism",
         "icd_code": "G20",
-        "key_features": "Shuffling gait overlaps, but absence of resting tremor, asymmetric rigidity, or L-dopa response and presence of magnetic gait + DESH favour NPH",
-        "likelihood": "moderate"
+        "key_features": "Freezing and reduced arm swing overlap, but there is no rest tremor, rigidity or asymmetry, vertical gaze is full, and the gait responds to CSF removal.",
+        "likelihood": "low"
       },
       {
         "diagnosis": "Alzheimer's disease",
         "icd_code": "G30.9",
-        "key_features": "Cognitive decline overlaps; AD typically presents with episodic-memory predominance and hippocampal atrophy rather than frontal-subcortical pattern and magnetic gait; targeted CSF Alzheimer biomarkers can evaluate suspected copathology when the result would change counselling or management",
-        "likelihood": "moderate"
+        "key_features": "Free recall improves with cues within a dysexecutive profile, naming is preserved, the hippocampi are MTA 1, and gait and urgency led the syndrome despite her mother's late-life memory problems.",
+        "likelihood": "low"
       },
       {
         "diagnosis": "Cerebral atrophy with secondary ex-vacuo ventriculomegaly",
         "icd_code": "G31.9",
-        "key_features": "Ventriculomegaly proportionate to sulcal widening, callosal angle >90\u00b0, and absence of DESH or transependymal signal argue against true NPH",
-        "likelihood": "moderate"
+        "key_features": "Ventricles are enlarged out of proportion to the sulci, with DESH and a callosal angle of 71 degrees, and the gait improves after the tap.",
+        "likelihood": "low"
       },
       {
-        "diagnosis": "Post-traumatic or post-SAH communicating hydrocephalus",
+        "diagnosis": "Secondary communicating hydrocephalus (post-traumatic, post-haemorrhagic or post-meningitic)",
         "icd_code": "G91.0",
-        "key_features": "No history of trauma, SAH, or meningitis on review; would be considered if history suggested antecedent intracranial event",
+        "key_features": "No head injury, subarachnoid haemorrhage or meningitis in the history.",
         "likelihood": "low"
       }
     ],
     "key_clinical_evidence": [
-      "iNPH diagnosis (Relkin 2005 INPH Study Group) requires (a) Hakim's triad of gait disturbance, cognitive impairment, and urinary urgency/incontinence \u2014 gait is typically first and most prominent; (b) ventriculomegaly with Evans >0.3 and DESH on MRI without mass effect; (c) age >40 and chronic course; (d) opening pressure <25 cmH2O; (e) absence of an alternative explanation",
-      "MRI is the imaging modality of choice \u2014 measure Evans index and callosal angle (<90\u00b0 supports NPH) and confirm DESH (tight high-convexity sulci + wide Sylvian fissures)",
-      "The tap test removes 30-50 mL of CSF after measuring opening pressure and compares prespecified objective gait and cognitive measures before and after drainage; a positive response supports shunt responsiveness, while a negative single tap does not exclude NPH",
-      "Tap-test sensitivity is only 50-80%; a single negative tap does not exclude NPH \u2014 an extended (3-5 day) lumbar drainage trial can resolve borderline cases",
-      "Reversible-cause laboratory tests do not diagnose NPH and are optional; order targeted tests only when the presentation suggests a metabolic, endocrine, infectious, inflammatory, vitamin, or medication-related mimic",
-      "Alzheimer copathology is common in iNPH and may reduce cognitive benefit from shunting without necessarily eliminating gait benefit",
-      "Shunt response is best predicted by an objectively positive tap test or extended drainage trial in a patient who meets imaging and clinical criteria",
-      "Tier per the July 2026 clinical review: The reversible-cause screen is good practice but does not establish or exclude hydrocephalus; the tap test does."
+      "Probable iNPH needs an insidious gait disturbance after age 40 lasting at least 3 to 6 months with cognitive or urinary symptoms, no antecedent cause, ventriculomegaly (Evans index greater than 0.3) not explained by atrophy, and a CSF opening pressure of 5 to 18 mmHg (7 to 24.5 cmH2O) [Relkin_2005].",
+      "DESH and an acute callosal angle support the diagnosis; here Evans 0.39, DESH and a callosal angle of 71 degrees [Nakajima_2021].",
+      "The tap test removes 30 to 50 mL and repeats the timed gait measures at 2 to 4 and 24 hours; a 10% or greater TUG improvement is a common positive criterion [Nakajima_2021]. Its sensitivity is 26% to 61% and its PPV 73% to 100%, so a single negative tap does not exclude shunt-responsive iNPH [Marmarou_2005].",
+      "With osteoporosis and one injurious fall already, the falls risk of the iNPH gait carries a high fracture risk while she awaits surgery."
     ],
-    "red_herrings": [],
+    "red_herrings": [
+      {
+        "correct_interpretation": "Late-life memory problems of unknown cause in one parent do not explain a gait-led syndrome with a dysexecutive profile, cue-responsive recall and MTA 1 hippocampi that improves after CSF removal.",
+        "data_point": "Mother had memory problems in 80s, etiology unknown",
+        "field_path": "patient.clinical_history.family_history",
+        "intended_effect": "The cognitive decline is attributed to familial Alzheimer's disease",
+        "location": "clinical_history.family_history"
+      }
+    ],
     "review_status": "draft",
     "sequence_constraints": [
       {
@@ -354,82 +497,86 @@
         "citations": [
           "[Relkin_2005]"
         ],
-        "reason": "MRI must precede large-volume LP to exclude mass effect or secondary obstructive hydrocephalus before removing 30-50 mL of CSF",
+        "reason": "Brain imaging must exclude a mass or obstructive hydrocephalus before CSF is removed [Relkin_2005]",
         "severity": "hard"
       },
       {
         "after_criterion_id": "action-4-analyze-csf",
         "before_criterion_id": "action-6-perform-clinical-assessment",
         "citations": [
-          "[Relkin_2005]"
+          "[Nakajima_2021]"
         ],
-        "reason": "The baseline gait and cognition must be measured before the large-volume tap, or the post-tap change cannot be interpreted and the tap test yields nothing",
+        "reason": "The baseline gait must be measured before the tap, or the post-tap change cannot be interpreted [Nakajima_2021]",
         "severity": "soft"
       }
     ],
     "stop_rule": {
-      "max_additional_actions": 0,
+      "max_additional_actions": 1,
       "required_before_assessment": [
         "action-2-analyze-brain-mri",
-        "action-4-analyze-csf",
-        "action-6-perform-clinical-assessment"
+        "action-6-perform-clinical-assessment",
+        "action-4-analyze-csf"
       ]
     }
   },
   "initial_tool_outputs": {
     "clinical_assessment": {
       "assessment_type": "gait_and_balance_timed",
-      "criteria_met": {
-        "cognition_reassessed_after_the_tap": true,
-        "objective_gait_measured_before_the_tap": true,
-        "response_meets_the_threshold": true,
-        "same_measures_repeated_after_the_tap": true
-      },
+      "criteria_met": null,
       "findings": [
         {
           "observation": "Gait pattern",
-          "result": "Wide-based, magnetic, short-stepped gait with reduced foot clearance."
+          "result": "Wide-based, short-stepped gait with reduced foot clearance (magnetic gait) and reduced arm swing"
         },
         {
-          "observation": "Gait pattern",
-          "result": "Freezing on initiation."
+          "observation": "Gait initiation",
+          "result": "Freezing on initiation"
         },
         {
-          "observation": "Gait pattern",
-          "result": "Pull test \u2014 2 steps backward."
+          "observation": "Turning",
+          "result": "En-bloc turning, 8 steps for 180 degrees"
+        },
+        {
+          "observation": "Pull test",
+          "result": "2 steps backward, recovers unaided"
+        },
+        {
+          "observation": "Tandem gait",
+          "result": "Unable"
+        },
+        {
+          "observation": "Urinary symptoms (history)",
+          "result": "Urge incontinence three to four times a week for 18 months; protective underwear daily"
         }
       ],
-      "impression": "Objective gait and cognition were measured before the large-volume tap and repeated after it. The objective improvement is consistent with a positive tap response and increases the likelihood of shunt responsiveness; it must be integrated with the clinical syndrome and structural imaging.",
-      "pre_post_comparison": {
-        "after the tap": "The same measures were repeated after the tap, and this is what the case's own tap-trial report states: Positive tap trial. TUG improved 33% at 24 hours (27 sec to 18 sec); 10-meter walk improved 30% (20 sec to 14 sec); MoCA improved 3 points (21 to 24). No freezing episodes were observed at 24-hour testing.",
-        "before the tap": "Wide-based, magnetic, short-stepped gait with reduced foot clearance.; Freezing on initiation.; Pull test \u2014 2 steps backward.",
-        "interpretation": "positive tap test"
-      },
+      "impression": "Slow, broad-based, short-stepped gait with reduced foot clearance, start freezing and en-bloc turning; postural recovery within 2 steps.",
+      "pre_post_comparison": null,
       "recommended_actions": [],
       "scores": {
-        "MoCA (from the bedside examination)": "21/30",
-        "assessment timing": "immediately before the large-volume tap, then repeated after it",
-        "positive-response threshold": ">10% TUG improvement is a commonly used criterion; interpret with absolute change and concordant gait/cognitive findings"
+        "10-metre walk": "20 s, 40 steps (with cane)",
+        "180-degree turn": "8 steps",
+        "MoCA (same session)": "21/30",
+        "Timed Up and Go": "27 s (with cane)"
       }
     },
     "csf": {
       "appearance": "Clear, colorless",
       "cell_count": {
-        "RBC": "0",
+        "RBC": "0 cells/mcL",
         "WBC": "1 cell/mcL",
-        "differential": "Lymphocyte"
+        "differential": "Lymphocytes"
       },
       "glucose": "70 mg/dL",
       "glucose_ratio": "0.76",
-      "interpretation": "Opening pressure: 12 cmH2O. WBC: 1 cell/mcL; RBC: 0. Protein: 36 mg/dL. Glucose: 70 mg/dL. Positive tap trial. TUG improved 33% at 24 hours (27 sec to 18 sec); 10-meter walk improved 30% (20 sec to 14 sec); MoCA improved 3 points (21 to 24). No freezing episodes were observed at 24-hour testing",
+      "interpretation": "Normal opening pressure and normal CSF cell count, protein and glucose. After removal of 40 mL, TUG changed from 27 s to 20 s at 2 hours and 18 s at 24 hours (33% at 24 hours); 10-m walk 20 s to 14 s; MoCA 21 to 24.",
       "opening_pressure": "12 cmH2O",
       "protein": "36 mg/dL",
       "special_tests": {
-        "cognitive": "MoCA 21 to 24 at 24 hours (3 points)",
+        "cognitive": "MoCA 21/30 before the tap, 24/30 at 24 hours",
         "freezing": "No freezing episodes observed at 24-hour testing",
-        "post_tap_10m_24h": "14 seconds (30% improvement)",
-        "post_tap_tug_24h": "18 seconds (33% improvement)",
-        "post_tap_tug_2h": "20 seconds (26% improvement)",
+        "post_tap_10m_24h": "14 seconds (30% faster)",
+        "post_tap_tug_24h": "18 seconds (33% faster)",
+        "post_tap_tug_2h": "20 seconds (26% faster)",
         "pre_tap_10m": "20 seconds",
         "pre_tap_tug": "27 seconds",
         "volume_removed": "40 mL"
@@ -437,10 +584,11 @@
     },
     "labs": {
       "abnormal_values_summary": [],
-      "interpretation": "All values within normal limits.",
+      "interpretation": "Normal blood count, electrolytes, calcium, creatinine and glucose. TSH, vitamin B12 and folate normal. RPR and HIV Ag/Ab non-reactive.",
       "panels": {
         "BMP": [
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "136-145",
             "test": "Sodium",
@@ -448,6 +596,7 @@
             "value": 141
           },
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "3.5-5.0",
             "test": "Potassium",
@@ -455,6 +604,7 @@
             "value": 3.9
           },
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "0.6-1.1",
             "test": "Creatinine",
@@ -462,6 +612,7 @@
             "value": 0.8
           },
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "8.5-10.5",
             "test": "Calcium",
@@ -469,6 +620,7 @@
             "value": 9.4
           },
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "70-99",
             "test": "Glucose",
@@ -476,18 +628,9 @@
             "value": 92
           }
         ],
-        "Baseline workup": [
-          {
-            "clinical_significance": "Ordered as part of the baseline workup; no abnormality that alters the diagnosis, which is what this case's diagnosis rests on",
-            "is_abnormal": false,
-            "reference_range": "",
-            "test": "HIV",
-            "unit": "",
-            "value": "Non-reactive"
-          }
-        ],
         "CBC": [
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "4.5-11.0",
             "test": "WBC",
@@ -495,6 +638,7 @@
             "value": 6.4
           },
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "12.0-16.0",
             "test": "Hemoglobin",
@@ -502,6 +646,7 @@
             "value": 13.2
           },
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "150-400",
             "test": "Platelets",
@@ -511,6 +656,7 @@
         ],
         "Metabolic": [
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "0.4-4.0",
             "test": "TSH",
@@ -518,6 +664,7 @@
             "value": 1.9
           },
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "200-900",
             "test": "Vitamin B12",
@@ -525,102 +672,110 @@
             "value": 488
           },
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "3-20",
             "test": "Folate",
             "unit": "ng/mL",
             "value": 14
-          },
+          }
+        ],
+        "Serology": [
           {
+            "clinical_significance": null,
             "is_abnormal": false,
             "reference_range": "Non-reactive",
             "test": "RPR",
+            "unit": "",
+            "value": "Non-reactive"
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "Non-reactive",
+            "test": "HIV Ag/Ab",
             "unit": "",
             "value": "Non-reactive"
           }
         ]
       }
     },
-    "literature_search": {
-      "general": {
-        "query": "Literature review of iNPH diagnostic criteria and shunt-response predictors",
-        "results": [
-          {
-            "evidence_level": "guideline recommendation",
-            "finding": "Relkin 2005 INPH Study Group criteria; Tisell 2011 tap-test predictors; Williams 2016 review",
-            "source": "Williams_2016"
-          }
-        ],
-        "summary": "Relkin 2005 INPH Study Group criteria; Tisell 2011 tap-test predictors; Williams 2016 review"
-      }
-    },
+    "literature_search": null,
     "mri": {
-      "additional_observations": [],
+      "additional_observations": [
+        "Technique: 1.5T brain MRI with sagittal T1, axial T2, FLAIR, DWI, SWI and coronal 3D T1 for the callosal angle and hippocampi; no contrast.",
+        "No obstructing lesion, mass or aqueductal stenosis.",
+        "No restricted diffusion. No microbleeds or superficial siderosis on SWI."
+      ],
       "findings": [
         {
           "borders": null,
-          "location": "bilateral lateral ventricles, third ventricle",
+          "location": "lateral and third ventricles",
           "mass_effect": null,
           "signal_characteristics": {
-            "description": "Evans index 0.39"
+            "description": "Marked symmetric enlargement of the lateral and third ventricles out of proportion to cortical volume loss; Evans index 0.39"
           },
-          "size": null,
+          "size": "Evans index 0.39",
           "type": "ventriculomegaly"
         },
         {
           "borders": null,
-          "location": "high convexity and Sylvian fissures",
+          "location": "high convexity, medial parietal sulci and Sylvian fissures",
           "mass_effect": null,
           "signal_characteristics": {
-            "description": "Classic DESH"
+            "description": "Tight high-convexity and medial parietal sulci with disproportionately enlarged Sylvian fissures (DESH, both components present)"
           },
           "size": null,
-          "type": "DESH pattern"
+          "type": "DESH"
         },
         {
           "borders": null,
           "location": "corpus callosum",
           "mass_effect": null,
           "signal_characteristics": {
-            "description": "Callosal angle 71 degrees"
+            "description": "Callosal angle 71 degrees on the coronal plane through the posterior commissure; thinning and upward bowing of the callosal body on sagittal images"
           },
-          "size": null,
+          "size": "callosal angle 71 degrees",
           "type": "callosal angle"
         },
         {
           "borders": null,
-          "location": "corpus callosum on sagittal",
+          "location": "temporal horns and hippocampi",
           "mass_effect": null,
           "signal_characteristics": {
-            "description": "Thinned, upward bowing of body"
+            "description": "Temporal horns enlarged out of proportion to hippocampal volume; hippocampi MTA score 1 bilaterally"
           },
           "size": null,
-          "type": "corpus callosum"
+          "type": "temporal horn enlargement"
         },
         {
           "borders": null,
           "location": "periventricular white matter",
           "mass_effect": null,
           "signal_characteristics": {
-            "description": "Periventricular FLAIR caps"
+            "FLAIR": "Thin periventricular caps at the frontal horns, Fazekas 1; no deep white matter lesions"
           },
           "size": null,
-          "type": "transependymal signal"
+          "type": "white matter hyperintensity"
         },
         {
           "borders": null,
-          "location": "cerebral aqueduct",
+          "location": "aqueduct of Sylvius and fourth ventricle",
           "mass_effect": null,
           "signal_characteristics": {
-            "description": "Prominent flow void"
+            "T2": "Aqueduct patent with a prominent CSF flow void on midsagittal T2; fourth ventricle normal in size"
           },
           "size": null,
-          "type": "aqueductal flow void"
+          "type": "flow void"
         }
       ],
-      "impression": "Marked ventriculomegaly with Evans index 0.39, callosal angle 71\u00b0, classic DESH, corpus callosum thinning with upward bowing, transependymal periventricular signal, and hyperdynamic aqueductal flow void",
+      "impression": "1. Communicating ventriculomegaly (Evans index 0.39) with DESH morphology, an acute callosal angle of 71 degrees and temporal horn enlargement, and no obstructing lesion. 2. Fazekas 1 periventricular signal. 3. Hippocampi MTA score 1. No mass, hemorrhage or restricted diffusion.",
       "recommended_actions": [],
-      "volumetrics": null
+      "volumetrics": {
+        "Evans index": "0.39",
+        "MTA score": "1 bilaterally",
+        "callosal angle": "71 degrees"
+      }
     }
   },
   "metadata": {
@@ -629,26 +784,23 @@
     "citation_gap": [],
     "created_by": "NeuroBench v5 generator",
     "criteria_pack_version": "1.0",
-    "difficulty_rationale": "4 required, 1 recommended, and 1 optional actions after the July 2026 NPH review; 0 grounded red herring(s); 5 differential alternatives.",
-    "difficulty_variant_description": "Straightforward iNPH in a 74-year-old left-handed retired pharmacist \u2014 florid MRI findings, strongly positive tap trial, osteoporosis as minor red herring.",
+    "difficulty_rationale": "3 required (MRI, baseline timed gait, CSF tap test), 1 recommended (post-tap reassessment) and 2 optional (labs, cognitive screen) actions; 1 grounded red herring; 5 differential alternatives.",
+    "difficulty_variant_description": "Straightforward iNPH in a 74-year-old left-handed retired pharmacist: gait, cognitive and urinary symptoms, Evans index 0.39 with DESH and a callosal angle of 71 degrees, and a tap response (TUG 33% faster at 24 hours); a maternal history of late-life memory problems as a minor red herring, and osteoporosis raising the stakes of her falls.",
     "expected_agent_confidence": 0.85,
     "fallback_tool_kinds": {
       "cardiac_monitoring": "normal",
       "ecg": "normal",
       "echo": "normal",
-      "eeg": "normal",
-      "literature_search": "normal"
+      "eeg": "normal"
     },
-    "last_revised": "2026-08-10",
+    "last_revised": "2026-10-24",
     "policy_spec_status": "draft",
-    "revision_reason": "case-level re-audit of all NPH reviewer requests: the tap report is routed to CSF, timed gait/cognitive assessment is the required pre/post measure, the standalone neuropsychological battery and advanced imaging are removed from gold actions and callable authored follow-ups, laboratories remain optional, unrelated CSF assays are no longer returned for free, and the unsupported universal 20% response threshold is corrected",
+    "revision_reason": "October 2026 review round (plan NPH): literature and drug-check steps removed, patient block without the referral diagnosis or scores, baseline and post-tap gait reports separated, MRI with all iNPH markers, policy rebuilt per the July 2026 tool review.",
     "version": "policy-v1",
-    "vocab_gap": [
-      "Phase-contrast (CSF flow) MRI is referenced in followup outputs but is not in the TOOL_PARAMETER_VOCABULARY closed list for order_advanced_imaging \u2014 recommend adding 'phase_contrast_MRI' or 'CSF_flow_MRI' to the modality vocabulary"
-    ]
+    "vocab_gap": []
   },
   "patient": {
-    "chief_complaint": "Difficulty walking, urinary leakage, and memory decline over the past two years \u2014 family brought in for evaluation",
+    "chief_complaint": "Difficulty walking, urinary leakage and memory decline over the past two years; brought in by her family for evaluation",
     "clinical_history": {
       "allergies": [
         "Sulfa drugs (rash)"
@@ -702,14 +854,14 @@
       "handedness": "left",
       "sex": "female"
     },
-    "history_present_illness": "A 74-year-old left-handed retired pharmacist with hypertension and osteoporosis was admitted for evaluation of a two-year progressive decline in gait, bladder control, and memory. Her husband, a retired engineer, has kept meticulous notes of her functional decline and brought these to the appointment. He documents the onset approximately two years ago when she began walking more slowly and taking smaller steps. She fell once on uneven pavement nine months ago and sustained a wrist contusion; she has used a cane since then. She describes her legs as 'not obeying her' and says she feels unsteady on her feet constantly. Her urinary urgency began approximately 18 months ago with three to four episodes of leakage per week, mainly associated with urgency or delayed response; she wears protective underwear daily. Cognitive symptoms include increasing word-finding difficulty, misplacing objects, difficulty calculating change, and repeating herself in conversation. She is an extremely detail-oriented person by training and is acutely aware of her deficits, which distresses her greatly. She denies headache, diplopia, tremor, or numbness. Her alendronate was not stopped prior to admission as there is no surgical intervention planned at this stage. Head CT obtained by her internist three weeks ago demonstrated hydrocephalus with an Evans index estimated at 0.37 and prompted this admission for NPH evaluation.",
+    "history_present_illness": "A 74-year-old left-handed retired pharmacist with hypertension and osteoporosis was admitted for evaluation of a two-year progressive decline in gait, bladder control and memory. Her husband, a retired engineer, has kept meticulous notes of her functional decline and brought them to the admission. He documents the onset approximately two years ago, when she began walking more slowly and taking smaller steps. She fell once on uneven pavement nine months ago and sustained a right wrist contusion; she has used a cane since then. She describes her legs as 'not obeying her' and says she feels unsteady on her feet constantly. Her urinary urgency began approximately 18 months ago, with three to four episodes of leakage per week, mainly with urgency or a delay in reaching the toilet; she wears protective underwear daily. Cognitive symptoms include increasing word-finding difficulty, misplacing objects, difficulty calculating change and repeating herself in conversation. She is an extremely detail-oriented person by training and is acutely aware of her deficits, which distresses her greatly. She denies headache, diplopia, tremor or numbness. There is no history of head injury, meningitis or intracranial hemorrhage. A head CT obtained by her internist three weeks ago was reported as showing enlarged ventricles; the images are not available. She was referred by her internist for progressive gait difficulty with memory decline and urinary urgency.",
     "neurological_exam": {
-      "additional": "Bilateral grasp reflexes. No nuchal rigidity. Well-healed right wrist from prior fall.",
+      "additional": "Bilateral grasp reflexes. No nuchal rigidity. No residual deformity or tenderness of the right wrist after the prior fall.",
       "coordination": "Intact finger-nose bilaterally. Normal heel-shin.",
       "cranial_nerves": "Normal. No papilledema. PERRL. Horizontal and vertical gaze intact.",
-      "gait": "Wide-based, magnetic, short-stepped gait with reduced foot clearance. Freezing on initiation. Reduced arm swing. TUG 27 seconds with cane. 10-meter walk 20 seconds. Cannot tandem walk. Pull test \u2014 2 steps backward.",
-      "mental_status": "Alert, oriented to person, place and day. Mildly distressed by her deficits. MoCA 21/30. Impaired delayed recall (2/5), visuospatial mildly impaired (4/5), word fluency reduced (8 words/min). No aphasia.",
-      "motor": "Normal tone and strength. No rigidity. No resting tremor. Mild hip flexor weakness bilaterally (4+/5).",
+      "gait": "Wide-based, magnetic, short-stepped gait with reduced foot clearance. Freezing on initiation. Reduced arm swing. Cannot tandem walk. Pull test: 2 steps backward, recovers unaided. Walks with a cane.",
+      "mental_status": "Alert, attentive, oriented to person, place and day. Mildly distressed by her deficits. Slowed responses. No aphasia. Formal cognitive screening reported separately.",
+      "motor": "Normal tone. No rigidity. No resting tremor. Mild hip flexor weakness bilaterally (4+/5); strength otherwise full.",
       "reflexes": "2+ throughout. Bilateral plantar flexors.",
       "sensory": "Normal to light touch and pinprick throughout. Vibration mildly reduced at ankles."
     },

@@ -52,3 +52,13 @@ Found and changed:
 - Levetiracetam drug report (`check_drug_interactions_levetiracetam`) proposed "Levetiracetam 500 mg twice daily", a regimen the case never gives: the HPI records a single 1000 mg IV loading dose at the outside hospital and the medication list has no levetiracetam. Changed `proposed` to "Levetiracetam (1000 mg IV loading dose given at the outside hospital)".
 
 Re-run: perfect_agent clean, case_io check clean for this case, leak guard passes.
+
+## Condition audit (24 Oct 2026)
+
+Condition auditor, cross-case pass over the 30 SYNC-CARD cases.
+
+Changed:
+- Added `initial_tool_outputs.literature_search.general` (the neutral syncope evaluation block already used in P02-P04 and RM01-RM03: ESC 2018 and ACC/AHA/HRS 2017 initial evaluation and risk stratification). Why: with no initial literature output, MockServer tier 2 answered any generic query (e.g. "syncope guidelines") with the case's disease-specific follow-up, which names the diagnosis. The block repeats no expected_evidence (leak guard passes).
+- Literature follow-up trigger `search_literature_arvc_exertional_syncope` renamed to `search_arvc_arrhythmogenic_right_ventricular_cardiomyopathy`. Why: the old trigger's meaningful tokens were generic (management, guidelines, diagnosis, syncope, literature), so a generic query hit the disease-specific report; the new tokens are the condition names, so only a query naming the condition reaches it.
+
+Re-run after the change: perfect_agent 30/30 clean, case_io check clean for SYNC-CARD, test_case_guards for SYNC-CARD 60 passed, discriminator and hijack guards clean.

@@ -41,3 +41,12 @@ A 48-year-old man labelled functional after outside AChR and MuSK negatives. The
 ## Open questions for Andrea (judgment calls you could not settle)
 
 - None. Spelling: the case is written in British English, so new text keeps it (haemoglobin, titre, anaesthetist), per ROUND_POLICY.
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. Read the log and the whole final case. No reviewer notes exist for MG. Checked each own-finding row against the file: NIF, FVC and ice-pack results are out of the exam; ice-pack MRD1 values agree between exam (2.5 mm at rest, 0.5 mm after upgaze) and report; one laboratory's ranges; CBC and BMP with values; RNS is the initial study and normal (maximum 9%), SFEMG abnormal in EDC and orbicularis oculi; LRP4 and clustered AChR CBA in one follow-up; respiratory values correct (FVC 3.8 L = 43.8 mL/kg at 86.8 kg, 84% of 4.5 L; supine fall 5%); BMI 27.4 matches; the literature citations (Higuchi 2011, Zisimopoulou 2014) exist and say what they are cited for; no thymectomy must (not routine in LRP4 MG); differential lowered with the excluding results; fallbacks in plain wording.
+
+Found and fixed:
+- C minor, `ground_truth.sequence_constraints`: the two soft constraints that put the repeat AChR/MuSK panel before LRP4 and before SFEMG were removed. Their premise (negative AChR and MuSK antibodies) is already documented in the HPI from the outside laboratory, so an agent that goes straight to the extended cell-based panel or SFEMG is doing the right thing and should not lose sequence credit. This departs from the plan's per-case line ("labs -> SFEMG keep; add labs -> LRP4"); the reason is the documented prior serology. `RNS -> SFEMG` (soft) is kept.
+
+Accepted as logged: the repeat AChR/MuSK with thyroid function stays required (reference-laboratory confirmation including modulating antibodies, and thyroid function never checked), drug check and literature optional. `perfect_agent.py MG-P04 -v` passes, `case_io.py check` reports no failure naming the case, case guards pass.

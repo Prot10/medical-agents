@@ -52,3 +52,12 @@ Found and fixed:
 - E minor, `metadata.difficulty_rationale`: "9 required tools, 1 red herrings" was stale; now 2 required, 4 red herrings.
 
 Re-ran `perfect_agent.py MG-RM15 -v` (pass, no warnings), `case_io.py check` (no failure names the case) and the case guards (pass).
+
+## Condition audit (MG auditor, 24 Oct 2026)
+
+- fallback_tool_outputs.echo.echo_type set to TTE. FIXED.
+  Why: the discriminator guard (PATTERNS.md section 5) requires an exact vocabulary value on every case fallback; an empty echo_type answered every echo variant. The RS11-RS16 verifiers fixed this only in their own cases.
+- fallback_tool_outputs.advanced_imaging (empty modality) set to null; metadata.fallback_tool_kinds.advanced_imaging removed. FIXED.
+  Why: a fallback with an empty modality answers every advanced-imaging study with one generic report; the benchmark library now serves the normal report for the study actually ordered.
+- metadata.actions_withdrawn: stale ice-pack entry ('recommended here') removed; no ice-pack criterion in a ventilated crisis. FIXED.
+- `perfect_agent.py` and `case_io.py check` re-run on all 30 MG cases after the changes; the hand-run discriminator guard reports 0 defects in the 30 MG cases.

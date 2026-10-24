@@ -42,3 +42,11 @@ The patient block no longer gives the outside imaging measurements, the referral
 
 ## Open questions for Andrea (judgment calls you could not settle)
 None.
+
+## Verification
+Adversarial verifier, 24 Oct 2026. Read the log, the pre-round version (`fa1d22e6`) against the current file, and the whole final case. Checked: patient block free of Evans, callosal angle, DESH, NPH, tap, shunt, TUG and MoCA (only the qualitative outside-MRI sentence remains); MRI meets F2 (Evans 0.32 with temporal horns out of proportion to MTA 1, callosal angle 91, DESH absent, Fazekas 2 wording matches the grade, no spine content); baseline gait report has no post-tap data; the tap figures agree across the CSF report, the reassessment follow-up, the three criteria and the referral must (TUG 30 to 26 to 24 s, 13% and 20%; 10-m walk 24 to 19.5 s, 19%); MoCA subscores sum to 21; labs (B12 202, MMA 520, HbA1c <5.7 reference) match the criterion and the B12 must; red herrings point at visible data; differential likelihoods follow C13; tiers, sequence constraints and stop rule follow plan 3.1 to 3.5; avoided actions use vocabulary terms. The paired serum glucose (162 mg/dL) in the CSF report matches the lab glucose, and a CSF glucose of 68 mg/dL with ratio 0.42 is acceptable in hyperglycaemia. MockServer probe: cognitive screen then "baseline before tap test" returns the baseline; post-tap call after the CSF returns the follow-up; `spine_MRI` returns the authored lumbar MRI. `perfect_agent.py -v`, `case_io.py check` and `test_case_guards` clean. No error found; no change made.
+
+## Condition audit (NPH auditor, 24 Oct 2026)
+- MoCA attention finding "Slowed serial subtraction with two errors; digit span backward 3." -> "Slowed serial subtraction with two errors; digits backward failed." so the finding scores to the stored Attention subscore (4/6); totals unchanged.
+- `[Tisell_2011]` removed from `action-4-analyze-csf.citations`: the pack entry is Tisell 2011, shunt surgery in hydrocephalus with white matter changes, and this rationale is about the tap response only; `[Marmarou_2005]` (tap test) stays.
+- Checks after the edits: `perfect_agent.py` passes for all 30 NPH cases, `case_io.py check` clean.

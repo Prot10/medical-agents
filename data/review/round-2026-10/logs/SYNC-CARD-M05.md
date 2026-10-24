@@ -41,3 +41,14 @@ Found and changed:
 - `action-4-order-cardiac-monitoring.rationale` cited "Locati 2016" in text while the key is [Locati_2014] and the reference is under verification (plan C5). Removed the text citation; the rationale now cites ESC 2018 IIa only, and the existing key is kept as the plan allows.
 
 Re-run: perfect_agent clean, case_io check clean for this case.
+
+## Condition audit (24 Oct 2026)
+
+Condition auditor, cross-case pass over the 30 SYNC-CARD cases.
+
+Changed:
+- Added `initial_tool_outputs.literature_search.general` (the neutral syncope evaluation block already used in P02-P04 and RM01-RM03: ESC 2018 and ACC/AHA/HRS 2017 initial evaluation and risk stratification). Why: with no initial literature output, MockServer tier 2 answered any generic query (e.g. "syncope guidelines") with the case's disease-specific follow-up, which names the diagnosis. The block repeats no expected_evidence (leak guard passes).
+- Literature follow-up trigger `search_psvt_avnrt_management` renamed to `search_psvt_avnrt_supraventricular_tachycardia`. Why: the old trigger's meaningful tokens were generic (management, guidelines, diagnosis, syncope, literature), so a generic query hit the disease-specific report; the new tokens are the condition names, so only a query naming the condition reaches it.
+- red herring 0 moved to `patient.history_present_illness`: the old data_point cited a PCP attribution absent from PMH[0]; it now quotes the HPI's anxiety and panic-attack attribution verbatim.
+
+Re-run after the change: perfect_agent 30/30 clean, case_io check clean for SYNC-CARD, test_case_guards for SYNC-CARD 60 passed, discriminator and hijack guards clean.

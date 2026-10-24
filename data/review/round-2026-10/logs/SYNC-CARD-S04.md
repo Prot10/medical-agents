@@ -41,3 +41,26 @@ The 82-year-old man who collapsed walking to the bathroom and struck his head no
 ## Open questions for Andrea (judgment calls you could not settle)
 
 None needing Andrea. Decision taken: the new medication list was built to explain the case's existing abnormal sodium, magnesium and urate rather than changing those values, so the hyponatraemia became a management must.
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. No reviewer notes exist for SYNC-CARD. Read the full final case against the log and plan; the record and telemetry were rewritten, so every cross-field link was checked.
+- Checked: record no longer shares medications, PMH, family or social history with S02; HPI indapamide sentence matches the medication list; eGFR about 40 (CKD-EPI 2021, male, 82, creatinine 1.7: recomputed 40) matches PMH; anion gap 9; echo LVEF 46% vs CMR 160/86 mL (46%); AS grading severe and concordant; ECG 32 bpm vs vitals 33 vs telemetry 29-43; scalp contusion right parietal in HPI, exam, CT and EEG artefact (P4); latex allergy carried into the pacing must; head CT recommended per NG232 (82 with loss of consciousness and a head strike); red-herring field path BMP[0] is sodium; leak guard passes.
+- Found and changed:
+  - The new PMH lists bilateral sensorineural hearing loss with hearing aids, but the exam still read "CN VIII: Hearing intact to finger rub bilaterally". Now "Hearing reduced bilaterally to finger rub without his hearing aids".
+  - A must and a prohibition called him hypotensive at 106/55 mmHg. Reworded: hold telmisartan while blood pressure is low for him with severe aortic stenosis and hyponatraemia, reviewing antihypertensives after the valve decision; the prohibition is "Do not start or increase vasodilators in severe aortic stenosis".
+  - Driving must allowed Group 1 driving 1 week after pacing with severe symptomatic aortic stenosis untreated; as in S02, driving is now restricted until the aortic stenosis has also been treated (ESC 2018 structural cardiac disease: until successful treatment).
+  - Head-CT criterion `action-8-order-ct-scan` cited [ESC_2018]; set to [] (NICE NG232 named in the rationale).
+- perfect_agent -v and case_io check clean after the changes.
+
+## Condition audit (24 Oct 2026)
+
+Condition auditor, cross-case pass over the 30 SYNC-CARD cases.
+
+Changed:
+- Added `initial_tool_outputs.literature_search.general` (the neutral syncope evaluation block already used in P02-P04 and RM01-RM03: ESC 2018 and ACC/AHA/HRS 2017 initial evaluation and risk stratification). Why: with no initial literature output, MockServer tier 2 answered any generic query (e.g. "syncope guidelines") with the case's disease-specific follow-up, which names the diagnosis. The block repeats no expected_evidence (leak guard passes).
+- Drug follow-ups and the fallback medication review: removed, where present, wording that asserted results the agent has not obtained ("while AV conduction disease is unpaced", "meets the labelled dose", device-implantation warnings, the eGFR-specific metformin line, cefazolin "for device implantation"). Each is now a conditional rule (e.g. contraindicated in second- or third-degree AV block without a pacemaker; apixaban 5 mg unless two of age 80 or over, weight 60 kg or less, creatinine 1.5 mg/dL or more; anticoagulation advice if a device is implanted). Why: a drug check must not disclose the conduction diagnosis or the management decision.
+- `initial_tool_outputs.drug_interactions` set to the medication-list review (copy of the fallback). Why: without it, tier 2 answered an unrelated drug (probe: ibuprofen) with the first per-drug follow-up.
+- Added "not performed" follow-ups for `tilt_table` and `exercise_stress_test` (RM04/RP02 format, "Deferred by the clinical team"). Why: otherwise the library returned a normal tilt (HR 68) or a normal exercise test (10.4 METs) in a patient with high-grade AV block, contradicting the case; both orders stay penalised as in the plan.
+
+Re-run after the change: perfect_agent 30/30 clean, case_io check clean for SYNC-CARD, test_case_guards for SYNC-CARD 60 passed, discriminator and hijack guards clean.

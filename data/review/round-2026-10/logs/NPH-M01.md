@@ -47,3 +47,10 @@ The patient block no longer gives the diagnosis, the outside Evans index or the 
 ## Open questions for Andrea (judgment calls you could not settle)
 
 - None specific to this case (plan Q1 and Q2 apply to all NPH cases).
+
+## Verification
+Adversarial verifier, 24 Oct 2026. Read the log, the whole final case and its diff against fa1d22e6 (the pre-round version; the worker's edit is in checkpoint 1fd43d22).
+- Checked: every own-finding row against the file (literature and drug outputs null, no drug or literature follow-ups, patient block free of Evans, callosal, DESH, NPH, tap, shunt, TUG and MoCA; baseline gait report has no post-tap data; post-tap follow-up, CSF report and criteria carry identical figures). Arithmetic: TUG 22 to 18 s = 18%, to 16.5 s = 25%; 10-metre walk 18 to 14.2 s = 21%; MoCA items sum to 23 (2+3+6+2+2+2+6) and fit the old exam's losses; CSF glucose 68 with ratio 0.61 matches serum glucose 112; opening pressure 16 cmH2O within F3. Tiers, order, constraints and stop rule match plan 3.1 to 3.5; vocabulary terms (holter_24h, TTE, 14_3_3_protein, RT_QuIC, oligoclonal_bands, meningitis_panel, HSV_PCR) exist in costs.yaml. MockServer probe (cognitive screen first, then "baseline TUG before tap test", MRI, CSF, "post-tap reassessment at 24 hours"): baseline served before the tap, follow-up after; a second post-tap phrasing returns the baseline again (miss, no leak).
+- Found and fixed (B, minor): the exam calls the reduced toe vibration "age-appropriate", while `ground_truth.red_herrings[0].correct_interpretation` and `key_clinical_evidence[6]` asserted a diabetic neuropathy. Both now say the signs "may reflect age or a mild diabetic neuropathy"; the red herring stays (ankle reflexes 1+, plan C20).
+- Not changed: one pre-existing em dash in an unedited HPI sentence (not new text); a unilateral left heel-shin finding in the original exam (pre-existing, does not affect the diagnosis).
+- perfect_agent -v ok, case_io check clean for the case, test_case_guards pass.

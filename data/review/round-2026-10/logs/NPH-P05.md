@@ -40,3 +40,14 @@ This is secondary NPH four years after a coiled right PCOM aneurysm SAH with int
 ## Open questions for Andrea (judgment calls you could not settle)
 
 None. No falls are documented, so no falls must was added (he lives alone; the referral must covers the risk).
+
+## Verification
+Adversarial verifier, 24 Oct 2026. No reviewer notes exist for NPH. Read the log, the diff against the pre-round version and every clinical field of the final case. Checked: the three clinical corrections (clear CSF 4 years after SAH, verapamil for hypertension after a 21-day nimodipine course, modified Fisher 4 with intraventricular extension) are correct; tap figures (TUG 28/22/20 s = 21%/29%, 10-m 22/16 s = 27%, MoCA 21/24) identical across CSF report, follow-up, criteria, musts and key evidence; MoCA subscores sum to 21 (serial 7s with two errors correctly scores attention 5/6; orientation 5/6 matches "knows the date with prompting"); label secondary NPH with G91.0 first; aspirin must and prohibition per ASRA_2018; red-herring timeline (decline 2 to 3 years after the SAH) consistent with 4 years minus 18 months; no falls documented, so no falls must is correct.
+Found and fixed:
+- `fallback_tool_outputs.ct.impression`: the coil was in the findings but not in the impression (plan C18 asks for the case's own lesions). Impression now names the right posterior communicating artery coil with streak artefact.
+- `fallback_tool_outputs.echo`: no `echo_type` (PATTERNS 5). Set to "TTE".
+No other defect found. Checks run after the edits: `perfect_agent.py -v` passes (every required and recommended criterion served by a case output, no fallback or library answer); `case_io.py check` clean for the case; `test_case_guards -k` passes (leak, follow-up and banned-string guards); MockServer hijack sequence (cognitive screen, then baseline gait "before tap test", MRI, CSF "large-volume lumbar puncture", post-tap reassessment, second CSF call) returns the baseline, the tap report and the post-tap follow-up in the right places; patient-block grep for Evans, callosal, DESH, NPH, hydroceph, tap, shunt, TUG, MoCA finds only hits allowed by C3/C4.
+
+## Condition audit (NPH auditor, 24 Oct 2026)
+- `action-post-tap-gait-reassessment.rationale` was the template sentence shared verbatim by P03 to P07; now case-specific (tap volume and what the reassessment separates).
+- Checks after the edits: `perfect_agent.py` passes for all 30 NPH cases, `case_io.py check` clean.

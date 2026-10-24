@@ -53,3 +53,9 @@ Found and fixed:
 - C minor: no thyroid antibodies, although the labs rationale itself cites autoimmune thyroid disease clustering with MG and type 1 diabetes (July 2026 guidance: thyroid antibodies in all patients). Added anti-TPO 14 IU/mL (normal) to the thyroid panel, interpretation and expected evidence; required arguments unchanged.
 
 perfect_agent passes; case_io check clean for this case.
+
+## Condition audit (MG auditor, 24 Oct 2026)
+
+- fallback_tool_outputs.echo.echo_type set to TTE. FIXED.
+  Why: the discriminator guard (PATTERNS.md section 5) requires an exact vocabulary value on every case fallback; an empty echo_type answered every echo variant. The RS11-RS16 verifiers fixed this only in their own cases.
+- `perfect_agent.py` and `case_io.py check` re-run on all 30 MG cases after the changes; the hand-run discriminator guard reports 0 defects in the 30 MG cases.

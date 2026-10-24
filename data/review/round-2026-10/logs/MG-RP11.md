@@ -45,3 +45,13 @@ Adversarial verifier, 24 Oct 2026. Read the log, the plan (RP11 entry) and the w
 Found and fixed: C minor, `initial_tool_outputs.body_imaging` (narrative and impression) ended "Tissue characterization recommended". For a well-defined, non-invasive anterior mediastinal mass typical of thymoma in AChR-positive MG, upfront biopsy is avoided (capsular breach and seeding) and resection is both diagnostic and therapeutic, which is what the thymectomy must and the chemotherapy prohibition say; the recommendation contradicted them and was removed. E minor, `metadata.difficulty_rationale` (5 required, 0 red herrings) updated to 4 required, 3 red herrings.
 
 Re-ran `perfect_agent.py MG-RP11 -v` (pass), `case_io.py check` (clean for the case) and the case guards (pass).
+
+## Condition audit (MG auditor, 24 Oct 2026)
+
+- fallback_tool_outputs.echo.echo_type set to TTE. FIXED.
+  Why: the discriminator guard (PATTERNS.md section 5) requires an exact vocabulary value on every case fallback; an empty echo_type answered every echo variant. The RS11-RS16 verifiers fixed this only in their own cases.
+- sequence constraint added: action-1-interpret-labs -> action-3-order-specialized-test (soft). FIXED.
+  Why: plan MG.md 3.3 sets soft labs -> SFEMG and RNS -> SFEMG wherever an SFEMG criterion exists; these were missing here and present in the sibling cases.
+- action-1-interpret-labs.citations: [Sanders_2016] (management guidance) -> [Punga_2022] (antibody biomarkers), plan 1.1. FIXED.
+  Why: plan 1.1 reserves [Sanders_2016] for management; antibody testing cites the biomarker key [Punga_2022].
+- `perfect_agent.py` and `case_io.py check` re-run on all 30 MG cases after the changes; the hand-run discriminator guard reports 0 defects in the 30 MG cases.

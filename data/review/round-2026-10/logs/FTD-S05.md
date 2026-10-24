@@ -51,3 +51,11 @@ Adversarial verifier, 24 Oct 2026.
   2. `ground_truth.assessment.required_recommendations[4]` called the father's change "late-life" while the family history places it "in his 60s". FIXED: "his father's personality change in his 60s".
 - Agreed FLAGGED item: the "probable" label with an optional positive C9orf72 result (plan Q1); not changed.
 - After the edits: `perfect_agent.py -v` passes, `case_io.py check` names no failure for the case, `test_case_guards` passes; a literature call with an arbitrary query and a sertraline check with other arguments now match their optional criteria.
+
+## Condition audit (FTD auditor, 24 Oct 2026)
+
+- D, major, `patient.neurological_exam.mental_status`: the examination gave the bedside screen results (MMSE 22/30, FAB 10/18 and category fluency), which the required `perform_clinical_assessment` returns (ROUND_POLICY timeline-leak rule). The other 12 FTD cases, and VASC-DEM and ALZ-EARLY, had already moved them out. Removed the scores and test results; the behavioural observations, insight and frontal signs stay. The clinical assessment output already carries every removed value, so no information is lost. This settles the worker's FLAGGED row on the same field. FIXED.
+- B, major, `followup_outputs`: an order of `genetic_panel:ALS` fell to the benchmark library, which reports a normal C9orf72 and so contradicted the expansion on this case's FTD panel. Added follow-up `request_als_gene_panel_c9orf72` (`test_type: genetic_panel:ALS`) with the same C9orf72 expansion and SOD1, TARDBP and FUS negative, as P04 and P05 already have. No criterion changed. FIXED.
+- B, minor, `metadata.fallback_tool_kinds`: the case has a cardiac-monitoring fallback but the kinds map omitted it; added `cardiac_monitoring: normal`. FIXED.
+- E, minor, `initial_tool_outputs.literature_search[*].results[*].source`: the sources were citation keys (`[Rascovsky_2011]` or `Rascovsky_2011`), which a literature tool does not return, and the condition used three styles. They now give the full reference, as in M07-P02 (for example "Rascovsky K et al. Brain 2011;134:2456-2477 (FTDC criteria for bvFTD)"). Findings and summary are unchanged. FIXED.
+- `perfect_agent.py` and `case_io.py check` were re-run on all 30 FTD cases after the changes and are clean; `test_case_guards.py -k FTD` passes (60 tests).

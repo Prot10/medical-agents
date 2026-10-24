@@ -38,3 +38,12 @@ A 42-year-old man develops fatigable ptosis, diplopia, jaw fatigue and nasal spe
 ## Open questions for Andrea (judgment calls you could not settle)
 
 - None that need Andrea's information. Decisions recorded: (1) respiratory function is `required` (plan 3.2: bulbar symptoms with reduced FVC and MIP stated in the case), not `recommended` as the plan's 3.5 table says; the PLEX/IVIG and monitoring musts depend on it. (2) The plan asked that the RNS report show no demyelination; the report keeps mild residual demyelinating features improving compared with the GBS study, which is what 4 weeks after GBS looks like and is what excludes a relapse. (3) SFEMG is `optional` rather than recommended because the RNS is diagnostic and a recovering neuropathy also raises jitter.
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. Read the log and the whole final case. No reviewer notes exist for MG. Checked each own-finding row against the file: enoxaparin removed from the medicines and stated as stopped, prior CSF moved to the HPI as history, chest CT now one body-imaging report (thymic hyperplasia, no thymoma) with the head-CT slot null, RNS report with technique, nasalis 13% decrement, post-activation exhaustion and improving residual demyelinating NCS, SFEMG with pair counts, respiratory values correct (FVC 2.6 L = 31.3 mL/kg at 83.0 kg, 57% of 4.6 L, supine fall 12%), BMI 26.8 matches, drug criterion and output deleted (gabapentin only, no interaction; check_drug_interactions is not a panel-required modality), musts specific (PLEX or IVIG with the second-course note, 20/30/40 triggers, thymectomy when stable per MGTX), differential lowered with the excluding results.
+
+Found and fixed:
+- B minor, `followup_outputs[request_respiratory_function].output.findings[Single-breath count]`: a count of 19 against a reference of >=25 was not flagged although every other reduced value is (plan fact 14). Now "19 L".
+
+`perfect_agent.py MG-RM12 -v` passes, `case_io.py check` reports no failure naming the case, case guards pass.

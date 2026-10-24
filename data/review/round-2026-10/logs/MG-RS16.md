@@ -47,3 +47,10 @@ Checked: HPI medication contradiction fixed and the MRI and steering sentence re
 - Found: the respiratory report used an MEP lower limit of >=60 cmH2O for a 73-year-old man while the other male MG RS cases (RS12, RS14) use >=80 cmH2O; MEP 78 would be low on that scale yet the report and criterion called it normal. Changed to reference >=80 cmH2O and MEP 88 cmH2O in findings, quantitative_data, impression and `action-7` expected_evidence (the case's normal-respiratory picture is unchanged).
 
 Checks re-run after the edits: `perfect_agent.py -v` passes (only the known mediastinum_MRI alternative served by the library normal), `case_io.py check` clean for the case, `test_case_guards.py -k` passes, and the 24 Oct discriminator guard (run by hand; MG is not yet in `DISCRIMINATOR_CONDITIONS`) reports no defect.
+
+## Condition audit (MG auditor, 24 Oct 2026)
+
+- sequence constraint added: action-1-interpret-labs -> action-3-order-specialized-test (soft). FIXED.
+  Why: plan MG.md 3.3 sets soft labs -> SFEMG and RNS -> SFEMG wherever an SFEMG criterion exists; these were missing here and present in the sibling cases.
+- sequence constraint added: action-2-order-specialized-test -> action-3-order-specialized-test (soft). FIXED.
+- `perfect_agent.py` and `case_io.py check` re-run on all 30 MG cases after the changes; the hand-run discriminator guard reports 0 defects in the 30 MG cases.

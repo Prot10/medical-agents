@@ -59,3 +59,13 @@ Found and changed:
 - Literature follow-up: the EP-study result and the monitoring result carried the same class errors as M01 (EP study "recommended" Class I; monitoring without symptoms "establishes" arrhythmic syncope). Reworded to pacing on an abnormal EP study (ESC 2021 I, B) and symptom correlation I / asymptomatic Mobitz II, CHB or pause over 3 s IIa (ESC 2018).
 
 Re-run: perfect_agent clean, case_io check clean for this case, leak guard passes.
+
+## Condition audit (24 Oct 2026)
+
+Condition auditor, cross-case pass over the 30 SYNC-CARD cases.
+
+Changed:
+- Added `initial_tool_outputs.literature_search.general` (the neutral syncope evaluation block already used in P02-P04 and RM01-RM03: ESC 2018 and ACC/AHA/HRS 2017 initial evaluation and risk stratification). Why: with no initial literature output, MockServer tier 2 answered any generic query (e.g. "syncope guidelines") with the case's disease-specific follow-up, which names the diagnosis. The block repeats no expected_evidence (leak guard passes).
+- red herrings 0 and 1 `data_point` now quote the HPI verbatim (the 10 to 15 second jerking; the PCP's "orthostatic hypotension" attribution and hydrochlorothiazide reduction).
+
+Re-run after the change: perfect_agent 30/30 clean, case_io check clean for SYNC-CARD, test_case_guards for SYNC-CARD 60 passed, discriminator and hijack guards clean.

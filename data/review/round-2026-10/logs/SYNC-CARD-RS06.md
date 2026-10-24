@@ -35,3 +35,24 @@ The 67-year-old man who collapsed at his kitchen counter has typical atrial flut
 ## Open questions for Andrea (judgment calls you could not settle)
 
 None needing Andrea. Deviation from the lead plan, decided for dataset quality: exercise testing added as waste (adrenergic drive before rate control can provoke 1:1 conduction); the plan's subtype row lists only tilt, MRI and EEG.
+
+## Verification
+
+Checked (24 Oct 2026, adversarial pass): the log against the diff from fa1d22e6 and the whole final case; CHA2DS2-VA 3 against the record (age 67, hypertension, diabetes; LVEF 55%, no vascular disease); ECG typical flutter pattern; telemetry arithmetic (300/4 = 75 bpm during 4:1, max 304) and fallback identical; DOAC doses (apixaban reduction criteria, rivaroxaban 15 mg at CrCl 15-49); ESC 2019 SVT, ESC 2024 AF and ESC 2018 statements in the literature output; red herring quotes; tilt fallback carries `test_type: tilt_table`, so it answers only tilt orders.
+
+Found and changed:
+- Initial and fallback drug output read a lab value ("potassium 3.6 mEq/L is low-normal"), and the apixaban and rivaroxaban follow-ups quoted "(creatinine 1.1 mg/dL here)": results the agent may not have ordered (labs are only recommended). Rewritten as general statements (thiazide potassium and magnesium loss, check potassium; the dose-reduction criteria without the patient's value).
+- Exercise is waste, but no exercise output was stored, so an exercise order received the library report ("sinus rhythm throughout", 10.4 METs), contradicting persistent flutter. Added a case-consistent exercise follow-up (stopped in stage 1 when 2:1 flutter changed to 1:1 at about 300 bpm with aberrancy and hypotension), consistent with the avoided-action reason.
+- `followup_outputs` order: the off-pathway brain MRI and head CT sat before the drug checks; reordered to echo, telemetry, drug checks, off-pathway (MRI, CT, exercise), literature last (plan section 3).
+
+perfect_agent clean, `case_io.py check` clean for this case, leak guard passes.
+
+## Condition audit (24 Oct 2026)
+
+Condition auditor, cross-case pass over the 30 SYNC-CARD cases.
+
+Changed:
+- Added `initial_tool_outputs.literature_search.general` (the neutral syncope evaluation block already used in P02-P04 and RM01-RM03: ESC 2018 and ACC/AHA/HRS 2017 initial evaluation and risk stratification). Why: with no initial literature output, MockServer tier 2 answered any generic query (e.g. "syncope guidelines") with the case's disease-specific follow-up, which names the diagnosis. The block repeats no expected_evidence (leak guard passes).
+- Literature follow-up trigger `search_atrial_flutter_guidelines` renamed to `search_atrial_flutter`. Why: the old trigger's meaningful tokens were generic (management, guidelines, diagnosis, syncope, literature), so a generic query hit the disease-specific report; the new tokens are the condition names, so only a query naming the condition reaches it.
+
+Re-run after the change: perfect_agent 30/30 clean, case_io check clean for SYNC-CARD, test_case_guards for SYNC-CARD 60 passed, discriminator and hijack guards clean.

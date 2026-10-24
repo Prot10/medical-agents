@@ -41,3 +41,24 @@ The 74-year-old man with exertional syncope on the stairs has complete AV block 
 ## Open questions for Andrea (judgment calls you could not settle)
 
 None needing Andrea. Decisions taken: head CT made waste rather than kept with an unexplained scalp haematoma (no head strike in the history or exam); microcytic anaemia added as a must because it changes the pre-TAVI plan and the case left it unaddressed.
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. No reviewer notes exist for SYNC-CARD. Read the full final case against the log and plan.
+- Checked: ECG 32 bpm vs vitals 33 vs telemetry 26-40; anion gap 13; Hb/Hct ratio; metformin 1000 mg/day at eGFR about 39; echo AS grading (AVA 0.9, mean 42, Vmax 4.3, SVi 36) consistent with the expected_evidence, differential and musts; CMR LVEF 40% from 185/111 mL; exam now records no scalp wound, so head CT as waste holds (no head injury, NG232 not engaged); cephalosporin allergy vs device prophylaxis must; harm entries for tilt and exercise; red-herring paths; leak guard passes.
+- Found and changed:
+  - Template carry-over: the CMR native T1 "1120 ms" is RS02's value (plan M: never copy a number from a sibling case). Set to 1085 ms in the finding signal and the impression (both occurrences).
+  - Driving must allowed Group 1 driving 1 week after pacing although the severe symptomatic aortic stenosis, a structural cause of this exertional syncope, is still untreated. ESC 2018 driving advice for structural cardiac disease is "until successful treatment is established". The must now restricts driving until the pacemaker is implanted and the aortic stenosis has been treated.
+- perfect_agent -v and case_io check clean after the changes.
+
+## Condition audit (24 Oct 2026)
+
+Condition auditor, cross-case pass over the 30 SYNC-CARD cases.
+
+Changed:
+- Added `initial_tool_outputs.literature_search.general` (the neutral syncope evaluation block already used in P02-P04 and RM01-RM03: ESC 2018 and ACC/AHA/HRS 2017 initial evaluation and risk stratification). Why: with no initial literature output, MockServer tier 2 answered any generic query (e.g. "syncope guidelines") with the case's disease-specific follow-up, which names the diagnosis. The block repeats no expected_evidence (leak guard passes).
+- Drug follow-ups and the fallback medication review: removed, where present, wording that asserted results the agent has not obtained ("while AV conduction disease is unpaced", "meets the labelled dose", device-implantation warnings, the eGFR-specific metformin line, cefazolin "for device implantation"). Each is now a conditional rule (e.g. contraindicated in second- or third-degree AV block without a pacemaker; apixaban 5 mg unless two of age 80 or over, weight 60 kg or less, creatinine 1.5 mg/dL or more; anticoagulation advice if a device is implanted). Why: a drug check must not disclose the conduction diagnosis or the management decision.
+- `initial_tool_outputs.drug_interactions` set to the medication-list review (copy of the fallback). Why: without it, tier 2 answered an unrelated drug (probe: ibuprofen) with the first per-drug follow-up.
+- Added "not performed" follow-ups for `tilt_table` and `exercise_stress_test` (RM04/RP02 format, "Deferred by the clinical team"). Why: otherwise the library returned a normal tilt (HR 68) or a normal exercise test (10.4 METs) in a patient with high-grade AV block, contradicting the case; both orders stay penalised as in the plan.
+
+Re-run after the change: perfect_agent 30/30 clean, case_io check clean for SYNC-CARD, test_case_guards for SYNC-CARD 60 passed, discriminator and hijack guards clean.

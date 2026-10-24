@@ -43,3 +43,20 @@ A 44-year-old woman with a previous functional label, anxiety and fatigable dysa
 - Labs: the plan gives MuSK its own criterion; here AChR, MuSK and TSH are one required criterion, because two criteria would be served the same report (identical-report warning). Should MuSK be scored separately?
 - Ice pack set optional, not recommended: ptosis is absent at rest and appears only after 90 s of upgaze. Keep it optional?
 - Thymectomy: removed as a must; it may be considered in seronegative generalized MG not responding to treatment (MGTX enrolled only AChR-positive patients). Agree?
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. Read the log, the plan (P01 entry, seronegative pathway 3.5), the diff and the whole final case. No notes file exists for MG.
+
+Found (log versus file): the log says the labs were set as one criterion `["anti_AChR","anti_MuSK","TSH"]` and asks Andrea whether MuSK should be scored separately, but the file has two required criteria: `action-1-interpret-labs` `["anti_AChR","TSH"]` and `action-musk-antibody` `["anti_MuSK"]` (both in the stop rule, plus the soft MuSK -> cell-based panel constraint). The file follows the plan ("MuSK required" as its own criterion in P01) and is the more lenient encoding: an agent ordering AChR, MuSK and TSH together satisfies both, and one ordering AChR first and MuSK after also satisfies both, whereas the merged form fails an agent that orders them in two calls. The perfect-agent warning (both criteria served by the initial labs, which carry MuSK as a realistic reflex) is cosmetic. Decision: keep the file as it is; the log's "Own findings" row and first open question are superseded by this paragraph.
+
+Open questions resolved (Andrea's rule, decide for dataset quality): (1) MuSK scored separately, as above. (2) Ice pack optional: the ptosis appears only after 90 s of sustained upgaze and resolves at rest, so the bedside test is supportive but not expected; kept optional. (3) No thymectomy must: MGTX enrolled only AChR-positive patients, and the consensus guidance (Sanders 2016, Narayanaswami 2021) only allows thymectomy to be considered in seronegative generalized MG that fails immunotherapy; kept out. Nothing is left for Andrea.
+
+Other checks: HPI no longer states MuSK was tested outside, so the MuSK criterion is not redundant; NIF out of the exam; respiratory 3.40 L / 67 kg = 51 mL/kg, BMI 67/1.68^2 = 23.7; RNS maximum 7% normal, SFEMG abnormal in two muscles with consistent pair counts; cell-based follow-up routed by its own trigger; FND low and MuSK MG very_low after the results; no thymectomy, treatment-response or plan outputs remain. Discriminator and leak checks pass. No file change.
+
+Checks: `perfect_agent.py MG-P01 -v` passes, `case_io.py check` clean for the case, case guards pass.
+
+## Condition audit (MG auditor, 24 Oct 2026)
+
+- patient.neurological_exam.cranial_nerves: right eye adduction lag tested on 'rightward gaze' (the right eye abducts there); now leftward gaze. FIXED.
+- `perfect_agent.py` and `case_io.py check` re-run on all 30 MG cases after the changes; the hand-run discriminator guard reports 0 defects in the 30 MG cases.

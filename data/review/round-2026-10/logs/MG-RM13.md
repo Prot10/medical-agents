@@ -40,3 +40,20 @@ A 68-year-old woman, 6 months after chemoradiation for limited-stage SCLC, has p
 ## Open questions for Andrea (judgment calls you could not settle)
 
 - None that need Andrea's information. Decisions recorded: (1) FDG-PET is `required`, not `recommended` as the plan's table says: the CT is deliberately equivocal and plan 3.5 and EFNS 2011 make PET the next step when CT does not show the tumour, so a work-up that stops at the CT misses the recurrence. (2) The DELTA-P score was not used in the text because the SCLC is already known. (3) A baseline ECG is a new required criterion because the EU SmPC asks for it at initiation and the patient takes ondansetron.
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. Read the log and the whole final case. No reviewer notes exist for MG. Checked each own-finding row against the file: the HPI no longer says a PET showed no recurrence; NIF and the "erectile dysfunction" template line are gone; reflex facilitation described; labs with values and one laboratory's ranges, Hu removed; RNS with the 10 s exercise protocol (increments recomputed: ADM 2.1 to 5.4 mV = 157%, APB 1.8 to 4.3 mV = 139%, deltoid 0.9 to 2.2 mV = 144%); CT with an indeterminate subcentimetre 4R node; FDG_PET and autonomic_testing discriminators; biopsy as `obtain_tissue_diagnosis`; amifampridine output matches the EU SmPC (15 mg/day in three doses, 5 mg steps every 4-5 days, maximum 60 mg/day and 20 mg per dose; QT-prolonging drugs, epilepsy, congenital long QT contraindicated); ECG QTc 441 ms; musts and prohibitions consistent with ondansetron being stopped first. The CT's FDG-PET suggestion and the PET's tissue-sampling suggestion are further diagnostic steps, which the style guide allows.
+
+Found and fixed:
+- B minor, `patient.clinical_history.past_medical_history[0]`: "diagnosed 8 months ago" with 4 cycles of carboplatin/etoposide plus thoracic radiation completed 6 months ago leaves about 2 months for a course that takes about 3 months from the first cycle. Changed to "diagnosed 10 months ago".
+- C minor, `ground_truth.action_criteria[action-1-interpret-labs]`: required panels were `[anti_VGCC_PQ, anti_SOX1]`. SOX1 is valuable to predict an associated SCLC, but here the SCLC is already known and histology will be obtained, so SOX1 changes nothing; an agent ordering VGCC alone should not miss a required criterion. Required panels now `[anti_VGCC_PQ]` (subset matching still accepts an order that adds SOX1); label and rationale updated; the SOX1 result stays in the report and the expected evidence. This departs from the plan's LEMS tier table for this case only; P02 (new tumour) is not affected.
+- N minor, `action-1-interpret-labs.citations`, `action-2-order-specialized-test.citations`: `[Gilhus_2016]` (an MG review) was cited for LEMS serology and post-exercise facilitation. Emptied; the rationales already cite Titulaer 2011 and Oh 2005 in text (plan 1.1: cite by author until CENTRAL adds the keys).
+- C minor, `followup_outputs[request_emg_single_fiber]`: the stimulated SFEMG used the voluntary-activation EDC reference (<34 us). Now "<25 us (stimulated)".
+
+Accepted as logged: FDG-PET required (CT deliberately equivocal), node biopsy recommended, ECG required before amifampridine. `perfect_agent.py MG-RM13 -v` passes, `case_io.py check` reports no failure naming the case, case guards pass.
+
+## Condition audit (MG auditor, 24 Oct 2026)
+
+- required_recommendations[1] and initial_tool_outputs.drug_interactions.amifampridine.warnings[1]: ECG 'after titration' replaced by 'at initiation and yearly thereafter' (EU SmPC 4.4), as in P02. FIXED.
+- `perfect_agent.py` and `case_io.py check` re-run on all 30 MG cases after the changes; the hand-run discriminator guard reports 0 defects in the 30 MG cases.

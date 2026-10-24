@@ -42,3 +42,11 @@ Reviewer status: R1 not reviewed, R2 not reviewed (no notes file for SYNC-CARD) 
 
 ## Open questions for Andrea (judgment calls you could not settle)
 None.
+
+## Verification
+Adversarial verifier, 24 Oct 2026. Read the whole final case against the plan (P03 bullets, sections A-O) and the log.
+- Confirmed: index ECG at 38.6 C carries the coved type 1 pattern (2.4/2.1 mm, 2.8 mm high V1) with QTc 408 ms and no "read as normal" sentence; repeat-ECG, ajmaline and EP follow-ups gone; MRI has no MRA content and is waste; monitoring is `telemetry` 72 h with the same report as the fallback; TTE is a full report (PASP 24 mmHg agrees with TR 2.2 m/s); tiers match the plan's Brugada row (required ECG and monitoring; recommended TTE, BMP, CMR; optional drug check and literature; tilt, exercise, MRI, EEG avoided); stop rule = the two required criteria, max 3; no "serotonergic" text; literature is the last follow-up and cites ESC 2022 and Postema 2009 correctly; red-herring data_points are verbatim from the HPI; musts cover paracetamol, ICD (IIa), brugadadrugs.org, genetic counselling with cascade screening, driving.
+- Found and fixed:
+  1. A (discriminator), minor: `fallback_tool_outputs.echo` had no `echo_type` and said "Normal transthoracic echocardiogram", so it answered any TEE, bubble or exercise-echo order with a TTE text (PATTERNS 5; P03 was the only SYNC-CARD case with such a fallback). Set to null (the TTE follow-up answers TTE orders, the library answers the others) and removed `echo` from `metadata.fallback_tool_kinds`.
+  2. K, minor: the LQTS differential cited "no QT prolongation or torsades on telemetry", which the telemetry report does not state. Rewritten to cite the 12-lead QTc 408 ms and the fever-dependent ectopy with coved ST elevation that the telemetry does report.
+- Re-ran `perfect_agent.py SYNC-CARD-P03 -v` (ok), `case_io.py check` (clean for this case) and the case guards (pass).

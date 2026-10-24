@@ -41,3 +41,18 @@ A 69-year-old man with two years of magnetic gait, urge incontinence and executi
 ## Open questions for Andrea (judgment calls you could not settle)
 
 None. Hydrochlorothiazide can add urinary frequency; it was left in the medication list without a must, since urge incontinence with a magnetic gait and a tap response is not explained by it.
+
+## Verification
+
+Checked against `plans/NPH.md` (sections 2 to 4 and the per-case entry), ROUND_POLICY and PATTERNS; NPH has no notes file, so there is no note id to account for. Read the whole final case (flattened, every field) and compared it with the pre-round version (`1fd43d22~1`). Verified: patient block free of Evans, callosal angle, DESH, NPH, hydrocephalus, tap, shunt, TUG and MoCA results; literature and drug-interaction outputs null with no such follow-ups; MoCA subscores sum to the total and match the exam orientation; TUG and 10-m percentages recomputed from the stored seconds and identical in the baseline report, the CSF report, the post-tap follow-up and the criteria; CSF/serum glucose ratio consistent with the lab glucose; Evans index identical in the MRI, CT fallback (within 0.01), criteria and key evidence; Fazekas grade matches the VCI likelihood (plan C13); musts, prohibitions and differential match plan section 4; discriminator values (`holter_24h`, `TTE`, CSF assay terms) are vocabulary terms; criteria order and tiers per plan 3.1, constraints per 3.4, stop rule per 3.5. Hijack check (MockServer through `NeuroBenchEnvironment`): cognitive screen then "baseline timed gait before tap test" returns the baseline (no `pre_post_comparison`); after the CSF call "post-tap reassessment at 24 hours" returns the follow-up; "repeat timed gait after lumbar puncture" re-serves the baseline (plan R5, already logged). `perfect_agent.py -v`, `case_io.py check` and `test_case_guards -k` pass after the changes below.
+
+Found and changed:
+- `ground_truth.action_criteria[action-post-tap-gait-reassessment].rationale`: template sentence shared by all NPH cases (C19); rewritten for his 38 mL tap.
+- `ground_truth.action_criteria[action-4-analyze-csf].citations`: `[Tisell_2011]` (white matter changes paper, not a tap-test source) removed; `[Marmarou_2005]` kept (ruling 8).
+- `ground_truth.red_herrings[0].data_point`: the log said it now "matches the PMH", but it read "apnoea" against the PMH "apnea"; set to the PMH text verbatim.
+- `patient.history_present_illness`: the last sentence ("His primary care physician referred him for progressive gait difficulty with memory decline and urinary urgency") repeated the opening ("admitted following referral from his primary care physician for a two-year history of progressive gait difficulty, urinary incontinence, and cognitive decline"); deleted as a duplicated sentence (PATTERNS 5).
+- Nothing else found.
+
+## Condition audit (NPH auditor, 24 Oct 2026)
+- `analyze_csf {"special_tests": ["HSV_PCR"]}` added to `avoid-waste-generic-csf-assays`, as in the other 24 NPH cases (plan 3.3, PCR panels).
+- Checks after the edits: `perfect_agent.py` passes for all 30 NPH cases, `case_io.py check` clean.

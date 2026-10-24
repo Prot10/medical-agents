@@ -44,3 +44,10 @@ The patient block no longer gives the outside Evans index, callosal angle, "comm
 ## Open questions for Andrea (judgment calls you could not settle)
 
 - None specific to this case (plan Q1 and Q2 apply).
+
+## Verification
+Adversarial verifier, 24 Oct 2026. Read the log, the whole final case and its diff against fa1d22e6.
+- Checked: all own-finding rows against the file; patient-block grep clean; figures identical across baseline report, post-tap follow-up, CSF report and criteria (TUG 28 to 24 s = 14%, to 21.5 s = 23%; 10-metre walk 22 to 17 s = 23%); MoCA items sum to 21 and the attention item (digits forward 1, backward 0, two tapping errors 0, serial sevens 1) scores 2/6 by MoCA rules; CSF glucose 64 with ratio 0.68 matches serum 94; MRI has a supportive feature (temporal horns) without DESH, consistent with the differential, key evidence and musts; AD low with MTA 1 (plan M02); new knee red herring visible in the PMH. MockServer probe as M01: no leak.
+- Found and fixed (B, minor): `patient.neurological_exam.mental_status` said "Alert, attentive" while the cognitive screen reports "marked attention and working-memory deficits" (attention 2/6). Now "Alert and fully oriented, with slowed responses."
+- Not changed: pre-existing em dashes in unedited HPI and motor sentences; `difficulty: straightforward` against a "Moderate iNPH" variant description is pre-existing and outside this round's edits.
+- perfect_agent -v ok, case_io check clean for the case, test_case_guards pass.

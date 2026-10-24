@@ -41,3 +41,13 @@ The case is a 38-year-old woman with MS on natalizumab whose new fatigable ptosi
 ## Open questions for Andrea (judgment calls you could not settle)
 
 - None that need Andrea's information. Decisions recorded: (1) the drug check is `recommended`, not `optional` as the plan's per-case line says, because natalizumab plus MG immunosuppression is a concrete interaction that changes the order of treatment (ruling 6). (2) The plan asked for "thymoma-associated MG" in the differential; it is a subtype of the labelled diagnosis, not a competing diagnosis, so it is stated in key evidence instead. (3) The label's qualifier "possible drug-associated autoimmunity" is weaker now that the CT shows a thymoma; the label was not changed (ROUND_POLICY 3). (4) `mediastinum_MRI` was not kept as an alternative, because the stored report is a CT and an MRI order would be answered by a normal library report.
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. Read the log and the whole final case (large rewrite in the batch-4 checkpoint commit). No reviewer notes exist for MG, so nothing can be missing from the notes table. Checked every own-finding row against the file: the repeat-MRI and NIF leaks are gone, the CSF JCV row is gone, labs use one laboratory, RNS has a technique row and no LEMS increment, the CT expected evidence matches the thymoma report, musts and prohibitions are management only and consistent with natalizumab (no steroid-sparing agent while it continues), the differential is lowered after the clean MRI, `[Wolfe_2016]` is only on the thymic imaging criterion, stop rule and constraints match plan 3.3 and 3.4. Arithmetic checked: BMI 21.9 from 59.6 kg and 165 cm; FVC 3.2 L = 53.7 mL/kg and 91% of 3.5 L. INO laterality (right MLF lesion, right adduction deficit, left abducting nystagmus) is correct.
+
+Found and fixed:
+- D minor, `patient.history_present_illness`: the closing sentence "Anti-AChR antibodies have not been checked." named the decisive required test and undercut the MS-relapse red herring. Removed.
+- B minor, `initial_tool_outputs.mri.additional_observations[3]` and `.impression`: "No brainstem ... abnormality" contradicted the right MLF (brainstem) lesion reported in the same study. Reworded to "No new brainstem lesion; no oculomotor nerve or cavernous sinus abnormality" and the impression likewise.
+
+Accepted as logged: drug check `recommended` (a real natalizumab-immunosuppression PML interaction), thymoma-associated MG stated in key evidence rather than the differential, label and G70.01 left for CENTRAL. `perfect_agent.py MG-P03 -v` passes, `case_io.py check` reports no failure naming the case, case guards pass.

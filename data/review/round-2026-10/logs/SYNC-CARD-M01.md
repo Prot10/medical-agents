@@ -58,3 +58,13 @@ Found and changed:
 - Literature follow-up (`search_pacing_indications_av_block_bifascicular`): result 2 said an EP study "is recommended" (Class I, B) in syncope with bifascicular block; the ESC 2021 Class I, B recommendation is pacing when the EP study shows HV of 70 ms or more or infra-Hisian block. Reworded to that. Result 3 said asymptomatic Mobitz II or CHB on monitoring is "diagnostic ... Class I"; ESC 2018 gives Class I to symptom-rhythm correlation and IIa to asymptomatic Mobitz II, CHB or pauses over 3 s. Rewritten with both classes.
 
 Re-run: perfect_agent clean, case_io check clean for this case, leak guard passes.
+
+## Condition audit (24 Oct 2026)
+
+Condition auditor, cross-case pass over the 30 SYNC-CARD cases.
+
+Changed:
+- Added `initial_tool_outputs.literature_search.general` (the neutral syncope evaluation block already used in P02-P04 and RM01-RM03: ESC 2018 and ACC/AHA/HRS 2017 initial evaluation and risk stratification). Why: with no initial literature output, MockServer tier 2 answered any generic query (e.g. "syncope guidelines") with the case's disease-specific follow-up, which names the diagnosis. The block repeats no expected_evidence (leak guard passes).
+- red herring 0 `data_point` now quotes the HPI verbatim ("the patient exhibited brief jerking movements ... 10-15 seconds"); the old text was a paraphrase.
+
+Re-run after the change: perfect_agent 30/30 clean, case_io check clean for SYNC-CARD, test_case_guards for SYNC-CARD 60 passed, discriminator and hijack guards clean.

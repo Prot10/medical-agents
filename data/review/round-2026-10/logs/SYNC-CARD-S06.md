@@ -36,3 +36,24 @@ The 74-year-old woman with recurrent syncope keeps her presentation, a resting E
 ## Open questions for Andrea (judgment calls you could not settle)
 
 None.
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. No reviewer notes exist for SYNC-CARD. Read the full final case against the log and plan.
+- Checked: CHA2DS2-VA 2 (hypertension, age 65-74; ESC 2024 removes female sex) correct; apixaban dose criteria; diltiazem raising apixaban exposure about 1.4-fold (apixaban label) and amlodipine; female reference ranges correct; drug check required with diltiazem or metoprolol and in the stop rule; musts (stop diltiazem, beta-blocker after pacing, apixaban without bridging) agree with the prohibitions; telemetry and fallback identical, monitor_type telemetry; ECG red-herring quote present; leak guard passes.
+- Found and changed:
+  - The telemetry event says she told the nurse she "felt dizzy and blacked out briefly" during the 4.8 s pause, while the impression (both copies) and the vasovagal differential called it "near-loss of consciousness". Aligned to "a brief blackout she reported to the nurse" / "the brief blackout on telemetry".
+  - Head CT is avoided as waste on the ground that "she did not strike her head", but the HPI never said so (a 74-year-old on apixaban who fell to the floor; NG232 would indicate CT for any head injury). The HPI now states she "slid to the floor onto her left side without striking her head", which matches the left elbow abrasion in the exam and makes the waste ruling hold.
+- perfect_agent -v and case_io check clean after the changes.
+
+## Condition audit (24 Oct 2026)
+
+Condition auditor, cross-case pass over the 30 SYNC-CARD cases.
+
+Changed:
+- Added `initial_tool_outputs.literature_search.general` (the neutral syncope evaluation block already used in P02-P04 and RM01-RM03: ESC 2018 and ACC/AHA/HRS 2017 initial evaluation and risk stratification). Why: with no initial literature output, MockServer tier 2 answered any generic query (e.g. "syncope guidelines") with the case's disease-specific follow-up, which names the diagnosis. The block repeats no expected_evidence (leak guard passes).
+- Drug follow-ups and the fallback medication review: removed, where present, wording that asserted results the agent has not obtained ("while AV conduction disease is unpaced", "meets the labelled dose", device-implantation warnings, the eGFR-specific metformin line, cefazolin "for device implantation"). Each is now a conditional rule (e.g. contraindicated in second- or third-degree AV block without a pacemaker; apixaban 5 mg unless two of age 80 or over, weight 60 kg or less, creatinine 1.5 mg/dL or more; anticoagulation advice if a device is implanted). Why: a drug check must not disclose the conduction diagnosis or the management decision.
+- `initial_tool_outputs.drug_interactions` set to the medication-list review (copy of the fallback). Why: without it, tier 2 answered an unrelated drug (probe: ibuprofen) with the first per-drug follow-up.
+- Added "not performed" follow-ups for `tilt_table` and `exercise_stress_test` (RM04/RP02 format, "Deferred by the clinical team"). Why: otherwise the library returned a normal tilt (HR 68) or a normal exercise test (10.4 METs) in a patient with high-grade AV block, contradicting the case; both orders stay penalised as in the plan.
+
+Re-run after the change: perfect_agent 30/30 clean, case_io check clean for SYNC-CARD, test_case_guards for SYNC-CARD 60 passed, discriminator and hijack guards clean.

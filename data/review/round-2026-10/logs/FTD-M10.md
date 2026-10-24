@@ -42,3 +42,14 @@ A 64-year-old retired accountant with two years of loss of familiar-face and per
 ## Verification
 
 `perfect_agent.py FTD-M10 -v`: ok. Assessment, labs and MRI come from `initial_tool_outputs`; neuropsychology from `followup_outputs[0]`. Probes: RPR/HIV, perfusion SPECT and FDG-PET reach their keyed follow-ups. A right-temporal literature query reaches its follow-up; other queries get the canonical output. CT returns the right anterior temporal fallback. `case_io.py check FTD-M10`: schema OK, and no failure names the case. `test_case_guards -k FTD-M10`: 2 passed. No em dashes remain in the file.
+
+## Verification (adversarial verifier, 24 Oct 2026)
+
+Note: the section above was written by the worker as a self-check; this is the independent verification. Checked against the pre-round file, the plan (M10) and the whole final case: the HPI contradiction fix (famous faces), the Benton change (42/54; associative person-knowledge loss with preserved face matching fits the right temporal variant, Ulugut Erkoyun 2020, Chan 2009), the 3-of-6 count (prosopagnosia not counted), musts (the sertraline must replaced by a review, consistent with the antidepressant-escalation prohibition), differential, KCE without amyloid claims, CT fallback laterality, literature sources (Ulugut Erkoyun 2020 Brain 143:2831-2843; Chan 2009 Brain 132:1287-1298).
+
+Found and fixed:
+- B minor, clinical-assessment screen line: the listed losses (recall 4, two executive items, orientation 2, naming 1 = 9) gave 21/30, not 20/30 (an original error the worker carried). Now adds one abstraction item and states the recall loss as 4 points, totalling 10 = 20/30.
+- B minor, neuropsych "Empathy and social cognition": NPI-Q disinhibition 4/12 contradicted the assessment's "disinhibition absent" (and the low FBI disinhibition). Set to 0/12.
+- E minor, neuropsych "Face and person identification": "5/8 identified by face alone, relying on context" was self-contradictory; now "5/8 personally known people identified, relying on contextual cues (uniform, setting) rather than the face", as the original intended.
+
+`perfect_agent.py FTD-M10 -v`: ok (the "<- ?" lines are initial outputs; probes confirm assessment, MRI and CT fallback). `case_io.py check FTD-M10`: schema OK, no failure names the case. `test_case_guards -k FTD-M10`: passed.

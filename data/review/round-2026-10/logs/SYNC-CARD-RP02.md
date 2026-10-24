@@ -35,3 +35,26 @@ The 22-year-old man with two exertional collapses, a pulmonary-area murmur and R
 ## Open questions for Andrea (judgment calls you could not settle)
 
 None. Deviation from the plan, decided for consistency of the simulated patient: the exercise-test follow-up is kept (the plan deletes the criterion and makes the test harm, which is done) because without it a harmful exercise order would receive the library's normal treadmill result.
+
+## Verification
+
+Adversarial verification, 24 Oct 2026 (diff against fa1d22e6; the batch-4 checkpoint commit holds the worker's edit).
+
+Checked: no reviewer notes for SYNC-CARD. Plan items: labs recommended BMP with D-dimer kept only as data for a low-probability PE differential; exercise test criterion deleted and made harm; tilt harm and the isoproterenol tilt deleted; "Do not call" text gone; drug check optional; HCM and ARVC low; musts are urgent excision, monitored admission with restricted exertion, histology and Carney screening, with no anticoagulation substitute. CMR volumes are internally consistent (RVEF (168-87)/168 = 48%, LVEF (125-48)/125 = 62%, RVEDVI 94 at BSA about 1.79). The PA systolic estimate (RVSP minus the 90 mmHg RVOT gradient = 18 mmHg) is consistent with the differential. Red herrings quote their fields; guards pass.
+
+Found and fixed:
+- `followup_outputs[0].output.valves["Tricuspid valve"]`: TR 4.9 m/s (gradient 96 mmHg) plus the stated RA pressure of 10 mmHg gives 106, not the RVSP of 108 reported in four places. RA pressure set to 12 mmHg (consistent with the moderately dilated RA and a JVP of 10 cm H2O), so every 108 and the derived PA pressure of 18 stand.
+- `ground_truth.avoided_actions[avoid-harm-5-tilt-table].rationale` and `prohibited_recommendations[2]` called the obstruction "fixed", while the diagnosis label, the musts, the echo and the CMR describe a mobile mass with dynamic obstruction. Now "severe dynamic" and "severe" respectively.
+- With the tilt follow-up deleted, a (harmful) tilt order received the library's normal tilt (HR 68) although his resting HR is 104 (the worker's CENTRAL note). Added a neutral "Tilt-table test not performed. Deferred by the clinical team." follow-up (`test_type: tilt_table`, trigger `request_tilt_table`) before the literature follow-up, as RM04 does; it reveals nothing about the diagnosis and the harm penalty still applies.
+
+perfect_agent.py SYNC-CARD-RP02 -v: ok. case_io.py check: clean for this case.
+
+## Condition audit (24 Oct 2026)
+
+Condition auditor, cross-case pass over the 30 SYNC-CARD cases.
+
+Changed:
+- Added `initial_tool_outputs.literature_search.general` (the neutral syncope evaluation block already used in P02-P04 and RM01-RM03: ESC 2018 and ACC/AHA/HRS 2017 initial evaluation and risk stratification). Why: with no initial literature output, MockServer tier 2 answered any generic query (e.g. "syncope guidelines") with the case's disease-specific follow-up, which names the diagnosis. The block repeats no expected_evidence (leak guard passes).
+- Literature follow-up trigger `search_exertional_syncope_structural_heart_disease` renamed to `search_exertional_structural_heart_disease`. Why: the old trigger's meaningful tokens were generic (management, guidelines, diagnosis, syncope, literature), so a generic query hit the disease-specific report; the new tokens are the condition names, so only a query naming the condition reaches it.
+
+Re-run after the change: perfect_agent 30/30 clean, case_io check clean for SYNC-CARD, test_case_guards for SYNC-CARD 60 passed, discriminator and hijack guards clean.

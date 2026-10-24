@@ -35,3 +35,23 @@ The 56-year-old woman with ischaemic cardiomyopathy (prior inferior STEMI, LVEF 
 ## Open questions for Andrea (judgment calls you could not settle)
 
 None needing Andrea.
+
+## Verification
+
+Checked (24 Oct 2026, adversarial pass): the log against the diff from fa1d22e6 and the whole final case; VT morphology (RBBB, superior axis) consistent across telemetry, key evidence and criterion; sustained (32 s, symptomatic) vs non-sustained (18 s) runs; telemetry fallback identical; heart_rate_range against the events; labs (K 3.2, Mg 1.6) against the labs criterion and red herring field path (BMP[1] is potassium); required drug check placed after the diagnostic core; stop rule lists the five required criteria; ICD must against ESC 2022 Class I; musts vs prohibitions.
+
+Found and changed:
+- Initial and fallback drug output (served for any drug at any time) quoted results the agent may not have obtained: "Sotalol with LVEF 32%, QTc 468 ms and hypokalaemia" (LVEF 32% is the new echo value; the HPI gives 38%) and "the loop diuretic is the likely cause of the low potassium and magnesium" (lab result). Rewritten as general cautions (sotalol in reduced LVEF, QT prolongation or hypokalaemia; loop diuretic causes potassium and magnesium loss); both copies identical.
+- Amiodarone follow-up warning "Baseline QTc 468 ms." (an ECG value in a drug report) now "Record a baseline QTc and monitor it during loading."
+- Exercise is waste, but no exercise output was stored, so an exercise order received the library report (10.4 METs, sinus rhythm throughout, normal), which contradicts LVEF 32% and her limited exercise tolerance. Added a case-consistent `order_specialized_test` exercise follow-up before the literature (3.8 METs, chronotropic response 76% of predicted on two beta-blockers, blunted BP, frequent PVCs of the scar morphology and a 4-beat NSVT run in recovery), the same fix RS01-RS03 received.
+
+perfect_agent clean, `case_io.py check` clean for this case, leak guard passes.
+
+## Condition audit (24 Oct 2026)
+
+Condition auditor, cross-case pass over the 30 SYNC-CARD cases.
+
+Changed:
+- Added `initial_tool_outputs.literature_search.general` (the neutral syncope evaluation block already used in P02-P04 and RM01-RM03: ESC 2018 and ACC/AHA/HRS 2017 initial evaluation and risk stratification). Why: with no initial literature output, MockServer tier 2 answered any generic query (e.g. "syncope guidelines") with the case's disease-specific follow-up, which names the diagnosis. The block repeats no expected_evidence (leak guard passes).
+
+Re-run after the change: perfect_agent 30/30 clean, case_io check clean for SYNC-CARD, test_case_guards for SYNC-CARD 60 passed, discriminator and hijack guards clean.

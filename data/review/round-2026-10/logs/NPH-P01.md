@@ -37,3 +37,10 @@ The patient block no longer gives the new Evans index, the referring neurologist
 
 ## Open questions for Andrea (judgment calls you could not settle)
 None.
+
+## Verification
+Adversarial verifier, 24 Oct 2026. Read the log, the patient block, every stored output and the ground truth. Checked: the mental status (oriented to place not date, mild anomia) matches the itemised MoCA (orientation 3/6, naming 2/3, subscores sum to 16); the temporal horn enlargement is reported as in keeping with MTA 3 hippocampal atrophy, so the supportive features rest on the acute callosal angle and mild DESH, which is what the must and the key evidence cite; the AD-biomarker follow-up repeats the full tap report (C17) with Abeta42, Abeta42/40, p-tau181 and total tau, and the criterion's two alternatives match the vocabulary; amyloid and FDG PET follow-ups agree with the A+T+ profile while the modality stays waste; tap figures agree across CSF report, biomarker follow-up, reassessment, criteria and must (TUG 42 to 37 to 34 s, 12% and 19%; walk not measurable; MoCA 16 to 17); prohibitions keep the AD-attribution item and add the no-withholding item; differential per plan (AD alone low, VCI moderate with Fazekas 2). MockServer probe: plain CSF call returns the tap report without biomarkers; the biomarker call returns the follow-up. `perfect_agent.py -v`, `case_io.py check` and `test_case_guards` clean. No error found; no change made.
+
+## Condition audit (NPH auditor, 24 Oct 2026)
+- `[Tisell_2011]` removed from `action-4-analyze-csf.citations`: the pack entry is Tisell 2011, shunt surgery in hydrocephalus with white matter changes, and this rationale is about the tap response only; `[Marmarou_2005]` (tap test) stays.
+- Checks after the edits: `perfect_agent.py` passes for all 30 NPH cases, `case_io.py check` clean.

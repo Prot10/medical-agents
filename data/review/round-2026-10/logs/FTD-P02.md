@@ -43,3 +43,15 @@ A 48-year-old senior accounting partner with no psychiatric history has had 20 m
 ## Verification
 
 `perfect_agent.py FTD-P02 -v`: ok. Assessment, labs and MRI come from `initial_tool_outputs`; neuropsych and FDG from `followup_outputs[0,3]`. Probes: plasma progranulin as a first order reaches its follow-up, not the baseline labs. The autoimmune panel, ANA and `NMDAR_IgG_cell_based` reach the autoimmune follow-up. RPR/HIV and perfusion SPECT reach their follow-ups. A baseline order returns the C5 panels. A sertraline drug check reaches the library. Any literature query returns the canonical output. `case_io.py check FTD-P02`: schema OK, and no failure names the case. `test_case_guards -k FTD-P02`: 2 passed. No em dashes remain.
+
+## Verification (adversarial verifier, 24 Oct 2026)
+
+Note: the section above was written by the worker as a self-check; this is the independent verification. Checked against the pre-round file, the plan (P02, C7) and the whole final case: patient diff (synthesis sentence, MoCA and PHQ-9 removed; two history items moved into the HPI), feature count against the history, quetiapine timeline (started 3 months ago, 17 months after onset, consistent across HPI, medication list, assessment and differential), progranulin and autoimmune follow-ups (targeted first orders reach them), FDG recommended with the SPECT alternative, GRN c.1477C>T p.Arg493* (a known pathogenic nonsense variant), musts, differential.
+
+Found and fixed:
+- B minor, clinical-assessment screen and dysexecutive lines: the listed losses (trails, fluency, recall 3/5 = 4) gave 26/30, not 25/30 (an original error). Abstraction 1/2 added (the neuropsychology reports impaired similarities), totalling 5 = 25/30.
+- C minor, must 1: certainty level made conditional on the recommended FDG result, as in P01 (plan C9).
+- C minor, KCE: line 5 stated the optional gene and progranulin results as making the diagnosis definite (C12); now supports offering counselling, testing optional, a pathogenic variant would make it definite. Line 1 said "loss of her job"; she is on administrative leave, now stated so.
+- C minor, literature source: Pottier 2016 title corrected as in P01.
+
+`perfect_agent.py FTD-P02 -v`: ok. `case_io.py check FTD-P02`: schema OK, no failure names the case. `test_case_guards -k FTD-P02`: passed.

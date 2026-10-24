@@ -43,3 +43,17 @@ A 75-year-old man with diabetes, hypertension and CKD stage 2, with 18 months of
 ## Open questions for Andrea (judgment calls you could not settle)
 
 None. The hip flexor weakness was removed rather than explained, because no finding in the case (spine, muscle enzymes, history) supports a cause and the plan rules out inventing one.
+
+## Verification
+
+Checked against `plans/NPH.md` (sections 2 to 4 and the per-case entry), ROUND_POLICY and PATTERNS; NPH has no notes file, so there is no note id to account for. Read the whole final case (flattened, every field) and compared it with the pre-round version (`1fd43d22~1`). Verified: patient block free of Evans, callosal angle, DESH, NPH, hydrocephalus, tap, shunt, TUG and MoCA results; literature and drug-interaction outputs null with no such follow-ups; MoCA subscores sum to the total and match the exam orientation; TUG and 10-m percentages recomputed from the stored seconds and identical in the baseline report, the CSF report, the post-tap follow-up and the criteria; CSF/serum glucose ratio consistent with the lab glucose; Evans index identical in the MRI, CT fallback (within 0.01), criteria and key evidence; Fazekas grade matches the VCI likelihood (plan C13); musts, prohibitions and differential match plan section 4; discriminator values (`holter_24h`, `TTE`, CSF assay terms) are vocabulary terms; criteria order and tiers per plan 3.1, constraints per 3.4, stop rule per 3.5. Hijack check (MockServer through `NeuroBenchEnvironment`): cognitive screen then "baseline timed gait before tap test" returns the baseline (no `pre_post_comparison`); after the CSF call "post-tap reassessment at 24 hours" returns the follow-up; "repeat timed gait after lumbar puncture" re-serves the baseline (plan R5, already logged). `perfect_agent.py -v`, `case_io.py check` and `test_case_guards -k` pass after the changes below.
+
+Found and changed:
+- `ground_truth.action_criteria[action-post-tap-gait-reassessment].rationale`: template sentence (C19); rewritten for his rollator, 42 mL tap and white matter change.
+- `ground_truth.red_herrings[0].data_point`: "in long-standing type 2 diabetes" is not in the exam field it points at, and the case never states the duration of his diabetes; set to the exam text "Mildly reduced vibration at both ankles and distal feet".
+- Kept: `[Tisell_2011]` on the CSF criterion and in the Fazekas prohibition, where the rationale is the white matter question that paper addresses. The eGFR 70 matches CKD-EPI 2021 for creatinine 1.1 mg/dL in a 75-year-old man (recomputed). The removal of the unexplained 4+/5 hip flexor weakness is logged by the worker and accepted.
+- Nothing else found.
+
+## Condition audit (NPH auditor, 24 Oct 2026)
+- `analyze_csf {"special_tests": ["HSV_PCR"]}` added to `avoid-waste-generic-csf-assays`, as in the other 24 NPH cases (plan 3.3, PCR panels).
+- Checks after the edits: `perfect_agent.py` passes for all 30 NPH cases, `case_io.py check` clean.

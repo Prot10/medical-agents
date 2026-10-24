@@ -40,3 +40,11 @@ A 60-year-old woman with known AChR-positive generalized MG (on pyridostigmine, 
 ## Open questions for Andrea (judgment calls you could not settle)
 
 None. The mediastinal CT tier (plan 3.5 leaves M04 to the worker) was set optional because the history documents two negative thymic CTs and the deterioration has an explained precipitant.
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. Read the log, the plan (M04 entry, crisis pathway 3.5), the diff and the whole final case. No notes file exists for MG. Every FIXED finding is in the file: RNS criterion deleted and RNS/SFEMG added as waste (the stored RNS report kept as data, consistent with known AChR+ MG); respiratory required first (1.60 L / 66 kg = 24 mL/kg, BMI 66/1.58^2 = 26.4, MIP -32 from -52 shown only as a same-modality comparison, so the HPI no longer leaks it); ciprofloxacin drug check required in checker voice (boxed warning, metoprolol caution, the xanthine-oxidase/azathioprine error and telithromycin gone, penicillin allergy listed); labs required as CBC with CMP or BMP, with magnesium and phosphate; urine culture moved to `order_microbiology` (ciprofloxacin-resistant E. coli, collected on day 4 of ciprofloxacin, `collected_before_antimicrobials` false, consistent); mediastinal CT optional with the reason (negative thymic CT 6 and 3 years ago, explained precipitant); constraint respiratory -> mediastinal CT soft; stop rule respiratory, drug check, labs. Musts: nitrofurantoin or fosfomycin match the susceptibilities and the penicillin allergy, creatinine 0.9 allows nitrofurantoin; ICU thresholds per fact 15; IVIG or PLEX now (MEP 38, MIP -32 with bulbar weakness). Cholinergic crisis low is consistent with the HPI (self-increase to five doses after the weakness began, no muscarinic signs, pupils 3 mm, HR 84). The old PMH "diet-controlled" diabetes contradiction with metformin is fixed.
+
+Found: nothing requiring a change. The plan's mediastinal CT tier choice is the worker's and is sound.
+
+Checks: `perfect_agent.py MG-M04 -v` passes, `case_io.py check` clean for the case, case guards pass.

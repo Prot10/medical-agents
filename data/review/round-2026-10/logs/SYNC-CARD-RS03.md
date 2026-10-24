@@ -41,3 +41,21 @@ None needing Andrea. Deviations from the lead plan, decided for dataset quality:
 - Head CT recommended instead of avoided (NICE NG232).
 - Labs pinned as BMP plus troponin, because the stored troponin is raised and the patient has exertional chest tightness after CABG.
 - The patient record (HPI, history, medications) was not rewritten: it already differs from RS02 (CABG, diabetes, atenolol, witnessed seated collapse); only the copied numbers were changed.
+
+## Verification
+
+Checked (24 Oct 2026, adversarial pass): the log against the diff from fa1d22e6; that no echo, telemetry, CMR, ECG or lab number still equals RS02 (plan M); CMR arithmetic ((168-94)/168 = 44%, echo 45%); telemetry timestamps against the 6:30 PM presentation; telemetry fallback identical to the follow-up; head CT tier (NICE NG232, LOC with a temple strike at 72: correct); troponin 0.05 ng/mL flagged and reflected in the labs criterion, the differential and the ischaemia must; atenolol must vs the "do not wait for washout" prohibition (consistent); Zeltser 2004 citation exists (J Am Coll Cardiol 2004;44:105-108); red herring quotes match the HPI and PMH.
+
+Found and changed:
+- CMR `LV_mass` "136 g (upper normal)": 136 g is mid-range for a man; label corrected to "(normal)".
+
+perfect_agent clean, `case_io.py check` clean for this case, leak guard passes.
+
+## Condition audit (24 Oct 2026)
+
+Condition auditor, cross-case pass over the 30 SYNC-CARD cases.
+
+Changed:
+- Added `initial_tool_outputs.literature_search.general` (the neutral syncope evaluation block already used in P02-P04 and RM01-RM03: ESC 2018 and ACC/AHA/HRS 2017 initial evaluation and risk stratification). Why: with no initial literature output, MockServer tier 2 answered any generic query (e.g. "syncope guidelines") with the case's disease-specific follow-up, which names the diagnosis. The block repeats no expected_evidence (leak guard passes).
+
+Re-run after the change: perfect_agent 30/30 clean, case_io check clean for SYNC-CARD, test_case_guards for SYNC-CARD 60 passed, discriminator and hijack guards clean.

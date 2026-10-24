@@ -43,3 +43,21 @@ A 54-year-old novelist with bipolar II, stable on valproate for 15 years, has ha
 ## Verification
 
 `perfect_agent.py FTD-P01 -v`: ok. Assessment, labs and MRI come from `initial_tool_outputs`; neuropsych, valproate/ammonia and FDG from `followup_outputs[0,1,3]`. Probes: a valproate/ammonia order reaches its follow-up; a baseline order returns the C5 panels; RPR/HIV, perfusion SPECT and the gene panel reach their follow-ups; a valproate drug check reaches the library ("no interaction"); any literature query returns the canonical output. `case_io.py check FTD-P01`: schema OK, and no failure names the case. `test_case_guards -k FTD-P01`: 2 passed. No em dashes remain.
+
+## Verification (adversarial verifier, 24 Oct 2026)
+
+Note: the section above was written by the worker as a self-check; this is the independent verification. Checked against the pre-round file, the plan (P01, C2, C7) and the whole final case: patient diff (MoCA and the "misdiagnosed FTD" inference removed), the valproate criterion now `interpret_labs [valproate_level, ammonia]` (id kept), FDG recommended with the SPECT alternative, MoCA 26/30 arithmetic (4 single-point losses), musts versus the valproate prohibition (consistent), differential and red herrings. MockServer probes: valproate first or second, baseline and CT all reach the intended outputs.
+
+Found and fixed:
+- B major, ammonia unit (labs panel and follow-up, `abnormal_values_summary` twice, the criterion's expected evidence, the red-herring data point): 38 "mcg/dL" with a reference range of 11-35, which is the umol/L range (the mcg/dL range is about 15-60, so 38 mcg/dL would be normal). Unit set to umol/L everywhere; 38 umol/L stays mildly raised.
+- B minor, `fallback_tool_outputs.ct`: a 3 mm calcified right frontal granuloma that the MRI does not show (same class as plan C6 for S04). Removed; impression completed; `fallback_tool_kinds.ct` "incidental" -> "normal".
+- C minor, must 1: the certainty level presumed the recommended FDG result ("probable with frontal hypometabolism"). Now "possible on the clinical features with a normal MRI; probable once functional imaging shows frontal hypometabolism; definite if a pathogenic variant is found" (plan C9: no must depends on a non-required result).
+- C minor, KCE 5 stated the optional gene result (C12). Now supports offering counselling, testing optional.
+- C minor, literature source: Pottier 2016 title corrected to "Genetics of FTLD: overview and what else we can do with genetic data" (J Neurochem 138 Suppl 1:32-53).
+
+`perfect_agent.py FTD-P01 -v`: ok. `case_io.py check FTD-P01`: schema OK, no failure names the case. `test_case_guards -k FTD-P01`: passed.
+
+## Condition audit (FTD auditor, 24 Oct 2026)
+
+- B, major, `followup_outputs`: an order of `genetic_panel:ALS` fell to the benchmark library, which reports a normal C9orf72 and so contradicted the expansion on this case's FTD panel. Added follow-up `request_als_gene_panel_c9orf72` (`test_type: genetic_panel:ALS`) with the same C9orf72 expansion and SOD1, TARDBP and FUS negative, as P04 and P05 already have. No criterion changed. FIXED.
+- `perfect_agent.py` and `case_io.py check` were re-run on all 30 FTD cases after the changes and are clean; `test_case_guards.py -k FTD` passes (60 tests).

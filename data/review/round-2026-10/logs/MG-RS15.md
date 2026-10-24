@@ -44,3 +44,10 @@ Checked: neostigmine follow-up and ice pack criterion gone (no ptosis; probed: a
 - No other error found.
 
 Checks re-run after the edits: `perfect_agent.py -v` passes (only the known mediastinum_MRI alternative served by the library normal), `case_io.py check` clean for the case, `test_case_guards.py -k` passes, and the 24 Oct discriminator guard (run by hand; MG is not yet in `DISCRIMINATOR_CONDITIONS`) reports no defect.
+
+## Condition audit (MG auditor, 24 Oct 2026)
+
+- sequence constraint added: action-1-interpret-labs -> action-3-order-specialized-test (soft). FIXED.
+  Why: plan MG.md 3.3 sets soft labs -> SFEMG and RNS -> SFEMG wherever an SFEMG criterion exists; these were missing here and present in the sibling cases.
+- sequence constraint added: action-2-order-specialized-test -> action-3-order-specialized-test (soft). FIXED.
+- `perfect_agent.py` and `case_io.py check` re-run on all 30 MG cases after the changes; the hand-run discriminator guard reports 0 defects in the 30 MG cases.

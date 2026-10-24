@@ -46,3 +46,11 @@ Found and fixed:
 - E minor: em dash in the rewritten `neurological_exam.cranial_nerves` sentence replaced by a comma.
 
 perfect_agent passes; case_io check clean for this case.
+
+## Condition audit (MG auditor, 24 Oct 2026)
+
+- fallback_tool_outputs.echo.echo_type set to TTE. FIXED.
+  Why: the discriminator guard (PATTERNS.md section 5) requires an exact vocabulary value on every case fallback; an empty echo_type answered every echo variant. The RS11-RS16 verifiers fixed this only in their own cases.
+- initial_tool_outputs.body_imaging.region 'mediastinum' -> 'chest, anterior mediastinum' so the chest_CT alternative gets the case's own CT chest report (as S01-S04). FIXED.
+  Why: perfect_agent warned that chest_CT fell back to a library normal report for this case.
+- `perfect_agent.py` and `case_io.py check` re-run on all 30 MG cases after the changes; the hand-run discriminator guard reports 0 defects in the 30 MG cases.

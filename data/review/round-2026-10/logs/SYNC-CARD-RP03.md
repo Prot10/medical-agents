@@ -39,3 +39,24 @@ The 38-year-old woman with three exertional collapses and a father who died sudd
 ## Open questions for Andrea (judgment calls you could not settle)
 
 None. Decided here: the MRI LGE was removed rather than keeping a structurally abnormal heart, because the CPVT label requires a structurally normal heart and the criterion already expected one.
+
+## Verification
+
+Adversarial verification, 24 Oct 2026 (diff against fa1d22e6; the batch-4 checkpoint commit holds the worker's edit).
+
+Checked: no reviewer notes for SYNC-CARD. Plan items: exercise test required with hard TTE-first, showing ectopy escalating to bidirectional and polymorphic VT; isoproterenol tilt and "Do not call" text gone; genetic report kept as last clinical follow-up and not a criterion; head CT waste (standing-height fall, 38, GCS 15, no NICE NG232 criterion); CMR recommended and, after the LGE removal, MVP with 4 mm MAD is present and the arrhythmic-MVP mimic is added as low (plan K condition met); LQTS low (QTc 448 ms is normal for a woman); drug check optional. RYR2 c.13489C>T codes p.Arg4497Cys (codon 4497 spans c.13489-13491; CGC to TGC), a well-described CPVT variant. Telemetry burden (386 PVCs at 72 bpm over 48 h = 0.19%) is consistent. Musts follow ESC 2022 (nadolol or propranolol at maximal dose, flecainide for breakthrough, no ICD as first-line or sole therapy, cascade screening of the sister and children); prohibition and must on the ICD agree. Escitalopram is correctly flagged as a QT-active drug in the medication review. Red herrings quote the HPI. Guards pass.
+
+Found and fixed:
+- `followup_outputs[6].output.panels.Arrhythmia_genetic_panel[4].test`: "Anderson-Tawil" misspelled; now "Andersen-Tawil" (the metadata pearl already spelled it correctly).
+
+perfect_agent.py SYNC-CARD-RP03 -v: ok. case_io.py check: clean for this case.
+
+## Condition audit (24 Oct 2026)
+
+Condition auditor, cross-case pass over the 30 SYNC-CARD cases.
+
+Changed:
+- Added `initial_tool_outputs.literature_search.general` (the neutral syncope evaluation block already used in P02-P04 and RM01-RM03: ESC 2018 and ACC/AHA/HRS 2017 initial evaluation and risk stratification). Why: with no initial literature output, MockServer tier 2 answered any generic query (e.g. "syncope guidelines") with the case's disease-specific follow-up, which names the diagnosis. The block repeats no expected_evidence (leak guard passes).
+- Literature follow-up trigger `search_cpvt_diagnosis_management` renamed to `search_cpvt_catecholaminergic_polymorphic_ventricular_tachycardia`. Why: the old trigger's meaningful tokens were generic (management, guidelines, diagnosis, syncope, literature), so a generic query hit the disease-specific report; the new tokens are the condition names, so only a query naming the condition reaches it.
+
+Re-run after the change: perfect_agent 30/30 clean, case_io check clean for SYNC-CARD, test_case_guards for SYNC-CARD 60 passed, discriminator and hijack guards clean.

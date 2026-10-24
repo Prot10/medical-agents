@@ -50,3 +50,11 @@ Found and fixed:
 - C/B major: no SFEMG report was stored, so an SFEMG order (a common extra study, inside the allowance of 2) returned the library's normal SFEMG ("no evidence of a neuromuscular transmission defect"), contradicting the decrement and the AChR titre. Added a follow-up `request_emg_single_fiber` (left frontalis, mean MCD 64 microseconds, increased jitter 13/20, blocking 4/20), an optional criterion `action-single-fiber-emg` after RNS, and the two soft constraints of plan 3.3 (`RNS -> SFEMG`, `labs -> SFEMG`), matching the S01-S04 pattern.
 
 Left as is: older template sentences with em dashes in `key_clinical_evidence[0,2]` and the red herring (pre-existing prose, correct content). perfect_agent passes (alternatives mediastinum_MRI and chest_CT answered by library normal reports, consistent with this normal CT); case_io check clean for this case.
+
+## Condition audit (MG auditor, 24 Oct 2026)
+
+- fallback_tool_outputs.echo.echo_type set to TTE. FIXED.
+  Why: the discriminator guard (PATTERNS.md section 5) requires an exact vocabulary value on every case fallback; an empty echo_type answered every echo variant. The RS11-RS16 verifiers fixed this only in their own cases.
+- initial_tool_outputs.body_imaging.region 'mediastinum' -> 'chest, anterior mediastinum' so the chest_CT alternative gets the case's own CT chest report (as S01-S04). FIXED.
+  Why: perfect_agent warned that chest_CT fell back to a library normal report for this case.
+- `perfect_agent.py` and `case_io.py check` re-run on all 30 MG cases after the changes; the hand-run discriminator guard reports 0 defects in the 30 MG cases.

@@ -51,3 +51,9 @@ Adversarial verifier, 24 Oct 2026.
   2. Same defect on the optional sertraline check: `required_arguments.indication = "behavioural symptoms in FTD"` (exact free text). FIXED: `indication` removed, `drug: sertraline` kept, as in M01, M04, S09.
 - Left as is (judgment, noted): no genetic-counselling must although onset at 60 is young onset (see the FTD-S01 verification note); the case has no genetics criterion and no family history.
 - After the edits: `perfect_agent.py -v` passes, `case_io.py check` names no failure for the case, `test_case_guards` passes; a literature call with an arbitrary query and a sertraline check with other arguments now match their optional criteria.
+
+## Condition audit (FTD auditor, 24 Oct 2026)
+
+- D, major, `patient.neurological_exam.mental_status`: the examination gave the bedside screen results (MMSE 22/30, FAB 11/18 and clock), which the required `perform_clinical_assessment` returns (ROUND_POLICY timeline-leak rule). The other 12 FTD cases, and VASC-DEM and ALZ-EARLY, had already moved them out. Removed the scores and test results; the behavioural observations, insight and frontal signs stay. The clinical assessment output already carries every removed value, so no information is lost. This settles the worker's FLAGGED row on the same field. FIXED.
+- E, minor, `initial_tool_outputs.literature_search[*].results[*].source`: the sources were citation keys (`[Rascovsky_2011]` or `Rascovsky_2011`), which a literature tool does not return, and the condition used three styles. They now give the full reference, as in M07-P02 (for example "Rascovsky K et al. Brain 2011;134:2456-2477 (FTDC criteria for bvFTD)"). Findings and summary are unchanged. FIXED.
+- `perfect_agent.py` and `case_io.py check` were re-run on all 30 FTD cases after the changes and are clean; `test_case_guards.py -k FTD` passes (60 tests).

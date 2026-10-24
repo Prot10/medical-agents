@@ -46,3 +46,9 @@ The patient block no longer names NPH or gives the Evans index, TUG, 10-metre wa
 ## Open questions for Andrea (judgment calls you could not settle)
 
 - Plan Q3 (72 h ASRA hold vs a 48 h local practice) applies directly to this case; the case follows ASRA 2018.
+
+## Verification
+Adversarial verifier, 24 Oct 2026. Read the log, the whole final case and its diff against fa1d22e6.
+- Checked: the drug-check criterion and follow-up, anti-Xa row and hold text are gone; the DOAC must and prohibition follow F7 (apixaban at least 72 hours, restart no sooner than 6 hours, no bridging); CHA2DS2-VASc 4 is derivable (age 72 = 1, hypertension = 1, prior stroke = 2); aspirin allergy not contradicted anywhere. The infarct relocation is justified: the old temporal and inferior parietal site could not explain right hand and face weakness, tongue deviation, dysarthria, right leg spasticity and Babinski; the new left precentral and corona radiata site does, CT fallback and expected evidence agree, and the corona radiata component can carry the chronic right hemisensory loss. DESH present (both components) agrees with differential, prohibitions and key evidence. Figures identical across reports (TUG 32 to 28 s = 13%, to 26.5 s = 17%; 10-metre walk 26 to 21 s = 19%; MoCA unchanged at 20, items sum to 20). Sinus ECG and Holter fallbacks fit paroxysmal AF. MockServer probe: no leak.
+- Found: nothing that needed a change. Noted only: the Holter fallback maximum of 129 bpm in sinus rhythm on metoprolol is high but possible and off-pathway.
+- No edits. perfect_agent -v ok, case_io check clean for the case, test_case_guards pass.

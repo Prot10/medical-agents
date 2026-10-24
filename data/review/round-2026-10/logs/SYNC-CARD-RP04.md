@@ -39,3 +39,25 @@ The 41-year-old woman with a 12-year label of refractory focal epilepsy and a fi
 
 - Deviation from plan E: the short monitoring (telemetry or Holter) is recommended, not optional, because one episode occurred during sleep, a high-risk feature for which ESC 2018 advises in-hospital monitoring at presentation. Please confirm.
 - Added cardiac MRI as recommended (plan tier table for AV block under 60) with a normal report. Inherited conduction disease is left moderate because the CMR cannot exclude it.
+
+## Verification
+
+Adversarial verification, 24 Oct 2026 (diff against fa1d22e6; the batch-4 checkpoint commit holds the worker's edit).
+
+Checked: no reviewer notes for SYNC-CARD. Plan items: HPI ECG result removed; ILR required with asystole of at least 6 s during typical events (18, 23, 27 s, each with a witnessed collapse, sinus P waves continuing at 68-72 bpm, no sinus slowing, which also excludes a vagal mechanism); event_monitor_30d recommended; stepwise-escalation must deleted; labs recommended AED_levels; drug check required on lamotrigine or levetiracetam with no current_medications pin; hard labs-before-monitoring deleted; PFO framing gone; EEG waste; refractory epilepsy low. Lamotrigine facts (in vitro class IB activity, 2021 FDA labelling warning in second- or third-degree heart block, taper over at least 2 weeks) are correct; driving advice (Group 1, 1 week after pacing) matches ESC 2018; the LMNA and CMR statements match ESC 2021 pacing. Event-monitor red herring quotes `followup_outputs[2].output.impression` verbatim at the right index. Telemetry, event monitor and ILR numbers agree with the ECG (PR 190-200 ms, no second-degree block). Guards pass.
+
+Open question settled (ROUND_POLICY: decide it): keeping the short in-hospital monitoring `recommended` rather than the plan's `optional` holter is correct. One of her events occurred during sleep, i.e. supine, and syncope in the supine position is an ESC 2018 major high-risk feature for which immediate in-hospital ECG monitoring is indicated; the low yield of 24 h for her event frequency is why it is recommended and not required. No question for Andrea remains in this case.
+
+Changed: nothing in the case file.
+
+perfect_agent.py SYNC-CARD-RP04 -v: ok. case_io.py check: clean for this case.
+
+## Condition audit (24 Oct 2026)
+
+Condition auditor, cross-case pass over the 30 SYNC-CARD cases.
+
+Changed:
+- Added `initial_tool_outputs.literature_search.general` (the neutral syncope evaluation block already used in P02-P04 and RM01-RM03: ESC 2018 and ACC/AHA/HRS 2017 initial evaluation and risk stratification). Why: with no initial literature output, MockServer tier 2 answered any generic query (e.g. "syncope guidelines") with the case's disease-specific follow-up, which names the diagnosis. The block repeats no expected_evidence (leak guard passes).
+- Literature follow-up trigger `search_convulsive_syncope_loop_recorder_av_block_pacing` renamed to `search_loop_recorder_paroxysmal_av_block_pacing`. Why: the old trigger's meaningful tokens were generic (management, guidelines, diagnosis, syncope, literature), so a generic query hit the disease-specific report; the new tokens are the condition names, so only a query naming the condition reaches it.
+
+Re-run after the change: perfect_agent 30/30 clean, case_io check clean for SYNC-CARD, test_case_guards for SYNC-CARD 60 passed, discriminator and hijack guards clean.

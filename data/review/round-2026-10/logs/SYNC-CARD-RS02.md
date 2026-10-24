@@ -40,3 +40,23 @@ The 72-year-old man after pembrolizumab with hypotensive complete heart block (w
 None needing Andrea. Deviations from the lead plan, decided for dataset quality:
 - Head CT recommended instead of avoided (NICE NG232, as above).
 - Labs pinned as BMP plus troponin rather than BMP alone, because the pembrolizumab history makes troponin a targeted assay for a reversible cause of the block.
+
+## Verification
+
+Checked (24 Oct 2026, adversarial pass): the log against the diff from fa1d22e6 and the whole final case; head CT tier against NICE NG232 (72, loss of consciousness, temporal contusion: CT within 8 h, so the deviation from the plan's subtype row is correct and follows the plan's own J rule); troponin as a targeted assay (pembrolizumab, coronary disease) is sound; echo vs CMR wall motion; CMR arithmetic ((172-100)/172 = 42%); telemetry (fallback identical); drug outputs against the list; musts vs prohibitions; differential; stop rule; pathway order.
+
+Found and changed:
+- `initial_tool_outputs.ecg.intervals.QTc` still read "492 ms (borderline prolonged)" after the worker fixed the interpretation; 492 ms in a man is prolonged. Now "492 ms (prolonged; the wide escape QRS contributes)".
+- CMR `LV_mass` "148 g (increased)" and "Increased LV mass (148 g)": 148 g is within the normal male CMR range, and the echo reports concentric hypertrophy (septum 1.3 cm). Value set to 188 g (increased) in both places; it remains distinct from RS03 (136 g).
+- Differential, immune-checkpoint myocarditis: "no history of myalgia or ptosis" is not recorded anywhere in the case. Now cites what the record does show (strength 5/5, extraocular movements intact, no dysphagia).
+
+perfect_agent clean, `case_io.py check` clean for this case, leak guard passes.
+
+## Condition audit (24 Oct 2026)
+
+Condition auditor, cross-case pass over the 30 SYNC-CARD cases.
+
+Changed:
+- Added `initial_tool_outputs.literature_search.general` (the neutral syncope evaluation block already used in P02-P04 and RM01-RM03: ESC 2018 and ACC/AHA/HRS 2017 initial evaluation and risk stratification). Why: with no initial literature output, MockServer tier 2 answered any generic query (e.g. "syncope guidelines") with the case's disease-specific follow-up, which names the diagnosis. The block repeats no expected_evidence (leak guard passes).
+
+Re-run after the change: perfect_agent 30/30 clean, case_io check clean for SYNC-CARD, test_case_guards for SYNC-CARD 60 passed, discriminator and hijack guards clean.

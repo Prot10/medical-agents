@@ -57,3 +57,13 @@ Found and changed:
 - Tilt follow-up baseline (146/86 mmHg, HR 54) was identical to M01's and M03's tilt reports. Set to 140/84 mmHg and HR 52, consistent with her vitals (143/85) and the ECG ventricular rate (52).
 
 Re-run: perfect_agent clean, case_io check clean for this case, leak guard passes.
+
+## Condition audit (24 Oct 2026)
+
+Condition auditor, cross-case pass over the 30 SYNC-CARD cases.
+
+Changed:
+- Added `initial_tool_outputs.literature_search.general` (the neutral syncope evaluation block already used in P02-P04 and RM01-RM03: ESC 2018 and ACC/AHA/HRS 2017 initial evaluation and risk stratification). Why: with no initial literature output, MockServer tier 2 answered any generic query (e.g. "syncope guidelines") with the case's disease-specific follow-up, which names the diagnosis. The block repeats no expected_evidence (leak guard passes).
+- red herring 0 `data_point` now quotes the HPI verbatim ("she was unresponsive and her arms were shaking for approximately 5 to 10 seconds").
+
+Re-run after the change: perfect_agent 30/30 clean, case_io check clean for SYNC-CARD, test_case_guards for SYNC-CARD 60 passed, discriminator and hijack guards clean.

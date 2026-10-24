@@ -39,3 +39,8 @@ Literature is optional background with a general bvFTD summary; the capacity ess
 
 ## Verification
 Adversarial verifier, 24 Oct 2026. Read the log, the diff and the whole final case. Checked: 4 of 6 features with executive feature false at the bedside agrees with `criteria_met`; MMSE 22/30 adds up (serial sevens -4, recall -2, orientation -2); second impression variant used; neuropsych report no longer pronounces on capacity (now a must); rigidity and shuffling gait removed from exam, red herrings and KCE, DaTscan rationale matches the normal exam; the new red herring points to an existing field (`clinical_assessment.findings[7]`) whose text it paraphrases; eGFR 88 matches creatinine 1.0, male 56; RPR/HIV routing probed (first or second order); FDG/SPECT authored; genetic report negative with correct interpretation; onset age 54 consistent with age 56 and a 2-year course; AD low with for/against. perfect_agent and case_io check clean; case guards pass. No errors found; no changes made.
+
+## Condition audit (FTD auditor, 24 Oct 2026)
+
+- E, minor, `initial_tool_outputs.literature_search[*].results[*].source`: the sources were citation keys (`[Rascovsky_2011]` or `Rascovsky_2011`), which a literature tool does not return, and the condition used three styles. They now give the full reference, as in M07-P02 (for example "Rascovsky K et al. Brain 2011;134:2456-2477 (FTDC criteria for bvFTD)"). Findings and summary are unchanged. FIXED.
+- `perfect_agent.py` and `case_io.py check` were re-run on all 30 FTD cases after the changes and are clean; `test_case_guards.py -k FTD` passes (60 tests).

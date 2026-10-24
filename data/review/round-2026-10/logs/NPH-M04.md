@@ -42,3 +42,10 @@ The patient block keeps her fear of Alzheimer's disease but no longer names NPH,
 
 - Plan deviation, decided: the plan lists M04 among the cases without DESH (C7), but the original MRI described "moderate tight sulci at high convexity with sylvian fissure widening", which is DESH. I kept DESH present (both components stated) rather than editing a finding out; nothing for Andrea to decide unless the lead wants all no-DESH cases uniform.
 - AD prohibition: the plan keeps it only in P01 and P09; I kept a rewritten one here because the chief complaint makes Alzheimer's disease the patient's explicit worry, which is the situation the plan's "wherever AD is in question" rule describes.
+
+## Verification
+Adversarial verifier, 24 Oct 2026. Read the log, the whole final case and its diff against fa1d22e6.
+- Checked: the deviation from the plan (DESH kept) is correct: the original MRI described "tight sulci at high convexity with sylvian fissure widening", which are both DESH components. Spine content is out of the brain MRI and in a recommended cervical spine MRI served by the case (probe: `order_body_imaging {"study": "spine_MRI"}` returns the follow-up); its right C5-C6 foraminal narrowing matches the residual right C6 radiculopathy. Thyroid labs recommended and normal; euthyroid and gabapentin musts present; gabapentin 300 mg three times daily = 900 mg/day as the key evidence says. Figures identical across reports (TUG 24 to 20.5 s = 15%, to 19 s = 21%; 10-metre walk 19 to 15.5 s = 18%). The kept AD prohibition is reasonable (the chief complaint makes AD the patient's stated worry).
+- Found and fixed (B, minor): the cognitive-screen attention item read "4/6: one letter-tapping error, serial sevens 2/3"; under MoCA rules one tapping error still scores 1, which makes 5/6 and a total of 23, not 22. Now "two letter-tapping errors", so the items sum to 22.
+- Found and fixed (B, minor): the spine MRI gave a C5-C6 canal AP diameter of 11 mm (relative stenosis range) beside "canal patent ... no canal stenosis". Now 13 mm.
+- perfect_agent -v ok, case_io check clean for the case, test_case_guards pass.

@@ -41,3 +41,24 @@ The 38-year-old woman with a pulseless, non-shockable arrest during trigger poin
 None needing Andrea. Decisions taken:
 - Drug check kept `recommended` as the plan tiers it, although the cyclobenzaprine contraindication is concrete: stopping it is a must, and the pacing or ICD decision does not depend on the review.
 - Cardiac sarcoidosis left `moderate`, not low: the CMR pattern fits it and no pathway result excludes it; the FDG-PET must covers it.
+
+## Verification
+
+Checked (24 Oct 2026, adversarial pass): the log against the diff from fa1d22e6 and the whole final case; patient block unchanged; ECG, telemetry (case fallback identical), echo, CMR arithmetic (LVEF (118-51)/118 = 57%, RVEF 54%), tilt and exercise follow-ups against the vitals and the ECG; drug outputs against the medication list; musts against prohibitions and avoided actions; differential against the results; stop rule, sequence constraints, pathway order (literature last); banned strings; leak guard.
+
+Found and changed:
+- `red_herrings[0..2].data_point` were paraphrases, not quotes from the field (plan L). Now quote the HPI ("She reported anxiety about the procedure but agreed to proceed.", "1 mL of lidocaine was injected intramuscularly") and the PMH ("Mitral valve prolapse noted incidentally on echocardiogram 3 years ago").
+- Literature follow-up `search_pacing_av_block_young_adults_lamin`: the ESC 2022 LMNA finding misstated the IIa criterion ("pacing indication or other high-risk feature"); now the 5-year risk of 10% or more with a manifest phenotype (NSVT, LVEF below 50% or AV conduction delay). The summary said an ICD is considered "when a laminopathy is likely or confirmed"; the guideline applies to LMNA mutation carriers, so it now says that and adds genetic testing when a familial conduction disease is suspected.
+- Escitalopram drug follow-up quoted this patient's QTc (492 ms) and rhythm, an ECG result inside a drug report: rewritten as the general QT caution (prolonged QTc, bradycardia or pauses).
+
+Confirmed correct, no change: cyclobenzaprine label contraindication; lidocaine maximum 4.5 mg/kg (300 mg); CHB tiers per plan; sarcoid kept moderate with the FDG-PET must. perfect_agent clean, `case_io.py check` clean for this case, leak guard passes.
+
+## Condition audit (24 Oct 2026)
+
+Condition auditor, cross-case pass over the 30 SYNC-CARD cases.
+
+Changed:
+- Added `initial_tool_outputs.literature_search.general` (the neutral syncope evaluation block already used in P02-P04 and RM01-RM03: ESC 2018 and ACC/AHA/HRS 2017 initial evaluation and risk stratification). Why: with no initial literature output, MockServer tier 2 answered any generic query (e.g. "syncope guidelines") with the case's disease-specific follow-up, which names the diagnosis. The block repeats no expected_evidence (leak guard passes).
+- Literature follow-up trigger `search_lidocaine_toxicity_cardiac_arrest` renamed to `search_lidocaine_local_anaesthetic_systemic_toxicity`. Why: the old trigger's meaningful tokens were generic (management, guidelines, diagnosis, syncope, literature), so a generic query hit the disease-specific report; the new tokens are the condition names, so only a query naming the condition reaches it.
+
+Re-run after the change: perfect_agent 30/30 clean, case_io check clean for SYNC-CARD, test_case_guards for SYNC-CARD 60 passed, discriminator and hijack guards clean.

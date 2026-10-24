@@ -48,3 +48,23 @@ The 70-year-old man with prior LAD PCI, paroxysmal AF on metoprolol, apixaban an
 None needing Andrea. Deviations from the lead plan, decided for dataset quality:
 - Head CT recommended instead of avoided (NICE NG232, as above).
 - Troponin set below the 99th percentile instead of exactly at it, so the case does not leave an unresolved ACS question that no criterion addresses.
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. No reviewer notes exist for SYNC-CARD (no notes file), so no note ids could be missing. Read the full final case against the log and plan sections A-O.
+- Checked: ECG 35 bpm vs vitals 36 vs telemetry 28-42; Hb 13.9 / Hct 41.6; anion gap 12; troponin 0.02 below the 99th percentile; echo LVEF 45% vs CMR 168/92 mL (45%); telemetry and fallback identical with monitor_type telemetry; drug follow-up and fallback content against the medication list (apixaban dose criteria, metformin at eGFR about 58); musts against prohibitions (hold metoprolol, no washout delay, no heparin bridging, ESC 2024 OAC monotherapy beyond 12 months after PCI); red-herring field paths and quotes (ecg.findings[4], medications[0], HPI); differential against pathway results; banned strings and tool names in clinical text (none); leak guard passes.
+- The head CT deviation from the plan (recommended instead of avoided) is sound: 70, loss of consciousness, forehead strike, apixaban meets NICE NG232 twice.
+- Found and changed: the head-CT criterion `action-9-order-ct-scan` cited [ESC_2018], which does not address head injury; citations set to [] (NICE NG232 is named in the rationale, as the plan requires for keys outside the allow-list).
+- perfect_agent -v and case_io check clean after the change.
+
+## Condition audit (24 Oct 2026)
+
+Condition auditor, cross-case pass over the 30 SYNC-CARD cases.
+
+Changed:
+- Added `initial_tool_outputs.literature_search.general` (the neutral syncope evaluation block already used in P02-P04 and RM01-RM03: ESC 2018 and ACC/AHA/HRS 2017 initial evaluation and risk stratification). Why: with no initial literature output, MockServer tier 2 answered any generic query (e.g. "syncope guidelines") with the case's disease-specific follow-up, which names the diagnosis. The block repeats no expected_evidence (leak guard passes).
+- Drug follow-ups and the fallback medication review: removed, where present, wording that asserted results the agent has not obtained ("while AV conduction disease is unpaced", "meets the labelled dose", device-implantation warnings, the eGFR-specific metformin line, cefazolin "for device implantation"). Each is now a conditional rule (e.g. contraindicated in second- or third-degree AV block without a pacemaker; apixaban 5 mg unless two of age 80 or over, weight 60 kg or less, creatinine 1.5 mg/dL or more; anticoagulation advice if a device is implanted). Why: a drug check must not disclose the conduction diagnosis or the management decision.
+- `initial_tool_outputs.drug_interactions` set to the medication-list review (copy of the fallback). Why: without it, tier 2 answered an unrelated drug (probe: ibuprofen) with the first per-drug follow-up.
+- Added "not performed" follow-ups for `tilt_table` and `exercise_stress_test` (RM04/RP02 format, "Deferred by the clinical team"). Why: otherwise the library returned a normal tilt (HR 68) or a normal exercise test (10.4 METs) in a patient with high-grade AV block, contradicting the case; both orders stay penalised as in the plan.
+
+Re-run after the change: perfect_agent 30/30 clean, case_io check clean for SYNC-CARD, test_case_guards for SYNC-CARD 60 passed, discriminator and hijack guards clean.

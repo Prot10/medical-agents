@@ -40,3 +40,24 @@ The 29-year-old woman 10 days after caesarean section, referred as "postpartum s
 ## Open questions for Andrea (judgment calls you could not settle)
 
 None. Decided here: the exercise test follow-up is kept (optional criterion, protected by a hard TTE-first constraint) although it was performed 10 days after surgery; its rationale says it can be deferred. Driving advice uses the 3-month interval after an ICD for an arrhythmic event (ESC 2018).
+
+## Verification
+
+Adversarial verification, 24 Oct 2026 (diff against fa1d22e6; the batch-4 checkpoint commit holds the worker's edit).
+
+Checked: no reviewer notes for SYNC-CARD. 2010 Task Force arithmetic: T-wave inversion V1-V3 without RBBB at age 29 is a major repolarisation criterion; regional RV dyskinesia with RVEDVI 112 mL/m2 (female threshold 100) and RVEF 39% (threshold 40) is a major imaging criterion, so "definite" is correct; the possible epsilon wave is not counted. Telemetry PVC burden (4,832 at 78 bpm over 24 h = 4.3%) and CMR volumes are consistent. Magnesium 4.4 mg/dL is plausible on a 4 g load plus 1 g/h. LactMed facts in musts and prohibition (metoprolol and propranolol acceptable; atenolol, nadolol and sotalol avoided) are correct; ICD "should be considered" after arrhythmic syncope in ARVC (ESC 2022) matches the must. Labs pin BMP, magnesium and urinalysis (plan C); exercise test optional with hard TTE-first constraint; drug check recommended with metoprolol and propranolol; differential all low with excluding results present in the stored outputs (BP, UPCR 0.18, platelets and liver enzymes, LVEF, BNP 89, PASP 24). Red herrings quote the chief complaint and HPI verbatim. Guards pass.
+
+Found and fixed (timeline, dim B, major):
+- The worker's added "magnesium started at the referring hospital about 5 hours ago" could not coexist with "two episodes ... over the past 6 hours" (first at 10:00, second at 15:30, magnesium started only after the second) or with the exam "approximately 40 minutes after the most recent event", which left no time for EMS, the referring hospital work-up, CT and transfer. Now: episodes "today" (`patient.history_present_illness`), magnesium "about 3 hours ago" (`patient.clinical_history.medications[4].indication`), exam "approximately 4 hours after the most recent event" (`patient.neurological_exam.mental_status`). The 24 h telemetry times (03:22, 11:40, 16:05 of the following day) remain consistent.
+
+perfect_agent.py SYNC-CARD-RP01 -v: ok. case_io.py check: clean for this case.
+
+## Condition audit (24 Oct 2026)
+
+Condition auditor, cross-case pass over the 30 SYNC-CARD cases.
+
+Changed:
+- Added `initial_tool_outputs.literature_search.general` (the neutral syncope evaluation block already used in P02-P04 and RM01-RM03: ESC 2018 and ACC/AHA/HRS 2017 initial evaluation and risk stratification). Why: with no initial literature output, MockServer tier 2 answered any generic query (e.g. "syncope guidelines") with the case's disease-specific follow-up, which names the diagnosis. The block repeats no expected_evidence (leak guard passes).
+- Literature follow-up trigger `search_arvc_diagnosis_management` renamed to `search_arvc_arrhythmogenic_right_ventricular_cardiomyopathy`. Why: the old trigger's meaningful tokens were generic (management, guidelines, diagnosis, syncope, literature), so a generic query hit the disease-specific report; the new tokens are the condition names, so only a query naming the condition reaches it.
+
+Re-run after the change: perfect_agent 30/30 clean, case_io check clean for SYNC-CARD, test_case_guards for SYNC-CARD 60 passed, discriminator and hijack guards clean.

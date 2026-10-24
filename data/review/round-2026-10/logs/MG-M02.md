@@ -44,3 +44,16 @@ A 48-year-old woman with SLE and Sjogren syndrome on hydroxychloroquine 400 mg, 
 ## Open questions for Andrea (judgment calls you could not settle)
 
 None.
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. Read the log, the plan (M02 entry, 3.2 drug-check table), the diff and the whole final case. No notes file exists for MG. Every FIXED finding is in the file: AChR 0.6 nmol/L against <0.5 called positive in labs, key evidence and red herring; thyroid stub replaced; titin row, post-IVIG panel, MuSK follow-up and literature follow-up deleted; NIF/FVC out of the exam; respiratory report per fact 14 (2.60 L / 58.5 kg = 44 mL/kg, BMI 58.5/1.62^2 = 22.3); RNS equivocal (maximum 10%, which is not above 10%) so SFEMG recommended; ice pack consistent with right-predominant ptosis; drug check required with real content (pilocarpine muscarinic load, hydroxychloroquine aggravation, celecoxib with prednisone, celecoxib label sulfonamide contraindication with the recorded sulfa allergy kept); stop rule includes the required drug check. The hydroxychloroquine must (no more than 5 mg/kg/day; 400 mg is 6.8 mg/kg) is correct and agrees with the HPI dose increase and the differential ("symptoms began before the dose increase"). The thymectomy must fits MGTX (48, AChR+, no thymoma on the stored CT). Discriminator and leak checks pass.
+
+Found: nothing requiring a change. Noted: AChR reference <0.5 nmol/L sits beside MuSK <0.02 nmol/L, two laboratory conventions; the plan explicitly keeps the 0.6/<0.5 pair and MuSK is negative either way, so no clinical consequence; left as is.
+
+Checks: `perfect_agent.py MG-M02 -v` passes (the mediastinum_MRI alternative is answered by the library normal, consistent with no thymoma), `case_io.py check` clean for the case, case guards pass.
+
+## Condition audit (MG auditor, 24 Oct 2026)
+
+- patient.neurological_exam.cranial_nerves: 'right eye adduction weakness' with diplopia on rightward gaze is impossible (the right eye adducts on leftward gaze); now left eye adduction weakness. FIXED.
+- `perfect_agent.py` and `case_io.py check` re-run on all 30 MG cases after the changes; the hand-run discriminator guard reports 0 defects in the 30 MG cases.

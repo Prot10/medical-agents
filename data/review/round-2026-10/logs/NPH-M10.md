@@ -35,3 +35,10 @@ The patient block keeps the 20-month spine-anchored history and the wife's obser
 
 ## Open questions for Andrea (judgment calls you could not settle)
 None. The case's early post-tap value is at 1 hour (the plan's protocol says 2 to 4 hours); I kept the stored 1-hour figure rather than relabel the data.
+
+## Verification
+Adversarial verifier, 24 Oct 2026. Read the log, the patient block, every stored output and the ground truth. Checked: patient block free of imaging measurements and timed or MoCA values; brain MRI has no lumbar content and meets F2 with DESH (both components), callosal angle 72, temporal horns, Fazekas 2 wording matching the grade; the optional lumbar MRI agrees with the PMH (moderate L4-L5 central stenosis, compared with the lumbar MRI of 14 months ago); tap figures agree across CSF report, reassessment, criteria and must (TUG 28 to 22 s at 1 hour, 21%, to 19 s at 24 hours, 32%; 10-m walk 22 to 15 s, 32%; MoCA 21 to 23); MoCA subscores sum to 21; aspirin must and prohibition are the canonical texts; the decompression prohibition and the "revisit after the shunt response" clause of the referral must do not contradict each other; red herrings are visible in the PMH and HPI; differential per plan (stenosis low, VCI moderate). Keeping the stored 1-hour value rather than relabelling it as 2 hours is correct. `perfect_agent.py -v`, `case_io.py check`, `test_case_guards` and the MockServer probe clean. No error found; no change made.
+
+## Condition audit (NPH auditor, 24 Oct 2026)
+- `[Tisell_2011]` removed from `action-4-analyze-csf.citations`: the pack entry is Tisell 2011, shunt surgery in hydrocephalus with white matter changes, and this rationale is about the tap response only; `[Marmarou_2005]` (tap test) stays.
+- Checks after the edits: `perfect_agent.py` passes for all 30 NPH cases, `case_io.py check` clean.

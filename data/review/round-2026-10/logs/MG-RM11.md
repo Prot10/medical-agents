@@ -41,3 +41,18 @@ A 57-year-old man with stage IV PTCL on DA-EPOCH and a vincristine neuropathy pr
 ## Open questions for Andrea (judgment calls you could not settle)
 
 - None that need Andrea's information. Decisions recorded: (1) respiratory function is `required`, not `recommended` as the plan's 3.5 table says, because plan 3.2 makes it required when bulbar symptoms are present and the case reports reduced FVC and MIP, and the IVIG and level-of-care musts depend on it. (2) The SFEMG muscle was changed from EDC to orbicularis oculi because a length-dependent vincristine neuropathy can itself raise jitter in a distal limb muscle, which would make a limb SFEMG non-specific in this patient. (3) The label's "paraneoplastic in context of peripheral T-cell lymphoma" is kept (ROUND_POLICY 3); the case data support an association, not proof.
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. Read the log and the whole final case. No reviewer notes exist for MG. Checked each own-finding row against the file: dexamethasone removed (EPOCH contains prednisone), NIF and synthesis removed from the exam, diplopia on leftward gaze now with limited left abduction (correct muscle), titin and paraneoplastic rows gone, TSH and free T4 with values, new RNS report with NCS showing the vincristine axonal neuropathy and no facilitation (ADM increment 11%), SFEMG in orbicularis oculi, respiratory values correct (FVC 2.8 L = 40.8 mL/kg at 68.6 kg, 70% of 4.0 L), BMI 23.2 matches, drug output in checker voice, musts specific (IVIG 2 g/kg, 20/30/40 ICU triggers, MG-safe febrile-neutropenia antibiotics, thymectomy deferred during stage IV lymphoma treatment).
+
+Found and fixed:
+- C minor, `ground_truth.differential[0]`: the HPI raises "vincristine-induced cranial neuropathy" as a mimic, but the entry covered only the peripheral neuropathy (ruling 7: a mimic the case raises must be in the differential or excluded). Renamed "Vincristine neurotoxicity alone (peripheral and cranial neuropathy)" with key features that say why the cranial form does not fit (fixed rather than fatigable ptosis and ophthalmoparesis, no ice-pack response) and "absent ankle reflexes" as on the exam.
+- C minor, `ground_truth.differential[4]`: the HPI also raises opportunistic infection; key features now note he is afebrile (37.1 C) and the contrast MRI shows no lesion to suggest an opportunistic CNS infection.
+
+Accepted as logged: respiratory function required (bulbar with reduced FVC and MIP), SFEMG recommended (RNS borderline), label and G70.01 left for CENTRAL. `perfect_agent.py MG-RM11 -v` passes, `case_io.py check` reports no failure naming the case, case guards pass.
+
+## Condition audit (MG auditor, 24 Oct 2026)
+
+- patient.neurological_exam.cranial_nerves: levator excursion replaced by MRD1 (left 0.5, right 2.5 mm) matching the ice-pack baseline. FIXED.
+- `perfect_agent.py` and `case_io.py check` re-run on all 30 MG cases after the changes; the hand-run discriminator guard reports 0 defects in the 30 MG cases.

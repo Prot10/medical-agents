@@ -42,3 +42,18 @@ A 67-year-old man with COPD (GOLD 2), type 2 diabetes, low-risk prostate cancer 
 ## Open questions for Andrea (judgment calls you could not settle)
 
 None.
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. Read the log, the plan (M03 entry), the diff and the whole final case. No notes file exists for MG. Every FIXED finding is in the file: canonical literature (leak guard passes); chest CT moved to body imaging (encapsulated 2.2 cm anterior mediastinal nodule, emphysema) with a consistent MRI follow-up; paraneoplastic panel and PSA follow-up deleted; titin and the "late-onset MG commonly presents with thymoma" line gone; tiotropium check rewritten to the correct pharmacology (M3 antagonist, no nicotinic action); steroid-diabetes "interaction" and ECG stub deleted with their criterion; NIF/FVC out of the exam; respiratory report separates obstruction from muscle weakness (2.45 L / 92 kg = 27 mL/kg). Penicillin allergy: no must names a penicillin, the antibiotic must names doxycycline, and the macrolide alternative of the old prohibition is gone. LEMS lowered with the RNS (5% increment), reflex and CT evidence. Musts fit the thymoma and his diabetes.
+
+Found and changed: the patient has benign prostatic hyperplasia on tamsulosin, and pyridostigmine is contraindicated in mechanical urinary obstruction; the drug check listed tamsulosin as "no interaction" without the BPH caution. Added a warning to `initial_tool_outputs.drug_interactions.pyridostigmine.warnings` (confirm no urinary retention before starting). The drug criterion stays optional (the caution does not change the treatment choice).
+
+Noted, not changed: BMI 92/1.75^2 = 30.0 against 30.1 in demographics (rounding, no clinical consequence).
+
+Checks after the change: `perfect_agent.py MG-M03 -v` passes, `case_io.py check` clean for the case, case guards pass.
+
+## Condition audit (MG auditor, 24 Oct 2026)
+
+- patient.neurological_exam.cranial_nerves: 'limited adduction of left eye' with diplopia on left lateral gaze (HPI: looking to the left) is inconsistent; now limited abduction; levator excursion replaced by MRD1 (left 1.5, right 3.0 mm) matching the ice-pack baseline. FIXED.
+- `perfect_agent.py` and `case_io.py check` re-run on all 30 MG cases after the changes; the hand-run discriminator guard reports 0 defects in the 30 MG cases.

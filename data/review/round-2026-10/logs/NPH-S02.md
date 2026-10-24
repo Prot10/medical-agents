@@ -38,3 +38,16 @@ The HPI no longer announces the admission for "MRI, lumbar puncture and tap tria
 ## Open questions for Andrea (judgment calls you could not settle)
 
 - None.
+
+## Verification (adversarial verifier, 24 Oct 2026)
+
+What I checked: Read the log and the final case (diffed against S01). MoCA subscores sum to 21. Tamsulosin 0.8 mg matches the HPI's dose increase. The BPH red herring, the counselling must and the BPH prohibition do not contradict each other. Pre/post figures agree across the baseline, tap and post-tap reports, the criteria and the must. Labs agree with the criterion's expected evidence. The differential is all low, as fits Fazekas 1, MTA 1 and the tap response. Every log row checked. Checks run after the edits: `perfect_agent.py -v` ok (MRI and baseline gait show `<- ?` only because of null fields; a MockServer run confirmed both come from the case's own initial outputs, not the library), `case_io.py check` clean for the case, `test_case_guards -k` passes. Hijack check (cognitive screen, baseline gait "before tap test", MRI, tap, post-tap reassessment): every call served by the case's own output in the right order, no post-tap leak to the baseline. Discriminator note for the close-out: the post-tap follow-up's `assessment_type` "gait_and_balance_timed (post-tap reassessment)" is the plan's deliberate prose value (C6). It will fail `test_routed_outputs_name_their_study` once NPH joins `DISCRIMINATOR_CONDITIONS`. Renaming it to the bare term would let the discriminator serve it at the baseline call, so this needs plan CENTRAL R4, not a rename.
+
+Found and fixed:
+1. (C, minor) `ground_truth.key_clinical_evidence[0]` stated what probable iNPH "needs" [Relkin_2005] but left out the physiological criterion. Added "a CSF opening pressure of 5 to 18 mmHg (7 to 24.5 cmH2O)" (F3). In `[2]`, the 10% TUG criterion is cited to [Nakajima_2021] (F4); before, only [Marmarou_2005] was cited.
+
+Changed: Edited `key_clinical_evidence[0]` and `[2]` only. Nothing else changed: no labels, tiers, criteria, sequence or stop rule. 
+
+## Condition audit (NPH auditor, 24 Oct 2026)
+- Lab rows RPR moved from the `Metabolic` panel to `Serology`; values unchanged.
+- Checks after the edits: `perfect_agent.py` passes for all 30 NPH cases, `case_io.py check` clean.
