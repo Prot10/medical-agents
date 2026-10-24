@@ -60,3 +60,14 @@ Checked and left: the initial labs carry the HIV monitoring panel, so a baseline
 
 - C, minor, `ground_truth.sequence_constraints`: plan C15 asks for MRI before every CSF criterion, and it was missing for `action-csf-opportunistic-pcr`. Added soft `action-6-analyze-brain-mri` -> `action-csf-opportunistic-pcr`, cited `[NICE_NG97]`, with the plan C15 reason already used for `action-8-analyze-csf` (imaging excludes a mass lesion and shows whether white-matter disease makes JCV testing relevant). FIXED.
 - `perfect_agent.py` and `case_io.py check` were re-run on all 30 FTD cases after the changes and are clean; `test_case_guards.py -k FTD` passes (60 tests).
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/FTD-decisions.md`. Changes:
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (the report is a transthoracic study). The MockServer routes echo reports by this field; without it the normal TTE fallback answered a TEE order too (PATTERNS section 5; FTD added to `DISCRIMINATOR_CONDITIONS`).
+- `ground_truth.diagnosis.accepted[0]`: the em dash replaced by a comma (house style; token matching ignores punctuation, so scoring is unchanged).
+- Synonyms (`G31.09` entry, applied with `--prune --conditions ftd`): "pick disease" and "pick's disease" (retired) and the code G31.01 are no longer accepted. Pick disease is one FTLD-tau pathology that no case establishes, and G31.01 is where ICD-10-CM codes primary progressive aphasia, so a PPA answer coded G31.01 scored as correct here.
+- Citations: the HIV viral load and CD4, CSF HIV RNA, CSF JCV/cryptococcal and Biktarvy drug-check criteria had `citations: []`; they now cite `[EACS_2025]` (EACS Guidelines version 13.0, 2025: HIV-associated neurocognitive impairment, CSF escape, antiretroviral interactions), registered in the pack (summary CENTRAL 2, optional `[EACS_2023]`; 13.0 is the current version).
+
+Checks: `perfect_agent.py` and `case_io.py check` clean; `test_case_guards.py -k FTD-` passes, including `test_routed_outputs_name_their_study`.

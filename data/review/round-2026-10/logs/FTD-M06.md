@@ -50,3 +50,13 @@ Adversarial verifier, 24 Oct 2026. Read the log, the diff and the whole final ca
 - B, minor, `fallback_tool_outputs.csf`: a case CSF fallback with empty `special_tests` answered any CSF order without a stored result (for example Abeta42, p-tau and t-tau), so the ordered assays were missing from the report. Deleted, together with `metadata.fallback_tool_kinds.csf`, as in M07, M09, M10, P01 and P02. The library now answers per assay; a probe returned normal AD markers. FIXED.
 - E, minor, `initial_tool_outputs.literature_search[*].results[*].source`: the sources were citation keys (`[Rascovsky_2011]` or `Rascovsky_2011`), which a literature tool does not return, and the condition used three styles. They now give the full reference, as in M07-P02 (for example "Rascovsky K et al. Brain 2011;134:2456-2477 (FTDC criteria for bvFTD)"). Findings and summary are unchanged. FIXED.
 - `perfect_agent.py` and `case_io.py check` were re-run on all 30 FTD cases after the changes and are clean; `test_case_guards.py -k FTD` passes (60 tests).
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/FTD-decisions.md`. Changes:
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (the report is a transthoracic study). The MockServer routes echo reports by this field; without it the normal TTE fallback answered a TEE order too (PATTERNS section 5; FTD added to `DISCRIMINATOR_CONDITIONS`).
+- `ground_truth.diagnosis.accepted[0]` relabelled from "probable" to "definite": 'Behavioral variant frontotemporal dementia (bvFTD), definite (known pathogenic GRN variant), with early corticobasal syndrome features' (Rascovsky 2011 definite: clinical syndrome plus known pathogenic mutation). She meets the clinical bvFTD criteria and carries a known pathogenic GRN variant, which is the Rascovsky 2011 definition of definite bvFTD; the diagnosis must already said so (summary Q1). Code G31.09 unchanged; scoring unchanged.
+- Synonyms (`G31.09` entry, applied with `--prune --conditions ftd`): "pick disease" and "pick's disease" (retired) and the code G31.01 are no longer accepted. Pick disease is one FTLD-tau pathology that no case establishes, and G31.01 is where ICD-10-CM codes primary progressive aphasia, so a PPA answer coded G31.01 scored as correct here.
+
+Checks: `perfect_agent.py` and `case_io.py check` clean; `test_case_guards.py -k FTD-` passes, including `test_routed_outputs_name_their_study`.

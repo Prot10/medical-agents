@@ -57,3 +57,13 @@ Found and fixed:
 - B minor, `initial_tool_outputs.clinical_assessment` bedside-screen finding and the neuropsych `quantitative_data.MoCA`: the listed item losses could not add up to 20/30 (the neuropsychology reports an intact clock contour, so the clock loses at most 2; trails, fluency, clock, recall 3 and naming give at most 8-9). Now lists clock 1/3, backward digits (his span is 2 backward) and abstraction 1/2 as well, totalling 10 points lost = 20/30, with the contour point kept.
 
 Checked and left: the alcohol "sole cause" differential stays moderate (the work-up cannot exclude it; only the course after abstinence can) alongside the prohibition on attributing the whole syndrome to alcohol, which is a statement about the evidence for bvFTD, not a contradiction. `perfect_agent.py FTD-M07 -v`: ok (the "<- ?" lines are initial outputs that the helper cannot match after `exclude_none`; MockServer probes confirm assessment, labs and MRI come from `initial_tool_outputs`, thiamine and PSG from their keyed follow-ups). `case_io.py check FTD-M07`: schema OK, no failure names the case. `test_case_guards -k FTD-M07`: passed.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/FTD-decisions.md`. Changes:
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (the report is a transthoracic study). The MockServer routes echo reports by this field; without it the normal TTE fallback answered a TEE order too (PATTERNS section 5; FTD added to `DISCRIMINATOR_CONDITIONS`).
+- `ground_truth.diagnosis.accepted[0]`: the em dash replaced by a comma (house style; token matching ignores punctuation, so scoring is unchanged).
+- Synonyms (`G31.09` entry, applied with `--prune --conditions ftd`): "pick disease" and "pick's disease" (retired) and the code G31.01 are no longer accepted. Pick disease is one FTLD-tau pathology that no case establishes, and G31.01 is where ICD-10-CM codes primary progressive aphasia, so a PPA answer coded G31.01 scored as correct here.
+
+Checks: `perfect_agent.py` and `case_io.py check` clean; `test_case_guards.py -k FTD-` passes, including `test_routed_outputs_name_their_study`.

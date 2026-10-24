@@ -77,3 +77,13 @@ For the FTD lead (class): any FTD case with an authored genetic result has the s
 - E, minor, `fallback_tool_outputs.literature_search`: the placeholder ("general", "Recommend correlating with current society guidelines") was deleted together with its kind key, as in the other FTD cases. The initial literature output answers any query. FIXED.
 - E, minor, `initial_tool_outputs.literature_search[*].results[*].source`: the sources were citation keys (`[Rascovsky_2011]` or `Rascovsky_2011`), which a literature tool does not return, and the condition used three styles. They now give the full reference, as in M07-P02 (for example "Rascovsky K et al. Brain 2011;134:2456-2477 (FTDC criteria for bvFTD)"). Findings and summary are unchanged. FIXED.
 - `perfect_agent.py` and `case_io.py check` were re-run on all 30 FTD cases after the changes and are clean; `test_case_guards.py -k FTD` passes (60 tests).
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/FTD-decisions.md`. Changes:
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (the report is a transthoracic study). The MockServer routes echo reports by this field; without it the normal TTE fallback answered a TEE order too (PATTERNS section 5; FTD added to `DISCRIMINATOR_CONDITIONS`).
+- `metadata.citation_gap` cleared: `[Strong_2017]`, `[EAN_ALS_2024]`, `[NICE_NG42]`, `[Gold_Coast_2020]`, `[Awaji_2008]` and `[AAN_2009]` are now in the FTD pack allow-list with full references.
+- Synonyms (`diagnosis_synonyms.yaml`, new scoped entry `G31.09+mnd`, applied with `--prune --conditions ftd`): the generic bvFTD labels and the codes G31.0 and G31.01 are no longer granted, so a bvFTD-only answer (missing the motor neuron disease that drives EMG, riluzole and NIV) no longer scores by label; FTD-MND / ALS-FTD / ALS-FTSD labels that name both components are accepted. G12.21 not added (an ALS-only answer would score through it). Residual: an answer coded G31.09 still scores through the code alone (scorer CENTRAL).
+
+Checks: `perfect_agent.py` and `case_io.py check` clean; `test_case_guards.py -k FTD-` passes, including `test_routed_outputs_name_their_study`.

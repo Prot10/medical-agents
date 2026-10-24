@@ -44,3 +44,13 @@ Found and fixed: (1) `key_clinical_evidence` said the MRI "rules out the red-her
 - E, minor, `patient.neurological_exam.reflexes`: "Hoffman" corrected to "Hoffmann", as in M09, P04 and P08. FIXED.
 - E, minor, `initial_tool_outputs.literature_search[*].results[*].source`: the sources were citation keys (`[Rascovsky_2011]` or `Rascovsky_2011`), which a literature tool does not return, and the condition used three styles. They now give the full reference, as in M07-P02 (for example "Rascovsky K et al. Brain 2011;134:2456-2477 (FTDC criteria for bvFTD)"). Findings and summary are unchanged. FIXED.
 - `perfect_agent.py` and `case_io.py check` were re-run on all 30 FTD cases after the changes and are clean; `test_case_guards.py -k FTD` passes (60 tests).
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/FTD-decisions.md`. Changes:
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (the report is a transthoracic study). The MockServer routes echo reports by this field; without it the normal TTE fallback answered a TEE order too (PATTERNS section 5; FTD added to `DISCRIMINATOR_CONDITIONS`).
+- `ground_truth.diagnosis.icd_codes[0]` G31.09 -> G31.01: ICD-10-CM lists primary progressive aphasia as an inclusion term of G31.01, and with G31.09 a bvFTD answer coded G31.09 scored as correct through the code. `metadata` and the PPA entries of `ground_truth.differential` recoded to match (other PPA variants G31.01, the Alzheimer lvPPA entry G30.9).
+- Synonyms (scoped entry `G31.01+nfvppa`, applied with `--prune`): the bvFTD labels (frontotemporal dementia, FTD, bvFTD, FTLD, Pick disease) and the codes G31.09 and G31.0 are gone (G31.01 is now the primary code); only the non-fluent/agrammatic variant (nfvPPA, agrammatic PPA, progressive non-fluent aphasia, PNFA) labels are accepted, so a bvFTD answer or the other PPA variant no longer scores by label (summary CENTRAL 3). Residual: svPPA and nfvPPA share G31.01, so a wrong-variant answer coded G31.01 still scores through the code (scorer CENTRAL).
+
+Checks: `perfect_agent.py` and `case_io.py check` clean; `test_case_guards.py -k FTD-` passes, including `test_routed_outputs_name_their_study`.

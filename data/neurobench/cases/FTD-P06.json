@@ -66,6 +66,7 @@
         "RA": "normal size",
         "RV": "normal size and function"
       },
+      "echo_type": "TTE",
       "ejection_fraction": 59.0,
       "findings": [
         "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
@@ -354,6 +355,43 @@
         ]
       },
       "trigger_action": "request_rpr_hiv_serology"
+    },
+    {
+      "output": {
+        "findings": [
+          {
+            "panel": "FTD gene panel",
+            "reference_range": "<30 repeats",
+            "result": "No hexanucleotide repeat expansion (both alleles 5 repeats)",
+            "test": "C9orf72"
+          },
+          {
+            "panel": "FTD gene panel",
+            "reference_range": "No pathogenic variant",
+            "result": "No pathogenic variant",
+            "test": "GRN"
+          },
+          {
+            "panel": "FTD gene panel",
+            "reference_range": "No pathogenic variant",
+            "result": "No pathogenic variant",
+            "test": "MAPT"
+          }
+        ],
+        "impression": "No C9orf72 expansion and no pathogenic GRN or MAPT variant. A negative panel does not exclude frontotemporal lobar degeneration; most people without a family history have no identified variant.",
+        "quantitative_data": {
+          "C9orf72 repeats": "5 / 5",
+          "GRN": "no pathogenic variant",
+          "MAPT": "no pathogenic variant"
+        },
+        "recommended_actions": [],
+        "test_type": "genetic_panel:FTD"
+      },
+      "tool_name": "order_specialized_test",
+      "tool_parameters": {
+        "test_type": "genetic_panel:FTD"
+      },
+      "trigger_action": "request_optional_counselled_ftd_genetics"
     }
   ],
   "ground_truth": {
@@ -494,6 +532,26 @@
         "importance": "optional",
         "label": "AD biomarker (amyloid PET or CSF Abeta42/p-tau) when AD remains in the differential",
         "rationale": "A mother with Alzheimer disease, one APOE e4 allele and a borderline left hippocampus keep AD possible; a negative study makes Alzheimer pathology unlikely but does not exclude FTLD."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "genetic_panel:FTD"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[Pottier_2016]",
+          "[Ducharme_2020]",
+          "[ACMG_NSGC_2011]"
+        ],
+        "criterion_id": "action-genetic-panel-optional",
+        "expected_evidence": "Identifies or excludes a pathogenic C9orf72, GRN or MAPT variant relevant to prognosis and to relatives",
+        "importance": "optional",
+        "label": "Genetic counselling and FTD gene panel (C9orf72, GRN, MAPT)",
+        "rationale": "Onset about 61 without a suggestive family history: the FTD consortium advises C9orf72 screening in possible or probable bvFTD, UK eligibility does not, so a counselled panel is optional."
       },
       {
         "alternatives": [
@@ -674,14 +732,11 @@
         "behavioral variant frontotemporal dementia",
         "behavioural variant frontotemporal dementia",
         "bvFTD",
-        "frontotemporal lobar degeneration",
-        "pick disease",
-        "pick's disease"
+        "frontotemporal lobar degeneration"
       ],
       "icd_codes": [
         "G31.09",
-        "G31.0",
-        "G31.01"
+        "G31.0"
       ]
     },
     "differential": [
@@ -744,6 +799,15 @@
           "[NICE_NG97]"
         ],
         "reason": "Imaging first excludes a mass lesion before lumbar puncture and characterises the atrophy pattern before a biomarker is chosen.",
+        "severity": "soft"
+      },
+      {
+        "after_criterion_id": "action-genetic-panel-optional",
+        "before_criterion_id": "action-4-perform-clinical-assessment",
+        "citations": [
+          "[ACMG_NSGC_2011]"
+        ],
+        "reason": "Genetic testing follows the clinical diagnosis and counselling.",
         "severity": "soft"
       }
     ],
