@@ -64,3 +64,8 @@ Condition auditor, after the workers and verifiers. Uniformity checks over all 3
 - `ground_truth.assessment.prohibited_recommendations[1]` and `[3]` (B/E, minor): the canonical P2 and P4 texts still carried an em dash before "antibody turnaround" and before "exclude mass effect", and an en dash in "1-2 weeks", while 18 other cases already had the dash-free canonical wording. Now "...high: antibody turnaround can take 1-2 weeks..." and "...new seizures: exclude mass effect first." Meaning unchanged.
 - `followup_outputs[0].output.eeg_type` (A, minor): the continuous EEG report had no `eeg_type`, unlike the other 25 cEEG reports; set to `continuous_icu` so the report names the study it is (the MockServer discriminator reads this field). Content unchanged.
 - `followup_outputs[0].output.impression` (E, minor): added the template closing "Clinical correlation recommended." (plan C7 template).
+
+## Close-out (24 Oct 2026)
+
+- Synonyms (`diagnosis_synonyms.yaml`, applied with `--prune --conditions autoimmune_encephalitis_nmdar`): the generic G04.81 labels "autoimmune encephalitis", "antibody mediated encephalitis" and "autoimmune limbic encephalitis" and code G04.90 are no longer accepted, because every token of the first two occurs in "anti-LGI1 autoimmune encephalitis" or "seronegative autoimmune encephalitis" (alternatives the work-up excludes), limbic encephalitis is a different syndrome (Graus 2016) and G04.90 is unspecified encephalitis. Added "glun1 encephalitis", "nr1 encephalitis" and code G04.8. `accepted[0]` and `icd_codes[0]` unchanged. Decisions: `plans/NMDAR-ENC-decisions.md`.
+- Label decision of the lead (CSF-positive, serum-negative anti-NMDAR after COVID-19) confirmed, not reverted: see decisions Q1. No further data change.

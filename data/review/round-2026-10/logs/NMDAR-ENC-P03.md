@@ -53,3 +53,7 @@ Found and changed:
 - `ground_truth.differential[1]`: the worker added GABA-A to the diagnosis name (correct for post-HSV autoimmune encephalitis, Armangue 2018) but the labs never tested it and the key features omitted it. FIXED: `Anti-GABA-A receptor IgG: Negative` added to `labs.panels["Autoimmune encephalitis antibodies (serum)"]` and GABA-A added to the key features.
 - `metadata.fallback_tool_kinds.cardiac_monitoring` "normal" against the tachycardic telemetry. FIXED: "sinus_tachycardia".
 - Confirmed: post-HSV M1 replacing valacyclovir, DDI duplicate-prodrug content, aspirin-urticaria NSAID cross-reactivity, deletion of the CAP CT and comparison-MRI follow-ups, cEEG laterality consistent with the routine EEG. Ward level of care follows the plan's M6 rule (no ICU trigger) and is logged by the worker; accepted.
+
+## Close-out (24 Oct 2026)
+
+- Synonyms (`diagnosis_synonyms.yaml`, applied with `--prune --conditions autoimmune_encephalitis_nmdar`): the generic G04.81 labels "autoimmune encephalitis", "antibody mediated encephalitis" and "autoimmune limbic encephalitis" and code G04.90 are no longer accepted, because every token of the first two occurs in "anti-LGI1 autoimmune encephalitis" or "seronegative autoimmune encephalitis" (alternatives the work-up excludes), limbic encephalitis is a different syndrome (Graus 2016) and G04.90 is unspecified encephalitis. Added "glun1 encephalitis", "nr1 encephalitis" and code G04.8. `accepted[0]` and `icd_codes[0]` unchanged. Decisions: `plans/NMDAR-ENC-decisions.md`.

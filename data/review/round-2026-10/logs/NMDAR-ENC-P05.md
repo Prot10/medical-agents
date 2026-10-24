@@ -45,3 +45,7 @@ Adversarial verifier, 24 Oct 2026. Checked against the plan (sections 1-4 and th
 Found and changed:
 - `metadata.fallback_tool_kinds.cardiac_monitoring` FIXED to "sinus_tachycardia".
 - Confirmed: four Graus groups with the cEEG seizures; ICU via catatonia with refusal of food (general M6 rule, worker's open-question note accepted); supportive hydration/feeding/VTE must appropriate; NMS excluded with stored temperature and CK; negative screen M3. No other error found.
+
+## Close-out (24 Oct 2026)
+
+- Synonyms (`diagnosis_synonyms.yaml`, applied with `--prune --conditions autoimmune_encephalitis_nmdar`): the generic G04.81 labels "autoimmune encephalitis", "antibody mediated encephalitis" and "autoimmune limbic encephalitis" and code G04.90 are no longer accepted, because every token of the first two occurs in "anti-LGI1 autoimmune encephalitis" or "seronegative autoimmune encephalitis" (alternatives the work-up excludes), limbic encephalitis is a different syndrome (Graus 2016) and G04.90 is unspecified encephalitis. Added "glun1 encephalitis", "nr1 encephalitis" and code G04.8. `accepted[0]` and `icd_codes[0]` unchanged. Decisions: `plans/NMDAR-ENC-decisions.md`.

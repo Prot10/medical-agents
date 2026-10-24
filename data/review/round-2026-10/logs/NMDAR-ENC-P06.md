@@ -49,3 +49,7 @@ Found and changed:
 - `ground_truth.differential` (migraine entry) asserted "no headache with this 12-day illness", which nothing in the patient block states. FIXED: key features now rest on what the case says (migraine without aura, husband says the illness is unlike her migraines, seizures, autonomic lability, CSF antibodies).
 - `metadata.fallback_tool_kinds.cardiac_monitoring` FIXED to "sinus_tachycardia".
 - Confirmed: lorazepam added to the medication list matches the HPI and the benzodiazepine screen; NSAID hold in M1 matches the DDI report; ICU by labile BP with diaphoresis. The new right lower facial droop is left as documented: it is contralateral to the left temporal seizure focus, and post-ictal weakness after the chewing episode is a plausible explanation, so it is not a deficit without a lesion.
+
+## Close-out (24 Oct 2026)
+
+- Synonyms (`diagnosis_synonyms.yaml`, applied with `--prune --conditions autoimmune_encephalitis_nmdar`): the generic G04.81 labels "autoimmune encephalitis", "antibody mediated encephalitis" and "autoimmune limbic encephalitis" and code G04.90 are no longer accepted, because every token of the first two occurs in "anti-LGI1 autoimmune encephalitis" or "seronegative autoimmune encephalitis" (alternatives the work-up excludes), limbic encephalitis is a different syndrome (Graus 2016) and G04.90 is unspecified encephalitis. Added "glun1 encephalitis", "nr1 encephalitis" and code G04.8. `accepted[0]` and `icd_codes[0]` unchanged. Decisions: `plans/NMDAR-ENC-decisions.md`.

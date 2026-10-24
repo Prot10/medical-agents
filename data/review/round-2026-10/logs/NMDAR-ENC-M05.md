@@ -53,3 +53,8 @@ Adversarial verifier, 24 Oct 2026. Read the log, the diff and the whole final ca
 - Found: `initial_tool_outputs.csf.opening_pressure` "20 cmH2O (mildly elevated)": 20 cmH2O is within the adult normal range (other cases of the condition call 20 normal).
 - Changed: opening pressure label now "20 cmH2O (normal)".
 - Accepted as is: label em dash in `diagnosis.accepted[0]` (worker listed it under CENTRAL; ruling 3).
+
+## Close-out (24 Oct 2026)
+
+- Synonyms (`diagnosis_synonyms.yaml`, applied with `--prune --conditions autoimmune_encephalitis_nmdar`): the generic G04.81 labels "autoimmune encephalitis", "antibody mediated encephalitis" and "autoimmune limbic encephalitis" and code G04.90 are no longer accepted, because every token of the first two occurs in "anti-LGI1 autoimmune encephalitis" or "seronegative autoimmune encephalitis" (alternatives the work-up excludes), limbic encephalitis is a different syndrome (Graus 2016) and G04.90 is unspecified encephalitis. Added "glun1 encephalitis", "nr1 encephalitis" and code G04.8. `accepted[0]` and `icd_codes[0]` unchanged. Decisions: `plans/NMDAR-ENC-decisions.md`.
+- `accepted[0]` reworded without the em dash: "Anti-NMDA receptor encephalitis, tumour-negative (idiopathic), male patient" (same diagnosis; summary CENTRAL 7).

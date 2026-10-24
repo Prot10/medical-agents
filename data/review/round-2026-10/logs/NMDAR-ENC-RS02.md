@@ -52,3 +52,7 @@ Adversarial verifier, 24 Oct 2026. No reviewer notes exist for NMDAR-ENC. Checke
   3. (B, minor) `patient.history_present_illness`: the worker's sentence on drugs continued at the rehabilitation facility sat before "She was discharged home", breaking the chronology. Moved after the transfer to rehabilitation; content unchanged.
   4. (C, minor) thiamine must and Wernicke `key_features` said "weeks of vomiting", which the HPI does not state (severe nausea and vomiting at the admission, then dysphagia). Reworded to "severe vomiting early in the illness, dysphagia with poor oral intake"; the must itself (empirical thiamine) stands.
 - Re-run: `perfect_agent.py NMDAR-ENC-RS02 -v` ok; `case_io.py check` nothing names RS02; case guards pass.
+
+## Close-out (24 Oct 2026)
+
+- Synonyms (`diagnosis_synonyms.yaml`, applied with `--prune --conditions autoimmune_encephalitis_nmdar`): the generic G04.81 labels "autoimmune encephalitis", "antibody mediated encephalitis" and "autoimmune limbic encephalitis" and code G04.90 are no longer accepted, because every token of the first two occurs in "anti-LGI1 autoimmune encephalitis" or "seronegative autoimmune encephalitis" (alternatives the work-up excludes), limbic encephalitis is a different syndrome (Graus 2016) and G04.90 is unspecified encephalitis. Added "glun1 encephalitis", "nr1 encephalitis" and code G04.8. `accepted[0]` and `icd_codes[0]` unchanged. Decisions: `plans/NMDAR-ENC-decisions.md`.

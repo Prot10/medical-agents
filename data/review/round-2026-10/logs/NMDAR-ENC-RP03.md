@@ -54,3 +54,7 @@ Adversarial verifier, 24 Oct 2026. No reviewer notes exist for NMDAR-ENC, so the
 - Found and fixed (B, minor): `fallback_tool_outputs.echo` described a "structurally normal heart" while the case ECG reports LVH by voltage (SV1 + RV5 = 38 mm) in a hypertensive man with CAD. Rewritten to mild concentric LVH (12 mm) with preserved EF and no regional wall-motion abnormality; `metadata.fallback_tool_kinds.echo` set to `incidental`.
 - Left as is: the pre-existing em dash in `initial_tool_outputs.ecg.findings[2]` (original text, not new).
 - Re-run: `perfect_agent.py NMDAR-ENC-RP03 -v` ok; `case_io.py check` nothing names RP03; case guards pass.
+
+## Close-out (24 Oct 2026)
+
+- Synonyms (`diagnosis_synonyms.yaml`, applied with `--prune --conditions autoimmune_encephalitis_nmdar`): the generic G04.81 labels "autoimmune encephalitis", "antibody mediated encephalitis" and "autoimmune limbic encephalitis" and code G04.90 are no longer accepted, because every token of the first two occurs in "anti-LGI1 autoimmune encephalitis" or "seronegative autoimmune encephalitis" (alternatives the work-up excludes), limbic encephalitis is a different syndrome (Graus 2016) and G04.90 is unspecified encephalitis. Added "glun1 encephalitis", "nr1 encephalitis" and code G04.8. `accepted[0]` and `icd_codes[0]` unchanged. Decisions: `plans/NMDAR-ENC-decisions.md`.

@@ -55,3 +55,7 @@ Found and changed:
 
 Condition auditor, after the workers and verifiers. Uniformity checks over all 30 cases; changes made here through `case_io` (all re-checked: `perfect_agent.py` 30/30, `case_io.py check` and the case guards clean):
 - `ground_truth.stop_rule.required_before_assessment` (A, minor): it listed the required drug-interaction criterion as a sixth id, while plan 3.5 sets the five diagnostic ids and RP02 (the other case with a required DDI) follows it. The stop rule names the evidence needed before the diagnosis is submitted; the DDI is a pre-treatment check whose omission is already penalised by required coverage. Removed `action-8-check-drug-interactions` from the stop rule; the criterion stays `required`.
+
+## Close-out (24 Oct 2026)
+
+- Synonyms (`diagnosis_synonyms.yaml`, applied with `--prune --conditions autoimmune_encephalitis_nmdar`): the generic G04.81 labels "autoimmune encephalitis", "antibody mediated encephalitis" and "autoimmune limbic encephalitis" and code G04.90 are no longer accepted, because every token of the first two occurs in "anti-LGI1 autoimmune encephalitis" or "seronegative autoimmune encephalitis" (alternatives the work-up excludes), limbic encephalitis is a different syndrome (Graus 2016) and G04.90 is unspecified encephalitis. Added "glun1 encephalitis", "nr1 encephalitis" and code G04.8. `accepted[0]` and `icd_codes[0]` unchanged. Decisions: `plans/NMDAR-ENC-decisions.md`.

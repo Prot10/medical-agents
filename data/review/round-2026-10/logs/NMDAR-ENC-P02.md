@@ -58,3 +58,7 @@ Found and changed:
 
 Condition auditor, after the workers and verifiers. Uniformity checks over all 30 cases; changes made here through `case_io` (all re-checked: `perfect_agent.py` 30/30, `case_io.py check` and the case guards clean):
 - `followup_outputs[0].tool_parameters`, `followup_outputs[1].tool_parameters` (A, minor): the cEEG and staging CT follow-ups had no `tool_parameters`, unlike every other follow-up of the condition. Added `{eeg_type: continuous_icu}` and `{study: chest_abdomen_pelvis_CT, contrast: true}`. Matching was already correct through the trigger and the report's own fields.
+
+## Close-out (24 Oct 2026)
+
+- Synonyms (`diagnosis_synonyms.yaml`, applied with `--prune --conditions autoimmune_encephalitis_nmdar`): the generic G04.81 labels "autoimmune encephalitis", "antibody mediated encephalitis" and "autoimmune limbic encephalitis" and code G04.90 are no longer accepted, because every token of the first two occurs in "anti-LGI1 autoimmune encephalitis" or "seronegative autoimmune encephalitis" (alternatives the work-up excludes), limbic encephalitis is a different syndrome (Graus 2016) and G04.90 is unspecified encephalitis. Added "glun1 encephalitis", "nr1 encephalitis" and code G04.8. `accepted[0]` and `icd_codes[0]` unchanged. Decisions: `plans/NMDAR-ENC-decisions.md`.

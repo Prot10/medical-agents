@@ -47,3 +47,7 @@ Adversarial verifier, 24 Oct 2026. No reviewer notes exist for NMDAR-ENC. Checke
 - Confirmed: Hct 42.4 with Hb 14.2 and removed from the abnormal summary; ECG rate 114 equals vitals HR; CSF ratio 62/98 = 0.63 and one antibody key (1:320); serum labs hold serum 1:160 only, beta-hCG negative; right ovarian 1.8 cm teratoma with characteristic features matches the removal must and the criterion; cEEG consistent with routine (left temporal seizures, EDB); placeholder literature/DDI outputs replaced with real sources and her real medicines (ACE-inhibitor angioedema allergy: no conflict with any must). Leak guard passes. Ward wording follows the plan's rule (HR max 130, not above).
 - Found: nothing requiring a change.
 - Re-run: `perfect_agent.py NMDAR-ENC-S01 -v` ok; `case_io.py check` nothing names S01; case guards pass.
+
+## Close-out (24 Oct 2026)
+
+- Synonyms (`diagnosis_synonyms.yaml`, applied with `--prune --conditions autoimmune_encephalitis_nmdar`): the generic G04.81 labels "autoimmune encephalitis", "antibody mediated encephalitis" and "autoimmune limbic encephalitis" and code G04.90 are no longer accepted, because every token of the first two occurs in "anti-LGI1 autoimmune encephalitis" or "seronegative autoimmune encephalitis" (alternatives the work-up excludes), limbic encephalitis is a different syndrome (Graus 2016) and G04.90 is unspecified encephalitis. Added "glun1 encephalitis", "nr1 encephalitis" and code G04.8. `accepted[0]` and `icd_codes[0]` unchanged. Decisions: `plans/NMDAR-ENC-decisions.md`.

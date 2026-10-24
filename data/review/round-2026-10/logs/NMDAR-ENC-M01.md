@@ -54,3 +54,7 @@ Adversarial verifier, 24 Oct 2026. Read the log, the diff and the whole final ca
 - Found: ANA 1:80 speckled with a mother with SLE is a mimic the case raises (ruling 7) but was absent from the differential (P01 and other NMDAR cases carry it).
 - Changed: added `ground_truth.differential` entry "Neuropsychiatric systemic lupus erythematosus" (M32.19, low, with the excluding features).
 - Accepted as is: serum 1:80 / CSF 1:128 titre pair (flagged by the worker; serum and CSF are titrated from different starting dilutions, and the plan fixed the CSF titre); cEEG `recommended_actions` "Continue EEG monitoring." (neurophysiology advice, tolerated by plan C13).
+
+## Close-out (24 Oct 2026)
+
+- Synonyms (`diagnosis_synonyms.yaml`, applied with `--prune --conditions autoimmune_encephalitis_nmdar`): the generic G04.81 labels "autoimmune encephalitis", "antibody mediated encephalitis" and "autoimmune limbic encephalitis" and code G04.90 are no longer accepted, because every token of the first two occurs in "anti-LGI1 autoimmune encephalitis" or "seronegative autoimmune encephalitis" (alternatives the work-up excludes), limbic encephalitis is a different syndrome (Graus 2016) and G04.90 is unspecified encephalitis. Added "glun1 encephalitis", "nr1 encephalitis" and code G04.8. `accepted[0]` and `icd_codes[0]` unchanged. Decisions: `plans/NMDAR-ENC-decisions.md`.
