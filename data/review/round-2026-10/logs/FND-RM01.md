@@ -60,3 +60,13 @@ Checks re-run after the changes: `perfect_agent.py -v` ok, `case_io.py check` cl
 - `action-1-search-medical-literature.rationale`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
 
 After the edit: `perfect_agent.py` 30/30 FND pass; `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k FND` 60 passed.
+
+## Close-out (24 Oct 2026)
+
+Andrea's FND ruling of 24 Oct 2026 and the close-out decisions (`plans/FND-decisions.md`). What changed and why:
+
+- `action-4-analyze-eeg` (video-EEG) required -> optional, removed from the stop rule; 1 soft constraint(s) naming it removed; rationale now says what the diagnosis rests on without the recording (ILAE 2013 levels).
+- `action-sodium-osmolality` required -> recommended (red-flag test), removed from the stop rule.
+- M-DX must, COMM must, red-herring interpretations and metadata no longer say the diagnosis rests on the video-EEG: they rest on the positive signs and the event semiology, with video-EEG confirmation where recorded (open question 8).
+- Diagnosis synonyms scoped by phenotype (`diagnosis_synonyms.yaml` F44 entries; a label or code naming another presentation must not score): removed "functional movement disorder"; added "psychogenic nonepileptic seizures", "dissociative seizures", "nonepileptic seizures", "functional limb weakness", "functional motor disorder".
+- Checks: `perfect_agent.py -v` and `case_io.py check` clean; `test_case_guards.py -k FND-` passes, now including the discriminator guard.

@@ -952,23 +952,25 @@ SPEC += [
     # === functional neurological disorder (reviewer 1) ===
     dict(cond="functional_neurological_disorder", filed="analyze_eeg", tool="analyze_eeg",
          reviewer=1, tier=None, status="applied",
-         response="Applied as your second option for this frozen phase: "
-                  "the current phase is frozen at 20 conditions and 600 cases, so authoring DLB "
-                  "and retiring FND are explicitly deferred. Your fallback option has now been "
-                  "applied end to end: the positive functional-sign examination is the sole required "
-                  "diagnostic act in all 30 cases; every instrumental action is optional. Video-EEG "
-                  "appears in 22 event-capture cases, MRI in 20 explicit red-flag/organic-comorbidity "
-                  "cases and targeted labs in 12; no ECG, CSF, neuropsychology or unexecutable null "
-                  "action remains. Efficient traces stop after the positive examination. "
-                  "The earlier rationale for keeping FND said it was "
-                  "the only way to measure diagnostic overuse; that is not true in this benchmark. "
-                  "Every current condition has case-level useless-tool penalties, and 16 of the 19 "
-                  "non-FND conditions also contain optional actions, so restraint and cost remain "
-                  "measurable without FND. The interim FND correction exposed a real defect — the "
-                  "old cases encoded diagnosis by exclusion — but it is not a strong reason to "
-                  "override your composition recommendation. FND therefore remains a temporary "
-                  "member of the frozen dataset, not the final composition choice; DLB is the "
-                  "first replacement in the backlog."),
+         response="Applied as your second option, as agreed in August 2026 and confirmed on 24 "
+                  "October 2026: FND stays in the frozen 20-condition dataset, and dementia with "
+                  "Lewy bodies remains a deferred same-size replacement. The examination of positive "
+                  "functional signs is the only required diagnostic act, in all 30 cases, and no "
+                  "instrumental test is required in any case. Video-EEG appears in 22 paroxysmal "
+                  "cases and is optional in every one of them. A test that answers a named red flag "
+                  "is recommended, not required: brain MRI in 12 cases (with gadolinium only for a "
+                  "new deficit on natalizumab; emergency MRI or CT for an acute hemiparesis three "
+                  "hours after an insulin bolus), spine MRI in 1 case of acute paraplegia, and named "
+                  "assays in 8 cases (glucose after insulin, sodium in polydipsia, electrolytes and "
+                  "thiamine in malnutrition, lupus and vasculitis markers). Optional elsewhere: brain "
+                  "MRI in 9 cases, labs in 4 cases, a 12-lead ECG in 10 cases whose events are "
+                  "apparent loss of consciousness or whose medicines affect the QT, and a "
+                  "neuropsychological battery in all 30 cases. The medicine review is required in 7 "
+                  "cases as a management act, not a diagnostic one: a drug started for the events "
+                  "(levetiracetam, carbamazepine, phenytoin, diazepam) is to be tapered, or a drug on "
+                  "the list worsens the picture (desmopressin with polydipsia, metoclopramide); "
+                  "please confirm this at re-review. EMG/NCS and evoked potentials are scored as "
+                  "waste in all 30 cases. Efficient traces stop after the examination."),
 ]
 
 SPEC += [

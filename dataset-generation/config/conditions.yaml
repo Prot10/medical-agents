@@ -881,33 +881,32 @@ functional_neurological_disorder:
     age_range: [20, 50]
     sex_bias: "female_predominant"
   encounter_type: "inpatient"
-  # Interim composition decision, August 2026: DLB remains the reviewers' preferred replacement,
-  # but the dataset is frozen at 20 conditions/600 cases. Their fallback FND option is therefore
-  # applied literally: perform_clinical_assessment{functional_neuro_signs} is the sole required
-  # diagnostic act, and every instrumental study is optional and case-targeted. Video-EEG is used
-  # only to capture an ambiguous typical event; MRI only for an explicit red flag or organic
-  # comorbidity; labs only for a named mimic. Efficient traces stop after the positive examination.
+  # Composition (August 2026 agreement with the physicians, confirmed by Andrea 24 Oct 2026): FND
+  # stays (DLB is a deferred same-size swap) on the physicians' terms:
+  # perform_clinical_assessment{functional_neuro_signs} is the only required diagnostic act; all
+  # instrumental work is optional, video-EEG in paroxysmal cases included; a test that answers a
+  # named red flag (glucose after insulin, sodium in polydipsia, MRI for a stroke or MS-relapse
+  # mimic) is recommended. A drug review may be required as a management act when a drug started
+  # for the events must be tapered. See criteria_packs/FND.md and plans/FND-decisions.md.
   required_modalities: [clinical_assessment]
   optional_modalities: [EEG, MRI, LABS]
   key_findings:
     eeg:
       all_difficulties:
-        - "Normal EEG throughout, including during clinical events"
-        - "No epileptiform abnormalities"
-        - "Normal background, symmetric posterior dominant rhythm"
-        - "If events captured: no EEG change during clinical seizure-like episode (psychogenic non-epileptic seizure)"
+        - "Video-EEG (paroxysmal cases, optional study): habitual events recorded without ictal change before, during or after the event"
+        - "No interictal epileptiform discharges, except in a patient with established epilepsy"
+        - "Normal background; the posterior dominant rhythm persists during the events"
+        - "The report describes the EEG and the recorded events; it never names PNES, functional or psychogenic"
     mri:
       all_difficulties:
-        - "Normal brain MRI"
+        - "Only where a named question exists (stroke mimic, new deficit on MS or PD, CNS vasculitis); non-contrast with DWI unless enhancement is the question (MS on natalizumab)"
         - "No structural lesion explaining symptoms"
         - "No evidence of stroke, demyelination, or mass"
     labs:
       all_difficulties:
-        - "CBC: normal"
-        - "BMP: normal"
-        - "Thyroid function: normal"
-        - "Post-event prolactin: NOT elevated (distinguishes from epileptic seizure)"
-        - "All screening labs normal"
+        - "Named assays for a named red flag only, never a screening battery: glucose after an insulin dose, sodium and osmolality in polydipsia, electrolytes, magnesium, phosphate and thiamine in malnutrition"
+        - "Results answer the red flag and do not explain the deficit or the events"
+        - "Post-event prolactin, if drawn: a normal level excludes nothing; a dopamine antagonist makes it uninterpretable"
   differential_diagnoses:
     - diagnosis: "Epileptic seizures"
       key_distinguishing: "EEG correlate during event, stereotyped semiology, post-ictal confusion, elevated prolactin"
@@ -921,30 +920,26 @@ functional_neurological_disorder:
       key_distinguishing: "Rest tremor, cogwheel rigidity, bradykinesia, asymmetric, progressive"
   difficulty_variants:
     straightforward:
-      presentation: "28-year-old woman with acute-onset right leg weakness and non-epileptic seizures captured on video-EEG. Hoover sign positive. Give-way weakness on exam. Recent psychosocial stressor."
+      presentation: "28-year-old woman with acute-onset right leg weakness and witnessed shaking episodes with eyes closed and preserved recall. Hoover sign positive. Give-way weakness on exam. Recent psychosocial stressor."
       expected_agent_confidence: 0.80
     moderate:
       presentation: "35-year-old woman with intermittent whole-body tremor and episodes of unresponsiveness. Some features overlap with epilepsy. Previous normal EEG but no events captured."
       expected_agent_confidence: 0.55
     diagnostic_puzzle:
-      presentation: "40-year-old woman with progressive bilateral leg weakness over weeks, wheelchair-bound. No clear positive functional signs initially. Extensive negative workup. Past history of fibromyalgia and chronic pain."
+      presentation: "40-year-old woman with progressive bilateral leg weakness over weeks, wheelchair-bound, after an extensive normal outpatient workup; the positive signs need a careful examination (one sign equivocal). Past history of fibromyalgia and chronic pain."
       expected_agent_confidence: 0.35
   common_followups:
+    # EMG/NCS is a waste avoided action in every FND case and a psychiatric evaluation is a must,
+    # not a test (ruling 4), so neither is seeded as a follow-up (24 Oct 2026 close-out).
     - trigger_action: "request_video_eeg"
       tool_name: "analyze_eeg"
-      description: "Prolonged video-EEG capturing habitual events with no EEG correlate"
-    - trigger_action: "request_emg_ncs"
-      tool_name: "interpret_labs"
-      description: "EMG/NCS showing normal motor and sensory conduction (rules out neuropathy/myopathy)"
+      description: "Prolonged video-EEG (eeg_type video) in paroxysmal cases, an optional study: habitual events recorded without ictal change"
     - trigger_action: "request_spine_mri"
-      tool_name: "analyze_brain_mri"
-      description: "MRI cervical/thoracic spine — normal (rules out myelopathy)"
+      tool_name: "order_body_imaging"
+      description: "Spine MRI (study spine_MRI) only for acute paraplegia or a cord question: normal cord, no compression"
     - trigger_action: "request_neuropsych_testing"
-      tool_name: "interpret_labs"
-      description: "Neuropsychological testing for comorbid cognitive complaints"
-    - trigger_action: "request_psychiatric_evaluation"
-      tool_name: "interpret_labs"
-      description: "Formal psychiatric evaluation for comorbid anxiety, depression, trauma history"
+      tool_name: "order_specialized_test"
+      description: "Neuropsychological battery (test_type neuropsych_battery), optional: quantifies the comorbidity that treatment targets"
 
 guillain_barre:
   name: "Guillain-Barré syndrome"

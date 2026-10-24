@@ -58,3 +58,10 @@ Checks re-run after the changes: `perfect_agent.py -v` ok, `case_io.py check` cl
 - `action-1-search-medical-literature.rationale`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
 
 After the edit: `perfect_agent.py` 30/30 FND pass; `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k FND` 60 passed.
+
+## Close-out (24 Oct 2026)
+
+Andrea's FND ruling of 24 Oct 2026 and the close-out decisions (`plans/FND-decisions.md`). What changed and why:
+
+- Diagnosis synonyms scoped by phenotype (`diagnosis_synonyms.yaml` F44 entries; a label or code naming another presentation must not score): removed "functional movement disorder", "functional weakness", "psychogenic non-epileptic seizures", "PNES", "functional seizures"; added "functional diplopia", "functional convergence spasm", "functional eye movement disorder"; codes removed F44.5, F44.7.
+- Checks: `perfect_agent.py -v` and `case_io.py check` clean; `test_case_guards.py -k FND-` passes, now including the discriminator guard.

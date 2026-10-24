@@ -134,11 +134,22 @@ CLAIMS = [
     ('ftd/baseline labs required all 30',       len(cases_with('ftd','interpret_labs',[R],'"folate"')), 30),
     ('ftd/CT used in 2',                        len(cases_with('ftd','order_ct_scan')), 2),
     ('ftd/clinical assessment required all 30',  len(cases_with('ftd','perform_clinical_assessment',[R])), 30),
-    ('fnd/video-EEG optional in 22',             len(cases_with('functional_neurological_disorder','analyze_eeg',[O])), 22),
-    ('fnd/MRI optional in 20',                   len(cases_with('functional_neurological_disorder','analyze_brain_mri',[O])), 20),
-    ('fnd/labs optional in 12',                  len(cases_with('functional_neurological_disorder','interpret_labs',[O])), 12),
-    ('fnd/no instrumental required/recommended', sum(n_actions('functional_neurological_disorder',tool,[R,C]) for tool in
-        ('analyze_eeg','analyze_brain_mri','interpret_labs','analyze_csf','analyze_ecg','order_specialized_test')), 0),
+    ('fnd/video-EEG optional in 22',             len(cases_with('functional_neurological_disorder','analyze_eeg',[O],'video')), 22),
+    ('fnd/video-EEG never required/recommended', len(cases_with('functional_neurological_disorder','analyze_eeg',[R,C])), 0),
+    ('fnd/brain MRI recommended 12 optional 9',  (len(cases_with('functional_neurological_disorder','analyze_brain_mri',[C])),
+                                                 len(cases_with('functional_neurological_disorder','analyze_brain_mri',[O]))), (12,9)),
+    ('fnd/spine MRI recommended in 1',           len(cases_with('functional_neurological_disorder','order_body_imaging',[C],'spine_MRI')), 1),
+    ('fnd/labs recommended 8 optional 4',        (len(cases_with('functional_neurological_disorder','interpret_labs',[C])),
+                                                 len(cases_with('functional_neurological_disorder','interpret_labs',[O]))), (8,4)),
+    ('fnd/ECG optional in 10',                   len(cases_with('functional_neurological_disorder','analyze_ecg',[O])), 10),
+    ('fnd/neuropsych battery optional all 30',   len(cases_with('functional_neurological_disorder','order_specialized_test',[O],'neuropsych_battery')), 30),
+    ('fnd/no instrumental required',             sum(n_actions('functional_neurological_disorder',tool,[R]) for tool in
+        ('analyze_eeg','analyze_brain_mri','interpret_labs','analyze_csf','analyze_ecg','order_specialized_test',
+         'order_body_imaging','order_ct_scan')), 0),
+    ('fnd/medicine review required in 7',        len(cases_with('functional_neurological_disorder','check_drug_interactions',[R])), 7),
+    ('fnd/EMG/NCS and SSEP waste all 30',        sum(all(any(a['alternatives'][0].get('required_arguments',{}).get('test_type')==t
+                                                            and a['severity']=='waste' for a in d['ground_truth']['avoided_actions'])
+                                                        for t in ('emg_ncs','ssep')) for d in CASES['functional_neurological_disorder']), 30),
     ('fnd/signs exam required all 30',           len(cases_with('functional_neurological_disorder','perform_clinical_assessment',[R],'functional_neuro_signs')), 30),
     ('gbs/ECG recommended all 30',               len(cases_with('guillain_barre','analyze_ecg',[C])), 30),
     ('gbs/monitoring required all 30',           len(cases_with('guillain_barre','order_cardiac_monitoring',[R])), 30),

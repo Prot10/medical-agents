@@ -193,12 +193,45 @@ G40:
   labels: [focal epilepsy, temporal lobe epilepsy, mesial temporal lobe epilepsy, mesial temporal sclerosis epilepsy, focal onset seizures, focal impaired awareness seizures, focal seizures, TLE, epilepsy temporal lobe]
   codes: [G40.2, G40.209, G40.219, G40.1, G40.109, G40.119, G40.009, G40.019, G40.9, G40.909]
 F44.5:
+  # The three pure functional-seizure FND cases take their labels and codes from the FND entries
+  # below (F44.4 motor and F44.7 mixed name another presentation there).
+  except_cases: [FND-M04, FND-M06, FND-RP01]
   labels: [psychogenic non-epileptic seizures, psychogenic nonepileptic seizures, PNES, functional seizures, dissociative seizures, non-epileptic seizures]
   codes: [F44.4, F44.7]
+# FND (24 Oct 2026 close-out, plans/FND-decisions.md): the category grants the generic labels and
+# the unspecified code; phenotype labels and codes go only where the case has that phenotype, so a
+# motor-only case does not credit a functional-seizure answer (or F44.5), a pure functional-seizure
+# case does not credit "functional weakness", and the diplopia case credits neither.
 F44:
   conditions: [functional_neurological_disorder]
-  labels: [functional neurological disorder, functional neurological symptom disorder, conversion disorder, FND, functional movement disorder, functional weakness, psychogenic non-epileptic seizures, PNES, functional seizures]
-  codes: [F44.4, F44.5, F44.6, F44.7, F44.9]
+  labels: [functional neurological disorder, functional neurological symptom disorder, conversion disorder, FND]
+  codes: [F44.9]
+# Paroxysmal phenotype: the 22 cases with functional seizures.
+F44+seizures:
+  conditions: [functional_neurological_disorder]
+  except_cases: [FND-M05, FND-M09, FND-P07, FND-P08, FND-RM02, FND-RP02, FND-S07, FND-S10]
+  # Not "non-epileptic seizures": its tokens (non, epileptic, seizures) occur in an epilepsy answer
+  # such as "focal non-motor epileptic seizures"; "nonepileptic" is one token.
+  labels: [psychogenic non-epileptic seizures, psychogenic nonepileptic seizures, PNES, functional seizures, dissociative seizures, nonepileptic seizures]
+  codes: [F44.5]
+# Motor phenotype (functional limb weakness, with or without tremor and sensory loss): every case
+# except the pure functional-seizure cases and the diplopia case.
+F44+motor:
+  conditions: [functional_neurological_disorder]
+  except_cases: [FND-M04, FND-M06, FND-RP01, FND-RM02]
+  labels: [functional weakness, functional limb weakness, functional motor disorder]
+  codes: [F44.4, F44.6, F44.7]
+# Functional tremor (entrainment or a distractible tremor on examination).
+F44+movement:
+  conditions: [functional_neurological_disorder]
+  cases: [FND-M01, FND-M02, FND-M03, FND-P01, FND-P07, FND-RM03, FND-RS03, FND-S04, FND-S05, FND-S06, FND-S09]
+  labels: [functional movement disorder, functional tremor]
+# FND-RM02: functional diplopia with convergence spasm.
+F44+diplopia:
+  conditions: [functional_neurological_disorder]
+  cases: [FND-RM02]
+  labels: [functional diplopia, functional convergence spasm, functional eye movement disorder]
+  codes: [F44.4, F44.6]
 
 # G41 (24 Oct 2026, SE close-out): the category grants the generic labels and the unspecified codes
 # only. The type codes (G41.0 convulsive, G41.2 complex partial / focal NCSE, G41.8 other) and their
