@@ -3,6 +3,24 @@
 Kept by the orchestrating session so a resumed session does not lose it. Remove an item when it
 lands.
 
+## Rulings for the batch-5 close-out
+- FND (Andrea, 24 Oct 2026, from the August 2026 exchange with Flavia Pennisi and Antonio: their
+  email in `docs/benchmark/tool-review-2026-07.md` "Dataset composition changes requested", our
+  reply section 2 in `tool-review-2026-07-reply-draft.md` and 1.7 in `tool-review-2026-07-decisioni.md`).
+  FND stays (20 conditions, 600 cases; DLB is deferred as a future same-size swap). The
+  physicians kept FND only with every diagnostic tool optional, and we replied that the exam of
+  positive functional signs is the only required diagnostic act and that all instrumental work,
+  video-EEG in paroxysmal cases included, is optional. The batch-5 plan broke that: on master FND
+  requires only `perform_clinical_assessment` (30/30); after the workflow it also requires
+  `analyze_eeg` in 22 cases, `analyze_brain_mri` in M09 and P08, `interpret_labs` in P08 and RM01.
+  Close-out: video-EEG back to `optional` in those 22 cases; the red-flag tests (P08 glucose and
+  imaging, RM01 sodium, M09 MRI on natalizumab) to `recommended` (the tier the reply already used for
+  the 7 MRI cases); keep the exam required. `check_drug_interactions` (required in M02, RM03,
+  RP01, RP03, RS01, RS02, S03) is a management act, not a diagnostic one: it may stay required, but
+  list it for the physicians. Fix the impressions that say video-EEG "is required in this case"
+  (M04, M06, RP01), the sequence constraints and `required_before_assessment` that name those
+  tests, the pack and the guidance claims to match.
+
 ## Code and tests
 - Scorer: a mixed case can score both diagnoses only by recoding (it accepts a diagnosis on its
   ICD code alone). Consider a per-case "all of" diagnosis rule. (HEP-ENC-P04, 24 Oct)
