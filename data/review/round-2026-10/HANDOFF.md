@@ -50,7 +50,7 @@ which needs torch); `bin/perfect_agent.py --all` 600/600; `apply_diagnosis_synon
   stored panel of an added assay.
 - Weight and height (b5a46c7c and the consistency pass): every case records height, weight and
   BMI, consistent with its text (guard `test_height_weight_and_bmi_agree`); doubts in
-  `plans/BODY-SIZE-{A,B}-decisions.md`. The VPS has not been redeployed since.
+  `plans/BODY-SIZE-{A,B}-decisions.md`. Deployed to the VPS on 25 Oct 2026.
 - Prices of the new terms were recalled, some estimated: verify against the 2024 MPFS / CLFS.
 - For the physicians: the scoring changes in `CENTRAL_PENDING.md` "For the physicians" and in
   each `plans/<COND>-decisions.md`; never physician-reviewed and changed by the round: VASC-DEM,
