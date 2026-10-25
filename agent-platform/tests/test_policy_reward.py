@@ -180,6 +180,9 @@ def test_diagnosis_drops_denied_clauses():
     assert ms.matches("Relapsing-remitting MS; NMOSD unlikely")
     als = DiagnosisCriterion(accepted=["amyotrophic lateral sclerosis", "ALS"])
     assert not als.matches("Thyrotoxicosis, ALS criteria not met")
+    assert not als.matches("Cervical myelopathy mimicking ALS")
+    assert not als.matches("Cervical myelopathy, previously misdiagnosed as ALS")
+    assert DiagnosisCriterion(accepted=["ALS"], rejected=["bell palsy"]).matches("ALS, initially diagnosed as Bell palsy")
 
 
 def test_rejected_labels_and_mixed_components():
@@ -187,6 +190,12 @@ def test_rejected_labels_and_mixed_components():
     assert pd.matches("Idiopathic PD")
     assert not pd.matches("PD dementia")
     assert pd.matches("PD, no dementia")
+    assert pd.matches("PD without dementia")
+    lgi1 = DiagnosisCriterion(accepted=["autoimmune encephalitis"], rejected=["LGI1 encephalitis"])
+    assert lgi1.matches("Seronegative autoimmune encephalitis, LGI1-negative")
+    assert DiagnosisCriterion(accepted=["myasthenia gravis"]).matches("AChR-negative myasthenia gravis")
+    aura = DiagnosisCriterion(accepted=["migraine with aura"])
+    assert not aura.matches("Migraine without aura")
     als = DiagnosisCriterion(accepted=["ALS"], rejected=["multiple sclerosis", "MS"])
     assert not als.matches("ALS or MS")
     assert als.matches("ALS rather than MS")

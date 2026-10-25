@@ -85,13 +85,19 @@ _DENIED_CLAUSE = re.compile(
     r"|not (?:met|likely|present|supported|fulfilled|confirmed|satisfied|consistent))\b"
 )
 # A cue that denies the rest of its clause: "MOGAD rather than MS", "SAH, not aneurysmal".
-_DENIAL_ONSET = re.compile(r"\b(?:not|no|rather than|instead of|excluding|without evidence of)\b")
+_DENIAL_ONSET = re.compile(
+    r"\b(?:not|no|rather than|instead of|excluding|without evidence of|mimicking|masquerading as"
+    r"|(?:previously |initially |originally )?(?:mis)?diagnosed as|mislabell?ed as)\b"
+)
 
 
 def _affirmed(text: str) -> str:
     """The part of a diagnosis text that is asserted, with denied clauses removed.
 
     "non-X" becomes the single word "nonX", so "non-aneurysmal" never supplies "aneurysmal".
+    "without X" becomes "withoutX" in the same way: "PD without dementia" names no dementia, and
+    "migraine without aura" stays distinct from "migraine with aura". "X negative" becomes
+    "Xnegative", so "LGI1-negative encephalitis" does not name LGI1 encephalitis.
     """
     text = re.sub(r"\bnon[\s-]+(?=[a-z])", "non", text.lower())
     kept = []
@@ -100,7 +106,8 @@ def _affirmed(text: str) -> str:
             continue
         onset = _DENIAL_ONSET.search(clause)
         kept.append(clause[: onset.start()] if onset else clause)
-    return " ".join(kept)
+    text = re.sub(r"\bwithout\s+(?=[a-z])", "without", " ".join(kept))
+    return re.sub(r"\b([a-z0-9]+)[\s-]+negative\b", r"\1negative", text)
 
 
 def _names(candidate: set[str], labels: list[str]) -> bool:
