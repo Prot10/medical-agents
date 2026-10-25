@@ -1,7 +1,7 @@
 # Handoff: October 2026 review round (25 Oct 2026)
 
-Branch `fix/review-round-2026-10`, everything committed (64 commits ahead of `master`, not
-pushed, no PR). The case-by-case round is finished: all 20 conditions (600 cases) are fixed,
+Branch `fix/review-round-2026-10`, everything committed and pushed to origin (no PR); deployed
+to the review VPS on 25 Oct 2026. The case-by-case round is finished: all 20 conditions (600 cases) are fixed,
 verified, audited and closed out, and the cross-condition MockServer work is landed. Read, for
 any follow-up: this file, `ROUND_POLICY.md`, `PATTERNS.md`, `CENTRAL_PENDING.md` (the open items),
 `plans/<COND>-decisions.md` (per-condition decisions and the physicians' items). The skills
@@ -40,10 +40,10 @@ Final checks at 6938668c: pytest 4723 passed, 0 failed (`--ignore=agent-platform
 which needs torch); `bin/perfect_agent.py --all` 600/600; `apply_diagnosis_synonyms.py --check` 0.
 
 ## Open items (details in CENTRAL_PENDING.md)
-- Scorer (design decision, code not cases): a diagnosis is accepted on its ICD code alone (C71,
-  G61.0, F01.50, G43.109 credit wrong answers); no negation matching ("non-aneurysmal SAH"); no
-  per-case rejected tokens (dementia accepts MCI, "PD dementia", "secondary progressive MS",
-  "MOGAD rather than MS"); ICD-10-CM vs WHO codes (G41).
+- Scorer v2 (677c7492, 7d9bbe3e): diagnosis on the asserted label only, denied clauses dropped,
+  per-case `rejected` labels (6,614) and `required_components` (8 mixed cases), ICD code a weight-0
+  component. Physician doubts in `plans/SCORER-V2-group{1..4}-decisions.md` (e.g. whether SE cases
+  headed by the cause must name it, MG antibody subtype not policed by tokens).
 - MockServer/library: library normals can contradict a case that does not store the variant
   (CT perfusion, amyloid PET, batch-4 terms); about 260 cases store a contrast MRI as their only
   study, so a non-contrast order gets post-gadolinium findings; a lab order returns the whole
@@ -55,4 +55,4 @@ which needs torch); `bin/perfect_agent.py --all` 600/600; `apply_diagnosis_synon
   NMDAR-ENC, MIG-AURA, SYNC-CARD, NPH, FTD, MG, FND, MS-RR, FEPI-TEMP, PD.
 - Optional: patient-surname repetition across conditions (Reyes in 8 cases, Tanaka in 2); SE-P02
   off the global F44.5 synonym entry.
-- Nothing is pushed and the review VPS still serves the old data: deploy only on Andrea's request.
+- The review VPS serves this branch (deployed 25 Oct 2026); redeploy with `deployment/hostinger/deploy.sh` only on Andrea's request.
