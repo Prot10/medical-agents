@@ -78,3 +78,19 @@ Commit 317e46db routes `analyze_eeg` by `eeg_type` (an order without it is a rou
 The lab matcher now keeps a urine or CSF row out of a blood order: a urinalysis, urine sodium or urine osmolality row answers only an order that names the urine assay, so a CBC or CMP order no longer returns the urine results. The lab criterion therefore names the urine assays its expected evidence cites.
 
 - `ground_truth.action_criteria[action-2-interpret-labs]`: new first alternative `{panels: ['CBC', 'CMP', 'magnesium', 'tox_screen', 'CK', 'urinalysis']}` (adds `urinalysis`); the previous orders stay as alternatives, so every call that matched before still matches. The expected evidence reads dipstick blood without red cells, which the first order received only through two matcher defects fixed on 25 Oct 2026: a urine row answered a blood-count or metabolic order (`Urine WBC` as WBC, `Urine sodium` as sodium, a urine creatinine ratio as creatinine), and the unit `mg/dL` read as magnesium. Scoring: cost reference only (the policy's reference order is fuller); coverage unchanged.
+
+## Library contradictions (25 Oct 2026)
+
+Orders that reached the benchmark library's normal report although this case contradicts it (diagnosis, history, medications or a stored finding) now get a case-specific report; every other off-pathway order still gets the library normal. No tier, criterion, diagnosis or existing output changed.
+
+- `analyze_eeg eeg_type=ambulatory` -> `followup_outputs[order_ambulatory]`: ambulatory EEG mirroring the stored continuous EEG (no video).
+- `perform_clinical_assessment assessment_type=performance_status` -> `followup_outputs[order_performance_status]`: performance status KPS 20, ECOG 4 during the admission.
+- `perform_clinical_assessment assessment_type=gait_and_balance_timed` -> `followup_outputs[order_gait_and_balance_timed]`: timed gait not testable, as on the examination.
+- `perform_clinical_assessment assessment_type=cognitive_screen` -> `followup_outputs[order_cognitive_screen]`: baseline cognitive screen not testable in the documented mental state.
+- `order_specialized_test test_type=neuropsych_battery` -> `followup_outputs[order_neuropsych_battery]`: neuropsychological battery not testable in the documented mental state.
+- `order_specialized_test test_type=speech_language_evaluation` -> `followup_outputs[order_speech_language_evaluation]`: speech and language evaluation not testable in the documented mental state.
+- `labs:lithium_level` -> fallback labs panel `Lithium`: lithium not detected (not prescribed).
+- `labs:AED_levels` -> fallback labs panel `Antiseizure medication levels`: antiseizure drug levels: none detected (no antiseizure drug prescribed).
+- `labs:valproate_level` -> fallback labs panel `Antiseizure medication levels`: antiseizure drug levels: none detected (no antiseizure drug prescribed).
+
+Checks: `perfect_agent.py` ok; `test_case_guards.py -k SE` pass; every order listed in `plans/LIBRARY-group2-map.yaml` for this case is answered without the library; served answers of every other order unchanged against HEAD. Reasons and doubts: `plans/LIBRARY-group2-decisions.md`.

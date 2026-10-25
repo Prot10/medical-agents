@@ -75,3 +75,23 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 20, ECOG 4 (fallback_tool_outputs.clinical_assessment). Why: rule 3: febrile, tachycardic (HR 119), intermittently confused and unwilling to walk; the library's Karnofsky 100 describes a person without disease.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: not performed (headache, photophobia, confusion); brief supported standing steady (followup_outputs[4] request_gait_and_balance_timed). Why: rule 3: the stored exam records gait not formally assessed because of severe headache and photophobia.
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: no parkinsonian signs; challenge not performed; gait and postural reflexes not assessable (followup_outputs[5] request_levodopa_challenge). Why: rule 3: the library describes a normal gait and postural reflexes in a patient who could not walk.
+- `perform_clinical_assessment {assessment_type: structured_headache_history_ichd3}`: new acute headache with red flags; criteria for a primary headache disorder not met (followup_outputs[6] request_structured_headache_history_ichd3). Why: rule 1 and 3: an acute febrile headache with photophobia, vomiting and confusion; the library elicits no red flags.
+- `analyze_brain_mri`: diffuse leptomeningeal enhancement and sulcal FLAIR hyperintensity; no complication (fallback_tool_outputs.mri). Why: rule 1: no MRI is stored; an MRI with gadolinium in this patient would not be normal (stored CT without mass, shift or hydrocephalus).
+- `analyze_eeg {eeg_type: continuous_icu}`: mild generalised theta slowing; no epileptiform discharges or seizures (followup_outputs[7] request_continuous_icu). Why: rule 3: the patient is slowed, inattentive and disoriented (GCS 14); a normal background contradicts the stored exam.
+- `analyze_eeg {eeg_type: ambulatory}`: mild generalised theta slowing; no epileptiform discharges or seizures (followup_outputs[8] request_ambulatory). Why: rule 3: the patient is slowed, inattentive and disoriented (GCS 14); a normal background contradicts the stored exam.
+- `perform_clinical_assessment {assessment_type: cognitive_screen}`: MoCA 17/30 with inattention and temporal disorientation (followup_outputs[9] request_cognitive_screen). Why: rule 3: the stored exam records impaired attention, repeated questions and a wrong date; the library reports MoCA 28/30.
+- `order_specialized_test {test_type: neuropsych_battery}`: not completed (inattention, acute confusion) (fallback_tool_outputs.specialized_test). Why: rule 3: an acutely confused patient cannot complete a battery in the average range.
+- `order_microbiology {specimen: whole_blood_pcr}`: Streptococcus pneumoniae DNA detected (fallback_tool_outputs.microbiology). Why: rule 3: blood cultures grow S. pneumoniae in 2 of 2 sets, a target of the panel; collected after 3 days of oral amoxicillin.
+- `perform_clinical_assessment {assessment_type: orthostatic_blood_pressure}`: supine BP 102/70, HR 119; standing not performed (followup_outputs[10] request_orthostatic_blood_pressure). Why: rule 3: vitals HR 119 and BP 102/70 in a patient who could stand only briefly; the library reports HR 68 and 3 minutes of standing.
+- `interpret_labs {panels: [peripheral smear]}`: Howell-Jolly bodies, toxic granulation (fallback_tool_outputs.labs['peripheral smear']). Why: rule 2: splenectomy at age 32; stored WBC 18.7 with 8% bands and platelets 139.
+- `interpret_labs {panels: [serum_osmolality]}`: serum osmolality 268 mOsm/kg (low) (fallback_tool_outputs.labs['serum_osmolality']). Why: rule 3: stored sodium 126 mmol/L (calculated osmolality about 270); the library reports 288 mOsm/kg.
+- Case fallback replaced, `analyze_eeg {eeg_type: routine}`: routine EEG now shows mild generalised theta slowing; no epileptiform discharges or seizures (was a normal awake and drowsy EEG) (fallback_tool_outputs.eeg). Why: rule 3: the patient is slowed, inattentive and disoriented (GCS 14); a normal background contradicts the stored exam.
+- Case fallback replaced, `analyze_ecg`: sinus tachycardia at 119 bpm, otherwise normal (was a normal ECG) (fallback_tool_outputs.ecg). Why: presenting heart rate 119 bpm.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

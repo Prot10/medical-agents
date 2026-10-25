@@ -92,3 +92,25 @@ Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it na
 - Approved case: changed for a real inconsistency (the policy's own order did not return what its evidence cites), so it goes back to re-review for this criterion only.
 
 Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.
+
+## Library contradictions (25 Oct 2026)
+
+Orders the benchmark library answered with a normal report that this case contradicts now have a case report. Contradiction = the history, the diagnosis or a stored finding makes the normal report impossible.
+
+- `analyze_csf (lumbar puncture, EVD, lumbar drain; xanthochromia)` -> fallback_tool_outputs.csf: blood-stained CSF without clearing (Fisher 3), xanthochromia result per time from onset. The library returned clear acellular CSF in a patient with subarachnoid blood on CT.
+- `perform_clinical_assessment {assessment_type: performance_status}` -> fallback_tool_outputs.clinical_assessment: Karnofsky 40, ECOG 3. The library returned Karnofsky 100, ECOG 0, working, in an acutely ill inpatient.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}` -> followup_outputs[request_gait_and_balance_timed]: assessment not completed, patient unable to stand safely; the library returned a normal Timed Up and Go in a patient whose gait the exam could not test or found abnormal.
+- `order_echocardiogram {echo_type: TEE}` -> fallback_tool_outputs.echo: stored TTE wall motion and LVEF 54% carried over; no thrombus or shunt. The library TEE was normal against an abnormal stored TTE.
+- `order_echocardiogram {echo_type: bubble_study}` -> followup_outputs[request_bubble_study]: same wall motion and LVEF, no right-to-left shunt at rest. The library bubble study called the echocardiogram normal.
+- `order_advanced_imaging {modality: cardiac_MRI}` -> fallback_tool_outputs.advanced_imaging: wall motion and LVEF as on the stored TTE, oedema in the dysfunctional segments, no late enhancement. The library cardiac MRI reported no structural heart disease.
+- `order_body_imaging {study: chest_abdomen_pelvis_CT / pelvis_abdomen_CT}` -> fallback_tool_outputs.body_imaging: enlarged postpartum uterus 2 hours after vaginal delivery; the library returned a normal pelvis.
+- `order_body_imaging {study: pelvis_abdomen_ultrasound}` -> followup_outputs[request_pelvis_abdomen_ultrasound]: enlarged postpartum uterus 2 hours after vaginal delivery; the library returned a normal pelvis.
+- `order_body_imaging {study: pelvis_abdomen_MRI}` -> followup_outputs[request_pelvis_abdomen_mri]: enlarged postpartum uterus 2 hours after vaginal delivery; the library returned a normal pelvis.
+- `interpret_labs {panels: [beta-hCG]}` -> fallback_tool_outputs.labs: beta-hCG 18,600 mIU/mL, 2 hours after delivery; the library returned 1 mIU/mL.
+- `interpret_labs {panels: [urinalysis]}` -> fallback_tool_outputs.labs: proteinuria 2+ and haematuria 1+; history and presentation of eclampsia with a seizure; the library returned a normal urinalysis.
+- `order_specialized_test {test_type: optical_coherence_tomography}` -> fallback_tool_outputs.specialized_test: mild bilateral RNFL thickening; the stored exam documents mild bilateral papilledema.
+- `perform_clinical_assessment {assessment_type: structured_headache_history_ichd3}` -> followup_outputs[request_structured_headache_history_ichd3]: sudden, of thunderclap quality, about 30 minutes after vaginal delivery; red flags: thunderclap onset, postpartum onset, seizure, altered consciousness. The library reported no thunderclap onset, no red flags and no nausea or photophobia, against the history.
+- `perform_clinical_assessment {assessment_type: orthostatic_blood_pressure}` -> followup_outputs[request_orthostatic_blood_pressure]: standing not attempted, supine BP 176/106 as at arrival. The library reported 3 minutes of symptom-free standing at BP 128/78.
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}` -> followup_outputs[request_levodopa_challenge]: no parkinsonian signs, challenge not performed. The library reported normal gait and postural reflexes and no nausea in a patient who cannot stand and is vomiting.
+
+Checks: `perfect_agent.py` ok; `test_case_guards.py -k SAH-P05` passed; no criterion answer changed (snapshot diff); every mapped order is answered without the library (`verify.py`).

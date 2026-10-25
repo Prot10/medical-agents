@@ -86,3 +86,16 @@ Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it na
 - Approved case: changed for a real inconsistency (the policy's own order did not return what its evidence cites), so it goes back to re-review for this criterion only.
 
 Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.
+
+## Library contradictions (25 Oct 2026)
+
+Orders the benchmark library answered with a normal report that this case contradicts now have a case report. Contradiction = the history, the diagnosis or a stored finding makes the normal report impossible.
+
+- `analyze_csf (lumbar puncture, EVD, lumbar drain; xanthochromia)` -> fallback_tool_outputs.csf: blood-stained CSF without clearing (Fisher 2), xanthochromia result per time from onset. The library returned clear acellular CSF in a patient with subarachnoid blood on CT.
+- `perform_clinical_assessment {assessment_type: performance_status}` -> fallback_tool_outputs.clinical_assessment: Karnofsky 50, ECOG 3. The library returned Karnofsky 100, ECOG 0, working, in an acutely ill inpatient.
+- `order_echocardiogram {echo_type: TEE}` -> fallback_tool_outputs.echo: stored TTE wall motion and LVEF 50% carried over; no thrombus or shunt. The library TEE was normal against an abnormal stored TTE.
+- `order_echocardiogram {echo_type: bubble_study}` -> followup_outputs[request_bubble_study]: same wall motion and LVEF, no right-to-left shunt at rest. The library bubble study called the echocardiogram normal.
+- `order_advanced_imaging {modality: cardiac_MRI}` -> fallback_tool_outputs.advanced_imaging: wall motion and LVEF as on the stored TTE, oedema in the dysfunctional segments, no late enhancement. The library cardiac MRI reported no structural heart disease.
+- `perform_clinical_assessment {assessment_type: structured_headache_history_ichd3}` -> followup_outputs[request_structured_headache_history_ichd3]: instantaneous during jumping jacks at the gym, 6 hours before assessment; red flags: thunderclap onset, onset during exertion, change from her usual headache pattern. The library reported no thunderclap onset, no red flags and no nausea or photophobia, against the history.
+
+Checks: `perfect_agent.py` ok; `test_case_guards.py -k SAH-RM11` passed; no criterion answer changed (snapshot diff); every mapped order is answered without the library (`verify.py`).

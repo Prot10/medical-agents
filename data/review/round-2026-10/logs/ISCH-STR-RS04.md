@@ -82,3 +82,26 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+Orders that reached the benchmark library's normal report although this case contradicts it (diagnosis, history, medications or a stored finding) now get a case-specific report; every other off-pathway order still gets the library normal. No tier, criterion, diagnosis or existing output changed.
+
+- `order_advanced_imaging modality=MR_angiography` -> `followup_outputs[order_mr_angiography]`: MR angiography showing the vessel lesion on the stored CTA.
+- `order_advanced_imaging modality=cerebral_angiography` -> `followup_outputs[order_cerebral_angiography]`: catheter angiography showing the vessel lesion on the stored CTA.
+- `order_advanced_imaging modality=carotid_duplex` -> `followup_outputs[order_carotid_duplex]`: carotid and vertebral duplex consistent with the stored CTA.
+- `order_advanced_imaging modality=transcranial_doppler` -> `followup_outputs[order_transcranial_doppler]`: transcranial Doppler consistent with the stored CTA.
+- `order_advanced_imaging modality=CT_perfusion` -> `followup_outputs[order_ct_perfusion]`: CT perfusion deficit in the infarct territory on the stored MRI.
+- `order_advanced_imaging modality=perfusion_MRI` -> `followup_outputs[order_perfusion_mri]`: perfusion MRI deficit in the infarct territory on the stored MRI.
+- `perform_clinical_assessment assessment_type=performance_status` -> `followup_outputs[order_performance_status]`: performance status KPS 20, ECOG 4 for the documented deficits.
+- `perform_clinical_assessment assessment_type=gait_and_balance_timed` -> `followup_outputs[order_gait_and_balance_timed]`: timed gait as on the examination.
+- `perform_clinical_assessment assessment_type=cognitive_screen` -> `followup_outputs[order_cognitive_screen]`: baseline cognitive screen as documented in the mental status examination.
+- `order_specialized_test test_type=neuropsych_battery` -> `followup_outputs[order_neuropsych_battery]`: neuropsychological battery impaired or not testable, as the documented deficits.
+- `order_specialized_test test_type=speech_language_evaluation` -> `followup_outputs[order_speech_language_evaluation]`: speech and language evaluation not testable when obtunded.
+- `labs:beta-hCG` -> fallback labs panel `Beta-hCG`: beta-hCG positive at 15 weeks of pregnancy.
+- `order_body_imaging study=pelvis_abdomen_ultrasound` -> `followup_outputs[order_pelvis_abdomen_ultrasound]`: abdominal and pelvic imaging: gravid uterus at 15 weeks.
+- `order_body_imaging study=pelvis_abdomen_CT` -> `followup_outputs[order_pelvis_abdomen_ct]`: abdominal and pelvic imaging: gravid uterus at 15 weeks.
+- `order_body_imaging study=pelvis_abdomen_MRI` -> `followup_outputs[order_pelvis_abdomen_mri]`: abdominal and pelvic imaging: gravid uterus at 15 weeks.
+- `order_body_imaging study=chest_abdomen_pelvis_CT` -> `followup_outputs[order_chest_abdomen_pelvis_ct]`: abdominal and pelvic imaging: gravid uterus at 15 weeks.
+
+Checks: `perfect_agent.py` ok; `test_case_guards.py -k ISCH-STR` pass; every order listed in `plans/LIBRARY-group2-map.yaml` for this case is answered without the library; served answers of every other order unchanged against HEAD. Reasons and doubts: `plans/LIBRARY-group2-decisions.md`.

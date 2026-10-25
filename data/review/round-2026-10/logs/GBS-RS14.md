@@ -91,3 +91,14 @@ Review-process wording (references to the round's rulings, the round policy file
 - The FVC mL/kg figures and the weight-based IVIg amounts in the text were checked against this weight: all within rounding, no text change.
 
 Checks: `perfect_agent.py` ok; BMI = weight / height^2 to one decimal.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 50, ECOG 3 (fallback_tool_outputs.clinical_assessment). Why: rule 1: the library reports Karnofsky 100 / ECOG 0 and a working patient; she cannot walk without assistance and cannot rise from a chair without using her arms.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: severely impaired gait and balance: steppage gait with support (berg 20/56); timed tests not completed (followup_outputs[3] request_gait_and_balance_timed). Why: rule 1: the library reports a normal timed gait and balance assessment; she walks only with support with a bilateral steppage gait.
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: no tremor or rigidity; motor items limited by weakness, response not assessable (followup_outputs[4] request_levodopa_challenge). Why: rule 1: the library describes a normal motor examination, gait and postural reflexes; symmetric flaccid weakness and a steppage gait.
+- `order_body_imaging {study: spine_MRI}`: smooth enhancement of the cauda equina roots, ventral more than dorsal; normal cord (fallback_tool_outputs.body_imaging). Why: rule 1: smooth enhancement of the cauda equina and ventral roots is seen in most patients with this polyradiculoneuropathy (Gorson 1996; Byun 1998), while the library reads the roots as normal.
+- `order_body_imaging {study: peripheral_nerve_MRI}`: smooth enhancement and mild T2 hyperintensity of the lumbosacral roots, no enlargement (followup_outputs[5] request_peripheral_nerve_mri). Why: rule 1 and 3: the library reads the nerve roots as normal; root enhancement as on the spine MRI of this case.
+- `perform_clinical_assessment {assessment_type: orthostatic_blood_pressure}`: active standing not performed (cannot stand unassisted); supine BP 122/78 mmHg, HR 92 bpm; sitting BP 118/78 mmHg, HR 100 bpm (followup_outputs[6] request_orthostatic_blood_pressure). Why: rule 3: she cannot stand unassisted; the library reports 3 minutes of symptom-free standing at a supine heart rate of 68.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

@@ -78,3 +78,20 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, named in the report's own text.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+A fresh order of each study below was answered by the benchmark-level normal library, which contradicted this patient (age, rhythm, devices, surgery, stored findings). Each now has a case-specific report:
+
+- perfusion_SPECT: Marked bilateral posterior parietal, precuneus and posterior cingulate hypoperfusion, a pattern consistent with an Alzheimer-type profile with posterior predominance, with mild patchy frontal hypoperfusion. (fallback_tool_outputs.advanced_imaging)
+- performance_status: Karnofsky 70 (cares for self; unable to carry on normal activity or active work), ECOG 1 (restricted in strenuous activity, able to carry out light work). (fallback_tool_outputs.clinical_assessment)
+- exercise_stress_test: No electrocardiographic or clinical evidence of inducible ischaemia at 7.0 METs. (fallback_tool_outputs.specialized_test)
+- tau_PET: Tau-positive PET: neocortical tau signal in the posterior parietal cortex, precuneus, posterior cingulate and lateral occipital cortex bilaterally, with lesser medial temporal involvement. (followup request_tau_pet)
+- TEE: Mild concentric left ventricular hypertrophy; aortic valve sclerosis without stenosis. No patent foramen ovale and no left atrial appendage thrombus. (followup request_tee)
+- emg_ncs: Chronic left L5 and S1 radiculopathy without active denervation; no polyneuropathy. (followup request_emg_ncs)
+- polysomnography: Moderate obstructive sleep apnoea (AHI 29/h) without CPAP, controlled on CPAP 9 cm H2O (residual AHI 3/h). (followup request_polysomnography)
+- DTI_tractography: Diffusely reduced white matter fractional anisotropy with posterior predominance, without tract interruption. (followup request_dti_tractography)
+- spine_MRI: L4-S1 instrumented fusion with left L5-S1 epidural fibrosis and mild adjacent-segment degeneration; no canal stenosis and normal cord. (fallback_tool_outputs.body_imaging)
+- spine_CT: Solid L4-S1 instrumented fusion with intact hardware; mild adjacent-segment degeneration at L3-L4. (followup request_spine_ct)
+
+Checks: `perfect_agent.py` pass; `test_case_guards.py -k VASC-DEM-P02` pass; criterion outputs unchanged against the pre-pass snapshot; no 60-character window of any expected_evidence in the new reports; synonym guard 0 changes.

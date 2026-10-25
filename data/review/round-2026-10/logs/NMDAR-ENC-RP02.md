@@ -95,3 +95,25 @@ Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it na
 - Scoring: coverage unchanged (any call matching the old order still matches); the cost reference of the required work-up now uses the new first order.
 
 Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the normal-row probe reports nothing for this criterion.
+
+## Library contradictions (25 Oct 2026)
+
+Orders that reached the benchmark library's normal report although this case contradicts it (diagnosis, history, medications or a stored finding) now get a case-specific report; every other off-pathway order still gets the library normal. No tier, criterion, diagnosis or existing output changed.
+
+- `order_advanced_imaging modality=FDG_PET` -> `followup_outputs[order_fdg_pet]`: brain FDG-PET: frontotemporal hypermetabolism with parieto-occipital hypometabolism, distributed as the stored MRI and EEG.
+- `analyze_eeg eeg_type=ambulatory` -> `followup_outputs[order_ambulatory]`: ambulatory EEG mirroring the stored continuous EEG (no video).
+- `perform_clinical_assessment assessment_type=cognitive_screen` -> `followup_outputs[order_cognitive_screen]`: baseline cognitive screen as documented in the mental status examination.
+- `perform_clinical_assessment assessment_type=cognitive_screen timing=post_intervention` -> `followup_outputs[order_cognitive_screen_post_intervention]`: repeat screen during the admission: persisting impairment.
+- `order_specialized_test test_type=neuropsych_battery` -> `followup_outputs[order_neuropsych_battery]`: neuropsychological battery not completable or impaired in the acute encephalopathy.
+- `perform_clinical_assessment assessment_type=performance_status` -> `followup_outputs[order_performance_status]`: performance status KPS 20, ECOG 4 for the documented dependency.
+- `perform_clinical_assessment assessment_type=gait_and_balance_timed` -> `followup_outputs[order_gait_and_balance_timed]`: timed gait not testable or impaired, as on the examination.
+- `order_specialized_test test_type=speech_language_evaluation` -> `followup_outputs[order_speech_language_evaluation]`: speech and language evaluation reflecting the documented speech disturbance.
+- `order_ct_scan` -> `fallback_tool_outputs.ct`: head CT shows the chronic lesion on the stored MRI.
+- `order_body_imaging study=chest_xray` -> `followup_outputs[order_chest_xray]`: chest radiograph: left upper zone mass, hilar prominence, right lower zone consolidation and hyperinflation, as on the stored CT.
+- `order_body_imaging study=mediastinum_CT` -> `followup_outputs[order_mediastinum_ct]`: mediastinal CT: regressing subcarinal and hilar nodes and the left upper lobe mass, as on the stored CT.
+- `order_body_imaging study=chest_CTA` -> `followup_outputs[order_chest_cta]`: CT pulmonary angiogram: no embolism; the known lung mass, nodes and right lower lobe consolidation.
+- `order_advanced_imaging modality=whole_body_FDG_PET` -> `followup_outputs[order_whole_body_fdg_pet]`: whole-body FDG-PET: avid left upper lobe mass and nodes, consolidation, no distant disease.
+- `labs:tox_screen` -> fallback labs panel `Urine drug screen`: urine drug screen positive for benzodiazepines (on clorazepate).
+- `labs:valproate_level` -> fallback labs panel `Antiseizure medication levels`: antiseizure drug levels: only the drugs the patient takes.
+
+Checks: `perfect_agent.py` ok; `test_case_guards.py -k NMDAR-ENC` pass; every order listed in `plans/LIBRARY-group2-map.yaml` for this case is answered without the library; served answers of every other order unchanged against HEAD. Reasons and doubts: `plans/LIBRARY-group2-decisions.md`.

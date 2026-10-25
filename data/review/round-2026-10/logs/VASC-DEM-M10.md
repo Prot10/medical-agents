@@ -80,3 +80,27 @@ Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym g
 - Why: rule 1: patient.physical_exam.general states weight 83 kg, height 172 cm.
 
 Checks: `perfect_agent.py` ok; BMI = weight / height^2 to one decimal.
+
+## Library contradictions (25 Oct 2026)
+
+A fresh order of each study below was answered by the benchmark-level normal library, which contradicted this patient (age, rhythm, devices, surgery, stored findings). Each now has a case-specific report:
+
+- FDG_PET: Right-hemispheric metabolic defects in the occipital (including calcarine), frontal opercular-insular and parietal cortex, mild hypometabolism of the remaining right hemisphere and crossed left cerebellar diaschisis; left hemisphere preserved. (fallback_tool_outputs.advanced_imaging)
+- perfusion_SPECT: Right-hemispheric perfusion defects in the occipital (including calcarine), frontal opercular-insular and parietal cortex, mild hypoperfusion of the remaining right hemisphere and crossed left cerebellar diaschisis; left hemisphere preserved. (followup request_perfusion_spect)
+- performance_status: Karnofsky 60 (requires occasional assistance but able to care for most needs), ECOG 2 (ambulatory and capable of all self-care, unable to carry out any work activities). (fallback_tool_outputs.clinical_assessment)
+- exercise_stress_test: Very low workload (2.8 METs) limited by claudication; atrial fibrillation throughout; non-diagnostic for ischaemia. (fallback_tool_outputs.specialized_test)
+- gait_and_balance_timed: Mildly slowed gait (Timed Up and Go 12.9 s) with reduced left arm swing and contact with obstacles on the left. (followup request_gait_and_balance_timed)
+- levodopa_challenge: MDS-UPDRS III 7/132 OFF and 7/132 ON (0% change), below the 30% threshold for a clinically meaningful levodopa response. (followup request_levodopa_challenge)
+- TEE: Moderate concentric left ventricular hypertrophy; dilated left atrium; atrial fibrillation with low appendage emptying velocity and mild spontaneous echo contrast, without appendage thrombus; aortic valve sclerosis without stenosis; grade III aortic arch atheroma without a mobile component. No patent foramen ovale and no left atrial appendage thrombus. (fallback_tool_outputs.echo)
+- cardiac_MRI: Moderate concentric left ventricular hypertrophy with preserved function (LVEF 55%) and biatrial enlargement, imaged in atrial fibrillation; no scar or thrombus. (followup request_cardiac_mri)
+- electrophysiology_study: Atrial fibrillation throughout; normal His-Purkinje conduction (HV 48 ms); no inducible ventricular arrhythmia. (followup request_electrophysiology_study)
+- visual_field_perimetry: Complete congruous left homonymous hemianopia on automated perimetry (24-2). (followup request_visual_field_perimetry)
+- DTI_tractography: Interrupted terminations of the right optic radiation and right arcuate fasciculus, with reduced fractional anisotropy in the right centrum semiovale segment of the corticospinal tract. (followup request_dti_tractography)
+- CT_perfusion: Matched perfusion defects confined to chronic tissue loss (right occipital lobe; right frontal operculum and insula; right parietal cortex); no acute core or penumbral mismatch. Mild haemodynamic delay in the right middle cerebral artery territory without an ischaemic threshold. (followup request_ct_perfusion)
+- perfusion_MRI: Matched perfusion defects confined to chronic tissue loss (right occipital lobe; right frontal operculum and insula; right parietal cortex); no acute core or penumbral mismatch. Mild haemodynamic delay in the right middle cerebral artery territory without an ischaemic threshold. (followup request_perfusion_mri)
+- cerebral_angiography: Severe right internal carotid origin stenosis (85%, NASCET) with delayed right middle cerebral branch filling; mild left stenosis (35%); no intracranial stenosis. (followup request_cerebral_angiography)
+- transcranial_doppler: Dampened right middle cerebral artery waveform with reduced velocity and pulsatility, consistent with a haemodynamically significant proximal right-sided stenosis. (followup request_transcranial_doppler)
+- urinalysis: glucose 3+ on an SGLT2 inhibitor (fallback_tool_outputs.labs[urinalysis])
+- BNP: 214 pg/mL, raised (fallback_tool_outputs.labs[BNP])
+
+Checks: `perfect_agent.py` pass; `test_case_guards.py -k VASC-DEM-M10` pass; criterion outputs unchanged against the pre-pass snapshot; no 60-character window of any expected_evidence in the new reports; synonym guard 0 changes.

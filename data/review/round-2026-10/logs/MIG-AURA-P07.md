@@ -89,3 +89,18 @@ Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it na
 - Scoring: none (recommended criterion; any call matching the old order still matches).
 
 Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the normal-row probe reports nothing for this criterion.
+
+## Library contradictions (25 Oct 2026)
+
+Case-specific reports stored where the benchmark library's normal report contradicted the case. Why: established right PCA-territory occipital infarct (3.5 x 2.5 cm, calcarine cortex) with a formally confirmed dense left homonymous hemianopia, and a small PFO on the stored bubble study; the library reports full fields, an intact interatrial septum and normal brain metabolism, perfusion, tracts and spectra.
+
+- visual_field_perimetry: dense congruous left homonymous hemianopia, macular sparing (fallback_tool_outputs.specialized_test)
+- TEE: small PFO with small right-to-left shunt on Valsalva, no ASA, no LAA thrombus (fallback_tool_outputs.echo)
+- FDG_PET: right occipital metabolic defect matching the infarct (fallback_tool_outputs.advanced_imaging)
+- perfusion_MRI: reduced perfusion confined to the right occipital infarct (followup request_perfusion_mri)
+- CT_perfusion: matched defect in the right occipital infarct, no mismatch (followup request_ct_perfusion)
+- perfusion_SPECT: right occipital hypoperfusion matching the infarct (followup request_perfusion_spect)
+- DTI_tractography: right optic radiation interrupted at the infarct (followup request_dti_tractography)
+- MR_spectroscopy: reduced NAA in the infarct, contralateral normal (followup request_mr_spectroscopy)
+
+Checks: `perfect_agent.py` pass; `test_case_guards.py -k MIG-AURA-P07` pass; no fixed order still answered by the library (`lib4.source`); no 60-character window of any criterion's expected_evidence in the added text; every criterion's served output unchanged (snapshot diff against the baseline).

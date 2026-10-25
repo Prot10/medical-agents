@@ -100,3 +100,13 @@ Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym g
 Review-process wording (references to the round's rulings, the round policy file, the criteria packs, and tier markers such as "(optional)" in criterion labels and rationales) is shown to physicians in the review app, so it was rewritten in clinical language. The tier stays in the criterion's `importance` field; scoring is unchanged. `test_case_guards.py::test_no_review_process_text` now fails on any of it.
 
 - criterion `action-6-search-medical-literature` label: "Guideline lookup on device choice (optional)" -> "Guideline lookup on device choice"
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 80, ECOG 1 (fallback_tool_outputs.clinical_assessment). Why: rule 2: the library reports Karnofsky 100 with no complaints in a woman with exertional near-syncope who arrested today in complete heart block.
+- `order_echocardiogram {echo_type: TEE}`: mild posterior mitral leaflet prolapse, otherwise normal (fallback_tool_outputs.echo). Why: rule 3: the stored TTE shows mild posterior mitral leaflet prolapse; the library TEE reports a structurally normal mitral valve.
+- `order_echocardiogram {echo_type: bubble_study}`: mild mitral prolapse, no shunt (followup_outputs[12] request_bubble_study). Why: rule 3: the stored TTE shows mild posterior mitral leaflet prolapse; the library reports a structurally normal mitral valve.
+- `order_echocardiogram {echo_type: exercise_echo}`: persistent complete AV block, escape 40 to 54 bpm, stopped early (followup_outputs[13] request_exercise_echo). Why: rule 3: the stored exercise test shows persistent complete AV block with chronotropic incompetence; the library reports a normal study at 9.5 METs.
+- `interpret_labs {panels: [lipid_panel]}`: LDL 168 mg/dL, total cholesterol 246 mg/dL (fallback_tool_outputs.labs['lipid_panel']). Why: rule 2: hyperlipidaemia managed with lifestyle measures only, no lipid-lowering drug; the library reports a normal lipid panel.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

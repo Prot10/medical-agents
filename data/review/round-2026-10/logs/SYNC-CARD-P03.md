@@ -95,3 +95,12 @@ Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it na
 - Scoring: none (recommended criterion; any call matching the old order still matches).
 
 Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the normal-row probe reports nothing for this criterion.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 80, ECOG 1 during the febrile illness (fallback_tool_outputs.clinical_assessment). Why: rule 2: the library reports Karnofsky 100 with no complaints in a febrile man with influenza who collapsed today.
+- `order_specialized_test {test_type: exercise_stress_test}`: not performed, deferred by the clinical team (followup_outputs[7] request_exercise_stress_test). Why: the library answers with a generic normal exercise test (10.4 METs) in a febrile patient with a type 1 Brugada pattern and fever-related polymorphic ventricular ectopy, in whom exercise testing is not done; the order is answered as deferred, as the stored drug challenge is.
+- `order_echocardiogram {echo_type: exercise_echo}`: not performed, deferred by the clinical team (fallback_tool_outputs.echo). Why: same reason as the exercise test: the library reports a normal stress study without arrhythmia in a febrile patient with fever-related polymorphic NSVT.
+- `order_microbiology {specimen: throat_swab}`: influenza A RNA detected, group A Streptococcus negative (fallback_tool_outputs.microbiology). Why: rule 3: the stored rapid antigen test is positive for influenza A; the library reports respiratory viral PCR not detected.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

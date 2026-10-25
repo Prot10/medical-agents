@@ -103,3 +103,18 @@ Review-process wording (references to the round's rulings, the round policy file
 
 - criterion `action-7-check-drug-interactions` label: "Medication review (optional)" -> "Medication review"
 - criterion `action-8-search-medical-literature` label: "Guideline lookup (optional)" -> "Guideline lookup"
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 80, ECOG 1 (fallback_tool_outputs.clinical_assessment). Why: rule 2: the library reports Karnofsky 100 with no complaints in a student who stopped sport for exertional dyspnoea and collapsed twice.
+- `order_echocardiogram {echo_type: TEE}`: pedunculated mobile RVOT mass with severe subpulmonic obstruction, no other mass (fallback_tool_outputs.echo). Why: rule 3: the stored TTE and cardiac MRI show a pedunculated RVOT mass with severe obstruction; the library TEE reports a normal heart.
+- `order_echocardiogram {echo_type: bubble_study}`: RVOT mass with severe obstruction, no shunt (followup_outputs[7] request_bubble_study). Why: rule 3: the stored TTE shows an obstructing RVOT mass; the library reports a normal heart.
+- `order_echocardiogram {echo_type: exercise_echo}`: not performed, deferred by the clinical team (followup_outputs[8] request_exercise_echo). Why: rule 3: exercise stress imaging is not done with an obstructing RV outflow mass; the library reports a normal exercise echo at 9.5 METs.
+- `order_body_imaging {study: chest_CT}`: low-attenuation RVOT filling defect with RV wall thickening, small pericardial effusion (fallback_tool_outputs.body_imaging). Why: rule 3: the stored TTE and cardiac MRI show a 2 cm RVOT mass; the library reports a normal contrast-enhanced CT of the chest.
+- `order_body_imaging {study: chest_CTA}`: low-attenuation RVOT filling defect with RV wall thickening, small pericardial effusion (followup_outputs[9] request_chest_cta). Why: rule 3: the stored TTE and cardiac MRI show a 2 cm RVOT mass; the library reports a normal CT pulmonary angiography.
+- `order_advanced_imaging {modality: coronary_CTA}`: normal coronaries; RVOT mass reported as a non-coronary finding (fallback_tool_outputs.advanced_imaging). Why: rule 3: a 2 cm RVOT mass is in the field of view of a cardiac CT; the library reports a normal study without it.
+- `order_advanced_imaging {modality: cardiac_FDG_PET}`: mildly FDG-avid RVOT mass, no myocardial uptake (followup_outputs[10] request_cardiac_fdg_pet). Why: rule 3: the stored imaging shows a 2 cm RVOT mass; the library reports a normal cardiac PET.
+- `order_advanced_imaging {modality: whole_body_FDG_PET}`: mildly FDG-avid RVOT mass, no extracardiac lesion (followup_outputs[11] request_whole_body_fdg_pet). Why: rule 3: the stored imaging shows a 2 cm RVOT mass; the library reports a normal whole-body PET.
+- `obtain_tissue_diagnosis {procedure: resection}`: cardiac myxoma, completely excised (fallback_tool_outputs.tissue_diagnosis). Why: rule 3: the stored TTE and cardiac MRI show a pedunculated RVOT mass most consistent with myxoma; the library answers a resection with normal brain tissue.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

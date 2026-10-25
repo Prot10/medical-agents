@@ -72,3 +72,27 @@ Commit 317e46db routes `analyze_eeg` by `eeg_type` (an order without it is a rou
 - Labs `action-2-interpret-labs`: unserved result cited in `expected_evidence`: troponin I 0.24, BNP 486 (Cardiac), lactate 2.6 (Lactate). TRIM: post-arrest cardiac markers and a post-ictal lactate, incidental (red herring only, no must). Scoring change: no.
   - action-2-interpret-labs expected_evidence: 'Sodium 140, potassium 4.1, calcium 9.2, magnesium 1.9 and creatinine 0.9 normal; glucose 108; ALT 68 mildly raised; lactate 2.6 after the convulsion; troponin I 0.24 ng/mL and BNP 486 pg/mL raised five days after the arrest' -> 'Sodium 140, potassium 4.1, calcium 9.2, magnesium 1.9 and creatinine 0.9 normal; glucose 108; ALT 68 mildly raised'
 - Checks: `perfect_agent.py -v` pass; `case_io.py check` schema and synonym guard OK, no test failure names the case; probe: routine (omitted and explicit) order -> the new case fallback, `continuous_icu` and `video` -> the stored index recording; every number in each lab criterion's evidence is in what its order returns.
+
+## Library contradictions (25 Oct 2026)
+
+Orders that reached the benchmark library's normal report although this case contradicts it (diagnosis, history, medications or a stored finding) now get a case-specific report; every other off-pathway order still gets the library normal. No tier, criterion, diagnosis or existing output changed.
+
+- `analyze_eeg eeg_type=ambulatory` -> `followup_outputs[order_ambulatory]`: ambulatory EEG mirroring the stored continuous EEG (no video).
+- `perform_clinical_assessment assessment_type=performance_status` -> `followup_outputs[order_performance_status]`: performance status KPS 20, ECOG 4 during the admission.
+- `perform_clinical_assessment assessment_type=gait_and_balance_timed` -> `followup_outputs[order_gait_and_balance_timed]`: timed gait not testable, as on the examination.
+- `perform_clinical_assessment assessment_type=cognitive_screen` -> `followup_outputs[order_cognitive_screen]`: baseline cognitive screen not testable in the documented mental state.
+- `order_specialized_test test_type=neuropsych_battery` -> `followup_outputs[order_neuropsych_battery]`: neuropsychological battery not testable in the documented mental state.
+- `order_specialized_test test_type=speech_language_evaluation` -> `followup_outputs[order_speech_language_evaluation]`: speech and language evaluation not testable in the documented mental state.
+- `perform_clinical_assessment assessment_type=cognitive_screen timing=post_intervention` -> `followup_outputs[order_cognitive_screen_post_intervention]`: repeat cognitive screen impaired or not testable, in keeping with the documented dementia or brain injury.
+- `labs:lithium_level` -> fallback labs panel `Lithium`: lithium not detected (not prescribed).
+- `labs:AED_levels` -> fallback labs panel `Antiseizure medication levels`: antiseizure drug levels: none detected (no antiseizure drug prescribed).
+- `labs:valproate_level` -> fallback labs panel `Antiseizure medication levels`: antiseizure drug levels: none detected (no antiseizure drug prescribed).
+- `order_echocardiogram echo_type=TEE` -> `followup_outputs[order_tee]`: TEE consistent with the stored TTE.
+- `order_echocardiogram echo_type=bubble_study` -> `followup_outputs[order_bubble_study]`: bubble study consistent with the stored TTE.
+- `order_advanced_imaging modality=cardiac_MRI` -> `followup_outputs[order_cardiac_mri]`: cardiac MRI consistent with the stored TTE and coronary disease.
+- `order_advanced_imaging modality=coronary_angiography` -> `followup_outputs[order_coronary_angiography]`: coronary imaging showing the documented coronary artery disease.
+- `order_advanced_imaging modality=coronary_CTA` -> `followup_outputs[order_coronary_cta]`: coronary imaging showing the documented coronary artery disease.
+- `order_body_imaging study=chest_xray` -> `followup_outputs[order_chest_xray]`: chest radiograph showing the documented device or surgical hardware.
+- `order_cardiac_monitoring monitor_type=device_interrogation` -> `followup_outputs[order_device_interrogation]`: ICD interrogation since implantation 2 days ago.
+
+Checks: `perfect_agent.py` ok; `test_case_guards.py -k SE` pass; every order listed in `plans/LIBRARY-group2-map.yaml` for this case is answered without the library; served answers of every other order unchanged against HEAD. Reasons and doubts: `plans/LIBRARY-group2-decisions.md`.

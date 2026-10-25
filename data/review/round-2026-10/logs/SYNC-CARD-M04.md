@@ -95,3 +95,13 @@ Review-process wording (references to the round's rulings, the round policy file
 
 - criterion `action-8-analyze-eeg` label: "EEG only if epilepsy remains likely after the cardiac work-up (optional)" -> "EEG only if epilepsy remains likely after the cardiac work-up"
 - criterion `action-6-search-medical-literature` label: "Guideline lookup on torsades management (optional)" -> "Guideline lookup on torsades management"
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 80, ECOG 1 (fallback_tool_outputs.clinical_assessment). Why: rule 2: the library reports Karnofsky 100 with no complaints in a woman recovering from pneumonia who collapsed with torsades.
+- `order_echocardiogram {echo_type: exercise_echo}`: not performed, deferred by the clinical team, as the stored exercise test (fallback_tool_outputs.echo). Why: rule 3: the stored exercise test was deferred in a patient with QTc 540 ms and recurrent pause-dependent torsades; the library reports a normal exercise echo with no arrhythmia.
+- `order_body_imaging {study: chest_xray}`: resolving right lower zone consolidation, normal heart size (fallback_tool_outputs.body_imaging). Why: rule 2: community-acquired pneumonia diagnosed five days ago; radiographic resolution lags clinical recovery by weeks, and the library reports clear lungs.
+- `order_body_imaging {study: chest_CT}`: right lower lobe consolidation in resolution, no effusion (followup_outputs[9] request_chest_ct). Why: rule 2: community-acquired pneumonia diagnosed five days ago; the library reports clear lungs.
+- `order_microbiology {specimen: sputum}`: normal flora on a specimen collected on day 5 of azithromycin (fallback_tool_outputs.microbiology). Why: rule 2: the patient is on day 5 of azithromycin; the library states the specimen was collected before antimicrobials.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

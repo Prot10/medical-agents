@@ -92,3 +92,21 @@ Checks: `perfect_agent.py` ok (the order returns every result its evidence cites
 Review-process wording (references to the round's rulings, the round policy file, the criteria packs, and tier markers such as "(optional)" in criterion labels and rationales) is shown to physicians in the review app, so it was rewritten in clinical language. The tier stays in the criterion's `importance` field; scoring is unchanged. `test_case_guards.py::test_no_review_process_text` now fails on any of it.
 
 - criterion `action-4-analyze-brain-mri` rationale: "Optional: shows the borderzone pattern that supports a hemodynamic mechanism; it must not delay thrombolysis, which is decided on CT." -> "It shows the borderzone pattern that supports a hemodynamic mechanism; it must not delay thrombolysis, which is decided on CT."
+
+## Library contradictions (25 Oct 2026)
+
+Orders that reached the benchmark library's normal report although this case contradicts it (diagnosis, history, medications or a stored finding) now get a case-specific report; every other off-pathway order still gets the library normal. No tier, criterion, diagnosis or existing output changed.
+
+- `order_advanced_imaging modality=MR_angiography` -> `followup_outputs[order_mr_angiography]`: MR angiography showing the vessel lesion on the stored CTA.
+- `order_advanced_imaging modality=cerebral_angiography` -> `followup_outputs[order_cerebral_angiography]`: catheter angiography showing the vessel lesion on the stored CTA.
+- `order_advanced_imaging modality=carotid_duplex` -> `followup_outputs[order_carotid_duplex]`: carotid and vertebral duplex consistent with the stored CTA.
+- `order_advanced_imaging modality=transcranial_doppler` -> `followup_outputs[order_transcranial_doppler]`: transcranial Doppler consistent with the stored CTA.
+- `order_advanced_imaging modality=CT_perfusion` -> `followup_outputs[order_ct_perfusion]`: CT perfusion deficit in the infarct territory on the stored MRI.
+- `order_advanced_imaging modality=perfusion_MRI` -> `followup_outputs[order_perfusion_mri]`: perfusion MRI deficit in the infarct territory on the stored MRI.
+- `order_echocardiogram echo_type=TEE` -> `followup_outputs[order_tee]`: TEE consistent with the stored echocardiogram.
+- `order_echocardiogram echo_type=bubble_study` -> `followup_outputs[order_bubble_study]`: bubble study consistent with the stored echocardiogram.
+- `order_advanced_imaging modality=cardiac_MRI` -> `followup_outputs[order_cardiac_mri]`: cardiac MRI consistent with the stored echocardiogram.
+- `perform_clinical_assessment assessment_type=performance_status` -> `followup_outputs[order_performance_status]`: performance status KPS 30, ECOG 4 for the documented deficits.
+- `perform_clinical_assessment assessment_type=gait_and_balance_timed` -> `followup_outputs[order_gait_and_balance_timed]`: timed gait as on the examination.
+
+Checks: `perfect_agent.py` ok; `test_case_guards.py -k ISCH-STR` pass; every order listed in `plans/LIBRARY-group2-map.yaml` for this case is answered without the library; served answers of every other order unchanged against HEAD. Reasons and doubts: `plans/LIBRARY-group2-decisions.md`.

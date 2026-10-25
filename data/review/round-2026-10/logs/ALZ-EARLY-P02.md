@@ -91,3 +91,13 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+Orders that reached the benchmark library's normal report although this case contradicts it (diagnosis, history, medications or a stored finding) now get a case-specific report; every other off-pathway order still gets the library normal. No tier, criterion, diagnosis or existing output changed.
+
+- `order_advanced_imaging modality=tau_PET` -> `followup_outputs[order_tau_pet]`: case-specific tau-positive flortaucipir PET with the distribution of the stored FDG-PET pattern.
+- `order_advanced_imaging modality=perfusion_SPECT` -> `followup_outputs[order_perfusion_spect]`: regional hypoperfusion matching the stored FDG-PET hypometabolism.
+- `perform_clinical_assessment assessment_type=performance_status` -> `followup_outputs[order_performance_status]`: dementia-stage performance status (Karnofsky 70/ECOG 1; 60/2 in the rapidly progressive case) instead of Karnofsky 100.
+
+Checks: `perfect_agent.py` ok; `test_case_guards.py -k ALZ-EARLY` pass; every order listed in `plans/LIBRARY-group2-map.yaml` for this case is answered without the library; served answers of every other order unchanged against HEAD. Reasons and doubts: `plans/LIBRARY-group2-decisions.md`.

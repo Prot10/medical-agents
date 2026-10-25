@@ -86,3 +86,14 @@ Review-process wording (references to the round's rulings, the round policy file
 - The FVC mL/kg figures and the weight-based IVIg amounts in the text were checked against this weight: all within rounding, no text change.
 
 Checks: `perfect_agent.py` ok; BMI = weight / height^2 to one decimal.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 30, ECOG 4 (fallback_tool_outputs.clinical_assessment). Why: rule 1: the library reports Karnofsky 100 / ECOG 0 and a working patient; he cannot stand or lift his legs off the bed, during leukaemia induction chemotherapy.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: unable to stand or walk (no antigravity leg movement); timed gait and balance tests not performed (followup_outputs[4] request_gait_and_balance_timed). Why: rule 1: the library reports a normal timed gait and balance assessment; he cannot stand (hip, knee and ankle 0/5).
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: no tremor or rigidity; motor items limited by weakness, response not assessable (followup_outputs[5] request_levodopa_challenge). Why: rule 1: the library describes a normal motor examination, gait and postural reflexes; leg power 0/5 and arm power 3/5.
+- `order_body_imaging {study: peripheral_nerve_MRI}`: moderate smooth lumbosacral ventral root enhancement, no nodularity (fallback_tool_outputs.body_imaging). Why: rule 1 and 3: the library reads the nerve roots as normal; root enhancement as on the spine MRI of this case (stored spine MRI: moderate smooth enhancement of the cauda equina roots, ventral more than dorsal).
+- `perform_clinical_assessment {assessment_type: orthostatic_blood_pressure}`: active standing not performed (no antigravity movement in the legs); supine BP 118/74 mmHg, HR 96 bpm; sitting BP 112/72 mmHg, HR 104 bpm (sitting with support) (followup_outputs[6] request_orthostatic_blood_pressure). Why: rule 3: he cannot stand (legs 0/5); the library reports 3 minutes of symptom-free standing at a supine heart rate of 68.
+- `interpret_labs {panels: [peripheral smear]}`: normocytic anaemia, neutrophilia and thrombocytopenia on the film; no blasts (fallback_tool_outputs.labs['peripheral smear']). Why: rule 3: the stored blood count shows haemoglobin 9.8 g/dL, WBC 14.3 and platelets 98 during leukaemia induction; the library reports a normal film.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

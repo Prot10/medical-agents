@@ -87,3 +87,12 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 60, ECOG 2; requires occasional assistance; ambulatory with walking aids (fallback_tool_outputs.clinical_assessment). Why: the library gives Karnofsky 100 / ECOG 0 (no evidence of disease, working) in a symptomatic patient.
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: MDS-UPDRS III 20 to 19 (5%); gait, gait initiation, turning and postural stability unchanged; no clinically meaningful levodopa response (below 30%) (followup_outputs[2] request_levodopa_challenge). Why: the library describes a normal motor examination and gait; this patient has a gait disorder, and the challenge shows little or no levodopa response.
+- `order_specialized_test {test_type: neuropsych_battery}`: frontal-subcortical profile of moderate severity (slowed processing, executive and attention deficits, recognition relatively preserved) (fallback_tool_outputs.specialized_test). Why: the library reports normal cognition in every domain; this patient has documented cognitive impairment on the stored bedside screen.
+- `order_specialized_test {test_type: exercise_stress_test}`: submaximal non-diagnostic test, stopped at 2.3 METs for gait unsteadiness with freezing on the moving belt (followup_outputs[3] request_exercise_stress_test). Why: the library describes a 9.5-minute Bruce protocol at 10.4 METs; this patient's gait disorder (magnetic gait with falls) does not allow it.
+- `order_echocardiogram {echo_type: exercise_echo}`: submaximal non-diagnostic study stopped at 2.3 METs; resting findings as on the stored TTE (followup_outputs[4] request_exercise_echo). Why: the library describes 9.5 METs on a treadmill with a normal echo; this patient's gait disorder does not allow it.
+- Checks: perfect agent ok; case guards pass; criteria answers unchanged.

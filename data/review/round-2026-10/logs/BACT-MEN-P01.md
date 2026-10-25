@@ -79,3 +79,18 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 50, ECOG 2 (fallback_tool_outputs.clinical_assessment). Why: rule 3: febrile illness with progressive headache, neck stiffness and mild confusion that kept him off work; the library's Karnofsky 100 describes a person without disease.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: mildly slowed gait speed, balance preserved (followup_outputs[3] request_gait_and_balance_timed). Why: rule 3: the stored exam records a steady but mildly slow gait; the library reports normal timed values.
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: no parkinsonian signs; neck stiffness noted; challenge not administered (followup_outputs[4] request_levodopa_challenge). Why: rule 3: the library reports an unremarkable examination including the neck, in a patient with neck stiffness; no challenge would be given without parkinsonism.
+- `perform_clinical_assessment {assessment_type: structured_headache_history_ichd3}`: new acute headache with red flags; criteria for a primary headache disorder not met (followup_outputs[5] request_structured_headache_history_ichd3). Why: rule 1 and 3: a progressive febrile headache with neck stiffness and new confusion; the library elicits no red flags.
+- `analyze_brain_mri`: thin leptomeningeal enhancement over both convexities; no complication (fallback_tool_outputs.mri). Why: rule 1: no brain imaging is stored; an MRI with gadolinium in this patient would not be normal.
+- `perform_clinical_assessment {assessment_type: cognitive_screen}`: MoCA 25/30 with attention errors (followup_outputs[6] request_cognitive_screen). Why: rule 3: the stored exam records mild inattention and orientation to date only with prompting; the library reports MoCA 28/30.
+- `order_specialized_test {test_type: neuropsych_battery}`: mildly reduced attention and processing speed (fallback_tool_outputs.specialized_test). Why: rule 3: the stored exam records mild inattention during an acute febrile illness.
+- `order_microbiology {specimen: whole_blood_pcr}`: Streptococcus pneumoniae DNA detected (fallback_tool_outputs.microbiology). Why: rule 3: blood cultures grow S. pneumoniae in 2 of 2 sets collected before antimicrobials; it is a target of the panel.
+- `perform_clinical_assessment {assessment_type: orthostatic_blood_pressure}`: no orthostatic hypotension; resting HR 92 (followup_outputs[7] request_orthostatic_blood_pressure). Why: rule 3: presenting HR 93; the library reports a supine HR of 68.
+- `interpret_labs {panels: [serum_osmolality]}`: serum osmolality 270 mOsm/kg (low) (fallback_tool_outputs.labs['serum_osmolality']). Why: rule 3: stored sodium 130 mmol/L (calculated osmolality about 271); the library reports 288 mOsm/kg.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

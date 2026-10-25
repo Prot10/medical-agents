@@ -85,3 +85,18 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, named in the report's own text.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+A fresh order of each study below was answered by the benchmark-level normal library, which contradicted this patient (age, rhythm, devices, surgery, stored findings). Each now has a case-specific report:
+
+- FDG_PET: Bilateral frontal and anterior temporal hypometabolism with reduced thalamic and left striatal uptake; posterior association cortex preserved. The pattern is consistent with subcortical small-vessel disease. (fallback_tool_outputs.advanced_imaging)
+- perfusion_SPECT: Bilateral frontal and anterior temporal hypoperfusion with reduced thalamic and left striatal uptake; posterior association cortex preserved. The pattern is consistent with subcortical small-vessel disease. (followup request_perfusion_spect)
+- performance_status: Karnofsky 60 (requires occasional assistance but able to care for most needs), ECOG 2 (ambulatory and capable of all self-care, unable to carry out any work activities). (fallback_tool_outputs.clinical_assessment)
+- exercise_stress_test: Reduced exercise capacity (4.6 METs) limited by gait; submaximal heart rate on beta-blockade, non-diagnostic for ischaemia. (fallback_tool_outputs.specialized_test)
+- levodopa_challenge: MDS-UPDRS III 22/132 OFF and 21/132 ON (5% change), below the 30% threshold for a clinically meaningful levodopa response. (followup request_levodopa_challenge)
+- speech_language_evaluation: Mild spastic dysarthria with reduced verbal initiation; naming, repetition and comprehension intact. (followup request_speech_language_evaluation)
+- structured_headache_history_ichd3: Criteria for migraine with typical aura are met. Prolonged sensory auras and two episodes with motor weakness fall outside the typical aura criteria. (followup request_structured_headache_history_ichd3)
+- DTI_tractography: Diffusely and severely reduced white matter fractional anisotropy, most marked in the anterior temporal white matter and external capsules, without tract interruption. (followup request_dti_tractography)
+
+Checks: `perfect_agent.py` pass; `test_case_guards.py -k VASC-DEM-P05` pass; criterion outputs unchanged against the pre-pass snapshot; no 60-character window of any expected_evidence in the new reports; synonym guard 0 changes.

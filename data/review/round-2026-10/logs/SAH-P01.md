@@ -77,3 +77,11 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+Orders the benchmark library answered with a normal report that this case contradicts now have a case report. Contradiction = the history, the diagnosis or a stored finding makes the normal report impossible.
+
+- `perform_clinical_assessment {assessment_type: structured_headache_history_ichd3}` -> fallback_tool_outputs.clinical_assessment: instantaneous 5 days before assessment, without exertional trigger; red flags: thunderclap onset, headache persisting for days, unlike her migraine. The library reported no thunderclap onset, no red flags and no nausea or photophobia, against the history.
+
+Checks: `perfect_agent.py` ok; `test_case_guards.py -k SAH-P01` passed; no criterion answer changed (snapshot diff); every mapped order is answered without the library (`verify.py`).

@@ -90,3 +90,11 @@ Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it na
 - Scoring: coverage unchanged (any call matching the old order still matches); the cost reference of the required work-up now uses the new first order.
 
 Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the normal-row probe reports nothing for this criterion.
+
+## Library contradictions (25 Oct 2026)
+
+- `order_specialized_test {test_type: visual_field_perimetry}`: 1. Mild central and paracentral depression in the left eye (MD -4.1 dB). 2. Normal right visual field. (fallback_tool_outputs.specialized_test). Why: rule c: left visual acuity 20/40 with a left RAPD and red desaturation: the left field cannot be normal; the library reports a normal study.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: Abnormal timed gait and balance assessment. Timed Up and Go 12.4 s and 10 m walk speed 1.04 m/s are slowed for age; Berg balance 50/56. (fallback_tool_outputs.clinical_assessment). Why: rule d: the examination documents a gait disorder (spastic left leg with circumduction; reduced left foot clearance); the library reports a normal study.
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 80, ECOG 1: restricted in physically strenuous activity, ambulatory and able to carry out light work. (followup_outputs[request_performance_status]). Why: rule d: inpatient relapse with a documented gait disorder: Karnofsky 100 / ECOG 0 'without evidence of disease' contradicts the case; the library reports a normal study.
+
+Checks: perfect agent ok; case guards pass; snapshot diff shows no criterion answer changed; map verified (served without the library).

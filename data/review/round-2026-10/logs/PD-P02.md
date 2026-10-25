@@ -62,3 +62,15 @@ After the edit: perfect_agent ok; case_io check clean for PD-P02; test_case_guar
 Decisions in `plans/PD-decisions.md`.
 
 - Stays in condition parkinsons as a PD-mimic case (ruling 3); `metadata.case_body_concerns` and `citation_gap` cleared (`[DLB_2017]` is in the PD pack). Labels and code unchanged (G31.83; "lewy body dementia" kept: it is an ICD-10-CM inclusion term of G31.83, and PD dementia is coded G20 + F02.8x). No PD label or G20 code is accepted.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: MDS-UPDRS III 30/132 OFF, 24/132 ON (20%) (fallback_tool_outputs.clinical_assessment). Why: rule 3: the stored exam documents parkinsonism; the library reports MDS-UPDRS III 3/132 with no parkinsonian signs; DLB: a modest response is expected.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: TUG 14.5 s, 10 m 0.91 m/s, Berg 46/56 (followup request_gait_and_balance_timed). Why: rule 3: the stored gait exam (arm swing, stride, turns, pull test) is abnormal; the library reports a normal gait, turns in 3 steps and Berg 56/56.
+- `perform_clinical_assessment {assessment_type: cognitive_screen}`: MoCA 19/30 as in the exam (followup request_cognitive_screen). Why: rule 3: the stored exam records this MoCA and its items; the library reports MoCA 28/30 with other items.
+- `order_specialized_test {test_type: olfactory_test}`: UPSIT 17/40 (anosmia) (fallback_tool_outputs.specialized_test). Why: rule 1: olfactory loss is a supportive feature of DLB; the library reports normosmia (UPSIT 35/40).
+- `order_specialized_test {test_type: autonomic_testing}`: tilt fall 28/14 mmHg, HR +6/min, Valsalva ratio 1.14 (followup request_autonomic_testing). Why: rule 3: the stored orthostatic test shows orthostatic hypotension; the library reports normal autonomic function.
+- `order_specialized_test {test_type: tilt_table}`: fall 30/16 mmHg, HR +7 bpm (followup request_tilt_table). Why: rule 3: the stored orthostatic test shows orthostatic hypotension; the library reports a normal tilt.
+- `analyze_eeg {eeg_type: routine}`: PDR 6.5-7 Hz with posterior slow activity, frontal rhythmic delta (fallback_tool_outputs.eeg). Why: rule 1: posterior slow-wave activity is a supportive biomarker of DLB; the library reports a normal 9-10 Hz background.
+
+Checks: `perfect_agent.py` 30/30 PD pass; `test_case_guards.py -k PD-` and `pytest agent-platform/tests -k PD-` 300 passed (`test_grpo_rollout.py` not collected: training extra not installed); every criterion's served output unchanged (snapshot before/after); synonym guard 0 changes; no new report repeats a 60-character window of any `expected_evidence`; every listed term is answered without the library.

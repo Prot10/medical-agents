@@ -115,3 +115,15 @@ Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it na
 - Scoring: none (evidence only; the reward does not read it).
 
 Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the normal-row probe reports nothing for this criterion.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 80, ECOG 1 (fallback_tool_outputs.clinical_assessment). Why: rule 2: the library reports Karnofsky 100 with no complaints in a woman who stopped exercising for exertional dizziness and has recurrent syncope.
+- `order_echocardiogram {echo_type: TEE}`: low-normal LVEF 53% with mild concentric LVH, no thrombus or shunt (fallback_tool_outputs.echo). Why: rule 3: the stored TTE shows mild concentric LVH with LVEF 53%; the library TEE reports a normal heart with LVEF 60%.
+- `order_echocardiogram {echo_type: bubble_study}`: mild LVH with LVEF 53%, no right-to-left shunt (followup_outputs[11] request_bubble_study). Why: rule 3: the stored TTE shows mild concentric LVH with LVEF 53%; the library reports a normal heart.
+- `order_echocardiogram {echo_type: exercise_echo}`: exercise-induced 2:1 AV block with a 3.8 s pause and presyncope, submaximal (followup_outputs[12] request_exercise_echo). Why: rule 3: the stored exercise test shows persistent 2:1 AV block with presyncope; the library reports a normal exercise echo with 9.5 METs.
+- `order_specialized_test {test_type: respiratory_function}`: mild fixed airflow obstruction, FEV1/FVC 0.65, FEV1 82% (fallback_tool_outputs.specialized_test). Why: rule 2: mild COPD in a former 20 pack-year smoker on tiotropium; the library reports normal spirometry.
+- `order_specialized_test {test_type: emg_ncs}`: mild length-dependent sensory-predominant axonal polyneuropathy (followup_outputs[13] request_emg_ncs). Why: rule 2: type 2 diabetes for twelve years with reduced vibration at the great toes and ankle reflexes 1+; the library reports normal nerve conduction.
+- `interpret_labs {panels: [serum_osmolality]}`: serum osmolality 271 mOsm/kg (low) (fallback_tool_outputs.labs['serum_osmolality']). Why: rule 3: the stored sodium is 128 mEq/L; the library reports a normal serum osmolality of 288.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

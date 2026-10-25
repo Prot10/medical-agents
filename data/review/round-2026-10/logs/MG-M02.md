@@ -85,3 +85,15 @@ Review-process wording (references to the round's rulings, the round policy file
 - The FVC mL/kg figures and the weight-based IVIg amounts in the text were checked against this weight: all within rounding, no text change.
 
 Checks: `perfect_agent.py` ok; BMI = weight / height^2 to one decimal.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 80, ECOG 1 (normal activity with effort; some signs and symptoms) (fallback_tool_outputs.clinical_assessment). Why: rule 1: the library reports Karnofsky 100 / ECOG 0 (no evidence of disease, working); rule 3: generalized MG with neck flexor 3+/5 and bulbar symptoms, still working.
+- `order_specialized_test {test_type: emg_ncs}`: normal nerve conductions and needle EMG, stating that neuromuscular transmission was not assessed (fallback_tool_outputs.specialized_test). Why: rule 1: the library report concludes there is no neuromuscular junction disorder, which routine conductions and needle EMG without repetitive stimulation cannot assess and which is not true here; the stored RNS study reports normal nerve conductions, which this report keeps.
+- `interpret_labs {panels: [clustered_AChR_cell_based]}`: clustered AChR antibody (cell-based assay) positive (fallback_tool_outputs.labs['clustered_AChR_cell_based']). Why: rule 1: AChR-antibody-positive myasthenia (stored AChR binding antibody 0.6 nmol/L); a cell-based clustered AChR assay is positive when the binding assay is.
+- `interpret_labs {panels: [ANA]}`: ANA positive 1:640, homogeneous pattern (fallback_tool_outputs.labs['ANA']). Why: rule 2: systemic lupus erythematosus with anti-dsDNA and anti-Ro positive (stored); the library reports a negative ANA.
+- `order_specialized_test {test_type: minor_salivary_gland_biopsy}`: focal lymphocytic sialadenitis, focus score 2 per 4 mm2 (followup_outputs[3] request_minor_salivary_gland_biopsy). Why: rule 2: Sjogren syndrome in the history (anti-Ro positive, on pilocarpine); the library reports a normal gland with focus score 0.
+- `order_specialized_test {test_type: speech_language_evaluation}`: fatigable flaccid dysarthria with hypernasality after 2 minutes; language normal (followup_outputs[4] request_speech_language_evaluation). Why: rule 3: the library reports no dysarthria; the examination documents mild dysarthria after sustained speech and nasal regurgitation.
+- `interpret_labs {panels: [ABG]}`: pH 7.42, pCO2 39, pO2 90 mmHg on room air, normal (fallback_tool_outputs.labs['ABG']). Why: rule 3: the stored respiratory function report gives this room-air gas (pH 7.42, PaCO2 39, PaO2 90 mmHg); the library reports pH 7.40, pCO2 40, pO2 92 mmHg.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

@@ -78,3 +78,13 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+- `order_specialized_test {test_type: ssep}`: 1. Prolonged cortical P37 latency on both tibial stimulations (right 45.1 ms, left 48.3 ms) with normal lumbar N22, indicating central somatosensory conduction delay above the lumbar cord. 2. Normal median responses... (fallback_tool_outputs.specialized_test). Why: rule c: vibration reduced to the ankles in both legs and joint position sense reduced at the left great toe with a dorsal C2-C3 and a left dorsal T9-T10 lesion; the library reports a normal study.
+- `order_specialized_test {test_type: vep}`: 1. Prolonged P100 latency, right eye (123 ms; reference < 115 ms), with reduced amplitude (5.2 uV; fellow eye 9.6 uV), consistent with right optic nerve conduction delay. 2. Normal left eye response. (followup_outputs[request_vep]). Why: rule c: right optic neuritis 8 months ago with 20/25 acuity, red desaturation and temporal pallor of the right disc; the library reports a normal study.
+- `order_specialized_test {test_type: optical_coherence_tomography}`: 1. Thinning of the right peripapillary RNFL (average 84 um, temporal 56 um) and right GCIPL (72 um), a pattern of a prior right optic neuropathy. 2. Left eye within normal limits. (followup_outputs[request_optical_coherence_tomography]). Why: rule c: right optic neuritis 8 months ago with temporal disc pallor: RNFL and GCIPL thinning is expected; the library reports a normal study.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: Abnormal timed gait and balance assessment. Timed Up and Go 12.9 s and 10 m walk speed 1.00 m/s are slowed for age; Berg balance 48/56. (fallback_tool_outputs.clinical_assessment). Why: rule d: the examination documents a gait disorder (spastic gait with left leg circumduction); the library reports a normal study.
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 80, ECOG 1: restricted in physically strenuous activity, ambulatory and able to carry out light work. (followup_outputs[request_performance_status]). Why: rule d: inpatient relapse with a documented gait disorder: Karnofsky 100 / ECOG 0 'without evidence of disease' contradicts the case; the library reports a normal study.
+
+Checks: perfect agent ok; case guards pass; snapshot diff shows no criterion answer changed; map verified (served without the library).

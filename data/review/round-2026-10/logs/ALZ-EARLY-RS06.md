@@ -85,3 +85,14 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - MRI contrast_used stated: index study false (non-contrast), request_contrast_mri follow-up true, so a contrast order receives the contrast study and a non-contrast order the index study.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+Orders that reached the benchmark library's normal report although this case contradicts it (diagnosis, history, medications or a stored finding) now get a case-specific report; every other off-pathway order still gets the library normal. No tier, criterion, diagnosis or existing output changed.
+
+- `order_advanced_imaging modality=tau_PET` -> `followup_outputs[order_tau_pet]`: case-specific tau-positive flortaucipir PET with the distribution of the stored FDG-PET pattern.
+- `order_advanced_imaging modality=perfusion_SPECT` -> `followup_outputs[order_perfusion_spect]`: regional hypoperfusion matching the stored FDG-PET hypometabolism.
+- `order_specialized_test test_type=speech_language_evaluation` -> `followup_outputs[order_speech_language_evaluation]`: language findings of the stored neuropsychological battery (naming, fluency) in the speech-language format.
+- `perform_clinical_assessment assessment_type=performance_status` -> `followup_outputs[order_performance_status]`: dementia-stage performance status (Karnofsky 70/ECOG 1; 60/2 in the rapidly progressive case) instead of Karnofsky 100.
+
+Checks: `perfect_agent.py` ok; `test_case_guards.py -k ALZ-EARLY` pass; every order listed in `plans/LIBRARY-group2-map.yaml` for this case is answered without the library; served answers of every other order unchanged against HEAD. Reasons and doubts: `plans/LIBRARY-group2-decisions.md`.

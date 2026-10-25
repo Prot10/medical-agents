@@ -82,3 +82,18 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, named in the report's own text.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+A fresh order of each study below was answered by the benchmark-level normal library, which contradicted this patient (age, rhythm, devices, surgery, stored findings). Each now has a case-specific report:
+
+- FDG_PET: Focal left inferior parietal (angular and supramarginal) metabolic defect with mild crossed cerebellar diaschisis; the right parietal lobe and posterior cingulate are preserved. No bilateral temporoparietal pattern. (fallback_tool_outputs.advanced_imaging)
+- perfusion_SPECT: Focal left inferior parietal (angular and supramarginal) perfusion defect with mild crossed cerebellar diaschisis; the right parietal lobe and posterior cingulate are preserved. No bilateral temporoparietal pattern. (followup request_perfusion_spect)
+- performance_status: Karnofsky 70 (cares for self; unable to carry on normal activity or active work), ECOG 1 (restricted in strenuous activity, able to carry out light work). (fallback_tool_outputs.clinical_assessment)
+- exercise_stress_test: No electrocardiographic or clinical evidence of inducible ischaemia at 8.1 METs; submaximal heart rate on beta-blockade. (fallback_tool_outputs.specialized_test)
+- speech_language_evaluation: Agraphia with fluent speech and intact naming, repetition and comprehension; no motor speech disorder. (followup request_speech_language_evaluation)
+- DTI_tractography: Interruption of the parietal terminations of the left arcuate fasciculus; corticospinal tracts and optic radiations intact. (followup request_dti_tractography)
+- CT_perfusion: Matched perfusion defects confined to chronic tissue loss (left angular and supramarginal gyri); no acute core or penumbral mismatch. (followup request_ct_perfusion)
+- perfusion_MRI: Matched perfusion defects confined to chronic tissue loss (left angular and supramarginal gyri); no acute core or penumbral mismatch. (followup request_perfusion_mri)
+
+Checks: `perfect_agent.py` pass; `test_case_guards.py -k VASC-DEM-M04` pass; criterion outputs unchanged against the pre-pass snapshot; no 60-character window of any expected_evidence in the new reports; synonym guard 0 changes.

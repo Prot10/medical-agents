@@ -101,3 +101,16 @@ Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the norma
 - The FVC mL/kg figures and the weight-based IVIg amounts in the text were checked against this weight: all within rounding, no text change.
 
 Checks: `perfect_agent.py` ok; BMI = weight / height^2 to one decimal.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 60, ECOG 2 (requires occasional assistance; cares for most needs) (fallback_tool_outputs.clinical_assessment). Why: rule 1: the library reports Karnofsky 100 / ECOG 0 (no evidence of disease, working); rule 3: proximal leg weakness 3+/5 with a wide-based unsteady gait, retired.
+- `order_specialized_test {test_type: emg_ncs}`: diffusely low CMAPs with normal conduction, reduced sural SNAPs, unstable motor units without denervation (fallback_tool_outputs.specialized_test). Why: rule 3: the stored RNS study reports low baseline CMAPs and reduced sural SNAPs; the library reports normal conductions and no neuromuscular junction disorder.
+- `order_specialized_test {test_type: emg_single_fiber}`: markedly increased jitter and blocking improving at higher stimulation rate (followup_outputs[1] request_emg_single_fiber). Why: rule 1: Lambert-Eaton myasthenic syndrome, a neuromuscular transmission disorder with a 14% decrement and 142-152% facilitation on the stored RNS; the library reports normal jitter.
+- `order_advanced_imaging {modality: whole_body_FDG_PET}`: FDG-avid left hilar node (SUVmax 8.4), post-surgical staple-line uptake, no distant lesion (fallback_tool_outputs.advanced_imaging). Why: rule 3: the stored FDG-PET shows the FDG-avid left hilar node and the biopsy small cell carcinoma; the library whole-body PET reports no lesion.
+- `order_body_imaging {study: chest_xray}`: post right upper lobectomy changes and emphysema, no mass (fallback_tool_outputs.body_imaging). Why: rule 2: right upper lobectomy 3 years ago and emphysema on the stored CT; the library reports a normal radiograph. The 8 mm hilar node is below radiographic resolution.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: TUG 16.5 s, gait speed 0.78 m/s, wide-based, Berg 45/56 (followup_outputs[2] request_gait_and_balance_timed). Why: rule 3: the library reports a normal timed gait (TUG 9.1 s, Berg 56/56); the examination documents hip flexors 3+/5 and a wide-based, mildly unsteady gait.
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: no parkinsonian signs and no levodopa response; points from gait and chair rise only (followup_outputs[3] request_levodopa_challenge). Why: rule 3: the library levodopa challenge describes normal gait, arm swing and postural reflexes, while the examination documents a wide-based, mildly unsteady gait.
+- `order_specialized_test {test_type: speech_language_evaluation}`: mild fatigable dysarthria after 5 minutes; language normal (followup_outputs[4] request_speech_language_evaluation). Why: rule 3: the library reports no dysarthria; the examination documents slurred speech after 5 minutes of sustained speech.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

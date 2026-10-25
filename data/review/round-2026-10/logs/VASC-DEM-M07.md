@@ -84,3 +84,22 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, named in the report's own text.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+A fresh order of each study below was answered by the benchmark-level normal library, which contradicted this patient (age, rhythm, devices, surgery, stored findings). Each now has a case-specific report:
+
+- perfusion_SPECT: Bilateral temporoparietal and posterior cingulate hypoperfusion, a pattern consistent with an Alzheimer-type profile, with additional patchy frontal hypoperfusion. (fallback_tool_outputs.advanced_imaging)
+- performance_status: Karnofsky 60 (requires occasional assistance but able to care for most needs), ECOG 2 (ambulatory and capable of all self-care, unable to carry out any work activities). (fallback_tool_outputs.clinical_assessment)
+- exercise_stress_test: Reduced exercise capacity (3.4 METs) in atrial fibrillation; non-diagnostic for ischaemia. (fallback_tool_outputs.specialized_test)
+- tau_PET: Tau-positive PET: neocortical tau signal in the medial and inferior temporal cortex bilaterally, extending to the lateral temporoparietal cortex and the posterior cingulate and precuneus. (followup request_tau_pet)
+- gait_and_balance_timed: Mildly slowed gait with reduced step length (Timed Up and Go 13.8 s). (followup request_gait_and_balance_timed)
+- levodopa_challenge: MDS-UPDRS III 8/132 OFF and 8/132 ON (0% change), below the 30% threshold for a clinically meaningful levodopa response. (followup request_levodopa_challenge)
+- TEE: Mild concentric left ventricular hypertrophy; mildly dilated left atrium; atrial fibrillation with low appendage emptying velocity and mild spontaneous echo contrast, without appendage thrombus; aortic valve sclerosis without stenosis. No patent foramen ovale and no left atrial appendage thrombus. (followup request_tee)
+- cardiac_MRI: Mildly dilated left atrium, imaged in atrial fibrillation; preserved left ventricular function; no scar or thrombus. (followup request_cardiac_mri)
+- electrophysiology_study: Atrial fibrillation throughout; normal His-Purkinje conduction (HV 48 ms); no inducible ventricular arrhythmia. (followup request_electrophysiology_study)
+- speech_language_evaluation: Mild anomia with word-finding pauses in fluent speech; repetition and comprehension intact; no motor speech disorder. (followup request_speech_language_evaluation)
+- DTI_tractography: Mildly reduced periventricular fractional anisotropy with reductions in the fornix and cingulum; tracts continuous. (followup request_dti_tractography)
+- BNP: 186 pg/mL, raised (fallback_tool_outputs.labs[BNP])
+
+Checks: `perfect_agent.py` pass; `test_case_guards.py -k VASC-DEM-M07` pass; criterion outputs unchanged against the pre-pass snapshot; no 60-character window of any expected_evidence in the new reports; synonym guard 0 changes.

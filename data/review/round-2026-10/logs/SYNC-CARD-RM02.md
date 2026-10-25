@@ -82,3 +82,14 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `initial_tool_outputs.eeg`: `eeg_type` set to `routine`, named in the report's own text.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 70, ECOG 1 (fallback_tool_outputs.clinical_assessment). Why: rule 2: the library reports Karnofsky 100 with no complaints in a febrile student with four months of exertional dyspnoea and three collapses.
+- `order_echocardiogram {echo_type: TEE}`: rheumatic-type mitral valve with moderate MR, mild AR, no vegetation, LVEF 45% (fallback_tool_outputs.echo). Why: rule 3: the stored TTE shows rheumatic mitral morphology, moderate MR, mild AR and LVEF 45%; the library TEE reports a normal heart.
+- `order_echocardiogram {echo_type: bubble_study}`: LVEF 45% with rheumatic valve changes, no right-to-left shunt (followup_outputs[9] request_bubble_study). Why: rule 3: the stored TTE is abnormal (LVEF 45%, rheumatic mitral and aortic valves); the library reports a normal heart.
+- `order_echocardiogram {echo_type: exercise_echo}`: severe chronotropic incompetence, 2:1 AV block with a pause in recovery, limited contractile reserve (followup_outputs[10] request_exercise_echo). Why: rule 3: the stored exercise test shows severe chronotropic incompetence and 2:1 AV block, and the stored TTE LVEF 45%; the library reports a normal exercise echo.
+- `order_advanced_imaging {modality: cardiac_FDG_PET}`: focal basal inferoseptal and inferolateral myocardial uptake, no nodal uptake (fallback_tool_outputs.advanced_imaging). Why: rule 3: the stored cardiac MRI shows basal non-ischaemic enhancement with raised T2 (active inflammation); the library reports no myocardial inflammation.
+- `order_body_imaging {study: chest_xray}`: mild cardiomegaly with left atrial enlargement (fallback_tool_outputs.body_imaging). Why: rule 3: the stored TTE shows a moderately dilated left atrium, moderate MR and LVEF 45% with BNP 285; the library reports a normal heart size.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

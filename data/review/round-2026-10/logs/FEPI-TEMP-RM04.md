@@ -63,3 +63,18 @@ Condition close-out (`plans/FEPI-TEMP-decisions.md`). What changed and why:
 - Label (summary CENTRAL 6): "...secondary to left superior temporal gyrus ganglioglioma (WHO grade I)" -> "...due to a left superior temporal gyrus low-grade epilepsy-associated tumor (presumed ganglioglioma, CNS WHO grade 1)": no tissue (the MRI names ganglioglioma and DNET), and WHO 2021 grades are arabic. The family-history red herring's "WHO grade I" now reads "CNS WHO grade 1".
 - Sertraline drug-check follow-up: empty `summary` filled in report voice (auditor flag); leak guard clean.
 - Checks: `perfect_agent.py -v` and `case_io.py check` clean; `test_case_guards.py -k FEPI-TEMP-` passes, now with the discriminator guard and the FEPI-TEMP banned strings.
+
+## Library contradictions (25 Oct 2026)
+
+Orders the benchmark library answered with a normal report that contradicts this case now get a case-specific report (term: gist, where stored):
+
+- analyze_eeg ambulatory: This is an ABNORMAL 48-hour ambulatory EEG due to: 1. Left mid-to-posterior temporal sharp waves (maximum at T5), maximal in drowsiness and NREM sleep (fallback_tool_outputs.eeg)
+- analyze_eeg video: This is an ABNORMAL 72-hour video-EEG due to: 1. Left mid-to-posterior temporal sharp waves (maximum at T5), maximal in drowsiness and NREM sleep. 2.  (followup request_video_eeg)
+- order_advanced_imaging FDG_PET: 1. Photopenic left posterior superior temporal lesion with a nodule of cortex-like uptake, without hypermetabolism. 2. Mild perilesional left lateral  (fallback_tool_outputs.advanced_imaging)
+- obtain_tissue_diagnosis resection: Ganglioglioma, CNS WHO grade 1 (fallback_tool_outputs.tissue_diagnosis)
+- obtain_tissue_diagnosis stereotactic_biopsy: Ganglioglioma, CNS WHO grade 1 (followup request_stereotactic_biopsy)
+- obtain_tissue_diagnosis open_biopsy: Ganglioglioma, CNS WHO grade 1 (followup request_open_biopsy)
+- interpret_labs AED_levels: No levetiracetam, valproate, carbamazepine, phenytoin, lamotrigine or lacosamide detected. (fallback_tool_outputs.labs[AED_levels], also answers valproate_level)
+- order_advanced_imaging MR_spectroscopy: mildly raised choline, reduced NAA in the mural nodule (followup request_mr_spectroscopy)
+
+Checks: `perfect_agent.py` passes; the criterion snapshot of the case is unchanged; `pytest agent-platform/tests -k FEPI-TEMP` (case guards included), `test_reports_do_not_fabricate.py` and `apply_diagnosis_synonyms.py --check` pass; no new report repeats a 60-character window of any criterion's expected evidence.

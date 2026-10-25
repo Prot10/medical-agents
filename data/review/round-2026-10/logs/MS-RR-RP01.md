@@ -86,3 +86,11 @@ Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it na
 - Scoring: coverage unchanged (any call matching the old order still matches); the cost reference of the required work-up now uses the new first order.
 
 Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the normal-row probe reports nothing for this criterion.
+
+## Library contradictions (25 Oct 2026)
+
+- `order_advanced_imaging {modality: DTI_tractography}`: 1. Reduced fractional anisotropy within the 2.1 cm right periventricular lesion with lateral displacement of the adjacent right corticospinal tract, which remains continuous. 2. Normal left-sided tracts and optic... (fallback_tool_outputs.advanced_imaging). Why: rule c: 2.1 cm right periventricular lesion with mass effect on the stored MRI; the library reports a normal study.
+- `order_advanced_imaging {modality: perfusion_MRI}`: Mildly raised rCBV at the enhancing rim of the right periventricular lesion (ratio 1.2) with a hypoperfused centre; no neovascular pattern. (followup_outputs[request_perfusion_mri]). Why: rule c: 2.1 cm enhancing lesion on the stored MRI; the library reports a normal study.
+- `order_advanced_imaging {modality: FDG_PET}`: Right periventricular lesion with mild marginal FDG uptake below cortical level and central hypometabolism; no intensely hypermetabolic focus. (followup_outputs[request_fdg_pet]). Why: rule c: 2.1 cm lesion on the stored MRI: a brain FDG-PET cannot be without a regional abnormality; the library reports a normal study.
+
+Checks: perfect agent ok; case guards pass; snapshot diff shows no criterion answer changed; map verified (served without the library).

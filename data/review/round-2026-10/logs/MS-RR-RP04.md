@@ -85,3 +85,11 @@ Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it na
 - Scoring: coverage unchanged (any call matching the old order still matches); the cost reference of the required work-up now uses the new first order.
 
 Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the normal-row probe reports nothing for this criterion.
+
+## Library contradictions (25 Oct 2026)
+
+- `order_specialized_test {test_type: ssep}`: 1. Prolonged right tibial cortical P37 latency (47.4 ms) with a normal lumbar N22, indicating central somatosensory conduction delay above the lumbar cord. 2. Normal left tibial and bilateral median responses. (fallback_tool_outputs.specialized_test). Why: rule c: reduced vibration at the right ankle and joint position sense at the right great toe with a right dorsolateral C5-C6 and a dorsal-column T4-T5 lesion; the library reports a normal study.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: Abnormal timed gait and balance assessment. Timed Up and Go 14.6 s and 10 m walk speed 0.88 m/s are slowed for age; Berg balance 44/56. (fallback_tool_outputs.clinical_assessment). Why: rule d: the examination documents a gait disorder (spastic-ataxic gait with right leg circumduction); the library reports a normal study.
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 70, ECOG 2: ambulatory and capable of all self-care, unable to carry out work activities, up and about more than half of waking hours. (followup_outputs[request_performance_status]). Why: rule d: inpatient relapse with a documented gait disorder: Karnofsky 100 / ECOG 0 'without evidence of disease' contradicts the case; the library reports a normal study.
+
+Checks: perfect agent ok; case guards pass; snapshot diff shows no criterion answer changed; map verified (served without the library).

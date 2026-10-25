@@ -99,3 +99,22 @@ Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it na
 - Scoring: none (recommended criterion; any call matching the old order still matches).
 
 Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the normal-row probe reports nothing for this criterion.
+
+## Library contradictions (25 Oct 2026)
+
+Orders that reached the benchmark library's normal report although this case contradicts it (diagnosis, history, medications or a stored finding) now get a case-specific report; every other off-pathway order still gets the library normal. No tier, criterion, diagnosis or existing output changed.
+
+- `order_advanced_imaging modality=cerebral_angiography` -> `followup_outputs[order_cerebral_angiography]`: catheter angiography showing the lesions on the stored MRA.
+- `order_advanced_imaging modality=carotid_duplex` -> `followup_outputs[order_carotid_duplex]`: carotid and vertebral duplex consistent with the stored CTA.
+- `order_advanced_imaging modality=transcranial_doppler` -> `followup_outputs[order_transcranial_doppler]`: transcranial Doppler consistent with the stored CTA.
+- `order_advanced_imaging modality=CT_perfusion` -> `followup_outputs[order_ct_perfusion]`: CT perfusion deficit in the infarct territory on the stored MRI.
+- `order_advanced_imaging modality=perfusion_MRI` -> `followup_outputs[order_perfusion_mri]`: perfusion MRI deficit in the infarct territory on the stored MRI.
+- `perform_clinical_assessment assessment_type=performance_status` -> `followup_outputs[order_performance_status]`: performance status KPS 70, ECOG 1 for the documented deficits.
+- `order_specialized_test test_type=speech_language_evaluation` -> `followup_outputs[order_speech_language_evaluation]`: speech and language evaluation reflecting the documented speech and language deficits.
+- `labs:beta-hCG` -> fallback labs panel `Beta-hCG`: beta-hCG positive at 18 weeks of pregnancy.
+- `order_body_imaging study=pelvis_abdomen_ultrasound` -> `followup_outputs[order_pelvis_abdomen_ultrasound]`: abdominal and pelvic imaging: gravid uterus at 18 weeks.
+- `order_body_imaging study=pelvis_abdomen_CT` -> `followup_outputs[order_pelvis_abdomen_ct]`: abdominal and pelvic imaging: gravid uterus at 18 weeks.
+- `order_body_imaging study=pelvis_abdomen_MRI` -> `followup_outputs[order_pelvis_abdomen_mri]`: abdominal and pelvic imaging: gravid uterus at 18 weeks.
+- `order_body_imaging study=chest_abdomen_pelvis_CT` -> `followup_outputs[order_chest_abdomen_pelvis_ct]`: abdominal and pelvic imaging: gravid uterus at 18 weeks.
+
+Checks: `perfect_agent.py` ok; `test_case_guards.py -k ISCH-STR` pass; every order listed in `plans/LIBRARY-group2-map.yaml` for this case is answered without the library; served answers of every other order unchanged against HEAD. Reasons and doubts: `plans/LIBRARY-group2-decisions.md`.

@@ -91,3 +91,16 @@ Review-process wording (references to the round's rulings, the round policy file
 - The FVC mL/kg figures and the weight-based IVIg amounts in the text were checked against this weight: all within rounding, no text change.
 
 Checks: `perfect_agent.py` ok; BMI = weight / height^2 to one decimal.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 50, ECOG 3 (fallback_tool_outputs.clinical_assessment). Why: rule 1: the library reports Karnofsky 100 / ECOG 0 and a working patient; she walks 15 feet only with single-hand support, with facial weakness and dysarthria.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: severely impaired gait and balance: walks only a few metres with one-hand support (berg 22/56); timed tests not completed (followup_outputs[3] request_gait_and_balance_timed). Why: rule 1: the library reports a normal timed gait and balance assessment; she walks only 15 feet with single-hand support.
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: no tremor or rigidity; motor items limited by weakness, response not assessable (followup_outputs[4] request_levodopa_challenge). Why: rule 1: the library describes a normal motor examination, gait and postural reflexes; limb weakness 3+-4/5 and a support-dependent gait.
+- `order_body_imaging {study: spine_MRI}`: smooth enhancement of the cauda equina roots, ventral more than dorsal; normal cord (fallback_tool_outputs.body_imaging). Why: rule 1: smooth enhancement of the cauda equina and ventral roots is seen in most patients with this polyradiculoneuropathy (Gorson 1996; Byun 1998), while the library reads the roots as normal.
+- `order_body_imaging {study: peripheral_nerve_MRI}`: smooth enhancement and mild T2 hyperintensity of the lumbosacral roots, no enlargement (followup_outputs[5] request_peripheral_nerve_mri). Why: rule 1 and 3: the library reads the nerve roots as normal; root enhancement as on the spine MRI of this case.
+- `order_specialized_test {test_type: nerve_biopsy}`: segmental demyelination with macrophage infiltration and sparse T-lymphocytes; reduced myelinated fibre density (fallback_tool_outputs.specialized_test). Why: rule 3: the stored nerve conduction study shows absent sural and reduced median sensory responses with a demyelinating pattern; the library sural biopsy is normal.
+- `order_specialized_test {test_type: speech_language_evaluation}`: mild flaccid dysarthria; language normal (followup_outputs[6] request_speech_language_evaluation). Why: rule 1 and 3: mild dysarthria and a left lower motor neuron facial weakness are in the examination; the library reports no dysarthria.
+- `perform_clinical_assessment {assessment_type: orthostatic_blood_pressure}`: no orthostatic hypotension; resting tachycardia 100 bpm, supported standing (followup_outputs[7] request_orthostatic_blood_pressure). Why: rule 3: she stands only with support and is tachycardic (HR 102); the library reports 3 minutes of symptom-free standing at a supine heart rate of 68.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

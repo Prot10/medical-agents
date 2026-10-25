@@ -69,3 +69,17 @@ Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym g
 - The FVC mL/kg figures and the weight-based IVIg amounts in the text were checked against this weight: all within rounding, no text change.
 
 Checks: `perfect_agent.py` ok; BMI = weight / height^2 to one decimal.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 70, ECOG 2 (cares for self; unable to carry on normal work) (fallback_tool_outputs.clinical_assessment). Why: rule 1: the library reports Karnofsky 100 / ECOG 0 (no evidence of disease, working); rule 3: readmitted carpenter with residual leg weakness and new generalized fatigable weakness.
+- `order_specialized_test {test_type: emg_ncs}`: mild residual demyelinating features improving since the earlier study, transmission not assessed (fallback_tool_outputs.specialized_test). Why: rule 1: the library report concludes there is no neuromuscular junction disorder, which routine conductions and needle EMG without repetitive stimulation cannot assess and which is not true here; the stored RNS study reports mild residual demyelinating features after the GBS-like illness, which this report keeps.
+- `interpret_labs {panels: [clustered_AChR_cell_based]}`: clustered AChR antibody (cell-based assay) positive (fallback_tool_outputs.labs['clustered_AChR_cell_based']). Why: rule 1: AChR-antibody-positive myasthenia (stored AChR binding antibody 2.1 nmol/L); a cell-based clustered AChR assay is positive when the binding assay is.
+- `order_body_imaging {study: mediastinum_MRI}`: thymic hyperplasia with uniform chemical-shift signal loss (fallback_tool_outputs.body_imaging). Why: rule 3: the stored CT shows diffuse thymic enlargement consistent with hyperplasia; the library reports an involuted thymus.
+- `order_advanced_imaging {modality: whole_body_FDG_PET}`: mild diffuse thymic uptake (SUVmax 2.6), hyperplasia pattern (fallback_tool_outputs.advanced_imaging). Why: rule 3: stored thymic enlargement consistent with hyperplasia; the library reports no thymic uptake.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: mildly wide-based gait, TUG 11.4 s, Berg 52/56 (followup_outputs[3] request_gait_and_balance_timed). Why: rule 3: the library reports a normal timed gait (TUG 9.1 s, Berg 56/56); the examination documents a mildly wide-based gait (residual from the GBS-like illness) and hip flexors 4/5.
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: no parkinsonian signs and no levodopa response; points from gait and chair rise only (followup_outputs[4] request_levodopa_challenge). Why: rule 3: the library levodopa challenge describes normal gait, arm swing and postural reflexes, while the examination documents a mildly wide-based gait.
+- `order_specialized_test {test_type: speech_language_evaluation}`: fatigable hypernasal dysarthria after 3 minutes; language normal (followup_outputs[5] request_speech_language_evaluation). Why: rule 3: the library reports no dysarthria; the examination documents nasal, slurred speech after 3 minutes.
+- Case fallback replaced, `fallback_tool_outputs.csf`: protein 62 mg/dL with 1 cell/uL (albuminocytological dissociation) in place of a normal CSF. Why: rule 3: 4 weeks after an acute demyelinating illness whose CSF had protein 58 mg/dL with 2 cells, protein stays raised; the case fallback reported normal protein (38 mg/dL).
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

@@ -89,3 +89,28 @@ Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym g
 - Why: rule 1: patient.physical_exam.general states weight 71 kg, height 172 cm.
 
 Checks: `perfect_agent.py` ok; BMI = weight / height^2 to one decimal.
+
+## Library contradictions (25 Oct 2026)
+
+A fresh order of each study below was answered by the benchmark-level normal library, which contradicted this patient (age, rhythm, devices, surgery, stored findings). Each now has a case-specific report:
+
+- perfusion_SPECT: Bilateral temporoparietal and posterior cingulate hypoperfusion, a pattern consistent with an Alzheimer-type profile, with additional patchy frontal hypoperfusion. (fallback_tool_outputs.advanced_imaging)
+- performance_status: Karnofsky 60 (requires occasional assistance but able to care for most needs), ECOG 2 (ambulatory and capable of all self-care, unable to carry out any work activities). (fallback_tool_outputs.clinical_assessment)
+- exercise_stress_test: Very low workload (2.3 METs) limited by leg pain; atrial fibrillation throughout; non-diagnostic for ischaemia. (fallback_tool_outputs.specialized_test)
+- tau_PET: Tau-positive PET: neocortical tau signal in the medial and inferior temporal cortex bilaterally, extending to the lateral temporoparietal cortex and the posterior cingulate. (followup request_tau_pet)
+- gait_and_balance_timed: Slow, stooped gait with reduced step length (Timed Up and Go 19.8 s with a stick) and reduced balance; walking distance is limited by leg symptoms on longer walks. (followup request_gait_and_balance_timed)
+- levodopa_challenge: MDS-UPDRS III 14/132 OFF and 14/132 ON (0% change), below the 30% threshold for a clinically meaningful levodopa response. (followup request_levodopa_challenge)
+- TEE: Mild concentric left ventricular hypertrophy; moderately dilated left atrium; atrial fibrillation with low appendage emptying velocity and mild spontaneous echo contrast, without appendage thrombus; aortic valve sclerosis without stenosis. No patent foramen ovale and no left atrial appendage thrombus. (followup request_tee)
+- cardiac_MRI: Moderately dilated left atrium, imaged in atrial fibrillation; preserved left ventricular function; no scar or thrombus. (followup request_cardiac_mri)
+- electrophysiology_study: Atrial fibrillation throughout; normal His-Purkinje conduction (HV 48 ms); no inducible ventricular arrhythmia. (followup request_electrophysiology_study)
+- speech_language_evaluation: Mild anomia in fluent speech; repetition and comprehension intact; no motor speech disorder. (followup request_speech_language_evaluation)
+- emg_ncs: Chronic bilateral L5 and S1 radiculopathies without active denervation; sensory responses preserved, with no evidence of a generalised polyneuropathy. (followup request_emg_ncs)
+- DTI_tractography: Mildly reduced periventricular fractional anisotropy with reductions in the fornix and cingulum; tracts continuous. (followup request_dti_tractography)
+- spine_MRI: Post-laminectomy lumbar spine (L4-L5) with moderate residual L3-L4 canal narrowing and bilateral L5-S1 foraminal stenosis; normal cord and conus. (fallback_tool_outputs.body_imaging)
+- spine_CT: Post-laminectomy and degenerative lumbar spine with L3-L4 canal and L5-S1 foraminal narrowing; no fracture or destructive lesion. (followup request_spine_ct)
+- pelvis_abdomen_MRI: Post-radiotherapy prostatic change without a focal lesion or lymphadenopathy. (followup request_pelvis_abdomen_mri)
+- pelvis_abdomen_CT: Post-radiotherapy pelvis with prostatic fiducial markers and mild bladder wall thickening; no mass or lymphadenopathy. (followup request_pelvis_abdomen_ct)
+- pelvis_abdomen_ultrasound: Post-radiotherapy prostatic change with mild bladder wall thickening; kidneys of normal size with mildly increased echogenicity. (followup request_pelvis_abdomen_ultrasound)
+- BNP: 238 pg/mL, raised (fallback_tool_outputs.labs[BNP])
+
+Checks: `perfect_agent.py` pass; `test_case_guards.py -k VASC-DEM-M08` pass; criterion outputs unchanged against the pre-pass snapshot; no 60-character window of any expected_evidence in the new reports; synonym guard 0 changes.

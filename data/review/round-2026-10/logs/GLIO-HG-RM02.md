@@ -129,3 +129,18 @@ Review-process wording (references to the round's rulings, the round policy file
 
 - criterion `action-9-order-body-imaging` rationale: "Optional: a solitary intramedullary metastasis is very unlikely at 34 without a known primary." -> "A solitary intramedullary metastasis is very unlikely at 34 without a known primary."
 - metadata.case_body_concerns.0: "Primary lesion is an intramedullary cervical spinal cord glioma (ICD C72.0), not a cerebral glioma; criteria pack focuses on C71.x cerebral high-grade glioma. Workup parallels cerebral GBM but with spinal-cord-specific surgical considerations (intramedullary resection morbidity) and adapted radiation planning." -> "Primary lesion is an intramedullary cervical spinal cord glioma (ICD C72.0), not a cerebral glioma; the glioma case set is built around C71.x cerebral high-grade glioma. Workup parallels cerebral GBM but with spinal-cord-specific surgical considerations (intramedullary resection morbidity) and adapted radiation planning."
+
+## Library contradictions (25 Oct 2026)
+
+Case-specific reports stored where the benchmark library's normal report contradicted the case. Why: intramedullary cervical cord tumour with a left optic pathway glioma and an abnormal exam; the library reports a normal head CT, a non-diagnostic biopsy, a normal prolonged EEG and normal evoked potentials and bedside tests where the exam is abnormal.
+
+- order_ct_scan: CT showing the stored lesion(s) instead of a normal head CT (fallback_tool_outputs.ct)
+- obtain_tissue_diagnosis stereotactic_biopsy: the stored integrated diagnosis on this procedure's specimen (fallback_tool_outputs.tissue_diagnosis)
+- video EEG: the stored routine EEG's abnormalities over 24 h (fallback_tool_outputs.eeg)
+- ambulatory EEG: the stored routine EEG's abnormalities over 48 h (followup request_ambulatory_eeg)
+- structured_headache_history_ichd3: the case's headache, prior primary headache and red flags (fallback_tool_outputs.clinical_assessment)
+- gait_and_balance_timed: matching the exam (followup request_timed_gait_balance)
+- ssep: cervical cord conduction delay (fallback_tool_outputs.specialized_test)
+- vep: left prechiasmal delay (known left optic pathway glioma) (followup request_vep)
+
+Checks: `perfect_agent.py` pass; `test_case_guards.py -k GLIO-HG-RM02` pass; no fixed order still answered by the library (`lib4.source`); no 60-character window of any criterion's expected_evidence in the added text, except tissue copies that repeat the stored tissue report verbatim; every criterion's served output unchanged (snapshot diff against the baseline).

@@ -79,3 +79,20 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, named in the report's own text.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+A fresh order of each study below was answered by the benchmark-level normal library, which contradicted this patient (age, rhythm, devices, surgery, stored findings). Each now has a case-specific report:
+
+- FDG_PET: Bilateral temporoparietal, posterior cingulate and medial temporal hypometabolism, a pattern consistent with an Alzheimer-type profile, with additional frontal hypometabolism and reduced thalamic and left striatal uptake. (fallback_tool_outputs.advanced_imaging)
+- perfusion_SPECT: Bilateral temporoparietal, posterior cingulate and medial temporal hypoperfusion, a pattern consistent with an Alzheimer-type profile, with additional frontal hypoperfusion and reduced thalamic and left striatal uptake. (followup request_perfusion_spect)
+- performance_status: Karnofsky 50 (requires considerable assistance and frequent care), ECOG 2 (ambulatory and capable of all self-care, unable to carry out any work activities). (fallback_tool_outputs.clinical_assessment)
+- exercise_stress_test: Very low workload (2.2 METs) limited by gait; submaximal heart rate, non-diagnostic for ischaemia. (fallback_tool_outputs.specialized_test)
+- tau_PET: Tau-positive PET: neocortical tau signal in the medial and inferior temporal cortex bilaterally, extending to the lateral temporoparietal cortex, posterior cingulate and precuneus, with mild frontal involvement. (followup request_tau_pet)
+- levodopa_challenge: MDS-UPDRS III 27/132 OFF and 25/132 ON (7% change), below the 30% threshold for a clinically meaningful levodopa response. (followup request_levodopa_challenge)
+- TEE: Mild concentric left ventricular hypertrophy; aortic valve sclerosis without stenosis. No patent foramen ovale and no left atrial appendage thrombus. (followup request_tee)
+- speech_language_evaluation: Mild spastic dysarthria with mild anomia; repetition and comprehension intact. (followup request_speech_language_evaluation)
+- emg_ncs: Mild length-dependent sensory axonal polyneuropathy. (followup request_emg_ncs)
+- DTI_tractography: Diffusely and severely reduced white matter fractional anisotropy, including the fornix and cingulum, without tract interruption. (followup request_dti_tractography)
+
+Checks: `perfect_agent.py` pass; `test_case_guards.py -k VASC-DEM-P01` pass; criterion outputs unchanged against the pre-pass snapshot; no 60-character window of any expected_evidence in the new reports; synonym guard 0 changes.

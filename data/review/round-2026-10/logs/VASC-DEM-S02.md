@@ -67,3 +67,20 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, named in the report's own text.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+A fresh order of each study below was answered by the benchmark-level normal library, which contradicted this patient (age, rhythm, devices, surgery, stored findings). Each now has a case-specific report:
+
+- FDG_PET: Frontal-predominant bilateral hypometabolism including the anterior cingulate, with reduced left putaminal uptake; posterior association cortex preserved. The pattern is consistent with subcortical small-vessel disease. (fallback_tool_outputs.advanced_imaging)
+- perfusion_SPECT: Frontal-predominant bilateral hypoperfusion including the anterior cingulate, with reduced left putaminal uptake; posterior association cortex preserved. The pattern is consistent with subcortical small-vessel disease. (followup request_perfusion_spect)
+- performance_status: Karnofsky 60 (requires occasional assistance but able to care for most needs), ECOG 2 (ambulatory and capable of all self-care, unable to carry out any work activities). (fallback_tool_outputs.clinical_assessment)
+- exercise_stress_test: Low workload (3.0 METs); submaximal heart rate, non-diagnostic for ischaemia. (fallback_tool_outputs.specialized_test)
+- levodopa_challenge: MDS-UPDRS III 19/132 OFF and 18/132 ON (5% change), below the 30% threshold for a clinically meaningful levodopa response. (followup request_levodopa_challenge)
+- TEE: Mild concentric left ventricular hypertrophy; aortic valve sclerosis without stenosis. No patent foramen ovale and no left atrial appendage thrombus. (followup request_tee)
+- speech_language_evaluation: Mild dysarthria with slow, sparse output; no aphasia. (followup request_speech_language_evaluation)
+- polysomnography: Moderate obstructive sleep apnoea (AHI 27/h, nadir SpO2 82%) on a study without CPAP. (followup request_polysomnography)
+- respiratory_function: Normal spirometry and respiratory muscle strength; overnight oximetry without CPAP shows frequent cyclical desaturations (ODI 22/h). (followup request_respiratory_function)
+- DTI_tractography: Frontal-predominant reduction of white matter fractional anisotropy without tract interruption. (followup request_dti_tractography)
+
+Checks: `perfect_agent.py` pass; `test_case_guards.py -k VASC-DEM-S02` pass; criterion outputs unchanged against the pre-pass snapshot; no 60-character window of any expected_evidence in the new reports; synonym guard 0 changes.

@@ -101,3 +101,17 @@ Review-process wording (references to the round's rulings, the round policy file
 
 - criterion `action-6-order-specialized-test` label: "Exercise stress test (optional)" -> "Exercise stress test"
 - criterion `action-8-search-medical-literature` label: "Guideline lookup on ARVC (optional)" -> "Guideline lookup on ARVC"
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 80, ECOG 1 (fallback_tool_outputs.clinical_assessment). Why: rule 2: the library reports Karnofsky 100 and 'working' in a woman 10 days after caesarean section, on maternity leave, with two collapses today.
+- `order_specialized_test {test_type: electrophysiology_study}`: inducible sustained monomorphic LBBB-superior-axis VT, normal AV conduction (fallback_tool_outputs.specialized_test). Why: rule 3: the stored cardiac MRI shows an RV free-wall scar with fat and enhancement and the monitoring frequent LBBB-morphology NSVT; the library reports no inducible arrhythmia.
+- `order_echocardiogram {echo_type: TEE}`: mildly dilated RV with subtricuspid hypokinesis, normal LV (fallback_tool_outputs.echo). Why: rule 3: the stored TTE shows a mildly dilated RV with focal free-wall hypokinesis; the library TEE reports a normal heart.
+- `order_echocardiogram {echo_type: bubble_study}`: mild RV dilatation with regional hypokinesis, no shunt (followup_outputs[10] request_bubble_study). Why: rule 3: the stored TTE shows RV dilatation and regional hypokinesis; the library reports a normal heart.
+- `order_echocardiogram {echo_type: exercise_echo}`: exercise-induced LBBB-superior-axis NSVT with dizziness, regional RV hypokinesis (followup_outputs[11] request_exercise_echo). Why: rule 3: the stored exercise test shows exercise-induced NSVT and the stored TTE RV regional hypokinesis; the library reports a normal study with no arrhythmia.
+- `interpret_labs {panels: [iron_studies]}`: iron deficiency pattern, ferritin 9 ng/mL (fallback_tool_outputs.labs['iron_studies']). Why: rule 2 and 3: iron deficiency anaemia in pregnancy on oral iron, stored haemoglobin 10.2 g/dL with MCV 76 fL; the library reports normal iron studies.
+- `interpret_labs {panels: [peripheral smear]}`: microcytic hypochromic red cells with pencil cells (fallback_tool_outputs.labs['peripheral smear']). Why: rule 3: stored haemoglobin 10.2 g/dL with MCV 76 fL; the library reports normocytic normochromic cells.
+- `interpret_labs {panels: [beta-hCG]}`: beta-hCG 46 mIU/mL, still detectable (fallback_tool_outputs.labs['beta-hCG']). Why: rule 2: delivery 10 days ago; serum hCG takes two to four weeks to fall below 5 mIU/mL, and the library reports 1 mIU/mL.
+- `interpret_labs {panels: [prolactin]}`: prolactin 118 ng/mL (fallback_tool_outputs.labs['prolactin']). Why: rule 2: breastfeeding 10 days postpartum; the library reports a non-lactating prolactin of 10 ng/mL.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

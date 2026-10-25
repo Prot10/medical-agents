@@ -62,3 +62,16 @@ Condition close-out (`plans/FEPI-TEMP-decisions.md`). What changed and why:
 
 - Diagnosis synonyms (`diagnosis_synonyms.yaml` G40 entries, re-applied with `--prune --conditions focal_epilepsy_temporal`): labels now focal epilepsy, temporal lobe epilepsy, TLE, epilepsy temporal lobe, mesial temporal lobe epilepsy, MTLE (added), mesial temporal sclerosis epilepsy; removed focal seizures; focal onset seizures; focal impaired awareness seizures (seizure-type labels, retired: their tokens occur in an acute symptomatic or functional-seizure answer). Codes: G40.2, G40.1, G40.9 plus G40.219, G40.119, G40.919 (drug-resistant, Kwan 2010); the idiopathic G40.009 and G40.019 removed and the not-intractable codes removed.
 - Checks: `perfect_agent.py -v` and `case_io.py check` clean; `test_case_guards.py -k FEPI-TEMP-` passes, now with the discriminator guard and the FEPI-TEMP banned strings.
+
+## Library contradictions (25 Oct 2026)
+
+Orders the benchmark library answered with a normal report that contradicts this case now get a case-specific report (term: gist, where stored):
+
+- analyze_eeg ambulatory: This is an ABNORMAL 48-hour ambulatory EEG due to: 1. Left anterior temporal sharp waves (phase reversal at F7), frequent in NREM sleep. 2. Three push (fallback_tool_outputs.eeg)
+- obtain_tissue_diagnosis resection: Hippocampal sclerosis, ILAE type 1 (fallback_tool_outputs.tissue_diagnosis)
+- obtain_tissue_diagnosis stereotactic_biopsy: Hypothalamic hamartoma (followup request_stereotactic_biopsy)
+- obtain_tissue_diagnosis open_biopsy: Hypothalamic hamartoma (followup request_open_biopsy)
+- order_specialized_test neuropsych_battery: Low average intellectual functioning (FSIQ 86) with slowed processing speed and impaired verbal learning and delayed verbal recall (T-scores 35 and 33 (fallback_tool_outputs.specialized_test)
+- interpret_labs AED_levels: Levetiracetam 21.0 mg/L; Valproate (total) 68.0 mg/L, within the reference ranges. Other analytes not detected. (fallback_tool_outputs.labs[AED_levels], also answers valproate_level)
+
+Checks: `perfect_agent.py` passes; the criterion snapshot of the case is unchanged; `pytest agent-platform/tests -k FEPI-TEMP` (case guards included), `test_reports_do_not_fabricate.py` and `apply_diagnosis_synonyms.py --check` pass; no new report repeats a 60-character window of any criterion's expected evidence.

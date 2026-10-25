@@ -77,3 +77,25 @@ Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it na
 - Scoring: none (recommended criterion: coverage unchanged, not in the cost reference).
 
 Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.
+
+## Library contradictions (25 Oct 2026)
+
+Orders the benchmark library answered with a normal report that contradicts this case now get a case-specific report (term: gist, where stored):
+
+- analyze_eeg ambulatory: This is an ABNORMAL 48-hour ambulatory EEG due to: 1. Five electroclinical seizures of left temporal onset (T3/T5), 30-70 seconds, without contralater (fallback_tool_outputs.eeg)
+- analyze_eeg video: This is an ABNORMAL 72-hour video-EEG due to: 1. Nine habitual seizures of left temporal onset (T3/T5): rhythmic 5-6 Hz theta evolving to 2-3 Hz delta (followup request_video_eeg)
+- obtain_tissue_diagnosis resection: Metastatic melanoma (fallback_tool_outputs.tissue_diagnosis)
+- obtain_tissue_diagnosis stereotactic_biopsy: Metastatic melanoma (followup request_stereotactic_biopsy)
+- obtain_tissue_diagnosis open_biopsy: Metastatic melanoma (followup request_open_biopsy)
+- interpret_labs valproate_level: valproate not detected (fallback_tool_outputs.labs[valproate_level])
+- order_body_imaging chest_abdomen_pelvis_CT: pulmonary, breast, hepatic and bone lesions (fallback_tool_outputs.body_imaging)
+- order_body_imaging chest_xray: Multiple bilateral pulmonary nodules. No effusion or consolidation. Clinical correlation recommended. (followup request_chest_xray)
+- order_body_imaging chest_CTA: 1. No pulmonary embolism. 2. Multiple bilateral pulmonary nodules. 3. Left breast nodule. Clinical correlation recommend (followup request_chest_cta)
+- order_body_imaging pelvis_abdomen_MRI: Multiple rim-enhancing hepatic lesions and a left iliac marrow-replacing lesion, consistent with metastases. Clinical co (followup request_pelvis_abdomen_mri)
+- order_body_imaging pelvis_abdomen_ultrasound: Several hypoechoic hepatic lesions with a target appearance. Clinical correlation recommended. (followup request_pelvis_abdomen_ultrasound)
+- order_advanced_imaging MR_spectroscopy: Elevated choline with reduced NAA and lipid-lactate in the left temporal lesion, without choline elevation in the surrou (followup request_mr_spectroscopy)
+- order_advanced_imaging perfusion_MRI: Hyperperfused left temporal lesion (maximum rCBV ratio 3.4) with low perfusion in the surrounding oedema. Clinical corre (followup request_perfusion_mri)
+- order_advanced_imaging amino_acid_PET: Metabolically active left temporal lesion (maximum tumour-to-brain ratio 2.9). No other focus. Clinical correlation reco (followup request_amino_acid_pet)
+- order_advanced_imaging whole_body_FDG_PET: Multiple hypermetabolic lesions in the lungs, left breast, liver and skeleton, consistent with metastatic disease. Clini (followup request_whole_body_fdg_pet)
+
+Checks: `perfect_agent.py` passes; the criterion snapshot of the case is unchanged; `pytest agent-platform/tests -k FEPI-TEMP` (case guards included), `test_reports_do_not_fabricate.py` and `apply_diagnosis_synonyms.py --check` pass; no new report repeats a 60-character window of any criterion's expected evidence.

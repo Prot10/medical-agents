@@ -55,3 +55,13 @@ After the edit: perfect_agent ok; case_io check clean for PD-P03; test_case_guar
 Decisions in `plans/PD-decisions.md`.
 
 - Stays in condition parkinsons as a PD-mimic case (ruling 3); `metadata.case_body_concerns` and `citation_gap` cleared (`[Hoglinger_2017]` is in the PD pack). Labels and code unchanged (G23.1). No PD label or G20 code is accepted.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: MDS-UPDRS III 41/132 OFF, 38/132 ON (7%) (fallback_tool_outputs.clinical_assessment). Why: rule 3: the stored exam documents parkinsonism; the library reports MDS-UPDRS III 3/132 with no parkinsonian signs; PSP on 600 mg/day levodopa with no benefit.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: TUG 21.4 s, 10 m 0.68 m/s, Berg 34/56 (followup request_gait_and_balance_timed). Why: rule 3: the stored gait exam (arm swing, stride, turns, pull test) is abnormal; the library reports a normal gait, turns in 3 steps and Berg 56/56.
+- `perform_clinical_assessment {assessment_type: cognitive_screen}`: MoCA 20/30 as in the exam (followup request_cognitive_screen). Why: rule 3: the stored exam records this MoCA and its items; the library reports MoCA 28/30 with other items.
+- `perform_clinical_assessment {assessment_type: orthostatic_blood_pressure}`: 148/88 supine, 142/84 at 3 min (as in the exam) (followup request_orthostatic_blood_pressure). Why: rule 3: the stored exam records orthostatic vitals; the library reports supine 128/78 and other numbers.
+- `order_specialized_test {test_type: speech_language_evaluation}`: spastic dysarthria (70 dB SPL), no aphasia (fallback_tool_outputs.specialized_test). Why: rule 3: the stored exam records spastic dysarthria; the library reports no motor speech disorder.
+
+Checks: `perfect_agent.py` 30/30 PD pass; `test_case_guards.py -k PD-` and `pytest agent-platform/tests -k PD-` 300 passed (`test_grpo_rollout.py` not collected: training extra not installed); every criterion's served output unchanged (snapshot before/after); synonym guard 0 changes; no new report repeats a 60-character window of any `expected_evidence`; every listed term is answered without the library.

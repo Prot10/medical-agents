@@ -88,3 +88,17 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, named in the report's own text.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+A fresh order of each study below was answered by the benchmark-level normal library, which contradicted this patient (age, rhythm, devices, surgery, stored findings). Each now has a case-specific report:
+
+- FDG_PET: Mild patchy bilateral prefrontal and subcortical hypometabolism with preserved posterior association cortex, a pattern consistent with mild small-vessel (subcortical) disease. (fallback_tool_outputs.advanced_imaging)
+- perfusion_SPECT: Mild patchy bilateral prefrontal and subcortical hypoperfusion with preserved posterior association cortex, a pattern consistent with mild small-vessel (subcortical) disease. (followup request_perfusion_spect)
+- performance_status: Karnofsky 90 (able to carry on normal activity; minor symptoms), ECOG 0 (fully active). (fallback_tool_outputs.clinical_assessment)
+- exercise_stress_test: No electrocardiographic or clinical evidence of inducible ischaemia at a moderate workload (7.2 METs). (fallback_tool_outputs.specialized_test)
+- TEE: Mild concentric left ventricular hypertrophy; aortic valve sclerosis without stenosis. No patent foramen ovale and no left atrial appendage thrombus. (followup request_tee)
+- DTI_tractography: Tracts continuous, with mildly reduced periventricular fractional anisotropy and a focal reduction in the right corona radiata segment of the corticospinal tract. (followup request_dti_tractography)
+- pelvis_abdomen_ultrasound: Post-hysterectomy pelvis without mass; normal upper abdomen. (fallback_tool_outputs.body_imaging)
+
+Checks: `perfect_agent.py` pass; `test_case_guards.py -k VASC-DEM-M01` pass; criterion outputs unchanged against the pre-pass snapshot; no 60-character window of any expected_evidence in the new reports; synonym guard 0 changes.

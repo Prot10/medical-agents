@@ -86,3 +86,11 @@ Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it na
 - Scoring: coverage unchanged (any call matching the old order still matches); the cost reference of the required work-up now uses the new first order.
 
 Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.
+
+## Library contradictions (25 Oct 2026)
+
+Orders the benchmark library answered with a normal report that this case contradicts now have a case report. Contradiction = the history, the diagnosis or a stored finding makes the normal report impossible.
+
+- `perform_clinical_assessment {assessment_type: structured_headache_history_ichd3}` -> fallback_tool_outputs.clinical_assessment: sudden while folding laundry, 18 hours before assessment; red flags: sudden onset, headache persisting beyond her usual pattern, altered behaviour after onset. The library reported no thunderclap onset, no red flags and no nausea or photophobia, against the history.
+
+Checks: `perfect_agent.py` ok; `test_case_guards.py -k SAH-P03` passed; no criterion answer changed (snapshot diff); every mapped order is answered without the library (`verify.py`).

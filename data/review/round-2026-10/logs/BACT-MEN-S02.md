@@ -70,3 +70,24 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 20, ECOG 4 (fallback_tool_outputs.clinical_assessment). Why: rule 3: obtunded (GCS 11), hypotensive (90/54) and tachycardic (HR 116); the library's Karnofsky 100 describes a person without disease.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: not testable (GCS 11, bed-bound) (followup_outputs[4] request_gait_and_balance_timed). Why: rule 3: the stored exam records gait not assessable in a bed-bound patient.
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: no parkinsonian signs; challenge not performed; gait and postural reflexes not assessable (followup_outputs[5] request_levodopa_challenge). Why: rule 3: the library describes a full normal motor examination and gait in an obtunded patient with bilateral extensor plantars.
+- `perform_clinical_assessment {assessment_type: structured_headache_history_ichd3}`: new acute headache with red flags; criteria for a primary headache disorder not met (followup_outputs[6] request_structured_headache_history_ichd3). Why: rule 1 and 3: an acute febrile headache with neck stiffness, photophobia and falling consciousness; the library elicits no red flags.
+- `analyze_brain_mri`: diffuse leptomeningeal enhancement; maxillary and ethmoid sinusitis; no complication (fallback_tool_outputs.mri). Why: rule 1 and 3: no MRI is stored; the stored CT shows bilateral maxillary and ethmoid sinus opacification with fluid levels.
+- `analyze_eeg {eeg_type: sleep_deprived}`: continuous generalised theta-delta slowing; no epileptiform discharges or seizures (followup_outputs[7] request_sleep_deprived). Why: rule 3: the patient is obtunded and oriented to self only (GCS 11); a normal background contradicts the stored exam.
+- `analyze_eeg {eeg_type: continuous_icu}`: continuous generalised theta-delta slowing; no epileptiform discharges or seizures (followup_outputs[8] request_continuous_icu). Why: rule 3: the patient is obtunded and oriented to self only (GCS 11); a normal background contradicts the stored exam.
+- `analyze_eeg {eeg_type: ambulatory}`: continuous generalised theta-delta slowing; no epileptiform discharges or seizures (followup_outputs[9] request_ambulatory). Why: rule 3: the patient is obtunded and oriented to self only (GCS 11); a normal background contradicts the stored exam.
+- `perform_clinical_assessment {assessment_type: cognitive_screen}`: not testable (GCS 11) (followup_outputs[10] request_cognitive_screen). Why: rule 3: the stored exam states she cannot participate in formal cognitive testing (GCS 11); the library reports MoCA 28/30.
+- `order_specialized_test {test_type: neuropsych_battery}`: not testable (reduced consciousness) (fallback_tool_outputs.specialized_test). Why: rule 3: an obtunded patient cannot complete a battery in the average range.
+- `order_specialized_test {test_type: speech_language_evaluation}`: dysarthria; incoherent output; testing limited by obtundation (followup_outputs[11] request_speech_language_evaluation). Why: rule 3: the stored exam records sparse, dysarthric, incoherent speech.
+- `order_microbiology {specimen: whole_blood_pcr}`: Streptococcus pneumoniae DNA detected (fallback_tool_outputs.microbiology). Why: rule 3: blood cultures grow S. pneumoniae in 2 of 2 sets, a target of the panel; no antibiotics before presentation.
+- `perform_clinical_assessment {assessment_type: orthostatic_blood_pressure}`: supine BP 90/54, HR 116; standing not performed (followup_outputs[12] request_orthostatic_blood_pressure). Why: rule 3: vitals BP 90/54 and HR 116 in a bed-bound patient; the library reports BP 124/78 and HR 68.
+- `analyze_ecg`: sinus tachycardia at 116 bpm, otherwise normal (fallback_tool_outputs.ecg). Why: rule 3: presenting heart rate 116 bpm; the library reports a rate of 72.
+- `interpret_labs {panels: [ABG]}`: lactic metabolic acidosis with partial respiratory compensation (fallback_tool_outputs.labs['ABG']). Why: rule 3: stored bicarbonate 19, lactate 4.1, RR 25 and hypotension in septic shock; the library reports a normal gas.
+- Case fallback replaced, `analyze_eeg {eeg_type: routine}`: routine EEG now shows continuous generalised theta-delta slowing; no epileptiform discharges or seizures (was a normal awake and drowsy EEG) (fallback_tool_outputs.eeg). Why: rule 3: the patient is obtunded and oriented to self only (GCS 11); a normal background contradicts the stored exam.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

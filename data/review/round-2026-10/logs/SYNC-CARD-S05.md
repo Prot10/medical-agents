@@ -105,3 +105,15 @@ Checks: `perfect_agent.py` ok (the order returns every result its evidence cites
 Review-process wording (references to the round's rulings, the round policy file, the criteria packs, and tier markers such as "(optional)" in criterion labels and rationales) is shown to physicians in the review app, so it was rewritten in clinical language. The tier stays in the criterion's `importance` field; scoring is unchanged. `test_case_guards.py::test_no_review_process_text` now fails on any of it.
 
 - criterion `action-5-search-medical-literature` label: "Guideline lookup on valve intervention (optional)" -> "Guideline lookup on valve intervention"
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 70, ECOG 1 (fallback_tool_outputs.clinical_assessment). Why: rule 2: the library reports Karnofsky 100 with no complaints in a man who has given up walking and stairs for exertional dyspnoea and presyncope.
+- `order_echocardiogram {echo_type: TEE}`: severe calcific AS (AVA about 0.7 cm2), concentric LVH, LVEF 62% (fallback_tool_outputs.echo). Why: rule 3: the stored TTE shows severe calcific aortic stenosis with concentric LVH; the library TEE reports a normal heart.
+- `order_echocardiogram {echo_type: bubble_study}`: severe AS and LVH as on the TTE, no shunt (followup_outputs[8] request_bubble_study). Why: rule 3: the stored TTE shows severe aortic stenosis with LVH; the library reports a normal heart.
+- `order_echocardiogram {echo_type: exercise_echo}`: stress phase not performed in symptomatic severe AS (followup_outputs[9] request_exercise_echo). Why: rule 3: exertional syncope with severe aortic stenosis, and the stored exercise test is not performed; the library reports a normal study at 9.5 METs.
+- `order_advanced_imaging {modality: cardiac_MRI}`: severe AS with concentric LVH, patchy septal mid-wall enhancement (fallback_tool_outputs.advanced_imaging). Why: rule 3: the stored TTE shows severe aortic stenosis with concentric LVH; the library reports a normal cardiac MRI with no structural heart disease.
+- `order_specialized_test {test_type: audiometry}`: bilateral mild high-frequency sensorineural hearing loss (fallback_tool_outputs.specialized_test). Why: rule 2: the examination records mild bilateral high-frequency hearing loss; the library reports normal hearing.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: slow antalgic gait, TUG 15.6 s, tandem not completed (followup_outputs[10] request_gait_and_balance_timed). Why: rule 2: the examination records a slow antalgic gait with tandem walking limited by knee arthritis; the library reports a normal timed gait.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

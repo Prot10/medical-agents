@@ -91,3 +91,38 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, named in the report's own text.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+A fresh order of each study below was answered by the benchmark-level normal library, which contradicted this patient (age, rhythm, devices, surgery, stored findings). Each now has a case-specific report:
+
+- brain MRI: not performed, non-MR-conditional pacemaker in a pacing-dependent patient (fallback_tool_outputs.mri)
+- FDG_PET: Two focal left middle cerebral territory metabolic defects (frontal operculum-anterior insula; supramarginal gyrus) with mild crossed cerebellar diaschisis and mild patchy frontal hypometabolism. No temporoparietal-predominant pattern. (fallback_tool_outputs.advanced_imaging)
+- perfusion_SPECT: Two focal left middle cerebral territory perfusion defects (frontal operculum-anterior insula; supramarginal gyrus) with mild crossed cerebellar diaschisis and mild patchy frontal hypoperfusion. No temporoparietal-predominant pattern. (followup request_perfusion_spect)
+- performance_status: Karnofsky 70 (cares for self; unable to carry on normal activity or active work), ECOG 1 (restricted in strenuous activity, able to carry out light work). (fallback_tool_outputs.clinical_assessment)
+- exercise_stress_test: Reduced exercise capacity (3.5 METs) with a paced rhythm throughout; non-diagnostic for ischaemia. (fallback_tool_outputs.specialized_test)
+- gait_and_balance_timed: Mildly slowed gait (Timed Up and Go 12.4 s) with reduced right arm swing and imperfect tandem gait. (followup request_gait_and_balance_timed)
+- levodopa_challenge: MDS-UPDRS III 8/132 OFF and 8/132 ON (0% change), below the 30% threshold for a clinically meaningful levodopa response. (followup request_levodopa_challenge)
+- TEE: Pacing leads in the right heart without attached mass; mild concentric left ventricular hypertrophy; aortic valve sclerosis without stenosis. No patent foramen ovale and no left atrial appendage thrombus. (followup request_tee)
+- cardiac_MRI: Not performed: the dual-chamber pacemaker system is not MR-conditional, the device documentation is unavailable and the patient is pacing-dependent. (followup request_cardiac_mri)
+- electrophysiology_study: Complete atrioventricular block with ventricular pacing by the implanted device; no inducible ventricular arrhythmia. (followup request_electrophysiology_study)
+- speech_language_evaluation: Mild aphasia with anomia and reduced repetition of long sentences in fluent speech; comprehension intact; no motor speech disorder. (followup request_speech_language_evaluation)
+- CT_perfusion: Matched perfusion defects confined to chronic tissue loss (left frontal operculum and anterior insula; left supramarginal gyrus); no acute core or penumbral mismatch. (followup request_ct_perfusion)
+- cerebral_angiography: Moderate left internal carotid stenosis (60%, NASCET) with irregular plaque; mild right stenosis (35%); no intracranial stenosis. (followup request_cerebral_angiography)
+- DTI_tractography: Not performed: the dual-chamber pacemaker system is not MR-conditional, the device documentation is unavailable and the patient is pacing-dependent. (followup request_dti_tractography)
+- perfusion_MRI: Not performed: the dual-chamber pacemaker system is not MR-conditional, the device documentation is unavailable and the patient is pacing-dependent. (followup request_perfusion_mri)
+- MR_angiography: Not performed: the dual-chamber pacemaker system is not MR-conditional, the device documentation is unavailable and the patient is pacing-dependent. (followup request_mr_angiography)
+- functional_MRI: Not performed: the dual-chamber pacemaker system is not MR-conditional, the device documentation is unavailable and the patient is pacing-dependent. (followup request_functional_mri)
+- MR_spectroscopy: Not performed: the dual-chamber pacemaker system is not MR-conditional, the device documentation is unavailable and the patient is pacing-dependent. (followup request_mr_spectroscopy)
+- MR_venography: Not performed: the dual-chamber pacemaker system is not MR-conditional, the device documentation is unavailable and the patient is pacing-dependent. (followup request_mr_venography)
+- holter_24h: Normally functioning dual-chamber pacing throughout 24 hours with no intrinsic atrioventricular conduction; no atrial arrhythmia recorded during this recording. (fallback_tool_outputs.cardiac_monitoring)
+- chest_abdomen_pelvis_CT: No mass or lymphadenopathy. Clear lungs without nodule, consolidation or interstitial abnormality; left pectoral pacemaker generator with right atrial and right ventricular leads; mild streak artefact. (fallback_tool_outputs.body_imaging)
+- chest_CTA: No pulmonary embolism or aortic dissection. Clear lungs without nodule, consolidation or interstitial abnormality; left pectoral pacemaker generator with right atrial and right ventricular leads; mild streak artefact. (followup request_chest_cta)
+- mediastinum_CT: No mediastinal mass or lymphadenopathy; left pectoral pacemaker generator with right atrial and right ventricular leads; mild streak artefact. (followup request_mediastinum_ct)
+- chest_xray: No acute cardiopulmonary abnormality; left subclavicular pacemaker generator with right atrial and right ventricular leads in satisfactory position. (followup request_chest_xray)
+- spine_MRI: MRI not performed: the dual-chamber pacemaker system is not MR-conditional, the device documentation is unavailable and the patient is pacing-dependent. (followup request_spine_mri)
+- mediastinum_MRI: MRI not performed: the dual-chamber pacemaker system is not MR-conditional, the device documentation is unavailable and the patient is pacing-dependent. (followup request_mediastinum_mri)
+- pelvis_abdomen_MRI: MRI not performed: the dual-chamber pacemaker system is not MR-conditional, the device documentation is unavailable and the patient is pacing-dependent. (followup request_pelvis_abdomen_mri)
+- peripheral_nerve_MRI: MRI not performed: the dual-chamber pacemaker system is not MR-conditional, the device documentation is unavailable and the patient is pacing-dependent. (followup request_peripheral_nerve_mri)
+
+Checks: `perfect_agent.py` pass; `test_case_guards.py -k VASC-DEM-P08` pass; criterion outputs unchanged against the pre-pass snapshot; no 60-character window of any expected_evidence in the new reports; synonym guard 0 changes.

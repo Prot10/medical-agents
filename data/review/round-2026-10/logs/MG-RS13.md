@@ -75,3 +75,13 @@ Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym g
 - The FVC mL/kg figures and the weight-based IVIg amounts in the text were checked against this weight: all within rounding, no text change.
 
 Checks: `perfect_agent.py` ok; BMI = weight / height^2 to one decimal.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 80, ECOG 1 (normal activity with effort; some signs and symptoms) (fallback_tool_outputs.clinical_assessment). Why: rule 1: the library reports Karnofsky 100 / ECOG 0 (no evidence of disease, working); rule 3: generalized fatigable ocular, bulbar and neck weakness in a working patient.
+- `order_specialized_test {test_type: emg_ncs}`: normal nerve conductions and needle EMG, stating that neuromuscular transmission was not assessed (fallback_tool_outputs.specialized_test). Why: rule 1: the library report concludes there is no neuromuscular junction disorder, which routine conductions and needle EMG without repetitive stimulation cannot assess and which is not true here; the stored RNS study reports normal nerve conductions, which this report keeps.
+- `interpret_labs {panels: [anti_thyroglobulin]}`: anti-thyroglobulin antibody 145 IU/mL (elevated) (fallback_tool_outputs.labs['anti_thyroglobulin']). Why: rule 2: autoimmune hypothyroidism on levothyroxine with anti-TPO 186 IU/mL (stored); the library reports a normal anti-thyroglobulin antibody.
+- `interpret_labs {panels: [ANA]}`: ANA positive 1:160, homogeneous pattern (fallback_tool_outputs.labs['ANA']). Why: rule 3: the case records ANA 1:160 with negative anti-dsDNA and anti-ENA; the library reports a negative ANA.
+- `order_specialized_test {test_type: speech_language_evaluation}`: fatigable hypernasal dysarthria after 3 minutes; language normal (followup_outputs[4] request_speech_language_evaluation). Why: rule 3: the library reports no dysarthria; the examination documents fatigable palatal elevation on the SLURP test.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

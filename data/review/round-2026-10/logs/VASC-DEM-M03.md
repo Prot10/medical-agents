@@ -86,3 +86,28 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, named in the report's own text.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+A fresh order of each study below was answered by the benchmark-level normal library, which contradicted this patient (age, rhythm, devices, surgery, stored findings). Each now has a case-specific report:
+
+- FDG_PET: Three focal metabolic defects in separate arterial territories (left posterior temporal, right postcentral-supramarginal, right cerebellar) with mild patchy frontal hypometabolism, a pattern consistent with multiple infarcts. No diffuse temporoparietal-predominant pattern. (fallback_tool_outputs.advanced_imaging)
+- perfusion_SPECT: Three focal perfusion defects in separate arterial territories (left posterior temporal, right postcentral-supramarginal, right cerebellar) with mild patchy frontal hypoperfusion, a pattern consistent with multiple infarcts. No diffuse temporoparietal-predominant pattern. (followup request_perfusion_spect)
+- performance_status: Karnofsky 60 (requires occasional assistance but able to care for most needs), ECOG 2 (ambulatory and capable of all self-care, unable to carry out any work activities). (fallback_tool_outputs.clinical_assessment)
+- exercise_stress_test: Reduced exercise capacity (3.8 METs) with a blunted blood pressure rise; submaximal heart rate on beta-blockade, non-diagnostic for inducible ischaemia. (fallback_tool_outputs.specialized_test)
+- neuropsych_battery: Multi-domain impairment led by executive dysfunction and slowed processing, with a retrieval-type memory deficit, mild anomia, impaired visuoconstruction and mild left-sided inattention. With the reported loss of independence, the profile is consistent with a major neurocognitive disorder of moderate severity. (followup request_neuropsych_battery)
+- gait_and_balance_timed: Mildly slowed timed gait (Timed Up and Go 12.6 s) with reduced left arm swing and imperfect tandem gait. (followup request_gait_and_balance_timed)
+- levodopa_challenge: MDS-UPDRS III 8/132 OFF and 8/132 ON (0% change), below the 30% threshold for a clinically meaningful levodopa response. (followup request_levodopa_challenge)
+- TEE: Apical aneurysm with laminated mural thrombus; LVEF about 38%; mildly dilated left atrium; aortic valve sclerosis without stenosis. No patent foramen ovale. (fallback_tool_outputs.echo)
+- cardiac_MRI: Chronic transmural anterior-apical infarct with an apical aneurysm containing laminated thrombus; dilated left ventricle with LVEF 36%. (followup request_cardiac_mri)
+- coronary_angiography: Chronic total occlusion of the mid left anterior descending artery with collateral filling; non-obstructive disease elsewhere. (followup request_coronary_angiography)
+- coronary_CTA: Occlusion of the mid left anterior descending artery (CAD-RADS 5) with an apical left ventricular aneurysm containing laminated thrombus; non-obstructive disease elsewhere. (followup request_coronary_cta)
+- DTI_tractography: Truncated posterior terminations of the left arcuate fasciculus in the posterior temporal lobe and reduced fractional anisotropy beneath the right postcentral cortex; optic radiations intact. (followup request_dti_tractography)
+- CT_perfusion: Matched perfusion defects confined to chronic tissue loss (left posterior temporal lobe; right postcentral and supramarginal cortex; right cerebellar hemisphere); no acute core or penumbral mismatch. (followup request_ct_perfusion)
+- perfusion_MRI: Matched perfusion defects confined to chronic tissue loss (left posterior temporal lobe; right postcentral and supramarginal cortex; right cerebellar hemisphere); no acute core or penumbral mismatch. (followup request_perfusion_mri)
+- MR_angiography: Mild left internal carotid bulb stenosis (about 30%) and minimal right bulb irregularity; no intracranial stenosis or occlusion. (followup request_mr_angiography)
+- cerebral_angiography: Mild left internal carotid bulb stenosis (about 30%); no intracranial stenosis, occlusion or aneurysm. (followup request_cerebral_angiography)
+- functional_MRI: Absent left posterior superior temporal activation within the infarct, with preserved left inferior frontal activation and normal motor somatotopy. (followup request_functional_mri)
+- BNP: 412 pg/mL, raised (fallback_tool_outputs.labs[BNP])
+
+Checks: `perfect_agent.py` pass; `test_case_guards.py -k VASC-DEM-M03` pass; criterion outputs unchanged against the pre-pass snapshot; no 60-character window of any expected_evidence in the new reports; synonym guard 0 changes.

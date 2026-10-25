@@ -77,3 +77,11 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: Abnormal timed gait and balance assessment. Timed Up and Go 16.2 s and 10 m walk speed 0.78 m/s are slowed for age; Berg balance 38/56. (fallback_tool_outputs.clinical_assessment). Why: rule d: the examination documents a gait disorder (wide-based, unsteady cerebellar gait veering to the right); the library reports a normal study.
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 70, ECOG 2: ambulatory and capable of all self-care, unable to carry out work activities, up and about more than half of waking hours. (followup_outputs[request_performance_status]). Why: rule d: inpatient relapse with a documented gait disorder: Karnofsky 100 / ECOG 0 'without evidence of disease' contradicts the case; the library reports a normal study.
+- `order_specialized_test {test_type: speech_language_evaluation}`: Mild ataxic dysarthria with a scanning quality. No aphasia. (fallback_tool_outputs.specialized_test). Why: rule c: scanning dysarthria in the stored examination; the library reports a normal study.
+
+Checks: perfect agent ok; case guards pass; snapshot diff shows no criterion answer changed; map verified (served without the library).

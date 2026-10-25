@@ -69,3 +69,25 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 20, ECOG 4 (fallback_tool_outputs.clinical_assessment). Why: rule 3: drowsy and confused (GCS 13), febrile and tachycardic (HR 114); the library's Karnofsky 100 describes a person without disease.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: not testable (drowsy, clinically unstable); timed tests not performed (followup_outputs[4] request_gait_and_balance_timed). Why: rule 3: the stored exam records gait not assessed because of altered mental status and clinical instability.
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: no parkinsonian signs; challenge not performed; gait and postural reflexes not assessable (followup_outputs[5] request_levodopa_challenge). Why: rule 3: the library describes a normal gait and postural reflexes in a drowsy patient who could not stand.
+- `perform_clinical_assessment {assessment_type: structured_headache_history_ichd3}`: new acute headache with red flags; criteria for a primary headache disorder not met (followup_outputs[6] request_structured_headache_history_ichd3). Why: rule 1 and 3: an acute febrile headache with neck stiffness, vomiting and falling consciousness; the library elicits no red flags.
+- `analyze_brain_mri`: diffuse leptomeningeal enhancement and sulcal FLAIR hyperintensity; maxillary sinus mucosal thickening; no complication (fallback_tool_outputs.mri). Why: rule 1 and 3: no MRI is stored; the stored CT shows maxillary sinus mucosal thickening, and an MRI with gadolinium in this patient would not be normal.
+- `analyze_eeg {eeg_type: continuous_icu}`: continuous generalised theta-delta slowing; no epileptiform discharges or seizures (followup_outputs[7] request_continuous_icu). Why: rule 3: the patient is drowsy and confused (GCS 13); a normal background contradicts the stored exam.
+- `analyze_eeg {eeg_type: ambulatory}`: continuous generalised theta-delta slowing; no epileptiform discharges or seizures (followup_outputs[8] request_ambulatory). Why: rule 3: the patient is drowsy and confused (GCS 13); a normal background contradicts the stored exam.
+- `perform_clinical_assessment {assessment_type: cognitive_screen}`: not completed (drowsy, inattentive); disoriented to time (followup_outputs[9] request_cognitive_screen). Why: rule 3: GCS 13, intermittently drowsy and disoriented to date; the library reports MoCA 28/30.
+- `order_specialized_test {test_type: neuropsych_battery}`: not completed (reduced arousal, inattention) (fallback_tool_outputs.specialized_test). Why: rule 3: a drowsy, confused patient cannot complete a battery in the average range.
+- `order_microbiology {specimen: whole_blood_pcr}`: Streptococcus pneumoniae DNA detected (fallback_tool_outputs.microbiology). Why: rule 3: blood cultures grow S. pneumoniae in 2 of 2 sets, a target of the panel; collected after 2 days of oral amoxicillin.
+- `perform_clinical_assessment {assessment_type: orthostatic_blood_pressure}`: supine BP 132/79, HR 114; standing not performed (followup_outputs[10] request_orthostatic_blood_pressure). Why: rule 3: HR 114 and a patient who cannot stand; the library reports HR 68 and 3 minutes of standing.
+- `interpret_labs {panels: [peripheral smear]}`: Howell-Jolly bodies, toxic granulation (fallback_tool_outputs.labs['peripheral smear']). Why: rule 2: splenectomy at age 38; stored WBC 18.4 with 13% bands.
+- `interpret_labs {panels: [HbA1c]}`: HbA1c 7.3% (fallback_tool_outputs.labs['HbA1c']). Why: rule 2: type 2 diabetes for 5 years on metformin.
+- `interpret_labs {panels: [ABG]}`: metabolic acidosis with partial respiratory compensation (fallback_tool_outputs.labs['ABG']). Why: rule 3: stored bicarbonate 18, lactate 3.4 and SpO2 95% in sepsis; the library reports a normal gas.
+- `interpret_labs {panels: [serum_osmolality]}`: serum osmolality 260 mOsm/kg (low) (fallback_tool_outputs.labs['serum_osmolality']). Why: rule 3: stored sodium 122 mmol/L (calculated osmolality about 262); the library reports 288 mOsm/kg.
+- Case fallback replaced, `analyze_eeg {eeg_type: routine}`: routine EEG now shows continuous generalised theta-delta slowing; no epileptiform discharges or seizures (was a normal awake and drowsy EEG) (fallback_tool_outputs.eeg). Why: rule 3: the patient is drowsy and confused (GCS 13); a normal background contradicts the stored exam.
+- Case fallback replaced, `analyze_ecg`: sinus tachycardia at 114 bpm, otherwise normal (was a normal ECG) (fallback_tool_outputs.ecg). Why: presenting heart rate 114 bpm.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

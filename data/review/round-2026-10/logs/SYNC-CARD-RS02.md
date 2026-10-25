@@ -100,3 +100,19 @@ Review-process wording (references to the round's rulings, the round policy file
 
 - criterion `action-8-order-advanced-imaging` label: "Cardiac MRI to characterise the substrate (optional)" -> "Cardiac MRI to characterise the substrate"
 - criterion `action-6-search-medical-literature` label: "Guideline lookup on pacing mode (optional)" -> "Guideline lookup on pacing mode"
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 70, ECOG 2 (fallback_tool_outputs.clinical_assessment). Why: rule 2: the library reports Karnofsky 100, no complaints and 'working' in a retired man with progressive fatigue, exertional dyspnoea and daily near-syncope.
+- `order_echocardiogram {echo_type: TEE}`: LVEF 42% with basal inferior hypokinesis, mild AS, no thrombus (fallback_tool_outputs.echo). Why: rule 3: the stored TTE shows LVEF 42%, LV dilatation and hypertrophy and mild aortic stenosis; the library TEE reports a normal heart.
+- `order_echocardiogram {echo_type: bubble_study}`: LVEF 42% and mild AS as on the TTE, no shunt (followup_outputs[9] request_bubble_study). Why: rule 3: the stored TTE is abnormal (LVEF 42%, mild AS); the library reports a normal heart.
+- `order_echocardiogram {echo_type: exercise_echo}`: persistent complete AV block, flat BP response, stopped early (followup_outputs[10] request_exercise_echo). Why: rule 3: the stored exercise test shows persistent complete AV block with a flat blood pressure response; the library reports a normal study at 9.5 METs.
+- `order_advanced_imaging {modality: coronary_CTA}`: severe mid RCA and moderate proximal LAD stenoses, calcium score 812 (fallback_tool_outputs.advanced_imaging). Why: rule 2: known two-vessel coronary artery disease at catheterisation and a stored inferior subendocardial scar on cardiac MRI; the library reports no plaque.
+- `order_advanced_imaging {modality: coronary_angiography}`: two-vessel disease (80% RCA, 60% LAD), LVEDP 21 mmHg (followup_outputs[11] request_coronary_angiography). Why: rule 2: two-vessel coronary artery disease on catheterisation five years ago, managed medically; the library reports normal coronaries.
+- `order_body_imaging {study: chest_abdomen_pelvis_CT}`: status post left nephrectomy, no recurrence, mild emphysema (fallback_tool_outputs.body_imaging). Why: rule 2: left radical nephrectomy three years ago; the library reports normal kidneys.
+- `order_body_imaging {study: pelvis_abdomen_CT}`: status post left nephrectomy, no recurrence (followup_outputs[12] request_pelvis_abdomen_ct). Why: rule 2: left radical nephrectomy three years ago; the library reports normal kidneys.
+- `order_body_imaging {study: pelvis_abdomen_MRI}`: status post left nephrectomy, no recurrence (followup_outputs[13] request_pelvis_abdomen_mri). Why: rule 2: left radical nephrectomy three years ago; the library reports normal kidneys.
+- `order_body_imaging {study: pelvis_abdomen_ultrasound}`: surgically absent left kidney, normal right kidney (followup_outputs[14] request_pelvis_abdomen_ultrasound). Why: rule 2: left radical nephrectomy three years ago; the library reports normal kidneys.
+- `interpret_labs {panels: [PTH]}`: intact PTH 96 pg/mL (fallback_tool_outputs.labs['PTH']). Why: rule 2: chronic kidney disease stage 3b (creatinine 1.6-1.7 mg/dL) after nephrectomy; the library reports a normal PTH.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

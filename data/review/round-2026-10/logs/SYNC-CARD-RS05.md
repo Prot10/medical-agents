@@ -93,3 +93,18 @@ Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym g
 Review-process wording (references to the round's rulings, the round policy file, the criteria packs, and tier markers such as "(optional)" in criterion labels and rationales) is shown to physicians in the review app, so it was rewritten in clinical language. The tier stays in the criterion's `importance` field; scoring is unchanged. `test_case_guards.py::test_no_review_process_text` now fails on any of it.
 
 - criterion `action-5-search-medical-literature` label: "Guideline lookup on VT management (optional)" -> "Guideline lookup on VT management"
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 70, ECOG 1 (fallback_tool_outputs.clinical_assessment). Why: rule 2: the library reports Karnofsky 100 with no complaints in a woman with heart failure limited to short walks on flat ground.
+- `order_echocardiogram {echo_type: TEE}`: dilated LV with LVEF 32%, inferior hypokinesis, no thrombus (fallback_tool_outputs.echo). Why: rule 3: the stored TTE shows a dilated LV with LVEF 32% and inferior hypokinesis; the library TEE reports a normal heart.
+- `order_echocardiogram {echo_type: bubble_study}`: LVEF 32% with inferior hypokinesis as on the TTE, no shunt (followup_outputs[8] request_bubble_study). Why: rule 3: the stored TTE is abnormal (dilated LV, LVEF 32%); the library reports a normal heart.
+- `order_echocardiogram {echo_type: exercise_echo}`: 3.8 METs, NSVT in recovery, fixed inferior hypokinesis (followup_outputs[9] request_exercise_echo). Why: rule 3: the stored exercise test stopped at 3.8 METs with non-sustained VT in recovery; the library reports a normal study at 9.5 METs with no arrhythmia.
+- `order_advanced_imaging {modality: cardiac_MRI}`: dilated LV, LVEF 31%, inferior and inferolateral infarct scar (fallback_tool_outputs.advanced_imaging). Why: rule 3: prior inferior STEMI with ischaemic cardiomyopathy (LVEF 32% on the stored TTE); the library reports a normal heart without late enhancement.
+- `order_advanced_imaging {modality: coronary_CTA}`: patent RCA stent, non-obstructive left coronary plaque (followup_outputs[10] request_coronary_cta). Why: rule 2: prior inferior STEMI treated with an RCA stent; the library reports no coronary plaque.
+- `order_advanced_imaging {modality: coronary_angiography}`: patent RCA stent, no new obstructive disease, LVEDP 22 mmHg (followup_outputs[11] request_coronary_angiography). Why: rule 2: prior inferior STEMI treated with an RCA stent; the library reports normal coronaries.
+- `order_body_imaging {study: chest_xray}`: cardiomegaly (CTR 0.56), no pulmonary oedema (fallback_tool_outputs.body_imaging). Why: rule 2: dilated left ventricle (LVEDD 6.2 cm) on the stored TTE; the library reports a normal cardiac silhouette.
+- `order_specialized_test {test_type: tilt_table}`: negative passive tilt at the patient's own rates (104/62 mmHg, 92 bpm) (fallback_tool_outputs.specialized_test). Why: the library answers with a generic study (118/74 mmHg, 68 bpm) unrelated to this patient; a tilt order gets the patient's own rates, and the result stays negative.
+- `order_specialized_test {test_type: emg_ncs}`: mild length-dependent sensory-predominant axonal polyneuropathy (followup_outputs[12] request_emg_ncs). Why: rule 2: type 2 diabetes for seven years with diminished vibration at the great toes and Achilles reflexes 1+; the library reports normal nerve conduction.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

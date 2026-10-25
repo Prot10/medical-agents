@@ -81,3 +81,13 @@ Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym g
 Review-process wording (references to the round's rulings, the round policy file, the criteria packs, and tier markers such as "(optional)" in criterion labels and rationales) is shown to physicians in the review app, so it was rewritten in clinical language. The tier stays in the criterion's `importance` field; scoring is unchanged. `test_case_guards.py::test_no_review_process_text` now fails on any of it.
 
 - metadata.revision_reason: "October 2026 review round: brain MRI recommended for the post-event deficit; criteria, outputs and assessment rebuilt to the FND criteria pack tiers. Close-out 24 Oct 2026: video-EEG optional and red-flag tests recommended, per the July 2026 agreement with the physicians that the examination is the only required diagnostic act." -> "October 2026 review round: brain MRI recommended for the post-event deficit; criteria, outputs and assessment rebuilt to the FND required, recommended and optional tiers. Close-out 24 Oct 2026: video-EEG optional and red-flag tests recommended, per the July 2026 agreement with the physicians that the examination is the only required diagnostic act."
+
+## Library contradictions (25 Oct 2026)
+
+Orders that reached the benchmark library's normal report although the case contradicts it now get a case-specific report (library answers stay for everything else).
+
+- `perform_clinical_assessment assessment_type=gait_and_balance_timed` -> `fallback_tool_outputs.clinical_assessment`: timed gait and balance: 19.8 s TUG, slow gait with exaggerated sway and lurching; walking backward was more fluent than walking forward. Why: the exam documents an abnormal gait; the library reports a normal timed gait (TUG 9.1 s).
+- `perform_clinical_assessment assessment_type=performance_status` -> `followup_outputs[request_performance_status]`: Karnofsky 60, ECOG 2. Why: the history documents limited activity; the library reports Karnofsky 100, ECOG 0, working.
+- `order_specialized_test test_type=neuropsych_battery` -> `followup_outputs[request_neuropsych_battery]`: cognition within normal limits; moderate anxiety, moderately severe depressive symptoms and elevated dissociative experiences; validity passed. Why: the history documents anxiety, depression or trauma-related symptoms; the library reports no significant mood or anxiety symptoms.
+
+Checks: `perfect_agent.py` pass; `test_case_guards.py -k FND-M03` pass; map verify (map_FND) problems 0; criterion-answer snapshot unchanged except `action-neuropsych-battery`, which the library answered before and the new report now answers.

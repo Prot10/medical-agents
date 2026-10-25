@@ -102,3 +102,15 @@ Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym g
 Review-process wording (references to the round's rulings, the round policy file, the criteria packs, and tier markers such as "(optional)" in criterion labels and rationales) is shown to physicians in the review app, so it was rewritten in clinical language. The tier stays in the criterion's `importance` field; scoring is unchanged. `test_case_guards.py::test_no_review_process_text` now fails on any of it.
 
 - criterion `action-8-search-medical-literature` label: "Guideline lookup on ARVC diagnosis and ICD indications (optional)" -> "Guideline lookup on ARVC diagnosis and ICD indications"
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 90, ECOG 0 (fallback_tool_outputs.clinical_assessment). Why: rule 2: the library reports Karnofsky 100 with no evidence of disease in a man with two exertional syncopes today.
+- `order_specialized_test {test_type: tilt_table}`: negative passive tilt at the patient's own rates (139/78 mmHg, 84 bpm) (fallback_tool_outputs.specialized_test). Why: the library answers with a generic study (118/74 mmHg, 68 bpm) unrelated to this patient; a tilt order gets the patient's own rates, and the result stays negative.
+- `order_echocardiogram {echo_type: TEE}`: dilated hypokinetic RV with basal free-wall bulge, normal LV (fallback_tool_outputs.echo). Why: rule 3: the stored TTE shows a dilated RV (FAC 30%) with basal free-wall akinesia; the library TEE reports a normal heart.
+- `order_echocardiogram {echo_type: bubble_study}`: dilated hypokinetic RV as on the TTE, no right-to-left shunt (followup_outputs[13] request_bubble_study). Why: rule 3: the stored TTE shows RV dilatation and dysfunction; the library reports a normal heart.
+- `order_echocardiogram {echo_type: exercise_echo}`: exercise-induced sustained LBBB-morphology VT with collapse; RV dysfunction at rest (followup_outputs[14] request_exercise_echo). Why: rule 3: the stored TTE shows RV dysfunction and the stored exercise test provoked sustained VT; the library reports a normal exercise echo.
+- `order_specialized_test {test_type: polysomnography}`: mild obstructive sleep apnoea, AHI 11/h (followup_outputs[15] request_polysomnography). Why: rule 2: known mild obstructive sleep apnoea with intermittent CPAP; the library reports AHI 2.1/h.
+- `interpret_labs {panels: [HbA1c]}`: HbA1c 6.0% (elevated) (fallback_tool_outputs.labs['HbA1c']). Why: rule 2: prediabetes with a documented HbA1c of 6.0%; the library reports 5.4%.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

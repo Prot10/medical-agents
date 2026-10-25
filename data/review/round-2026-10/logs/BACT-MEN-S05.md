@@ -81,3 +81,15 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 30, ECOG 3 (fallback_tool_outputs.clinical_assessment). Why: rule 3: febrile (39.8 C), tachycardic (HR 124), hypotensive after a fluid bolus, with spreading purpura; the library's Karnofsky 100 describes a person without disease.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: slowed antalgic gait, no ataxia (followup_outputs[4] request_gait_and_balance_timed). Why: rule 3: the stored exam records a slow, hunched, antalgic gait; the library reports normal timed values.
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: no parkinsonian signs; neck stiffness noted; challenge not administered (followup_outputs[5] request_levodopa_challenge). Why: rule 3: the library reports a normal neck and gait in a patient with marked nuchal rigidity and an antalgic gait; no challenge would be given without parkinsonism.
+- `perform_clinical_assessment {assessment_type: structured_headache_history_ichd3}`: new acute headache with red flags; criteria for a primary headache disorder not met (followup_outputs[6] request_structured_headache_history_ichd3). Why: rule 1 and 3: an acute febrile headache with neck stiffness and a spreading purpuric rash; the library elicits no red flags.
+- `perform_clinical_assessment {assessment_type: orthostatic_blood_pressure}`: supine BP 102/62, HR 124; standing not performed (followup_outputs[7] request_orthostatic_blood_pressure). Why: rule 3: vitals BP 102/62 and HR 124 after a fluid bolus in septic shock; the library reports HR 68 and 3 minutes of standing.
+- `interpret_labs {panels: [ABG]}`: lactic metabolic acidosis with partial respiratory compensation (fallback_tool_outputs.labs['ABG']). Why: rule 3: stored bicarbonate 17, lactate 3.6, RR 22 and hypotension in septic shock; the library reports a normal gas.
+- `interpret_labs {panels: [peripheral smear]}`: toxic granulation, thrombocytopenia, occasional schistocytes (fallback_tool_outputs.labs['peripheral smear']). Why: rule 3: stored platelets 94, fibrinogen 158, INR 1.4 and D-dimer 5.2 with a purpuric rash; the library reports a normal smear.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

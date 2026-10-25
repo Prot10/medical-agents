@@ -83,3 +83,16 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 30, ECOG 3 (fallback_tool_outputs.clinical_assessment). Why: rule 3: febrile (38.6 C), tachycardic (HR 108), mildly inattentive and able to take only a few assisted steps; the library's Karnofsky 100 describes a person without disease.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: not performed (headache, photophobia); a few assisted steps with normal base (followup_outputs[5] request_gait_and_balance_timed). Why: rule 3: the stored exam records gait not fully assessed; he could only stand with assistance and take a few steps.
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: no parkinsonian signs; challenge not performed; gait and postural reflexes not assessable (followup_outputs[6] request_levodopa_challenge). Why: rule 3: the library describes a normal gait and postural reflexes in a patient who could take only a few assisted steps.
+- `perform_clinical_assessment {assessment_type: structured_headache_history_ichd3}`: new acute headache with red flags; criteria for a primary headache disorder not met (followup_outputs[7] request_structured_headache_history_ichd3). Why: rule 1 and 3: an acute febrile worst-ever headache with neck stiffness and vomiting; the library elicits no red flags.
+- `analyze_brain_mri`: leptomeningeal enhancement; right maxillary and ethmoid sinus disease; no complication (fallback_tool_outputs.mri). Why: rule 1 and 3: no MRI is stored; the stored CT shows right maxillary and ethmoid sinus disease, and an MRI with gadolinium in this patient would not be normal.
+- `perform_clinical_assessment {assessment_type: cognitive_screen}`: MoCA 24/30 with mild inattention and reduced recall (followup_outputs[8] request_cognitive_screen). Why: rule 3: the stored exam records mild inattention, recall 2 of 3 and disorientation to date; the library reports MoCA 28/30.
+- `order_specialized_test {test_type: neuropsych_battery}`: mildly reduced attention, processing speed and recall (fallback_tool_outputs.specialized_test). Why: rule 3: the stored exam records mild inattention and reduced recall during an acute febrile illness.
+- `perform_clinical_assessment {assessment_type: orthostatic_blood_pressure}`: supine BP 122/78, HR 108; standing not performed (followup_outputs[9] request_orthostatic_blood_pressure). Why: rule 3: HR 108 and only assisted standing; the library reports HR 68 and 3 minutes of standing.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

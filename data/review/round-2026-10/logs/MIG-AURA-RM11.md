@@ -117,3 +117,16 @@ Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it na
 - Scoring: none (recommended criterion; any call matching the old order still matches).
 
 Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the normal-row probe reports nothing for this criterion.
+
+## Library contradictions (25 Oct 2026)
+
+Case-specific reports stored where the benchmark library's normal report contradicted the case. Why: acute attack with continuous left hemispheric slowing on the stored EEGs, confusion, motor aphasia, right hemiparesis (arm 3/5, leg 4/5), a right homonymous field restriction and a bed-bound patient; the library reports a normal ambulatory EEG, full fields, normal language, MoCA 28/30, normal gait and Karnofsky 100.
+
+- EEG ambulatory: continuous left hemispheric slowing, no seizures or IEDs (followup request_ambulatory_eeg)
+- visual_field_perimetry: incomplete right homonymous restriction, limited reliability (fallback_tool_outputs.specialized_test)
+- speech_language_evaluation: non-fluent motor aphasia, simple commands followed (followup request_speech_language_evaluation)
+- cognitive_screen: not scorable, confused and aphasic (fallback_tool_outputs.clinical_assessment)
+- gait_and_balance_timed: not possible, bed-bound with right hemiparesis (followup request_gait_and_balance_timed)
+- performance_status: ECOG 4, bed-bound during the attack (followup request_performance_status)
+
+Checks: `perfect_agent.py` pass; `test_case_guards.py -k MIG-AURA-RM11` pass; no fixed order still answered by the library (`lib4.source`); no 60-character window of any criterion's expected_evidence in the added text; every criterion's served output unchanged (snapshot diff against the baseline).

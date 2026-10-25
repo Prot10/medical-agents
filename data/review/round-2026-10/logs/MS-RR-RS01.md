@@ -84,3 +84,10 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+- `order_specialized_test {test_type: visual_field_perimetry}`: 1. Mild generalized depression of the left visual field (MD -4.6 dB) without a focal defect. 2. Normal right visual field. (fallback_tool_outputs.specialized_test). Why: rule c: longstanding dense left amblyopia (acuity 6/75): the left field is not normal; the library reports a normal study.
+- `order_specialized_test {test_type: vep}`: 1. Reduced P100 amplitude, left eye (3.1 uV; fellow eye 9.8 uV), with a P100 latency within normal limits (111 ms; reference < 115 ms). 2. Normal right eye response. (followup_outputs[request_vep]). Why: rule c: dense left amblyopia (6/75): the pattern response of the amblyopic eye is reduced; the library reports a normal study.
+
+Checks: perfect agent ok; case guards pass; snapshot diff shows no criterion answer changed; map verified (served without the library).

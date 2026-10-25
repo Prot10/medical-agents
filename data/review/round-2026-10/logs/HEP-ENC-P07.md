@@ -91,3 +91,20 @@ Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it na
 - Scoring: coverage unchanged (any call matching the old order still matches); the cost reference of the required work-up now uses the new first order.
 
 Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the normal-row probe reports nothing for this criterion.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: cognitive_screen}`: MoCA 25/30, just below the normal range (26 or above), with points lost on attention, executive and delayed-recall items; orientation, naming and abstraction ... (fallback_tool_outputs.clinical_assessment). Why: six weeks of forgetfulness and spreadsheet errors with a stored PHES of -5: a MoCA of 28/30 overstates him.
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 90, ECOG 0. Normal activity with minor symptoms. (followup_outputs[request_performance_status]). Why: Karnofsky 100 / ECOG 0 contradicts an outpatient with symptoms at work.
+- `analyze_eeg {eeg_type: video}`: Prolonged video-EEG over 24 hours: Posterior dominant rhythm 7.5 Hz, below the adult lower limit of 8 Hz, with intermittent diffuse theta (5-7 Hz ... (fallback_tool_outputs.eeg). Why: the stored routine EEG is abnormal; a prolonged recording cannot show a normal background.
+- `analyze_eeg {eeg_type: ambulatory}`: 48-hour ambulatory EEG: Posterior dominant rhythm 7.5 Hz, below the adult lower limit of 8 Hz, with intermittent diffuse theta (5-7 Hz, approximately 10% of ... (followup_outputs[request_ambulatory]). Why: the stored routine EEG is abnormal; a 48-hour recording cannot be normal.
+- `order_advanced_imaging {modality: MR_spectroscopy}`: Abnormal MR spectroscopy: mild reduction of myo-inositol (mI/Cr 0.42) and choline (Cho/Cr 0.66) with an increased glutamine-glutamate (Glx) peak; NAA ... (fallback_tool_outputs.advanced_imaging). Why: characteristic test of the condition: reduced myo-inositol and choline with raised Glx.
+- `order_body_imaging {study: pelvis_abdomen_ultrasound}`: Abdominal and pelvic ultrasound with Doppler: 1. Cirrhotic liver morphology with increased echogenicity. 2. No focal liver lesion. 3. Patent portal vein. 4. ... (fallback_tool_outputs.body_imaging). Why: cirrhosis with no ascites: the library reports a normal liver and spleen.
+- `order_body_imaging {study: pelvis_abdomen_CT}`: Contrast-enhanced CT of the abdomen and pelvis (arterial and portal venous phases): 1. Cirrhotic liver morphology with steatosis. 2. No focal liver lesion. 3. ... (followup_outputs[request_pelvis_abdomen_ct]). Why: cirrhosis with no ascites: the library reports a normal liver and spleen.
+- `order_body_imaging {study: pelvis_abdomen_MRI}`: Contrast-enhanced MRI of the abdomen and pelvis: 1. Cirrhotic liver morphology with steatosis. 2. No focal liver lesion. 3. Patent portal vein. 4. Spleen of ... (followup_outputs[request_pelvis_abdomen_mri]). Why: cirrhosis with no ascites: the library reports a normal liver and spleen.
+- `interpret_labs {panels: [peripheral_smear]}`: Normocytic, normochromic red cells with occasional target cells; normal white cell morphology; platelets reduced in number, of normal morphology, without ... (fallback_tool_outputs.labs[peripheral_smear]). Why: stored CBC: platelets 148: 'adequate platelets' contradicts it.
+- `order_specialized_test {test_type: polysomnography}`: Severe obstructive sleep apnoea (AHI 32/h) with significant nocturnal hypoxaemia (nadir 79%, 18% of sleep below 90%) and fragmented sleep with reduced ... (fallback_tool_outputs.specialized_test). Why: OSA with CPAP used 3.2 h/night and SpO2 < 90% for 18% of the night.
+
+Checks: `perfect_agent.py` pass; `test_case_guards.py -k HEP-ENC-P07` pass; the map verifier serves every listed term from the case; the snapshot of the 322 previously case-answered orders is unchanged.
+
+Lab prose (25 Oct 2026, same pass): the fallback-labs interpretation now gives the smear as one sentence headed `Peripheral blood smear:` (commas, no semicolons), so an order for another panel no longer receives smear fragments; the smear rows are unchanged.

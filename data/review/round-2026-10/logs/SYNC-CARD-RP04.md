@@ -94,3 +94,12 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `initial_tool_outputs.eeg`: `eeg_type` set to `routine`, named in the report's own text.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 80, ECOG 1 (fallback_tool_outputs.clinical_assessment). Why: rule 2: the library reports Karnofsky 100 with no complaints in a woman who avoids exertion after five collapses in two months.
+- `order_specialized_test {test_type: exercise_stress_test}`: normal at the patient's own rates (rest 62 bpm, PR 192 ms), 1:1 conduction throughout (fallback_tool_outputs.specialized_test). Why: the library answers with a generic study (resting HR 68, 10.4 METs) unrelated to this patient; an exercise order gets the patient's own rates and baseline PR, and the result stays normal, as paroxysmal AV block need not appear on exercise.
+- `order_specialized_test {test_type: tilt_table}`: negative passive tilt at the patient's own rates (122/74 mmHg, 62 bpm) (followup_outputs[9] request_tilt_table). Why: the library answers with a generic study (118/74 mmHg, 68 bpm) unrelated to this patient; a tilt order gets the patient's own rates, and the result stays negative.
+- `order_echocardiogram {echo_type: exercise_echo}`: normal at the patient's own rates (9.4 METs, 62 to 166 bpm), 1:1 conduction (fallback_tool_outputs.echo). Why: the library answers with a generic study (9.5 METs, 90% of the predicted heart rate) unrelated to this patient; an exercise echo gets the rates and workload of the patient's own exercise test, and the result stays as that test.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

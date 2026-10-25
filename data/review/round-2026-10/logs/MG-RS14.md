@@ -72,3 +72,17 @@ Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym g
 - The FVC mL/kg figures and the weight-based IVIg amounts in the text were checked against this weight: all within rounding, no text change.
 
 Checks: `perfect_agent.py` ok; BMI = weight / height^2 to one decimal.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 40, ECOG 3 (disabled; requires special care and assistance) (fallback_tool_outputs.clinical_assessment). Why: rule 1: the library reports Karnofsky 100 / ECOG 0 (no evidence of disease, working); rule 3: NG-tube feeding, severe bulbar weakness and freezing of gait, living with a daily aide.
+- `order_specialized_test {test_type: emg_ncs}`: normal nerve conductions and needle EMG, stating that neuromuscular transmission was not assessed (fallback_tool_outputs.specialized_test). Why: rule 1: the library report concludes there is no neuromuscular junction disorder, which routine conductions and needle EMG without repetitive stimulation cannot assess and which is not true here; MuSK-positive myasthenia with a facial decrement on the stored RNS.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: festinating gait with freezing, TUG 24.5 s, Berg 38/56 (followup_outputs[4] request_gait_and_balance_timed). Why: rule 3: freezing and festinating gait with en-bloc turning in the examination; the library reports a normal timed gait (TUG 9.1 s, Berg 56/56).
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: MDS-UPDRS III 41 to 35 (15%), axial and bulbar signs unchanged (followup_outputs[5] request_levodopa_challenge). Why: rule 2 and 3: parkinsonism treated with levodopa with a modest response in the history; the library reports a drug-naive patient without parkinsonian signs.
+- `order_specialized_test {test_type: speech_language_evaluation}`: severe mixed flaccid-hypokinetic dysarthria; language normal (followup_outputs[6] request_speech_language_evaluation). Why: rule 3: the library reports no dysarthria; the examination documents severe dysarthria with hypophonia and nasal speech.
+- `perform_clinical_assessment {assessment_type: cognitive_screen}`: MoCA 23/30 with executive deficits, limited by dysarthria (followup_outputs[7] request_cognitive_screen). Why: rule 3: mild executive dysfunction on bedside testing; the library reports MoCA 28/30.
+- `order_specialized_test {test_type: neuropsych_battery}`: mild dysexecutive profile (followup_outputs[8] request_neuropsych_battery). Why: rule 3: mild executive dysfunction on bedside testing; the library reports all domains in the average range.
+- `order_advanced_imaging {modality: DaTscan}`: abnormal, asymmetric putaminal loss (fallback_tool_outputs.advanced_imaging). Why: rule 2 and 3: asymmetric left-predominant rest tremor with a modest levodopa response and reduced nigral signal on the stored MRI; the library reports a normal DaTscan.
+- `order_specialized_test {test_type: muscle_biopsy}`: type I and II fibre atrophy, normal COX and SDH (followup_outputs[9] request_muscle_biopsy). Why: rule 3: the history records a biceps biopsy with type I and II fibre atrophy without COX or SDH abnormalities; the library reports normal histology.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

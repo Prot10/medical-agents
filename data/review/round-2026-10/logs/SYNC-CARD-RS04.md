@@ -97,3 +97,11 @@ Review-process wording (references to the round's rulings, the round policy file
 - criterion `action-9-order-advanced-imaging` label: "Cardiac MRI (optional)" -> "Cardiac MRI"
 - criterion `action-6-check-drug-interactions` label: "Medication review before acute antiarrhythmic therapy (optional)" -> "Medication review before acute antiarrhythmic therapy"
 - criterion `action-7-search-medical-literature` label: "Guideline lookup on pre-excitation management (optional)" -> "Guideline lookup on pre-excitation management"
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 90, ECOG 0 (fallback_tool_outputs.clinical_assessment). Why: rule 2: the library reports Karnofsky 100 with no complaints in a man with three months of palpitations and a syncope today.
+- `order_echocardiogram {echo_type: exercise_echo}`: pre-excitation persisting to 168 bpm, normal contractile response (fallback_tool_outputs.echo). Why: rule 3: the stored exercise test shows pre-excitation persisting to 168 bpm at 11.2 METs; the library reports a generic study at 9.5 METs with an interpretable ECG and no mention of pre-excitation.
+- `order_specialized_test {test_type: tilt_table}`: negative passive tilt at the patient's own rates (122/78 mmHg, 72 bpm) (fallback_tool_outputs.specialized_test). Why: the library answers with a generic study (118/74 mmHg, 68 bpm) unrelated to this patient; a tilt order gets the patient's own rates, and the result stays negative.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

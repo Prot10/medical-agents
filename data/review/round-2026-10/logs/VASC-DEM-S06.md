@@ -77,3 +77,27 @@ Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym g
 - Why: rule 1: patient.physical_exam.general states weight 82 kg, height 174 cm.
 
 Checks: `perfect_agent.py` ok; BMI = weight / height^2 to one decimal.
+
+## Library contradictions (25 Oct 2026)
+
+A fresh order of each study below was answered by the benchmark-level normal library, which contradicted this patient (age, rhythm, devices, surgery, stored findings). Each now has a case-specific report:
+
+- FDG_PET: Focal metabolic defects in three arterial territories (left frontal opercular-insular, right middle frontal, left parieto-occipital) with right caudate reduction and mild crossed cerebellar diaschisis, a pattern consistent with multiple infarcts. No temporoparietal-predominant pattern. (fallback_tool_outputs.advanced_imaging)
+- perfusion_SPECT: Focal perfusion defects in three arterial territories (left frontal opercular-insular, right middle frontal, left parieto-occipital) with right caudate reduction and mild crossed cerebellar diaschisis, a pattern consistent with multiple infarcts. No temporoparietal-predominant pattern. (followup request_perfusion_spect)
+- performance_status: Karnofsky 70 (cares for self; unable to carry on normal activity or active work), ECOG 1 (restricted in strenuous activity, able to carry out light work). (fallback_tool_outputs.clinical_assessment)
+- exercise_stress_test: Reduced exercise capacity (3.6 METs) in atrial fibrillation; ST segments not interpretable for ischaemia. (fallback_tool_outputs.specialized_test)
+- gait_and_balance_timed: Timed Up and Go 11.9 s with mildly reduced right arm swing and imperfect tandem gait. (followup request_gait_and_balance_timed)
+- levodopa_challenge: MDS-UPDRS III 7/132 OFF and 7/132 ON (0% change), below the 30% threshold for a clinically meaningful levodopa response. (followup request_levodopa_challenge)
+- TEE: Mild concentric left ventricular hypertrophy; dilated left atrium; atrial fibrillation with low appendage emptying velocity and mild spontaneous echo contrast, without appendage thrombus; aortic valve sclerosis without stenosis. No patent foramen ovale and no left atrial appendage thrombus. (fallback_tool_outputs.echo)
+- cardiac_MRI: Dilated left atrium, imaged in atrial fibrillation, with mild concentric hypertrophy and preserved function (LVEF 58%); no scar or thrombus. (followup request_cardiac_mri)
+- electrophysiology_study: Atrial fibrillation throughout; normal His-Purkinje conduction (HV 48 ms); no inducible ventricular arrhythmia. (followup request_electrophysiology_study)
+- speech_language_evaluation: Mild anomia in fluent speech; repetition and comprehension intact; no motor speech disorder. (followup request_speech_language_evaluation)
+- DTI_tractography: Interrupted frontal terminations of the left arcuate fasciculus and reduced left corticospinal contribution from the lower precentral gyrus; optic radiations intact. (followup request_dti_tractography)
+- CT_perfusion: Matched perfusion defects confined to chronic tissue loss (left frontal operculum, insula and lower precentral gyrus; right middle frontal gyrus; left parieto-occipital cortex); no acute core or penumbral mismatch. (followup request_ct_perfusion)
+- perfusion_MRI: Matched perfusion defects confined to chronic tissue loss (left frontal operculum, insula and lower precentral gyrus; right middle frontal gyrus; left parieto-occipital cortex); no acute core or penumbral mismatch. (followup request_perfusion_mri)
+- MR_angiography: Mild bilateral carotid bulb disease (right 30-40%, left under 30%); no intracranial stenosis or occlusion. (followup request_mr_angiography)
+- cerebral_angiography: Mild right internal carotid bulb stenosis (35%); no intracranial stenosis, occlusion or aneurysm. (followup request_cerebral_angiography)
+- functional_MRI: Reduced activation of the left inferior frontal and lower precentral cortex adjacent to the opercular infarct, with perilesional and right inferior frontal recruitment; overall left hemispheric language dominance. (followup request_functional_mri)
+- BNP: 168 pg/mL, raised (fallback_tool_outputs.labs[BNP])
+
+Checks: `perfect_agent.py` pass; `test_case_guards.py -k VASC-DEM-S06` pass; criterion outputs unchanged against the pre-pass snapshot; no 60-character window of any expected_evidence in the new reports; synonym guard 0 changes.

@@ -106,3 +106,25 @@ Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the norma
 - Why: rule 1: patient.physical_exam.general states weight 57.7 kg, height 158 cm.
 
 Checks: `perfect_agent.py` ok; BMI = weight / height^2 to one decimal.
+
+## Library contradictions (25 Oct 2026)
+
+A fresh order of each study below was answered by the benchmark-level normal library, which contradicted this patient (age, rhythm, devices, surgery, stored findings). Each now has a case-specific report:
+
+- FDG_PET: Focal left occipital metabolic defect with adjacent left posterior hypometabolism and mild patchy right posterior cortical hypometabolism; the posterior cingulate and medial temporal lobes are preserved. (fallback_tool_outputs.advanced_imaging)
+- perfusion_SPECT: Focal left occipital perfusion defect with adjacent left posterior hypoperfusion and mild patchy right posterior cortical hypoperfusion; the posterior cingulate and medial temporal lobes are preserved. (followup request_perfusion_spect)
+- performance_status: Karnofsky 60 (requires occasional assistance but able to care for most needs), ECOG 2 (ambulatory and capable of all self-care, unable to carry out any work activities). (fallback_tool_outputs.clinical_assessment)
+- exercise_stress_test: Very low workload (2.5 METs) limited by unsteadiness; atrial fibrillation throughout; non-diagnostic for ischaemia. (fallback_tool_outputs.specialized_test)
+- amyloid_PET: Amyloid-positive PET, posterior predominant (occipital and posterior parietal), with a photopenic defect at the left occipital cavity. (followup request_amyloid_pet)
+- gait_and_balance_timed: Slowed, cautious gait (Timed Up and Go 16.4 s) with reduced balance and a raised fall risk. (followup request_gait_and_balance_timed)
+- levodopa_challenge: MDS-UPDRS III 11/132 OFF and 11/132 ON (0% change), below the 30% threshold for a clinically meaningful levodopa response. (followup request_levodopa_challenge)
+- TEE: Mild concentric left ventricular hypertrophy; moderately dilated left atrium; atrial fibrillation with low appendage emptying velocity and mild spontaneous echo contrast, without appendage thrombus; aortic valve sclerosis without stenosis. No patent foramen ovale and no left atrial appendage thrombus. (followup request_tee)
+- cardiac_MRI: Moderately dilated left atrium, imaged in atrial fibrillation; preserved left ventricular function; no scar or thrombus. (followup request_cardiac_mri)
+- electrophysiology_study: Atrial fibrillation throughout; normal His-Purkinje conduction (HV 48 ms); no inducible ventricular arrhythmia. (followup request_electrophysiology_study)
+- visual_field_perimetry: Complete congruous right homonymous hemianopia on automated perimetry (24-2). (followup request_visual_field_perimetry)
+- DTI_tractography: Interruption of the left optic radiation at the occipital haemorrhage cavity with posterior-predominant reduced fractional anisotropy; corticospinal tracts intact. (followup request_dti_tractography)
+- CT_perfusion: Matched perfusion defects confined to chronic tissue loss (left occipital lobe (haemorrhage cavity)); no acute core or penumbral mismatch. (followup request_ct_perfusion)
+- perfusion_MRI: Matched perfusion defects confined to chronic tissue loss (left occipital lobe (haemorrhage cavity)); no acute core or penumbral mismatch. (followup request_perfusion_mri)
+- BNP: 196 pg/mL, raised (fallback_tool_outputs.labs[BNP])
+
+Checks: `perfect_agent.py` pass; `test_case_guards.py -k VASC-DEM-P04` pass; criterion outputs unchanged against the pre-pass snapshot; no 60-character window of any expected_evidence in the new reports; synonym guard 0 changes.

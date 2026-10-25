@@ -74,3 +74,23 @@ Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym g
 - Why: rule 1: patient.physical_exam.general states weight 70 kg, height 165 cm.
 
 Checks: `perfect_agent.py` ok; BMI = weight / height^2 to one decimal.
+
+## Library contradictions (25 Oct 2026)
+
+A fresh order of each study below was answered by the benchmark-level normal library, which contradicted this patient (age, rhythm, devices, surgery, stored findings). Each now has a case-specific report:
+
+- FDG_PET: Focal metabolic defects in the right parietal and left lateral occipital cortex with a focal left thalamic reduction and mild crossed cerebellar diaschisis, a pattern consistent with multiple infarcts. No temporoparietal-predominant pattern. (fallback_tool_outputs.advanced_imaging)
+- perfusion_SPECT: Focal perfusion defects in the right parietal and left lateral occipital cortex with a focal left thalamic reduction and mild crossed cerebellar diaschisis, a pattern consistent with multiple infarcts. No temporoparietal-predominant pattern. (followup request_perfusion_spect)
+- performance_status: Karnofsky 70 (cares for self; unable to carry on normal activity or active work), ECOG 1 (restricted in strenuous activity, able to carry out light work). (fallback_tool_outputs.clinical_assessment)
+- exercise_stress_test: No electrocardiographic evidence of inducible ischaemia at 5.8 METs; frequent premature atrial complexes. (fallback_tool_outputs.specialized_test)
+- gait_and_balance_timed: Timed Up and Go 11.2 s with reduced left arm swing; balance near normal. (followup request_gait_and_balance_timed)
+- levodopa_challenge: MDS-UPDRS III 6/132 OFF and 6/132 ON (0% change), below the 30% threshold for a clinically meaningful levodopa response. (followup request_levodopa_challenge)
+- TEE: Mild concentric left ventricular hypertrophy; aortic valve sclerosis without stenosis. No patent foramen ovale and no left atrial appendage thrombus. (followup request_tee)
+- DTI_tractography: Interruption of the right arcuate fasciculus at the parietal infarct with reduced fractional anisotropy in the adjacent right corticospinal tract; optic radiations intact. (followup request_dti_tractography)
+- CT_perfusion: Matched perfusion defects confined to chronic tissue loss (right parietal cortex; left lateral occipital cortex); no acute core or penumbral mismatch. (followup request_ct_perfusion)
+- perfusion_MRI: Matched perfusion defects confined to chronic tissue loss (right parietal cortex; left lateral occipital cortex); no acute core or penumbral mismatch. (followup request_perfusion_mri)
+- MR_angiography: Minimal right carotid bulb irregularity (under 30%); no stenosis, occlusion or dissection elsewhere. (followup request_mr_angiography)
+- cerebral_angiography: Minimal right carotid bulb irregularity; no stenosis, occlusion or aneurysm. (followup request_cerebral_angiography)
+- pelvis_abdomen_ultrasound: Post-hysterectomy pelvis without mass; normal upper abdomen. (fallback_tool_outputs.body_imaging)
+
+Checks: `perfect_agent.py` pass; `test_case_guards.py -k VASC-DEM-S07` pass; criterion outputs unchanged against the pre-pass snapshot; no 60-character window of any expected_evidence in the new reports; synonym guard 0 changes.

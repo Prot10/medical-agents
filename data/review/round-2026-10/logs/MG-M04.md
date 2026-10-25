@@ -82,3 +82,18 @@ Review-process wording (references to the round's rulings, the round policy file
 - The FVC mL/kg figures and the weight-based IVIg amounts in the text were checked against this weight: all within rounding, no text change.
 
 Checks: `perfect_agent.py` ok; BMI = weight / height^2 to one decimal.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 50, ECOG 3 (requires considerable assistance and frequent care) (fallback_tool_outputs.clinical_assessment). Why: rule 1: the library reports Karnofsky 100 / ECOG 0 (no evidence of disease, working); rule 3: MGFA class III exacerbation needing assistance to rise, with accessory muscle use.
+- `order_specialized_test {test_type: emg_ncs}`: normal nerve conductions and needle EMG, stating that neuromuscular transmission was not assessed (fallback_tool_outputs.specialized_test). Why: rule 1: the library report concludes there is no neuromuscular junction disorder, which routine conductions and needle EMG without repetitive stimulation cannot assess and which is not true here; the stored RNS study reports normal nerve conductions, which this report keeps.
+- `interpret_labs {panels: [clustered_AChR_cell_based]}`: clustered AChR antibody (cell-based assay) positive (fallback_tool_outputs.labs['clustered_AChR_cell_based']). Why: rule 1: AChR-antibody-positive myasthenia (stored AChR binding antibody 3.2 nmol/L); a cell-based clustered AChR assay is positive when the binding assay is.
+- `order_specialized_test {test_type: emg_single_fiber}`: markedly increased jitter with blocking in EDC and frontalis (followup_outputs[1] request_emg_single_fiber). Why: rule 1: AChR-positive generalized MG in exacerbation with a 16-21% decrement on the stored RNS; the library reports normal jitter.
+- `order_specialized_test {test_type: ice_pack_test}`: positive on the right (MRD1 +2.5 mm) (followup_outputs[2] request_ice_pack_test). Why: rule 3: bilateral fatigable ptosis, right greater than left; the library reports no ptosis at baseline.
+- `interpret_labs {panels: [HbA1c]}`: HbA1c 7.3% (elevated) (fallback_tool_outputs.labs['HbA1c']). Why: rule 2: type 2 diabetes on metformin, taking prednisone 10 mg; the library reports HbA1c 5.4%.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: TUG 21 s, gait speed 0.62 m/s, needs arm push-off to rise (followup_outputs[3] request_gait_and_balance_timed). Why: rule 3: the library reports a normal timed gait (TUG 9.1 s, Berg 56/56); the examination documents a slow, effortful, mildly wide-based gait with hip flexors 4-/5 and help needed to rise from a chair.
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: no parkinsonian signs and no levodopa response; points from gait and chair rise only (followup_outputs[4] request_levodopa_challenge). Why: rule 3: the library levodopa challenge describes normal gait, arm swing and postural reflexes, while the examination documents a slow, effortful, mildly wide-based gait.
+- `order_specialized_test {test_type: speech_language_evaluation}`: moderate fatigable flaccid dysarthria with hypernasality; language normal (followup_outputs[5] request_speech_language_evaluation). Why: rule 3: the library reports no dysarthria; the examination documents nasal dysarthria after 60 seconds of speech.
+- `interpret_labs {panels: [ABG]}`: pH 7.41, pCO2 43, pO2 82 mmHg on room air, no hypercapnia (fallback_tool_outputs.labs['ABG']). Why: rule 3: the stored respiratory function report gives this room-air gas (pH 7.41, PaCO2 43, PaO2 82 mmHg, HCO3 27); the library reports pH 7.40, pCO2 40, pO2 92 mmHg.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

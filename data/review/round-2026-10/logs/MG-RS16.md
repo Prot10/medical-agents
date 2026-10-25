@@ -86,3 +86,18 @@ Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the norma
 - The FVC mL/kg figures and the weight-based IVIg amounts in the text were checked against this weight: all within rounding, no text change.
 
 Checks: `perfect_agent.py` ok; BMI = weight / height^2 to one decimal.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 60, ECOG 2 (requires occasional assistance; cares for most needs) (fallback_tool_outputs.clinical_assessment). Why: rule 1: the library reports Karnofsky 100 / ECOG 0 (no evidence of disease, working); rule 3: neck extensors 2/5 with head drop limiting activity, retired.
+- `order_specialized_test {test_type: emg_ncs}`: normal nerve conductions and needle EMG, stating that neuromuscular transmission was not assessed (fallback_tool_outputs.specialized_test). Why: rule 1: the library report concludes there is no neuromuscular junction disorder, which routine conductions and needle EMG without repetitive stimulation cannot assess and which is not true here; the stored RNS study reports normal needle EMG, which this report keeps.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: mildly shuffling gait with head drop, TUG 12.6 s (followup_outputs[2] request_gait_and_balance_timed). Why: rule 3: the library reports a normal timed gait (TUG 9.1 s, Berg 56/56); the examination documents a slightly shuffling gait with mild festination and head drop.
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: MDS-UPDRS III 18 to 14 (22%), equivocal; head drop unchanged (followup_outputs[3] request_levodopa_challenge). Why: rule 3: the library levodopa challenge describes normal gait, arm swing and postural reflexes, while the examination documents hypomimia, bradykinesia, asymmetric rigidity and a shuffling gait.
+- `order_specialized_test {test_type: speech_language_evaluation}`: mild fatigable dysphonia; language normal (followup_outputs[4] request_speech_language_evaluation). Why: rule 3: the library reports no dysarthria; the examination documents a hoarse, quieter voice worse at the end of conversations.
+- `interpret_labs {panels: [glucose]}`: fasting glucose 136 mg/dL (elevated) (fallback_tool_outputs.labs['glucose']). Why: rule 2: type 2 diabetes on metformin with HbA1c 7.4% (stored); the library reports a normal fasting glucose.
+- `order_body_imaging {study: spine_MRI}`: mild cervical spondylosis without cord compression (fallback_tool_outputs.body_imaging). Why: rule 2 and 3: mild cervical spondylosis in the history and on the stored MRI; the library reports a normal spine.
+- `order_body_imaging {study: spine_CT}`: mild cervical spondylosis without canal stenosis (followup_outputs[5] request_spine_ct). Why: rule 2: mild cervical spondylosis on prior imaging; the library reports a normal spine.
+- `order_advanced_imaging {modality: coronary_CTA}`: moderate proximal LAD stenosis, calcium score 420, CAD-RADS 3 (fallback_tool_outputs.advanced_imaging). Why: rule 2: coronary artery disease managed conservatively on aspirin and atorvastatin; the library reports normal coronaries.
+- `order_advanced_imaging {modality: coronary_angiography}`: 60% proximal LAD and 30% RCA stenoses (followup_outputs[6] request_coronary_angiography). Why: rule 2: coronary artery disease managed conservatively; the library reports a normal angiogram.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

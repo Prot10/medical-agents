@@ -114,3 +114,14 @@ Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it na
 - Scoring: none.
 
 Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 70, ECOG 1 (fallback_tool_outputs.clinical_assessment). Why: rule 2: the library reports Karnofsky 100 with no complaints in a woman with two months of fatigue and dyspnoea, admitted in complete heart block.
+- `order_echocardiogram {echo_type: TEE}`: basal anteroseptal hypokinesis with increased echogenicity, preserved LVEF (fallback_tool_outputs.echo). Why: rule 3: the stored TTE shows basal anteroseptal echogenicity and hypokinesis; the library TEE reports a normal heart without regional abnormality.
+- `order_echocardiogram {echo_type: bubble_study}`: basal anteroseptal regional abnormality, no shunt (followup_outputs[13] request_bubble_study). Why: rule 3: the stored TTE shows a regional basal septal abnormality; the library reports a normal heart.
+- `order_echocardiogram {echo_type: exercise_echo}`: persistent complete AV block, ventricular rate 40-46 bpm, stopped at 3.5 METs (followup_outputs[14] request_exercise_echo). Why: rule 3: the stored exercise test shows persistent complete AV block with chronotropic incompetence; the library reports a normal study at 9.5 METs.
+- `order_advanced_imaging {modality: whole_body_FDG_PET}`: intensely avid bilateral hilar and paratracheal nodes, focal septal uptake (fallback_tool_outputs.advanced_imaging). Why: rule 3: the stored cardiac FDG-PET shows intense hilar and paratracheal nodal uptake and the CT bilateral hilar adenopathy; the library reports a normal whole-body PET.
+- `order_body_imaging {study: mediastinum_MRI}`: symmetric bilateral hilar and right paratracheal lymphadenopathy (followup_outputs[15] request_mediastinum_mri). Why: rule 3: the stored chest CT shows symmetric bilateral hilar and right paratracheal lymphadenopathy; the library reports no lymphadenopathy.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

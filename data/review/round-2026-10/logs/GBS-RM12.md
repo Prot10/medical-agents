@@ -98,3 +98,13 @@ Review-process wording (references to the round's rulings, the round policy file
 - The FVC mL/kg figures and the weight-based IVIg amounts in the text were checked against this weight: all within rounding, no text change.
 
 Checks: `perfect_agent.py` ok; BMI = weight / height^2 to one decimal.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 60, ECOG 2 (fallback_tool_outputs.clinical_assessment). Why: rule 1: the library reports Karnofsky 100 / ECOG 0 and a working patient; he has arm and neck weakness with dysphagia and cannot work.
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: no tremor or rigidity; upper-limb items limited by weakness, response not assessable (followup_outputs[6] request_levodopa_challenge). Why: rule 1: the library describes a normal motor examination, gait and postural reflexes; shoulder abduction 3/5, grip 4/5 and neck flexion 3+/5.
+- `order_body_imaging {study: spine_MRI}`: smooth enhancement of the ventral cervical roots C5-C8; cauda equina and cord normal (fallback_tool_outputs.body_imaging). Why: rule 1: smooth enhancement of the cauda equina and ventral roots is seen in most patients with this polyradiculoneuropathy (Gorson 1996; Byun 1998), while the library reads the roots as normal (here the cervical roots, which supply the weak arms).
+- `order_body_imaging {study: peripheral_nerve_MRI}`: C5-T1 root enhancement and mild brachial plexus T2 hyperintensity; lumbosacral normal (followup_outputs[7] request_peripheral_nerve_mri). Why: rule 1 and 3: the library reads the nerve roots as normal; root enhancement as on the spine MRI of this case (cervical roots).
+- `order_specialized_test {test_type: speech_language_evaluation}`: moderate flaccid dysarthria with hypernasality; language normal (fallback_tool_outputs.specialized_test). Why: rule 1 and 3: nasal dysarthria, palatal weakness and dysphagia are in the examination; the library reports no dysarthria.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

@@ -64,3 +64,17 @@ Condition close-out (`plans/FEPI-TEMP-decisions.md`). What changed and why:
 
 - Diagnosis synonyms (`diagnosis_synonyms.yaml` G40 entries, re-applied with `--prune --conditions focal_epilepsy_temporal`): labels now focal epilepsy, temporal lobe epilepsy, TLE, epilepsy temporal lobe, mesial temporal lobe epilepsy, MTLE (added), mesial temporal sclerosis epilepsy; removed focal seizures; focal onset seizures; focal impaired awareness seizures (seizure-type labels, retired: their tokens occur in an acute symptomatic or functional-seizure answer). Codes: G40.2, G40.1, G40.9 plus G40.209, G40.109, G40.909 (not intractable); the idiopathic G40.009 and G40.019 removed and the intractable codes removed.
 - Checks: `perfect_agent.py -v` and `case_io.py check` clean; `test_case_guards.py -k FEPI-TEMP-` passes, now with the discriminator guard and the FEPI-TEMP banned strings.
+
+## Library contradictions (25 Oct 2026)
+
+Orders the benchmark library answered with a normal report that contradicts this case now get a case-specific report (term: gist, where stored):
+
+- analyze_eeg ambulatory: This is an ABNORMAL 48-hour ambulatory EEG due to: 1. Right anterior temporal sharp waves (phase reversal at F8), maximal in NREM sleep. 2. Intermitte (fallback_tool_outputs.eeg)
+- analyze_eeg video: This is an ABNORMAL 72-hour video-EEG due to: 1. Right anterior temporal sharp waves (phase reversal at F8), maximal in NREM sleep. 2. Intermittent ri (followup request_video_eeg)
+- obtain_tissue_diagnosis resection: Hippocampal sclerosis, ILAE type 1 (fallback_tool_outputs.tissue_diagnosis)
+- obtain_tissue_diagnosis stereotactic_biopsy: Hippocampal neuronal loss with fibrillary gliosis (followup request_stereotactic_biopsy)
+- obtain_tissue_diagnosis open_biopsy: Hippocampal neuronal loss with fibrillary gliosis (followup request_open_biopsy)
+- order_specialized_test neuropsych_battery: Weakness in visual learning and delayed visual recall (T-scores 37 and 35) with verbal memory and naming within the average range and intellectual fun (fallback_tool_outputs.specialized_test)
+- interpret_labs AED_levels: No levetiracetam, valproate, carbamazepine, phenytoin, lamotrigine or lacosamide detected. (fallback_tool_outputs.labs[AED_levels], also answers valproate_level)
+
+Checks: `perfect_agent.py` passes; the criterion snapshot of the case is unchanged; `pytest agent-platform/tests -k FEPI-TEMP` (case guards included), `test_reports_do_not_fabricate.py` and `apply_diagnosis_synonyms.py --check` pass; no new report repeats a 60-character window of any criterion's expected evidence.

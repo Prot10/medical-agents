@@ -65,3 +65,30 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, named in the report's own text.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+A fresh order of each study below was answered by the benchmark-level normal library, which contradicted this patient (age, rhythm, devices, surgery, stored findings). Each now has a case-specific report:
+
+- FDG_PET: Right middle cerebral territory metabolic defects (inferior parietal; frontal operculum) with mild right border-zone hypometabolism and crossed left cerebellar diaschisis; left hemisphere preserved. (fallback_tool_outputs.advanced_imaging)
+- perfusion_SPECT: Right middle cerebral territory perfusion defects (inferior parietal; frontal operculum) with mild right border-zone hypoperfusion and crossed left cerebellar diaschisis; left hemisphere preserved. (followup request_perfusion_spect)
+- performance_status: Karnofsky 60 (requires occasional assistance but able to care for most needs), ECOG 2 (ambulatory and capable of all self-care, unable to carry out any work activities). (fallback_tool_outputs.clinical_assessment)
+- exercise_stress_test: Very low workload (2.5 METs) limited by claudication; submaximal heart rate on beta-blockade, non-diagnostic for ischaemia. (fallback_tool_outputs.specialized_test)
+- gait_and_balance_timed: Mildly slowed, slightly wide-based gait (Timed Up and Go 14.8 s) with reduced left arm swing; longer walks are limited by calf symptoms rather than balance. (followup request_gait_and_balance_timed)
+- levodopa_challenge: MDS-UPDRS III 9/132 OFF and 9/132 ON (0% change), below the 30% threshold for a clinically meaningful levodopa response. (followup request_levodopa_challenge)
+- TEE: Mild basal inferior hypokinesis; LVEF 52%; mild concentric left ventricular hypertrophy; aortic valve sclerosis without stenosis; grade III aortic arch atheroma without a mobile component. No patent foramen ovale and no left atrial appendage thrombus. (followup request_tee)
+- cardiac_MRI: Chronic basal inferior subendocardial infarct with mild hypokinesis; LVEF 53%; no thrombus. (followup request_cardiac_mri)
+- coronary_angiography: Severe native three-vessel disease after bypass grafting: patent arterial graft to the left anterior descending and vein graft to the obtuse marginal; occluded vein graft to the right coronary artery. (followup request_coronary_angiography)
+- coronary_CTA: Post-bypass study: patent arterial graft to the left anterior descending and vein graft to the obtuse marginal, occluded vein graft to the right coronary artery; severe calcified native disease. (followup request_coronary_cta)
+- speech_language_evaluation: Mild dysarthria with intact language. (followup request_speech_language_evaluation)
+- DTI_tractography: Interrupted parietal terminations of the right arcuate fasciculus with reduced fractional anisotropy of the right corticospinal tract in the centrum semiovale; optic radiations intact. (followup request_dti_tractography)
+- CT_perfusion: Matched perfusion defects confined to chronic tissue loss (right supramarginal and angular gyri; right frontal operculum); no acute core or penumbral mismatch. Mild haemodynamic delay in the right middle cerebral artery territory without an ischaemic threshold. (followup request_ct_perfusion)
+- perfusion_MRI: Matched perfusion defects confined to chronic tissue loss (right supramarginal and angular gyri; right frontal operculum); no acute core or penumbral mismatch. Mild haemodynamic delay in the right middle cerebral artery territory without an ischaemic threshold. (followup request_perfusion_mri)
+- cerebral_angiography: Severe right internal carotid stenosis (75%, NASCET) with delayed right middle cerebral branch filling; left bulb stenosis 45%; no tandem intracranial stenosis. (followup request_cerebral_angiography)
+- transcranial_doppler: Dampened right middle cerebral artery waveform with reduced velocity and pulsatility and increased right posterior cerebral velocity, consistent with a haemodynamically significant proximal right-sided stenosis with posterior collateral flow. (followup request_transcranial_doppler)
+- chest_abdomen_pelvis_CT: No mass or lymphadenopathy. Mild upper-lobe centrilobular emphysema; median sternotomy wires, coronary graft clips and dense native coronary calcification. (fallback_tool_outputs.body_imaging)
+- chest_CTA: No pulmonary embolism or aortic dissection. Mild upper-lobe centrilobular emphysema; median sternotomy wires, coronary graft clips and dense native coronary calcification. (followup request_chest_cta)
+- mediastinum_CT: No mediastinal mass or lymphadenopathy; median sternotomy wires, coronary graft clips and dense native coronary calcification. (followup request_mediastinum_ct)
+- chest_xray: No acute cardiopulmonary abnormality; median sternotomy wires and coronary graft clips. (followup request_chest_xray)
+
+Checks: `perfect_agent.py` pass; `test_case_guards.py -k VASC-DEM-S08` pass; criterion outputs unchanged against the pre-pass snapshot; no 60-character window of any expected_evidence in the new reports; synonym guard 0 changes.

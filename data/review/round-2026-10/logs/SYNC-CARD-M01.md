@@ -116,3 +116,16 @@ Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it na
 - Scoring: none (evidence only; the reward does not read it).
 
 Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the normal-row probe reports nothing for this criterion.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 80, ECOG 1, exertional limitation and recurrent falls (fallback_tool_outputs.clinical_assessment). Why: rule 2: the library reports Karnofsky 100 with no complaints in a man with exertional dyspnoea and three syncopal falls.
+- `order_echocardiogram {echo_type: TEE}`: LVEF 47% with anterior-apical hypokinesis and concentric LVH, no thrombus or shunt (fallback_tool_outputs.echo). Why: rule 3: the stored TTE shows LVEF 47% with LAD-territory hypokinesis and LVH; the library TEE reports a normal heart.
+- `order_echocardiogram {echo_type: bubble_study}`: same LV findings as the TTE, no right-to-left shunt (followup_outputs[10] request_bubble_study). Why: rule 3: the stored TTE is abnormal (LVEF 47%, regional hypokinesis, LVH); the library bubble study reports a normal heart.
+- `order_echocardiogram {echo_type: exercise_echo}`: exercise-induced 2:1 AV block with presyncope, fixed anterior-apical hypokinesis, submaximal (followup_outputs[11] request_exercise_echo). Why: rule 3: the stored TTE (LVEF 47%, regional hypokinesis) and stored exercise test (exercise-induced 2:1 AV block) contradict a normal exercise echo with 9.5 METs.
+- `order_advanced_imaging {modality: coronary_CTA}`: patent LAD stent and mild non-obstructive plaque, calcium score 412 (fallback_tool_outputs.advanced_imaging). Why: rule 2: prior anterior STEMI with PCI to the LAD; the library reports no plaque and calcium score 0.
+- `order_advanced_imaging {modality: coronary_angiography}`: patent LAD stent, non-obstructive disease elsewhere, LVEDP 17 mmHg (followup_outputs[12] request_coronary_angiography). Why: rule 2: prior anterior STEMI with an LAD stent; the library reports normal coronaries.
+- `order_specialized_test {test_type: polysomnography}`: severe obstructive sleep apnoea, AHI 34/h, nadir SpO2 81% (fallback_tool_outputs.specialized_test). Why: rule 2: known obstructive sleep apnoea with inconsistent CPAP use; the library reports AHI 2.1/h.
+- `order_specialized_test {test_type: emg_ncs}`: mild length-dependent sensorimotor axonal polyneuropathy (followup_outputs[13] request_emg_ncs). Why: rule 2: type 2 diabetes for six years with reduced vibration at the malleoli and ankle reflexes 1+; the library reports normal nerve conduction.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

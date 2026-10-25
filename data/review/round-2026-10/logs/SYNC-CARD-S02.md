@@ -105,3 +105,15 @@ Review-process wording (references to the round's rulings, the round policy file
 - criterion `action-8-order-advanced-imaging` label: "Cardiac MRI to characterise the myocardium (optional)" -> "Cardiac MRI to characterise the myocardium"
 - criterion `action-5-check-drug-interactions` label: "Review the medication list (vasodilators) (optional)" -> "Review the medication list (vasodilators)"
 - criterion `action-6-search-medical-literature` label: "Guideline lookup on pacing and valve intervention (optional)" -> "Guideline lookup on pacing and valve intervention"
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 70, ECOG 2 (fallback_tool_outputs.clinical_assessment). Why: rule 2: the library reports Karnofsky 100 with no complaints in a man who can no longer walk a block without resting.
+- `order_echocardiogram {echo_type: TEE}`: severe calcific AS (AVA about 0.8 cm2), LVEF 40%, no thrombus (fallback_tool_outputs.echo). Why: rule 3: the stored TTE shows severe calcific aortic stenosis with LVEF 40% and concentric LVH; the library TEE reports a normal heart.
+- `order_echocardiogram {echo_type: bubble_study}`: severe AS and LVEF 40% as on the TTE, no shunt (followup_outputs[11] request_bubble_study). Why: rule 3: the stored TTE shows severe aortic stenosis with LVEF 40%; the library reports a normal heart.
+- `order_echocardiogram {echo_type: exercise_echo}`: stress phase not performed in symptomatic severe AS with complete heart block (followup_outputs[12] request_exercise_echo). Why: rule 3: symptomatic severe aortic stenosis with complete heart block, and the stored exercise test is not performed; the library reports a normal study at 9.5 METs.
+- `interpret_labs {panels: [PTH]}`: intact PTH 118 pg/mL (fallback_tool_outputs.labs['PTH']). Why: rule 2: chronic kidney disease stage 3b with creatinine 1.8 mg/dL and phosphorus 4.7 mg/dL; the library reports a normal PTH.
+- `interpret_labs {panels: [iron_studies]}`: iron deficiency pattern, ferritin 24 ng/mL (fallback_tool_outputs.labs['iron_studies']). Why: rule 2: stored microcytic anaemia (haemoglobin 11.5 g/dL, MCV 78.7 fL); the library reports normal iron studies.
+- `order_specialized_test {test_type: emg_ncs}`: mild length-dependent sensory-predominant axonal polyneuropathy (fallback_tool_outputs.specialized_test). Why: rule 2: type 2 diabetes for twelve years on insulin with reduced vibration at the toes and malleoli and Achilles reflexes 1+; the library reports normal nerve conduction.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

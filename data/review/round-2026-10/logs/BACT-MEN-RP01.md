@@ -90,3 +90,26 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 40, ECOG 3 (fallback_tool_outputs.clinical_assessment). Why: rule 3: progressive headache, neck stiffness and new confusion (GCS 14) on a background of 2 years of recurrent infections; the library's Karnofsky 100 describes a person without disease.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: not performed (headache, unsteadiness on standing) (followup_outputs[4] request_gait_and_balance_timed). Why: rule 3: the stored exam records gait not formally tested, with mild unsteadiness on standing.
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: no parkinsonian signs; neck stiffness noted; challenge not administered (followup_outputs[5] request_levodopa_challenge). Why: rule 3: the library reports a normal gait and neck in a patient with neck stiffness and unsteadiness on standing; no challenge would be given without parkinsonism.
+- `perform_clinical_assessment {assessment_type: structured_headache_history_ichd3}`: new acute headache with red flags; criteria for a primary headache disorder not met (followup_outputs[6] request_structured_headache_history_ichd3). Why: rule 1 and 3: a progressive febrile headache with neck stiffness and confusion; the library elicits no red flags.
+- `analyze_brain_mri`: thin leptomeningeal enhancement; paranasal sinus disease; no complication (fallback_tool_outputs.mri). Why: rule 1: no brain imaging is stored; an MRI with gadolinium in this patient would not be normal (recurrent sinopulmonary infections, current sinus symptoms).
+- `perform_clinical_assessment {assessment_type: cognitive_screen}`: MoCA 24/30 with mild inattention and reduced recall (followup_outputs[7] request_cognitive_screen). Why: rule 3: the stored exam records mild inattention, recall 2 of 3 and an initial error on the date; the library reports MoCA 28/30.
+- `order_specialized_test {test_type: neuropsych_battery}`: mildly reduced attention, processing speed and recall (fallback_tool_outputs.specialized_test). Why: rule 3: the stored exam records mild inattention and reduced recall.
+- `order_microbiology {specimen: whole_blood_pcr}`: Streptococcus pneumoniae DNA detected (fallback_tool_outputs.microbiology). Why: rule 3: blood cultures grow S. pneumoniae (1 of 2 sets), a target of the panel; collected after 5 days of amoxicillin-clavulanate.
+- `perform_clinical_assessment {assessment_type: orthostatic_blood_pressure}`: no orthostatic hypotension; resting HR 92 (followup_outputs[8] request_orthostatic_blood_pressure). Why: rule 3: presenting HR 92 and unsteadiness on standing; the library reports a supine HR of 68 without symptoms.
+- `interpret_labs {panels: [IgA]}`: IgA 12 mg/dL (low) (fallback_tool_outputs.labs['IgA']). Why: rule 3: the stored immunoglobulin panel shows IgA 12 mg/dL; the library reports IgA 210.
+- `interpret_labs {panels: [IgG_subclasses]}`: all IgG subclasses low (fallback_tool_outputs.labs['IgG_subclasses']). Why: rule 3: the stored total IgG is 185 mg/dL; subclasses cannot all be normal.
+- `order_body_imaging {study: chest_CT}`: bilateral basal bronchiectasis with mucus plugging (fallback_tool_outputs.body_imaging). Why: rule 2: bronchiectasis on chest CT 6 months ago, bilateral basal crackles now; the library reports clear lungs.
+- `order_body_imaging {study: chest_CTA}`: no embolism; bilateral basal bronchiectasis (followup_outputs[9] request_chest_cta). Why: rule 2: bronchiectasis on chest CT 6 months ago; the library reports normal lungs.
+- `order_body_imaging {study: chest_xray}`: basal bronchial wall thickening (followup_outputs[10] request_chest_xray). Why: rule 2: known bronchiectasis with basal crackles; the library reports clear lungs.
+- `order_body_imaging {study: chest_abdomen_pelvis_CT}`: bronchiectasis and mild splenomegaly (followup_outputs[11] request_chest_abdomen_pelvis_ct). Why: rule 2 and 3: known bronchiectasis and mild splenomegaly on palpation; the library reports a normal study.
+- `order_body_imaging {study: pelvis_abdomen_CT}`: mild splenomegaly (followup_outputs[12] request_pelvis_abdomen_ct). Why: rule 3: mild splenomegaly on palpation; the library reports a normal spleen.
+- `order_body_imaging {study: pelvis_abdomen_ultrasound}`: mild splenomegaly (followup_outputs[13] request_pelvis_abdomen_ultrasound). Why: rule 3: mild splenomegaly on palpation; the library reports a normal spleen size.
+- `order_body_imaging {study: pelvis_abdomen_MRI}`: mild splenomegaly (followup_outputs[14] request_pelvis_abdomen_mri). Why: rule 3: mild splenomegaly on palpation; the library reports a normal spleen.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

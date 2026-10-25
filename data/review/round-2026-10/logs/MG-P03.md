@@ -74,3 +74,17 @@ Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym g
 - The FVC mL/kg figures and the weight-based IVIg amounts in the text were checked against this weight: all within rounding, no text change.
 
 Checks: `perfect_agent.py` ok; BMI = weight / height^2 to one decimal.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 70, ECOG 2 (cares for self; unable to carry on normal activity or active work) (fallback_tool_outputs.clinical_assessment). Why: rule 1: the library reports Karnofsky 100 / ECOG 0 (no evidence of disease, working); rule 2 and 3: chronic MS deficits (right hemiparesis, ataxia, spastic gait) plus new generalized fatigable weakness.
+- `order_specialized_test {test_type: emg_ncs}`: normal nerve conductions and needle EMG, stating that neuromuscular transmission was not assessed (fallback_tool_outputs.specialized_test). Why: rule 1: the library report concludes there is no neuromuscular junction disorder, which routine conductions and needle EMG without repetitive stimulation cannot assess and which is not true here; the stored RNS study reports normal nerve conductions, which this report keeps.
+- `order_body_imaging {study: mediastinum_MRI}`: 2.8 cm solid anterior mediastinal mass without signal loss, thymoma most likely (fallback_tool_outputs.body_imaging). Why: rule 3: the stored chest CT shows a 2.8 cm anterior mediastinal mass most consistent with thymoma; the library reports an involuted thymus.
+- `order_advanced_imaging {modality: whole_body_FDG_PET}`: moderately FDG-avid 2.8 cm anterior mediastinal mass (fallback_tool_outputs.advanced_imaging). Why: rule 3: stored anterior mediastinal mass on CT; the library reports no lesion.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: mild right spastic-ataxic gait, gait speed 0.95 m/s, impaired tandem (followup_outputs[4] request_gait_and_balance_timed). Why: rule 3: the library reports a normal timed gait (TUG 9.1 s, Berg 56/56); the examination documents a mildly spastic right-sided gait with right cerebellar ataxia from MS.
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: no parkinsonian signs and no levodopa response; spastic right-sided gait unchanged (followup_outputs[5] request_levodopa_challenge). Why: rule 3: the library levodopa challenge describes normal gait, arm swing and postural reflexes, while the examination documents a mildly spastic right-sided gait.
+- `order_specialized_test {test_type: ssep}`: prolonged central conduction of the right median and tibial SSEPs (followup_outputs[6] request_ssep). Why: rule 2: relapsing-remitting MS with a chronic right hemiparesis and patchy sensory deficits; the library reports normal central somatosensory conduction.
+- `perform_clinical_assessment {assessment_type: cognitive_screen}`: MoCA 26/30 with reduced fluency and attention, recall intact (followup_outputs[7] request_cognitive_screen). Why: rule 3: the examination documents mild cognitive slowing on formal testing; the library reports MoCA 28/30 with no impairment.
+- `order_specialized_test {test_type: neuropsych_battery}`: reduced processing speed with preserved memory, language and visuospatial function (followup_outputs[8] request_neuropsych_battery). Why: rule 3: mild cognitive slowing on formal testing in a patient with MS; the library reports all domains in the average range.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

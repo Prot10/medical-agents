@@ -98,3 +98,18 @@ Review-process wording (references to the round's rulings, the round policy file
 
 - criterion `action-8-order-advanced-imaging` label: "Cardiac MRI to characterise the substrate (optional)" -> "Cardiac MRI to characterise the substrate"
 - criterion `action-6-search-medical-literature` label: "Guideline lookup on drug-related AV block (optional)" -> "Guideline lookup on drug-related AV block"
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 70, ECOG 1 (fallback_tool_outputs.clinical_assessment). Why: rule 2: the library reports Karnofsky 100, no complaints and 'working' in a retired man with six weeks of fatigue, exertional symptoms and syncope.
+- `order_echocardiogram {echo_type: TEE}`: LVEF 45% with anteroseptal hypokinesis, mild calcific AS, no thrombus (fallback_tool_outputs.echo). Why: rule 3: the stored TTE shows LVEF 45% with regional hypokinesis and mild aortic stenosis; the library TEE reports a normal heart.
+- `order_echocardiogram {echo_type: bubble_study}`: LVEF 45% and mild AS as on the TTE, no shunt (followup_outputs[9] request_bubble_study). Why: rule 3: the stored TTE is abnormal (LVEF 45%, mild AS); the library reports a normal heart.
+- `order_echocardiogram {echo_type: exercise_echo}`: persistent complete heart block, symptomatic hypotension at 2 minutes (followup_outputs[10] request_exercise_echo). Why: rule 3: the stored exercise test stopped at 2 minutes for hypotension in persistent complete heart block; the library reports a normal study at 9.5 METs.
+- `order_advanced_imaging {modality: coronary_CTA}`: patent LIMA-LAD and SVG-OM grafts, severe native LAD and circumflex disease (fallback_tool_outputs.advanced_imaging). Why: rule 2: two-vessel CABG six years ago; the library reports normal native coronaries without grafts.
+- `order_advanced_imaging {modality: coronary_angiography}`: patent grafts, grafted severe native disease, LVEDP 19 mmHg (followup_outputs[11] request_coronary_angiography). Why: rule 2: two-vessel CABG six years ago; the library reports normal coronaries.
+- `order_body_imaging {study: chest_xray}`: sternotomy wires and graft clips, borderline heart size (fallback_tool_outputs.body_imaging). Why: rule 2: coronary artery bypass surgery six years ago; the library reports a normal chest radiograph.
+- `order_body_imaging {study: chest_CT}`: post-CABG and sternotomy changes, coronary and aortic valve calcification (followup_outputs[12] request_chest_ct). Why: rule 2: coronary artery bypass surgery six years ago and mild calcific aortic stenosis; the library reports a normal chest CT.
+- `order_body_imaging {study: chest_CTA}`: no PE, post-CABG and sternotomy changes (followup_outputs[13] request_chest_cta). Why: rule 2: coronary artery bypass surgery six years ago; the library reports a normal chest CT angiogram.
+- `order_specialized_test {test_type: emg_ncs}`: mild length-dependent sensory-predominant axonal polyneuropathy (fallback_tool_outputs.specialized_test). Why: rule 2: type 2 diabetes for ten years with reduced vibration at the great toes and ankle reflexes 1+; the library reports normal nerve conduction.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

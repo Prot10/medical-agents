@@ -104,3 +104,15 @@ Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it na
 - Scoring: none (evidence only; the reward does not read it).
 
 Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the normal-row probe reports nothing for this criterion.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 80, ECOG 1 (fallback_tool_outputs.clinical_assessment). Why: rule 2: the library reports Karnofsky 100 with no complaints in a man who stopped his daily walks three months ago for fatigue and palpitations.
+- `order_echocardiogram {echo_type: TEE}`: atrial flutter, no appendage thrombus, mildly dilated atria, LVEF 55% (fallback_tool_outputs.echo). Why: rule 3: the stored TTE shows dilated atria and mild mitral and tricuspid regurgitation in atrial flutter, with the appendage not visualised; the library TEE reports a normal heart.
+- `order_echocardiogram {echo_type: bubble_study}`: dilated atria as on the TTE, no shunt (followup_outputs[11] request_bubble_study). Why: rule 3: the stored TTE shows dilated atria and mild valve regurgitation; the library reports a normal heart.
+- `order_echocardiogram {echo_type: exercise_echo}`: 1:1 flutter conduction at about 300 bpm in stage 1, stopped (followup_outputs[12] request_exercise_echo). Why: rule 3: the stored exercise test stopped in stage 1 for 1:1 flutter conduction with hypotension; the library reports a normal study at 9.5 METs with no arrhythmia.
+- `order_specialized_test {test_type: polysomnography}`: mild obstructive sleep apnoea (AHI 11 /h), flutter with 4:1 conduction (followup_outputs[13] request_polysomnography). Why: rule 2: known mild obstructive sleep apnoea, untreated; the library reports a normal polysomnogram.
+- `interpret_labs {panels: [HbA1c]}`: HbA1c 6.6% (fallback_tool_outputs.labs['HbA1c']). Why: rule 2: type 2 diabetes for nine years, diet-controlled; the library reports a normal HbA1c of 5.4%.
+- `order_advanced_imaging {modality: cardiac_MRI}`: mild biatrial enlargement, LVEF 54%, no late enhancement (fallback_tool_outputs.advanced_imaging). Why: rule 3: the stored TTE shows mildly dilated left and right atria and mild mitral and tricuspid regurgitation; the library reports normal atria.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

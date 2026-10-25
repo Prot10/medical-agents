@@ -74,3 +74,19 @@ Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it na
 - Scoring: none (evidence only; the reward does not read it).
 
 Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the normal-row probe reports nothing for this criterion.
+
+## Library contradictions (25 Oct 2026)
+
+Orders the benchmark library answered with a normal report that contradicts this case now get a case-specific report (term: gist, where stored):
+
+- analyze_eeg ambulatory: This is an ABNORMAL 48-hour ambulatory EEG due to: 1. Occasional left anterior temporal sharp waves (phase reversal at F7), mainly in NREM sleep. 2. I (fallback_tool_outputs.eeg)
+- analyze_eeg video: This is an ABNORMAL 72-hour video-EEG due to: 1. One habitual seizure of left anterior temporal onset (F7/T3): rhythmic 5-6 Hz theta evolving to 2-3 H (followup request_video_eeg)
+- order_advanced_imaging FDG_PET: 1. Left mesial and anterior temporal hypometabolism, most marked in the anterior parahippocampal gyrus and uncus. 2. Small focus of right superior fro (fallback_tool_outputs.advanced_imaging)
+- obtain_tissue_diagnosis resection: Cortical tuber (fallback_tool_outputs.tissue_diagnosis)
+- obtain_tissue_diagnosis stereotactic_biopsy: Cortical tuber (followup request_stereotactic_biopsy)
+- obtain_tissue_diagnosis open_biopsy: Cortical tuber (followup request_open_biopsy)
+- order_specialized_test neuropsych_battery: Weakness in verbal learning and delayed verbal recall (T-scores 34 and 31) and mild confrontation naming weakness (BNT T-score 39), with visual memory (fallback_tool_outputs.specialized_test)
+- order_echocardiogram TTE: small septal intramyocardial nodule (rhabdomyoma), normal function (fallback_tool_outputs.echo)
+- order_echocardiogram TEE: 1. Small homogeneous intramyocardial septal nodule without obstruction, in keeping with a small cardiac rhabdomyoma. 2.  (followup request_tee)
+
+Checks: `perfect_agent.py` passes; the criterion snapshot of the case is unchanged; `pytest agent-platform/tests -k FEPI-TEMP` (case guards included), `test_reports_do_not_fabricate.py` and `apply_diagnosis_synonyms.py --check` pass; no new report repeats a 60-character window of any criterion's expected evidence.

@@ -93,3 +93,22 @@ Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it na
 - Scoring: coverage unchanged (any call matching the old order still matches); the cost reference of the required work-up now uses the new first order.
 
 Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the normal-row probe reports nothing for this criterion.
+
+## Library contradictions (25 Oct 2026)
+
+Orders that reached the benchmark library's normal report although the case contradicts it now get a case-specific report; every other off-pathway order still gets the library normal.
+
+- `analyze_csf special_tests=[NfL, NfH]` -> `fallback_tool_outputs.csf`. Why: CSF neurofilaments are raised in ALS; the library reported NfL 420 pg/mL, normal. Basic CSF acellular, protein 48 mg/dL, NfL 5,200 pg/mL..
+- `order_specialized_test test_type=emg_single_fiber` -> `fallback_tool_outputs.specialized_test`. Why: the stored EMG shows chronic reinnervation; single-fibre EMG then shows raised fibre density and jitter, not the library's normal study.
+- `order_specialized_test test_type=muscle_biopsy` -> `followup_outputs[request_muscle_biopsy]`. Why: muscle in ALS shows neurogenic grouped atrophy; the library reported normal muscle.
+- `perform_clinical_assessment assessment_type=performance_status` -> `fallback_tool_outputs.clinical_assessment`. Why: the library reported Karnofsky 100 / ECOG 0 with no limitation; the history documents difficulty feeding himself; choking episodes; supervised for behaviour (Karnofsky 50, ECOG 3).
+- `perform_clinical_assessment assessment_type=gait_and_balance_timed` -> `followup_outputs[request_gait_and_balance_timed]`. Why: the exam documents a hesitant gait with a mild spastic element; impulsive turns; the library reported a normal timed gait (moderate slowing stored).
+- `order_specialized_test test_type=speech_language_evaluation` -> `followup_outputs[request_speech_language_evaluation]`. Why: the exam documents dysarthria; the library reported no motor speech disorder (moderate mixed spastic-flaccid dysarthria stored).
+- `order_advanced_imaging modality=DTI_tractography` -> `followup_outputs[request_dti_tractography]`. Why: the stored MRI shows corticospinal tract T2/FLAIR hyperintensity; DTI cannot show normal corticospinal anisotropy.
+- `order_specialized_test test_type=genetic_panel:FTD` -> `followup_outputs[request_genetic_panel_ftd]`. Why: the stored ALS gene panel finds a C9orf72 expansion, which the FTD panel also tests; the library reported a normal repeat length.
+- `interpret_labs panels=[genetic]` -> `fallback_tool_outputs.labs`. Why: the stored ALS gene panel finds a pathogenic variant; the library's targeted gene panel reported none.
+- `perform_clinical_assessment assessment_type=cognitive_screen` -> `followup_outputs[request_cognitive_screen]`. Why: known bvFTD with MMSE 22/30 on exam; the library reported MoCA 28/30.
+- `order_specialized_test test_type=neuropsych_battery` -> `followup_outputs[request_neuropsych_battery]`. Why: known bvFTD; the library reported normal cognition in all domains.
+- `order_advanced_imaging modality=FDG_PET` -> `followup_outputs[request_fdg_pet]`. Why: the history documents frontal and temporal hypometabolism on FDG-PET; the library reported a normal study.
+
+Checks: `perfect_agent.py` ok; `test_case_guards.py -k ALS-` pass; every mapped order answered without the library (`verify.py`, map_ALS); no criterion answer changed (snapshot diff).

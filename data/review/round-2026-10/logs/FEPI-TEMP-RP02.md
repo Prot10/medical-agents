@@ -83,3 +83,15 @@ Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it na
 - Scoring: none (recommended criterion: coverage unchanged, not in the cost reference).
 
 Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.
+
+## Library contradictions (25 Oct 2026)
+
+Orders the benchmark library answered with a normal report that contradicts this case now get a case-specific report (term: gist, where stored):
+
+- analyze_eeg video: This is an ABNORMAL 72-hour video-EEG due to: 1. Left anterior temporal sharp waves (phase reversal at F7), maximal in NREM sleep. 2. Wicket spikes ov (fallback_tool_outputs.eeg)
+- interpret_labs valproate_level: valproate not detected (fallback_tool_outputs.labs[valproate_level])
+- order_echocardiogram TEE: 1. Mild posterior mitral leaflet prolapse with trace regurgitation. 2. Normal biventricular size and systolic function.  (followup request_tee)
+- order_body_imaging chest_CT (non-contrast): left lower lobe wedge-shaped opacity (fallback_tool_outputs.body_imaging)
+- order_body_imaging lower_extremity_venous_duplex: left popliteal and calf vein DVT (followup request_lower_extremity_venous_duplex)
+
+Checks: `perfect_agent.py` passes; the criterion snapshot of the case is unchanged; `pytest agent-platform/tests -k FEPI-TEMP` (case guards included), `test_reports_do_not_fabricate.py` and `apply_diagnosis_synonyms.py --check` pass; no new report repeats a 60-character window of any criterion's expected evidence.

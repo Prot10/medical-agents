@@ -99,3 +99,10 @@ Review-process wording (references to the round's rulings, the round policy file
 - The FVC mL/kg figures and the weight-based IVIg amounts in the text were checked against this weight: all within rounding, no text change.
 
 Checks: `perfect_agent.py` ok; BMI = weight / height^2 to one decimal.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 80, ECOG 1 (fallback_tool_outputs.clinical_assessment). Why: rule 1: the library reports Karnofsky 100 / ECOG 0 and a working patient; he has complete bilateral facial paralysis with drooling, lagophthalmos and slurred speech.
+- `order_specialized_test {test_type: speech_language_evaluation}`: moderate labial flaccid dysarthria; language normal (fallback_tool_outputs.specialized_test). Why: rule 1 and 3: labial dysarthria with complete bilateral facial weakness is in the examination; the library reports no dysarthria.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

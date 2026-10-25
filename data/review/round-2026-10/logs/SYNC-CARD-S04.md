@@ -119,3 +119,16 @@ Review-process wording (references to the round's rulings, the round policy file
 - criterion `action-7-order-advanced-imaging` label: "Cardiac MRI to characterise the myocardium (optional)" -> "Cardiac MRI to characterise the myocardium"
 - criterion `action-5-check-drug-interactions` label: "Review the medication list (indapamide, telmisartan) (optional)" -> "Review the medication list (indapamide, telmisartan)"
 - criterion `action-6-search-medical-literature` label: "Guideline lookup on valve intervention and pacing (optional)" -> "Guideline lookup on valve intervention and pacing"
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 70, ECOG 1 (fallback_tool_outputs.clinical_assessment). Why: rule 2: the library reports Karnofsky 100 with no complaints in an 82-year-old man who gave up his daily walks for fatigue and presyncope.
+- `order_echocardiogram {echo_type: TEE}`: severe calcific AS (AVA about 0.8 cm2), concentric LVH, LVEF 46% (fallback_tool_outputs.echo). Why: rule 3: the stored TTE shows severe calcific aortic stenosis with concentric LVH and LVEF 46%; the library TEE reports a normal heart.
+- `order_echocardiogram {echo_type: bubble_study}`: severe AS and LVH as on the TTE, no shunt (followup_outputs[9] request_bubble_study). Why: rule 3: the stored TTE shows severe aortic stenosis with LVH; the library reports a normal heart.
+- `order_echocardiogram {echo_type: exercise_echo}`: stress phase not performed in symptomatic severe AS with complete heart block (followup_outputs[10] request_exercise_echo). Why: rule 3: symptomatic severe aortic stenosis with complete heart block, and the stored exercise test is not performed; the library reports a normal study at 9.5 METs.
+- `order_specialized_test {test_type: audiometry}`: bilateral moderate high-frequency sensorineural hearing loss (fallback_tool_outputs.specialized_test). Why: rule 2: bilateral sensorineural hearing loss with hearing aids, and hearing reduced to finger rub on examination; the library reports normal hearing.
+- `order_specialized_test {test_type: emg_ncs}`: mild length-dependent sensory-predominant axonal polyneuropathy (followup_outputs[11] request_emg_ncs). Why: rule 2: type 2 diabetes for fifteen years with stocking pinprick loss below the ankles, reduced vibration at the great toes and Achilles reflexes 1+; the library reports normal nerve conduction.
+- `interpret_labs {panels: [PTH]}`: intact PTH 104 pg/mL (fallback_tool_outputs.labs['PTH']). Why: rule 2: chronic kidney disease stage 3b with creatinine 1.7 mg/dL and phosphorus 4.6 mg/dL; the library reports a normal PTH.
+- `interpret_labs {panels: [serum_osmolality]}`: serum osmolality 263 mOsm/kg (low) (fallback_tool_outputs.labs['serum_osmolality']). Why: rule 3: the stored sodium is 123 mEq/L on indapamide; the library reports a normal serum osmolality of 288.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

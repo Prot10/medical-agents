@@ -108,3 +108,13 @@ Review-process wording (references to the round's rulings, the round policy file
 - Why: rule 1: exam states 'Weight stable at 64 kg'; height 165 cm keeps BMI near the stored 23.4 (now 23.5); no text cites a BMI.
 
 Checks: `perfect_agent.py` ok; BMI = weight / height^2 to one decimal.
+
+## Library contradictions (25 Oct 2026)
+
+Orders that reached the benchmark library's normal report although this case contradicts it (diagnosis, history, medications or a stored finding) now get a case-specific report; every other off-pathway order still gets the library normal. No tier, criterion, diagnosis or existing output changed.
+
+- `order_specialized_test test_type=speech_language_evaluation` -> `followup_outputs[order_speech_language_evaluation]`: speech-language findings matching the stored neuropsychology (reduced verbal fluency; naming as tested).
+- `perform_clinical_assessment assessment_type=performance_status` -> `followup_outputs[order_performance_status]`: performance status of the case's functional decline instead of Karnofsky 100.
+- `perform_clinical_assessment assessment_type=gait_and_balance_timed` -> `followup_outputs[order_gait_and_balance_timed]`: timed gait matching the examined gait abnormality.
+
+Checks: `perfect_agent.py` ok; `test_case_guards.py -k FTD` pass; every order listed in `plans/LIBRARY-group2-map.yaml` for this case is answered without the library; served answers of every other order unchanged against HEAD. Reasons and doubts: `plans/LIBRARY-group2-decisions.md`.

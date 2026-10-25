@@ -80,3 +80,14 @@ Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym g
 Commit c02f3050 added `cysticercosis_serology`, `IGRA` (interpret_labs), `olfactory_test` (order_specialized_test) and `levodopa_challenge` (perform_clinical_assessment); `HBV_DNA` (interpret_labs) was added the same day for this round. The requests are now wired into the case.
 
 - `fallback_tool_outputs.specialized_test` (was null) is now an `olfactory_test` report with the examination's Sniffin' Sticks 12-item identification result (6/12, olfactory loss), served only to an olfactory order, which before got the library's normosmia. No criterion: the test is already in the examination and is the case's second supportive criterion.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: MDS-UPDRS III 33/132 OFF, 19/132 ON (42%) (fallback_tool_outputs.clinical_assessment). Why: rule 3: the stored exam documents parkinsonism; the library reports MDS-UPDRS III 3/132 with no parkinsonian signs.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: TUG 12.5 s, 10 m 1.03 m/s, Berg 50/56 (followup request_gait_and_balance_timed). Why: rule 3: the stored gait exam (arm swing, stride, turns, pull test) is abnormal; the library reports a normal gait, turns in 3 steps and Berg 56/56.
+- `perform_clinical_assessment {assessment_type: cognitive_screen}`: MoCA 24/30 as in the exam (followup request_cognitive_screen). Why: rule 3: the stored exam records this MoCA and its items; the library reports MoCA 28/30 with other items.
+- `order_specialized_test {test_type: speech_language_evaluation}`: hypophonia, articulation precise (65 dB SPL), no aphasia (followup request_speech_language_evaluation). Why: rule 3: the stored exam records hypophonia; the library reports no motor speech disorder.
+- `order_specialized_test {test_type: autonomic_testing}`: tilt fall 36/22 mmHg, HR +7/min, Valsalva ratio 1.15 (followup request_autonomic_testing). Why: rule 3: the stored orthostatic test shows orthostatic hypotension; the library reports normal autonomic function.
+- `order_specialized_test {test_type: tilt_table}`: fall 40/24 mmHg, HR +7 bpm (followup request_tilt_table). Why: rule 3: the stored orthostatic test shows orthostatic hypotension; the library reports a normal tilt.
+
+Checks: `perfect_agent.py` 30/30 PD pass; `test_case_guards.py -k PD-` and `pytest agent-platform/tests -k PD-` 300 passed (`test_grpo_rollout.py` not collected: training extra not installed); every criterion's served output unchanged (snapshot before/after); synonym guard 0 changes; no new report repeats a 60-character window of any `expected_evidence`; every listed term is answered without the library.

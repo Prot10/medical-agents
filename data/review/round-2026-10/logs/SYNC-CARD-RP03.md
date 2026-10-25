@@ -111,3 +111,14 @@ Review-process wording (references to the round's rulings, the round policy file
 
 - criterion `action-7-check-drug-interactions` label: "Review the planned beta-blocker against the medication list (optional)" -> "Review the planned beta-blocker against the medication list"
 - criterion `action-8-search-medical-literature` label: "Guideline lookup on CPVT (optional)" -> "Guideline lookup on CPVT"
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 90, ECOG 0 (fallback_tool_outputs.clinical_assessment). Why: rule 2: the library reports Karnofsky 100 with no complaints in a woman with three exertional syncopes.
+- `order_specialized_test {test_type: tilt_table}`: negative passive tilt at the patient's own rates (108/68 mmHg, 78 bpm) (fallback_tool_outputs.specialized_test). Why: the library answers with a generic study (118/74 mmHg, 68 bpm) unrelated to this patient; a tilt order gets the patient's own rates, and the result stays negative.
+- `order_echocardiogram {echo_type: TEE}`: mild posterior mitral leaflet prolapse with trivial MR, otherwise normal (fallback_tool_outputs.echo). Why: rule 3: the stored TTE and cardiac MRI show mild posterior mitral leaflet prolapse; the library TEE reports a structurally normal mitral valve.
+- `order_echocardiogram {echo_type: bubble_study}`: mild mitral prolapse, no right-to-left shunt (followup_outputs[8] request_bubble_study). Why: rule 3: the stored TTE shows mild posterior mitral leaflet prolapse; the library reports a structurally normal mitral valve.
+- `order_echocardiogram {echo_type: exercise_echo}`: workload-dependent ectopy escalating to bidirectional and polymorphic VT with presyncope (followup_outputs[9] request_exercise_echo). Why: rule 3: the stored exercise test shows workload-dependent ectopy escalating to bidirectional and polymorphic VT; the library reports a normal study with no arrhythmia.
+- `interpret_labs {panels: [peripheral smear]}`: microcytic hypochromic red cells with pencil cells (fallback_tool_outputs.labs['peripheral smear']). Why: rule 3: stored haemoglobin 10.8 g/dL, MCV 76 fL and ferritin 8 ng/mL; the library reports normocytic normochromic cells.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

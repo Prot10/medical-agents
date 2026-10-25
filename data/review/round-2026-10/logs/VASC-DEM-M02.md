@@ -86,3 +86,20 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, named in the report's own text.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+A fresh order of each study below was answered by the benchmark-level normal library, which contradicted this patient (age, rhythm, devices, surgery, stored findings). Each now has a case-specific report:
+
+- FDG_PET: Bilateral frontal and anterior cingulate hypometabolism with focal left thalamic and right putaminal reduction and reduced superior vermian uptake; posterior association cortex relatively preserved. The cerebral pattern is consistent with subcortical small-vessel disease. (fallback_tool_outputs.advanced_imaging)
+- perfusion_SPECT: Bilateral frontal and anterior cingulate hypoperfusion with focal left thalamic and right putaminal reduction and reduced superior vermian uptake; posterior association cortex relatively preserved. The cerebral pattern is consistent with subcortical small-vessel disease. (followup request_perfusion_spect)
+- performance_status: Karnofsky 60 (requires occasional assistance but able to care for most needs), ECOG 2 (ambulatory and capable of all self-care, unable to carry out any work activities). (fallback_tool_outputs.clinical_assessment)
+- exercise_stress_test: Reduced exercise capacity (4.6 METs) limited by unsteadiness; submaximal heart rate, non-diagnostic for ischaemia. (fallback_tool_outputs.specialized_test)
+- levodopa_challenge: MDS-UPDRS III 16/132 OFF and 15/132 ON (6% change), below the 30% threshold for a clinically meaningful levodopa response. (followup request_levodopa_challenge)
+- TEE: Mild concentric left ventricular hypertrophy; aortic valve sclerosis without stenosis. No patent foramen ovale and no left atrial appendage thrombus. (followup request_tee)
+- emg_ncs: Length-dependent, sensory-predominant axonal sensorimotor polyneuropathy of moderate severity. (followup request_emg_ncs)
+- ssep: Delayed lower-limb responses with normal central conduction times, indicating peripheral slowing in the legs; upper-limb and central pathways normal. (followup request_ssep)
+- skin_biopsy_iencf: Reduced distal intraepidermal nerve fibre density with a length-dependent gradient. (followup request_skin_biopsy_iencf)
+- DTI_tractography: Diffusely reduced white matter fractional anisotropy involving the corticospinal tracts, arcuate fasciculi and optic radiations, without tract interruption. (followup request_dti_tractography)
+
+Checks: `perfect_agent.py` pass; `test_case_guards.py -k VASC-DEM-M02` pass; criterion outputs unchanged against the pre-pass snapshot; no 60-character window of any expected_evidence in the new reports; synonym guard 0 changes.

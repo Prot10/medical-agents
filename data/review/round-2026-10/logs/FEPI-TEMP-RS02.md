@@ -76,3 +76,20 @@ Commit c02f3050 added `cysticercosis_serology`, `IGRA` (interpret_labs), `olfact
 - `followup_outputs[0]` (one `Infectious_Workup` panel of cysticercosis IgG, HIV, RPR, HBsAg, HCV and QuantiFERON, trigger `request_cysticercosis_hiv_syphilis_hepatitis_quantiferon_serology`) split into three follow-ups in the same place: `request_cysticercosis_serology_eitb` (panel `Cysticercosis_serology`, Taenia solium IgG by EITB, negative), `request_igra_quantiferon` (panel `IGRA`, QuantiFERON-TB Gold Plus TB1 0.02, TB2 0.04 IU/mL, mitogen > 10, negative) and `request_hiv_syphilis_hepatitis_serology` (panel `Infectious_serology`, the four other rows unchanged). Each order now receives its own assay, not the whole serology block.
 - Two new recommended criteria after the EEG: `action-9-interpret-labs-cysticercosis-serology` (`{panels: [cysticercosis_serology]}`, [IDSA_NCC_2018]) and `action-10-interpret-labs-igra` (`{panels: [IGRA]}`, [ATS_IDSA_CDC_TB_2017], added to the FEPI-TEMP pack). Two criteria rather than one naming both, so that each assay is credited on its own: the serology answers the neurocysticercosis question, the IGRA the calcified-tuberculoma differential and the screening a pregnant woman from a high-incidence country in a shelter needs. Scoring change: recommended coverage now counts them; the stop rule is unchanged.
 - `ground_truth.red_herrings[1]`: `field_path` now `followup_outputs[0].output.panels.Cysticercosis_serology[0]`, data point names the EITB.
+
+## Library contradictions (25 Oct 2026)
+
+Orders the benchmark library answered with a normal report that contradicts this case now get a case-specific report (term: gist, where stored):
+
+- analyze_eeg ambulatory: This is an ABNORMAL 48-hour ambulatory EEG due to: 1. Right anterior temporal sharp waves (phase reversal at F8), maximal in NREM sleep. 2. Right temp (fallback_tool_outputs.eeg)
+- analyze_eeg video: This is an ABNORMAL 72-hour video-EEG due to: 1. Right anterior temporal sharp waves (phase reversal at F8), maximal in NREM sleep. 2. Right temporal  (followup request_video_eeg)
+- order_advanced_imaging FDG_PET: 1. Right mesial temporal hypometabolism extending to the temporal pole. 2. Normal metabolism elsewhere. Clinical correlation recommended. (fallback_tool_outputs.advanced_imaging)
+- obtain_tissue_diagnosis resection: Hippocampal sclerosis, ILAE type 1 (fallback_tool_outputs.tissue_diagnosis)
+- obtain_tissue_diagnosis stereotactic_biopsy: Hippocampal neuronal loss with fibrillary gliosis (followup request_stereotactic_biopsy)
+- obtain_tissue_diagnosis open_biopsy: Hippocampal neuronal loss with fibrillary gliosis (followup request_open_biopsy)
+- order_specialized_test neuropsych_battery: Weakness in visual learning and delayed visual recall (T-scores 37 and 35) with verbal memory and naming within the average range and intellectual fun (fallback_tool_outputs.specialized_test)
+- interpret_labs valproate_level: valproate not detected (fallback_tool_outputs.labs[valproate_level])
+- interpret_labs beta-hCG: Beta-hCG 24,500 mIU/mL, positive, within the range seen in the third trimester. (fallback_tool_outputs.labs[beta-hCG])
+- interpret_labs D_dimer: D-dimer 1.6 mg/L FEU, above the non-pregnant reference range. (fallback_tool_outputs.labs[D_dimer])
+
+Checks: `perfect_agent.py` passes; the criterion snapshot of the case is unchanged; `pytest agent-platform/tests -k FEPI-TEMP` (case guards included), `test_reports_do_not_fabricate.py` and `apply_diagnosis_synonyms.py --check` pass; no new report repeats a 60-character window of any criterion's expected evidence.

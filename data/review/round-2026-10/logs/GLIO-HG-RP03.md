@@ -89,3 +89,27 @@ Review-process wording (references to the round's rulings, the round policy file
 
 - criterion `action-8-order-body-imaging` rationale: "Optional: excludes a systemic primary for leptomeningeal carcinomatosis and the hilar lymphadenopathy of systemic sarcoidosis; tissue decides." -> "It excludes a systemic primary for leptomeningeal carcinomatosis and the hilar lymphadenopathy of systemic sarcoidosis; tissue decides."
 - criterion `action-check-drug-interactions` rationale: "Optional: no interaction changes the diagnostic plan." -> "No interaction changes the diagnostic plan."
+
+## Library contradictions (25 Oct 2026)
+
+Case-specific reports stored where the benchmark library's normal report contradicted the case. Why: the stored MRI shows a mass in the right temporal lobe (4.8 cm) with an abnormal routine EEG and a focal history and exam; the library reports a normal head CT, a non-diagnostic biopsy, normal brain metabolism, perfusion and vessels, a normal prolonged EEG, no headache and normal bedside and neurophysiological tests where the exam is abnormal.
+
+- order_ct_scan: CT showing the stored lesion(s) instead of a normal head CT (fallback_tool_outputs.ct)
+- obtain_tissue_diagnosis open_biopsy: the stored integrated diagnosis on this procedure's specimen (fallback_tool_outputs.tissue_diagnosis)
+- FDG_PET: hypermetabolic lesion(s) (fallback_tool_outputs.advanced_imaging)
+- amino_acid_PET: FET-avid lesion(s) (followup request_amino_acid_pet)
+- CT_perfusion: lesion perfusion matching the stored perfusion MRI (followup request_ct_perfusion)
+- perfusion_SPECT: regional hypoperfusion over the lesion (followup request_perfusion_spect)
+- cerebral_angiography: mass effect and lesion vascularity (followup request_cerebral_angiography)
+- DTI_tractography: tracts displaced or infiltrated by the lesion (followup request_dti_tractography_tracts)
+- video EEG: the stored routine EEG's abnormalities over 24 h (fallback_tool_outputs.eeg)
+- ambulatory EEG: the stored routine EEG's abnormalities over 48 h (followup request_ambulatory_eeg)
+- structured_headache_history_ichd3: the case's headache, prior primary headache and red flags (fallback_tool_outputs.clinical_assessment)
+- cognitive_screen: MoCA matching the exam (followup request_cognitive_screen)
+- gait_and_balance_timed: matching the exam (followup request_timed_gait_balance)
+- neuropsych_battery: domain deficits matching the exam (fallback_tool_outputs.specialized_test)
+- speech_language_evaluation: matching the exam (followup request_speech_language_evaluation)
+- chest_xray: the stored VP shunt tubing (fallback_tool_outputs.body_imaging)
+- labs AED_levels: Levetiracetam 24.8 mg/L (therapeutic range); no other antiseizure drug detected. (fallback_tool_outputs.labs[AED_levels])
+
+Checks: `perfect_agent.py` pass; `test_case_guards.py -k GLIO-HG-RP03` pass; no fixed order still answered by the library (`lib4.source`); no 60-character window of any criterion's expected_evidence in the added text, except tissue copies that repeat the stored tissue report verbatim; every criterion's served output unchanged (snapshot diff against the baseline).

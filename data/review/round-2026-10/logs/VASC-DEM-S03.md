@@ -70,3 +70,21 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, named in the report's own text.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+A fresh order of each study below was answered by the benchmark-level normal library, which contradicted this patient (age, rhythm, devices, surgery, stored findings). Each now has a case-specific report:
+
+- FDG_PET: Bilateral frontal hypometabolism with reduced thalamic and striatal uptake and mild diffuse cortical reduction; posterior cingulate relatively preserved. The pattern is consistent with severe subcortical small-vessel disease. (fallback_tool_outputs.advanced_imaging)
+- perfusion_SPECT: Bilateral frontal hypoperfusion with reduced thalamic and striatal uptake and mild diffuse cortical reduction; posterior cingulate relatively preserved. The pattern is consistent with severe subcortical small-vessel disease. (followup request_perfusion_spect)
+- performance_status: Karnofsky 50 (requires considerable assistance and frequent care), ECOG 2 (ambulatory and capable of all self-care, unable to carry out any work activities). (fallback_tool_outputs.clinical_assessment)
+- exercise_stress_test: Test abandoned at the lowest stage because of gait failure; non-diagnostic. (fallback_tool_outputs.specialized_test)
+- levodopa_challenge: MDS-UPDRS III 31/132 OFF and 30/132 ON (3% change), below the 30% threshold for a clinically meaningful levodopa response. (followup request_levodopa_challenge)
+- TEE: Mild concentric left ventricular hypertrophy; aortic valve sclerosis without stenosis. No patent foramen ovale and no left atrial appendage thrombus. (followup request_tee)
+- speech_language_evaluation: Mild spastic dysarthria with slow, sparse output; no aphasia. (followup request_speech_language_evaluation)
+- DTI_tractography: Diffusely and severely reduced white matter fractional anisotropy without tract interruption. (followup request_dti_tractography)
+- pelvis_abdomen_MRI: Small kidneys with cortical thinning and an enlarged prostate with transition-zone hyperplasia; no mass. (fallback_tool_outputs.body_imaging)
+- pelvis_abdomen_CT: Small kidneys with cortical thinning and an enlarged prostate; no mass or hydronephrosis. (followup request_pelvis_abdomen_ct)
+- pelvis_abdomen_ultrasound: Small echogenic kidneys with cortical thinning, without hydronephrosis; enlarged prostate with a post-void residual of 90 mL. (followup request_pelvis_abdomen_ultrasound)
+
+Checks: `perfect_agent.py` pass; `test_case_guards.py -k VASC-DEM-S03` pass; criterion outputs unchanged against the pre-pass snapshot; no 60-character window of any expected_evidence in the new reports; synonym guard 0 changes.

@@ -70,3 +70,11 @@ Review-process wording (references to the round's rulings, the round policy file
 
 - criterion `action-hm-genetic-panel` label: "Optional: hemiplegic migraine gene panel (CACNA1A, ATP1A2, SCN1A, PRRT2)" -> "Hemiplegic migraine gene panel (CACNA1A, ATP1A2, SCN1A, PRRT2)"
 - criterion `action-1-search-medical-literature` label: "Optional: literature on familial aneurysm screening and management of unruptured aneurysms" -> "Literature on familial aneurysm screening and management of unruptured aneurysms"
+
+## Library contradictions (25 Oct 2026)
+
+Case-specific reports stored where the benchmark library's normal report contradicted the case. Why: 4 mm saccular left MCA bifurcation aneurysm on the stored MRA; the library catheter angiogram reports no aneurysm.
+
+- cerebral_angiography: ~4 mm saccular left MCA bifurcation aneurysm, no other lesion (fallback_tool_outputs.advanced_imaging)
+
+Checks: `perfect_agent.py` pass; `test_case_guards.py -k MIG-AURA-P09` pass; no fixed order still answered by the library (`lib4.source`); no 60-character window of any criterion's expected_evidence in the added text; every criterion's served output unchanged (snapshot diff against the baseline).

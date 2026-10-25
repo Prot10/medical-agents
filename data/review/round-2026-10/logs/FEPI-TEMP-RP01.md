@@ -82,3 +82,17 @@ Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it na
 - Scoring: none (recommended criterion: coverage unchanged, not in the cost reference).
 
 Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.
+
+## Library contradictions (25 Oct 2026)
+
+Orders the benchmark library answered with a normal report that contradicts this case now get a case-specific report (term: gist, where stored):
+
+- analyze_eeg ambulatory: This is an ABNORMAL 48-hour ambulatory EEG due to: 1. Recurrent electrographic seizures of right temporal onset. 2. Right temporal lateralized periodi (fallback_tool_outputs.eeg)
+- obtain_tissue_diagnosis resection: Acute necrotizing encephalitis with herpes simplex virus type 1 antigen (fallback_tool_outputs.tissue_diagnosis)
+- obtain_tissue_diagnosis stereotactic_biopsy: Acute necrotizing encephalitis with herpes simplex virus type 1 antigen (followup request_stereotactic_biopsy)
+- obtain_tissue_diagnosis open_biopsy: Acute necrotizing encephalitis with herpes simplex virus type 1 antigen (followup request_open_biopsy)
+- order_specialized_test neuropsych_battery: Formal neuropsychological testing could not be completed: the patient was disoriented and could not sustain attention beyond a three-digit span. Testi (fallback_tool_outputs.specialized_test)
+- perform_clinical_assessment cognitive_screen (baseline): MoCA 7/30 with global impairment, worst in attention and orientation. The screen reflects an acute confusional state. (fallback_tool_outputs.clinical_assessment)
+- interpret_labs AED_levels: No levetiracetam, valproate, carbamazepine, phenytoin, lamotrigine or lacosamide detected. (fallback_tool_outputs.labs[AED_levels], also answers valproate_level)
+
+Checks: `perfect_agent.py` passes; the criterion snapshot of the case is unchanged; `pytest agent-platform/tests -k FEPI-TEMP` (case guards included), `test_reports_do_not_fabricate.py` and `apply_diagnosis_synonyms.py --check` pass; no new report repeats a 60-character window of any criterion's expected evidence.

@@ -79,3 +79,18 @@ Review-process wording (references to the round's rulings, the round policy file
 - The FVC mL/kg figures and the weight-based IVIg amounts in the text were checked against this weight: all within rounding, no text change.
 
 Checks: `perfect_agent.py` ok; BMI = weight / height^2 to one decimal.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 20, ECOG 4 (very sick; hospital admission and active supportive treatment necessary) (fallback_tool_outputs.clinical_assessment). Why: rule 1: the library reports Karnofsky 100 / ECOG 0 (no evidence of disease, working); rule 3: crisis with FVC 1.2 L, neck flexors 1/5 and inability to walk.
+- `order_specialized_test {test_type: emg_ncs}`: normal nerve conductions and needle EMG, stating that neuromuscular transmission was not assessed (fallback_tool_outputs.specialized_test). Why: rule 1: the library report concludes there is no neuromuscular junction disorder, which routine conductions and needle EMG without repetitive stimulation cannot assess and which is not true here; AChR-positive myasthenia in crisis.
+- `order_specialized_test {test_type: emg_single_fiber}`: severely increased jitter with frequent blocking in EDC and frontalis (followup_outputs[1] request_emg_single_fiber). Why: rule 1: AChR-positive myasthenia in crisis (binding antibody 8.4 nmol/L); the library reports normal jitter.
+- `order_specialized_test {test_type: repetitive_nerve_stimulation}`: decrement 34% nasalis, 29% trapezius, 16% ADM (followup_outputs[2] request_repetitive_nerve_stimulation). Why: rule 1: AChR-positive myasthenia in crisis with severe generalized weakness; the library reports no decrement.
+- `order_specialized_test {test_type: ice_pack_test}`: positive bilaterally (MRD1 +2.5 mm) (followup_outputs[3] request_ice_pack_test). Why: rule 3: severe bilateral ptosis with the eyes nearly closed at rest; the library reports no ptosis at baseline.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: not performed, unable to stand safely (followup_outputs[4] request_gait_and_balance_timed). Why: rule 3: the library reports a normal timed gait (TUG 9.1 s, Berg 56/56); the examination documents that she is unable to walk safely.
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: not performed, oral challenge unsafe in crisis (followup_outputs[5] request_levodopa_challenge). Why: rule 3: severe dysphagia and respiratory distress; the library describes a normal walking examination.
+- `order_specialized_test {test_type: speech_language_evaluation}`: severe flaccid dysarthria, barely intelligible; language normal (followup_outputs[6] request_speech_language_evaluation). Why: rule 3: the library reports no dysarthria; the examination documents nasal, barely intelligible speech.
+- `perform_clinical_assessment {assessment_type: orthostatic_blood_pressure}`: not performed, unable to stand; supine 158/96, HR 118 (followup_outputs[7] request_orthostatic_blood_pressure). Why: rule 3: unable to stand in crisis, BP 158/96 and HR 118; the library reports a standing test with BP 128/78 and HR 68.
+- Case fallback replaced, `fallback_tool_outputs.cardiac_monitoring`: persistent sinus tachycardia (mean 108, minimum 92, maximum 132 bpm) without arrhythmia, in place of a normal sinus rhythm with minimum 49 bpm. Why: rule 3: sinus tachycardia at 118 bpm on the stored ECG and at the bedside in respiratory distress; the case fallback reported sinus rhythm averaging 80 bpm.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

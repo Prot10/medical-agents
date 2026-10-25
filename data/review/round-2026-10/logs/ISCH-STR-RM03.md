@@ -106,3 +106,15 @@ Review-process wording (references to the round's rulings, the round policy file
 
 - criterion `action-8-order-echocardiogram` rationale: "Optional: with no infarct and a dissection that explains the presentation, a cardiac source is not under investigation." -> "With no infarct and a dissection that explains the presentation, a cardiac source is not under investigation."
 - criterion `action-9-order-cardiac-monitoring` rationale: "Optional: atrial fibrillation is not a plausible mechanism for a dissection without infarct." -> "Atrial fibrillation is not a plausible mechanism for a dissection without infarct."
+
+## Library contradictions (25 Oct 2026)
+
+Orders that reached the benchmark library's normal report although this case contradicts it (diagnosis, history, medications or a stored finding) now get a case-specific report; every other off-pathway order still gets the library normal. No tier, criterion, diagnosis or existing output changed.
+
+- `order_advanced_imaging modality=MR_angiography` -> `followup_outputs[order_mr_angiography]`: MR angiography showing the vessel lesion on the stored CTA.
+- `order_advanced_imaging modality=cerebral_angiography` -> `followup_outputs[order_cerebral_angiography]`: catheter angiography showing the vessel lesion on the stored CTA.
+- `order_advanced_imaging modality=carotid_duplex` -> `followup_outputs[order_carotid_duplex]`: carotid and vertebral duplex consistent with the stored CTA.
+- `order_advanced_imaging modality=transcranial_doppler` -> `followup_outputs[order_transcranial_doppler]`: transcranial Doppler consistent with the stored CTA.
+- `perform_clinical_assessment assessment_type=performance_status` -> `followup_outputs[order_performance_status]`: performance status KPS 90, ECOG 0 for the documented deficits.
+
+Checks: `perfect_agent.py` ok; `test_case_guards.py -k ISCH-STR` pass; every order listed in `plans/LIBRARY-group2-map.yaml` for this case is answered without the library; served answers of every other order unchanged against HEAD. Reasons and doubts: `plans/LIBRARY-group2-decisions.md`.

@@ -88,3 +88,12 @@ Review-process wording (references to the round's rulings, the round policy file
 - The FVC mL/kg figures and the weight-based IVIg amounts in the text were checked against this weight: all within rounding, no text change.
 
 Checks: `perfect_agent.py` ok; BMI = weight / height^2 to one decimal.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 80, ECOG 1 (normal activity with effort; some signs and symptoms) (fallback_tool_outputs.clinical_assessment). Why: rule 1: the library reports Karnofsky 100 / ECOG 0 (no evidence of disease, working); rule 3: fluctuating bulbar and ocular symptoms for 6 months, still working.
+- `order_specialized_test {test_type: emg_ncs}`: normal nerve conductions and needle EMG, stating that neuromuscular transmission was not assessed (fallback_tool_outputs.specialized_test). Why: rule 1: the library report concludes there is no neuromuscular junction disorder, which routine conductions and needle EMG without repetitive stimulation cannot assess and which is not true here; the stored RNS study reports normal CMAP amplitudes, which this report keeps.
+- `interpret_labs {panels: [tox_screen]}`: urine benzodiazepines positive, rest negative (fallback_tool_outputs.labs['tox_screen']). Why: rule 2: takes clonazepam 0.5 mg; the library reports a negative benzodiazepine screen.
+- `order_specialized_test {test_type: speech_language_evaluation}`: normal at rest, mild fatigable hypernasality after 15 minutes of reading (followup_outputs[4] request_speech_language_evaluation). Why: rule 3: speech becomes slurred after 20-30 minutes of speaking (history) and the swallow study was mildly impaired; the library reports no dysarthria at any duration. The report stays normal at rest, as the 10-minute examination was.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

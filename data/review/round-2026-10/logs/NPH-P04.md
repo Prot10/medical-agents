@@ -82,3 +82,14 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 50, ECOG 3; requires considerable assistance (fallback_tool_outputs.clinical_assessment). Why: the library gives Karnofsky 100 / ECOG 0 (no evidence of disease, working) in a symptomatic patient.
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: MDS-UPDRS III 24 to 23 (4%); gait, gait initiation, turning and postural stability unchanged; no clinically meaningful levodopa response (below 30%) (followup_outputs[3] request_levodopa_challenge). Why: the library describes a normal motor examination and gait; this patient has a gait disorder, and the challenge shows little or no levodopa response.
+- `order_specialized_test {test_type: neuropsych_battery}`: severe frontal behavioural-dysexecutive profile with impaired social cognition; recognition and visuospatial function relatively preserved (fallback_tool_outputs.specialized_test). Why: the library reports normal cognition in every domain; this patient has documented cognitive impairment on the stored bedside screen.
+- `order_specialized_test {test_type: exercise_stress_test}`: treadmill test not performed (unable to walk safely on a treadmill (freezing; walks only with a walker)); non-diagnostic (followup_outputs[4] request_exercise_stress_test). Why: the library describes a 9.5-minute Bruce protocol at 10.4 METs; this patient's gait disorder (magnetic gait with falls) does not allow it.
+- `order_echocardiogram {echo_type: exercise_echo}`: exercise not performed (unable to walk safely on a treadmill (freezing; walks only with a walker)); resting findings as on the stored TTE (followup_outputs[5] request_exercise_echo). Why: the library describes 9.5 METs on a treadmill with a normal echo; this patient's gait disorder does not allow it.
+- `order_advanced_imaging {modality: perfusion_SPECT}`: bilateral frontal and anterior temporal hypoperfusion (left > right) (fallback_tool_outputs.advanced_imaging). Why: the library reports normal perfusion; the stored FDG-PET shows bilateral frontal and anterior temporal hypometabolism and the stored MRI bifrontal atrophy.
+- `order_specialized_test {test_type: speech_language_evaluation}`: perseverative, concrete speech with mild anomia; motor speech normal (followup_outputs[6] request_speech_language_evaluation). Why: the library reports normal speech and naming; the examination documents perseverative speech and mild anomia.
+- Checks: perfect agent ok; case guards pass; criteria answers unchanged.

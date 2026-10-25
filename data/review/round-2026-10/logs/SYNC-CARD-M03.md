@@ -121,3 +121,16 @@ Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it na
 - Scoring: none (evidence only; the reward does not read it).
 
 Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the normal-row probe reports nothing for this criterion.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 80, ECOG 1 (fallback_tool_outputs.clinical_assessment). Why: rule 2: the library reports Karnofsky 100, no complaints and 'working' in a retired man with recurrent syncope who has curtailed his activity.
+- `order_echocardiogram {echo_type: TEE}`: mild calcific aortic stenosis, concentric LVH, LVEF 52%, no thrombus or shunt (fallback_tool_outputs.echo). Why: rule 3: the stored TTE shows concentric LVH, mild calcific aortic stenosis and a dilated left atrium; the library TEE reports a normal heart.
+- `order_echocardiogram {echo_type: bubble_study}`: concentric LVH and mild AS as on the TTE, no right-to-left shunt (followup_outputs[9] request_bubble_study). Why: rule 3: the stored TTE is abnormal (LVH, mild AS); the library reports a normal heart.
+- `order_echocardiogram {echo_type: exercise_echo}`: chronotropic incompetence, 5.2 METs, Mobitz II in recovery, mild AS (followup_outputs[10] request_exercise_echo). Why: rule 3: the stored exercise test shows chronotropic incompetence and Mobitz II block, and the stored TTE mild AS with LVH; the library reports a normal study.
+- `order_advanced_imaging {modality: coronary_CTA}`: non-obstructive plaque, calcium score 486, calcified aortic valve (fallback_tool_outputs.advanced_imaging). Why: rule 2: catheterisation three years ago showed non-obstructive coronary artery disease; the library reports no plaque and calcium score 0.
+- `order_advanced_imaging {modality: coronary_angiography}`: non-obstructive coronary disease, LVEDP 16 mmHg (followup_outputs[11] request_coronary_angiography). Why: rule 2: prior catheterisation showed non-obstructive coronary artery disease; the library reports normal coronaries.
+- `order_specialized_test {test_type: polysomnography}`: moderate obstructive sleep apnoea, AHI 27/h (fallback_tool_outputs.specialized_test). Why: rule 2: known obstructive sleep apnoea treated with CPAP; the library reports AHI 2.1/h.
+- `order_specialized_test {test_type: emg_ncs}`: mild length-dependent sensory-predominant axonal polyneuropathy (followup_outputs[12] request_emg_ncs). Why: rule 2: type 2 diabetes for ten years with reduced vibration at the great toes and ankle reflexes 1+; the library reports normal nerve conduction.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

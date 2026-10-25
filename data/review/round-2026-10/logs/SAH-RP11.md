@@ -82,3 +82,19 @@ Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it na
 - Approved case: changed for a real inconsistency (the policy's own order did not return what its evidence cites), so it goes back to re-review for this criterion only.
 
 Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.
+
+## Library contradictions (25 Oct 2026)
+
+Orders the benchmark library answered with a normal report that this case contradicts now have a case report. Contradiction = the history, the diagnosis or a stored finding makes the normal report impossible.
+
+- `analyze_csf (lumbar puncture, EVD, lumbar drain; xanthochromia)` -> fallback_tool_outputs.csf: blood-stained CSF without clearing (Fisher 3), xanthochromia result per time from onset; oligoclonal bands, IgG index and JCV PCR. The library returned clear acellular CSF in a patient with subarachnoid blood on CT.
+- `perform_clinical_assessment {assessment_type: performance_status}` -> fallback_tool_outputs.clinical_assessment: Karnofsky 50, ECOG 3. The library returned Karnofsky 100, ECOG 0, working, in an acutely ill inpatient.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}` -> followup_outputs[request_gait_and_balance_timed]: timed measures abnormal; the library returned a normal Timed Up and Go in a patient whose gait the exam could not test or found abnormal.
+- `interpret_labs {panels: [anti_JCV_antibody]}` -> fallback_tool_outputs.labs: positive, index 3.2, as the HPI records; the library returned negative.
+- `order_specialized_test {test_type: vep}` -> fallback_tool_outputs.specialized_test: bilaterally prolonged P100; MS with bilateral optic disc pallor on the stored exam.
+- `order_specialized_test {test_type: optical_coherence_tomography}` -> followup_outputs[request_optical_coherence_tomography]: bilateral temporal RNFL and GCIPL thinning; bilateral optic disc pallor on the stored exam.
+- `perform_clinical_assessment {assessment_type: structured_headache_history_ichd3}` -> followup_outputs[request_structured_headache_history_ichd3]: maximal within 2 to 3 seconds while grocery shopping, 2 hours before assessment; red flags: thunderclap onset. The library reported no thunderclap onset, no red flags and no nausea or photophobia, against the history.
+- `perform_clinical_assessment {assessment_type: orthostatic_blood_pressure}` -> followup_outputs[request_orthostatic_blood_pressure]: supine BP 146/86 as at arrival, standing values similar, headache worse on standing. The library reported 3 minutes of symptom-free standing at BP 128/78.
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}` -> followup_outputs[request_levodopa_challenge]: no parkinsonian signs, challenge not performed. The library reported normal gait and postural reflexes and no nausea in a patient who walks only slowly with headache.
+
+Checks: `perfect_agent.py` ok; `test_case_guards.py -k SAH-RP11` passed; no criterion answer changed (snapshot diff); every mapped order is answered without the library (`verify.py`).

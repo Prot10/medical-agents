@@ -86,3 +86,22 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, named in the report's own text.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+A fresh order of each study below was answered by the benchmark-level normal library, which contradicted this patient (age, rhythm, devices, surgery, stored findings). Each now has a case-specific report:
+
+- FDG_PET: Bilateral temporoparietal, posterior cingulate and medial temporal hypometabolism, left more than right, a pattern consistent with an Alzheimer-type profile, with an additional focal left thalamic reduction and mild patchy frontal hypometabolism. (fallback_tool_outputs.advanced_imaging)
+- perfusion_SPECT: Bilateral temporoparietal, posterior cingulate and medial temporal hypoperfusion, left more than right, a pattern consistent with an Alzheimer-type profile, with an additional focal left thalamic reduction and mild patchy frontal hypoperfusion. (followup request_perfusion_spect)
+- performance_status: Karnofsky 60 (requires occasional assistance but able to care for most needs), ECOG 2 (ambulatory and capable of all self-care, unable to carry out any work activities). (fallback_tool_outputs.clinical_assessment)
+- exercise_stress_test: Very low workload (2.6 METs) limited by gait; submaximal heart rate, non-diagnostic for ischaemia. (fallback_tool_outputs.specialized_test)
+- tau_PET: Tau-positive PET: neocortical tau signal in the medial and inferior temporal cortex bilaterally, extending to the lateral temporal and inferior parietal cortex and the posterior cingulate, left greater than right. (followup request_tau_pet)
+- gait_and_balance_timed: Slow, mildly wide-based and short-stepped gait with right leg circumduction (Timed Up and Go 21.4 s with a stick); impaired balance with a raised fall risk. (followup request_gait_and_balance_timed)
+- levodopa_challenge: MDS-UPDRS III 17/132 OFF and 17/132 ON (0% change), below the 30% threshold for a clinically meaningful levodopa response. (followup request_levodopa_challenge)
+- TEE: Mild concentric left ventricular hypertrophy; aortic valve sclerosis without stenosis. No patent foramen ovale and no left atrial appendage thrombus. (followup request_tee)
+- ssep: Prolonged and attenuated cortical responses to right median and tibial stimulation with normal cervical responses, indicating central somatosensory conduction delay above the cervical cord on the left; right hemisphere pathways normal. (followup request_ssep)
+- DTI_tractography: Reduced fractional anisotropy of the left corticospinal tract at the internal capsule and of the left thalamocortical sensory radiation, with periventricular, fornix and cingulum reductions. (followup request_dti_tractography)
+- MR_angiography: Mild bilateral carotid bulb disease (left 30-40%, right under 30%); no haemodynamically significant or intracranial stenosis. (followup request_mr_angiography)
+- cerebral_angiography: Mild bilateral carotid bulb disease (left 35%); no intracranial stenosis, occlusion or aneurysm. (followup request_cerebral_angiography)
+
+Checks: `perfect_agent.py` pass; `test_case_guards.py -k VASC-DEM-M05` pass; criterion outputs unchanged against the pre-pass snapshot; no 60-character window of any expected_evidence in the new reports; synonym guard 0 changes.

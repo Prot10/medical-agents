@@ -76,3 +76,22 @@ Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym g
 - Why: rule 1: patient.physical_exam.general states weight 72 kg, height 172 cm.
 
 Checks: `perfect_agent.py` ok; BMI = weight / height^2 to one decimal.
+
+## Library contradictions (25 Oct 2026)
+
+A fresh order of each study below was answered by the benchmark-level normal library, which contradicted this patient (age, rhythm, devices, surgery, stored findings). Each now has a case-specific report:
+
+- FDG_PET: Bilateral frontal hypometabolism with reduced left thalamic uptake and mild diffuse cortical reduction; posterior cingulate relatively preserved. The pattern is consistent with severe subcortical small-vessel disease. (fallback_tool_outputs.advanced_imaging)
+- perfusion_SPECT: Bilateral frontal hypoperfusion with reduced left thalamic uptake and mild diffuse cortical reduction; posterior cingulate relatively preserved. The pattern is consistent with severe subcortical small-vessel disease. (followup request_perfusion_spect)
+- performance_status: Karnofsky 50 (requires considerable assistance and frequent care), ECOG 2 (ambulatory and capable of all self-care, unable to carry out any work activities). (fallback_tool_outputs.clinical_assessment)
+- exercise_stress_test: Test abandoned at the lowest stage because of gait failure; non-diagnostic. (fallback_tool_outputs.specialized_test)
+- levodopa_challenge: MDS-UPDRS III 30/132 OFF and 29/132 ON (3% change), below the 30% threshold for a clinically meaningful levodopa response. (followup request_levodopa_challenge)
+- TEE: Mild concentric left ventricular hypertrophy; mildly dilated left atrium; aortic valve sclerosis without stenosis. No patent foramen ovale and no left atrial appendage thrombus. (followup request_tee)
+- cardiac_MRI: Mildly dilated left atrium with preserved left ventricular function; no scar or thrombus. (followup request_cardiac_mri)
+- speech_language_evaluation: Moderate spastic (pseudobulbar) dysarthria with intact language. (followup request_speech_language_evaluation)
+- respiratory_function: Moderate obstructive ventilatory defect (FEV1/FVC 0.56, FEV1 62% predicted) with normal respiratory muscle strength. (followup request_respiratory_function)
+- DTI_tractography: Bilateral attenuation of the corticospinal and corticobulbar tracts at the internal capsules on a background of severely reduced white matter fractional anisotropy. (followup request_dti_tractography)
+- chest_abdomen_pelvis_CT: No mass or lymphadenopathy. Centrilobular and paraseptal emphysema, upper-lobe predominant, with bronchial wall thickening; coronary artery calcification. (fallback_tool_outputs.body_imaging)
+- chest_CTA: No pulmonary embolism or aortic dissection. Centrilobular and paraseptal emphysema, upper-lobe predominant, with bronchial wall thickening; coronary artery calcification. (followup request_chest_cta)
+
+Checks: `perfect_agent.py` pass; `test_case_guards.py -k VASC-DEM-S05` pass; criterion outputs unchanged against the pre-pass snapshot; no 60-character window of any expected_evidence in the new reports; synonym guard 0 changes.

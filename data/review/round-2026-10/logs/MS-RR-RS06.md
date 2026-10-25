@@ -88,3 +88,11 @@ Commit c02f3050 added `cysticercosis_serology`, `IGRA` (interpret_labs), `olfact
 
 - New optional criterion `action-7-interpret-labs-mma` (`{panels: [MMA]}`, after the AQP4/MOG criterion) and its follow-up `request_mma_methylmalonic_acid` (panel `MMA`, methylmalonic acid 0.22 umol/L, reference 0.00-0.40), placed after the AQP4/MOG follow-up and before the drug check. Optional, not recommended: B12 228 pg/mL is inside the reference range and the enhancing lesions and oligoclonal bands already exclude subacute combined degeneration, so the test confirms rather than decides; ordering it is no longer unjustified. No scoring change for an agent that does not order it.
 - `ground_truth.differential[B12 deficiency myelopathy].key_features`: the normal methylmalonic acid added to the Against list.
+
+## Library contradictions (25 Oct 2026)
+
+- `order_specialized_test {test_type: ssep}`: 1. Prolonged left tibial cortical P37 latency (47.0 ms) with a normal lumbar N22, indicating central somatosensory conduction delay above the lumbar cord. 2. Prolonged left median N13-N20 interpeak latency with... (fallback_tool_outputs.specialized_test). Why: rule c: reduced vibration and joint position sense in the left hand and forearm and at the left great toe with a left dorsolateral C3-C4 and a dorsal-column T6 lesion; the library reports a normal study.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: Abnormal timed gait and balance assessment. Timed Up and Go 15.1 s and 10 m walk speed 0.84 m/s are slowed for age; Berg balance 42/56. (fallback_tool_outputs.clinical_assessment). Why: rule d: the examination documents a gait disorder (wide-based spastic-ataxic gait with left leg circumduction, veering to the left); the library reports a normal study.
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 70, ECOG 2: ambulatory and capable of all self-care, unable to carry out work activities, up and about more than half of waking hours. (followup_outputs[request_performance_status]). Why: rule d: inpatient relapse with a documented gait disorder: Karnofsky 100 / ECOG 0 'without evidence of disease' contradicts the case; the library reports a normal study.
+
+Checks: perfect agent ok; case guards pass; snapshot diff shows no criterion answer changed; map verified (served without the library).

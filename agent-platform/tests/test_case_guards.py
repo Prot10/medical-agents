@@ -15,6 +15,8 @@ Each guard is parametrized by case id, so one condition runs alone with e.g.
 7. Diagnosis labels (scorer v2, 25 Oct 2026): the case's own primary label scores, and no rejected
    label is named inside an accepted one.
 8. Body size (25 Oct 2026): every case records height, weight and BMI, and they agree.
+9. Library contradictions (25 Oct 2026): the orders listed in
+   `config/tools/library_contradictions.yaml` get a case-specific answer, never the library normal.
 """
 
 from __future__ import annotations
@@ -552,3 +554,43 @@ def test_body_size_guard_fires():
     assert body_size_problems({"patient": {"demographics": {"height_cm": 170, "weight_kg": 70, "bmi": 30.0}}})
     assert body_size_problems({"patient": {"demographics": {"bmi": 24.2}}})
     assert not body_size_problems({"patient": {"demographics": {"height_cm": 170, "weight_kg": 70, "bmi": 24.2}}})
+
+
+# ---------------------------------------------------------------------------------------
+# 9. The library normal never answers an order it would contradict (25 Oct 2026).
+
+LIBRARY_MAP = ROOT / "agent-platform/config/tools/library_contradictions.yaml"
+
+
+def contradicted_orders(case_id: str, table: dict[str, Any]) -> list[dict[str, Any]]:
+    entry = table.get(condition_of(case_id)) or {}
+    orders = [] if case_id in entry.get("except", []) else list(entry.get("all_cases", []))
+    return orders + list((entry.get("cases") or {}).get(case_id, []))
+
+
+def library_answers(case_id: str, orders: list[dict[str, Any]]) -> list[str]:
+    from neuroagent.tools.mock_server import MockServer
+    from neuroagent_schemas import NeuroBenchCase
+
+    case = NeuroBenchCase.model_validate_json((CASES / f"{case_id}.json").read_text())
+    hits = []
+    for order in orders:
+        result = MockServer(case).get_output(order["tool"], {"clinical_context": "guard", **order["params"]})
+        if result.library:
+            hits.append(f"{order['tool']} {order['params']}")
+    return hits
+
+
+@pytest.mark.parametrize("case_id", CASE_IDS)
+def test_library_never_answers_a_contradicted_order(case_id):
+    import yaml
+
+    table = yaml.safe_load(LIBRARY_MAP.read_text()) or {}
+    assert not library_answers(case_id, contradicted_orders(case_id, table))
+
+
+def test_library_guard_fires():
+    table = {"ALS": {"all_cases": [{"tool": "order_specialized_test", "params": {"test_type": "genetic_panel:HD"}}]}}
+    orders = contradicted_orders("ALS-M01", table)
+    assert orders and library_answers("ALS-M01", orders)
+    assert not contradicted_orders("ALS-M01", {"ALS": {"all_cases": orders, "except": ["ALS-M01"]}})

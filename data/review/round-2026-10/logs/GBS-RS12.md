@@ -83,3 +83,14 @@ Review-process wording (references to the round's rulings, the round policy file
 - The FVC mL/kg figures and the weight-based IVIg amounts in the text were checked against this weight: all within rounding, no text change.
 
 Checks: `perfect_agent.py` ok; BMI = weight / height^2 to one decimal.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 40, ECOG 3 (fallback_tool_outputs.clinical_assessment). Why: rule 1: the library reports Karnofsky 100 / ECOG 0 and a working patient; she cannot stand or walk on postoperative day 14.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: unable to stand; timed gait and balance tests not performed (followup_outputs[4] request_gait_and_balance_timed). Why: rule 1: the library reports a normal timed gait and balance assessment; she cannot stand or walk (leg weakness 3/5).
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: no tremor or rigidity; motor items limited by weakness, response not assessable (followup_outputs[5] request_levodopa_challenge). Why: rule 1: the library describes a normal motor examination, gait and postural reflexes; leg weakness 3/5 and inability to stand.
+- `order_body_imaging {study: peripheral_nerve_MRI}`: smooth enhancement and mild T2 hyperintensity of the lumbosacral roots, no enlargement (fallback_tool_outputs.body_imaging). Why: rule 1 and 3: the library reads the nerve roots as normal; root enhancement as on the spine MRI of this case (stored spine MRI: smooth enhancement of the cauda equina roots beyond the operative bed).
+- `order_body_imaging {study: spine_CT}`: post-surgical L1-L5 laminectomy and L4-L5 fusion, hardware in position; osteopenia (followup_outputs[6] request_spine_ct). Why: rule 2: L1-L5 laminectomy with L4/5 posterolateral fusion 14 days ago and osteoporosis are in the history; the library reports a normal spine.
+- `perform_clinical_assessment {assessment_type: orthostatic_blood_pressure}`: active standing not performed (cannot stand); supine BP 142/84 mmHg, HR 90 bpm; sitting BP 138/84 mmHg, HR 96 bpm (followup_outputs[7] request_orthostatic_blood_pressure). Why: rule 3: she cannot stand; the library reports 3 minutes of symptom-free standing at a supine heart rate of 68.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

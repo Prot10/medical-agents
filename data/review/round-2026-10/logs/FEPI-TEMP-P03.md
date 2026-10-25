@@ -63,3 +63,17 @@ Condition close-out (`plans/FEPI-TEMP-decisions.md`). What changed and why:
 
 - Past history says "Mild obesity" but the stored BMI was 28.2 (overweight). Rule 3: BMI 28.2 -> 31.0 (class I obesity), weight 69.5 -> 76.4 kg, height 157 cm kept. No text cited the old BMI.
 - Checks: `perfect_agent.py` pass; weight/height/BMI consistency check clean.
+
+## Library contradictions (25 Oct 2026)
+
+Orders the benchmark library answered with a normal report that contradicts this case now get a case-specific report (term: gist, where stored):
+
+- analyze_eeg ambulatory: This is an ABNORMAL 48-hour ambulatory EEG due to: 1. Occasional right anterior temporal sharp waves (phase reversal at F8) in drowsiness and NREM sle (fallback_tool_outputs.eeg)
+- order_advanced_imaging FDG_PET: 1. Mild right mesial temporal hypometabolism. 2. Normal metabolism elsewhere. Clinical correlation recommended. (fallback_tool_outputs.advanced_imaging)
+- obtain_tissue_diagnosis resection: Hippocampal sclerosis, ILAE type 1 (fallback_tool_outputs.tissue_diagnosis)
+- obtain_tissue_diagnosis stereotactic_biopsy: Hippocampal neuronal loss with fibrillary gliosis (followup request_stereotactic_biopsy)
+- obtain_tissue_diagnosis open_biopsy: Hippocampal neuronal loss with fibrillary gliosis (followup request_open_biopsy)
+- order_specialized_test neuropsych_battery: Mild Weakness in visual learning and delayed visual recall (T-scores 39 and 37) with verbal memory and naming within the average range and intellectua (fallback_tool_outputs.specialized_test)
+- interpret_labs AED_levels: Lamotrigine 5.8 mg/L, within the reference range. Other analytes not detected. (fallback_tool_outputs.labs[AED_levels], also answers valproate_level)
+
+Checks: `perfect_agent.py` passes; the criterion snapshot of the case is unchanged; `pytest agent-platform/tests -k FEPI-TEMP` (case guards included), `test_reports_do_not_fabricate.py` and `apply_diagnosis_synonyms.py --check` pass; no new report repeats a 60-character window of any criterion's expected evidence.

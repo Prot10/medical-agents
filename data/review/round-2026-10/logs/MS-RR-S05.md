@@ -91,3 +91,10 @@ Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it na
 - Scoring: coverage unchanged (any call matching the old order still matches); the cost reference of the required work-up now uses the new first order.
 
 Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the normal-row probe reports nothing for this criterion.
+
+## Library contradictions (25 Oct 2026)
+
+- `order_specialized_test {test_type: ssep}`: 1. Prolonged right tibial cortical P37 latency (46.7 ms) with a normal lumbar N22, indicating central somatosensory conduction delay above the lumbar cord. 2. Normal left tibial and bilateral median responses. (fallback_tool_outputs.specialized_test). Why: rule c: vibration reduced in the right leg from the knee down with a right dorsolateral C4-C5 and a dorsal-column T5-T6 lesion; the library reports a normal study.
+- `order_specialized_test {test_type: visual_field_perimetry}`: 1. Diffuse depression of the left visual field, most marked centrally (MD -12.3 dB). 2. Normal right visual field. (followup_outputs[request_visual_field_perimetry]). Why: rule c: acute left optic neuritis with acuity 20/80, a left RAPD and generalized reduction of sensitivity on confrontation; the library reports a normal study.
+
+Checks: perfect agent ok; case guards pass; snapshot diff shows no criterion answer changed; map verified (served without the library).

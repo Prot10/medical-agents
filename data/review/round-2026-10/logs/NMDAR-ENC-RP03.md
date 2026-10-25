@@ -72,3 +72,25 @@ Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.
 Review-process wording (references to the round's rulings, the round policy file, the criteria packs, and tier markers such as "(optional)" in criterion labels and rationales) is shown to physicians in the review app, so it was rewritten in clinical language. The tier stays in the criterion's `importance` field; scoring is unchanged. `test_case_guards.py::test_no_review_process_text` now fails on any of it.
 
 - criterion `action-7-search-medical-literature` label: "Optional: review published evidence on autoimmune encephalitis after HSV encephalitis" -> "Review published evidence on autoimmune encephalitis after HSV encephalitis"
+
+## Library contradictions (25 Oct 2026)
+
+Orders that reached the benchmark library's normal report although this case contradicts it (diagnosis, history, medications or a stored finding) now get a case-specific report; every other off-pathway order still gets the library normal. No tier, criterion, diagnosis or existing output changed.
+
+- `order_advanced_imaging modality=FDG_PET` -> `followup_outputs[order_fdg_pet]`: brain FDG-PET: frontotemporal hypermetabolism with parieto-occipital hypometabolism, distributed as the stored MRI and EEG.
+- `analyze_eeg eeg_type=ambulatory` -> `followup_outputs[order_ambulatory]`: ambulatory EEG mirroring the stored continuous EEG (no video).
+- `perform_clinical_assessment assessment_type=cognitive_screen` -> `followup_outputs[order_cognitive_screen]`: baseline cognitive screen as documented in the mental status examination.
+- `perform_clinical_assessment assessment_type=cognitive_screen timing=post_intervention` -> `followup_outputs[order_cognitive_screen_post_intervention]`: repeat screen during the admission: persisting impairment.
+- `order_specialized_test test_type=neuropsych_battery` -> `followup_outputs[order_neuropsych_battery]`: neuropsychological battery not completable or impaired in the acute encephalopathy.
+- `perform_clinical_assessment assessment_type=performance_status` -> `followup_outputs[order_performance_status]`: performance status KPS 30, ECOG 4 for the documented dependency.
+- `perform_clinical_assessment assessment_type=gait_and_balance_timed` -> `followup_outputs[order_gait_and_balance_timed]`: timed gait not testable or impaired, as on the examination.
+- `order_specialized_test test_type=speech_language_evaluation` -> `followup_outputs[order_speech_language_evaluation]`: speech and language evaluation reflecting the documented speech disturbance.
+- `order_ct_scan` -> `fallback_tool_outputs.ct`: head CT shows the chronic lesion on the stored MRI.
+- `order_advanced_imaging modality=MR_spectroscopy` -> `followup_outputs[order_mr_spectroscopy]`: MR spectroscopy abnormal in the encephalomalacic tissue on the stored MRI.
+- `order_advanced_imaging modality=perfusion_MRI` -> `followup_outputs[order_perfusion_mri]`: perfusion MRI abnormal in the encephalomalacic tissue on the stored MRI.
+- `order_advanced_imaging modality=coronary_angiography` -> `followup_outputs[order_coronary_angiography]`: coronary angiogram: patent LAD stent with mild non-obstructive disease (stented LAD and coronary calcification in the case).
+- `order_advanced_imaging modality=coronary_CTA` -> `followup_outputs[order_coronary_cta]`: coronary CTA: LAD stent and calcified non-obstructive plaque.
+- `labs:HbA1c` -> fallback labs panel `Glycated haemoglobin`: HbA1c 6.3% in diet-controlled type 2 diabetes (6.2% three months ago).
+- `labs:valproate_level` -> fallback labs panel `Antiseizure medication levels`: antiseizure drug levels: none detected (no antiseizure drug prescribed).
+
+Checks: `perfect_agent.py` ok; `test_case_guards.py -k NMDAR-ENC` pass; every order listed in `plans/LIBRARY-group2-map.yaml` for this case is answered without the library; served answers of every other order unchanged against HEAD. Reasons and doubts: `plans/LIBRARY-group2-decisions.md`.

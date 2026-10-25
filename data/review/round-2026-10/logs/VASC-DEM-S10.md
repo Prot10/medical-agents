@@ -61,3 +61,19 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, named in the report's own text.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+A fresh order of each study below was answered by the benchmark-level normal library, which contradicted this patient (age, rhythm, devices, surgery, stored findings). Each now has a case-specific report:
+
+- FDG_PET: Focal left caudate metabolic defect with left inferior-medial frontal and anterior cingulate hypometabolism and a small right putaminal reduction; posterior cortex preserved. (fallback_tool_outputs.advanced_imaging)
+- perfusion_SPECT: Focal left caudate perfusion defect with left inferior-medial frontal and anterior cingulate hypoperfusion and a small right putaminal reduction; posterior cortex preserved. (followup request_perfusion_spect)
+- performance_status: Karnofsky 60 (requires occasional assistance but able to care for most needs), ECOG 2 (ambulatory and capable of all self-care, unable to carry out any work activities). (fallback_tool_outputs.clinical_assessment)
+- exercise_stress_test: No electrocardiographic or clinical evidence of inducible ischaemia at 6.0 METs; slow to start and needed continual prompting. (fallback_tool_outputs.specialized_test)
+- gait_and_balance_timed: Timed Up and Go 13.2 s, prolonged mainly by slow initiation; slightly reduced right arm swing. (followup request_gait_and_balance_timed)
+- levodopa_challenge: MDS-UPDRS III 11/132 OFF and 11/132 ON (0% change), below the 30% threshold for a clinically meaningful levodopa response. (followup request_levodopa_challenge)
+- TEE: Mild concentric left ventricular hypertrophy; aortic valve sclerosis without stenosis. No patent foramen ovale and no left atrial appendage thrombus. (followup request_tee)
+- speech_language_evaluation: Markedly reduced verbal initiation with mild dysarthria; naming, repetition and comprehension preserved. (followup request_speech_language_evaluation)
+- DTI_tractography: Interruption of the left anterior thalamic radiation at the capsular genu; corticospinal tracts, arcuate fasciculi and optic radiations intact. (followup request_dti_tractography)
+
+Checks: `perfect_agent.py` pass; `test_case_guards.py -k VASC-DEM-S10` pass; criterion outputs unchanged against the pre-pass snapshot; no 60-character window of any expected_evidence in the new reports; synonym guard 0 changes.

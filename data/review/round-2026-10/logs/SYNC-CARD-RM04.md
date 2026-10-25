@@ -120,3 +120,18 @@ Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it na
 - Scoring: coverage unchanged (any call matching the old order still matches); the cost reference of the required work-up now uses the new first order.
 
 Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the normal-row probe reports nothing for this criterion.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 60, ECOG 2 (fallback_tool_outputs.clinical_assessment). Why: rule 2: the library reports Karnofsky 100 and 'working' in a walker-dependent woman 18 days after knee arthroplasty, on medical leave, hypoxic with dyspnoea.
+- `order_echocardiogram {echo_type: TEE}`: thrombus in the proximal right pulmonary artery, RV pressure overload, no intracardiac thrombus (fallback_tool_outputs.echo). Why: rule 3: the stored TTE shows RV dilatation with McConnell sign and the stored CTPA thrombus in both main pulmonary arteries; the library TEE reports a normal heart.
+- `order_echocardiogram {echo_type: bubble_study}`: RV dilatation and dysfunction as on the TTE, no shunt at rest (followup_outputs[14] request_bubble_study). Why: rule 3: the stored TTE shows RV pressure overload; the library reports a normal heart.
+- `order_echocardiogram {echo_type: exercise_echo}`: not performed: walker-dependent after knee arthroplasty (followup_outputs[15] request_exercise_echo). Why: rule 3: the stored exercise test was not performed for the same reason; the library reports a normal treadmill study at 9.5 METs.
+- `order_advanced_imaging {modality: cardiac_MRI}`: dilated RV with RVEF 33% and septal flattening, normal LV (fallback_tool_outputs.advanced_imaging). Why: rule 3: the stored TTE and CTPA show RV dilatation and strain; the library reports a normal cardiac MRI.
+- `order_body_imaging {study: chest_xray}`: peripheral right basal opacity, small bilateral effusions, prominent pulmonary artery (fallback_tool_outputs.body_imaging). Why: rule 3: the stored chest CT shows a right lower lobe wedge-shaped opacity, small bilateral effusions and a dilated pulmonary artery; the library reports a normal chest radiograph.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: walker-dependent antalgic gait, TUG 34 s, 10 m walk not completed (followup_outputs[16] request_gait_and_balance_timed). Why: rule 2: the examination records an antalgic gait with a walker and inability to tandem walk 18 days after knee arthroplasty; the library reports a normal timed gait without aids.
+- `interpret_labs {panels: [ABG]}`: hypoxaemia with hypocapnia on nasal oxygen, low bicarbonate, lactate 2.8 (fallback_tool_outputs.labs['ABG']). Why: rule 3: SpO2 91% with tachypnoea, stored bicarbonate 20 and lactate 2.8 mmol/L; the library reports a normal blood gas with lactate 0.9.
+- `interpret_labs {panels: [HbA1c]}`: HbA1c 7.1% (elevated) (fallback_tool_outputs.labs['HbA1c']). Why: rule 2: type 2 diabetes treated with metformin; the library reports 5.4%.
+- `interpret_labs {panels: [tox_screen]}`: oxycodone positive, other classes negative (fallback_tool_outputs.labs['tox_screen']). Why: rule 2: oxycodone-acetaminophen after knee arthroplasty; the library reports a negative screen.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

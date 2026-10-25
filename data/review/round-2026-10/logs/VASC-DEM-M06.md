@@ -85,3 +85,25 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, named in the report's own text.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+A fresh order of each study below was answered by the benchmark-level normal library, which contradicted this patient (age, rhythm, devices, surgery, stored findings). Each now has a case-specific report:
+
+- FDG_PET: Bilateral, symmetric strip-like hypometabolism along the anterior-middle and middle-posterior cerebral border zones, a pattern consistent with bilateral border-zone (watershed) injury; territory cores and the posterior cingulate preserved. (fallback_tool_outputs.advanced_imaging)
+- perfusion_SPECT: Bilateral, symmetric strip-like hypoperfusion along the anterior-middle and middle-posterior cerebral border zones, a pattern consistent with bilateral border-zone (watershed) injury; territory cores and the posterior cingulate preserved. (followup request_perfusion_spect)
+- performance_status: Karnofsky 70 (cares for self; unable to carry on normal activity or active work), ECOG 1 (restricted in strenuous activity, able to carry out light work). (fallback_tool_outputs.clinical_assessment)
+- exercise_stress_test: Reduced exercise capacity (4.4 METs); ST segments not interpretable for ischaemia because of the resting repolarisation abnormality. (fallback_tool_outputs.specialized_test)
+- gait_and_balance_timed: Mildly slowed, cautious gait (Timed Up and Go 14.2 s) with reduced balance reserve. (followup request_gait_and_balance_timed)
+- levodopa_challenge: MDS-UPDRS III 9/132 OFF and 9/132 ON (0% change), below the 30% threshold for a clinically meaningful levodopa response. (followup request_levodopa_challenge)
+- TEE: Normally functioning aortic bioprosthesis; mild concentric left ventricular hypertrophy; mildly dilated left atrium. No patent foramen ovale and no left atrial appendage thrombus. (fallback_tool_outputs.echo)
+- cardiac_MRI: Concentric left ventricular hypertrophy (septum 13 mm) with preserved function (LVEF 57%), aortic bioprosthesis and mildly dilated left atrium; no scar. (followup request_cardiac_mri)
+- DTI_tractography: Bilateral reduced fractional anisotropy along the deep border zones involving the centrum semiovale segments of both corticospinal tracts and the posterior arcuate fasciculi; optic radiations intact. (followup request_dti_tractography)
+- CT_perfusion: Matched perfusion defects confined to chronic tissue loss (superior frontal and paracentral border zones bilaterally; parieto-occipital border zones bilaterally); no acute core or penumbral mismatch. (followup request_ct_perfusion)
+- perfusion_MRI: Matched perfusion defects confined to chronic tissue loss (superior frontal and paracentral border zones bilaterally; parieto-occipital border zones bilaterally); no acute core or penumbral mismatch. (followup request_perfusion_mri)
+- chest_abdomen_pelvis_CT: No mass or lymphadenopathy. Clear lungs without nodule, consolidation or interstitial abnormality; median sternotomy wires; bioprosthetic aortic valve. (fallback_tool_outputs.body_imaging)
+- chest_CTA: No pulmonary embolism or aortic dissection. Clear lungs without nodule, consolidation or interstitial abnormality; median sternotomy wires; bioprosthetic aortic valve. (followup request_chest_cta)
+- mediastinum_CT: No mediastinal mass or lymphadenopathy; median sternotomy wires; bioprosthetic aortic valve. (followup request_mediastinum_ct)
+- chest_xray: No acute cardiopulmonary abnormality; median sternotomy wires; aortic valve prosthesis. (followup request_chest_xray)
+
+Checks: `perfect_agent.py` pass; `test_case_guards.py -k VASC-DEM-M06` pass; criterion outputs unchanged against the pre-pass snapshot; no 60-character window of any expected_evidence in the new reports; synonym guard 0 changes.

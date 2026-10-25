@@ -77,3 +77,15 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `initial_tool_outputs.eeg`: `eeg_type` set to `video`, named in the report's own text.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+Orders that reached the benchmark library's normal report although the case contradicts it now get a case-specific report (library answers stay for everything else).
+
+- `perform_clinical_assessment assessment_type=performance_status` -> `fallback_tool_outputs.clinical_assessment`: Karnofsky 50, ECOG 3. Why: the history documents limited activity; the library reports Karnofsky 100, ECOG 0, working.
+- `order_specialized_test test_type=neuropsych_battery` -> `followup_outputs[request_neuropsych_battery]`: cognition within normal limits; abnormal anxiety, borderline depressive symptoms and elevated health anxiety; validity passed. Why: the history documents anxiety, depression or trauma-related symptoms; the library reports no significant mood or anxiety symptoms.
+- `interpret_labs panels=[HbA1c]` -> `fallback_tool_outputs.labs[HbA1c]`: HbA1c 7.6%. Why: type 2 diabetes for 12 years on metformin with neuropathy; the library reports HbA1c 5.4%.
+- `order_specialized_test test_type=emg_ncs` -> `fallback_tool_outputs.specialized_test`: mild length-dependent axonal sensorimotor polyneuropathy; proximal muscles normal. Why: known diabetic distal symmetric sensorimotor neuropathy with reduced ankle reflexes and stocking sensory loss; the library reports normal nerve conduction.
+- `order_specialized_test test_type=skin_biopsy_iencf` -> `followup_outputs[request_skin_biopsy_iencf]`: distal IENFD 4.8/mm (reduced), proximal normal. Why: known diabetic peripheral neuropathy; the library reports normal nerve fibre density.
+
+Checks: `perfect_agent.py` pass; `test_case_guards.py -k FND-RS02` pass; map verify (map_FND) problems 0; criterion-answer snapshot unchanged except `action-neuropsych-battery`, which the library answered before and the new report now answers.

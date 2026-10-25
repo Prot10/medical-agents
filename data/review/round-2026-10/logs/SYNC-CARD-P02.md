@@ -97,3 +97,13 @@ Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it na
 - Scoring: none (recommended criterion: coverage unchanged, not in the cost reference).
 
 Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 80, ECOG 1 (fallback_tool_outputs.clinical_assessment). Why: rule 2: the library reports Karnofsky 100 with no complaints in a man with progressive exertional dyspnoea and two exertional syncopes.
+- `order_specialized_test {test_type: tilt_table}`: not performed, deferred by the clinical team (fallback_tool_outputs.specialized_test). Why: the library answers with a generic normal tilt (118/74 mmHg, 68 bpm) in a patient with dynamic LVOT obstruction, in whom tilt testing is avoided; the order is answered as deferred.
+- `order_echocardiogram {echo_type: TEE}`: asymmetric septal hypertrophy, SAM with posteriorly directed MR, no thrombus (fallback_tool_outputs.echo). Why: rule 3: the stored TTE shows asymmetric septal hypertrophy 21 mm with SAM; the library TEE reports a normal heart.
+- `order_echocardiogram {echo_type: bubble_study}`: asymmetric septal hypertrophy with SAM, no right-to-left shunt (followup_outputs[10] request_bubble_study). Why: rule 3: the stored TTE shows hypertrophic septum with SAM; the library reports a normal heart.
+- `order_specialized_test {test_type: polysomnography}`: moderate obstructive sleep apnoea, AHI 22/h (followup_outputs[11] request_polysomnography). Why: rule 2: known obstructive sleep apnoea on nightly CPAP; the library reports AHI 2.1/h.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

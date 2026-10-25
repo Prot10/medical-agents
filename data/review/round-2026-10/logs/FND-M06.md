@@ -84,3 +84,12 @@ Review-process wording (references to the round's rulings, the round policy file
 - Why: rule 3: past history 'Obesity' with stored BMI 29.4; BMI raised to 31.0 at the default height.
 
 Checks: `perfect_agent.py` ok; BMI = weight / height^2 to one decimal.
+
+## Library contradictions (25 Oct 2026)
+
+Orders that reached the benchmark library's normal report although the case contradicts it now get a case-specific report (library answers stay for everything else).
+
+- `analyze_eeg eeg_type=routine (and sleep_deprived, served by the routine report)` -> `fallback_tool_outputs.eeg`: abnormal routine EEG: occasional right anterior temporal sharp-and-slow waves and intermittent right temporal theta. Why: the stored video-EEG shows about 6 right anterior temporal discharges per hour, awake and asleep, unchanged from the prior study; the library reports a normal routine EEG.
+- `analyze_eeg eeg_type=ambulatory` -> `followup_outputs[request_ambulatory]`: abnormal 48-hour ambulatory EEG: intermittent right anterior temporal discharges and slowing. Why: the stored video-EEG shows frequent right temporal interictal discharges; the library reports a normal ambulatory EEG.
+
+Checks: `perfect_agent.py` pass; `test_case_guards.py -k FND-M06` pass; map verify (map_FND) problems 0; criterion-answer snapshot unchanged.

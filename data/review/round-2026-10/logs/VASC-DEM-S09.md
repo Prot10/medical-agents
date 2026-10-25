@@ -61,3 +61,16 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, named in the report's own text.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+A fresh order of each study below was answered by the benchmark-level normal library, which contradicted this patient (age, rhythm, devices, surgery, stored findings). Each now has a case-specific report:
+
+- FDG_PET: Focal left anterior-medial thalamic metabolic defect with mild left frontal and anterior cingulate hypometabolism; medial temporal lobes and posterior association cortex preserved. (fallback_tool_outputs.advanced_imaging)
+- perfusion_SPECT: Focal left anterior-medial thalamic perfusion defect with mild left frontal and anterior cingulate hypoperfusion; medial temporal lobes and posterior association cortex preserved. (followup request_perfusion_spect)
+- performance_status: Karnofsky 70 (cares for self; unable to carry on normal activity or active work), ECOG 1 (restricted in strenuous activity, able to carry out light work). (fallback_tool_outputs.clinical_assessment)
+- exercise_stress_test: No electrocardiographic or clinical evidence of inducible ischaemia at 7.0 METs. (fallback_tool_outputs.specialized_test)
+- TEE: Mild concentric left ventricular hypertrophy; aortic valve sclerosis without stenosis. No patent foramen ovale and no left atrial appendage thrombus. (fallback_tool_outputs.echo)
+- structured_headache_history_ichd3: Past migraine without aura (ICHD-3 criteria met for attacks in her thirties); no current headache disorder. (followup request_structured_headache_history_ichd3)
+
+Checks: `perfect_agent.py` pass; `test_case_guards.py -k VASC-DEM-S09` pass; criterion outputs unchanged against the pre-pass snapshot; no 60-character window of any expected_evidence in the new reports; synonym guard 0 changes.

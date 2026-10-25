@@ -69,3 +69,15 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 30, ECOG 4 (fallback_tool_outputs.clinical_assessment). Why: rule 3: febrile (39.2 C), tachycardic (HR 112) and in severe distress, declining to walk; the library's Karnofsky 100 describes a person without disease.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: not performed (headache, dizziness); brief standing steady (followup_outputs[3] request_gait_and_balance_timed). Why: rule 3: the stored exam records that the patient declines to walk because of headache and dizziness.
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: no parkinsonian signs; challenge not performed; gait and postural reflexes not assessable (followup_outputs[4] request_levodopa_challenge). Why: rule 3: the library describes a normal neck, gait and postural reflexes in a patient with marked nuchal rigidity who declines to walk.
+- `perform_clinical_assessment {assessment_type: structured_headache_history_ichd3}`: new acute headache with red flags; criteria for a primary headache disorder not met (followup_outputs[5] request_structured_headache_history_ichd3). Why: rule 1 and 3: an acute febrile headache with neck stiffness, photophobia and a recent ear infection; the library elicits no red flags.
+- `analyze_brain_mri`: diffuse leptomeningeal enhancement; partial left mastoid opacification; no complication (fallback_tool_outputs.mri). Why: rule 1 and 3: no MRI is stored; the stored CT shows partial opacification of the left mastoid air cells.
+- `order_microbiology {specimen: whole_blood_pcr}`: Streptococcus pneumoniae DNA detected (fallback_tool_outputs.microbiology). Why: rule 3: blood cultures grow S. pneumoniae in 2 of 2 sets, a target of the panel; no antibiotics since an amoxicillin course completed more than a week earlier.
+- `perform_clinical_assessment {assessment_type: orthostatic_blood_pressure}`: supine BP 148/92, HR 112; standing not performed (followup_outputs[6] request_orthostatic_blood_pressure). Why: rule 3: vitals HR 112 and dizziness in a patient who declines to stand; the library reports HR 68 and 3 minutes of standing without symptoms.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

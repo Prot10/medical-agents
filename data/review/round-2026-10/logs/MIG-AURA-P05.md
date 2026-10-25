@@ -63,3 +63,11 @@ Checks after the change: `perfect_agent.py` pass, `case_io.py check` clean for t
 Review-process wording (references to the round's rulings, the round policy file, the criteria packs, and tier markers such as "(optional)" in criterion labels and rationales) is shown to physicians in the review app, so it was rewritten in clinical language. The tier stays in the criterion's `importance` field; scoring is unchanged. `test_case_guards.py::test_no_review_process_text` now fails on any of it.
 
 - criterion `action-1-search-medical-literature` label: "Optional: literature on the clinical features that separate migraine aura from TIA" -> "Literature on the clinical features that separate migraine aura from TIA"
+
+## Library contradictions (25 Oct 2026)
+
+Case-specific reports stored where the benchmark library's normal report contradicted the case. Why: on warfarin with gum bleeding, epistaxis and an INR of 3.8 at the last check; the library coagulation panel reports INR 1.0.
+
+- labs coagulation: PT 37.5 s, INR 3.8 (H), aPTT and fibrinogen normal (fallback_tool_outputs.labs[coagulation])
+
+Checks: `perfect_agent.py` pass; `test_case_guards.py -k MIG-AURA-P05` pass; no fixed order still answered by the library (`lib4.source`); no 60-character window of any criterion's expected_evidence in the added text; every criterion's served output unchanged (snapshot diff against the baseline).

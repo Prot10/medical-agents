@@ -93,3 +93,12 @@ Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it na
 - Scoring: coverage unchanged (any call matching the old order still matches); the cost reference of the required work-up now uses the new first order.
 
 Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.
+
+## Library contradictions (25 Oct 2026)
+
+- `order_specialized_test {test_type: ssep}`: 1. Prolonged right tibial cortical P37 latency (46.9 ms) with a normal lumbar N22, indicating central somatosensory conduction delay above the lumbar cord. 2. Normal left tibial and bilateral median responses. (fallback_tool_outputs.specialized_test). Why: rule c: reduced vibration and joint position sense at the right great toe with dorsolateral C4-C5 and dorsal T4-T5 cord lesions; the library reports a normal study.
+- `order_specialized_test {test_type: visual_field_perimetry}`: 1. Mild paracentral depression in the right eye (MD -2.9 dB). 2. Normal left visual field. (followup_outputs[request_visual_field_perimetry]). Why: rule c: right acuity 20/30 with a right RAPD and temporal pallor; stored VEP and OCT show a right optic neuropathy; the library reports a normal study.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: Abnormal timed gait and balance assessment. Timed Up and Go 12.5 s and 10 m walk speed 1.03 m/s are slowed for age; Berg balance 49/56. (fallback_tool_outputs.clinical_assessment). Why: rule d: the examination documents a gait disorder (spastic gait with right leg circumduction; heel-walking impaired on the right); the library reports a normal study.
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 80, ECOG 1: restricted in physically strenuous activity, ambulatory and able to carry out light work. (followup_outputs[request_performance_status]). Why: rule d: inpatient relapse with a documented gait disorder: Karnofsky 100 / ECOG 0 'without evidence of disease' contradicts the case; the library reports a normal study.
+
+Checks: perfect agent ok; case guards pass; snapshot diff shows no criterion answer changed; map verified (served without the library).

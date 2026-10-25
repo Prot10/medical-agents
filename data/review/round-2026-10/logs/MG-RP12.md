@@ -80,3 +80,21 @@ Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym g
 - The FVC mL/kg figures and the weight-based IVIg amounts in the text were checked against this weight: all within rounding, no text change.
 
 Checks: `perfect_agent.py` ok; BMI = weight / height^2 to one decimal.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 50, ECOG 3 (requires considerable assistance and frequent care) (fallback_tool_outputs.clinical_assessment). Why: rule 1: the library reports Karnofsky 100 / ECOG 0 (no evidence of disease, working); rule 2 and 3: Parkinson disease with Berg 36 plus severe bulbar MG with recurrent aspiration and wasting.
+- `order_specialized_test {test_type: emg_ncs}`: normal nerve conductions and needle EMG, stating that neuromuscular transmission was not assessed (fallback_tool_outputs.specialized_test). Why: rule 1: the library report concludes there is no neuromuscular junction disorder, which routine conductions and needle EMG without repetitive stimulation cannot assess and which is not true here; the stored RNS study reports normal conductions and no denervation including genioglossus, which this report keeps.
+- `interpret_labs {panels: [clustered_AChR_cell_based]}`: clustered AChR antibody (cell-based assay) positive (fallback_tool_outputs.labs['clustered_AChR_cell_based']). Why: rule 1: AChR-antibody-positive myasthenia (stored AChR binding antibody 4.2 nmol/L); a cell-based clustered AChR assay is positive when the binding assay is.
+- `order_advanced_imaging {modality: whole_body_FDG_PET}`: no recurrence; mild inflammatory bibasal uptake from aspiration (fallback_tool_outputs.advanced_imaging). Why: rule 2 and 3: resected lung adenocarcinoma, and bronchiectasis with ground-glass change from aspiration on the stored CT; the library reports normal lungs.
+- `order_body_imaging {study: chest_xray}`: post-lobectomy changes and patchy bilateral lower-zone opacities (fallback_tool_outputs.body_imaging). Why: rule 2 and 3: the history describes a radiograph with patchy bilateral lower-zone opacities after a right upper lobectomy; the library reports a normal radiograph.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: parkinsonian shuffling gait, Berg 36/56, freezing at the turn (followup_outputs[4] request_gait_and_balance_timed). Why: rule 2 and 3: Parkinson disease with a shuffling, festinating gait and Berg Balance Scale 36 in the examination; the library reports Berg 56/56.
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: MDS-UPDRS III 32 to 19 (41%), bulbar signs unchanged (followup_outputs[5] request_levodopa_challenge). Why: rule 2: Parkinson disease treated with levodopa; the library reports a drug-naive patient without parkinsonian signs.
+- `order_specialized_test {test_type: speech_language_evaluation}`: hypophonic and fatigable hypernasal dysarthria; language normal (followup_outputs[6] request_speech_language_evaluation). Why: rule 3: the library reports no dysarthria; the examination documents hypophonic, muffled speech becoming more nasal on sustained counting.
+- `perform_clinical_assessment {assessment_type: cognitive_screen}`: MMSE 26/30 (followup_outputs[7] request_cognitive_screen). Why: rule 3: MMSE 26/30 in the examination; the library reports MoCA 28/30.
+- `order_specialized_test {test_type: neuropsych_battery}`: attention-executive and visuospatial mild cognitive impairment (followup_outputs[8] request_neuropsych_battery). Why: rule 2 and 3: Parkinson disease with MMSE 26/30; the library reports all domains in the average range.
+- `order_advanced_imaging {modality: DaTscan}`: abnormal, asymmetric putaminal loss (followup_outputs[9] request_datscan). Why: rule 2: Parkinson disease for 4 years on levodopa; the library reports a normal DaTscan.
+- `order_advanced_imaging {modality: MIBG_scan}`: reduced heart-to-mediastinum ratio (1.3) (followup_outputs[10] request_mibg_scan). Why: rule 2: Parkinson disease; the library reports a normal ratio.
+- `order_specialized_test {test_type: olfactory_test}`: severe hyposmia (UPSIT 19/40) (followup_outputs[11] request_olfactory_test). Why: rule 2: Parkinson disease; the library reports normosmia.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

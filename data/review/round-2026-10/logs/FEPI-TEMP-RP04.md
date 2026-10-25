@@ -81,3 +81,17 @@ Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it na
 - Scoring: none (recommended criterion: coverage unchanged, not in the cost reference).
 
 Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.
+
+## Library contradictions (25 Oct 2026)
+
+Orders the benchmark library answered with a normal report that contradicts this case now get a case-specific report (term: gist, where stored):
+
+- analyze_eeg routine: This is an ABNORMAL EEG due to: 1. Left anterior temporal sharp waves (phase reversal at F7), increasing in drowsiness. 2. Intermittent left temporal  (fallback_tool_outputs.eeg)
+- analyze_eeg ambulatory: This is an ABNORMAL 48-hour ambulatory EEG due to: 1. Frequent left anterior temporal sharp waves (phase reversal at F7), maximal in NREM sleep. 2. In (followup request_ambulatory_eeg)
+- obtain_tissue_diagnosis resection: Hippocampal sclerosis, ILAE type 1, with focal cortical dysplasia ILAE type IIIa of the temporal pole (fallback_tool_outputs.tissue_diagnosis)
+- obtain_tissue_diagnosis stereotactic_biopsy: Hippocampal neuronal loss with fibrillary gliosis (followup request_stereotactic_biopsy)
+- obtain_tissue_diagnosis open_biopsy: Hippocampal neuronal loss with fibrillary gliosis (followup request_open_biopsy)
+- interpret_labs valproate_level: valproate not detected (fallback_tool_outputs.labs[valproate_level])
+- interpret_labs HbA1c: Hemoglobin A1c 6.9%, in the diabetic range. (fallback_tool_outputs.labs[HbA1c])
+
+Checks: `perfect_agent.py` passes; the criterion snapshot of the case is unchanged; `pytest agent-platform/tests -k FEPI-TEMP` (case guards included), `test_reports_do_not_fabricate.py` and `apply_diagnosis_synonyms.py --check` pass; no new report repeats a 60-character window of any criterion's expected evidence.

@@ -88,3 +88,15 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `initial_tool_outputs.eeg`: `eeg_type` set to `routine`, named in the report's own text.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 70, ECOG 1 (fallback_tool_outputs.clinical_assessment). Why: rule 2: the library reports Karnofsky 100, no complaints and 'working' in a retired man with progressive fatigue, dysphagia and nocturnal apnoeic arrests.
+- `order_specialized_test {test_type: exercise_stress_test}`: 7.1 METs, appropriate heart rate response at the patient's own rates, no arrhythmia (followup_outputs[11] request_exercise_stress_test). Why: rule 2: two months of fatigue and reduced exercise tolerance in a 71-year-old; the library reports 10.4 METs at generic rates.
+- `order_specialized_test {test_type: speech_language_evaluation}`: oropharyngeal dysphagia with delayed swallow initiation, normal speech and language (followup_outputs[12] request_speech_language_evaluation). Why: rule 2: progressive oropharyngeal dysphagia with coughing on liquids and a slightly diminished left gag; the library reports a normal evaluation.
+- `order_body_imaging {study: chest_xray}`: widened right paratracheal stripe and splayed carina (fallback_tool_outputs.body_imaging). Why: rule 3: the stored chest CT shows a 3.4 cm subcarinal mass with right paratracheal nodes; the library reports a normal mediastinum.
+- `obtain_tissue_diagnosis {procedure: lymph_node_biopsy}`: metastatic small cell carcinoma in the subcarinal node (EBUS-TBNA) (fallback_tool_outputs.tissue_diagnosis). Why: rule 3: the stored CT and FDG-PET show a hypermetabolic subcarinal mass with nodes suspicious for malignancy and the stored panel a high-titre anti-Hu antibody; the library reports a reactive cervical node.
+- `perform_clinical_assessment {assessment_type: cognitive_screen}`: MoCA 27/30 (delayed recall 3/5, abstraction 1/2) (followup_outputs[13] request_cognitive_screen). Why: rule 3: the admission examination records MoCA 27/30 with delayed recall 3/5 and abstraction 1/2; the library reports 28/30 with different subscores.
+- `order_echocardiogram {echo_type: exercise_echo}`: reduced capacity (7.1 METs) at the patient's own rates, no ischaemia (fallback_tool_outputs.echo). Why: the library answers with a generic study (9.5 METs, 90% of the predicted heart rate) unrelated to this patient and the mildly dilated left atrium on his TTE; an exercise echo gets the rates and workload of the patient's own exercise test, and the result stays as that test.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

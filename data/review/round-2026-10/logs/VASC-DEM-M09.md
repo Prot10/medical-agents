@@ -79,3 +79,23 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, named in the report's own text.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+A fresh order of each study below was answered by the benchmark-level normal library, which contradicted this patient (age, rhythm, devices, surgery, stored findings). Each now has a case-specific report:
+
+- FDG_PET: Absent right thalamic metabolism with ipsilateral frontal-predominant hemispheric hypometabolism and crossed left cerebellar diaschisis, plus bilateral patchy frontal hypometabolism. No temporoparietal-predominant pattern. (fallback_tool_outputs.advanced_imaging)
+- perfusion_SPECT: Absent right thalamic perfusion with ipsilateral frontal-predominant hemispheric hypoperfusion and crossed left cerebellar diaschisis, plus bilateral patchy frontal hypoperfusion. No temporoparietal-predominant pattern. (followup request_perfusion_spect)
+- performance_status: Karnofsky 50 (requires considerable assistance and frequent care), ECOG 2 (ambulatory and capable of all self-care, unable to carry out any work activities). (fallback_tool_outputs.clinical_assessment)
+- exercise_stress_test: Very low workload (2.0 METs) limited by hemiparesis; non-diagnostic for ischaemia. (fallback_tool_outputs.specialized_test)
+- gait_and_balance_timed: Slow hemiparetic gait (Timed Up and Go 22.6 s with a stick) with impaired balance and a raised fall risk. (followup request_gait_and_balance_timed)
+- levodopa_challenge: MDS-UPDRS III 18/132 OFF and 18/132 ON (0% change), below the 30% threshold for a clinically meaningful levodopa response. (followup request_levodopa_challenge)
+- TEE: Moderate concentric left ventricular hypertrophy; mildly dilated left atrium; aortic valve sclerosis without stenosis. No patent foramen ovale and no left atrial appendage thrombus. (followup request_tee)
+- cardiac_MRI: Moderate concentric left ventricular hypertrophy with preserved function and a mildly dilated left atrium; no scar or infiltration. (followup request_cardiac_mri)
+- speech_language_evaluation: Reduced verbal initiation and output with preserved naming, repetition and comprehension; no aphasia and no dysarthria. (followup request_speech_language_evaluation)
+- ssep: Absent cortical responses to left median and tibial stimulation with preserved cervical responses, indicating interruption of the right central somatosensory pathway above the cervical cord; left hemisphere pathways normal. (followup request_ssep)
+- DTI_tractography: Attenuated right corticospinal tract at the internal capsule and interrupted right thalamocortical radiations, on a background of diffusely reduced white matter fractional anisotropy. (followup request_dti_tractography)
+- CT_perfusion: Matched perfusion defects confined to chronic tissue loss (right thalamus (haemorrhage cavity)); no acute core or penumbral mismatch. (followup request_ct_perfusion)
+- perfusion_MRI: Matched perfusion defects confined to chronic tissue loss (right thalamus (haemorrhage cavity)); no acute core or penumbral mismatch. (followup request_perfusion_mri)
+
+Checks: `perfect_agent.py` pass; `test_case_guards.py -k VASC-DEM-M09` pass; criterion outputs unchanged against the pre-pass snapshot; no 60-character window of any expected_evidence in the new reports; synonym guard 0 changes.

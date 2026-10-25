@@ -75,3 +75,18 @@ Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it na
 - Scoring: none (evidence only; the reward does not read it).
 
 Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the normal-row probe reports nothing for this criterion.
+
+## Library contradictions (25 Oct 2026)
+
+Orders the benchmark library answered with a normal report that contradicts this case now get a case-specific report (term: gist, where stored):
+
+- analyze_eeg routine: This is an ABNORMAL EEG due to: 1. Moderate diffuse background slowing. 2. Rare left anterior temporal sharp waves (F7/T3). 3. Intermittent bitemporal (fallback_tool_outputs.eeg)
+- analyze_eeg ambulatory: This is an ABNORMAL 48-hour ambulatory EEG due to: 1. Moderate diffuse background slowing. 2. Occasional left anterior temporal sharp waves (F7/T3). 3 (followup request_ambulatory_eeg)
+- obtain_tissue_diagnosis resection: Chronic T-lymphocytic inflammation with neuronal loss in limbic grey matter (fallback_tool_outputs.tissue_diagnosis)
+- obtain_tissue_diagnosis stereotactic_biopsy: Chronic T-lymphocytic inflammation with neuronal loss in limbic grey matter (followup request_stereotactic_biopsy)
+- obtain_tissue_diagnosis open_biopsy: Chronic T-lymphocytic inflammation with neuronal loss in limbic grey matter (followup request_open_biopsy)
+- order_specialized_test neuropsych_battery: Severe anterograde amnesia for verbal and visual material (delayed recall T-scores 22 and 30) with slowed processing speed, impaired calculation and e (fallback_tool_outputs.specialized_test)
+- perform_clinical_assessment cognitive_screen (baseline): MoCA 17/30 with impaired delayed recall, attention and calculation, and disorientation to date. Cognitive impairment on  (fallback_tool_outputs.clinical_assessment)
+- interpret_labs valproate_level: valproate not detected (fallback_tool_outputs.labs[valproate_level])
+
+Checks: `perfect_agent.py` passes; the criterion snapshot of the case is unchanged; `pytest agent-platform/tests -k FEPI-TEMP` (case guards included), `test_reports_do_not_fabricate.py` and `apply_diagnosis_synonyms.py --check` pass; no new report repeats a 60-character window of any criterion's expected evidence.

@@ -82,3 +82,22 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, decided by reading the report.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 20, ECOG 4 (fallback_tool_outputs.clinical_assessment). Why: rule 3: GCS 11 with BP 92/58 and HR 118; the library's Karnofsky 100 describes a person without disease.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: not testable (bed-bound, GCS 11) (followup_outputs[4] request_gait_and_balance_timed). Why: rule 3: the stored exam records the patient as bed-bound, gait not assessable.
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: no parkinsonian signs; challenge not performed; gait and postural reflexes not assessable (followup_outputs[5] request_levodopa_challenge). Why: rule 3: the library describes a normal motor examination and gait in a bed-bound patient with GCS 11.
+- `perform_clinical_assessment {assessment_type: structured_headache_history_ichd3}`: new acute headache with red flags; criteria for a primary headache disorder not met (followup_outputs[6] request_structured_headache_history_ichd3). Why: rule 1 and 3: an acute febrile headache followed by falling consciousness; the library elicits no red flags.
+- `analyze_brain_mri`: diffuse leptomeningeal enhancement, mild diffuse swelling, maxillary sinus thickening (fallback_tool_outputs.mri). Why: rule 1 and 3: no MRI is stored; the stored CT shows mild diffuse cerebral oedema and right maxillary sinus thickening.
+- `analyze_eeg {eeg_type: continuous_icu}`: continuous generalised theta-delta slowing; no epileptiform discharges or seizures (followup_outputs[7] request_continuous_icu). Why: rule 3: GCS 11 and the stored routine EEG shows diffuse slowing; the library reports a normal background.
+- `analyze_eeg {eeg_type: ambulatory}`: continuous generalised theta-delta slowing; no epileptiform discharges or seizures (followup_outputs[8] request_ambulatory). Why: rule 3: GCS 11 and the stored routine EEG shows diffuse slowing; the library reports a normal background.
+- `perform_clinical_assessment {assessment_type: cognitive_screen}`: not completed (GCS 11) (followup_outputs[9] request_cognitive_screen). Why: rule 3: the stored exam states he cannot cooperate with formal cognitive testing; the library reports MoCA 28/30.
+- `order_specialized_test {test_type: neuropsych_battery}`: not completed (reduced consciousness) (fallback_tool_outputs.specialized_test). Why: rule 3: the stored exam states he cannot cooperate with formal cognitive testing.
+- `order_microbiology {specimen: whole_blood_pcr}`: Haemophilus influenzae DNA detected (fallback_tool_outputs.microbiology). Why: rule 3: blood cultures grow H. influenzae type b in 2 of 2 sets, a target of the panel; collected after 3 days of oral amoxicillin.
+- `perform_clinical_assessment {assessment_type: orthostatic_blood_pressure}`: supine BP 92/58, HR 118; standing not performed (followup_outputs[10] request_orthostatic_blood_pressure). Why: rule 3: BP 92/58 and HR 118 in a bed-bound patient; the library reports a normal orthostatic set.
+- `interpret_labs {panels: [peripheral smear]}`: Howell-Jolly bodies, left shift with toxic granulation (fallback_tool_outputs.labs['peripheral smear']). Why: rule 2: splenectomy at age 38; stored WBC 3.1 with 14% bands and platelets 142.
+- `interpret_labs {panels: [HbA1c]}`: HbA1c 7.8% (fallback_tool_outputs.labs['HbA1c']). Why: rule 2: type 2 diabetes on metformin with a recent HbA1c of 7.8% in the history.
+- `analyze_ecg`: sinus tachycardia at 118 bpm, otherwise normal (fallback_tool_outputs.ecg). Why: rule 3: presenting heart rate 118 bpm; the library reports a rate of 72.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

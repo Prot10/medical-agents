@@ -92,3 +92,14 @@ Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it na
 - Scoring: none (recommended criterion; any call matching the old order still matches).
 
 Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the normal-row probe reports nothing for this criterion.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 70, ECOG 1 (fallback_tool_outputs.clinical_assessment). Why: rule 2: the library reports Karnofsky 100 with no complaints in a man with four months of exertional dyspnoea, fatigue and three syncopal falls.
+- `order_echocardiogram {echo_type: TEE}`: LVEF 38% with anteroseptal-apical hypokinesis and thinning, no thrombus, aortic atheroma (fallback_tool_outputs.echo). Why: rule 3: the stored TTE shows LVEF 38% with regional hypokinesis and a dilated LV; the library TEE reports a normal heart.
+- `order_echocardiogram {echo_type: bubble_study}`: LVEF 38% with regional hypokinesis, no right-to-left shunt (followup_outputs[8] request_bubble_study). Why: rule 3: the stored TTE shows LVEF 38%; the library reports a normal heart.
+- `order_echocardiogram {echo_type: exercise_echo}`: 2:1 AV block in stage 1 with presyncope, fixed regional hypokinesis (followup_outputs[9] request_exercise_echo). Why: rule 3: the stored exercise test stopped in stage 1 for 2:1 AV block and the stored TTE shows LVEF 38%; the library reports a normal study.
+- `order_advanced_imaging {modality: coronary_CTA}`: occluded mid LAD, moderate RCA stenosis, calcium score 684 (fallback_tool_outputs.advanced_imaging). Why: rule 3: the stored cardiac MRI shows LAD-territory subendocardial to transmural scar and the stored ECG Q waves in V1-V3; the library reports normal coronaries.
+- `order_advanced_imaging {modality: coronary_angiography}`: chronic total occlusion of the mid LAD with collaterals, moderate RCA stenosis (followup_outputs[10] request_coronary_angiography). Why: rule 3: the stored cardiac MRI shows a transmural LAD-territory scar; peripheral vascular disease and a smoking history; the library reports normal coronaries.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

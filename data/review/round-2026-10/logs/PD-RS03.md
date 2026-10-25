@@ -74,3 +74,14 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: MDS-UPDRS III 29/132 OFF, 16/132 ON (45%) (fallback_tool_outputs.clinical_assessment). Why: rule 3: the stored exam documents parkinsonism; the library reports MDS-UPDRS III 3/132 with no parkinsonian signs.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: TUG 12.7 s, 10 m 1.01 m/s, Berg 49/56 (followup request_gait_and_balance_timed). Why: rule 3: the stored gait exam (arm swing, stride, turns, pull test) is abnormal; the library reports a normal gait, turns in 3 steps and Berg 56/56.
+- `perform_clinical_assessment {assessment_type: cognitive_screen}`: MoCA 26/30 as in the exam (followup request_cognitive_screen). Why: rule 3: the stored exam records this MoCA and its items; the library reports MoCA 28/30 with other items.
+- `perform_clinical_assessment {assessment_type: orthostatic_blood_pressure}`: 148/88 supine, 136/82 at 3 min (as in the exam) (followup request_orthostatic_blood_pressure). Why: rule 3: the stored exam records orthostatic vitals; the library reports supine 128/78 and other numbers.
+- `order_specialized_test {test_type: olfactory_test}`: UPSIT 26/40 (moderate microsmia) (fallback_tool_outputs.specialized_test). Why: rule 1: olfactory loss is a supportive feature of PD; the library reports normosmia (UPSIT 35/40).
+- `order_advanced_imaging {modality: MIBG_scan}`: early H/M 1.44, delayed 1.25, washout 39% (fallback_tool_outputs.advanced_imaging). Why: rule 1: cardiac sympathetic denervation is a supportive criterion of PD; the library reports normal uptake (H/M 2.4/2.6).
+
+Checks: `perfect_agent.py` 30/30 PD pass; `test_case_guards.py -k PD-` and `pytest agent-platform/tests -k PD-` 300 passed (`test_grpo_rollout.py` not collected: training extra not installed); every criterion's served output unchanged (snapshot before/after); synonym guard 0 changes; no new report repeats a 60-character window of any `expected_evidence`; every listed term is answered without the library.

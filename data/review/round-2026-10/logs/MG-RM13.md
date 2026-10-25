@@ -78,3 +78,16 @@ Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym g
 - The FVC mL/kg figures and the weight-based IVIg amounts in the text were checked against this weight: all within rounding, no text change.
 
 Checks: `perfect_agent.py` ok; BMI = weight / height^2 to one decimal.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 60, ECOG 2 (requires occasional assistance; cares for most needs) (fallback_tool_outputs.clinical_assessment). Why: rule 1: the library reports Karnofsky 100 / ECOG 0 (no evidence of disease, working); rule 3: retired, after chemoradiation for SCLC, with hip flexors 3+/5 and difficulty rising from chairs.
+- `order_specialized_test {test_type: emg_ncs}`: diffusely low CMAPs with normal conduction, reduced sural SNAPs, unstable motor units without denervation (fallback_tool_outputs.specialized_test). Why: rule 3: the stored RNS study reports low baseline CMAPs in all tested nerves and reduced sural SNAPs; the library reports normal conductions and no neuromuscular junction disorder.
+- `order_body_imaging {study: mediastinum_MRI}`: 0.9 cm paratracheal node with restricted diffusion and post-radiation fibrosis (fallback_tool_outputs.body_imaging). Why: rule 3: the stored CT shows a new 0.9 cm right paratracheal node and post-radiation fibrosis, and the node biopsy small cell carcinoma; the library reports a normal mediastinum.
+- `order_advanced_imaging {modality: whole_body_FDG_PET}`: FDG-avid paratracheal node (SUVmax 6.8), post-radiation uptake, no distant disease (fallback_tool_outputs.advanced_imaging). Why: rule 3: the stored FDG-PET shows the SUVmax 6.8 paratracheal node; the library whole-body PET reports no lesion.
+- `order_body_imaging {study: chest_xray}`: right paramediastinal post-radiation fibrosis (followup_outputs[4] request_chest_xray). Why: rule 2 and 3: thoracic radiotherapy with stable paramediastinal fibrosis on the stored CT; the library reports a normal radiograph. The 0.9 cm node is below radiographic resolution.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: TUG 17.2 s, gait speed 0.77 m/s, mildly wide-based (followup_outputs[5] request_gait_and_balance_timed). Why: rule 3: the library reports a normal timed gait (TUG 9.1 s, Berg 56/56); the examination documents hip flexors 3+/5, a mildly wide-based gait and difficulty rising from a chair.
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: no parkinsonian signs and no levodopa response; points from gait and chair rise only (followup_outputs[6] request_levodopa_challenge). Why: rule 3: the library levodopa challenge describes normal gait, arm swing and postural reflexes, while the examination documents a mildly wide-based gait with difficulty rising.
+- `order_specialized_test {test_type: speech_language_evaluation}`: mild fatigable hypernasality after 10 minutes; language normal (followup_outputs[7] request_speech_language_evaluation). Why: rule 3: the library reports no dysarthria; the examination documents a slightly nasal voice at the end of the 10-minute examination.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

@@ -90,3 +90,17 @@ Review-process wording (references to the round's rulings, the round policy file
 - The FVC mL/kg figures and the weight-based IVIg amounts in the text were checked against this weight: all within rounding, no text change.
 
 Checks: `perfect_agent.py` ok; BMI = weight / height^2 to one decimal.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 40, ECOG 3 (fallback_tool_outputs.clinical_assessment). Why: rule 1: the library reports Karnofsky 100 / ECOG 0 and a working patient; he cannot walk independently, with four-limb weakness.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: unable to walk independently; timed gait and balance tests not performed (followup_outputs[5] request_gait_and_balance_timed). Why: rule 1: the library reports a normal timed gait and balance assessment; he cannot walk without bilateral support (knee extension and ankle dorsiflexion 3/5).
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: no tremor or rigidity; motor items limited by weakness, response not assessable (followup_outputs[6] request_levodopa_challenge). Why: rule 1: the library describes a normal motor examination, gait and postural reflexes; four-limb weakness 3-4/5 and a support-dependent gait.
+- `order_body_imaging {study: spine_MRI}`: smooth enhancement of the cauda equina roots, ventral more than dorsal; normal cord (fallback_tool_outputs.body_imaging). Why: rule 1: smooth enhancement of the cauda equina and ventral roots is seen in most patients with this polyradiculoneuropathy (Gorson 1996; Byun 1998), while the library reads the roots as normal.
+- `order_body_imaging {study: peripheral_nerve_MRI}`: smooth enhancement and mild T2 hyperintensity of the lumbosacral roots, no enlargement (followup_outputs[7] request_peripheral_nerve_mri). Why: rule 1 and 3: the library reads the nerve roots as normal; root enhancement as on the spine MRI of this case.
+- `order_specialized_test {test_type: nerve_biopsy}`: segmental demyelination with macrophage infiltration and sparse T-lymphocytes; reduced myelinated fibre density (fallback_tool_outputs.specialized_test). Why: rule 3: the stored nerve conduction study shows absent sural sensory responses with a demyelinating pattern; the library sural biopsy is normal.
+- `perform_clinical_assessment {assessment_type: orthostatic_blood_pressure}`: active standing not performed (cannot stand without bilateral support); supine BP 160/100 mmHg, HR 76 bpm; sitting BP 148/96 mmHg, HR 82 bpm (followup_outputs[8] request_orthostatic_blood_pressure). Why: rule 3: he cannot stand without bilateral support and has hourly blood pressure swings of up to 40 mmHg on telemetry; the library reports 3 minutes of symptom-free standing at a supine heart rate of 68.
+- `order_specialized_test {test_type: autonomic_testing}`: reduced cardiovagal function, distal sudomotor impairment and labile blood pressure on tilt (followup_outputs[9] request_autonomic_testing). Why: rule 3: the stored telemetry shows blood pressure 132/80-184/106 mmHg with hourly systolic swings of up to 40 mmHg
+- `order_specialized_test {test_type: tilt_table}`: Abnormal head-up tilt: labile blood pressure; no sustained orthostatic hypotension or vasovagal response (followup_outputs[10] request_tilt_table). Why: rule 3: the stored telemetry shows blood pressure 132/80-184/106 mmHg with hourly systolic swings of up to 40 mmHg
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

@@ -69,3 +69,17 @@ Andrea's FND ruling of 24 Oct 2026 and the close-out decisions (`plans/FND-decis
 
 - Diagnosis synonyms scoped by phenotype (`diagnosis_synonyms.yaml` F44 entries; a label or code naming another presentation must not score): removed "psychogenic non-epileptic seizures", "PNES", "functional seizures"; added "functional limb weakness", "functional motor disorder", "functional tremor"; codes removed F44.5.
 - Checks: `perfect_agent.py -v` and `case_io.py check` clean; `test_case_guards.py -k FND-` passes, now including the discriminator guard.
+
+## Library contradictions (25 Oct 2026)
+
+Orders that reached the benchmark library's normal report although the case contradicts it now get a case-specific report (library answers stay for everything else).
+
+- `perform_clinical_assessment assessment_type=gait_and_balance_timed` -> `fallback_tool_outputs.clinical_assessment`: timed gait and balance: 15.6 s TUG, reduced right arm swing and short shuffling right steps; left leg dragged behind. Why: the exam documents an abnormal gait; the library reports a normal timed gait (TUG 9.1 s).
+- `perform_clinical_assessment assessment_type=performance_status` -> `followup_outputs[request_performance_status]`: Karnofsky 70, ECOG 2. Why: the history documents limited activity; the library reports Karnofsky 100, ECOG 0, working.
+- `order_specialized_test test_type=neuropsych_battery` -> `followup_outputs[request_neuropsych_battery]`: cognition largely within normal limits; mild-to-moderate depressive and moderate anxiety symptoms; validity passed. Why: the history documents anxiety, depression or trauma-related symptoms; the library reports no significant mood or anxiety symptoms.
+- `perform_clinical_assessment assessment_type=levodopa_challenge` -> `followup_outputs[request_levodopa_challenge]`: MDS-UPDRS III 31 OFF, 17 ON (45% improvement); left action tremor unchanged. Why: established levodopa-treated PD with a satisfactory response; the library reports no parkinsonian signs.
+- `perform_clinical_assessment assessment_type=cognitive_screen` -> `followup_outputs[request_cognitive_screen]`: MoCA 26/30. Why: the exam records MoCA 26/30; the library reports MoCA 28/30.
+- `order_specialized_test test_type=olfactory_test` -> `fallback_tool_outputs.specialized_test`: UPSIT 22/40, moderate microsmia. Why: hyposmia is present in most patients with established PD; the library reports normosmia.
+- `order_advanced_imaging modality=MIBG_scan` -> `followup_outputs[request_mibg_scan]`: reduced cardiac MIBG uptake, delayed H/M 1.4. Why: cardiac sympathetic denervation is a characteristic finding in established PD (the stored DaTscan is abnormal); the library reports a normal MIBG.
+
+Checks: `perfect_agent.py` pass; `test_case_guards.py -k FND-P07` pass; map verify (map_FND) problems 0; criterion-answer snapshot unchanged except `action-neuropsych-battery`, which the library answered before and the new report now answers.

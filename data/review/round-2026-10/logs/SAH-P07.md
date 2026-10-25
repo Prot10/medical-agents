@@ -90,3 +90,16 @@ Checks: `perfect_agent.py` ok (the order returns every result its evidence cites
 
 - Past history "Obesity BMI was higher, lost weight" (known IIH) with a stored BMI of 21.8, which would need a loss of more than a quarter of body weight from the obese range. Rule 3: BMI 21.8 -> 27.6 (overweight after losing weight from obesity), weight 57.9 -> 73.3 kg, height 163 cm kept. No text cited the old BMI.
 - Checks: `perfect_agent.py` pass; weight/height/BMI consistency check clean.
+
+## Library contradictions (25 Oct 2026)
+
+Orders the benchmark library answered with a normal report that this case contradicts now have a case report. Contradiction = the history, the diagnosis or a stored finding makes the normal report impossible.
+
+- `analyze_csf (lumbar puncture, EVD, lumbar drain; xanthochromia)` -> fallback_tool_outputs.csf: blood-stained CSF without clearing (Fisher 2), xanthochromia result per time from onset. The library returned clear acellular CSF in a patient with subarachnoid blood on CT.
+- `perform_clinical_assessment {assessment_type: performance_status}` -> fallback_tool_outputs.clinical_assessment: Karnofsky 50, ECOG 3. The library returned Karnofsky 100, ECOG 0, working, in an acutely ill inpatient.
+- `order_specialized_test {test_type: optical_coherence_tomography}` -> fallback_tool_outputs.specialized_test: bilateral RNFL thickening; known IIH with chronic papilledema on the stored exam.
+- `order_specialized_test {test_type: visual_field_perimetry}` -> followup_outputs[request_visual_field_perimetry]: bilateral blind spot enlargement; the library stated no enlargement of the blind spot.
+- `order_advanced_imaging {modality: MR_venography}` -> fallback_tool_outputs.advanced_imaging: bilateral transverse sinus narrowing without thrombosis, the usual venous finding in IIH; the library MRV was normal.
+- `perform_clinical_assessment {assessment_type: structured_headache_history_ichd3}` -> followup_outputs[request_structured_headache_history_ichd3]: instantaneous, maximal within 2 to 3 seconds, 4 hours before assessment; red flags: thunderclap onset, change from her usual headache pattern. The library reported no thunderclap onset, no red flags and no nausea or photophobia, against the history.
+
+Checks: `perfect_agent.py` ok; `test_case_guards.py -k SAH-P07` passed; no criterion answer changed (snapshot diff); every mapped order is answered without the library (`verify.py`).

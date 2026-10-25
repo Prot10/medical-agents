@@ -86,3 +86,12 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+- `order_specialized_test {test_type: ssep}`: 1. Prolonged cortical P37 latency on both tibial stimulations (right 44.9 ms, left 45.6 ms) with normal lumbar N22, indicating central somatosensory conduction delay above the lumbar cord. 2. Normal median responses... (fallback_tool_outputs.specialized_test). Why: rule c: vibration reduced to the ankles in both legs with a dorsal-column C3-C4 lesion; the library reports a normal study.
+- `order_specialized_test {test_type: visual_field_perimetry}`: 1. Central scotoma with diffuse depression in the left eye (MD -10.2 dB). 2. Normal right visual field. (followup_outputs[request_visual_field_perimetry]). Why: rule c: acute left optic neuritis with acuity 20/80 and a left RAPD; the library reports a normal study.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: Abnormal timed gait and balance assessment. Timed Up and Go 11.6 s and 10 m walk speed 1.10 m/s are slowed for age; Berg balance 51/56. (fallback_tool_outputs.clinical_assessment). Why: rule d: the examination documents a gait disorder (mildly wide-based gait); the library reports a normal study.
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 80, ECOG 1: restricted in physically strenuous activity, ambulatory and able to carry out light work. (followup_outputs[request_performance_status]). Why: rule d: inpatient relapse with a documented gait disorder: Karnofsky 100 / ECOG 0 'without evidence of disease' contradicts the case; the library reports a normal study.
+
+Checks: perfect agent ok; case guards pass; snapshot diff shows no criterion answer changed; map verified (served without the library).

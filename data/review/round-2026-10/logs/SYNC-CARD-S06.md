@@ -105,3 +105,15 @@ Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it na
 - Scoring: none (recommended criterion; any call matching the old order still matches).
 
 Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the normal-row probe reports nothing for this criterion.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 80, ECOG 1 (fallback_tool_outputs.clinical_assessment). Why: rule 2: the library reports Karnofsky 100 with no complaints in a woman whose activity has fallen over six weeks with fatigue and near-syncope.
+- `order_echocardiogram {echo_type: TEE}`: mild LVH, mildly dilated LA, aortic sclerosis, no thrombus (fallback_tool_outputs.echo). Why: rule 3: the stored TTE shows mild LVH, a mildly dilated left atrium and aortic sclerosis; the library TEE reports a normal heart with a normal left atrium.
+- `order_echocardiogram {echo_type: bubble_study}`: mild LVH and LA dilatation as on the TTE, no shunt (followup_outputs[9] request_bubble_study). Why: rule 3: the stored TTE shows mild LVH and left atrial dilatation; the library reports a normal heart.
+- `order_echocardiogram {echo_type: exercise_echo}`: stress phase not performed, deferred by the clinical team (followup_outputs[10] request_exercise_echo). Why: rule 3: the stored exercise test is not performed; the library reports a normal study at 9.5 METs with 90% of the predicted heart rate in a woman with sinus node dysfunction on two rate-slowing drugs.
+- `order_specialized_test {test_type: audiometry}`: bilateral mild high-frequency sensorineural hearing loss (fallback_tool_outputs.specialized_test). Why: rule 2: the examination records mildly reduced hearing to finger rub bilaterally; the library reports normal hearing.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: mildly slowed gait, TUG 12.4 s, tandem with one side-step (followup_outputs[11] request_gait_and_balance_timed). Why: rule 2: the examination records a mildly reduced stride and a tandem walk with one side-step; the library reports a normal gait with an unassisted tandem walk.
+- `order_advanced_imaging {modality: cardiac_MRI}`: mild concentric LVH, mildly dilated LA, no late enhancement (fallback_tool_outputs.advanced_imaging). Why: rule 3: the stored TTE shows mild concentric LVH and a mildly dilated left atrium; the library reports normal wall thickness and atria.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

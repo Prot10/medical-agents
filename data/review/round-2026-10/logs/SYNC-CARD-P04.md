@@ -87,3 +87,10 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - follow-up EEG `request_eeg`: `eeg_type` set to `routine`, named in the report's own text.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 90, ECOG 0 (fallback_tool_outputs.clinical_assessment). Why: rule 2: the library reports Karnofsky 100 with no complaints in a student with recurrent exertional collapses and palpitations.
+- `order_echocardiogram {echo_type: exercise_echo}`: exercise-induced polymorphic VT with presyncope, QT not shortening, normal contractile response (fallback_tool_outputs.echo). Why: rule 3: the stored exercise test shows paradoxical QT prolongation and polymorphic VT with presyncope; the library reports a normal study with no arrhythmia.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

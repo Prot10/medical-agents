@@ -87,3 +87,13 @@ Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it na
 - Scoring: none.
 
 Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.
+
+## Library contradictions (25 Oct 2026)
+
+Orders that reached the benchmark library's normal report although the case contradicts it now get a case-specific report (library answers stay for everything else).
+
+- `perform_clinical_assessment assessment_type=gait_and_balance_timed` -> `fallback_tool_outputs.clinical_assessment`: timed gait and balance: 16.8 s TUG, right leg dragged behind with the foot kept on the floor. Why: the exam documents an abnormal gait; the library reports a normal timed gait (TUG 9.1 s).
+- `perform_clinical_assessment assessment_type=performance_status` -> `followup_outputs[request_performance_status]`: Karnofsky 70, ECOG 2. Why: the history documents limited activity; the library reports Karnofsky 100, ECOG 0, working.
+- `order_specialized_test test_type=neuropsych_battery` -> `followup_outputs[request_neuropsych_battery]`: cognition within normal limits; trauma-related symptoms above the screening threshold, moderate depressive and anxiety symptoms, hazardous alcohol use on self-report and elevated dissociative experiences; validity passed. Why: the history documents anxiety, depression or trauma-related symptoms; the library reports no significant mood or anxiety symptoms.
+
+Checks: `perfect_agent.py` pass; `test_case_guards.py -k FND-S09` pass; map verify (map_FND) problems 0; criterion-answer snapshot unchanged except `action-neuropsych-battery`, which the library answered before and the new report now answers.

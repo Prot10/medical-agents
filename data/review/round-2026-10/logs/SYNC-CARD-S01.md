@@ -117,3 +117,15 @@ Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it na
 - Scoring: none (recommended criterion; any call matching the old order still matches).
 
 Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the normal-row probe reports nothing for this criterion.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 70, ECOG 2 (fallback_tool_outputs.clinical_assessment). Why: rule 2: the library reports Karnofsky 100 with no complaints in a sedentary man with two months of fatigue, exertional dyspnoea and near-syncope.
+- `order_echocardiogram {echo_type: TEE}`: LVEF 45% with mid-anterior hypokinesis, mild LVH, no thrombus (fallback_tool_outputs.echo). Why: rule 3: the stored TTE shows LVEF 45% with regional hypokinesis and mild LVH; the library TEE reports a normal heart.
+- `order_echocardiogram {echo_type: bubble_study}`: LVEF 45% as on the TTE, no shunt (followup_outputs[9] request_bubble_study). Why: rule 3: the stored TTE is abnormal (LVEF 45%, regional hypokinesis); the library reports a normal heart.
+- `order_echocardiogram {echo_type: exercise_echo}`: stress phase not performed, deferred by the clinical team (followup_outputs[10] request_exercise_echo). Why: rule 3: the stored exercise test is not performed in complete AV block with a 35 bpm escape; the library reports a normal study at 9.5 METs, which this rhythm cannot produce.
+- `order_advanced_imaging {modality: coronary_CTA}`: patent LAD stent, non-obstructive RCA and circumflex plaque (fallback_tool_outputs.advanced_imaging). Why: rule 2: coronary artery disease with an LAD stent four years ago and a mid-anterior infarct scar on the stored cardiac MRI; the library reports no plaque.
+- `order_advanced_imaging {modality: coronary_angiography}`: patent LAD stent, non-obstructive RCA disease (followup_outputs[11] request_coronary_angiography). Why: rule 2: coronary artery disease with an LAD stent four years ago; the library reports normal coronaries.
+- `order_specialized_test {test_type: emg_ncs}`: mild length-dependent sensory-predominant axonal polyneuropathy (fallback_tool_outputs.specialized_test). Why: rule 2: type 2 diabetes for eight years with diminished vibration at the great toes and Achilles reflexes 1+; the library reports normal nerve conduction.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

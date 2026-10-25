@@ -80,3 +80,22 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, decided by reading the report.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 20, ECOG 4 (fallback_tool_outputs.clinical_assessment). Why: rule 3: GCS 10, unable to stand, febrile; even the pre-illness baseline (cane, residual dysarthria) excludes the library's Karnofsky 100.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: not testable (GCS 10, unable to stand) (followup_outputs[5] request_gait_and_balance_timed). Why: rule 3: the stored exam records that he cannot stand or walk; baseline gait required a cane.
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: no parkinsonian signs; bilateral pyramidal signs; challenge not performed (followup_outputs[6] request_levodopa_challenge). Why: rule 3: the library describes a normal motor examination and gait in a somnolent patient with bilateral extensor plantars.
+- `perform_clinical_assessment {assessment_type: structured_headache_history_ichd3}`: new acute headache with red flags; criteria for a primary headache disorder not met (followup_outputs[7] request_structured_headache_history_ichd3). Why: rule 1 and 3: a febrile illness with falling consciousness on immunosuppression; the library elicits no red flags.
+- `analyze_eeg {eeg_type: continuous_icu}`: continuous generalised theta-delta slowing; no epileptiform discharges or seizures (followup_outputs[8] request_continuous_icu). Why: rule 3: GCS 10 and the stored routine EEG shows diffuse slowing; the library reports a normal background.
+- `analyze_eeg {eeg_type: ambulatory}`: continuous generalised theta-delta slowing; no epileptiform discharges or seizures (followup_outputs[9] request_ambulatory). Why: rule 3: GCS 10 and the stored routine EEG shows diffuse slowing; the library reports a normal background.
+- `perform_clinical_assessment {assessment_type: cognitive_screen}`: not completed (GCS 10) (followup_outputs[10] request_cognitive_screen). Why: rule 3: the stored exam states cognitive testing is not possible; the library reports MoCA 28/30.
+- `order_specialized_test {test_type: neuropsych_battery}`: not completed (reduced consciousness) (fallback_tool_outputs.specialized_test). Why: rule 3: the stored exam states cognitive testing is not possible.
+- `order_specialized_test {test_type: speech_language_evaluation}`: severe dysarthria; language not testable (followup_outputs[11] request_speech_language_evaluation). Why: rule 3: the stored exam records severely dysarthric speech, with mild residual dysarthria from a previous stroke.
+- `order_microbiology {specimen: whole_blood_pcr}`: Streptococcus pneumoniae DNA detected (fallback_tool_outputs.microbiology). Why: rule 3: blood cultures grow S. pneumoniae in 2 of 2 sets collected before antimicrobials; it is a target of the panel.
+- `perform_clinical_assessment {assessment_type: orthostatic_blood_pressure}`: supine BP 142/82, HR 96; standing not performed (followup_outputs[12] request_orthostatic_blood_pressure). Why: rule 3: a patient unable to stand for 2 days cannot complete 3 minutes of standing.
+- `order_advanced_imaging {modality: cerebral_angiography}`: hypoplastic arterial segments; no vasculitic change (fallback_tool_outputs.advanced_imaging). Why: rule 3: the history records an angiogram 8 months ago with hypoplastic vascular segments; the library reports normal calibre throughout.
+- `order_advanced_imaging {modality: MR_angiography}`: hypoplastic arterial segments; no stenosis (followup_outputs[13] request_mr_angiography). Why: rule 3: the history records hypoplastic vascular segments on angiography 8 months ago; the library reports normal calibre throughout.
+- `interpret_labs {panels: [ABG]}`: metabolic acidosis with partial respiratory compensation (fallback_tool_outputs.labs['ABG']). Why: rule 3: stored bicarbonate 19, lactate 2.8, creatinine 1.6 and RR 24; the library reports a normal gas.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

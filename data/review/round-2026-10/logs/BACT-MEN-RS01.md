@@ -76,3 +76,17 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 50, ECOG 2 (fallback_tool_outputs.clinical_assessment). Why: rule 3: two weeks of persistent neck pain and stiffness, fatigue, a near-syncopal episode and HR 120; the library's Karnofsky 100 describes a person without disease.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: mildly slowed antalgic gait; lightheaded on rising (followup_outputs[5] request_gait_and_balance_timed). Why: rule 3: the stored exam records a mildly antalgic gait, tandem gait not tested and near-syncope on standing; the library reports normal timed values.
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: no parkinsonian signs; fixed left torticollis; challenge not administered (followup_outputs[6] request_levodopa_challenge). Why: rule 3: the library reports a normal neck and gait in a patient with fixed left torticollis and an antalgic gait; no challenge would be given without parkinsonism.
+- `perform_clinical_assessment {assessment_type: structured_headache_history_ichd3}`: no headache; persistent neck pain and stiffness with systemic red flags (followup_outputs[7] request_structured_headache_history_ichd3). Why: rule 1 and 3: the patient denies headache but has 15 days of neck stiffness with systemic features; the library describes a headache history without red flags.
+- `analyze_brain_mri`: basal and posterior fossa leptomeningeal enhancement; no complication (fallback_tool_outputs.mri). Why: rule 1 and 3: no brain MRI is stored; the stored spine MRI shows leptomeningeal enhancement along the cervical cord, so an MRI with gadolinium of the brain would not be normal.
+- `analyze_ecg`: sinus tachycardia at 120 bpm, otherwise normal (fallback_tool_outputs.ecg). Why: rule 3: presenting heart rate 120 bpm; the library reports a rate of 72.
+- `perform_clinical_assessment {assessment_type: orthostatic_blood_pressure}`: orthostatic hypotension with symptoms; resting HR 120 (followup_outputs[8] request_orthostatic_blood_pressure). Why: rule 3: a near-syncopal episode on standing today and HR 120 at rest, on tamsulosin and cyclobenzaprine; the library reports a normal response with HR 68.
+- `order_body_imaging {study: spine_CT}`: C4-C6 degenerative disc disease; no fracture or bone destruction (fallback_tool_outputs.body_imaging). Why: rule 3: the stored spine MRI shows disc space narrowing and osteophytes at C4-C5 and C5-C6; the library reports a normal spine.
+- `interpret_labs {panels: [tox_screen]}`: urine opiates positive (prescribed hydrocodone) (fallback_tool_outputs.labs['tox_screen']). Why: rule 2: acetaminophen/hydrocodone prescribed at the last ED visit, with pinpoint pupils on the stored exam; the library reports opiates negative.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

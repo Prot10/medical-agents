@@ -88,3 +88,21 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg` set to null: it describes no single recording, so it cannot be typed; an off-pathway EEG order now gets the library normal of the type ordered.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 30, ECOG 4 (fallback_tool_outputs.clinical_assessment). Why: rule 3: febrile (39.1 C), tachycardic (HR 108), disoriented to date with marked meningism, refusing to stand; the library's Karnofsky 100 describes a person without disease.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: not performed (refuses to stand: headache, photophobia) (followup_outputs[7] request_gait_and_balance_timed). Why: rule 3: the stored exam records gait not assessed because the patient refuses to stand.
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: no parkinsonian signs; challenge not performed; gait and postural reflexes not assessable (followup_outputs[8] request_levodopa_challenge). Why: rule 3: the library describes a normal gait and postural reflexes in a patient who refuses to stand, with marked nuchal rigidity.
+- `perform_clinical_assessment {assessment_type: structured_headache_history_ichd3}`: new acute headache with red flags; criteria for a primary headache disorder not met (followup_outputs[9] request_structured_headache_history_ichd3). Why: rule 1 and 3: an acute febrile headache with neck stiffness and photophobia, the second such episode; the library elicits no red flags.
+- `analyze_eeg {eeg_type: routine}`: mild generalised theta slowing; no epileptiform discharges or seizures (fallback_tool_outputs.eeg). Why: rule 3: no EEG is stored and the patient is disoriented to date with impaired concentration (GCS 14); the library reports a normal background.
+- `analyze_eeg {eeg_type: sleep_deprived}`: mild generalised theta slowing; no epileptiform discharges or seizures (followup_outputs[10] request_sleep_deprived). Why: rule 3: disoriented to date with impaired concentration (GCS 14); the library reports a normal background.
+- `analyze_eeg {eeg_type: continuous_icu}`: mild generalised theta slowing; no epileptiform discharges or seizures (followup_outputs[11] request_continuous_icu). Why: rule 3: disoriented to date with impaired concentration (GCS 14); the library reports a normal background.
+- `analyze_eeg {eeg_type: ambulatory}`: mild generalised theta slowing; no epileptiform discharges or seizures (followup_outputs[12] request_ambulatory). Why: rule 3: disoriented to date with impaired concentration (GCS 14); the library reports a normal background.
+- `perform_clinical_assessment {assessment_type: cognitive_screen}`: MoCA 18/30 with inattention and temporal disorientation (followup_outputs[13] request_cognitive_screen). Why: rule 3: the stored exam records disorientation to date and serial subtraction lost after two steps; the library reports MoCA 28/30.
+- `order_specialized_test {test_type: neuropsych_battery}`: not completed (inattention, acute confusion) (fallback_tool_outputs.specialized_test). Why: rule 3: an acutely confused patient cannot complete a battery in the average range.
+- `order_microbiology {specimen: whole_blood_pcr}`: Streptococcus pneumoniae DNA detected (fallback_tool_outputs.microbiology). Why: rule 3: blood cultures grow S. pneumoniae in 1 of 2 sets, a target of the panel; no antibiotics in the week before presentation.
+- `perform_clinical_assessment {assessment_type: orthostatic_blood_pressure}`: supine BP 122/74, HR 108; standing not performed (followup_outputs[14] request_orthostatic_blood_pressure). Why: rule 3: vitals HR 108 in a patient who refuses to stand; the library reports HR 68 and 3 minutes of standing.
+- `interpret_labs {panels: [serum_osmolality]}`: serum osmolality 267 mOsm/kg (low) (fallback_tool_outputs.labs['serum_osmolality']). Why: rule 3: stored sodium 128 mmol/L (calculated osmolality about 268); the library reports 288 mOsm/kg.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

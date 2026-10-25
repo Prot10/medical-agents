@@ -81,3 +81,24 @@ Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the norma
 
 - The HPI, social history and clinical assessment state a height of 150 cm (short stature, a MELAS clue) and BMI 18.8; the default height was 165 cm. Rules 1-2: height 165 -> 150 cm, weight 51.2 -> 42.3 kg, BMI 18.8 kept.
 - Checks: `perfect_agent.py` pass; weight/height/BMI consistency check clean.
+
+## Library contradictions (25 Oct 2026)
+
+Case-specific reports stored where the benchmark library's normal report contradicted the case. Why: subacute 6.0 x 3.5 cm right parieto-occipital stroke-like lesion, left homonymous field defect on examination, documented mild bilateral high-frequency sensorineural hearing loss, mild concentric LVH with grade I diastolic dysfunction on the stored TTE, and m.3243A>G MELAS; the library reports a normal EEG, full fields, normal hearing, normal muscle histology, normal LV and normal brain metabolism, perfusion and tracts.
+
+- EEG routine: right parieto-occipital slowing, no epileptiform activity (also answers sleep-deprived orders) (fallback_tool_outputs.eeg)
+- EEG ambulatory: right parieto-occipital slowing, no seizures or IEDs (followup request_ambulatory_eeg)
+- EEG video: right parieto-occipital slowing, no seizures or IEDs (followup request_video_eeg)
+- visual_field_perimetry: left inferior homonymous quadrantanopia extending into the upper quadrant, macula spared (fallback_tool_outputs.specialized_test)
+- audiometry: mild bilateral high-frequency sensorineural hearing loss (followup request_audiometry)
+- muscle_biopsy: ragged-red fibres, SDH-reactive vessels, occasional COX-deficient fibres (followup request_muscle_biopsy)
+- bubble_study: mild concentric LVH, grade I diastolic dysfunction, no shunt (fallback_tool_outputs.echo)
+- TEE: mild concentric LVH, no embolic source (followup request_tee)
+- exercise_echo: mild concentric LVH, no inducible ischaemia (followup request_exercise_echo)
+- FDG_PET: right parieto-occipital hypometabolism over the lesion (fallback_tool_outputs.advanced_imaging)
+- perfusion_MRI: hyperperfusion of the right parieto-occipital lesion (followup request_perfusion_mri)
+- CT_perfusion: hyperperfusion of the right parieto-occipital lesion (followup request_ct_perfusion)
+- perfusion_SPECT: right parieto-occipital hyperperfusion over the lesion (followup request_perfusion_spect)
+- DTI_tractography: right optic radiation involved by the lesion (followup request_dti_tractography)
+
+Checks: `perfect_agent.py` pass; `test_case_guards.py -k MIG-AURA-P08` pass; no fixed order still answered by the library (`lib4.source`); no 60-character window of any criterion's expected_evidence in the added text; every criterion's served output unchanged (snapshot diff against the baseline).
