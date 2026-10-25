@@ -10,6 +10,8 @@ Each guard is parametrized by case id, so one condition runs alone with e.g.
    study, not with a repeat-study follow-up that shares a token with it.
 3. Banned strings per condition: superseded drugs, criteria and phrasings the reviewers removed.
    Data-driven (`BANNED`), so later conditions add rows rather than tests.
+6. Review-process text: no ruling numbers, round-policy, criteria-pack, CENTRAL or credit wording in
+   any case field, and no tier marker in a criterion label or rationale (25 Oct 2026).
 """
 
 from __future__ import annotations
@@ -433,3 +435,60 @@ def test_routine_eeg_guard_fires():
     assert routine_eeg_defects(case)
     case["fallback_tool_outputs"]["eeg"] = {"eeg_type": "routine", "impression": "Seizures."}
     assert not routine_eeg_defects(case)
+
+
+# ---------------------------------------------------------------------------------------
+# 6. Review-process text in case fields (25 Oct 2026).
+#
+# The review app sends the whole case to the physicians (`review_api/routes/datasets.py` returns
+# `case.model_dump()`, metadata included in a collapsed panel) and the agent sees the patient and
+# the tool outputs, so no string field is exempt. References to the round's machinery (a ruling
+# number, the round policy file, the criteria packs, the central queue, credit wording) mean
+# nothing to a physician or a model and are rewritten in clinical language. `CENTRAL` is matched
+# case-sensitively as a whole word so "central canal" and "central pontine" pass. A tier marker
+# ("(optional)", "Optional:") in a criterion's label or rationale repeats `importance` in
+# engineering words; the metadata's difficulty summaries ("Required core: ... Optional: ...")
+# describe the work-up tiers to reviewers on purpose and are not criterion text, so they pass.
+
+_PROCESS_TEXT = re.compile(
+    r"\bruling\s+\d+|\bround[_ ]policy\b|\bcriteria[ _-]packs?\b|\bearns? no credit\b", re.I)
+_CENTRAL = re.compile(r"\bCENTRAL\b")
+_TIER_MARKER = re.compile(r"\(optional\)|^\s*optional\s*:|\(optional\s*:", re.I)
+
+
+def _paths(value: Any, path: str = "") -> Iterator[tuple[str, str]]:
+    if isinstance(value, str):
+        yield path, value
+    elif isinstance(value, dict):
+        for key, item in value.items():
+            yield from _paths(item, f"{path}.{key}" if path else str(key))
+    elif isinstance(value, list):
+        for index, item in enumerate(value):
+            yield from _paths(item, f"{path}[{index}]")
+
+
+def process_text_hits(case: dict[str, Any]) -> list[str]:
+    hits = []
+    for path, text in _paths(case):
+        found = [m.group(0) for m in _PROCESS_TEXT.finditer(text)] + _CENTRAL.findall(text)
+        if re.search(r"action_criteria\[\d+\]\.(label|rationale)$", path):
+            found += [m.group(0) for m in _TIER_MARKER.finditer(text)]
+        hits += [f"{path}: {hit!r}" for hit in found]
+    return hits
+
+
+@pytest.mark.parametrize("case_id", CASE_IDS)
+def test_no_review_process_text(case_id):
+    assert not process_text_hits(_raw(case_id))
+
+
+def test_process_text_guard_fires():
+    case = {"patient": {"history": "Lesion near the central canal; ruling out infection."},
+            "ground_truth": {"action_criteria": [
+                {"label": "Literature search (optional)", "rationale": "Optional: low yield."},
+                {"label": "MRI (optional: normal exam)", "rationale": "Per ROUND_POLICY ruling 6."}]},
+            "metadata": {"difficulty_rationale": "Required core: exam. Optional: MRI.",
+                         "notes": "Queued in CENTRAL; the criteria pack says it earns no credit."}}
+    hits = process_text_hits(case)
+    assert len(hits) == 8, hits
+    assert not any("patient" in hit or "difficulty_rationale" in hit for hit in hits)

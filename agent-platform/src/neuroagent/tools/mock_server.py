@@ -8,7 +8,9 @@ from neuroagent_schemas import (
 from .base import ToolCall, ToolResult
 from .fallback_library import FallbackLibrary, default_library
 from .followup_matcher import match_followup, resolve_followup
-from .lab_matching import LabMatcher, mentions, split_sentences, tokens as lab_tokens
+from .lab_matching import (
+    LabMatcher, like as lab_like, mentions, specimen_compatible, split_sentences, tokens as lab_tokens,
+)
 from .vocabulary import (
     DOMAIN_PACKS,
     advanced_imaging_modalities,
@@ -92,6 +94,40 @@ class MockServer:
     _SAME_STUDY: dict[str, tuple[frozenset[str], ...]] = {
         "analyze_eeg": (frozenset({"video", "continuous_icu"}),),
     }
+
+    # One-way stand-ins (25 Oct 2026, SE-routing CENTRAL 5): an order for the key study is answered
+    # by a stored report of a listed study when the case stores no report of the key study itself
+    # (initial, follow-up or case fallback). A sleep-deprived EEG is the routine 20 to 40 minute
+    # recording made after sleep deprivation, to raise the yield of interictal discharges: what the
+    # routine recording showed, it would have shown, so the patient's own routine report is the
+    # fair answer, where the library's normal recording contradicted a patient in non-convulsive
+    # status or with temporal discharges. The reverse is never served (a routine order does not get
+    # a sleep-deprived recording's extra yield), the same rule as the monitoring tiers. Ambulatory
+    # EEG is left out: a 24 to 72 hour recording captures events a 30-minute report cannot speak for.
+    _STANDS_IN: dict[str, dict[str, tuple[str, ...]]] = {
+        "analyze_eeg": {"sleep_deprived": ("routine",)},
+    }
+
+    def _stored_reports(self, tool_name: str) -> list[Any]:
+        initial = self._match_initial_output(tool_name, {})
+        fallback = self._match_fallback_output(tool_name, {})
+        followups = [fu.output for fu in self.case.followup_outputs or [] if fu.tool_name == tool_name]
+        return [report for report in (initial, *followups, fallback) if isinstance(report, BaseModel)]
+
+    def _stands_in(self, tool_name: str, wanted: Any, got: Any) -> bool:
+        """May a stored report of study `got` answer an order for study `wanted` (`_STANDS_IN`)?"""
+        spec = self._DISCRIMINATOR.get(tool_name)
+        table = self._STANDS_IN.get(tool_name)
+        if spec is None or not table:
+            return False
+        stand_ins = next((terms for term, terms in table.items() if self._fold(term) == self._fold(wanted)), ())
+        if not any(self._fold(term) == self._fold(got) for term in stand_ins):
+            return False
+        key = spec[0]
+        return not any(
+            getattr(report, key, None) and self._same_study(tool_name, getattr(report, key), wanted)
+            for report in self._stored_reports(tool_name)
+        )
 
     def _wanted(self, tool_name: str, parameters: dict[str, Any]) -> Any:
         """The study the call orders by its primary discriminator (`None`: not stated)."""
@@ -278,7 +314,7 @@ class MockServer:
         if tool_name == "order_cardiac_monitoring":
             return self._monitor_answers(str(wanted), got, output)
         if folded and folded in {self._fold(term) for term in vocabulary(packs=self.packs)}:
-            return self._same_study(tool_name, got, wanted)
+            return self._same_study(tool_name, got, wanted) or self._stands_in(tool_name, wanted, got)
         return True  # the report names the study in prose; not ours to adjudicate
 
     def _monitor_answers(self, wanted: str, got: Any, output: Any) -> bool:
@@ -388,7 +424,10 @@ class MockServer:
         for name in requested:
             tokens = [t for t in re.split(r"[^a-z0-9]+", str(name).lower())
                       if len(t) >= 3 and t not in cls._UNINFORMATIVE]
-            if tokens and any(t[:5] in blob for t in tokens):
+            # A token counts at the start of a word, after an optional "anti" ("Anticardiolipin"):
+            # "lipid" inside "antiphospholipid" named a lipid panel the payload does not carry
+            # (VASC-DEM-P05/P06, 25 Oct 2026).
+            if tokens and any(re.search(r"(?<![a-z0-9])(?:anti-?)?" + re.escape(t[:5]), blob) for t in tokens):
                 hits += 1
         return hits
 
@@ -619,8 +658,15 @@ class MockServer:
         """
         tokens = [t for t in re.split(r"[^a-z0-9]+", str(assay).lower())
                   if len(t) >= 3 and t not in cls._UNINFORMATIVE]
-        blob = " ".join([name, *(row.test for row in rows)]).lower()
-        return bool(tokens) and all(t[:5] in blob for t in tokens)
+        measured = [row.test for row in rows if specimen_compatible(row.test, name, str(assay))]
+        if len(measured) < len(rows) and not measured:
+            return False  # every row is another specimen's (a urinalysis for a blood order)
+        blob = " ".join([name, *measured]).lower()
+        words = set(re.split(r"[^a-z0-9]+", blob)) | set(lab_tokens(blob))
+        # Word stems, not five-letter prefixes anywhere in the text: `complement` shares "compl"
+        # with "Complete Blood Count" and an anti-dsDNA + complement order received the CBC
+        # (SE-routing CENTRAL 4, 25 Oct 2026).
+        return bool(tokens) and all(any(lab_like(t, word) for word in words if word) for t in tokens)
 
     def _merge_lab_order(
         self, tool_name: str, parameters: dict[str, Any], served: Any, served_followup: Any, initial: Any

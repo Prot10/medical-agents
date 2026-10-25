@@ -89,17 +89,73 @@
     {
       "output": {
         "abnormal_values_summary": [],
-        "interpretation": "Cysticercosis IgG negative. HIV antigen/antibody, RPR, hepatitis B surface antigen and hepatitis C antibody non-reactive or negative. QuantiFERON-TB Gold negative.",
+        "interpretation": "Taenia solium IgG antibody by enzyme-linked immunoelectrotransfer blot: no diagnostic glycoprotein band, negative.",
         "panels": {
-          "Infectious_Workup": [
+          "Cysticercosis_serology": [
+            {
+              "clinical_significance": null,
+              "is_abnormal": false,
+              "reference_range": "Negative (no diagnostic glycoprotein band)",
+              "test": "Taenia solium (cysticercosis) IgG antibody, serum (EITB)",
+              "unit": "",
+              "value": "Negative"
+            }
+          ]
+        }
+      },
+      "tool_name": "interpret_labs",
+      "trigger_action": "request_cysticercosis_serology_eitb"
+    },
+    {
+      "output": {
+        "abnormal_values_summary": [],
+        "interpretation": "Interferon-gamma release assay (QuantiFERON-TB Gold Plus) negative, with a valid mitogen response.",
+        "panels": {
+          "IGRA": [
+            {
+              "clinical_significance": null,
+              "is_abnormal": false,
+              "reference_range": "<0.35",
+              "test": "QuantiFERON-TB Gold Plus, TB1 antigen minus nil",
+              "unit": "IU/mL",
+              "value": 0.02
+            },
+            {
+              "clinical_significance": null,
+              "is_abnormal": false,
+              "reference_range": "<0.35",
+              "test": "QuantiFERON-TB Gold Plus, TB2 antigen minus nil",
+              "unit": "IU/mL",
+              "value": 0.04
+            },
+            {
+              "clinical_significance": null,
+              "is_abnormal": false,
+              "reference_range": ">=0.50",
+              "test": "QuantiFERON-TB Gold Plus, mitogen minus nil",
+              "unit": "IU/mL",
+              "value": ">10.00"
+            },
             {
               "clinical_significance": null,
               "is_abnormal": false,
               "reference_range": "Negative",
-              "test": "Cysticercosis IgG",
+              "test": "QuantiFERON-TB Gold Plus, result",
               "unit": "",
               "value": "Negative"
-            },
+            }
+          ]
+        }
+      },
+      "tool_name": "interpret_labs",
+      "trigger_action": "request_igra_quantiferon"
+    },
+    {
+      "output": {
+        "abnormal_values_summary": [],
+        "interpretation": "HIV antigen/antibody, RPR, hepatitis B surface antigen and hepatitis C antibody non-reactive or negative.",
+        "panels": {
+          "Infectious_serology": [
             {
               "clinical_significance": null,
               "is_abnormal": false,
@@ -131,20 +187,12 @@
               "test": "Hepatitis C antibody",
               "unit": "",
               "value": "Non-reactive"
-            },
-            {
-              "clinical_significance": null,
-              "is_abnormal": false,
-              "reference_range": "Negative",
-              "test": "QuantiFERON-TB Gold",
-              "unit": "",
-              "value": "Negative"
             }
           ]
         }
       },
       "tool_name": "interpret_labs",
-      "trigger_action": "request_cysticercosis_hiv_syphilis_hepatitis_quantiferon_serology"
+      "trigger_action": "request_hiv_syphilis_hepatitis_serology"
     },
     {
       "output": {
@@ -277,6 +325,46 @@
         "importance": "required",
         "label": "Obtain a routine EEG with drowsiness and sleep",
         "rationale": "A routine EEG lateralizes the focal epilepsy suggested by her habitual auras."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "panels": [
+                "cysticercosis_serology"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          }
+        ],
+        "citations": [
+          "[IDSA_NCC_2018]"
+        ],
+        "criterion_id": "action-9-interpret-labs-cysticercosis-serology",
+        "expected_evidence": "Taenia solium IgG by EITB negative, which does not exclude calcified neurocysticercosis",
+        "importance": "recommended",
+        "label": "Serum cysticercosis antibody by EITB",
+        "rationale": "EITB serology is the confirmatory blood test for suspected neurocysticercosis, but its sensitivity is low with single or only calcified lesions, so the MRI pattern and the exposure history carry the diagnosis [IDSA_NCC_2018]"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "panels": [
+                "IGRA"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          }
+        ],
+        "citations": [
+          "[ATS_IDSA_CDC_TB_2017]"
+        ],
+        "criterion_id": "action-10-interpret-labs-igra",
+        "expected_evidence": "QuantiFERON-TB Gold Plus negative with a valid mitogen response",
+        "importance": "recommended",
+        "label": "Interferon-gamma release assay for tuberculous infection",
+        "rationale": "Calcified tuberculomas are the other cause of healed calcified granulomas, and she was born in a high-incidence country and lives in a congregate shelter; an IGRA is the preferred test of tuberculous infection in adults and is valid in pregnancy [ATS_IDSA_CDC_TB_2017]"
       },
       {
         "alternatives": [
@@ -484,8 +572,8 @@
       },
       {
         "correct_interpretation": "Serum antibody tests are often negative when cysticerci are only calcified; the MRI pattern and exposure history carry the diagnosis.",
-        "data_point": "Cysticercosis IgG negative",
-        "field_path": "followup_outputs[0].output.panels.Infectious_Workup[0]",
+        "data_point": "Taenia solium (cysticercosis) IgG by EITB negative",
+        "field_path": "followup_outputs[0].output.panels.Cysticercosis_serology[0]",
         "intended_effect": "Dismiss neurocysticercosis as the cause of the calcified lesions.",
         "location": "labs"
       }

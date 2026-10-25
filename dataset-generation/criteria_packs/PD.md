@@ -53,7 +53,11 @@ severity; normal presynaptic dopaminergic imaging; a documented alternative cond
 supportive criterion (rest tremor) unless the case contains a validated smell test or an MIBG, so
 the label is **clinically probable PD**, never "established". "Clinically established" is used only
 in PD-M04 (rest tremor and UPSIT microsmia), PD-RM05 (documented response and rest tremor) and
-PD-RP04 (dramatic response, dyskinesia, rest tremor).
+PD-RP04 (dramatic response, dyskinesia, rest tremor). Since 25 Oct 2026 a validated smell test can
+be ordered (`order_specialized_test {"test_type": "olfactory_test"}`): where the history reports
+smell loss the case stores the UPSIT result, and the must says that olfactory loss on the test is a
+second supportive criterion that makes a first-visit diagnosis clinically established (without a
+red flag), clinically probable otherwise.
 
 1.8 **Current D2-blocker exposure (PD-M01, M02, M03).** While metoclopramide is taken the exposure is
 an absolute exclusion, so the MDS criteria cannot yet be met. The label "PD unmasked by
@@ -87,6 +91,8 @@ a case-specific question.
   asks for the review: M01, M02, M03 (metoclopramide), RM05 (prochlorperazine), RP04 (pre-DBS:
   iron with levodopa, rasagiline before surgery).
 - `order_specialized_test {"test_type": "neuropsych_battery"}` only in RP04 (pre-DBS candidacy).
+- `perform_clinical_assessment {"assessment_type": "levodopa_challenge"}` only in RP04 (MDS-UPDRS
+  III OFF and ON; at least 30% improvement supports STN-DBS candidacy [CAPSIT_PD_1999]).
 
 **Recommended**
 - DaTscan in RP05 (vascular versus degenerative parkinsonism with Fazekas 2 white matter disease).
@@ -118,6 +124,12 @@ a case-specific question.
 - `perform_clinical_assessment {"assessment_type": "orthostatic_blood_pressure"}` in M01, RM04 and
   RP04 (orthostatic light-headedness with no lying and standing figures in the exam).
 - Medication review in the other 18 cases.
+- `order_specialized_test {"test_type": "olfactory_test"}` (UPSIT) in the 12 cases whose history
+  reports smell loss without a validated test: M02 (smell is normal in pure drug-induced
+  parkinsonism), M05, RM02, RM03, RM04, RP02 (smell is usually preserved in MSA; post-viral history
+  competes), RP05, RS01, RS05, S04, S05, S06. M04 and RP01 (test already in the examination), RM05
+  and RP04 (already clinically established) store the result as a case fallback with no criterion,
+  so an order is not answered with the library's normosmia.
 
 **Never a criterion:** literature search (deleted in all 30, ruling 5), EEG, CSF, EMG/NCS,
 repetitive nerve stimulation, biopsies, evoked potentials, formal autonomic testing, tilt-table
@@ -281,6 +293,9 @@ Every key cited in the 30 cases is listed (checked 24 Oct 2026).
   2012;27(3):349-356. doi:10.1002/mds.24893
 - `[ESC_2018]` Brignole M, Moya A, de Lange FJ, et al. 2018 ESC Guidelines for the diagnosis and
   management of syncope. Eur Heart J 2018;39(21):1883-1948. doi:10.1093/eurheartj/ehy037
+- `[CAPSIT_PD_1999]` Defer GL, Widner H, Marié RM, Rémy P, Levivier M. Core assessment program
+  for surgical interventional therapies in Parkinson's disease (CAPSIT-PD). Mov Disord
+  1999;14(4):572-584. doi:10.1002/1531-8257(199907)14:4<572::AID-MDS1005>3.0.CO;2-C
 - `[EASL_ERN_Wilson_2025]` European Association for the Study of the Liver, European Reference
   Network on Hepatological Diseases (Socha P, et al.). EASL-ERN Clinical Practice Guidelines on
   Wilson's disease. J Hepatol 2025;82(4):690-728. doi:10.1016/j.jhep.2024.11.007

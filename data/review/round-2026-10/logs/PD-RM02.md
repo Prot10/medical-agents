@@ -81,3 +81,11 @@ Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it na
 - Scoring: none (recommended criterion: coverage unchanged, not in the cost reference).
 
 Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.
+
+## Batch-5 vocabulary (25 Oct 2026)
+
+Commit c02f3050 added `cysticercosis_serology`, `IGRA` (interpret_labs), `olfactory_test` (order_specialized_test) and `levodopa_challenge` (perform_clinical_assessment); `HBV_DNA` (interpret_labs) was added the same day for this round. The requests are now wired into the case.
+
+- New optional criterion `olfactory-test` (`order_specialized_test {test_type: olfactory_test}`, `action_criteria[5]`, before the medication review) and its follow-up `request_olfactory_test_upsit` (`followup_outputs[3]`): UPSIT 23/40, severe microsmia, below the normal range for age and sex. Before, an olfactory order got the library's normosmia (35/40), which contradicts the smell loss in the history. Optional: the test can add an MDS supportive criterion but changes no management. No scoring change for an agent that does not order it.
+- `ground_truth.assessment.required_recommendations[0]`: rewritten so the smell loss counts as a supportive criterion once a validated test confirms it (UPSIT 23/40), instead of saying it cannot be tested.
+- `ground_truth.key_clinical_evidence[0]`: rewritten so the smell loss counts as a supportive criterion once a validated test confirms it (UPSIT 23/40), instead of saying it cannot be tested.

@@ -48,7 +48,10 @@ _PHRASES: tuple[tuple[str, str], ...] = (
     (r"folic acid", "folate"), (r"\bhgb\b|\bhb\b", "hemoglobin"), (r"\bhct\b", "hematocrit"),
     (r"\bplts?\b|platelet count", "platelets"),
     (r"\bbicarb\b|\btotal co2\b|\bco2\b|\bhco3\b", "bicarbonate"),
-    (r"\bna\b", "sodium"), (r"\bk\b", "potassium"), (r"\bcl\b", "chloride"), (r"\bmg\b", "magnesium"),
+    (r"\bna\b", "sodium"), (r"\bk\b", "potassium"), (r"\bcl\b", "chloride"),
+    # `Mg` is magnesium, but `mg` after a number or before a slash is the unit (25 Oct 2026: every
+    # "112 mg/dL" read as citing magnesium, LABS-EVIDENCE CENTRAL).
+    (r"(?<![\d.])(?<![\d.] )\bmg\b(?!\s*(?:/|per\b))", "magnesium"),
     (r"\bphos\b|phosphorus", "phosphate"), (r"\bcr\b|\bcreat\b", "creatinine"),
     (r"\bglu\b", "glucose"), (r"\balb\b", "albumin"), (r"\bt\.? ?bili\b", "bilirubin"),
     (r"\bsgot\b", "ast"), (r"\bsgpt\b", "alt"), (r"gamma[- ]?glutamyl ?transferase|\bggt\b", "ggt"),
@@ -123,6 +126,9 @@ def _like(a: str, b: str) -> bool:
     return len(short) >= 4 or (len(short) >= 3 and re.fullmatch(r"\d+|s", long[len(short):]) is not None)
 
 
+like = _like
+
+
 def _covers(container: frozenset[str], needed: frozenset[str]) -> bool:
     return bool(needed) and all(any(_like(n, c) for c in container) for n in needed)
 
@@ -159,7 +165,48 @@ class LabMatcher:
         if normalize_analyte(assay) in _SCOPED:
             return False
         components = self.components(assay)
-        return any(row_is(row.test, component) for row in rows for component in components)
+        return any(
+            row_is(row.test, component) and specimen_compatible(row.test, name, component, assay)
+            for row in rows for component in components
+        )
+
+
+# Specimens other than blood, by the tokens that name them (25 Oct 2026). A urinalysis row `RBC`
+# or `Urine WBC` is not the blood count's red or white cell count, and a spot `Urine sodium` is not
+# the serum sodium of a metabolic panel (ISCH-STR-P03 received its urinalysis from a CBC order).
+_SPECIMENS: dict[str, frozenset[str]] = {
+    "urine": frozenset({"urine", "urinalysis", "ua", "dipstick"}),
+    "csf": frozenset({"csf", "cerebrospinal"}),
+}
+_BLOOD = re.compile(r"\b(?:serum|plasma|blood|whole blood|venous|arterial)\b(?! \(dipstick\))")
+
+
+def _specimens_named(text: str) -> frozenset[str]:
+    found = tokens(text)
+    return frozenset(key for key, markers in _SPECIMENS.items() if found & markers)
+
+
+def row_specimens(test: str, panel_name: str) -> frozenset[str]:
+    """The non-blood specimen a stored row measures: its own words, else its panel's name.
+
+    A row that names serum, plasma or blood is a blood test whatever panel holds it (`Serum
+    osmolality` beside the urine studies).
+    """
+    own = _specimens_named(test)
+    if own:
+        return own
+    if _BLOOD.search(str(test).lower()):
+        return frozenset()
+    return _specimens_named(panel_name)
+
+
+def specimen_compatible(test: str, panel_name: str, *ordered: str) -> bool:
+    """Is a stored row of a non-blood specimen answering only an order that names that specimen?"""
+    stored = row_specimens(test, panel_name)
+    if not stored:
+        return True
+    named = frozenset().union(*(_specimens_named(text) for text in ordered))
+    return stored <= named
 
 
 def mentions(text: str, test: str) -> bool:

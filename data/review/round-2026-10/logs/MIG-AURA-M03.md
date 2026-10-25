@@ -68,3 +68,9 @@ Checks after the change: `perfect_agent.py` pass, `case_io.py check` clean for t
 Genetic panel decision: not wired as a criterion. One motor attack at 42 makes this probable HM; the must already ties gene testing to a second attack or an affected relative, so ordering the panel now is not indicated. No case data changed.
 
 Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.
+
+## Engineering text (25 Oct 2026)
+
+Review-process wording (references to the round's rulings, the round policy file, the criteria packs, and tier markers such as "(optional)" in criterion labels and rationales) is shown to physicians in the review app, so it was rewritten in clinical language. The tier stays in the criterion's `importance` field; scoring is unchanged. `test_case_guards.py::test_no_review_process_text` now fails on any of it.
+
+- criterion `action-1-search-medical-literature` label: "Search the literature on sporadic hemiplegic migraine (optional)" -> "Search the literature on sporadic hemiplegic migraine"

@@ -93,6 +93,10 @@ discharges in roughly 30 to 50% of adults with epilepsy; a normal EEG does not e
   weeks: urine protein/creatinine, platelets, creatinine, liver enzymes; levetiracetam level).
 - Recommended with a named indication (7): an ASM level after a breakthrough seizure (RM02, RP02,
   RP03, RP04, RS03), renal function before acyclovir (RP01), glucose on metformin (RS05).
+- RS02 (calcified neurocysticercosis, 25 Oct 2026): `cysticercosis_serology` (EITB; often negative
+  with calcified cysts, so a negative result does not exclude the diagnosis [IDSA_NCC_2018]) and
+  `IGRA` (calcified-tuberculoma differential; high-incidence country of birth, congregate shelter
+  [ATS_IDSA_CDC_TB_2017]) are two recommended criteria, each with its own follow-up.
 - Optional in 15 first presentations without a provoking clue; none in 5 cases.
 - **Prolactin** is not a routine test [AAN_prolactin_2005]: drawn 10 to 20 minutes after a suspected
   tonic-clonic or focal impaired-awareness seizure it helps against PNES; it does not separate seizure
@@ -336,6 +340,10 @@ Every key the 30 cases cite is listed here with its verified reference (checked 
 - `[IDSA_NCC_2018]`: White AC Jr, Coyle CM, Rajshekhar V, et al. Diagnosis and treatment of
   neurocysticercosis: 2017 clinical practice guidelines by the IDSA and the ASTMH. Clin Infect Dis
   2018;66(8):e49-e75
+- `[ATS_IDSA_CDC_TB_2017]`: Lewinsohn DM, Leonard MK, LoBue PA, et al. Official American Thoracic
+  Society/Infectious Diseases Society of America/Centers for Disease Control and Prevention clinical
+  practice guidelines: diagnosis of tuberculosis in adults and children. Clin Infect Dis
+  2017;64(2):e1-e33
 - `[Garcia_2014]`: Garcia HH, Nash TE, Del Brutto OH. Clinical symptoms, diagnosis, and treatment of
   neurocysticercosis. Lancet Neurol 2014;13(12):1202-1215
 - `[TSC_2021]`: Northrup H, Aronow ME, Bebin EM, et al. Updated international tuberous sclerosis

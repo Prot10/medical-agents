@@ -63,3 +63,10 @@ Discriminator fixes. The MockServer now routes stored reports by their discrimin
 - `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
 
 Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.
+
+## Engineering text (25 Oct 2026)
+
+Review-process wording (references to the round's rulings, the round policy file, the criteria packs, and tier markers such as "(optional)" in criterion labels and rationales) is shown to physicians in the review app, so it was rewritten in clinical language. The tier stays in the criterion's `importance` field; scoring is unchanged. `test_case_guards.py::test_no_review_process_text` now fails on any of it.
+
+- criterion `action-hm-genetic-panel` label: "Optional: hemiplegic migraine gene panel (CACNA1A, ATP1A2, SCN1A, PRRT2)" -> "Hemiplegic migraine gene panel (CACNA1A, ATP1A2, SCN1A, PRRT2)"
+- criterion `action-1-search-medical-literature` label: "Optional: literature on familial aneurysm screening and management of unruptured aneurysms" -> "Literature on familial aneurysm screening and management of unruptured aneurysms"

@@ -81,3 +81,10 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Batch-5 vocabulary (25 Oct 2026)
+
+Commit c02f3050 added `cysticercosis_serology`, `IGRA` (interpret_labs), `olfactory_test` (order_specialized_test) and `levodopa_challenge` (perform_clinical_assessment); `HBV_DNA` (interpret_labs) was added the same day for this round. The requests are now wired into the case.
+
+- New optional criterion `action-7-interpret-labs-mma` (`{panels: [MMA]}`, after the AQP4/MOG criterion) and its follow-up `request_mma_methylmalonic_acid` (panel `MMA`, methylmalonic acid 0.22 umol/L, reference 0.00-0.40), placed after the AQP4/MOG follow-up and before the drug check. Optional, not recommended: B12 228 pg/mL is inside the reference range and the enhancing lesions and oligoclonal bands already exclude subacute combined degeneration, so the test confirms rather than decides; ordering it is no longer unjustified. No scoring change for an agent that does not order it.
+- `ground_truth.differential[B12 deficiency myelopathy].key_features`: the normal methylmalonic acid added to the Against list.

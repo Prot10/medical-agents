@@ -64,3 +64,9 @@ Condition close-out (plans/MIG-AURA-decisions.md). Changes and reasons:
 - key clinical evidence citation [AAN_2000] -> [AHS_neuroimaging_2020].
 - Citation [AAN_2000] retired: Silberstein 2000 covers treatment, not neuroimaging; imaging statements now cite Evans 2020 [AHS_neuroimaging_2020], test-waste statements [ICHD_3] (diagnosis is clinical).
 Checks after the change: `perfect_agent.py` pass, `case_io.py check` clean for the case, `test_case_guards.py -k MIG-AURA-` 60/60.
+
+## Engineering text (25 Oct 2026)
+
+Review-process wording (references to the round's rulings, the round policy file, the criteria packs, and tier markers such as "(optional)" in criterion labels and rationales) is shown to physicians in the review app, so it was rewritten in clinical language. The tier stays in the criterion's `importance` field; scoring is unchanged. `test_case_guards.py::test_no_review_process_text` now fails on any of it.
+
+- criterion `action-2-check-drug-interactions` rationale: "She takes only ibuprofen and has no vascular disease, so the check does not change management (ROUND_POLICY 6). Sources: sumatriptan SmPC; NICE CG150." -> "She takes only ibuprofen and has no vascular disease, so the check does not change management. Sources: sumatriptan SmPC; NICE CG150."

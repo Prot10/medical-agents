@@ -106,3 +106,10 @@ Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it na
 - Scoring: coverage unchanged (any call matching the old order still matches); the cost reference of the required work-up now uses the new first order.
 
 Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.
+
+## Batch-5 vocabulary (25 Oct 2026)
+
+Commit c02f3050 added `cysticercosis_serology`, `IGRA` (interpret_labs), `olfactory_test` (order_specialized_test) and `levodopa_challenge` (perform_clinical_assessment); `HBV_DNA` (interpret_labs) was added the same day for this round. The requests are now wired into the case.
+
+- `initial_tool_outputs.labs.panels.Hepatitis_B` (HBV DNA 340 IU/mL, HBeAg negative) split into `HBV_serology` (hepatitis B surface antigen positive, added: the history states HBsAg positive and an HBsAg order otherwise got the library's negative; HBeAg negative) and `HBV_DNA` (the same HBV DNA 340 IU/mL, row renamed `HBV DNA (quantitative PCR)`). Before, the viral load was returned only to an `hepatitis_B_surface_antigen` order, through the panel name.
+- New recommended criterion `action-11-interpret-labs-hbv-dna` (`{panels: [HBV_DNA]}`, the new `interpret_labs` term, [EASL_HBV_2025]), before the medication review: must 5 acts on HBV DNA 340 IU/mL and the differential weighs an HBV flare, so the policy now orders the test that returns it. Scoring change: recommended coverage counts it; required work-up and stop rule unchanged.

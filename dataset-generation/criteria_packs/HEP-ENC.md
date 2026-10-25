@@ -62,7 +62,7 @@ check last.
 
 **Recommended:**
 - `analyze_eeg` (`{}`): diffuse slowing, with or without triphasic waves, supports a metabolic encephalopathy and excludes non-convulsive seizures; **required** where NCSE is the question. NCSE is excluded by the EEG, never by a benzodiazepine (or naloxone) challenge [EASL_HE_2022]
-- Case-specific steps where the case raises them: `order_body_imaging` (TIPS Doppler, renal ultrasound for loin pain with AKI and UTI, abdominal shunt imaging), `order_specialized_test` `neuropsych_battery` (covert HE), `genetic_panel:wilson`
+- Case-specific steps where the case raises them: `order_body_imaging` (TIPS Doppler, renal ultrasound for loin pain with AKI and UTI, abdominal shunt imaging), `order_specialized_test` `neuropsych_battery` (covert HE), `genetic_panel:wilson`, `interpret_labs` `HBV_DNA` (S05: hepatitis B cirrhosis decompensating on tenofovir, flare or breakthrough as the precipitant [EASL_HBV_2025]; term added 25 Oct 2026)
 
 **Drug-interaction check** (`check_drug_interactions`): **required only for a concrete interaction, allergy or dosing issue that changes management** (the patient's medicines against the drugs in the musts, the allergies, renal or hepatic dosing); otherwise optional, with a short real output ("no clinically relevant interaction between lactulose, rifaximin and the current medicines; avoid sedatives"). One follow-up whose trigger names the drugs, last in the pathway; `initial_tool_outputs.drug_interactions` null. A non-severe penicillin rash does not contraindicate ceftriaxone (low cross-reactivity: give with monitoring); penicillin anaphylaxis needs an alternative or specialist advice before any beta-lactam.
 

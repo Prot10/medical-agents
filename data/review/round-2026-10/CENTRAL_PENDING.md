@@ -3,24 +3,6 @@
 Kept by the orchestrating session so a resumed session does not lose it. Remove an item when it
 lands.
 
-## Rulings for the batch-5 close-out
-- FND (Andrea, 24 Oct 2026, from the August 2026 exchange with Flavia Pennisi and Antonio: their
-  email in `docs/benchmark/tool-review-2026-07.md` "Dataset composition changes requested", our
-  reply section 2 in `tool-review-2026-07-reply-draft.md` and 1.7 in `tool-review-2026-07-decisioni.md`).
-  FND stays (20 conditions, 600 cases; DLB is deferred as a future same-size swap). The
-  physicians kept FND only with every diagnostic tool optional, and we replied that the exam of
-  positive functional signs is the only required diagnostic act and that all instrumental work,
-  video-EEG in paroxysmal cases included, is optional. The batch-5 plan broke that: on master FND
-  requires only `perform_clinical_assessment` (30/30); after the workflow it also requires
-  `analyze_eeg` in 22 cases, `analyze_brain_mri` in M09 and P08, `interpret_labs` in P08 and RM01.
-  Close-out: video-EEG back to `optional` in those 22 cases; the red-flag tests (P08 glucose and
-  imaging, RM01 sodium, M09 MRI on natalizumab) to `recommended` (the tier the reply already used for
-  the 7 MRI cases); keep the exam required. `check_drug_interactions` (required in M02, RM03,
-  RP01, RP03, RS01, RS02, S03) is a management act, not a diagnostic one: it may stay required, but
-  list it for the physicians. Fix the impressions that say video-EEG "is required in this case"
-  (M04, M06, RP01), the sequence constraints and `required_before_assessment` that name those
-  tests, the pack and the guidance claims to match.
-
 ## Code and tests
 - Scorer: a mixed case can score both diagnoses only by recoding (it accepts a diagnosis on its
   ICD code alone). Consider a per-case "all of" diagnosis rule. (HEP-ENC-P04, 24 Oct)
@@ -30,12 +12,6 @@ lands.
 - Scorer: C71 codes the site, not the entity, so "glioblastoma, C71.1" still scores in an
   IDH-mutant astrocytoma through the code. Needs a per-case label requirement or ICD-O-3
   morphology codes; same root as the ICD-code-alone item above. (GLIO-HG, 24 Oct)
-- Discriminator data (24 Oct): the 12 closed conditions are fixed and guarded
-  (`test_case_guards.py::test_routed_outputs_name_their_study`, `DISCRIMINATOR_CONDITIONS`). Left,
-  per condition (cases / outputs): FEPI-TEMP 29/33, FND 30/84, MS-RR 30/30, PD 30/30 (SYNC-CARD,
-  FTD, MG and NPH are now in `DISCRIMINATOR_CONDITIONS`); mostly untyped `TTE` echo fallbacks and generic
-  advanced-imaging and specialized-test fallbacks (null them). Each worker adds its condition to
-  `DISCRIMINATOR_CONDITIONS` when clean.
 - Library: nulling generic fallbacks exposes library normals that some cases contradict, e.g. a
   normal `neuropsych_battery` in overt hepatic encephalopathy (HEP-ENC, West Haven II-III). Same root
   as the SAH library item below.
@@ -45,18 +21,6 @@ lands.
 - MockServer: prose `test_type` follow-ups in a tool with no initial output are served for any
   test type (MG-RS15's `Neostigmine challenge` answers an `emg_ncs` or audiometry order). Write
   the vocabulary term in stored `test_type`.
-- Labs evidence (24 Oct, needs Andrea): `interpret_labs` now serves only the panels an order
-  names. 143 required/recommended criteria (SAH 28, SE 26, GLIO-HG 16, HEP-ENC 15, ISCH-STR 11,
-  NMDAR-ENC 11, ALZ-EARLY 8, SYNC-CARD 6, ALS 5, FEPI-TEMP 5, MS-RR 5, MG 3, FND 2, PD 2) cite in
-  `expected_evidence` an abnormal result of a stored panel their order does not name (HEP-ENC
-  CRP as the infection precipitant, GLIO-HG HbA1c, ISCH-STR LDL). Scoring is unchanged (the
-  reward does not read the evidence), but an agent following the policy no longer sees that
-  result. Either add the assay to the criterion's order or trim the evidence; per criterion, not
-  in bulk. List: `notes/labs-evidence-unserved-2026-10-24.txt` (case, criterion, order, unserved
-  abnormal rows, evidence).
-- Library (24 Oct): with EEG routed by type, a routine order in SE gets the library's normal
-  routine EEG while the patient is in NCSE (the case stores only the cEEG), and MIG-AURA-RM11's
-  video-EEG alternative gets a library normal. Same root as the SAH library item below.
 - MRI contrast (24 Oct): `contrast` defaults to false and `MRIReport.contrast_used` exists, but
   only ALZ-EARLY-RS06 states it. 575 cases store one MRI study, about 260 of them a contrast study
   by their text, so a non-contrast order receives post-gadolinium findings. Routing needs a
@@ -70,7 +34,6 @@ lands.
 - `perfect_agent.py`: a mode that tries every criterion alternative, not only the first.
   (ALZ-EARLY, 24 Oct)
 - Library: normal amyloid PET, CSF AD-biomarker and FDG-PET defaults. (ALZ-EARLY, 24 Oct)
-- PD cases: `[McKeith_2017_DLB]` should become `[DLB_2017]` (batch 5).
 - `analyze_csf.source`: an EVD sample is billed as a lumbar puncture (a lumbar drain is billed on
   top, 184); only shunt-tap, EVD and lumbar-drain criteria may name `source`. (vocabulary agents,
   24 Oct)
@@ -84,6 +47,19 @@ lands.
   receives the stored post-tap report; the soft sequence constraint (tap before reassessment)
   penalises the order but does not hide the result. Consider serving the post-intervention report
   only after the intervention's own criterion has been called.
+- Library: MIG-AURA-RM11's video-EEG alternative may still receive a library normal (the case
+  stores a routine EEG and an untyped fallback). SE now stores a case-specific routine EEG and a
+  guard requires one wherever a continuous EEG is stored (25 Oct).
+- Lab matcher (25 Oct, `plans/SE-routing-decisions.md` CENTRAL): interpretation prose is filtered
+  by sentence, so a one-sentence "Abnormal values: ..." still reads out values of panels the order
+  did not name (SE M02, M03, M05-M07, P03, S01, S07, S09); orders are answered panel by panel, so
+  an added assay returns its whole stored panel (SE RS11, S05, S10); a stored blood gas answers a
+  `CMP` order through `HCO3`. Filter by clause or split the panels.
+- Lab evidence (25 Oct): the 143 criteria whose evidence cited abnormal results their order did
+  not return are fixed (`plans/LABS-EVIDENCE-decisions.md`, `plans/SE-routing-decisions.md`).
+  About 99 more cite normal results their order does not return (ALS 25, MS-RR 18, ...):
+  `notes/labs-evidence-normal-unserved-2026-10-25.txt`. Consistency only; the reward does not
+  read the evidence.
 
 ## Schema
 - Demographics lack `weight_kg` and `height_cm` (GBS respiratory mL/kg thresholds, BACT-MEN-RS04
@@ -108,12 +84,7 @@ lands.
 - Batch 5 (25 Oct, recalled): interpret_labs cysticercosis_serology 15 (86682), IGRA 71 (86480).
   Estimates: olfactory_test 46 (no CPT; unlisted 92700), levodopa_challenge 184 (no CPT; priced
   as two scored motor examinations). Methylmalonic acid was already priced as `MMA` 28 (83921).
-
-## Batch-3 cases waiting on data (terms and routing landed 24 Oct)
-- Stored monitoring reports with a prose `monitor_type` (routed on `duration_hours` only): none
-  left in NPH and SYNC-CARD (both pass the discriminator guard since their close-outs). (SE, VASC-DEM-P08, MIG-AURA and GBS wired 24 Oct; see their logs.)
-- Citation keys used by name in the wiring: Di Stefano 2020 (JNNP, hemiplegic migraine genetics)
-  for the MIG-AURA pack; the NIH/CDC/IDSA opportunistic-infection guideline for SE (SE-M08).
+  `HBV_DNA` 43 (87517), 25 Oct, recalled.
 
 ## Close-out recipe per batch (what batches 1 and 2 did)
 1. Workflow `bin/round-v2.js` (plan, fix, verify, audit; args `[{cond, cases}]`). 2. One close-out agent per condition
@@ -121,17 +92,6 @@ lands.
 and the claim table, open questions decided; brief `CLOSEOUT_BRIEF.md` with COND replaced, the batch-2 decisions
 files show the result) plus one vocabulary agent for the
 batch's CENTRAL terms. 3. One agent per condition wires the new terms into the cases.
-
-## Vocabulary follow-ups
-- Other conditions citing "WHO 2025 Annex A.4" should read "section A.4" (the guideline has no
-  Annex A.4).
-
-## Synonym prune effects on later batches
-- (MIG-AURA-P03 and P07 done 24 Oct: P03 recoded G43.609 with migrainous-infarction labels only,
-  P07 cardioembolic labels only, I63 category excepted; plans/MIG-AURA-decisions.md.)
-- `apply_diagnosis_synonyms --prune` would change SE-P04 (lose "stroke"
-  and mechanism labels) and SE-P07 (loses "hepatic coma", K72.91); `--check` adds I63.5/I63.51 to
-  SE-P04. Apply when those conditions run.
 
 ## For the physicians at re-review
 - ISCH-STR-RS02: thrombolysis reversed to "give" (its CTA excludes aortic extension, R2's own
@@ -149,8 +109,11 @@ batch's CENTRAL terms. 3. One agent per condition wires the new terms into the c
   ASCVD events (more cases would move to < 55).
 - SE: tell R2 about the recodes and that P04 and P06 now need the seizure component for credit.
 
-## Guard failures left in later batches (24 Oct)
-- Leak guard (recounted 24 Oct, after the batch-4 vocabulary wiring): FEPI-TEMP 3 (P02, P03,
-  RP05); every other condition passes at that moment (batch 5 is editing FND, MS-RR, FEPI-TEMP
-  and PD). `test_guidance_claims` then failed only on FND, MS-RR and PD claims (batch 5). Follow-up guard: clean.
-  Workers see the rule in PATTERNS.md section 5.
+- Scoring changes of 25 Oct: ALS-M07 requires `blood_lead` and ISCH-STR-RM02 `ESR` and `CRP` in
+  every alternative; SE-P01, S05 (thiamine, S05 also phosphate), P05, RS11, S06, S10 (CK), P08
+  (serum osmolality) require the added assay; PD-RP04 requires a levodopa challenge; new
+  recommended criteria FEPI-TEMP-RS02 (cysticercosis serology, IGRA) and HEP-ENC-S05 (HBV DNA);
+  new optional MS-RR-RS06 MMA and the olfactory test in 12 PD cases. 22 approved or probably
+  approved cases had lab criteria changed (`plans/LABS-EVIDENCE-decisions.md`).
+- FND: instrumental tests are optional per the August 2026 ruling; `check_drug_interactions`
+  stays required in M02, RM03, RP01, RP03, RS01, RS02, S03 (a management act): confirm.

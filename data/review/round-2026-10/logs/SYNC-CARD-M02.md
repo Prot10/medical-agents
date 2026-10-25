@@ -99,3 +99,9 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - follow-up EEG `request_prolonged_eeg`: `eeg_type` set to `ambulatory`, decided by reading the report.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Engineering text (25 Oct 2026)
+
+Review-process wording (references to the round's rulings, the round policy file, the criteria packs, and tier markers such as "(optional)" in criterion labels and rationales) is shown to physicians in the review app, so it was rewritten in clinical language. The tier stays in the criterion's `importance` field; scoring is unchanged. `test_case_guards.py::test_no_review_process_text` now fails on any of it.
+
+- criterion `action-6-search-medical-literature` label: "Guideline lookup on pacing indications (optional)" -> "Guideline lookup on pacing indications"

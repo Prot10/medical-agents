@@ -85,3 +85,10 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `initial_tool_outputs.eeg`: `eeg_type` set to `routine`, decided by reading the report.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Engineering text (25 Oct 2026)
+
+Review-process wording (references to the round's rulings, the round policy file, the criteria packs, and tier markers such as "(optional)" in criterion labels and rationales) is shown to physicians in the review app, so it was rewritten in clinical language. The tier stays in the criterion's `importance` field; scoring is unchanged. `test_case_guards.py::test_no_review_process_text` now fails on any of it.
+
+- criterion `action-2-order-ct-scan` rationale: "Optional: there is no focal deficit, seizure or head trauma and the precipitant is clear, so brain imaging is not routine; INR 1.6 and platelets 116 lower the threshold to exclude a subdural hematoma if the course is atypical or she does not improve with treatment." -> "There is no focal deficit, seizure or head trauma and the precipitant is clear, so brain imaging is not routine; INR 1.6 and platelets 116 lower the threshold to exclude a subdural hematoma if the course is atypical or she does not improve with treatment."
+- criterion `action-4-check-drug-interactions` rationale: "Optional: the pruritus treatment (a bile-acid sequestrant) binds ursodeoxycholic acid and levothyroxine and is constipating, which matters in an episode precipitated by constipation." -> "The pruritus treatment (a bile-acid sequestrant) binds ursodeoxycholic acid and levothyroxine and is constipating, which matters in an episode precipitated by constipation."

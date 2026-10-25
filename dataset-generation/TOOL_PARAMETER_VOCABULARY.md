@@ -59,7 +59,7 @@ panels. `B12` and `vitamin_B12` are one assay: `vitamin_B12` is advertised and `
 it through `_ANALYTE_SYNONYMS`. Batch 4 (24 Oct 2026) added `CDT` (carbohydrate-deficient
 transferrin, FTD-M07). Batch 5 (25 Oct 2026) added `cysticercosis_serology` (serum Taenia
 solium IgG, EITB or ELISA) and `IGRA` (QuantiFERON-TB Gold Plus or T-SPOT.TB), both for
-FEPI-TEMP-RS02. Methylmalonic acid was already priced as `MMA`. One `panels` order that names assays stored in different payloads (the
+FEPI-TEMP-RS02. Methylmalonic acid was already priced as `MMA`. `HBV_DNA` (quantitative hepatitis B viral load, HEP-ENC-S05) was added on the same day. One `panels` order that names assays stored in different payloads (the
 first-line panels and a second-tier assay) receives each of them (`MockServer._merge_lab_order`).
 
 `order_cardiac_monitoring.monitor_type` is `telemetry`, `holter_24h`, `holter_48h`,

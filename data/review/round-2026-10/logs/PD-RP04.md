@@ -74,3 +74,11 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Batch-5 vocabulary (25 Oct 2026)
+
+Commit c02f3050 added `cysticercosis_serology`, `IGRA` (interpret_labs), `olfactory_test` (order_specialized_test) and `levodopa_challenge` (perform_clinical_assessment); `HBV_DNA` (interpret_labs) was added the same day for this round. The requests are now wired into the case.
+
+- `fallback_tool_outputs.specialized_test` (was null) is now an `olfactory_test` report, served only to an olfactory order: her 5 years of anosmia would otherwise meet the library's normosmia; UPSIT 15/40, in the anosmic range. No criterion: the diagnosis is established on three supportive criteria and the visit is a DBS assessment.
+- New required criterion `levodopa-challenge` (`perform_clinical_assessment {assessment_type: levodopa_challenge}`, [CAPSIT_PD_1999], added to the PD pack), `action_criteria[4]`, before the neuropsychological battery, and added to `stop_rule.required_before_assessment`. Follow-up `request_levodopa_challenge` (`followup_outputs[4]`): OFF 12 hours after the last dose (pramipexole and amantadine held from the previous morning), carbidopa-levodopa 50/200 mg, MDS-UPDRS III 46/132 OFF and 16/132 ON at 60 minutes (65%), axial signs responsive, bilateral postural and kinetic tremor unchanged, peak-dose choreiform dyskinesia, mild nausea. Before, the challenge was a must because it could not be ordered (PD CENTRAL R4). Scoring change: required coverage and the stop rule now include it.
+- `ground_truth.assessment.required_recommendations[2]`: the must that asked for a levodopa challenge now states its result and what it means for candidacy; the diary and team review stay.

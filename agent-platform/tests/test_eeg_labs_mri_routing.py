@@ -11,6 +11,12 @@
 3. `analyze_brain_mri.contrast` defaults to false. A report that states `contrast_used` answers
    only an order with that value (ALZ-EARLY-RS06); one that does not is not adjudicated. The
    library's normal reports state it and drop their post-gadolinium sentences for a plain order.
+4. Matcher fixes (25 Oct 2026): a unit ("mg/dL") is not magnesium; an assay token matches whole
+   word stems, so `complement` no longer lands in the CBC ("complete"); a urine or CSF row
+   answers only an order that names that specimen, so a CBC or CMP order does not return the
+   urinalysis or urine electrolytes; a sleep-deprived EEG order is answered by the stored routine
+   EEG when the case stores no sleep-deprived recording (never the reverse), not by the library
+   normal.
 """
 
 from __future__ import annotations
@@ -199,3 +205,58 @@ def test_library_mri_states_contrast_and_drops_gadolinium_for_a_plain_order():
         enhanced = library.resolve("analyze_brain_mri", {"protocol": protocol, "contrast": True})
         assert enhanced.contrast_used is True
         assert "gadolinium" in json.dumps(enhanced.model_dump()).lower(), protocol
+
+
+# --------------------------------------------------------------------------- 4. matcher fixes
+
+
+def test_milligram_unit_is_not_magnesium():
+    from neuroagent.tools.lab_matching import tokens
+
+    assert "magnesium" not in tokens("Glucose 112 mg/dL")
+    assert "magnesium" not in tokens("Creatinine 1.1 mg per dL")
+    assert "magnesium" in tokens("Mg 1.6")
+    result = _labs(_env("HEP-ENC-M07"), "magnesium")
+    assert "Endocrine" not in result.output["panels"]
+
+
+def test_complement_order_does_not_return_the_cbc():
+    result = _labs(_env("SE-M03"), "complement")
+    assert "Complete Blood Count" not in result.output["panels"]
+    assert "c3" in json.dumps(result.output).lower()
+
+
+@pytest.mark.parametrize("case_id", ["MG-M04", "ISCH-STR-P03"])
+def test_cbc_order_does_not_return_the_urinalysis(case_id):
+    result = _labs(_env(case_id), "CBC")
+    assert "Urinalysis" not in result.output["panels"]
+    assert "Urinalysis" in _labs(_env(case_id), "urinalysis").output["panels"]
+
+
+def test_urine_sodium_does_not_answer_a_cmp_order():
+    result = _labs(_env("SE-S03"), "CMP")
+    assert not {"Urinalysis", "Urine studies"} & set(result.output["panels"])
+    assert "urine" not in json.dumps(result.output["panels"]).lower()
+
+
+def test_hbv_dna_is_served_on_its_own():
+    stored = _labs(_env("HEP-ENC-S05"), "HBV_DNA")
+    assert not stored.from_fallback and set(stored.output["panels"]) == {"HBV_DNA"}
+    basic = _labs(_env("HEP-ENC-S05"), "CBC", "CMP")
+    assert "hbv" not in json.dumps(basic.output["panels"]).lower()
+    library = _labs(_env("MS-RR-M01"), "HBV_DNA")
+    assert library.from_fallback and set(library.output["panels"]) == {"HBV_DNA"}
+
+
+def test_sleep_deprived_order_gets_the_stored_routine_eeg():
+    routine = _raw("SE-M01")["fallback_tool_outputs"]["eeg"]
+    result = _call(_env("SE-M01"), "analyze_eeg", eeg_type="sleep_deprived")
+    assert result.output["impression"] == routine["impression"]
+
+
+def test_routine_order_never_gets_a_sleep_deprived_recording():
+    raw = _raw("FEPI-TEMP-M01")
+    assert "sleep_deprived" in json.dumps(raw)
+    for arguments in ({}, {"eeg_type": "routine"}):
+        result = _call(_env("FEPI-TEMP-M01"), "analyze_eeg", **arguments)
+        assert result.output["eeg_type"] == "routine", arguments

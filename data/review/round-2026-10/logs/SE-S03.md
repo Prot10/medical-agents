@@ -77,3 +77,15 @@ Commit 317e46db routes `analyze_eeg` by `eeg_type` (an order without it is a rou
   - action-2-interpret-labs expected_evidence: 'Sodium 121 with serum osmolality 262, urine osmolality 420 and urine sodium 22 (hypovolemic hyponatremia); potassium 3.4; BUN 34 and creatinine 1.6; WBC 18.4, CRP 96, procalcitonin 1.8 and pyuria with positive nitrite; lactate 7.8 after the convulsion; levetiracetam 18 within range' -> 'Sodium 121 with urine osmolality 420 and urine sodium 22 (hypovolemic hyponatremia); potassium 3.4; BUN 34 and creatinine 1.6; WBC 18.4 and pyuria with positive nitrite; lactate 7.8 after the convulsion; levetiracetam 18 within range'
   - initial_tool_outputs.labs: Lactate 7.8 moved from panel 'Other' to 'Arterial blood gas'
 - Checks: `perfect_agent.py -v` pass; `case_io.py check` schema and synonym guard OK, no test failure names the case; probe: routine (omitted and explicit) order -> the new case fallback, `continuous_icu` and `video` -> the stored index recording; every number in each lab criterion's evidence is in what its order returns.
+
+## Matcher fix (25 Oct 2026)
+
+The lab matcher now keeps a urine or CSF row out of a blood order: a urinalysis, urine sodium or urine osmolality row answers only an order that names the urine assay, so a CBC or CMP order no longer returns the urine results. The lab criterion therefore names the urine assays its expected evidence cites.
+
+- `ground_truth.action_criteria[action-2-interpret-labs]`: new first alternative `{panels: ['CBC', 'CMP', 'magnesium', 'AED_levels', 'urinalysis', 'urine_osmolality', 'urine_sodium']}` (adds `urinalysis`, `urine_osmolality`, `urine_sodium`); the previous orders stay as alternatives, so every call that matched before still matches. The expected evidence reads urine osmolality 420, urine sodium 22 and pyuria with positive nitrite, which the first order received only through two matcher defects fixed on 25 Oct 2026: a urine row answered a blood-count or metabolic order (`Urine WBC` as WBC, `Urine sodium` as sodium, a urine creatinine ratio as creatinine), and the unit `mg/dL` read as magnesium. Scoring: cost reference only (the policy's reference order is fuller); coverage unchanged.
+
+## Engineering text (25 Oct 2026)
+
+Review-process wording (references to the round's rulings, the round policy file, the criteria packs, and tier markers such as "(optional)" in criterion labels and rationales) is shown to physicians in the review app, so it was rewritten in clinical language. The tier stays in the criterion's `importance` field; scoring is unchanged. `test_case_guards.py::test_no_review_process_text` now fails on any of it.
+
+- criterion `action-4-analyze-brain-mri` label: "MRI brain to exclude a new lesion (optional: known post-stroke epilepsy with a metabolic trigger)" -> "MRI brain to exclude a new lesion in known post-stroke epilepsy with a metabolic trigger"

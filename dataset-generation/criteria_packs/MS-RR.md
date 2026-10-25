@@ -207,7 +207,9 @@ No hard constraint remains (the LP in RP02 and RP03 is an avoided action instead
 - **OCB-negative MS** (P01-P03, RP04): does not exclude MS.
 - **Age over 50 with vascular risk** (RS01, RP05): small-vessel disease and lacunar stroke are
   argued against by lesion shape and site, absent diffusion restriction, cord lesions and CSF.
-- **Low-normal B12** (RS06 228 pg/mL): does not explain enhancing brain lesions and OCB.
+- **Low-normal B12** (RS06 228 pg/mL): does not explain enhancing brain lesions and OCB. Since 25 Oct
+  2026 RS06 has an optional methylmalonic acid criterion (`{panels: [MMA]}`, normal 0.22 umol/L;
+  combined oral contraceptives lower serum B12 without deficiency [BSH_B12_2014]).
 - **Low vitamin D, ANA at low titre, hypercalcaemia with neurosarcoidosis in the differential
   (RM04)**: only where the labs carry that row.
 - **Family history of Behcet disease** (RM01): no oral or genital ulcers, no uveitis.
@@ -235,6 +237,8 @@ No must orders a diagnostic test (AQP4/MOG, MRI, OCT live in action criteria).
 
 ## 9. Allowed citations
 
+- `[BSH_B12_2014]`: Devalia V, Hamilton MS, Molloy AM. Guidelines for the diagnosis and treatment of
+  cobalamin and folate disorders. Br J Haematol 2014;166(4):496-513 (RS06, methylmalonic acid).
 - `[McDonald_2024]`: Montalban X, Lebrun-Frenay C, Oh J, et al. Diagnosis of multiple sclerosis:
   2024 revisions of the McDonald criteria. Lancet Neurol 2025;24(10):850-865, doi
   10.1016/S1474-4422(25)00270-4. Governs diagnosis.

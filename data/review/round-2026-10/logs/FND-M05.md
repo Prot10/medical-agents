@@ -64,3 +64,9 @@ Andrea's FND ruling of 24 Oct 2026 and the close-out decisions (`plans/FND-decis
 - `ground_truth.diagnosis.accepted[0]` relabelled without the exclusion clause (was 'Functional neurological disorder — right-sided functional hemimotor syndrome, in patient with quiescent SLE (neuropsychiatric SLE excluded)'); ICD code unchanged.
 - Diagnosis synonyms scoped by phenotype (`diagnosis_synonyms.yaml` F44 entries; a label or code naming another presentation must not score): removed "functional movement disorder", "psychogenic non-epileptic seizures", "PNES", "functional seizures"; added "functional limb weakness", "functional motor disorder"; codes removed F44.5.
 - Checks: `perfect_agent.py -v` and `case_io.py check` clean; `test_case_guards.py -k FND-` passes, now including the discriminator guard.
+
+## Engineering text (25 Oct 2026)
+
+Review-process wording (references to the round's rulings, the round policy file, the criteria packs, and tier markers such as "(optional)" in criterion labels and rationales) is shown to physicians in the review app, so it was rewritten in clinical language. The tier stays in the criterion's `importance` field; scoring is unchanged. `test_case_guards.py::test_no_review_process_text` now fails on any of it.
+
+- metadata.revision_reason: "October 2026 review round: brain MRI and targeted SLE serology recommended for the named stroke-mimic question; criteria, outputs and assessment rebuilt to the FND criteria pack tiers." -> "October 2026 review round: brain MRI and targeted SLE serology recommended for the named stroke-mimic question; criteria, outputs and assessment rebuilt to the FND required, recommended and optional tiers."

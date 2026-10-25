@@ -98,7 +98,28 @@
     "labs": null,
     "literature_search": null,
     "mri": null,
-    "specialized_test": null
+    "specialized_test": {
+      "findings": [
+        {
+          "parameter": "University of Pennsylvania Smell Identification Test (40 items)",
+          "result": "15 of 40 items correctly identified"
+        },
+        {
+          "parameter": "comparison with normative data",
+          "result": "in the anosmic range; below the normal range for a 58-year-old woman"
+        },
+        {
+          "parameter": "test conditions",
+          "result": "booklets self-administered under supervision; no nasal obstruction or upper respiratory symptoms on the day of testing"
+        }
+      ],
+      "impression": "Score in the anosmic range on the UPSIT (15/40).",
+      "quantitative_data": {
+        "UPSIT_score": "15/40"
+      },
+      "recommended_actions": [],
+      "test_type": "olfactory_test"
+    }
   },
   "followup_outputs": [
     {
@@ -246,6 +267,49 @@
         "test_type": "polysomnography"
       },
       "trigger_action": "request_sleep_study"
+    },
+    {
+      "output": {
+        "assessment_type": "levodopa_challenge",
+        "criteria_met": null,
+        "findings": [
+          {
+            "domain": "OFF state",
+            "result": "marked bradykinesia and rigidity, left more than right; left-hand rest tremor; hypophonia; rises from the chair only with the arms; short shuffling steps with reduced arm swing; retropulsion with 3 steps on the pull test"
+          },
+          {
+            "domain": "ON state at 60 minutes",
+            "result": "rest tremor abolished; mild residual left bradykinesia; normal chair rise; near-normal gait and arm swing; one step on the pull test"
+          },
+          {
+            "domain": "tremor not responding to levodopa",
+            "result": "bilateral postural and kinetic hand tremor of similar amplitude OFF and ON"
+          },
+          {
+            "domain": "dyskinesia",
+            "result": "moderate choreiform dyskinesia of both arms and the trunk from 50 minutes after the dose"
+          },
+          {
+            "domain": "tolerance",
+            "result": "mild transient nausea; no hallucinations; no light-headedness during the challenge"
+          }
+        ],
+        "impression": "Levodopa-responsive parkinsonism: MDS-UPDRS III 46/132 OFF and 16/132 ON (65% improvement), axial signs included. Bilateral postural and kinetic hand tremor unchanged by levodopa. Peak-dose choreiform dyskinesia of the arms and trunk.",
+        "pre_post_comparison": {
+          "OFF_state": "MDS-UPDRS III 46/132, 12 hours after the last levodopa dose; pramipexole and amantadine held from the previous morning",
+          "ON_state_60_min": "MDS-UPDRS III 16/132 at best ON, 60 minutes after the dose",
+          "change": "30-point reduction (65%)"
+        },
+        "recommended_actions": [],
+        "scores": {
+          "MDS_UPDRS_III_OFF": "46/132",
+          "MDS_UPDRS_III_ON": "16/132",
+          "improvement": "65%",
+          "levodopa_dose": "carbidopa-levodopa 50/200 mg orally (twice the usual morning dose)"
+        }
+      },
+      "tool_name": "perform_clinical_assessment",
+      "trigger_action": "request_levodopa_challenge"
     },
     {
       "output": {
@@ -421,6 +485,24 @@
         "alternatives": [
           {
             "required_arguments": {
+              "assessment_type": "levodopa_challenge"
+            },
+            "tool_name": "perform_clinical_assessment"
+          }
+        ],
+        "citations": [
+          "[CAPSIT_PD_1999]"
+        ],
+        "criterion_id": "levodopa-challenge",
+        "expected_evidence": "MDS-UPDRS III 46/132 OFF and 16/132 ON, a 65% improvement (above 30%), axial signs included; the postural and kinetic hand tremor does not change; peak-dose dyskinesia",
+        "importance": "required",
+        "label": "Acute levodopa challenge (MDS-UPDRS III OFF and ON) for DBS candidacy",
+        "rationale": "The motor response to a supra-threshold levodopa dose predicts the benefit of STN-DBS on every sign except tremor, and an improvement of at least 30% on the motor score is the usual threshold for candidacy [CAPSIT_PD_1999]"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
               "test_type": "neuropsych_battery"
             },
             "tool_name": "order_specialized_test"
@@ -462,7 +544,7 @@
       "required_recommendations": [
         "Confirm clinically established PD (MDS 2015): left-predominant bradykinesia with rigidity and rest tremor, three supportive criteria (dramatic levodopa response with predictable wearing-off, levodopa-induced dyskinesia, rest tremor), no absolute exclusion and no red flag; the coexisting essential tremor does not change the diagnosis [Postuma_2015]",
         "Separate ferrous sulfate from levodopa by at least 2 hours and reassess the wearing-off before surgery; investigate the cause of the iron-deficiency anaemia (gastrointestinal evaluation unless menstrual loss explains it) and correct it before surgery",
-        "A formal levodopa challenge (MDS-UPDRS III OFF and ON, at least 30% improvement) is needed for candidacy, with an OFF-time and dyskinesia diary and review by the multidisciplinary DBS team",
+        "The levodopa challenge supports STN-DBS candidacy (MDS-UPDRS III 46/132 OFF to 16/132 ON, a 65% improvement, above the 30% threshold, axial signs included); the levodopa-unresponsive postural and kinetic tremor is not predicted by the challenge and goes into the target choice by the multidisciplinary DBS team, with an OFF-time and dyskinesia diary [CAPSIT_PD_1999]",
         "The cognitive profile is PD mild cognitive impairment (DRS-2 128/144, multiple domain, preserved set-shifting), which does not exclude STN-DBS: record it as the pre-operative baseline, address the mild depressive symptoms (BDI-II 14) and anxiety before surgery, and advise bedroom safety for the dream enactment [Litvan_2012]",
         "Tell the anaesthetic and surgical teams about rasagiline (no meperidine, tramadol, methadone or dextromethorphan; avoid sympathomimetic amines), taper the bedtime lorazepam before surgery, plan the peri-operative dopaminergic schedule with the DBS team (any overnight OFF for intraoperative testing is brief and supervised, and the regimen is resumed promptly after surgery), and ask about impulse control disorders and excessive daytime sleepiness on pramipexole 4.5 mg/day at every visit [NICE_NG71]"
       ]
@@ -702,6 +784,7 @@
       "max_additional_actions": 2,
       "required_before_assessment": [
         "action-1-analyze-brain-mri",
+        "levodopa-challenge",
         "action-5-order-specialized-test",
         "action-3-check-drug-interactions"
       ]

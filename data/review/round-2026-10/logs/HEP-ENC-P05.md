@@ -78,3 +78,9 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `initial_tool_outputs.eeg`: `eeg_type` set to `routine`, decided by reading the report.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Engineering text (25 Oct 2026)
+
+Review-process wording (references to the round's rulings, the round policy file, the criteria packs, and tier markers such as "(optional)" in criterion labels and rationales) is shown to physicians in the review app, so it was rewritten in clinical language. The tier stays in the criterion's `importance` field; scoring is unchanged. `test_case_guards.py::test_no_review_process_text` now fails on any of it.
+
+- criterion `action-2-order-ct-scan` rationale: "Optional: imaging is indicated by the new eye-movement signs and ataxia, and MRI answers that question; CT adds only exclusion of hemorrhage." -> "Imaging is indicated by the new eye-movement signs and ataxia, and MRI answers that question; CT adds only exclusion of hemorrhage."

@@ -73,3 +73,11 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `initial_tool_outputs.eeg`: `eeg_type` set to `routine`, decided by reading the report.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Engineering text (25 Oct 2026)
+
+Review-process wording (references to the round's rulings, the round policy file, the criteria packs, and tier markers such as "(optional)" in criterion labels and rationales) is shown to physicians in the review app, so it was rewritten in clinical language. The tier stays in the criterion's `importance` field; scoring is unchanged. `test_case_guards.py::test_no_review_process_text` now fails on any of it.
+
+- criterion `action-8-order-microbiology` rationale: "Optional: a 6-week covert cognitive change in an afebrile outpatient with a normal white cell count and CRP and no source; the infection screen belongs to overt episodes." -> "A 6-week covert cognitive change in an afebrile outpatient with a normal white cell count and CRP and no source; the infection screen belongs to overt episodes."
+- criterion `action-9-order-microbiology` rationale: "Optional: a 6-week covert cognitive change in an afebrile outpatient with a normal white cell count and CRP and no source; the infection screen belongs to overt episodes." -> "A 6-week covert cognitive change in an afebrile outpatient with a normal white cell count and CRP and no source; the infection screen belongs to overt episodes."
+- criterion `action-2-order-ct-scan` rationale: "Optional: no focal deficit, seizure or head trauma; a structural cause of a 6-week cognitive change is unlikely, but imaging is reasonable before attributing it to covert HE." -> "No focal deficit, seizure or head trauma; a structural cause of a 6-week cognitive change is unlikely, but imaging is reasonable before attributing it to covert HE."

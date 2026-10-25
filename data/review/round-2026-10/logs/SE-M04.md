@@ -84,3 +84,9 @@ Commit 317e46db routes `analyze_eeg` by `eeg_type` (an order without it is a rou
 - Labs `action-6-interpret-labs`: unserved result cited in `expected_evidence`: none (the probe's sodium 123 is a core-labs value the evidence does not cite). NO CHANGE. Scoring change: no.
   - action-2-interpret-labs expected_evidence: 'Sodium 123 and chloride 88; carbamazepine 14.2 (high); creatinine 1.6 with BUN 28 (CKD 3); lactate 3.6 and CK 580; WBC 12.4; INR 1.2; procalcitonin and urinalysis normal' -> 'Sodium 123 and chloride 88; carbamazepine 14.2 (high); creatinine 1.6 with BUN 28 (CKD 3); WBC 12.4; INR 1.2; urinalysis normal'
 - Checks: `perfect_agent.py -v` pass; `case_io.py check` schema and synonym guard OK, no test failure names the case; probe: routine (omitted and explicit) order -> the new case fallback, `continuous_icu` and `video` -> the stored index recording; every number in each lab criterion's evidence is in what its order returns.
+
+## Matcher fix (25 Oct 2026)
+
+The lab matcher now keeps a urine or CSF row out of a blood order: a urinalysis, urine sodium or urine osmolality row answers only an order that names the urine assay, so a CBC or CMP order no longer returns the urine results. The lab criterion therefore names the urine assays its expected evidence cites.
+
+- `ground_truth.action_criteria[action-2-interpret-labs]`: new first alternative `{panels: ['CBC', 'CMP', 'magnesium', 'AED_levels', 'coagulation', 'urinalysis']}` (adds `urinalysis`); the previous orders stay as alternatives, so every call that matched before still matches. The expected evidence reads the normal urinalysis, which the first order received only through two matcher defects fixed on 25 Oct 2026: a urine row answered a blood-count or metabolic order (`Urine WBC` as WBC, `Urine sodium` as sodium, a urine creatinine ratio as creatinine), and the unit `mg/dL` read as magnesium. Scoring: cost reference only (the policy's reference order is fuller); coverage unchanged.

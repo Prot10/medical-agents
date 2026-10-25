@@ -90,3 +90,9 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - Action-5-analyze-eeg alternatives reordered routine first (the stored EEG is the routine one).
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Engineering text (25 Oct 2026)
+
+Review-process wording (references to the round's rulings, the round policy file, the criteria packs, and tier markers such as "(optional)" in criterion labels and rationales) is shown to physicians in the review app, so it was rewritten in clinical language. The tier stays in the criterion's `importance` field; scoring is unchanged. `test_case_guards.py::test_no_review_process_text` now fails on any of it.
+
+- criterion `action-1-search-medical-literature` label: "Optional: literature on hemiplegic migraine with seizures, contraception and topiramate" -> "Literature on hemiplegic migraine with seizures, contraception and topiramate"

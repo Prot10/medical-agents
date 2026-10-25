@@ -62,3 +62,9 @@ Discriminator fixes. The MockServer now routes stored reports by their discrimin
 - `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
 
 Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.
+
+## Engineering text (25 Oct 2026)
+
+Review-process wording (references to the round's rulings, the round policy file, the criteria packs, and tier markers such as "(optional)" in criterion labels and rationales) is shown to physicians in the review app, so it was rewritten in clinical language. The tier stays in the criterion's `importance` field; scoring is unchanged. `test_case_guards.py::test_no_review_process_text` now fails on any of it.
+
+- criterion `action-4-analyze-brain-mri` rationale: "Optional: a typical aura with a normal examination needs no imaging (AHS neuroimaging evidence assessment, Evans RW et al., Headache 2020;60:318-336; AAN Choosing Wisely). Punctate white matter hyperintensities are common in migraine with aura and do not change management." -> "A typical aura with a normal examination needs no imaging (AHS neuroimaging evidence assessment, Evans RW et al., Headache 2020;60:318-336; AAN Choosing Wisely). Punctate white matter hyperintensities are common in migraine with aura and do not change management."
