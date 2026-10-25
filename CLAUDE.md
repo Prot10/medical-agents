@@ -66,7 +66,9 @@ command wraps both (`cern help`). In short, to choose:
   vocabulary in `tools/vocabulary.py` derives every enum from it
 - `agent-platform/config/policies/diagnosis_synonyms.yaml` — accepted diagnosis labels/codes per
   ICD-10 code, expanded into each case by `scripts/validation/apply_diagnosis_synonyms.py`
-  (idempotent; `--check` in CI). The scorer matches label tokens or the submitted `icd10_code`
+  (idempotent; `--check` in CI). Scorer v2 matches label tokens of the asserted text only (negated
+  clauses dropped, `rejected` labels veto, `required_components` for mixed diagnoses); the
+  submitted `icd10_code` is a separate weight-0 component and never decides the diagnosis
 - `agent-platform/config/hospital_rules/{hospital}/*.yaml` — clinical pathways (served by the API,
   not injected into the harness prompt)
 - `agent-platform/config/tools/fallback_library.yaml` — benchmark-level normal results per tool × parameter

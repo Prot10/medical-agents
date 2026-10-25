@@ -19,6 +19,7 @@ const COMPONENTS: Array<{ key: keyof RewardBreakdown; label: string; icon: React
   { key: "assessment", label: "Assessment", icon: ClipboardList },
   { key: "cost_efficiency", label: "Cost efficiency", icon: DollarSign },
   { key: "token_efficiency", label: "Token efficiency", icon: Zap },
+  { key: "icd_code", label: "ICD code (weight 0)", icon: ClipboardList },
 ]
 
 function tone(value: number) {

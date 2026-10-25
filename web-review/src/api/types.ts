@@ -425,7 +425,7 @@ export interface SequenceConstraint {
 
 export interface GroundTruth {
   review_status: "draft" | "needs_revision" | "approved"
-  diagnosis: { accepted: string[]; icd_codes: string[] }
+  diagnosis: { accepted: string[]; icd_codes: string[]; rejected?: string[]; required_components?: string[][] }
   differential: Array<{
     diagnosis: string
     likelihood: string

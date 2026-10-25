@@ -10,7 +10,9 @@ e.g. a variant label that is right for one GBS case and wrong for the others. `-
 synonyms an entry no longer grants: every label after `accepted[0]` that some entry of the table
 lists, and every code after `icd_codes[0]`, is recomputed from the entries that apply now. Labels no
 entry lists are case-specific and are kept, except those named under the table's `RETIRED` key
-(labels the table once granted and no longer does). `except_cases: [...]` excludes named cases from
+(labels the table once granted and no longer does). An entry's `rejected: [...]` labels are added to
+`ground_truth.diagnosis.rejected` (answers naming them score no diagnosis credit) and are pruned the
+same way. `except_cases: [...]` excludes named cases from
 an otherwise applicable entry. `--cases` / `--conditions` limit the run (check, apply or prune) to
 those cases, so a change can be applied to one condition while other conditions are being edited.
 """
@@ -60,6 +62,7 @@ def main() -> None:
     table = yaml.safe_load(SYNONYMS.read_text())
     granted = {label for entry in table.values() for label in entry.get("labels", [])}
     granted |= set(table.get("RETIRED", {}).get("retired_labels", []))
+    granted_rejected = {label for entry in table.values() for label in entry.get("rejected", [])}
     changed = []
     reformatted = 0
     for path in sorted(CASES.glob("*.json")):
@@ -72,16 +75,21 @@ def main() -> None:
         reformatted += _dump(data) != raw  # canonical form: indent 2, sorted keys, ASCII
         diagnosis = data["ground_truth"]["diagnosis"]
         labels, codes = list(diagnosis["accepted"]), list(diagnosis["icd_codes"])
+        rejected = list(diagnosis.get("rejected", []))
         if args.prune:
             labels = labels[:1] + [item for item in labels[1:] if item not in granted]
             codes = codes[:1]
+            rejected = [item for item in rejected if item not in granted_rejected]
         # Entries are selected by the case's own primary code (always first); codes added by
         # earlier runs never cascade into further entries.
         for entry in entries_for(codes[0], data["condition"], table, data["case_id"]):
             labels += [item for item in entry.get("labels", []) if item not in labels]
             codes += [item for item in entry.get("codes", []) if item not in codes]
-        if labels != diagnosis["accepted"] or codes != diagnosis["icd_codes"]:
+            rejected += [item for item in entry.get("rejected", []) if item not in rejected]
+        if labels != diagnosis["accepted"] or codes != diagnosis["icd_codes"] or rejected != diagnosis.get("rejected", []):
             diagnosis["accepted"], diagnosis["icd_codes"] = labels, codes
+            if rejected or "rejected" in diagnosis:
+                diagnosis["rejected"] = rejected
             changed.append(path)
             if not args.check:
                 path.write_text(_dump(data))

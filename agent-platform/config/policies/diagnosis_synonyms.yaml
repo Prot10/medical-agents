@@ -5,7 +5,10 @@
 # migration `scripts/validation/apply_diagnosis_synonyms.py` appends `labels` to
 # `ground_truth.diagnosis.accepted` and `codes` to `ground_truth.diagnosis.icd_codes`; the case
 # file remains the scored artefact. A submitted diagnosis matches when every token of an accepted
-# label appears in it, or when the submitted ICD-10 code is one of the accepted codes.
+# label appears in its asserted part (denied clauses such as "rather than MS" dropped) and no label
+# in `rejected` does; an entry's `rejected` labels go to `ground_truth.diagnosis.rejected`. Since
+# scorer v2 (25 Oct 2026) the ICD code never decides the diagnosis; it is a separate weight-0
+# component, so `codes` matter for that component only.
 #
 # STATUS: draft, authored 2026-09-02 for the migration; every entry is subject to physician review
 # together with the case policies. Entity-specific puzzles (e.g. LGI1 encephalitis filed under

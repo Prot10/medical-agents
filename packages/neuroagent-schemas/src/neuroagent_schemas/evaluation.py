@@ -77,23 +77,76 @@ def _code(text: str) -> str:
     return re.sub(r"[^A-Z0-9]", "", text.upper())
 
 
-class DiagnosisCriterion(StrictModel):
-    """Accepted labels and ICD-10 codes for the primary diagnosis.
+# Negation scope is the clause: text between punctuation, a spaced dash or "but".
+_CLAUSE = re.compile(r"[,;:.()\[\]{}]|\s[-–—]\s|[–—]|\bbut\b")
+# A clause that denies what it names: "CADASIL excluded", "ALS criteria not met".
+_DENIED_CLAUSE = re.compile(
+    r"\b(?:ruled out|excluded|unlikely|less likely"
+    r"|not (?:met|likely|present|supported|fulfilled|confirmed|satisfied|consistent))\b"
+)
+# A cue that denies the rest of its clause: "MOGAD rather than MS", "SAH, not aneurysmal".
+_DENIAL_ONSET = re.compile(r"\b(?:not|no|rather than|instead of|excluding|without evidence of)\b")
 
-    A submitted diagnosis matches when every token of an accepted label occurs in it (order
-    and punctuation insensitive), or when the submitted ICD-10 code equals an accepted code.
-    Labels are seeded per ICD code from `config/policies/diagnosis_synonyms.yaml` and refined by
-    physician review.
+
+def _affirmed(text: str) -> str:
+    """The part of a diagnosis text that is asserted, with denied clauses removed.
+
+    "non-X" becomes the single word "nonX", so "non-aneurysmal" never supplies "aneurysmal".
+    """
+    text = re.sub(r"\bnon[\s-]+(?=[a-z])", "non", text.lower())
+    kept = []
+    for clause in _CLAUSE.split(text):
+        if _DENIED_CLAUSE.search(clause):
+            continue
+        onset = _DENIAL_ONSET.search(clause)
+        kept.append(clause[: onset.start()] if onset else clause)
+    return " ".join(kept)
+
+
+def _names(candidate: set[str], labels: list[str]) -> bool:
+    return any(label <= candidate for text in labels if (label := _tokens(_affirmed(text))))
+
+
+class DiagnosisCriterion(StrictModel):
+    """Accepted and rejected labels, and ICD-10 codes, for the primary diagnosis.
+
+    A submitted diagnosis matches when every token of an accepted label occurs in its asserted
+    part (order and punctuation insensitive; denied clauses such as "rather than MS" or "CADASIL
+    excluded" are dropped first), no rejected label occurs there (a competing diagnosis named
+    alongside, e.g. "ALS or MS", or a wrong subtype, e.g. "PD dementia"), and every required
+    component of a mixed diagnosis is named too. The ICD code never decides the diagnosis: it is
+    scored apart by `code_matches`. Labels are seeded per ICD code from
+    `config/policies/diagnosis_synonyms.yaml` and refined by physician review.
     """
 
     accepted: list[str] = Field(min_length=1)
     icd_codes: list[str] = Field(default_factory=list)
+    rejected: list[str] = Field(default_factory=list)
+    # Mixed diagnoses: each component is a list of alternative labels, one of which must be named.
+    required_components: list[list[str]] = Field(default_factory=list)
 
-    def matches(self, diagnosis: str, icd10_code: str | None = None) -> bool:
-        candidate = _tokens(diagnosis)
-        if any(label <= candidate for accepted in self.accepted if (label := _tokens(accepted))):
-            return True
-        return bool(icd10_code) and _code(icd10_code) in {_code(code) for code in self.icd_codes}
+    def matches(self, diagnosis: str) -> bool:
+        candidate = _tokens(_affirmed(diagnosis))
+        return (
+            _names(candidate, self.accepted)
+            and not _names(candidate, self.rejected)
+            and all(_names(candidate, component) for component in self.required_components)
+        )
+
+    def code_matches(self, icd10_code: str | None) -> bool:
+        """The submitted code equals an accepted one at the WHO subcategory level (4 characters).
+
+        ICD-10-CM extends the WHO codes, so G43.1 (WHO) and G43.109 (CM) agree, while G30.0 and
+        G30.1 (onset before and after 65) do not.
+        """
+        submitted = _code(icd10_code or "")
+        if len(submitted) < 3:
+            return False
+        for code in map(_code, self.icd_codes):
+            width = min(4, len(submitted), len(code))
+            if width >= 3 and submitted[:width] == code[:width]:
+                return True
+        return False
 
 
 class DifferentialDx(StrictModel):

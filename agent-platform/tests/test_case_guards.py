@@ -12,6 +12,8 @@ Each guard is parametrized by case id, so one condition runs alone with e.g.
    Data-driven (`BANNED`), so later conditions add rows rather than tests.
 6. Review-process text: no ruling numbers, round-policy, criteria-pack, CENTRAL or credit wording in
    any case field, and no tier marker in a criterion label or rationale (25 Oct 2026).
+7. Diagnosis labels (scorer v2, 25 Oct 2026): the case's own primary label scores, and no rejected
+   label is named inside an accepted one.
 """
 
 from __future__ import annotations
@@ -492,3 +494,34 @@ def test_process_text_guard_fires():
     hits = process_text_hits(case)
     assert len(hits) == 8, hits
     assert not any("patient" in hit or "difficulty_rationale" in hit for hit in hits)
+
+
+# ---------------------------------------------------------------------------------------
+# 7. Diagnosis labels against scorer v2 (25 Oct 2026).
+#
+# The diagnosis scores on its label alone, so the case's primary label (`accepted[0]`, what the
+# perfect agent submits) must match the case, components of a mixed diagnosis included. A rejected
+# label named inside an accepted label would veto that correct answer.
+
+def diagnosis_label_problems(case: dict[str, Any]) -> list[str]:
+    from neuroagent_schemas.evaluation import DiagnosisCriterion
+
+    diagnosis = DiagnosisCriterion.model_validate(case["ground_truth"]["diagnosis"])
+    problems = [] if diagnosis.matches(diagnosis.accepted[0]) else [f"primary label does not score: {diagnosis.accepted[0]!r}"]
+    for label in diagnosis.accepted:
+        vetoes = [r for r in diagnosis.rejected if DiagnosisCriterion(accepted=[r]).matches(label)]
+        problems += [f"accepted {label!r} names rejected {r!r}" for r in vetoes]
+    return problems
+
+
+@pytest.mark.parametrize("case_id", CASE_IDS)
+def test_diagnosis_labels_score_under_scorer_v2(case_id):
+    assert not diagnosis_label_problems(_raw(case_id))
+
+
+def test_diagnosis_label_guard_fires():
+    case = {"ground_truth": {"diagnosis": {
+        "accepted": ["parkinson disease dementia", "PD"], "icd_codes": ["G20"],
+        "rejected": ["PD dementia", "parkinson disease dementia"]}}}
+    problems = diagnosis_label_problems(case)
+    assert len(problems) == 2, problems

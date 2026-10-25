@@ -42,13 +42,17 @@ class RewardBreakdown(BaseModel):
     assessment: float = Field(ge=0, le=1)
     cost_efficiency: float = Field(ge=0, le=1)
     token_efficiency: float = Field(ge=0, le=1)
+    # The submitted ICD-10 code, reported with weight 0: coding is not clinical reasoning.
+    icd_code: float = Field(ge=0, le=1)
     invalid_actions: int = Field(ge=0)
     scalar: float = Field(ge=0, le=1)
     caps_applied: list[str] = Field(default_factory=list)
 
 
 class ClinicalPolicyReward:
-    scorer_id = "clinical-policy-v1"
+    # v2 (25 Oct 2026): the diagnosis is matched on its label alone, with negation, rejected
+    # labels and mixed-diagnosis components; the ICD code is a separate weight-0 component.
+    scorer_id = "clinical-policy-v2"
 
     def __init__(self, *, require_approved: bool = True) -> None:
         self.require_approved = require_approved
@@ -63,9 +67,8 @@ class ClinicalPolicyReward:
 
         actions = episode.tool_actions
         assessment = episode.assessment
-        diagnosis = float(
-            bool(assessment and policy.diagnosis.matches(assessment.primary_diagnosis, assessment.icd10_code))
-        )
+        diagnosis = float(bool(assessment and policy.diagnosis.matches(assessment.primary_diagnosis)))
+        icd_code = float(bool(assessment and policy.diagnosis.code_matches(assessment.icd10_code)))
 
         matched: dict[str, list[int]] = {
             criterion.criterion_id: [
@@ -183,6 +186,7 @@ class ClinicalPolicyReward:
             assessment=assessment_score,
             cost_efficiency=cost_efficiency,
             token_efficiency=token_efficiency,
+            icd_code=icd_code,
             invalid_actions=invalid,
             scalar=max(0.0, min(1.0, scalar)),
             caps_applied=caps,

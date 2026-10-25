@@ -755,6 +755,16 @@ function GroundTruthSection({ groundTruth }: { groundTruth: GroundTruth }) {
                 Also accepted: {synonyms.join(" · ")}
               </p>
             )}
+            {(groundTruth.diagnosis.required_components ?? []).map((component, index) => (
+              <p key={index} className="text-xs text-muted-foreground mt-1.5">
+                Must also name: {component.join(" · ")}
+              </p>
+            ))}
+            {(groundTruth.diagnosis.rejected ?? []).length > 0 && (
+              <p className="text-xs text-muted-foreground mt-1.5">
+                Not accepted (scores no credit when named): {groundTruth.diagnosis.rejected!.join(" · ")}
+              </p>
+            )}
           </div>
         </AnnotatableField>
 

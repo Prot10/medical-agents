@@ -52,6 +52,16 @@ export function GroundTruthPanel({ groundTruth }: { groundTruth: GroundTruth }) 
             Also accepted: {groundTruth.diagnosis.accepted.slice(1).join(" · ")}
           </p>
         )}
+        {(groundTruth.diagnosis.required_components ?? []).map((component, index) => (
+          <p key={index} className="text-sm text-muted-foreground mt-1">
+            Must also name: {component.join(" · ")}
+          </p>
+        ))}
+        {(groundTruth.diagnosis.rejected ?? []).length > 0 && (
+          <p className="text-sm text-muted-foreground mt-1">
+            Not accepted: {groundTruth.diagnosis.rejected!.join(" · ")}
+          </p>
+        )}
         {groundTruth.diagnosis.icd_codes.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mt-2">
             {groundTruth.diagnosis.icd_codes.map((code) => (

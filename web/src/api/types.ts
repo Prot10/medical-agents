@@ -118,7 +118,7 @@ export interface RedHerring {
 
 export interface GroundTruth {
   review_status: PolicyReviewStatus
-  diagnosis: { accepted: string[]; icd_codes: string[] }
+  diagnosis: { accepted: string[]; icd_codes: string[]; rejected?: string[]; required_components?: string[][] }
   differential: DifferentialDx[]
   action_criteria: ActionCriterion[]
   avoided_actions: AvoidedActionCriterion[]
@@ -298,6 +298,7 @@ export interface RewardBreakdown {
   assessment: number
   cost_efficiency: number
   token_efficiency: number
+  icd_code: number
   invalid_actions: number
   scalar: number
   caps_applied: string[]
