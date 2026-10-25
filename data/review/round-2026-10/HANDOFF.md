@@ -1,10 +1,11 @@
-# Handoff: October 2026 review round (24 Oct 2026)
+# Handoff: October 2026 review round (25 Oct 2026)
 
-Branch `fix/review-round-2026-10`, everything committed (35 commits ahead of `master`, not
-pushed, no PR). The session that wrote this stopped the batch-4 workflow on Andrea's request so
-another account can continue. Read, in this order: this file, `ROUND_POLICY.md`, `PATTERNS.md`,
-`CENTRAL_PENDING.md`, `CLOSEOUT_BRIEF.md`. The skill `claude-workflow-fanout` has the lessons on
-running long fan-outs (limits, markers, token economy, scratchpad hygiene).
+Branch `fix/review-round-2026-10`, everything committed (64 commits ahead of `master`, not
+pushed, no PR). The case-by-case round is finished: all 20 conditions (600 cases) are fixed,
+verified, audited and closed out, and the cross-condition MockServer work is landed. Read, for
+any follow-up: this file, `ROUND_POLICY.md`, `PATTERNS.md`, `CENTRAL_PENDING.md` (the open items),
+`plans/<COND>-decisions.md` (per-condition decisions and the physicians' items). The skills
+`claude-workflow-fanout` and `neurobench-case-serving` have the lessons learned.
 
 ## Standing rules from Andrea (24 Oct 2026)
 - Open questions: decide them "nel modo migliore per la qualità del dataset", apply, record the
@@ -12,69 +13,46 @@ running long fan-outs (limits, markers, token economy, scratchpad hygiene).
 - Leaks on a criterion's own tool count too (any-query outputs never repeat any expected_evidence).
 - Commit each finished, checked piece as you go (conventional commits); never stage files a
   running agent owns.
-- One workflow at a time, 4 conditions per batch; no `effort: 'high'`.
+- Small steps, one agent at a time unless their files are disjoint; no workflows without asking.
 
-## Where the round stands
+## Where the round stands (25 Oct 2026)
 
 | Batch | Conditions | State |
 |---|---|---|
-| 1 | ALS, BACT-MEN, ISCH-STR, HEP-ENC | done: workflow, close-out, vocabulary wired |
+| 1 | ALS, BACT-MEN, ISCH-STR, HEP-ENC | done |
 | 2 | GLIO-HG, GBS, ALZ-EARLY, SAH | done |
 | 3 | SE, VASC-DEM, NMDAR-ENC, MIG-AURA | done |
-| 4 | SYNC-CARD, NPH, FTD, MG | workflow stopped mid-run (checkpoint commit) |
-| 5 | FND, MS-RR, FEPI-TEMP, PD | not started |
+| 4 | SYNC-CARD, NPH, FTD, MG | done |
+| 5 | FND, MS-RR, FEPI-TEMP, PD | done |
 
-The 12 done conditions pass every guard (leak, follow-up, banned strings, discriminators) and
-600/600 cases pass the perfect-agent check. Discriminator fixes and the new guard
-`test_routed_outputs_name_their_study` cover only the 12 done conditions so far
-(`DISCRIMINATOR_CONDITIONS` in `agent-platform/tests/test_case_guards.py`).
+Cross-condition work landed after the batches:
+- MockServer (317e46db): EEG routed by `eeg_type`; `interpret_labs` serves only the ordered
+  panels (`tools/lab_matching.py`), interpretation prose cut item by item (6938668c); MRI orders
+  default to no contrast.
+- Lab criteria order the panels their evidence cites (476dda4e, 6938668c, SE in 0f200830);
+  decisions in `plans/LABS-EVIDENCE-decisions.md` and `plans/SE-routing-decisions.md`.
+- SE stores a case-specific routine EEG; guard: every case storing a continuous EEG stores one.
+- Batch-5 vocabulary (c02f3050) and wiring, matcher fixes, `test_no_review_process_text`
+  (f6a33e45).
+- Every condition is in `DISCRIMINATOR_CONDITIONS`.
 
-### Batch 4 at the stop (from the on-disk markers)
-- Plans: all four written (`plans/{SYNC-CARD,NPH,FTD,MG}.md`).
-- Fixed (log has `## Changes`): SYNC-CARD 29/30 (missing RP05), NPH 27/30 (missing P02, P08,
-  S05), FTD 30/30, MG 30/30. No case was left mid-edit.
-- Verified (log has `## Verification`): SYNC-CARD 7, NPH 0, FTD 30, MG 18.
-- Condition audits (`plans/<COND>-summary.md`): none yet.
-
-## How to resume
-
-1. Check the markers yourself first (a stopped run can differ from this file):
-   ```bash
-   uv run python data/review/round-2026-10/bin/perfect_agent.py --all
-   uv run pytest agent-platform/tests/test_case_guards.py -q
-   ```
-2. Relaunch batch 4 with the Workflow tool, script `data/review/round-2026-10/bin/round-v2.js`,
-   args one object per condition: `{"cond": "SYNC-CARD", "planDone": true, "cases": [...30 ids]}`
-   (same for NPH, FTD, MG; all four plans exist, so `planDone: true`). Case ids:
-   the files whose id minus its last `-` part equals the condition (so `MG-` does not pick up
-   other prefixes). Workers skip cases with `## Changes`,
-   verifiers skip cases with `## Verification`, so only the remaining work runs. Check
-   `journal.jsonl` for `null` results before trusting a finished stage.
-3. When batch 4 finishes: commit cases, logs, plans and summaries (one commit). Then the
-   close-out, as for batches 1-3 (recipe in `CENTRAL_PENDING.md`):
-   - one agent per condition with `CLOSEOUT_BRIEF.md` (COND replaced): synonyms, criteria pack,
-     generator block, guidance claims (FTD and MG claims fail today until this step),
-     discriminators plus adding COND to `DISCRIMINATOR_CONDITIONS`, open questions;
-   - one vocabulary agent for the batch's CENTRAL terms (pattern: commits a07f7dfa, e19131d6,
-     a27e03ad); then wire the new terms into the cases (one agent per condition or one for all).
-   - Commit each condition's cases/logs/decisions/pack when its agent reports; commit the shared
-     files (`conditions.yaml`, `diagnosis_synonyms.yaml`, guidance builder, YAML and claim test)
-     once all four are done. Run the full suite and the perfect agent before each commit.
-4. Batch 5 (FND, MS-RR, FEPI-TEMP, PD) the same way, without `planDone`. Batch 4 and batch 5 can
-   overlap only as batch-4 close-out alongside the batch-5 workflow (disjoint files).
-5. Final step: full suite
-   (`uv run pytest agent-platform/tests packages/neuroagent-schemas/tests -q --ignore=agent-platform/tests/test_grpo_rollout.py`),
-   `perfect_agent.py --all`, `apply_diagnosis_synonyms.py --check`, then the open items below.
+Final checks at 6938668c: pytest 4723 passed, 0 failed (`--ignore=agent-platform/tests/test_grpo_rollout.py`,
+which needs torch); `bin/perfect_agent.py --all` 600/600; `apply_diagnosis_synonyms.py --check` 0.
 
 ## Open items (details in CENTRAL_PENDING.md)
-- Scorer: a diagnosis is accepted on its ICD code alone (C71, G61.0, F01.50, G43.109 credit wrong
-  answers); no negation matching ("non-aneurysmal SAH"); no per-case rejected tokens (dementia
-  accepts MCI). These are the main remaining validity issues; they need code, not case edits.
-- MockServer/library: normal library reports can contradict a case; a first lab order bundling a
-  second-tier assay gets the first-line panel without it.
+- Scorer (design decision, code not cases): a diagnosis is accepted on its ICD code alone (C71,
+  G61.0, F01.50, G43.109 credit wrong answers); no negation matching ("non-aneurysmal SAH"); no
+  per-case rejected tokens (dementia accepts MCI, "PD dementia", "secondary progressive MS",
+  "MOGAD rather than MS"); ICD-10-CM vs WHO codes (G41).
+- MockServer/library: library normals can contradict a case that does not store the variant
+  (CT perfusion, amyloid PET, batch-4 terms); about 260 cases store a contrast MRI as their only
+  study, so a non-contrast order gets post-gadolinium findings; a lab order returns the whole
+  stored panel of an added assay.
 - Schema: no `weight_kg` / `height_cm`.
-- Prices of the new terms were recalled, some estimated: verify against the fee schedule.
-- For the physicians: the scoring changes listed per condition in `plans/<COND>-decisions.md`;
-  VASC-DEM, NMDAR-ENC, MIG-AURA and the batch-4/5 conditions were never physician-reviewed and
-  should be scheduled.
-- Nothing is pushed and the review VPS still serves the old data: deploy only after the round.
+- Prices of the new terms were recalled, some estimated: verify against the 2024 MPFS / CLFS.
+- For the physicians: the scoring changes in `CENTRAL_PENDING.md` "For the physicians" and in
+  each `plans/<COND>-decisions.md`; never physician-reviewed and changed by the round: VASC-DEM,
+  NMDAR-ENC, MIG-AURA, SYNC-CARD, NPH, FTD, MG, FND, MS-RR, FEPI-TEMP, PD.
+- Optional: patient-surname repetition across conditions (Reyes in 8 cases, Tanaka in 2); SE-P02
+  off the global F44.5 synonym entry.
+- Nothing is pushed and the review VPS still serves the old data: deploy only on Andrea's request.
