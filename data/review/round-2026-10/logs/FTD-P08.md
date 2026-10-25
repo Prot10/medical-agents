@@ -101,3 +101,10 @@ Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym g
 Review-process wording (references to the round's rulings, the round policy file, the criteria packs, and tier markers such as "(optional)" in criterion labels and rationales) is shown to physicians in the review app, so it was rewritten in clinical language. The tier stays in the criterion's `importance` field; scoring is unchanged. `test_case_guards.py::test_no_review_process_text` now fails on any of it.
 
 - criterion `action-9-search-medical-literature` label: "Literature on bvFTD with motor neuron disease (optional)" -> "Literature on bvFTD with motor neuron disease"
+
+## Weight and height (25 Oct 2026)
+
+- `patient.demographics`: weight 57.7 -> 64 kg, height 157 -> 165 cm, BMI 23.4 -> 23.5 (the prompt shows height, weight and BMI).
+- Why: rule 1: exam states 'Weight stable at 64 kg'; height 165 cm keeps BMI near the stored 23.4 (now 23.5); no text cites a BMI.
+
+Checks: `perfect_agent.py` ok; BMI = weight / height^2 to one decimal.

@@ -93,3 +93,11 @@ Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it na
 - Scoring: coverage unchanged (any call matching the old order still matches); the cost reference of the required work-up now uses the new first order.
 
 Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the normal-row probe reports nothing for this criterion.
+
+## Weight and height (25 Oct 2026)
+
+- `patient.demographics`: weight 87.4 -> 83.5 kg, height 182 -> 178 cm, BMI 26.4 -> 26.4 (the prompt shows height, weight and BMI).
+- Why: rule 1: patient.physical_exam.general states weight 83.5 kg, height 178 cm.
+- The FVC mL/kg figures and the weight-based IVIg amounts in the text were checked against this weight: all within rounding, no text change.
+
+Checks: `perfect_agent.py` ok; BMI = weight / height^2 to one decimal.

@@ -78,3 +78,11 @@ Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym g
 Review-process wording (references to the round's rulings, the round policy file, the criteria packs, and tier markers such as "(optional)" in criterion labels and rationales) is shown to physicians in the review app, so it was rewritten in clinical language. The tier stays in the criterion's `importance` field; scoring is unchanged. `test_case_guards.py::test_no_review_process_text` now fails on any of it.
 
 - criterion `action-6-check-drug-interactions` rationale: "The regimen contains a neurotoxic drug with an azole interaction and an agent that disturbs coagulation, which change the lumbar puncture, the choice of IVIg or plasma exchange and the vincristine plan (ROUND_POLICY ruling 6)." -> "The regimen contains a neurotoxic drug with an azole interaction and an agent that disturbs coagulation, which change the lumbar puncture, the choice of IVIg or plasma exchange and the vincristine plan."
+
+## Weight and height (25 Oct 2026)
+
+- `patient.demographics`: weight 69.4 -> 78 kg, height 168 -> 178 cm, BMI 24.6 -> 24.6 (the prompt shows height, weight and BMI).
+- Why: rule 1: patient.physical_exam.general states weight 78 kg, height 178 cm.
+- The FVC mL/kg figures and the weight-based IVIg amounts in the text were checked against this weight: all within rounding, no text change.
+
+Checks: `perfect_agent.py` ok; BMI = weight / height^2 to one decimal.

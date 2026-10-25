@@ -94,3 +94,11 @@ Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it na
 - Scoring: none (evidence only; the reward does not read it).
 
 Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the normal-row probe reports nothing for this criterion.
+
+## Weight and height (25 Oct 2026)
+
+- `patient.demographics`: weight 75.4 -> 80 kg, height 169 -> 174 cm, BMI 26.4 -> 26.4 (the prompt shows height, weight and BMI).
+- Why: rule 1: patient.physical_exam.general states weight 80 kg, height 174 cm.
+- The FVC mL/kg figures and the weight-based IVIg amounts in the text were checked against this weight: all within rounding, no text change.
+
+Checks: `perfect_agent.py` ok; BMI = weight / height^2 to one decimal.

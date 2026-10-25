@@ -82,3 +82,11 @@ Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym g
 Review-process wording (references to the round's rulings, the round policy file, the criteria packs, and tier markers such as "(optional)" in criterion labels and rationales) is shown to physicians in the review app, so it was rewritten in clinical language. The tier stays in the criterion's `importance` field; scoring is unchanged. `test_case_guards.py::test_no_review_process_text` now fails on any of it.
 
 - criterion `action-6-check-drug-interactions` rationale: "Amlodipine does not change the choice or the dosing of IVIg or plasma exchange (ROUND_POLICY ruling 6)." -> "Amlodipine does not change the choice or the dosing of IVIg or plasma exchange."
+
+## Weight and height (25 Oct 2026)
+
+- `patient.demographics`: weight 70.5 -> 74 kg, height 166 -> 170 cm, BMI 25.6 -> 25.6 (the prompt shows height, weight and BMI).
+- Why: rule 1: patient.physical_exam.general states weight 74 kg, height 170 cm.
+- The FVC mL/kg figures and the weight-based IVIg amounts in the text were checked against this weight: all within rounding, no text change.
+
+Checks: `perfect_agent.py` ok; BMI = weight / height^2 to one decimal.

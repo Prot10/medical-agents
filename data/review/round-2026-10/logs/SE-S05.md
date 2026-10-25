@@ -75,3 +75,8 @@ Commit 317e46db routes `analyze_eeg` by `eeg_type` (an order without it is a rou
   - action-2-interpret-labs label -> 'Emergency laboratory work-up: glucose, CBC, electrolytes, magnesium, renal and hepatic function, ammonia, coagulation, toxicology, thiamine level, phosphate'
   - action-2-interpret-labs rationale + 'Thiamine is drawn before thiamine is given, and phosphate because malnutrition and refeeding lower it [EFNS_Wernicke_2010].'
 - Checks: `perfect_agent.py -v` pass; `case_io.py check` schema and synonym guard OK, no test failure names the case; probe: routine (omitted and explicit) order -> the new case fallback, `continuous_icu` and `video` -> the stored index recording; every number in each lab criterion's evidence is in what its order returns.
+
+## Weight and height (25 Oct 2026)
+
+- HPI and exam describe a "malnourished appearance" in a heavy drinker (low thiamine, albumin 3.0), but the stored BMI was 28.8. Rule 3: BMI 28.8 -> 19.6, weight 92.3 -> 62.8 kg, height 179 cm kept. No text cited the old BMI; the levetiracetam load is stated per kg with the 4500 mg cap only, so no dose text changes.
+- Checks: `perfect_agent.py` pass; weight/height/BMI consistency check clean.

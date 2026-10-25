@@ -58,3 +58,8 @@ Condition close-out (`plans/FEPI-TEMP-decisions.md`). What changed and why:
 
 - Synonyms (F44.5 token hazard from the FND close-out): P03 excluded from the global F44.5 entry and given `F44.5+fepi`: "non-epileptic seizures" removed (its tokens occur in "focal non-motor epileptic seizures", so a breakthrough-epilepsy answer scored), "nonepileptic seizures" added, codes F44.4 (motor) and F44.7 (mixed) removed. Probed: no epilepsy answer or G40 code scores here; PNES, functional, dissociative and psychogenic nonepileptic seizure answers do.
 - Checks: `perfect_agent.py -v` and `case_io.py check` clean; `test_case_guards.py -k FEPI-TEMP-` passes, now with the discriminator guard and the FEPI-TEMP banned strings.
+
+## Weight and height (25 Oct 2026)
+
+- Past history says "Mild obesity" but the stored BMI was 28.2 (overweight). Rule 3: BMI 28.2 -> 31.0 (class I obesity), weight 69.5 -> 76.4 kg, height 157 cm kept. No text cited the old BMI.
+- Checks: `perfect_agent.py` pass; weight/height/BMI consistency check clean.

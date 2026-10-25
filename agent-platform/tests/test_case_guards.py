@@ -14,6 +14,7 @@ Each guard is parametrized by case id, so one condition runs alone with e.g.
    any case field, and no tier marker in a criterion label or rationale (25 Oct 2026).
 7. Diagnosis labels (scorer v2, 25 Oct 2026): the case's own primary label scores, and no rejected
    label is named inside an accepted one.
+8. Body size (25 Oct 2026): every case records height, weight and BMI, and they agree.
 """
 
 from __future__ import annotations
@@ -525,3 +526,29 @@ def test_diagnosis_label_guard_fires():
         "rejected": ["PD dementia", "parkinson disease dementia"]}}}
     problems = diagnosis_label_problems(case)
     assert len(problems) == 2, problems
+
+
+# ---------------------------------------------------------------------------------------
+# 8. Height, weight and BMI agree (25 Oct 2026).
+#
+# The prompt shows all three, and mL/kg thresholds and weight-based doses are read against the
+# weight, so a case whose BMI does not follow from its height and weight contradicts itself.
+
+def body_size_problems(case: dict[str, Any]) -> list[str]:
+    demo = case["patient"]["demographics"]
+    height, weight, bmi = demo.get("height_cm"), demo.get("weight_kg"), demo.get("bmi")
+    if None in (height, weight, bmi):
+        return [f"missing: height {height}, weight {weight}, BMI {bmi}"]
+    expected = round(weight / (height / 100) ** 2, 1)
+    return [] if abs(expected - bmi) <= 0.1 else [f"BMI {bmi} but {weight} kg / {height} cm gives {expected}"]
+
+
+@pytest.mark.parametrize("case_id", CASE_IDS)
+def test_height_weight_and_bmi_agree(case_id):
+    assert not body_size_problems(_raw(case_id))
+
+
+def test_body_size_guard_fires():
+    assert body_size_problems({"patient": {"demographics": {"height_cm": 170, "weight_kg": 70, "bmi": 30.0}}})
+    assert body_size_problems({"patient": {"demographics": {"bmi": 24.2}}})
+    assert not body_size_problems({"patient": {"demographics": {"height_cm": 170, "weight_kg": 70, "bmi": 24.2}}})

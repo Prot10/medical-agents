@@ -67,3 +67,11 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Weight and height (25 Oct 2026)
+
+- `patient.demographics`: weight 61.3 -> 72 kg, height 155 -> 168 cm, BMI 25.5 -> 25.5 (the prompt shows height, weight and BMI).
+- Why: rule 1: patient.physical_exam.general states weight 72 kg, height 168 cm.
+- The FVC mL/kg figures and the weight-based IVIg amounts in the text were checked against this weight: all within rounding, no text change.
+
+Checks: `perfect_agent.py` ok; BMI = weight / height^2 to one decimal.

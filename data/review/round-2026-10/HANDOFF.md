@@ -48,7 +48,9 @@ which needs torch); `bin/perfect_agent.py --all` 600/600; `apply_diagnosis_synon
   (CT perfusion, amyloid PET, batch-4 terms); about 260 cases store a contrast MRI as their only
   study, so a non-contrast order gets post-gadolinium findings; a lab order returns the whole
   stored panel of an added assay.
-- Schema: no `weight_kg` / `height_cm`.
+- Weight and height (b5a46c7c and the consistency pass): every case records height, weight and
+  BMI, consistent with its text (guard `test_height_weight_and_bmi_agree`); doubts in
+  `plans/BODY-SIZE-{A,B}-decisions.md`. The VPS has not been redeployed since.
 - Prices of the new terms were recalled, some estimated: verify against the 2024 MPFS / CLFS.
 - For the physicians: the scoring changes in `CENTRAL_PENDING.md` "For the physicians" and in
   each `plans/<COND>-decisions.md`; never physician-reviewed and changed by the round: VASC-DEM,

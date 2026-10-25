@@ -84,3 +84,15 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Weight and height (25 Oct 2026)
+
+- `patient.demographics`: weight 73 -> 59 kg, height 174 -> 174 cm, BMI 24.1 -> 19.5 (the prompt shows height, weight and BMI).
+- Why: rule 3: exam 'Cachexia noted with recent 20-lb weight loss' with stored BMI 24.1; BMI lowered to 19.5 (59 kg, about 68 kg before the loss); the apixaban note 'at most one [criterion] can apply' still holds.
+
+Checks: `perfect_agent.py` ok; BMI = weight / height^2 to one decimal.
+
+Lead follow-up (25 Oct 2026): weight 59 -> 61 kg (BMI 20.1). At 59 kg the case sat just under the
+apixaban 60 kg dose-reduction threshold; with age 67 and creatinine 1.2 mg/dL only one criterion
+would be met, so 5 mg twice daily was already right, but 61 kg removes the ambiguity while keeping
+the post-oesophagectomy cachexia.

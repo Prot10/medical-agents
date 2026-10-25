@@ -84,3 +84,11 @@ Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym g
 Review-process wording (references to the round's rulings, the round policy file, the criteria packs, and tier markers such as "(optional)" in criterion labels and rationales) is shown to physicians in the review app, so it was rewritten in clinical language. The tier stays in the criterion's `importance` field; scoring is unchanged. `test_case_guards.py::test_no_review_process_text` now fails on any of it.
 
 - criterion `action-6-check-drug-interactions` rationale: "Apixaban, aspirin and ticagrelor change when and whether the LP is done, and lisinopril changes how plasma exchange is given; IVIg carries a thrombotic warning 3 days after a myocardial infarction (ROUND_POLICY ruling 6)." -> "Apixaban, aspirin and ticagrelor change when and whether the LP is done, and lisinopril changes how plasma exchange is given; IVIg carries a thrombotic warning 3 days after a myocardial infarction."
+
+## Weight and height (25 Oct 2026)
+
+- `patient.demographics`: weight 65.2 -> 64.5 kg, height 159 -> 158 cm, BMI 25.8 -> 25.8 (the prompt shows height, weight and BMI).
+- Why: rule 1: patient.physical_exam.general states weight 64.5 kg, height 158 cm.
+- The FVC mL/kg figures and the weight-based IVIg amounts in the text were checked against this weight: all within rounding, no text change.
+
+Checks: `perfect_agent.py` ok; BMI = weight / height^2 to one decimal.

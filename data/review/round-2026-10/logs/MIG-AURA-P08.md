@@ -76,3 +76,8 @@ Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it na
 - Scoring: none (recommended criterion; any call matching the old order still matches).
 
 Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the normal-row probe reports nothing for this criterion.
+
+## Weight and height (25 Oct 2026)
+
+- The HPI, social history and clinical assessment state a height of 150 cm (short stature, a MELAS clue) and BMI 18.8; the default height was 165 cm. Rules 1-2: height 165 -> 150 cm, weight 51.2 -> 42.3 kg, BMI 18.8 kept.
+- Checks: `perfect_agent.py` pass; weight/height/BMI consistency check clean.

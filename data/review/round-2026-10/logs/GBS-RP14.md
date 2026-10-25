@@ -74,3 +74,11 @@ Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.
 Review-process wording (references to the round's rulings, the round policy file, the criteria packs, and tier markers such as "(optional)" in criterion labels and rationales) is shown to physicians in the review app, so it was rewritten in clinical language. The tier stays in the criterion's `importance` field; scoring is unchanged. `test_case_guards.py::test_no_review_process_text` now fails on any of it.
 
 - criterion `action-6-check-drug-interactions` rationale: "The only management-changing drug, hydrochlorothiazide, was stopped on admission; the check does not change the IVIg or plasma exchange decision (ROUND_POLICY ruling 6)." -> "The only management-changing drug, hydrochlorothiazide, was stopped on admission; the check does not change the IVIg or plasma exchange decision."
+
+## Weight and height (25 Oct 2026)
+
+- `patient.demographics`: weight 84.1 -> 81 kg, height 168 -> 165 cm, BMI 29.8 -> 29.8 (the prompt shows height, weight and BMI).
+- Why: rule 1: patient.physical_exam.general states weight 81 kg, height 165 cm.
+- The FVC mL/kg figures and the weight-based IVIg amounts in the text were checked against this weight: all within rounding, no text change.
+
+Checks: `perfect_agent.py` ok; BMI = weight / height^2 to one decimal.

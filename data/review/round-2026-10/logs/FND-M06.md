@@ -77,3 +77,10 @@ Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym g
 Review-process wording (references to the round's rulings, the round policy file, the criteria packs, and tier markers such as "(optional)" in criterion labels and rationales) is shown to physicians in the review app, so it was rewritten in clinical language. The tier stays in the criterion's `importance` field; scoring is unchanged. `test_case_guards.py::test_no_review_process_text` now fails on any of it.
 
 - metadata.revision_reason: "October 2026 review round: criteria, outputs and assessment rebuilt to the FND criteria pack tiers with the dual-diagnosis variants. Close-out 24 Oct 2026: video-EEG optional and red-flag tests recommended, per the July 2026 agreement with the physicians that the examination is the only required diagnostic act." -> "October 2026 review round: criteria, outputs and assessment rebuilt to the FND required, recommended and optional tiers with the dual-diagnosis variants. Close-out 24 Oct 2026: video-EEG optional and red-flag tests recommended, per the July 2026 agreement with the physicians that the examination is the only required diagnostic act."
+
+## Weight and height (25 Oct 2026)
+
+- `patient.demographics`: weight 90 -> 94.9 kg, height 175 -> 175 cm, BMI 29.4 -> 31 (the prompt shows height, weight and BMI).
+- Why: rule 3: past history 'Obesity' with stored BMI 29.4; BMI raised to 31.0 at the default height.
+
+Checks: `perfect_agent.py` ok; BMI = weight / height^2 to one decimal.

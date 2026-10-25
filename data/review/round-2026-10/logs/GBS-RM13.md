@@ -81,3 +81,11 @@ Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym g
 Review-process wording (references to the round's rulings, the round policy file, the criteria packs, and tier markers such as "(optional)" in criterion labels and rationales) is shown to physicians in the review app, so it was rewritten in clinical language. The tier stays in the criterion's `importance` field; scoring is unchanged. `test_case_guards.py::test_no_review_process_text` now fails on any of it.
 
 - criterion `action-6-check-drug-interactions` rationale: "Her medicines include a statin while CK is raised, metformin in hepatic insufficiency and a potassium-sparing diuretic alongside IVIg: concrete interactions that change management (ROUND_POLICY ruling 6)." -> "Her medicines include a statin while CK is raised, metformin in hepatic insufficiency and a potassium-sparing diuretic alongside IVIg: concrete interactions that change management."
+
+## Weight and height (25 Oct 2026)
+
+- `patient.demographics`: weight 73.6 -> 70 kg, height 161 -> 157 cm, BMI 28.4 -> 28.4 (the prompt shows height, weight and BMI).
+- Why: rule 1: patient.physical_exam.general states weight 70 kg, height 157 cm.
+- The FVC mL/kg figures and the weight-based IVIg amounts in the text were checked against this weight: all within rounding, no text change.
+
+Checks: `perfect_agent.py` ok; BMI = weight / height^2 to one decimal.

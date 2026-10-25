@@ -71,3 +71,11 @@ Review-process wording (references to the round's rulings, the round policy file
 
 - criterion `action-achr-repeat` label: "Repeat AChR antibody (optional)" -> "Repeat AChR antibody"
 - criterion `action-2-order-body-imaging` label: "Repeat mediastinal CT once stable (optional)" -> "Repeat mediastinal CT once stable"
+
+## Weight and height (25 Oct 2026)
+
+- `patient.demographics`: weight 68 -> 72.4 kg, height 155 -> 160 cm, BMI 28.3 -> 28.3 (the prompt shows height, weight and BMI).
+- Why: rule 1: patient.physical_exam.general states weight 72.4 kg, height 160 cm.
+- The FVC mL/kg figures and the weight-based IVIg amounts in the text were checked against this weight: all within rounding, no text change.
+
+Checks: `perfect_agent.py` ok; BMI = weight / height^2 to one decimal.

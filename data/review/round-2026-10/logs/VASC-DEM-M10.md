@@ -73,3 +73,10 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, named in the report's own text.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Weight and height (25 Oct 2026)
+
+- `patient.demographics`: weight 79.3 -> 83 kg, height 168 -> 172 cm, BMI 28.1 -> 28.1 (the prompt shows height, weight and BMI).
+- Why: rule 1: patient.physical_exam.general states weight 83 kg, height 172 cm.
+
+Checks: `perfect_agent.py` ok; BMI = weight / height^2 to one decimal.

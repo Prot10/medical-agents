@@ -74,3 +74,11 @@ The lab matcher now keeps a urine or CSF row out of a blood order: a urinalysis,
 Review-process wording (references to the round's rulings, the round policy file, the criteria packs, and tier markers such as "(optional)" in criterion labels and rationales) is shown to physicians in the review app, so it was rewritten in clinical language. The tier stays in the criterion's `importance` field; scoring is unchanged. `test_case_guards.py::test_no_review_process_text` now fails on any of it.
 
 - criterion `action-6-search-medical-literature` label: "Literature on fluoroquinolones and MG exacerbation (optional)" -> "Literature on fluoroquinolones and MG exacerbation"
+
+## Weight and height (25 Oct 2026)
+
+- `patient.demographics`: weight 64.2 -> 66 kg, height 156 -> 158 cm, BMI 26.4 -> 26.4 (the prompt shows height, weight and BMI).
+- Why: rule 1: patient.physical_exam.general states weight 66 kg, height 158 cm.
+- The FVC mL/kg figures and the weight-based IVIg amounts in the text were checked against this weight: all within rounding, no text change.
+
+Checks: `perfect_agent.py` ok; BMI = weight / height^2 to one decimal.

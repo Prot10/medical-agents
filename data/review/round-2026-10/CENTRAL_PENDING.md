@@ -57,10 +57,6 @@ lands.
   reaches its stored value only through `anti_thyroglobulin`). Request `tacrolimus_level` (CPT
   80197) and `thyroglobulin` (CPT 84432) with library normals and the `tool_io.py` mirror.
 
-## Schema
-- Demographics lack `weight_kg` and `height_cm` (GBS respiratory mL/kg thresholds, BACT-MEN-RS04
-  dosing). A fallback respiratory report with FVC (L, % predicted, mL/kg), MIP and MEP then needs
-  the patient's weight. (GBS, 24 Oct)
 
 ## Prices to verify
 - The October 2026 terms' Medicare rates were recalled, not looked up in the fee schedule; four

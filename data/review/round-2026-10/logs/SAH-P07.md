@@ -85,3 +85,8 @@ Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it na
 - Approved case: changed for a real inconsistency (the policy's own order did not return what its evidence cites), so it goes back to re-review for this criterion only.
 
 Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.
+
+## Weight and height (25 Oct 2026)
+
+- Past history "Obesity BMI was higher, lost weight" (known IIH) with a stored BMI of 21.8, which would need a loss of more than a quarter of body weight from the obese range. Rule 3: BMI 21.8 -> 27.6 (overweight after losing weight from obesity), weight 57.9 -> 73.3 kg, height 163 cm kept. No text cited the old BMI.
+- Checks: `perfect_agent.py` pass; weight/height/BMI consistency check clean.
