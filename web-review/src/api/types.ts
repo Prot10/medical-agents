@@ -356,6 +356,8 @@ export interface PatientProfile {
     handedness?: string
     ethnicity?: string
     bmi?: number
+    weight_kg?: number | null
+    height_cm?: number | null
   }
   clinical_history: {
     past_medical_history?: string[]

@@ -339,6 +339,18 @@ function PatientSection({ patient }: { patient: PatientProfile }) {
         <VitalCard label="RR" value={v.rr} unit="/min" path="patient.vitals.rr" />
         <VitalCard label="SpO₂" value={v.spo2} unit="%" path="patient.vitals.spo2" />
         <VitalCard
+          label="Height"
+          value={patient.demographics.height_cm ?? undefined}
+          unit="cm"
+          path="patient.demographics.height_cm"
+        />
+        <VitalCard
+          label="Weight"
+          value={patient.demographics.weight_kg ?? undefined}
+          unit="kg"
+          path="patient.demographics.weight_kg"
+        />
+        <VitalCard
           label="BMI"
           value={patient.demographics.bmi}
           path="patient.demographics.bmi"

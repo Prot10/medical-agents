@@ -13,6 +13,10 @@ class Demographics(BaseModel):
     handedness: str = "right"
     ethnicity: str = ""
     bmi: float | None = None
+    # Weight and height (25 Oct 2026): mL/kg respiratory thresholds and weight-based dosing need
+    # them. Every NeuroBench case records both, consistent with `bmi`; a recorded case may not.
+    weight_kg: float | None = Field(default=None, gt=25, lt=300)
+    height_cm: float | None = Field(default=None, gt=120, lt=230)
 
 
 class Medication(BaseModel):

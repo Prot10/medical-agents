@@ -41,7 +41,7 @@ def format_patient_info(case: NeuroBenchCase) -> str:
     exam = patient.neurological_exam
     history = patient.clinical_history
     parts = [
-        f"Patient: {patient.demographics.age}-year-old {patient.demographics.sex}",
+        f"Patient: {patient.demographics.age}-year-old {patient.demographics.sex}{format_body_size(patient.demographics)}",
         f"Chief complaint: {patient.chief_complaint}",
         f"History of present illness: {patient.history_present_illness}",
     ]
@@ -88,6 +88,20 @@ def format_patient_info(case: NeuroBenchCase) -> str:
         )
     parts.append(format_vitals(vitals))
     return "\n".join(parts)
+
+
+def format_body_size(demographics: Any) -> str:
+    """Height, weight and BMI as recorded; a measure the record left blank is not shown."""
+    size = [
+        f"{label} {value:g} {unit}".rstrip()
+        for label, value, unit in (
+            ("height", demographics.height_cm, "cm"),
+            ("weight", demographics.weight_kg, "kg"),
+            ("BMI", demographics.bmi, ""),
+        )
+        if value is not None
+    ]
+    return f", {', '.join(size)}" if size else ""
 
 
 def format_vitals(vitals: Any) -> str:
