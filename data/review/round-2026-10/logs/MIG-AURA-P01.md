@@ -68,3 +68,13 @@ Checks after the change: `perfect_agent.py` pass, `case_io.py check` clean for t
 Review-process wording (references to the round's rulings, the round policy file, the criteria packs, and tier markers such as "(optional)" in criterion labels and rationales) is shown to physicians in the review app, so it was rewritten in clinical language. The tier stays in the criterion's `importance` field; scoring is unchanged. `test_case_guards.py::test_no_review_process_text` now fails on any of it.
 
 - criterion `action-2-check-drug-interactions` rationale: "Optional: no interaction changes management; the triptan label caution about cardiovascular risk factors is part of the acute-treatment must." -> "No interaction changes management; the triptan label caution about cardiovascular risk factors is part of the acute-treatment must."
+
+## Lab evidence, normal results (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited normal results its own order (the first alternative) did not return; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-5-interpret-labs]`.alternatives: was [ESR, CRP] | [ESR_CRP] | [inflammatory_markers]; now [ESR, CRP, glucose, HbA1c, lipid_panel] | [ESR, CRP] | [ESR_CRP] | [inflammatory_markers].
+- Decision: serve: new first alternative (old order kept as an alternative). The label adds glucose, HbA1c and lipids for her vascular risk review and the evidence reads the HbA1c and LDL; ESR and CRP did not return them.
+- Scoring: none (recommended criterion; any call matching the old order still matches).
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the normal-row probe reports nothing for this criterion.

@@ -92,3 +92,13 @@ Review-process wording (references to the round's rulings, the round policy file
 
 - criterion `action-2-order-ct-scan` rationale: "Optional: there is no focal deficit, seizure or head trauma and the precipitant is clear, so brain imaging is not routine; INR 1.6 and platelets 116 lower the threshold to exclude a subdural hematoma if the course is atypical or she does not improve with treatment." -> "There is no focal deficit, seizure or head trauma and the precipitant is clear, so brain imaging is not routine; INR 1.6 and platelets 116 lower the threshold to exclude a subdural hematoma if the course is atypical or she does not improve with treatment."
 - criterion `action-4-check-drug-interactions` rationale: "Optional: the pruritus treatment (a bile-acid sequestrant) binds ursodeoxycholic acid and levothyroxine and is constipating, which matters in an episode precipitated by constipation." -> "The pruritus treatment (a bile-acid sequestrant) binds ursodeoxycholic acid and levothyroxine and is constipating, which matters in an episode precipitated by constipation."
+
+## Lab evidence, normal results (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited normal results its own order (the first alternative) did not return; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-1-interpret-labs]`.alternatives: was [CBC, CMP, coagulation, ammonia, zinc, copper] | [CBC, BMP, LFTs, coagulation, ammonia, zinc, copper]; now [CBC, CMP, coagulation, ammonia, zinc, copper, CRP] | [CBC, CMP, coagulation, ammonia, zinc, copper] | [CBC, BMP, LFTs, coagulation, ammonia, zinc, copper].
+- Decision: serve: new first alternative (old order kept as an alternative). The label names CRP with the core bloods (infection is the precipitant to exclude) and the evidence reads it; CBC, CMP, coagulation and ammonia did not return the inflammatory panel.
+- Scoring: coverage unchanged (any call matching the old order still matches); the cost reference of the required work-up now uses the new first order.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the normal-row probe reports nothing for this criterion.

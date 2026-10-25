@@ -69,3 +69,13 @@ The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a 
 - `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
 
 Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Lab evidence, normal results (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited normal results its own order (the first alternative) did not return; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-5-interpret-labs]`.alternatives: was [antiphospholipid] | [lupus_anticoagulant] | [anti_cardiolipin]; now [antiphospholipid, inflammatory_markers, HbA1c, lipid_panel] | [antiphospholipid] | [lupus_anticoagulant] | [anti_cardiolipin].
+- Decision: serve: new first alternative (old order kept as an alternative). The label names antiphospholipid antibodies, inflammatory markers and vascular risk bloods, and the evidence reads all three; the antiphospholipid order returned only the first.
+- Scoring: none (recommended criterion; any call matching the old order still matches).
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the normal-row probe reports nothing for this criterion.

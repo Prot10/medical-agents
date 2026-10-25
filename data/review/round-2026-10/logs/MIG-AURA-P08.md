@@ -66,3 +66,13 @@ Checks after the change: `perfect_agent.py` pass, `case_io.py check` clean for t
 Review-process wording (references to the round's rulings, the round policy file, the criteria packs, and tier markers such as "(optional)" in criterion labels and rationales) is shown to physicians in the review app, so it was rewritten in clinical language. The tier stays in the criterion's `importance` field; scoring is unchanged. `test_case_guards.py::test_no_review_process_text` now fails on any of it.
 
 - criterion `action-1-search-medical-literature` label: "Optional: literature on mitochondrial stroke-like episodes and hemiplegic migraine criteria" -> "Literature on mitochondrial stroke-like episodes and hemiplegic migraine criteria"
+
+## Lab evidence, normal results (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited normal results its own order (the first alternative) did not return; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-5-interpret-labs]`.alternatives: was [lactate] | [CK]; now [lactate, CK, glucose, HbA1c] | [lactate] | [CK].
+- Decision: serve: new first alternative (old order kept as an alternative). The label names lactate, CK, glucose and HbA1c, and a must screens for the diabetes of m.3243A>G; a lactate or CK order alone did not return the glucose panel.
+- Scoring: none (recommended criterion; any call matching the old order still matches).
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the normal-row probe reports nothing for this criterion.

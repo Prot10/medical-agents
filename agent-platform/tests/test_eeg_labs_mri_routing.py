@@ -17,6 +17,10 @@
    urinalysis or urine electrolytes; a sleep-deprived EEG order is answered by the stored routine
    EEG when the case stores no sleep-deprived recording (never the reverse), not by the library
    normal.
+5. Interpretation prose (25 Oct 2026): a cut payload's interpretation and abnormal-values lines
+   are cut by list item, not by sentence (`lab_matching.cut_prose`), so a one-sentence
+   "Abnormal values: ..." list does not read out the values of panels the order did not name,
+   and ordinary prose keeps its grammar.
 """
 
 from __future__ import annotations
@@ -260,3 +264,74 @@ def test_routine_order_never_gets_a_sleep_deprived_recording():
     for arguments in ({}, {"eeg_type": "routine"}):
         result = _call(_env("FEPI-TEMP-M01"), "analyze_eeg", **arguments)
         assert result.output["eeg_type"] == "routine", arguments
+
+
+# --------------------------------------------------------------------------- 5. interpretation prose
+
+
+def _prose(text, kept, dropped):
+    from neuroagent.tools.lab_matching import cut_prose
+
+    return cut_prose(text, [(t, "Kept") for t in kept], [(t, "Dropped") for t in dropped])
+
+
+def test_abnormal_values_list_keeps_only_the_kept_items():
+    text = ("Abnormal values: Hemoglobin 11.8 g/dL (L), Platelets 142 x10^9/L (L), CRP 4.2 mg/L (H), "
+            "Lactate 3.8 mmol/L (H), CK 480 U/L (H).")
+    assert _prose(text, ["Hemoglobin", "Platelets"], ["CRP", "Lactate", "CK"]) == (
+        "Abnormal values: Hemoglobin 11.8 g/dL (L), Platelets 142 x10^9/L (L).")
+    assert _prose(text, ["CRP"], ["Hemoglobin", "Platelets", "Lactate", "CK"]) == "Abnormal values: CRP 4.2 mg/L (H)."
+
+
+def test_name_list_keeps_its_shared_tail_and_final_and():
+    text = "Sodium, potassium, calcium, magnesium and TSH within reference ranges."
+    assert _prose(text, ["Sodium", "Potassium", "Calcium"], ["Magnesium", "TSH"]) == (
+        "Sodium, potassium and calcium within reference ranges.")
+    assert _prose(text, ["TSH"], ["Sodium", "Potassium", "Calcium", "Magnesium"]) == "TSH within reference ranges."
+    assert _prose("Troponin and TSH are normal.", ["TSH"], ["Troponin I"]) == "TSH is normal."
+
+
+def test_shared_head_moves_to_the_first_kept_item():
+    text = "Elevated carbamazepine level (21.4 mcg/mL), WBC (14.8), lactate (6.4 mmol/L) and CK (412 U/L);"
+    assert _prose(text, ["WBC"], ["Carbamazepine", "Lactate", "CK"]) == "Elevated WBC (14.8);"
+    assert _prose("Low bicarbonate (20) with raised lactate (2.8).", ["Lactate"], ["Bicarbonate"]) == (
+        "Raised lactate (2.8).")
+
+
+def test_shared_noun_and_parentheses_are_cut_inside():
+    text = "Electrolytes, renal and hepatic function, coagulation and TSH within reference ranges."
+    assert _prose(text, ["Sodium", "Creatinine", "INR", "TSH"], ["ALT", "AST"]) == (
+        "Electrolytes, renal function, coagulation and TSH within reference ranges.")
+    assert _prose("Metabolic acidosis (pH 7.15, bicarbonate 12) with lactate 4.6 mmol/L.",
+                  ["Bicarbonate"], ["pH (arterial)", "Lactate"]) == "Metabolic acidosis (bicarbonate 12)."
+
+
+def test_urine_items_follow_the_urine_rows():
+    kept = [("Sodium", "BMP"), ("WBC", "CBC"), ("Serum osmolality", "BMP")]
+    dropped = [("Urine sodium", "Urine studies"), ("Urine osmolality", "Urine studies"),
+               ("Nitrite (urine)", "Urinalysis"), ("Leukocyte esterase", "Urinalysis"), ("RBC (urine)", "Urinalysis")]
+    from neuroagent.tools.lab_matching import cut_prose
+
+    assert cut_prose("Sodium 121 with urine osmolality 420 and urine sodium 22.", kept, dropped) == "Sodium 121."
+    assert cut_prose("Pyuria with positive nitrite and leukocyte esterase.", kept, dropped) == ""
+    assert cut_prose("Urinalysis: proteinuria, microscopic haematuria and rare RBC casts.", kept, dropped) == ""
+    assert cut_prose("WBC 11.8 x10^9/L (H), nitrite positive", kept, dropped) == "WBC 11.8 x10^9/L (H)"
+
+
+def test_ordinary_prose_is_unchanged():
+    text = "Anti-AChR antibodies are found in most patients with generalized myasthenia gravis."
+    assert _prose(text, ["Anti-AChR Binding Antibody"], ["TSH"]) == text
+    assert _prose("Type and screen: A positive, antibody screen negative.", ["type_and_screen"], ["TSH"]) == (
+        "Type and screen: A positive, antibody screen negative.")
+
+
+@pytest.mark.parametrize("case_id, panels, absent", [
+    ("SE-M02", ["CBC"], ["crp", "lactate", "ck 480"]),
+    ("SE-M03", ["AED_levels", "CBC", "CMP", "beta-hCG", "lactate", "magnesium", "urinalysis"], ["dsdna", "c3 62", "esr"]),
+    ("SE-S11", ["CBC", "CMP", "magnesium"], ["ph 7.15", "lactate 4.6"]),
+    ("SE-S04", ["CBC", "CMP", "magnesium", "AED_levels", "ammonia", "beta-hCG"], ["proteinuria", "c3 48", "nitrite"]),
+])
+def test_served_interpretation_names_no_unserved_value(case_id, panels, absent):
+    result = _labs(_env(case_id), *panels)
+    prose = " ".join([result.output["interpretation"], *result.output["abnormal_values_summary"]]).lower()
+    assert not [term for term in absent if term in prose], prose

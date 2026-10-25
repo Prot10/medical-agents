@@ -111,3 +111,13 @@ Review-process wording (references to the round's rulings, the round policy file
 
 - criterion `action-10-order-advanced-imaging` label: "Cardiac MRI to characterise the substrate (optional)" -> "Cardiac MRI to characterise the substrate"
 - criterion `action-6-search-medical-literature` label: "Guideline lookup on pacing indications (optional)" -> "Guideline lookup on pacing indications"
+
+## Lab evidence, normal results (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited normal results its own order (the first alternative) did not return; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-2-interpret-labs]`.expected_evidence: was "Potassium 3.2 mEq/L and magnesium 1.5 mg/dL low with a hypochloraemic alkalosis on hydrochlorothiazide; troponin I not elevated"; now "Potassium 3.2 mEq/L and magnesium 1.5 mg/dL low with a hypochloraemic alkalosis on hydrochlorothiazide".
+- Decision: trim evidence. The July 2026 tool review ruled that syncope panels name only the assay that changes management; the label names electrolytes and magnesium, so the normal troponin is incidental and trimmed.
+- Scoring: none (evidence only; the reward does not read it).
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the normal-row probe reports nothing for this criterion.

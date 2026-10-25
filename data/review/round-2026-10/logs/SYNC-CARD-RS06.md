@@ -94,3 +94,13 @@ Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym g
 Review-process wording (references to the round's rulings, the round policy file, the criteria packs, and tier markers such as "(optional)" in criterion labels and rationales) is shown to physicians in the review app, so it was rewritten in clinical language. The tier stays in the criterion's `importance` field; scoring is unchanged. `test_case_guards.py::test_no_review_process_text` now fails on any of it.
 
 - criterion `action-5-search-medical-literature` label: "Guideline lookup on atrial flutter management (optional)" -> "Guideline lookup on atrial flutter management"
+
+## Lab evidence, normal results (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited normal results its own order (the first alternative) did not return; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-2-interpret-labs]`.expected_evidence: was "Potassium 3.6 mEq/L low-normal on hydrochlorothiazide, creatinine 1.1 mg/dL for anticoagulant dosing; TSH, if ordered, normal"; now "Potassium 3.6 mEq/L low-normal on hydrochlorothiazide, creatinine 1.1 mg/dL for anticoagulant dosing".
+- Decision: trim evidence. The July 2026 tool review ruled that syncope panels name only the assay that changes management and left TSH named in one case (SYNC-CARD-S06). The rationale calls TSH only a reasonable extra, so it is trimmed from this BMP order's evidence; the panel stays servable to a TSH order, which the key evidence and the thyrotoxicosis differential read.
+- Scoring: none (evidence only; the reward does not read it).
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the normal-row probe reports nothing for this criterion.

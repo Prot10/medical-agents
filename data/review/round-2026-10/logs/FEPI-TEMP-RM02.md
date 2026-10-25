@@ -64,3 +64,13 @@ Condition close-out (`plans/FEPI-TEMP-decisions.md`). What changed and why:
 - Label (summary CENTRAL 16): the em dash in accepted[0] ("hippocampal sclerosis — dual pathology") replaced by a comma.
 - Soft MRI -> drug check constraint: citation `[ILAE_MRI_2019]` -> `[NICE_NG217_2025]`, as in the other cases (ASM choice is what the constraint is about; auditor flag).
 - Checks: `perfect_agent.py -v` and `case_io.py check` clean; `test_case_guards.py -k FEPI-TEMP-` passes, now with the discriminator guard and the FEPI-TEMP banned strings.
+
+## Lab evidence, normal results (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited normal results its own order (the first alternative) did not return; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-7-interpret-labs]`.expected_evidence: was "Valproic acid 38 mcg/mL, below range, consistent with the missed doses; normal ammonia, liver enzymes and platelets."; now "Valproic acid 38 mcg/mL, below range, consistent with the missed doses.".
+- Decision: trim evidence. Ammonia, liver enzymes and platelets are valproate safety bloods, not the level this order names; their panels stay servable to an agent that orders them.
+- Scoring: none (evidence only; the reward does not read it).
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the normal-row probe reports nothing for this criterion.

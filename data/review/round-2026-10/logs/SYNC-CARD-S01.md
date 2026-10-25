@@ -107,3 +107,13 @@ Review-process wording (references to the round's rulings, the round policy file
 
 - criterion `action-8-order-advanced-imaging` label: "Cardiac MRI to characterise the substrate (optional)" -> "Cardiac MRI to characterise the substrate"
 - criterion `action-6-search-medical-literature` label: "Guideline lookup on pacing indications (optional)" -> "Guideline lookup on pacing indications"
+
+## Lab evidence, normal results (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited normal results its own order (the first alternative) did not return; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-2-interpret-labs]`.alternatives: was [BMP]; now [BMP, troponin] | [BMP].
+- Decision: serve: new first alternative (old order kept as an alternative). The ischaemic AV block differential and a red herring read the troponin, and the July 2026 syncope ruling keeps troponin where ischaemia is in question; the BMP did not return it.
+- Scoring: none (recommended criterion; any call matching the old order still matches).
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the normal-row probe reports nothing for this criterion.

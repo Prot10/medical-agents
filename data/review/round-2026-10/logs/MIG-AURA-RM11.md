@@ -96,3 +96,24 @@ Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym g
 Review-process wording (references to the round's rulings, the round policy file, the criteria packs, and tier markers such as "(optional)" in criterion labels and rationales) is shown to physicians in the review app, so it was rewritten in clinical language. The tier stays in the criterion's `importance` field; scoring is unchanged. `test_case_guards.py::test_no_review_process_text` now fails on any of it.
 
 - criterion `action-1-search-medical-literature` label: "Optional: literature on hemiplegic migraine with seizures, contraception and topiramate" -> "Literature on hemiplegic migraine with seizures, contraception and topiramate"
+
+## Video-EEG fallback (25 Oct 2026)
+
+`action-5-analyze-eeg` accepts `routine` or `video`. The stored EEG is the routine one and the case had no EEG fallback (`fallback_tool_outputs.eeg` null), so a `video` order (and a `continuous_icu` order, the same study for routing) received the library's "Normal video-EEG recording", which contradicts the left hemispheric slowing of the routine EEG recorded on the same day (`perfect_agent.py -v` and a direct MockServer probe of `analyze_eeg` with `eeg_type` video, alone and after a routine order).
+
+- `fallback_tool_outputs.eeg`: was null; now a 24-hour video-EEG from the day of admission (`eeg_type` video, abnormal): continuous left hemispheric polymorphic theta and delta slowing, maximal posteriorly, in wakefulness and sleep; no interictal epileptiform discharges, no lateralised periodic discharges, no electrographic seizures, no clinical events; limitation that the slowing may be post-ictal or reflect the left hemispheric process.
+- Decision: store the case-specific study, consistent with the routine EEG and the criterion's evidence, so both accepted alternatives read the same findings. A repeat routine order still gets the stored routine EEG; an ambulatory order gets the library normal, a later outpatient study that does not contradict the admission findings.
+- Scoring: none (no criterion or alternative changed).
+
+Checks: `perfect_agent.py` ok (the video alternative is now answered by the case fallback, not the library); `case_io.py check` clean for this case.
+
+## Lab evidence, normal results (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited normal results its own order (the first alternative) did not return; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-6-interpret-labs]`.alternatives: was [lactate] | [CMP] | [CBC] | [glucose]; now [lactate, CBC, CMP, CRP, beta-hCG] | [lactate] | [CMP] | [CBC] | [glucose].
+- `ground_truth.action_criteria[action-6-interpret-labs]`.expected_evidence: was "Normal blood count, electrolytes, glucose, CRP and CK; venous lactate 1.3 mmol/L; beta-hCG negative"; now "Normal blood count, electrolytes, glucose and CRP; venous lactate 1.3 mmol/L; beta-hCG negative".
+- Decision: serve: new first alternative (old order kept as an alternative) + trim evidence. The label names glucose, electrolytes, blood count, inflammatory markers and lactate, and the encephalitis differential reads CRP 2; each alternative returned one of them. The negative beta-hCG belongs in the order of a 26-year-old on topiramate (the musts act on pregnancy prevention). The normal CK is incidental and trimmed.
+- Scoring: none (recommended criterion; any call matching the old order still matches).
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the normal-row probe reports nothing for this criterion.

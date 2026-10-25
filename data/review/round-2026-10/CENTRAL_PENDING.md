@@ -47,19 +47,15 @@ lands.
   receives the stored post-tap report; the soft sequence constraint (tap before reassessment)
   penalises the order but does not hide the result. Consider serving the post-intervention report
   only after the intervention's own criterion has been called.
-- Library: MIG-AURA-RM11's video-EEG alternative may still receive a library normal (the case
-  stores a routine EEG and an untyped fallback). SE now stores a case-specific routine EEG and a
-  guard requires one wherever a continuous EEG is stored (25 Oct).
-- Lab matcher (25 Oct, `plans/SE-routing-decisions.md` CENTRAL): interpretation prose is filtered
-  by sentence, so a one-sentence "Abnormal values: ..." still reads out values of panels the order
-  did not name (SE M02, M03, M05-M07, P03, S01, S07, S09); orders are answered panel by panel, so
-  an added assay returns its whole stored panel (SE RS11, S05, S10); a stored blood gas answers a
-  `CMP` order through `HCO3`. Filter by clause or split the panels.
-- Lab evidence (25 Oct): the 143 criteria whose evidence cited abnormal results their order did
-  not return are fixed (`plans/LABS-EVIDENCE-decisions.md`, `plans/SE-routing-decisions.md`).
-  About 99 more cite normal results their order does not return (ALS 25, MS-RR 18, ...):
-  `notes/labs-evidence-normal-unserved-2026-10-25.txt`. Consistency only; the reward does not
-  read the evidence.
+- Lab matcher (25 Oct, `plans/SE-routing-decisions.md` CENTRAL): orders are answered panel by
+  panel, so an added assay returns its whole stored panel (SE RS11, S05, S10; MS-RR-RP01's ANA
+  order returns ESR, CRP and tumour markers stored in the same panel); a stored blood gas answers a
+  `CMP` order through `HCO3`. Split the panels. (The prose part is closed: interpretation and
+  abnormal-values lines are now cut item by item to the tests served, 25 Oct.)
+- Vocabulary (25 Oct, `plans/LABS-EVIDENCE-decisions.md`): no `interpret_labs` term orders a
+  tacrolimus trough (GBS-RP15 stores one; evidence trimmed) or a serum thyroglobulin (GLIO-HG-RP01
+  reaches its stored value only through `anti_thyroglobulin`). Request `tacrolimus_level` (CPT
+  80197) and `thyroglobulin` (CPT 84432) with library normals and the `tool_io.py` mirror.
 
 ## Schema
 - Demographics lack `weight_kg` and `height_cm` (GBS respiratory mL/kg thresholds, BACT-MEN-RS04

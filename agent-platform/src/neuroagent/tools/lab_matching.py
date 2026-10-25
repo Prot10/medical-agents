@@ -26,6 +26,7 @@ spellings (`Hb`, `haemoglobin`), and multi-word names that would otherwise colli
 from __future__ import annotations
 
 import re
+from functools import lru_cache
 from typing import Callable, Iterable
 
 from .vocabulary import analyte_class_members, normalize_analyte
@@ -35,6 +36,8 @@ _PHRASES: tuple[tuple[str, str], ...] = (
     (r"haem", "hem"), (r"\burinary\b", "urine"), (r"\b24[- ]?(?:hours?|hr|h)\b", "24h"), (r"oestr", "estr"), (r"leucocyt", "leukocyt"),
     (r"lactate dehydrogenase", "ldh"), (r"creatine (?:phospho)?kinase", "ck"), (r"\bcpk\b", "ck"),
     (r"c[- ]reactive protein", "crp"), (r"(?:erythrocyte )?sedimentation rate|\bsed rate", "esr"),
+    # The urine dipstick's leukocyte esterase is not the white cell count (25 Oct 2026).
+    (r"\bleukocyte esterase\b", "leukesterase"),
     (r"white (?:blood )?cells?(?: count)?|\bwbc count|\bleukocytes?\b", "wbc"),
     (r"red (?:blood )?cells?(?: count)?", "rbc"),
     (r"alkaline phosphatase", "alp"), (r"thyroid[- ]stimulating hormone|thyrotropin", "tsh"),
@@ -108,6 +111,11 @@ _NAME_ALIASES: dict[str, tuple[frozenset[str], ...]] = {
 
 
 def tokens(text: str) -> frozenset[str]:
+    return _tokens(str(text))
+
+
+@lru_cache(maxsize=65536)
+def _tokens(text: str) -> frozenset[str]:
     lowered = str(text).lower().replace("_", " ")
     for pattern, replacement in _PHRASES:
         lowered = re.sub(pattern, replacement, lowered)
@@ -217,3 +225,261 @@ def mentions(text: str, test: str) -> bool:
 
 def split_sentences(text: str) -> list[str]:
     return [part for part in re.split(r"(?<=[.;])\s+", text.strip()) if part]
+
+
+# --------------------------------------------------------------------------- prose of a cut payload
+#
+# 25 Oct 2026. The interpretation of a stored payload was filtered by sentence: a sentence naming a
+# kept test was kept whole. Most interpretations are one list sentence ("Abnormal values: WBC 11.8
+# (H), sodium 134 (L), CRP 45 (H), lactate 4.1 (H)."), so an order for the blood count read out
+# the CRP and lactate of panels it never named (SE M02-M07, P03, S01, S07, S09; 262 criterion
+# orders across the dataset). A sentence that names tests of both kept and dropped panels is now
+# cut by list item: the items separated by commas, semicolons or "and" at the top level (never
+# inside parentheses). An item naming only dropped tests goes; an item naming a kept test, or no
+# test at all (a closing remark), stays. Findings and panel summaries count as naming their tests
+# ("thrombocytopenia" the platelets, "renal function" the creatinine: `_IMPLIED`). A shared head ("Abnormal
+# values:", "Elevated ...") moves to the first item kept, a shared tail ("... within reference
+# ranges") to the last, and the final "and" is restored, so the sentence still reads as written.
+# An item that still names both is cut once more at "with", then inside its parentheses. A head
+# naming a specimen ("Urinalysis: ...") scopes its items to that specimen, and goes with them when
+# the order kept no row of it.
+
+TestRef = tuple[str, str]  # (row test, panel name)
+
+_HEAD = re.compile(
+    r"^(?:[^:\d()]{1,40}:\s+|(?:(?:mildly|markedly|slightly)\s+)?"
+    r"(?:elevated|raised|high|low|abnormal|increased|decreased|reduced)\s+(?=\S))",
+    re.IGNORECASE,
+)
+_TAIL = re.compile(
+    r"\s+((?:(?:are|were|is|was|all|both|otherwise)\s+)?(?:(?:mildly|markedly|slightly|all)\s+)?"
+    r"(?:within|elevated|raised|normal|negative|positive|unremarkable|not detected|in range|low|high)\b[^()]*)$",
+    re.IGNORECASE,
+)
+_SEPARATOR = re.compile(r",\s+and\s+|;\s+|,\s+|\s+and\s+")
+_WITH = re.compile(r"\s+with\s+")
+_AND = re.compile(r"(?:,\s+)?and\s+|\s+and\s+")
+_SPECIMEN_WORDS = frozenset().union(*_SPECIMENS.values())
+_QUALIFIERS = frozenset({"complement", "measured", "intact"})
+
+# Findings and panel summaries that name a result without naming its test: "pyuria" is the urine
+# white cells, "thrombocytopenia" the platelets, "renal function" the creatinine. Read in prose
+# only (never in panel matching), so "Proteinuria 2+ with microscopic hematuria" goes with the
+# urinalysis an order did not name.
+_IMPLIED: tuple[tuple[re.Pattern, str], ...] = tuple((re.compile(pattern, re.IGNORECASE), words) for pattern, words in (
+    (r"\bproteinuria\b", "urine protein"), (r"\bha?ematuria\b", "urine rbc"), (r"\bpyuria\b", "urine wbc"),
+    (r"\bleu[ck]ocyto(?:sis|penia)\b|\bneutrophilia\b|\bneutropenia\b", "wbc neutrophils"),
+    (r"\blympho(?:penia|cytosis)\b", "lymphocytes"), (r"\bbanda?emia\b", "bands"),
+    (r"\bana?emi(?:a|c)\b", "hemoglobin"), (r"\bthrombocyto(?:penia|sis)\b", "platelets"),
+    (r"\bhyp(?:er|o)glyc(?:a)?emi(?:a|c)\b", "glucose"), (r"\bhyp(?:er|o)natr(?:a)?emi(?:a|c)\b", "sodium"),
+    (r"\bhyp(?:er|o)kal(?:a)?emi(?:a|c)\b", "potassium"), (r"\bhyp(?:er|o)magnes(?:a)?emi(?:a|c)\b", "magnesium"),
+    (r"\bhyp(?:er|o)calc(?:a)?emi(?:a|c)\b", "calcium"), (r"\bhyp(?:er|o)phosphat(?:a)?emi(?:a|c)\b", "phosphate"),
+    (r"\bhyperammon(?:a)?emi(?:a|c)\b", "ammonia"), (r"\bhyperlactat(?:a)?emia\b|\blactic acidosis\b", "lactate"),
+    (r"\bhypoalbumin(?:a)?emia\b", "albumin"), (r"\bhyperbilirubin(?:a)?emia\b", "bilirubin"),
+    (r"\brenal (?:function|indices|tests)\b", "creatinine bun"),
+    (r"\b(?:hepatic|liver) (?:function|tests|enzymes|indices|panel)\b|\btransaminases\b", "alt ast"),
+    (r"\bthyroid function\b", "tsh"), (r"\binflammatory markers\b", "crp esr"),
+    (r"\belectrolytes\b", "sodium potassium"), (r"\bcoagulation\b|\bclotting\b", "inr pt"),
+    (r"\bblood count\b|\bcbc\b|\bfbc\b", "wbc hemoglobin platelets"),
+    (r"\bmetabolic panel\b|\bbmp\b|\bcmp\b", "sodium creatinine glucose"),
+    (r"\blipids?\b|\blipid (?:panel|profile)\b", "ldl"),
+)
+)
+
+
+# "renal and hepatic function": two adjectives sharing one noun are one list item.
+_ORGAN = r"(renal|kidney|hepatic|liver|thyroid|cardiac|pancreatic|adrenal|muscle|bone)"
+_SHARED_NOUN = re.compile(
+    rf"{_ORGAN} and {_ORGAN} (function|functions|indices|tests|panels?|enzymes|markers)\b", re.IGNORECASE)
+
+
+def _merge_shared_nouns(items: list[tuple[str, str]]) -> list[tuple[str, str]]:
+    merged: list[tuple[str, str]] = []
+    for sep, item in items:
+        if (merged and _AND.fullmatch(sep) and re.fullmatch(r"[A-Za-z]+", merged[-1][1].strip())
+                and _SHARED_NOUN.match(f"{merged[-1][1].strip()} and {item.strip()}")):
+            merged[-1] = (merged[-1][0], f"{merged[-1][1]}{sep}{item}")
+            continue
+        merged.append((sep, item))
+    return merged
+
+
+def _implied(text: str) -> str:
+    text = _SHARED_NOUN.sub(lambda m: f"{m[1]} {m[3]} and {m[2]} {m[3]}", text)
+    extra = [words for pattern, words in _IMPLIED if pattern.search(text)]
+    return f"{text} {' '.join(extra)}" if extra else text
+
+
+def _split_top(text: str, pattern: re.Pattern) -> list[tuple[str, str]]:
+    """`[(separator, item), ...]` at parenthesis depth 0; the first separator is ``""``."""
+    out: list[tuple[str, str]] = []
+    depth, start, sep, i = 0, 0, "", 0
+    while i < len(text):
+        ch = text[i]
+        if ch in "([":
+            depth += 1
+        elif ch in ")]":
+            depth = max(0, depth - 1)
+        elif depth == 0 and i > start:
+            match = pattern.match(text, i)
+            if match and match.end() > match.start():
+                out.append((sep, text[start:i]))
+                sep, start, i = match.group(0), match.end(), match.end()
+                continue
+        i += 1
+    out.append((sep, text[start:]))
+    return [(s, item) for s, item in out if item.strip()] or [("", text)]
+
+
+def _capitalise(text: str) -> str:
+    first = re.match(r"[^\s,;:()]+", text)
+    word = first.group(0) if first else ""
+    return text[0].upper() + text[1:] if word.isalpha() and word.islower() else text
+
+
+class _ProseCut:
+    """Cuts the prose of one payload to the rows an order kept (see the block comment)."""
+
+    def __init__(self, kept: list[TestRef], dropped: list[TestRef]):
+        self.kept, self.dropped = list(kept), list(dropped)
+        # Analytes measured in blood somewhere in the payload: an item naming no specimen ("sodium
+        # 122") means the blood test, never the urine sodium; one with no blood namesake ("nitrite
+        # positive") names the urine row by its analyte alone.
+        self.blood = [tokens(t) for t, p in self.kept + self.dropped if not row_specimens(t, p)]
+
+    def _analyte(self, test: str, panel: str) -> frozenset[str]:
+        """The tokens prose uses for a row: its name without a parenthetical or a qualifier
+        ("C3" for `Complement C3`, "prolactin" for `Prolactin (emergency department sample ...)`),
+        and without its specimen word when no blood row shares the analyte."""
+        full = tokens(test)
+        core = tokens(re.sub(r"\([^()]*\)", " ", str(test))) - _QUALIFIERS or full
+        if not row_specimens(test, panel):
+            return core
+        bare = core - _SPECIMEN_WORDS
+        if not bare or any(_covers(blood, bare) for blood in self.blood):
+            return full
+        return bare
+
+    def names(self, text: str, refs: list[TestRef], context: str = "") -> bool:
+        """Does the text name one of these row tests, in the same specimen?
+
+        Read item by item (and either side of "with"): an item that names a specimen (`urine osmolality 420`) names only that
+        specimen's rows, so the serum osmolality of a kept panel does not make it a kept item, and
+        "urinalysis" at the end of a list does not hide the serum tests before it. A specimen named
+        in `context` (the list's head) holds for every item that names none. A text naming no
+        specimen is also read whole, for a row test whose name spans several items ("Prolactin
+        (sample 3 months ago, drawn 22 minutes after ...)").
+        """
+        outer = _specimens_named(context)
+        parts = [part for _, item in _merge_shared_nouns(_split_top(text, _SEPARATOR))
+                 for _, part in _split_top(item, _WITH)]
+        for item in parts:
+            item = _implied(item)
+            named = _specimens_named(item) or outer
+            found = tokens(item)
+            for test, panel in refs:
+                where = row_specimens(test, panel)
+                if named and where != named:
+                    continue
+                if _covers(found, tokens(test)) or _covers(found, self._analyte(test, panel)):
+                    return True
+        if not (_specimens_named(text) or outer):
+            return any(mentions(text, test) for test, _ in refs)
+        return False
+
+    def only_dropped(self, text: str, context: str = "") -> bool:
+        return self.names(text, self.dropped, context) and not self.names(text, self.kept, context)
+
+    def mixed(self, item: str, context: str) -> str:
+        """One list item naming kept and dropped tests: cut at "with", then inside parentheses."""
+        shared = _SHARED_NOUN.fullmatch(item)
+        if shared:  # "renal and hepatic function": keep the halves the order kept
+            first, second, noun = shared.groups()
+            halves = [word for word in (first, second) if not self.only_dropped(f"{word} {noun}", context)]
+            return " and ".join(halves) + f" {noun}" if halves else ""
+        parts = _split_top(item, _WITH)
+        if len(parts) >= 2:
+            parts = [(sep, part) for sep, part in parts if not self.only_dropped(part, context)]
+            if not parts:
+                return ""
+            item = parts[0][1] + "".join(sep + part for sep, part in parts[1:])
+        if not self.names(item, self.dropped, context):
+            return item
+
+        def inside(match: re.Match) -> str:
+            cut = self.items(match.group(1), context)
+            return f" ({cut})" if cut else ""
+
+        return re.sub(r"\s*\(([^()]*,[^()]*)\)", inside, item)
+
+    def items(self, body: str, context: str = "") -> str:
+        """The list items of `body` that do not name only dropped tests."""
+        head = ""
+        match = _HEAD.match(body)
+        if match:
+            head, body = match.group(0), body[match.end():]
+            if ":" not in head and len(_split_top(body, _SEPARATOR)) < 2:
+                head, body = "", head + body  # one item: "Low bicarbonate (20) with raised lactate (2.8)"
+        context = f"{context} {head}".strip()
+        specimen = _specimens_named(head)
+        head_dropped = bool(head) and (self.only_dropped(head) or bool(specimen) and not any(
+            row_specimens(t, p) == specimen for t, p in self.kept))
+        items = _merge_shared_nouns(_split_top(body, _SEPARATOR))
+        tail = ""
+        # A tail is shared by a list joined with a final "and", or by a list of names without values
+        # ("Electrolytes, renal and hepatic function, TSH normal"); otherwise it is its own item's.
+        last = _TAIL.search(items[-1][1]) if len(items) >= 2 else None
+        if last and (_AND.fullmatch(items[-1][0]) or not re.search(r"\d", body[: -len(last.group(0))])):
+            tail = last.group(0)
+            items[-1] = (items[-1][0], items[-1][1][: last.start()])
+        keep: list[tuple[str, str]] = []
+        changed = False
+        for sep, item in items:
+            has_kept = self.names(item, self.kept, context)
+            has_dropped = self.names(item, self.dropped, context)
+            if (has_dropped or head_dropped) and not has_kept:
+                changed = True
+                continue
+            if has_dropped:
+                cut = self.mixed(item, context)
+                changed = changed or cut != item
+                if not cut:
+                    continue
+                item = cut
+            keep.append((sep, item))
+        if not keep:
+            return ""
+        if not changed:
+            return head + body
+        if ((_AND.fullmatch(items[-1][0]) or _SHARED_NOUN.match(items[-1][1].strip())) and len(keep) >= 2 and keep[-1][1] != items[-1][1]
+                and not _AND.fullmatch(keep[-1][0]) and " and " not in keep[-1][1]):
+            keep[-1] = (" and ", keep[-1][1])  # the last item went: the new last one takes the "and"
+        if len(keep) == 1 and " and " not in keep[0][1]:
+            tail = re.sub(r"^(\s+)are\b", r"\1is", tail)  # "Troponin and TSH are normal" -> "TSH is normal"
+        if len(keep) == 2 and re.fullmatch(r",\s+and\s+", keep[1][0]):
+            keep[1] = (" and ", keep[1][1])  # two items left: no serial comma
+        return head + keep[0][1] + "".join(sep + item for sep, item in keep[1:]) + tail
+
+
+def cut_prose(text: str, kept: list[TestRef], dropped: list[TestRef]) -> str:
+    """One sentence (or summary line) of a stored payload, cut to the tests the order kept.
+
+    Unchanged when it names no dropped test; ``""`` when it names dropped tests and no kept one;
+    otherwise cut by list item (see the block comment above).
+    """
+    cutter = _ProseCut(kept, dropped)
+    stripped = text.rstrip()
+    end = stripped[-1] if stripped and stripped[-1] in ".;" else ""
+    body = stripped[:-1] if end else stripped
+    if not cutter.names(body, cutter.dropped) and not _HEAD.match(body):
+        return text
+    if cutter.only_dropped(body):
+        return ""
+    cut = cutter.items(body).strip()
+    if cut == body.strip():
+        return text
+    if not cut:
+        return ""
+    if body[:1].isupper():
+        cut = _capitalise(cut)
+    return cut + end

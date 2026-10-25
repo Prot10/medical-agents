@@ -85,3 +85,13 @@ Discriminator fixes. The MockServer now routes stored reports by their discrimin
 - `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
 
 Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.
+
+## Lab evidence, normal results (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited normal results its own order (the first alternative) did not return; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-4-interpret-labs]`.alternatives: was [CBC, CMP, TSH, anti_TPO, HIV, NMDAR_IgG_cell_based, paraneoplastic_panel, autoimmune_encephalitis_panel] | [CBC, CMP, thyroid, anti_TPO, HIV, NMDAR_IgG_cell_based, paraneoplastic_panel, autoimmune_encephalitis_panel]; now [CBC, CMP, TSH, anti_TPO, HIV, NMDAR_IgG_cell_based, paraneoplastic_panel, autoimmune_encephalitis_panel, ammonia] | [CBC, CMP, TSH, anti_TPO, HIV, NMDAR_IgG_cell_based, paraneoplastic_panel, autoimmune_encephalitis_panel] | [CBC, CMP, thyroid, anti_TPO, HIV, NMDAR_IgG_cell_based, paraneoplastic_panel, autoimmune_encephalitis_panel].
+- Decision: serve: new first alternative (old order kept as an alternative). The rationale names ammonia among the metabolic causes and the toxic-metabolic differential reads it; the order did not return it.
+- Scoring: coverage unchanged (any call matching the old order still matches); the cost reference of the required work-up now uses the new first order.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the normal-row probe reports nothing for this criterion.

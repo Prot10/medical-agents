@@ -65,3 +65,13 @@ Condition close-out (`plans/FEPI-TEMP-decisions.md`). What changed and why:
 
 - Synonyms: the generic G04.81 labels (autoimmune encephalitis, antibody mediated encephalitis, autoimmune limbic encephalitis) and codes G04.8, G04.90 removed (P02 added to the entry's `except_cases`): their tokens occur in "anti-NMDA receptor autoimmune encephalitis" and "GAD65 autoimmune limbic encephalitis", alternatives this case excludes. New `G04.81+lgi1` entry: LGI1 encephalitis, anti-LGI1 encephalitis, LGI1 antibody encephalitis, LGI1 limbic encephalitis, leucine rich glioma inactivated 1 encephalitis.
 - Checks: `perfect_agent.py -v` and `case_io.py check` clean; `test_case_guards.py -k FEPI-TEMP-` passes, now with the discriminator guard and the FEPI-TEMP banned strings.
+
+## Lab evidence, normal results (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited normal results its own order (the first alternative) did not return; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-9-interpret-labs]`.expected_evidence: was "Serum LGI1 IgG positive by cell-based assay (titer 1:320) with other neuronal antibodies negative; sodium 126 mEq/L; carbamazepine 8.2 mcg/mL."; now "Serum LGI1 IgG positive by cell-based assay (titer 1:320) with other neuronal antibodies negative; sodium 126 mEq/L.".
+- Decision: trim evidence. The carbamazepine level is not part of the antibody and sodium order and no other field relies on it; the AED-level panel stays servable to an agent that orders it.
+- Scoring: none (evidence only; the reward does not read it).
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the normal-row probe reports nothing for this criterion.

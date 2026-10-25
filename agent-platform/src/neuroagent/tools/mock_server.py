@@ -9,7 +9,7 @@ from .base import ToolCall, ToolResult
 from .fallback_library import FallbackLibrary, default_library
 from .followup_matcher import match_followup, resolve_followup
 from .lab_matching import (
-    LabMatcher, like as lab_like, mentions, specimen_compatible, split_sentences, tokens as lab_tokens,
+    LabMatcher, cut_prose, like as lab_like, specimen_compatible, split_sentences, tokens as lab_tokens,
 )
 from .vocabulary import (
     DOMAIN_PACKS,
@@ -767,20 +767,18 @@ class MockServer:
                 if any(self._lab_answers(name, rows, assay) for assay in requested)}
         if kept.keys() == payload.panels.keys():
             return payload
-        dropped = [row.test for name, rows in payload.panels.items() if name not in kept for row in rows]
-        dropped += [name for name in payload.panels if name not in kept and len(lab_tokens(name)) >= 2]
-        kept_tests = [row.test for rows in kept.values() for row in rows]
-
-        def keep(text: str) -> bool:
-            return any(mentions(text, test) for test in kept_tests) or not any(
-                mentions(text, test) for test in dropped
-            )
-
-        interpretation = " ".join(s for s in split_sentences(payload.interpretation) if keep(s))
+        dropped = [(row.test, name) for name, rows in payload.panels.items() if name not in kept for row in rows]
+        dropped += [(name, name) for name in payload.panels if name not in kept and len(lab_tokens(name)) >= 2]
+        kept_tests = [(row.test, name) for name, rows in kept.items() for row in rows]
+        # By list item, not by sentence: a one-sentence "Abnormal values: ..." list naming a kept
+        # test would otherwise read out every dropped value with it (`lab_matching.cut_prose`).
+        cut = [cut_prose(s, kept_tests, dropped) for s in split_sentences(payload.interpretation)]
+        interpretation = " ".join(s for s in cut if s)
+        summary = [cut_prose(line, kept_tests, dropped) for line in payload.abnormal_values_summary]
         return LabResults(
             panels=kept,
             interpretation=interpretation or "Results of the requested assays are listed.",
-            abnormal_values_summary=[line for line in payload.abnormal_values_summary if keep(line)],
+            abnormal_values_summary=[line for line in summary if line],
         )
 
     def _lab_order_from(self, parameters: dict[str, Any], payload: Any, pathway: bool) -> Any | None:

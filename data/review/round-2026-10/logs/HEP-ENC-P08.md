@@ -84,3 +84,14 @@ Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym g
 Review-process wording (references to the round's rulings, the round policy file, the criteria packs, and tier markers such as "(optional)" in criterion labels and rationales) is shown to physicians in the review app, so it was rewritten in clinical language. The tier stays in the criterion's `importance` field; scoring is unchanged. `test_case_guards.py::test_no_review_process_text` now fails on any of it.
 
 - criterion `action-8-order-microbiology` rationale: "Optional: afebrile, white cell count 5.6 with a normal differential, lactate 1.4, a clean urinalysis and an obvious precipitant (constipation after a large protein load)." -> "Afebrile, white cell count 5.6 with a normal differential, lactate 1.4, a clean urinalysis and an obvious precipitant (constipation after a large protein load)."
+
+## Lab evidence, normal results (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited normal results its own order (the first alternative) did not return; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-1-interpret-labs]`.alternatives: was [CBC, CMP, coagulation, ammonia] | [CBC, BMP, LFTs, coagulation, ammonia]; now [CBC, CMP, coagulation, ammonia, CRP, tox_screen] | [CBC, CMP, coagulation, ammonia] | [CBC, BMP, LFTs, coagulation, ammonia].
+- `ground_truth.action_criteria[action-1-interpret-labs]`.expected_evidence: was "Bilirubin 1.1 mg/dL, albumin 3.8 g/dL, INR 1.1, creatinine 1.0 mg/dL, sodium 139 (Child-Pugh A, MELD-Na 8); platelets 122 x10^9/L; glucose, electrolytes, CRP, TSH and ethanol normal; ammonia 118 µmol/L, consistent with HE but not a measure of its grade."; now "Bilirubin 1.1 mg/dL, albumin 3.8 g/dL, INR 1.1, creatinine 1.0 mg/dL, sodium 139 (Child-Pugh A, MELD-Na 8); platelets 122 x10^9/L; glucose, electrolytes, CRP and ethanol normal; ammonia 118 µmol/L, consistent with HE but not a measure of its grade.".
+- Decision: serve: new first alternative (old order kept as an alternative) + trim evidence. The label names CRP with the core bloods (infection is the precipitant to exclude) and the evidence reads it; CBC, CMP, coagulation and ammonia did not return the inflammatory panel. The label adds toxicology where alcohol is in question (serum ethanol). The normal TSH is not part of this order and is trimmed.
+- Scoring: coverage unchanged (any call matching the old order still matches); the cost reference of the required work-up now uses the new first order.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the normal-row probe reports nothing for this criterion.

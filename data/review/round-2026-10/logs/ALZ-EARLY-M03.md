@@ -72,3 +72,13 @@ Discriminator fixes. The MockServer now routes stored reports by their discrimin
 - `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
 
 Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.
+
+## Lab evidence, normal results (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited normal results its own order (the first alternative) did not return; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-10-interpret-labs-mma]`.expected_evidence: was "Methylmalonic acid 0.26 umol/L, normal: no functional B12 deficiency"; now "Methylmalonic acid 0.26 umol/L, normal: no functional deficiency".
+- Decision: reword evidence (cited result comes from another criterion's order). The criterion is the MMA order: the B12 level comes from the dementia screen order, so the evidence now reads only the MMA result and what it means.
+- Scoring: none (evidence only; the reward does not read it).
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the normal-row probe reports nothing for this criterion.

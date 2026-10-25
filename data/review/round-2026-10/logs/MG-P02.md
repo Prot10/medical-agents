@@ -83,3 +83,13 @@ Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym g
 Review-process wording (references to the round's rulings, the round policy file, the criteria packs, and tier markers such as "(optional)" in criterion labels and rationales) is shown to physicians in the review app, so it was rewritten in clinical language. The tier stays in the criterion's `importance` field; scoring is unchanged. `test_case_guards.py::test_no_review_process_text` now fails on any of it.
 
 - criterion `action-6-search-medical-literature` label: "Literature on LEMS (optional)" -> "Literature on LEMS"
+
+## Lab evidence, normal results (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited normal results its own order (the first alternative) did not return; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-1-interpret-labs]`.alternatives: was [anti_VGCC_PQ, anti_SOX1]; now [anti_VGCC_PQ, anti_SOX1, anti_AChR, anti_MuSK] | [anti_VGCC_PQ, anti_SOX1].
+- Decision: serve: new first alternative (old order kept as an alternative). The differential and a red herring read the negative AChR and MuSK antibodies (LEMS against seronegative MG); the VGCC and SOX1 order did not return them.
+- Scoring: coverage unchanged (any call matching the old order still matches); the cost reference of the required work-up now uses the new first order.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the normal-row probe reports nothing for this criterion.

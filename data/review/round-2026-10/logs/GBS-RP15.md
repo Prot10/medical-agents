@@ -84,3 +84,13 @@ Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym g
 Review-process wording (references to the round's rulings, the round policy file, the criteria packs, and tier markers such as "(optional)" in criterion labels and rationales) is shown to physicians in the review app, so it was rewritten in clinical language. The tier stays in the criterion's `importance` field; scoring is unchanged. `test_case_guards.py::test_no_review_process_text` now fails on any of it.
 
 - criterion `action-6-check-drug-interactions` rationale: "A nephrotoxic calcineurin inhibitor with IVIg, a renally dosed antiviral and immunosuppressant handling during plasma exchange change how treatment is given (ROUND_POLICY ruling 6)." -> "A nephrotoxic calcineurin inhibitor with IVIg, a renally dosed antiviral and immunosuppressant handling during plasma exchange change how treatment is given."
+
+## Lab evidence, normal results (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited normal results its own order (the first alternative) did not return; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-1-interpret-labs]`.expected_evidence: was "Creatinine 1.4 mg/dL (renal impairment that shapes IVIg and valganciclovir dosing) and magnesium 1.6 mg/dL; normal potassium, liver tests, albumin and CK; tacrolimus trough within target"; now "Creatinine 1.4 mg/dL (renal impairment that shapes IVIg and valganciclovir dosing) and magnesium 1.6 mg/dL; normal potassium, liver tests, albumin and CK".
+- Decision: trim evidence. No vocabulary term orders a tacrolimus level (CENTRAL), and the differential reads the history of troughs, not this result; the drug-level panel stays stored.
+- Scoring: none (evidence only; the reward does not read it).
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the normal-row probe reports nothing for this criterion.

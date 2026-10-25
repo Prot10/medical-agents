@@ -91,3 +91,13 @@ Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym g
 Review-process wording (references to the round's rulings, the round policy file, the criteria packs, and tier markers such as "(optional)" in criterion labels and rationales) is shown to physicians in the review app, so it was rewritten in clinical language. The tier stays in the criterion's `importance` field; scoring is unchanged. `test_case_guards.py::test_no_review_process_text` now fails on any of it.
 
 - criterion `action-check-drug-interactions` rationale: "Optional: no interaction changes the diagnostic plan." -> "No interaction changes the diagnostic plan."
+
+## Lab evidence, normal results (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited normal results its own order (the first alternative) did not return; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-2-interpret-labs]`.alternatives: was [CBC, BMP, coagulation, type_and_screen]; now [CBC, BMP, coagulation, type_and_screen, anti_thyroglobulin] | [CBC, BMP, coagulation, type_and_screen].
+- Decision: serve: new first alternative (old order kept as an alternative). A must, the differential, the key evidence and a red herring read the stable thyroglobulin with negative antibodies (prior thyroid carcinoma against a metastasis); no term orders thyroglobulin itself (CENTRAL), and anti_thyroglobulin returns the tumour-marker panel that holds both rows.
+- Scoring: coverage unchanged (any call matching the old order still matches); the cost reference of the required work-up now uses the new first order.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the normal-row probe reports nothing for this criterion.

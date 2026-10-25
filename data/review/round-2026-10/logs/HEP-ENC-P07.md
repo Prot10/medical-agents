@@ -81,3 +81,13 @@ Review-process wording (references to the round's rulings, the round policy file
 - criterion `action-8-order-microbiology` rationale: "Optional: a 6-week covert cognitive change in an afebrile outpatient with a normal white cell count and CRP and no source; the infection screen belongs to overt episodes." -> "A 6-week covert cognitive change in an afebrile outpatient with a normal white cell count and CRP and no source; the infection screen belongs to overt episodes."
 - criterion `action-9-order-microbiology` rationale: "Optional: a 6-week covert cognitive change in an afebrile outpatient with a normal white cell count and CRP and no source; the infection screen belongs to overt episodes." -> "A 6-week covert cognitive change in an afebrile outpatient with a normal white cell count and CRP and no source; the infection screen belongs to overt episodes."
 - criterion `action-2-order-ct-scan` rationale: "Optional: no focal deficit, seizure or head trauma; a structural cause of a 6-week cognitive change is unlikely, but imaging is reasonable before attributing it to covert HE." -> "No focal deficit, seizure or head trauma; a structural cause of a 6-week cognitive change is unlikely, but imaging is reasonable before attributing it to covert HE."
+
+## Lab evidence, normal results (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited normal results its own order (the first alternative) did not return; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-1-interpret-labs]`.alternatives: was [CBC, CMP, coagulation, ammonia] | [CBC, BMP, LFTs, coagulation, ammonia]; now [CBC, CMP, coagulation, ammonia, CRP, TSH, B12, folate, tox_screen] | [CBC, CMP, coagulation, ammonia] | [CBC, BMP, LFTs, coagulation, ammonia].
+- Decision: serve: new first alternative (old order kept as an alternative). The label names CRP with the core bloods (infection is the precipitant to exclude) and the evidence reads it; CBC, CMP, coagulation and ammonia did not return the inflammatory panel. The rationale excludes endocrine, nutritional and toxic causes, so TSH, B12, folate and toxicology belong in the order.
+- Scoring: coverage unchanged (any call matching the old order still matches); the cost reference of the required work-up now uses the new first order.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the normal-row probe reports nothing for this criterion.
