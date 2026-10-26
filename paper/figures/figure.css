@@ -1,0 +1,90 @@
+/* Shared style for the paper figures. Sizes are physical: the page is the printed figure
+   (180 mm = Nature double column), text in pt (5–7 pt, panel letters 8 pt bold). */
+
+:root {
+  --ink: #2F2F2F;
+  --ink2: #48484e;
+  --dim: #85858c;
+  --rule: #d6d6dc;
+  --grey: #f3f3f6;
+  --grey2: #e6e6ea;
+
+  /* CERN palette (CERN.potx theme): blue 0033A0, cyan 61C4D3, orange E15E32, grey BEBECB,
+     purple 6E2466, navy 1C446A. Roles: blue agent/model, cyan environment/required/correct,
+     navy policy/physicians, orange harm/violation, purple training. */
+  --blue: #0033A0;   --blue-l: #e6ebf5;   --blue-m: #b3c2e3;   --blue-t: #0033A0;
+  --cyan: #2a9fb0;   --cyan-l: #e3f4f7;   --cyan-m: #b0e1e9;   --cyan-t: #17717f;
+  --navy: #1C446A;   --navy-l: #e5eaf0;   --navy-m: #b9c6d4;   --navy-t: #1C446A;
+  --orange: #E15E32; --orange-l: #fce8e0; --orange-m: #f4bba6; --orange-t: #c0441b;
+  --purple: #6E2466; --purple-l: #f2e8f1; --purple-m: #d8bcd5; --purple-t: #6E2466;
+  --lilac: #BEBECB;
+
+  --sans: Arial, "Helvetica Neue", Helvetica, sans-serif;
+  --mono: "SF Mono", Menlo, Consolas, monospace;
+}
+
+@page { margin: 0; }
+/* One figure, one PDF page: without this Chrome moves an unbreakable grid that ends near the page
+   edge onto a second page, leaving its panel empty on the first. */
+@media print { html, body { height: 100%; overflow: hidden; } .figure, .panel { break-inside: avoid; } }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: #fff; }
+body {
+  font-family: var(--sans);
+  font-size: 6.5pt;
+  line-height: 1.25;
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.figure { width: 180mm; position: relative; overflow: hidden; padding: 0.2mm; }
+
+/* panels */
+.panel { position: relative; }
+.ptitle { display: flex; align-items: baseline; gap: 1.8mm; margin-bottom: 2.4mm; }
+.ptitle b { font-size: 9pt; font-weight: 700; line-height: 1; }
+.ptitle span { font-size: 7pt; color: var(--ink); font-weight: 600; }
+
+/* Panels are rounded boxes; data-style on .figure picks the treatment (?style= in the URL, default tint):
+   border = white box with a hairline border; tint = a faint background in the panel's role colour
+   (data-tone) with neutral cards turned white; dots = white boxes on a dotted figure background. */
+.figure { row-gap: 2.5mm; }
+.row { column-gap: 2.5mm; }
+.panel { border-radius: 2.6mm; padding: 2.2mm 2mm 2mm; display: flex; flex-direction: column; min-width: 0; }
+.figure[data-style="border"] .panel { border: 0.3mm solid #d9d9df; }
+.figure[data-style="tint"] .panel { --grey: #fff; }
+.figure[data-style="tint"] .panel[data-tone="grey"]   { background: #f6f6f8; }
+.figure[data-style="tint"] .panel[data-tone="blue"]   { background: #f4f6fb; }
+.figure[data-style="tint"] .panel[data-tone="cyan"]   { background: #f1f9fa; }
+.figure[data-style="tint"] .panel[data-tone="navy"]   { background: #f3f5f8; }
+.figure[data-style="tint"] .panel[data-tone="purple"] { background: #f8f3f7; }
+.figure[data-style="dots"] {
+  background-color: #fff;
+  background-image: radial-gradient(circle, #c9c9d2 0.17mm, transparent 0.21mm);
+  background-size: 1.4mm 1.4mm;
+}
+.figure[data-style="dots"] .panel { background: #fff; border: 0.3mm solid #dcdce2; }
+
+/* generic pieces */
+.box { border-radius: 1.6mm; }
+.dash { border: 0.25mm dashed #a9a9b0; border-radius: 2mm; }
+.tag {
+  display: inline-flex; align-items: center; gap: 0.7mm;
+  padding: 0.35mm 1.3mm; border-radius: 4mm; font-size: 5.6pt; white-space: nowrap;
+}
+.mono { font-family: var(--mono); font-size: 5.4pt; letter-spacing: -0.01em; }
+.small { font-size: 5.6pt; }
+.dim { color: var(--dim); }
+.ink2 { color: var(--ink2); }
+.label { font-size: 5.4pt; color: var(--dim); letter-spacing: 0.02em; }
+.strong { font-weight: 600; }
+
+.ic { display: inline-flex; width: 3.4mm; height: 3.4mm; flex: none; }
+.ic svg { width: 100%; height: 100%; stroke-width: 1.7; }
+.ic.s { width: 2.6mm; height: 2.6mm; }
+.ic.l { width: 5mm; height: 5mm; }
+.ic.xl { width: 7mm; height: 7mm; }
+
+.arrow { position: absolute; overflow: visible; pointer-events: none; }
