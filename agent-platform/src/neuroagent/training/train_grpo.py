@@ -463,6 +463,9 @@ def build_trainer(
     save_steps: int = 5,
     prefix_sharing: bool = True,
     verify_packing: bool = False,
+    loss_type: str = "dapo",
+    num_iterations: int = 1,
+    lr_schedule: str = "constant_with_warmup",
 ):
     import torch
     from datasets import Dataset
@@ -479,7 +482,7 @@ def build_trainer(
         """TRL sizes the colocated engine for its own one-sequence-per-step generation; the rollout
         batches every live episode into one generate call, so the engine must admit all of them.
         The engine also gets the serving configuration that measured fastest (large prefill
-        chunks; Qwen's lossless MTP draft), and its weight sync is timed."""
+        chunks; `engine_kwargs` of the model registry), and its weight sync is timed."""
 
         def __init__(self, *args_, max_num_seqs=None, **kwargs):
             super().__init__(*args_, max_num_seqs=concurrent_episodes, **kwargs)
@@ -489,8 +492,10 @@ def build_trainer(
             # that is two copies of the model on a 40 GB card, which allocator fragmentation turned
             # into an out-of-memory at step 56 of the first long run. The policy sits on the CPU
             # from here until the rollouts are done (rollout_func moves it back).
+            # A card that holds both copies keeps the policy resident: the LoRA merge is far slower on the CPU.
             started = time.perf_counter()
-            self.model.to("cpu")
+            if torch.cuda.get_device_properties(0).total_memory < 60 * 1024**3:
+                self.model.to("cpu")
             gc.collect()
             torch.cuda.empty_cache()
             super().sync_weights()
@@ -559,6 +564,12 @@ def build_trainer(
             # TRL parks custom metrics in a pending buffer that is flushed at the next generation,
             # so anything logged after it (the training forward) would land one step late.
             self._metrics["train"][name].append(float(value))
+
+        def training_step(self, *args_, **kwargs):
+            started = time.perf_counter()
+            loss = super().training_step(*args_, **kwargs)
+            self._log_metric("train/training_step_seconds", time.perf_counter() - started)
+            return loss
 
         def compute_loss(self, model, inputs, return_outputs=False, num_items_in_batch=None):
             started = time.perf_counter()
@@ -870,7 +881,7 @@ def build_trainer(
         model_init_kwargs={"dtype": "bfloat16", "device_map": "cpu", **({"attn_implementation": ATTN_IMPLEMENTATION} if packable else {})},
         max_steps=max_steps,
         learning_rate=learning_rate,
-        lr_scheduler_type="constant_with_warmup",
+        lr_scheduler_type=lr_schedule,
         warmup_steps=min(5, max_steps),
         # A micro-batch is a packable slice of one group (Gemma, Granite; see pack_rows); Qwen's
         # recurrent layers cannot fork a prefix state, so it trains one row at a time.
@@ -886,13 +897,14 @@ def build_trainer(
         temperature=float(request.get("temperature", 1.0)),
         max_completion_length=max_completion_tokens,
         # Loss: token-level DAPO normalization, clip-higher, batch-level advantage scale, no KL,
-        # truncated episodes masked, vLLM importance-sampling correction.
-        loss_type="dapo",
+        # truncated episodes masked, vLLM importance-sampling correction. With num_iterations=1 the
+        # new/old ratio is exactly 1 at the only update, so clipping acts only from 2 upwards.
+        loss_type=loss_type,
         epsilon=0.2,
         epsilon_high=0.28,
         scale_rewards="batch",
         beta=0.0,
-        num_iterations=1,
+        num_iterations=num_iterations,
         mask_truncated_completions=False,  # handled per episode in the rollout (see env_mask)
         vllm_importance_sampling_correction=True,
         # Token-level truncated IS: a sequence-level ratio over ~1k action tokens underflows to 0
@@ -942,10 +954,14 @@ def main() -> None:
     selection = parser.add_mutually_exclusive_group(required=True)
     selection.add_argument("--split", choices=["train", "test"])
     selection.add_argument("--cases", nargs="+")
+    selection.add_argument("--cases-file", type=Path, help="whitespace-separated case ids, e.g. a condition-held-out training set")
     parser.add_argument("--max-steps", type=int, default=50)
     parser.add_argument("--num-generations", type=int, default=8)
     parser.add_argument("--cases-per-step", type=int, default=2)
     parser.add_argument("--learning-rate", type=float, default=1e-5)
+    parser.add_argument("--lr-schedule", choices=["constant_with_warmup", "cosine"], default="constant_with_warmup")
+    parser.add_argument("--loss-type", choices=["dapo", "grpo", "dr_grpo"], default="dapo")
+    parser.add_argument("--num-iterations", type=int, default=1, help="optimizer passes over each rollout batch; clipping acts only above 1")
     parser.add_argument("--max-turns", type=int, default=12)
     parser.add_argument("--max-cost-usd", type=float, default=15000.0)
     parser.add_argument("--max-completion-tokens", type=int, default=4096)
@@ -962,14 +978,15 @@ def main() -> None:
 
     dataset = DATASETS[DEFAULT_DATASET_VERSION]
     _, cases = load_dataset(dataset.path)
-    if args.cases:
-        train_cases = [cases[case_id] for case_id in args.cases]
+    if args.cases or args.cases_file:
+        ids = args.cases or args.cases_file.read_text().split()
+        train_cases = [cases[case_id] for case_id in ids]
     else:
         ids = (dataset.path / "splits" / f"{args.split}_cases.txt").read_text().split()
         train_cases = [cases[case_id] for case_id in ids]
     Path(args.output).mkdir(parents=True, exist_ok=True)
     weights.mkdir(parents=True, exist_ok=True)
-    Path(args.output, "run_config.json").write_text(json.dumps(vars(args), indent=2))
+    Path(args.output, "run_config.json").write_text(json.dumps(vars(args), indent=2, default=str))
     trainer, _ = build_trainer(
         model_key=args.model,
         cases=cases,
@@ -990,6 +1007,9 @@ def main() -> None:
         save_steps=args.save_steps,
         prefix_sharing=not args.no_prefix_sharing,
         verify_packing=args.verify_packing,
+        loss_type=args.loss_type,
+        num_iterations=args.num_iterations,
+        lr_schedule=args.lr_schedule,
     )
     resume = None
     if args.resume:

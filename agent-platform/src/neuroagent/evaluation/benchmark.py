@@ -192,6 +192,8 @@ def main(argv: list[str] | None = None) -> None:
     }
     (args.output / "summary.json").write_text(json.dumps(summary, indent=2))
     print(json.dumps({k: v for k, v in summary.items() if k not in {"profile", "by_condition"}}, indent=2))
+    if rows and all(row["failure_reason"] == "model_error" for row in rows):
+        raise SystemExit("every episode failed with a model error: is the model server up?")
 
 
 if __name__ == "__main__":

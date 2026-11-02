@@ -18,12 +18,20 @@ real prompt shape of ~8k input tokens, 128 output tokens):
 | Model | load (RAM-staged) | weights | KV cache | 1 stream | 8 concurrent | 16 concurrent |
 |---|---:|---:|---:|---:|---:|---:|
 | Qwen3.5-9B | 137 s | 16.8 GiB | 489k tokens | 60 tok/s, TPOT 14 ms | 365 tok/s | 448 tok/s |
-| Qwen3.5-9B + MTP spec. decoding (default) | 137 s | 17.3 GiB | 425k tokens | 80 tok/s, TPOT 8.5 ms | 417 tok/s | 502 tok/s |
+| Qwen3.5-9B + MTP spec. decoding | 137 s | 17.3 GiB | 425k tokens | 80 tok/s, TPOT 8.5 ms | 417 tok/s | 502 tok/s |
 | Gemma 4 E4B | 3 s | 14.3 GiB | 854k tokens | 73 tok/s, TPOT 12 ms | 427 tok/s | 786 tok/s |
 | Granite 4.1 8B | 3 s | 15.7 GiB | 124k tokens | 56 tok/s, TPOT 16 ms | 317 tok/s | 574 tok/s |
 
 SGLang 0.5.9 was measured on the same Qwen3.5-9B workload and was slower at every concurrency
 (44 vs 60 tok/s single-stream, 277 vs 448 tok/s at 16), so vLLM is the engine.
+
+Since 2 Nov 2026 the stack is vLLM 0.32 and Qwen3.5-9B runs with prefix cache on and MTP off. On
+0.23 the pair moved its log-probabilities past the batching noise floor (|Δlogp| max 6.86 vs 0.21,
+top-1 agreement 299/320 vs 312/320 on teacher-forced prefixes), and that was the serving default
+until then, so earlier Qwen benchmark numbers are not reportable. On 0.32 the pair is inside the
+floor, but MTP adds no throughput with the cache on and vllm#53912 is still open. Throughput for
+this workload is the transcript's prefill: 320 requests take 123 s with no cache on 0.23, 15 s
+then 10 s on 0.32. The table above predates this.
 
 ```bash
 HF_HOME=/dev/shm/hf agent-platform/scripts/runtime/serve_model.sh qwen3.5-9b
