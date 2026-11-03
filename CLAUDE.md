@@ -150,7 +150,8 @@ HF_HOME=/dev/shm/hf uv run python -m neuroagent.training.train_grpo --model qwen
   ClinicalEpisode → ClinicalPolicyReward`
 - The final turn of a policy run must submit the assessment; invalid model output is retried with a
   one-off correction inside the profile's `max_invalid_actions` budget and counted, never discarded
-- Reward components: diagnosis, required/recommended coverage, tool accuracy (first match of a
+- Reward components: diagnosis, required/recommended coverage (partial credit per required argument
+  element; the all-or-nothing count is reported as `required_action_coverage_exact`), tool accuracy (first match of a
   criterion only; re-ordering a resulted study is unjustified), safety, waste avoidance, sequence
   (orders two actions the agent actually took), stopping (unjustified actions after the required
   set), assessment, cost efficiency (relative to the policy's own required work-up) and completion

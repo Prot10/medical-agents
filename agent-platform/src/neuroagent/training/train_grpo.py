@@ -107,7 +107,9 @@ _SAMPLING_METRICS = (
 )
 
 TOOL_PARSERS = {"qwen3.5-9b": "qwen3_coder", "granite-4.1-8b": "granite4", "gemma-4-e4b": "gemma4"}
-REWARD_COMPONENTS = ("diagnosis", "required_action_coverage", "tool_accuracy", "safety", "stopping")
+REWARD_COMPONENTS = (
+    "diagnosis", "required_action_coverage", "required_action_coverage_exact", "tool_accuracy", "safety", "stopping",
+)
 
 
 # --------------------------------------------------------------------------------------------------

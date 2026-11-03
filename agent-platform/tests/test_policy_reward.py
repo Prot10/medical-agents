@@ -5,6 +5,8 @@ from pathlib import Path
 import pytest
 
 from neuroagent.evaluation import ClinicalPolicyReward
+from neuroagent.evaluation.policy_reward import criterion_credit, criterion_matches, pattern_credit, pattern_matches
+from neuroagent_schemas.evaluation import ToolCallPattern
 from neuroagent_schemas import (
     ActionProposed,
     AssessmentSubmitted,
@@ -105,6 +107,36 @@ def test_missing_required_evidence_disables_efficiency_and_stopping():
     assert score.required_action_coverage == 0
     assert score.stopping == 0
     assert score.cost_efficiency == 0 and score.token_efficiency == 0
+
+
+def test_partial_credit_counts_the_tool_and_each_required_argument():
+    pattern = ToolCallPattern(
+        tool_name="order_microbiology",
+        required_arguments={"specimen": "blood_culture", "tests": ["culture", "gram_stain", "susceptibility"]},
+    )
+    partial = ToolAction(tool_name="order_microbiology", arguments={"specimen": "blood_culture", "tests": ["culture", "susceptibility"]})
+    complete = ToolAction(tool_name="order_microbiology", arguments={"specimen": "blood_culture", "tests": ["culture", "gram_stain", "susceptibility", "PCR"]})
+    assert pattern_credit(pattern, partial) == pytest.approx(4 / 5)
+    assert pattern_credit(pattern, complete) == 1 and pattern_matches(pattern, complete)
+    assert pattern_credit(pattern, ToolAction(tool_name="analyze_csf", arguments={})) == 0
+
+
+def test_partial_credit_is_full_exactly_when_the_criterion_matches():
+    case = approved_case()
+    actions = [criterion_action(c) for c in case.ground_truth.action_criteria]
+    for criterion in case.ground_truth.action_criteria:
+        for action in actions:
+            assert (criterion_credit(criterion, action) == 1) == criterion_matches(criterion, action)
+
+
+def test_required_coverage_credits_a_study_ordered_with_the_wrong_argument():
+    case = approved_case()
+    first = by_importance(case, "required")[0]
+    pattern = first.alternatives[0]
+    wrong = ToolAction(tool_name=pattern.tool_name, arguments={key: "not_the_required_value" for key in pattern.required_arguments})
+    score = ClinicalPolicyReward().score(make_episode(case, [wrong]), case)
+    assert score.required_action_coverage_exact == 0
+    assert 0 < score.required_action_coverage < 1 / len(by_importance(case, "required"))
 
 
 def test_answering_without_any_action_earns_the_diagnosis_weight_only():

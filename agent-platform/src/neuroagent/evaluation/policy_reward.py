@@ -33,6 +33,8 @@ class RewardBreakdown(BaseModel):
     model_config = ConfigDict(extra="forbid")
     diagnosis: float = Field(ge=0, le=1)
     required_action_coverage: float = Field(ge=0, le=1)
+    # The same criteria counted only when every required argument is met; reported, weight 0.
+    required_action_coverage_exact: float = Field(ge=0, le=1)
     recommended_action_coverage: float = Field(ge=0, le=1)
     tool_accuracy: float = Field(ge=0, le=1)
     safety: float = Field(ge=0, le=1)
@@ -78,10 +80,19 @@ class ClinicalPolicyReward:
         }
         required = [c for c in policy.action_criteria if c.importance is ActionImportance.REQUIRED]
         recommended = [c for c in policy.action_criteria if c.importance is ActionImportance.RECOMMENDED]
-        required_coverage = _coverage(required, matched)
+        # Coverage gives partial credit for a study ordered with part of its required arguments
+        # (3 Nov 2026): all-or-nothing matching mixed knowing what to order with spelling out
+        # every argument, and gave GRPO no signal in a fifth of the episodes. Stopping, sequence
+        # and tool accuracy still use exact matches; exact coverage is reported beside it.
+        credit = {
+            criterion.criterion_id: max((criterion_credit(criterion, action) for action in actions), default=0.0)
+            for criterion in policy.action_criteria
+        }
+        required_coverage = _coverage(required, credit)
+        required_exact = _coverage(required, {key: float(bool(hits)) for key, hits in matched.items()})
         # With nothing recommended there is nothing extra to credit: follow the required work-up
         # rather than paying 1.0 to an agent that ordered nothing.
-        recommended_coverage = _coverage(recommended, matched) if recommended else required_coverage
+        recommended_coverage = _coverage(recommended, credit) if recommended else required_coverage
 
         # An action is justified when it satisfies a criterion no earlier action already
         # satisfied; re-ordering a study that was already resulted is unjustified even though it
@@ -184,6 +195,7 @@ class ClinicalPolicyReward:
         return RewardBreakdown(
             diagnosis=diagnosis,
             required_action_coverage=required_coverage,
+            required_action_coverage_exact=required_exact,
             recommended_action_coverage=recommended_coverage,
             tool_accuracy=tool_accuracy,
             safety=safety,
@@ -200,10 +212,10 @@ class ClinicalPolicyReward:
         )
 
 
-def _coverage(criteria, matched: dict[str, list[int]]) -> float:
+def _coverage(criteria, credit: dict[str, float]) -> float:
     if not criteria:
         return 1.0
-    return sum(bool(matched[item.criterion_id]) for item in criteria) / len(criteria)
+    return sum(credit[item.criterion_id] for item in criteria) / len(criteria)
 
 
 def _assessment_score(assessment, criteria) -> float:
@@ -332,3 +344,29 @@ def pattern_matches(pattern, action: ToolAction) -> bool:
 def criterion_matches(criterion, action: ToolAction) -> bool:
     """Does the action satisfy an action criterion or an avoided-action criterion?"""
     return any(pattern_matches(pattern, action) for pattern in criterion.alternatives)
+
+
+def pattern_credit(pattern, action: ToolAction) -> float:
+    """Share of a pattern the action fulfils, 1.0 exactly when `pattern_matches`.
+
+    The tool is one element; each member of a required non-empty list is one more, and every
+    other required argument (scalar, boolean, mapping, empty list) is one more. A CSF order with
+    no arguments against six basic studies, paired serum and a meningitis panel earns 1/9.
+    """
+    if action.tool_name != pattern.tool_name:
+        return 0.0
+    actual = executed_arguments(action)
+    assay_keys = _ASSAY_ARGUMENTS.get(action.tool_name, ())
+    met = total = 1
+    for key, wanted in pattern.required_arguments.items():
+        satisfied = _assays_satisfied if key in assay_keys else _contains_required
+        items = [[item] for item in wanted] if isinstance(wanted, list) and wanted else [wanted]
+        total += len(items)
+        if key in actual:
+            met += sum(satisfied(actual[key], item) for item in items)
+    return met / total
+
+
+def criterion_credit(criterion, action: ToolAction) -> float:
+    """Best share of any alternative pattern of the criterion that the action fulfils."""
+    return max((pattern_credit(pattern, action) for pattern in criterion.alternatives), default=0.0)
