@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="figure-size" content="180x161.8">
+<title>Extended Data Figure: case diversity</title>
+<link rel="stylesheet" href="figure.css">
+<style>
+  @page { size: 180mm 161.8mm; }
+  .figure { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .row { display: grid; grid-template-columns: 97mm minmax(0, 1fr); }
+  .panel svg { display: block; width: 100%; overflow: visible; }
+  .ptitle span { line-height: 1.15; }
+
+  .tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 1.8mm; margin-top: auto; padding-top: 2mm; }
+  .tile { background: #fff; border-radius: 1.6mm; padding: 1.4mm 1.6mm; display: flex; align-items: center; gap: 1.4mm; }
+  .tile b { font-size: 8.5pt; line-height: 1; white-space: nowrap; color: var(--navy-t); }
+  .tile span { font-size: 5.2pt; color: var(--ink2); line-height: 1.2; }
+  .note { font-size: 5.2pt; color: var(--ink2); line-height: 1.25; margin-top: 1.2mm; }
+  .note b { color: var(--ink); }
+</style>
+</head>
+<body>
+<div class="figure" id="fig">
+  <div class="row">
+    <section class="panel" data-tone="navy">
+      <div class="ptitle"><b>a</b><span>The condition explains most of the work-up and a small share of the text</span></div>
+      <div id="views"></div>
+      <div class="tiles" id="tiles"></div>
+    </section>
+    <section class="panel" data-tone="navy">
+      <div class="ptitle"><b>b</b><span>Every pair of conditions differs in work-up, much less in text</span></div>
+      <div id="heat"></div>
+    </section>
+  </div>
+  <div class="row">
+    <section class="panel" data-tone="cyan">
+      <div class="ptitle"><b>c</b><span>A new condition cannot be solved by copying the work-up of a known one</span></div>
+      <div id="copy"></div>
+      <div class="note" id="copynote"></div>
+    </section>
+    <section class="panel" data-tone="blue">
+      <div class="ptitle"><b>d</b><span>The proposed test conditions are among the hardest to copy</span></div>
+      <div id="split"></div>
+    </section>
+  </div>
+</div>
+
+<script src="figure.js"></script>
+<script>
+const C = { text: "#2a9fb0", work: "#1C446A", textT: "#17717f", workT: "#1C446A", blue: "#0033A0", ink: "#2F2F2F", ink2: "#48484e", dim: "#85858c", grid: "#d6d6dc", lilac: "#BEBECB" };
+const F = { tick: 1.6, label: 1.75, small: 1.65, head: 1.9 }; // mm (≈ 4.5, 5, 4.7, 5.4 pt)
+const $id = (id) => document.getElementById(id);
+const widthMM = (n) => n.getBoundingClientRect().width / MM;
+const fmt = (v, d = 2) => v.toFixed(d).replace(/^0\./, "0.");
+const T = (s, x, y, text, o = {}) => el("text", { x, y, "font-size": o.size ?? F.label, fill: o.fill ?? C.ink2, "font-family": "Arial", "text-anchor": o.anchor ?? "start", "font-weight": o.bold ? 700 : 400, ...(o.attrs || {}), text }, s);
+const svgIn = (box, W, H) => el("svg", { viewBox: `0 0 ${W} ${H}`, style: `height:${H}mm` }, box);
+
+function axis(s, x0, w, y, ticks, label) {
+  el("line", { x1: x0, x2: x0 + w, y1: y, y2: y, stroke: "#9a9aa2", "stroke-width": 0.15 }, s);
+  ticks.forEach((v) => {
+    el("line", { x1: x0 + v * w, x2: x0 + v * w, y1: y, y2: y + 0.7, stroke: "#9a9aa2", "stroke-width": 0.15 }, s);
+    T(s, x0 + v * w, y + 2.5, String(v), { size: F.tick, fill: C.dim, anchor: "middle" });
+  });
+  if (label) T(s, x0 + w / 2, y + 5.2, label, { size: F.tick, fill: C.dim, anchor: "middle" });
+}
+
+// a — R² and 1-NN per view, observed against shuffled labels
+function views(D) {
+  const box = $id("views"), W = widthMM(box);
+  const lab = 27, gap = 7, pad = 4.5, P = (W - lab - gap - pad) / 2, xs = [lab, lab + P + gap];
+  const rowH = 3.85, headH = 4.4, top = 5.4;
+  const rows = [];
+  let y = top;
+  for (const [kind, title] of [["text", "Text"], ["work", "Work-up"]]) {
+    rows.push({ head: title, kind, y: y + headH - 1.1 }); y += headH;
+    D.views.filter((v) => v.kind === kind).forEach((v) => { rows.push({ v, y: y + rowH / 2 }); y += rowH; });
+  }
+  const H = y + 7.5, s = svgIn(box, W, H);
+  [["Variance explained (R²)", "r2", "shuffled_r2"], ["Nearest case, same condition (1-NN)", "knn1", "shuffled_knn1"]].forEach(([title, key, null_], k) => {
+    const x0 = xs[k];
+    T(s, x0, 2.2, title, { size: F.head, fill: C.ink, bold: true });
+    [0, 0.25, 0.5, 0.75, 1].forEach((t) => el("line", { x1: x0 + t * P, x2: x0 + t * P, y1: top, y2: y, stroke: t ? "#e4e4ea" : "#bdbdc4", "stroke-width": 0.18 }, s));
+    axis(s, x0, P, y + 0.4, [0, 0.25, 0.5, 0.75, 1]);
+    rows.filter((r) => r.v).forEach(({ v, y: ry }) => {
+      const col = v.kind === "text" ? C.text : C.work, a = x0 + v[null_] * P, b = x0 + v[key] * P;
+      el("line", { x1: a, x2: b, y1: ry, y2: ry, stroke: col, "stroke-width": 0.35, opacity: 0.45 }, s);
+      el("circle", { cx: a, cy: ry, r: 0.6, fill: "#fff", stroke: C.dim, "stroke-width": 0.22 }, s);
+      el("circle", { cx: b, cy: ry, r: 0.85, fill: col }, s);
+      T(s, b + 1.4, ry + 0.6, fmt(v[key]), { size: F.small, fill: C.ink2 });
+    });
+  });
+  rows.forEach((r) => {
+    if (r.head) T(s, 0, r.y, r.head, { size: F.head, fill: r.kind === "text" ? C.textT : C.workT, bold: true });
+    else T(s, 1.2, r.y + 0.6, r.v.name + (r.v.n < 600 ? ` (n=${r.v.n})` : ""), { size: F.label, fill: C.ink });
+  });
+  const ly = H - 1;
+  el("circle", { cx: lab + 0.6, cy: ly - 0.6, r: 0.6, fill: "#fff", stroke: C.dim, "stroke-width": 0.22 }, s);
+  T(s, lab + 2, ly, "labels shuffled (negative control)", { size: F.tick, fill: C.dim });
+  el("circle", { cx: xs[1] + 0.6, cy: ly - 0.6, r: 0.85, fill: C.work }, s);
+  T(s, xs[1] + 2, ly, "observed; chance for 1-NN is 0.05", { size: F.tick, fill: C.dim });
+
+  const sp = D.specificity;
+  const maxDiff = Math.max(...D.views.map((v) => v.r2_difficulty));
+  $id("tiles").innerHTML = [
+    [`${sp.tokens_in_one_condition}/${sp.required_tokens}`, "required studies are specific to one condition"],
+    [`${sp.pairs_in_one_condition}/${sp.precedence_pairs}`, "ordered study pairs are specific to one condition"],
+    [`≤${fmt(maxDiff + 0.0005, 3)}`, "R² of case difficulty, in any view"],
+  ].map(([b, t]) => `<div class="tile"><b>${b}</b><span>${t}</span></div>`).join("");
+}
+
+// b — pairwise R²: upper triangle required studies, lower triangle narrative meaning
+const SHORT = { ischemic_stroke: ["Stroke", "IS"], subarachnoid_hemorrhage: ["SAH", "SAH"], bacterial_meningitis: ["Bact. meningitis", "BM"],
+  autoimmune_encephalitis_nmdar: ["NMDAR enceph.", "AE"], multiple_sclerosis: ["Mult. sclerosis", "MS"], alzheimers_early: ["Alzheimer's", "AD"],
+  ftd: ["FTD", "FTD"], vascular_dementia: ["Vascular dem.", "VaD"], nph: ["NPH", "NPH"], parkinsons: ["Parkinson's", "PD"], als: ["ALS", "ALS"],
+  focal_epilepsy_temporal: ["Temporal epil.", "TLE"], status_epilepticus: ["Status epil.", "SE"], guillain_barre: ["Guillain–Barré", "GBS"],
+  myasthenia_gravis: ["Myasthenia", "MG"], brain_tumor_glioma: ["Glioma", "HGG"], migraine_with_aura: ["Migraine", "MA"],
+  functional_neurological_disorder: ["Functional", "FND"], syncope_cardiac: ["Cardiac syncope", "CS"], hepatic_encephalopathy: ["Hepatic enceph.", "HE"] };
+const VMAX = 0.85;
+function ramp(v) { // sequential navy, light (pair barely differs) → dark (well separated)
+  const t = Math.max(0, Math.min(1, v / VMAX)) ** 0.85;
+  const a = [243, 245, 248], b = [28, 68, 106];
+  return `rgb(${a.map((x, i) => Math.round(x + (b[i] - x) * t)).join(",")})`;
+}
+function heat(D) {
+  const box = $id("heat"), W = widthMM(box);
+  const order = D.heat_order, n = order.length, groupOf = {};
+  Object.entries(D.groups).forEach(([g, cs]) => cs.forEach((c) => (groupOf[c] = g)));
+  const lab = 16.5, gg = 0.55, topLab = 5.6;
+  const nGap = new Set(order.map((c) => groupOf[c])).size - 1;
+  const cell = (W - lab - 1 - nGap * gg) / n;
+  const pos = []; let p = 0;
+  order.forEach((c, i) => { if (i && groupOf[c] !== groupOf[order[i - 1]]) p += gg; pos.push(p); p += cell; });
+  const side = p, y0 = topLab + 1.4, test = new Set(D.split.proposed), valid = new Set(D.split.validation);
+  const H = y0 + side + 14, s = svgIn(box, W, H);
+  const up = D.heat.required_tokens, lo = D.heat.narrative_embedding;
+  for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
+    if (i === j) continue;
+    const v = j > i ? up[i][j] : lo[i][j];
+    el("rect", { x: lab + pos[j], y: y0 + pos[i], width: cell - 0.18, height: cell - 0.18, rx: 0.25, fill: ramp(v) }, s);
+  }
+  order.forEach((c, i) => {
+    const o = { size: 1.6, fill: test.has(c) ? C.blue : C.ink2, bold: test.has(c) };
+    T(s, lab - 0.8, y0 + pos[i] + cell / 2 + 0.55, SHORT[c][0], { ...o, anchor: "end" });
+    const cx = lab + pos[i] + cell / 2 + 0.55;
+    T(s, cx, topLab, SHORT[c][1], { ...o, attrs: { transform: `rotate(-90 ${cx} ${topLab})` } });
+  });
+  // triangle keys
+  const ky = y0 + side + 3.4;
+  const key = (x, label, sub, anchor) => { T(s, x, ky, label, { size: F.label, fill: C.ink, bold: true, anchor }); T(s, x, ky + 2.3, sub, { size: F.tick, fill: C.dim, anchor }); };
+  key(lab, "Lower: narrative meaning", "embedding of the patient text", "start");
+  key(lab + side, "Upper: required studies", "tool + arguments of required criteria", "end");
+  // colour scale
+  const lx = lab, lw = side, ly = ky + 6.2;
+  T(s, lx, ly - 1, "R² of the pair", { size: F.tick, fill: C.dim });
+  const NS = "http://www.w3.org/2000/svg", gid = "hg"; // el() does not know gradient tags
+  const g = el("defs", {}, s).appendChild(document.createElementNS(NS, "linearGradient"));
+  g.setAttribute("id", gid);
+  for (let k = 0; k <= 10; k++) {
+    const st = g.appendChild(document.createElementNS(NS, "stop"));
+    st.setAttribute("offset", `${k * 10}%`); st.setAttribute("stop-color", ramp((k / 10) * VMAX));
+  }
+  el("rect", { x: lx, y: ly, width: lw, height: 1.3, rx: 0.3, fill: `url(#${gid})` }, s);
+  [0, 0.2, 0.4, 0.6, 0.8].forEach((v) => T(s, lx + (v / VMAX) * lw, ly + 3.6, String(v), { size: F.tick, fill: C.dim, anchor: v ? "middle" : "start" }));
+  const nul = D.views.find((v) => v.key === "required_tokens").sibling_r2_p95, nx = lx + (nul / VMAX) * lw;
+  el("line", { x1: nx, x2: nx, y1: ly - 0.5, y2: ly + 1.8, stroke: "#E15E32", "stroke-width": 0.35 }, s);
+  T(s, lx + lw, ly - 1, `orange line: ${fmt(nul)}, two random halves of one condition`, { size: F.tick, fill: "#c0441b", anchor: "end" });
+  return H;
+}
+
+// c — copy the required work-up of another case
+function copy(D) {
+  const box = $id("copy"), W = widthMM(box);
+  const get = (ref, metric) => D.copy.find((r) => r.retriever === "tfidf" && r.reference === ref && r.metric === metric);
+  const groups = [
+    ["Same condition", C.text, [["siblings", "nearest narrative", true], ["random_siblings", "random case"], ["oracle_siblings", "best possible case"]]],
+    ["Other condition", C.work, [["leave_condition_out", "nearest narrative", true], ["random_leave_condition_out", "random case"], ["popular_leave_condition_out", "most common work-up"], ["oracle_leave_condition_out", "best possible case"]]],
+    ["Other family", C.work, [["leave_family_out", "nearest narrative", true]]],
+  ];
+  const lab = 27, gap = 7, pad = 4.5, P = (W - lab - gap - pad) / 2, xs = [lab, lab + P + gap];
+  const rowH = 3.4, headH = 3.9, top = 4.6;
+  const rows = []; let y = top;
+  groups.forEach(([title, col, items]) => {
+    rows.push({ head: title, col, y: y + headH - 1.1 }); y += headH;
+    items.forEach(([ref, label, main]) => { rows.push({ ref, label, main, col, y: y + rowH / 2 }); y += rowH; });
+  });
+  const H = y + 7.5, s = svgIn(box, W, H);
+  [["Required studies recovered (F1)", "token_f1"], ["Required tools recovered (F1)", "tool_f1"]].forEach(([title, metric], k) => {
+    const x0 = xs[k];
+    T(s, x0, 2.2, title, { size: F.head, fill: C.ink, bold: true });
+    [0, 0.25, 0.5, 0.75, 1].forEach((t) => el("line", { x1: x0 + t * P, x2: x0 + t * P, y1: top, y2: y, stroke: t ? "#e4e4ea" : "#bdbdc4", "stroke-width": 0.18 }, s));
+    axis(s, x0, P, y + 0.4, [0, 0.25, 0.5, 0.75, 1]);
+    rows.filter((r) => r.ref).forEach((r) => {
+      const v = get(r.ref, metric);
+      el("line", { x1: x0 + v.ci_low * P, x2: x0 + v.ci_high * P, y1: r.y, y2: r.y, stroke: r.col, "stroke-width": 0.3, opacity: 0.7 }, s);
+      el("circle", { cx: x0 + v.mean * P, cy: r.y, r: 0.8, fill: r.main ? r.col : "#fff", stroke: r.col, "stroke-width": r.main ? 0 : 0.28 }, s);
+      T(s, x0 + v.ci_high * P + 1.1, r.y + 0.6, fmt(v.mean), { size: F.small, fill: r.main ? C.ink : C.ink2, bold: r.main });
+    });
+  });
+  rows.forEach((r) => {
+    if (r.head) T(s, 0, r.y, r.head, { size: F.head, fill: r.col === C.text ? C.textT : C.workT, bold: true });
+    else T(s, 1.2, r.y + 0.6, r.label, { size: F.label, fill: r.main ? C.ink : C.ink2 });
+  });
+  const ly = H - 1;
+  el("circle", { cx: lab + 0.8, cy: ly - 0.6, r: 0.8, fill: C.work }, s);
+  T(s, lab + 2.2, ly, "copy the most similar narrative", { size: F.tick, fill: C.dim });
+  el("circle", { cx: xs[1] + 0.8, cy: ly - 0.6, r: 0.8, fill: "#fff", stroke: C.work, "stroke-width": 0.28 }, s);
+  T(s, xs[1] + 2.2, ly, "reference copies · bars, 95% CI", { size: F.tick, fill: C.dim });
+  const av = (ref) => Math.round(get(ref, "any_avoided").mean * 100);
+  $id("copynote").innerHTML = `Copying from another condition brings in an action the case's policy lists as to be avoided in <b>${av("leave_condition_out")}%</b> of cases (same condition ${av("siblings")}%). Nearest narrative from another condition beats a random case (Wilcoxon over 20 conditions, <i>P</i> = ${fmt(D.copy_tests["tfidf/tests"].loco_vs_random_token, 3)}) but not the most common work-up (<i>P</i> = ${fmt(D.copy_tests["tfidf/tests"].loco_vs_popular_token)}).`;
+}
+
+// d — every choice of four test conditions
+function split(D) {
+  const box = $id("split"), W = widthMM(box);
+  const S = D.split, combos = S.combos;
+  const xs = combos.map((c) => c[0]), ys = combos.map((c) => c[1]);
+  const x0 = 9, w = W - x0 - 1, top = 5, h = 46;
+  const xmin = 0.11, xmax = 0.18, ymax = 0.3;
+  const X = (v) => x0 + ((v - xmin) / (xmax - xmin)) * w, Y = (v) => top + h - (v / ymax) * h;
+  const H = top + h + 8.2, s = svgIn(box, W, H);
+  [0, 0.1, 0.2, 0.3].forEach((t) => {
+    el("line", { x1: x0, x2: x0 + w, y1: Y(t), y2: Y(t), stroke: t ? "#e4e4ea" : "#9a9aa2", "stroke-width": t ? 0.18 : 0.15 }, s);
+    T(s, x0 - 1, Y(t) + 0.55, String(t), { size: F.tick, fill: C.dim, anchor: "end" });
+  });
+  [0.12, 0.14, 0.16, 0.18].forEach((t) => {
+    el("line", { x1: X(t), x2: X(t), y1: top + h, y2: top + h + 0.7, stroke: "#9a9aa2", "stroke-width": 0.15 }, s);
+    T(s, X(t), top + h + 2.5, String(t), { size: F.tick, fill: C.dim, anchor: "middle" });
+  });
+  T(s, x0 + w / 2, top + h + 5.2, "Narrative similarity of test cases to the nearest training case (TF-IDF cosine)", { size: F.tick, fill: C.dim, anchor: "middle" });
+  T(s, 1.3, top + h / 2, "Required studies recovered by copying it (F1)", { size: F.tick, fill: C.dim, anchor: "middle", attrs: { transform: `rotate(-90 1.3 ${top + h / 2})` } });
+  combos.forEach(([x, y]) => el("circle", { cx: X(x), cy: Y(y), r: 0.32, fill: "#a3a3b5", opacity: 0.5 }, s));
+  const mine = combos.find((c) => [...c[2]].sort().join() === [...S.proposed].sort().join());
+  const top1 = combos.reduce((a, b) => (b[1] > a[1] ? b : a));
+  const pct = (arr, v) => {
+    const n = Math.round((arr.filter((a) => a <= v).length / arr.length) * 100);
+    return n + ({ 1: "st", 2: "nd", 3: "rd" }[n % 100 > 10 && n % 100 < 14 ? 0 : n % 10] ?? "th");
+  };
+  const nm = (ids) => ids.map((c) => SHORT[c][1]).join(", ");
+  el("circle", { cx: X(top1[0]), cy: Y(top1[1]), r: 0.9, fill: C.ink2, stroke: "#fff", "stroke-width": 0.3 }, s);
+  T(s, X(top1[0]) + 1.6, Y(top1[1]) + 0.6, `most copyable: ${nm(top1[2])}`, { size: F.small, fill: C.ink2, attrs: { stroke: "#fff", "stroke-width": 0.7, "paint-order": "stroke", "stroke-linejoin": "round" } });
+  el("circle", { cx: X(mine[0]), cy: Y(mine[1]), r: 1.15, fill: C.blue, stroke: "#fff", "stroke-width": 0.35 }, s);
+  const lx = x0 + w, ly = Y(0.115);
+  el("path", { d: `M${X(mine[0]) + 0.9},${Y(mine[1]) - 0.9} L${X(mine[0]) + 6},${ly + 1.4} L${lx - 1},${ly + 1.4}`, stroke: C.blue, "stroke-width": 0.22, fill: "none" }, s);
+  T(s, lx, ly - 2.4, `Proposed test set: ${nm(S.proposed)}`, { size: F.label, fill: C.blue, bold: true, anchor: "end", attrs: { stroke: "#fff", "stroke-width": 0.7, "paint-order": "stroke", "stroke-linejoin": "round" } });
+  T(s, lx, ly, `${pct(ys, mine[1])} percentile of copy F1, ${pct(xs, mine[0])} of similarity`, { size: F.small, fill: C.blue, anchor: "end", attrs: { stroke: "#fff", "stroke-width": 0.7, "paint-order": "stroke", "stroke-linejoin": "round" } });
+  T(s, x0 + w, top - 2.4, `${combos.length} choices of 4 test conditions out of 20`, { size: F.small, fill: C.dim, anchor: "end" });
+}
+
+function render(D) { views(D); heat(D); copy(D); split(D); }
+
+(async () => {
+  const D = await fetch("data/diversity.json").then((r) => r.json());
+  document.querySelector(".figure").dataset.style = new URLSearchParams(location.search).get("style") || "tint";
+  render(D);
+  await document.fonts.ready;
+  document.body.dataset.ready = "1";
+})();
+</script>
+</body>
+</html>

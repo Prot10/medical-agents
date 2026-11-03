@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="figure-size" content="180x151.3">
+<title>Extended Data Table: diversity by condition</title>
+<link rel="stylesheet" href="figure.css">
+<link rel="stylesheet" href="table.css">
+<style>@page { size: 180mm 151.3mm; } .figure { padding: 1mm 0.5mm; }</style>
+</head>
+<body>
+<div class="figure" id="fig">
+  <div class="ttl">Each condition: variety of its cases and distance from the others</div>
+  <table class="tbl" id="t"></table>
+  <div class="cap" id="cap"></div>
+</div>
+<script>
+const fmt = (v, d = 2) => (v < 0 ? "−" : "") + Math.abs(v).toFixed(d);
+(async () => {
+  const D = await fetch("data/diversity.json").then((r) => r.json());
+  const head = [["Condition", ""], ["Split", "proposed"], ["Distinct", "work-ups of 30"], ["Required", "items per case"],
+    ["Silhouette", "required studies"], ["1-NN", "required studies"], ["1-NN", "narrative style"], ["1-NN", "narrative meaning"],
+    ["Copy F1", "same condition"], ["Copy F1", "other condition"], ["No study shared", "cases of 30"], ["Closest work-up", "condition, cases of 30"]];
+  let html = `<thead><tr>${head.map(([a, b]) => `<th>${a}${b ? `<span class="u">${b}</span>` : ""}</th>`).join("")}</tr></thead><tbody>`;
+  let group = null;
+  for (const c of D.per_condition) {
+    if (c.group !== group) { group = c.group; html += `<tr class="sec"><td colspan="${head.length}">${group}</td></tr>`; }
+    const cls = c.split === "test" ? "test" : c.split === "validation" ? "val" : "";
+    const bar = (v, col) => `<span class="bar" style="width:${(v / 30) * 8}mm;background:${col}"></span>`;
+    html += `<tr><td class="l ${cls}">${c.name}</td><td class="${cls}">${c.split}</td>
+      <td>${c.distinct_required_sets}${bar(c.distinct_required_sets, "var(--navy-m)")}</td><td>${c.mean_required.toFixed(1)}</td>
+      <td>${fmt(c.silhouette_workup)}</td><td>${fmt(c.knn1_workup)}</td><td>${fmt(c.knn1_style)}</td><td>${fmt(c.knn1_meaning)}</td>
+      <td>${fmt(c.copy_siblings)}</td><td><b>${fmt(c.copy_other)}</b></td><td>${c.no_shared_study}</td><td class="l">${c.nearest_workup ? D.names[c.nearest_workup] : "–"} <span style="color:var(--dim)">${c.nearest_workup_cases || ""}</span></td></tr>`;
+  }
+  document.getElementById("t").innerHTML = html + "</tbody>";
+  document.getElementById("cap").innerHTML = `Groups as in Fig. 2b. Proposed split: test conditions in blue, validation in cyan. Distinct work-ups: different sets of required studies (tool + arguments) among the 30 cases. Silhouette and 1-NN per condition, computed over all 600 cases (Extended Data Table on views). Copy F1: token F1 of the required studies when a case copies the required work-up of its most similar narrative (TF-IDF), within its own condition or from any other condition. Closest work-up: for each case, the other condition holding the case with the most similar required studies (Jaccard); the most frequent such condition and how many of the 30 cases point to it. No study shared: cases whose required studies appear in no case of any other condition. All policies are drafts pending physician approval.`;
+  document.body.dataset.ready = "1";
+})();
+</script>
+</body>
+</html>

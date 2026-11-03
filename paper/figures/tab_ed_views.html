@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="figure-size" content="180x83">
+<title>Extended Data Table: diversity by view</title>
+<link rel="stylesheet" href="figure.css">
+<link rel="stylesheet" href="table.css">
+<style>@page { size: 180mm 83mm; } .figure { padding: 1mm 0.5mm; }</style>
+</head>
+<body>
+<div class="figure" id="fig">
+  <div class="ttl">How much of each description of a case is explained by its condition</div>
+  <table class="tbl" id="t"></table>
+  <div class="cap" id="cap"></div>
+</div>
+<script>
+const fmt = (v, d = 2) => (v < 0 ? "−" : "") + Math.abs(v).toFixed(d);
+const P = (p) => (p <= 0.0001 ? "&lt;0.001" : p < 0.001 ? "&lt;0.001" : p.toFixed(3));
+(async () => {
+  const D = await fetch("data/diversity.json").then((r) => r.json());
+  const fam = D.families.families, grp = D.families.paper_groups;
+  const head = [["Description", ""], ["Cases", ""], ["R²", "condition"], ["R²", "given setting"], ["R²", "labels shuffled"],
+    ["1-NN", "chance 0.05"], ["1-NN", "labels shuffled"], ["Silhouette", ""], ["Pairs differing", "Holm, of 190"],
+    ["Closest pair", "R²"], ["Family", "P, two taxonomies"]];
+  const short = (c) => ({ alzheimers_early: "AD", ftd: "FTD", ischemic_stroke: "IS", subarachnoid_hemorrhage: "SAH", functional_neurological_disorder: "FND",
+    migraine_with_aura: "MA", vascular_dementia: "VaD", autoimmune_encephalitis_nmdar: "AE", multiple_sclerosis: "MS", brain_tumor_glioma: "HGG",
+    status_epilepticus: "SE", bacterial_meningitis: "BM", hepatic_encephalopathy: "HE", guillain_barre: "GBS", myasthenia_gravis: "MG",
+    focal_epilepsy_temporal: "TLE", syncope_cardiac: "CS", nph: "NPH", parkinsons: "PD", als: "ALS" }[c] ?? c);
+  let html = `<thead><tr>${head.map(([a, b]) => `<th>${a}${b ? `<span class="u">${b}</span>` : ""}</th>`).join("")}</tr></thead><tbody>`;
+  for (const [kind, title] of [["text", "Text"], ["work", "Work-up"]]) {
+    html += `<tr class="sec ${kind}"><td colspan="${head.length}">${title}</td></tr>`;
+    for (const v of D.views.filter((x) => x.kind === kind)) {
+      const c = v.closest;
+      html += `<tr><td class="l">${v.name}</td><td>${v.n}</td><td><b>${fmt(v.r2)}</b></td><td>${fmt(v.r2_given_encounter)}</td><td>${fmt(v.shuffled_r2, 3)}</td>
+        <td><b>${fmt(v.knn1)}</b></td><td>${fmt(v.shuffled_knn1)}</td><td>${fmt(v.silhouette)}</td><td>${v.pairs_holm}</td>
+        <td>${short(c.a)}–${short(c.b)} ${fmt(c.R2, 3)}</td><td>${P(fam[v.key].p)} / ${P(grp[v.key].p)}</td></tr>`;
+    }
+  }
+  document.getElementById("t").innerHTML = html + "</tbody>";
+  document.getElementById("cap").innerHTML = `${D.n_cases} cases, 20 conditions × 30. Each row is one distance between cases (Methods). R²: PERMANOVA, ${D.permutations} permutations, <i>P</i> &lt; 0.001 in every row, also within difficulty strata; given setting: partial R² after the encounter type (emergency, inpatient, outpatient). Labels shuffled: the same statistic with condition labels permuted (expected R² 19/599 = 0.032). 1-NN: share of cases whose nearest other case has the same condition. Pairs differing: pairwise PERMANOVA between the 190 pairs of conditions, Holm-corrected. Family: within- versus across-family distance between conditions, permuting whole conditions, for the a-priori families of Methods and the groups of Fig. 2b. Order rows use the cases with at least one order constraint.`;
+  document.body.dataset.ready = "1";
+})();
+</script>
+</body>
+</html>
