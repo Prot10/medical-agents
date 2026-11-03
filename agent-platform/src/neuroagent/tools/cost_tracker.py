@@ -18,7 +18,7 @@ from typing import Any
 import yaml
 from pydantic import BaseModel, Field
 
-from .vocabulary import normalize_analyte
+from .vocabulary import merge_packs, normalize_analyte
 
 logger = logging.getLogger(__name__)
 
@@ -90,7 +90,9 @@ class CostTracker:
             )
         with open(path) as f:
             data = yaml.safe_load(f) or {}
-        return data.get("tools", {})
+        # Every vocabulary pack is priced: which terms a case may order is the catalogue's
+        # business (its domain's packs), what an order costs is the same for every case.
+        return merge_packs(data, tuple(data.get("packs", {})))
 
     def _require(self, cfg: dict[str, Any], key: str, tool_name: str) -> Any:
         """Fetch a required cost entry; missing keys fail loudly."""
@@ -294,6 +296,13 @@ class CostTracker:
         base = float(self._require(cfg, "base", tool_name))
         breakdown: dict[str, float] = {"base": base}
         total = base
+        # Where the fluid is drawn: priced at 0 except a lumbar drain, the one source with a
+        # procedure of its own on top of the LP in `base` (CPT 62272, NPH-P08).
+        source = params.get("source")
+        surcharge = float(cfg.get("sources", {}).get(source, 0) or 0) if isinstance(source, str) else 0.0
+        if surcharge:
+            breakdown[f"source:{source}"] = surcharge
+            total += surcharge
         by_test = self._priced_lookup(self._require(cfg, "by_special_test", tool_name))
         for test in _as_item_names(params.get("special_tests", [])):
             cost = float(self._require(by_test, normalize_analyte(test), tool_name))

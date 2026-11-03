@@ -1,0 +1,725 @@
+<!doctype html>
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="figure-size" content="180x182.8">
+<title>Figure 1</title>
+<style>/* Shared style for the paper figures. Sizes are physical: the page is the printed figure
+   (180 mm = Nature double column), text in pt (5–7 pt, panel letters 8 pt bold). */
+
+:root {
+  --ink: #2F2F2F;
+  --ink2: #48484e;
+  --dim: #85858c;
+  --rule: #d6d6dc;
+  --grey: #f3f3f6;
+  --grey2: #e6e6ea;
+
+  /* CERN palette (CERN.potx theme): blue 0033A0, cyan 61C4D3, orange E15E32, grey BEBECB,
+     purple 6E2466, navy 1C446A. Roles: blue agent/model, cyan environment/required/correct,
+     navy policy/physicians, orange harm/violation, purple training. */
+  --blue: #0033A0;   --blue-l: #e6ebf5;   --blue-m: #b3c2e3;   --blue-t: #0033A0;
+  --cyan: #2a9fb0;   --cyan-l: #e3f4f7;   --cyan-m: #b0e1e9;   --cyan-t: #17717f;
+  --navy: #1C446A;   --navy-l: #e5eaf0;   --navy-m: #b9c6d4;   --navy-t: #1C446A;
+  --orange: #E15E32; --orange-l: #fce8e0; --orange-m: #f4bba6; --orange-t: #c0441b;
+  --purple: #6E2466; --purple-l: #f2e8f1; --purple-m: #d8bcd5; --purple-t: #6E2466;
+  --lilac: #BEBECB;
+
+  --sans: Arial, "Helvetica Neue", Helvetica, sans-serif;
+  --mono: "SF Mono", Menlo, Consolas, monospace;
+}
+
+@page { margin: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: #fff; }
+body {
+  font-family: var(--sans);
+  font-size: 6.5pt;
+  line-height: 1.25;
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.figure { width: 180mm; position: relative; overflow: hidden; padding: 0.2mm; }
+
+/* panels */
+.panel { position: relative; }
+.ptitle { display: flex; align-items: baseline; gap: 1.8mm; margin-bottom: 2.4mm; }
+.ptitle b { font-size: 9pt; font-weight: 700; line-height: 1; }
+.ptitle span { font-size: 7pt; color: var(--ink); font-weight: 600; }
+
+/* Panels are rounded boxes; data-style on .figure picks the treatment (?style= in the URL, default tint):
+   border = white box with a hairline border; tint = a faint background in the panel's role colour
+   (data-tone) with neutral cards turned white; dots = white boxes on a dotted figure background. */
+.figure { row-gap: 2.5mm; }
+.row { column-gap: 2.5mm; }
+.panel { border-radius: 2.6mm; padding: 2.2mm 2mm 2mm; display: flex; flex-direction: column; min-width: 0; }
+.figure[data-style="border"] .panel { border: 0.3mm solid #d9d9df; }
+.figure[data-style="tint"] .panel { --grey: #fff; }
+.figure[data-style="tint"] .panel[data-tone="grey"]   { background: #f6f6f8; }
+.figure[data-style="tint"] .panel[data-tone="blue"]   { background: #f4f6fb; }
+.figure[data-style="tint"] .panel[data-tone="cyan"]   { background: #f1f9fa; }
+.figure[data-style="tint"] .panel[data-tone="navy"]   { background: #f3f5f8; }
+.figure[data-style="tint"] .panel[data-tone="purple"] { background: #f8f3f7; }
+.figure[data-style="dots"] {
+  background-color: #fff;
+  background-image: radial-gradient(circle, #c9c9d2 0.17mm, transparent 0.21mm);
+  background-size: 1.4mm 1.4mm;
+}
+.figure[data-style="dots"] .panel { background: #fff; border: 0.3mm solid #dcdce2; }
+
+/* generic pieces */
+.box { border-radius: 1.6mm; }
+.dash { border: 0.25mm dashed #a9a9b0; border-radius: 2mm; }
+.tag {
+  display: inline-flex; align-items: center; gap: 0.7mm;
+  padding: 0.35mm 1.3mm; border-radius: 4mm; font-size: 5.6pt; white-space: nowrap;
+}
+.mono { font-family: var(--mono); font-size: 5.4pt; letter-spacing: -0.01em; }
+.small { font-size: 5.6pt; }
+.dim { color: var(--dim); }
+.ink2 { color: var(--ink2); }
+.label { font-size: 5.4pt; color: var(--dim); letter-spacing: 0.02em; }
+.strong { font-weight: 600; }
+
+.ic { display: inline-flex; width: 3.4mm; height: 3.4mm; flex: none; }
+.ic svg { width: 100%; height: 100%; stroke-width: 1.7; }
+.ic.s { width: 2.6mm; height: 2.6mm; }
+.ic.l { width: 5mm; height: 5mm; }
+.ic.xl { width: 7mm; height: 7mm; }
+
+.arrow { position: absolute; overflow: visible; pointer-events: none; }
+</style>
+<style>
+  @page { size: 180mm 182.8mm; }
+  .figure { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .row { display: grid; }
+  .r1 { grid-template-columns: 50mm minmax(0, 1fr); }
+  .r2 { grid-template-columns: 101mm minmax(0, 1fr); }
+
+  /* a — hospital */
+  .hosp { display: flex; flex-direction: column; gap: 2.6mm; padding: 2.2mm 2.4mm; background: #fafafb; }
+  .hosp-h { display: flex; align-items: center; gap: 1mm; color: var(--ink2); font-size: 6pt; }
+  .hosp-in { display: flex; justify-content: space-between; align-items: flex-start; padding: 0 1mm; }
+  .tile { display: flex; flex-direction: column; align-items: center; gap: 1mm; text-align: center; }
+  .tile .sq { width: 13mm; height: 13mm; border-radius: 2.2mm; display: grid; place-items: center; }
+  .ehr .sq { background: #fff; border: 0.3mm solid var(--rule); color: var(--ink2); }
+  .gpu .sq { background: var(--blue); color: #fff; }
+  .onsite { text-align: center; color: var(--blue); font-size: 5.8pt; display: flex; justify-content: center; align-items: center; gap: 0.8mm; }
+  .cloud { margin-top: 2.6mm; display: flex; align-items: center; gap: 1.6mm; padding: 1.4mm 2mm; background: var(--orange-l); border-radius: 1.6mm; color: var(--orange); font-size: 5.8pt; }
+  .models { margin-top: 2.4mm; }
+  .models .label { margin-bottom: 1mm; }
+  .chips { display: flex; flex-wrap: wrap; gap: 1mm; }
+  .chip { padding: 0.4mm 1.2mm; border-radius: 1mm; background: var(--blue-l); color: var(--blue); font-size: 5.5pt; font-weight: 500; }
+
+  /* b — environment */
+  .env { display: grid; grid-template-columns: 29mm 33mm minmax(0, 1fr); column-gap: 5mm; }
+  .card { background: var(--grey); border-radius: 1.8mm; padding: 2mm 2.2mm; }
+  .patient .who { display: flex; align-items: center; gap: 1.4mm; margin-bottom: 1.6mm; }
+  .patient .av { width: 5.4mm; height: 5.4mm; border-radius: 50%; background: #fff; display: grid; place-items: center; color: var(--ink2); }
+  .patient p { margin-top: 1mm; color: var(--ink2); }
+  .patient .lab { margin-top: 2.2mm; }
+  .patient .vit { display: flex; flex-wrap: wrap; gap: 0.7mm; margin-top: 1.2mm; }
+  .figure[data-style="tint"] .patient .vit span { background: #f0f0f4 !important; }
+  .patient .vit span { background: #fff; border-radius: 0.8mm; padding: 0.3mm 0.9mm; font-size: 5.3pt; color: var(--ink2); white-space: nowrap; }
+  .agentcol { display: flex; flex-direction: column; align-items: center; justify-content: space-between; gap: 4.5mm; }
+  .agent { width: 100%; background: var(--blue-l); border-radius: 1.8mm; padding: 1.8mm; display: flex; align-items: center; gap: 1.6mm; color: var(--blue); }
+  .agent .sq { width: 7.5mm; height: 7.5mm; border-radius: 1.4mm; background: var(--blue); color: #fff; display: grid; place-items: center; flex: none; }
+  .msg { width: 100%; border-radius: 1.4mm; padding: 1.3mm 1.6mm; font-size: 5.7pt; }
+  .msg .label { display: block; margin-bottom: 0.5mm; }
+  .call { background: #fff; border: 0.3mm solid var(--blue-m); }
+  .call .mono { color: var(--blue); font-size: 5pt; }
+  .obs { background: var(--cyan-l); }
+  .obs .cost { float: right; color: var(--dim); font-family: var(--mono); font-size: 5.2pt; }
+  .assess { width: 100%; background: var(--blue); color: #fff; border-radius: 1.6mm; padding: 1.4mm 1.8mm; font-size: 5.8pt; }
+  .assess .label { color: var(--blue-m); }
+  .tools .head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1.4mm; }
+  .tgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.1mm; }
+  .tool { height: 10.2mm; border-radius: 1.3mm; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.6mm; font-size: 5.3pt; text-align: center; line-height: 1.05; }
+  .tool.img { background: var(--blue-l); color: var(--blue-t); }
+  .tool.phy { background: var(--cyan-l); color: var(--cyan-t); }
+  .tool.lab { background: var(--purple-l); color: var(--purple-t); }
+  .tool.kno { background: var(--grey); color: var(--ink2); }
+  .tool.on { outline: 0.45mm solid var(--blue); outline-offset: -0.45mm; background: #fff; }
+  .legend { display: flex; gap: 2.4mm; margin-top: 1.4mm; }
+  .legend span { display: inline-flex; align-items: center; gap: 0.7mm; color: var(--ink2); font-size: 5.4pt; }
+  .legend i { width: 2.2mm; height: 2.2mm; border-radius: 0.5mm; display: inline-block; border: 0.25mm solid; }
+
+  /* c — policy */
+  .oarr { display: inline-block; width: 3.4mm; height: 1.4mm; flex: none; }
+  .policy { border: 0.3mm solid var(--rule); border-radius: 2mm; overflow: hidden; flex: 1; background: #fff; }
+  .policy-h { display: flex; justify-content: space-between; align-items: center; background: var(--navy-l); padding: 1.5mm 2.2mm; }
+  .policy-h .t { display: flex; align-items: center; gap: 1.2mm; font-size: 6.4pt; font-weight: 600; color: var(--navy-t); }
+  .badge { display: flex; align-items: center; gap: 1mm; color: var(--navy); font-size: 5.6pt; }
+  .policy-b { display: grid; grid-template-columns: 45mm minmax(0, 1fr); column-gap: 3mm; padding: 2.2mm; }
+  .sec { margin-bottom: 1.8mm; }
+  .sec:last-child { margin-bottom: 0; }
+  .sec-h { display: flex; align-items: center; gap: 0.8mm; font-weight: 600; font-size: 6pt; margin-bottom: 1mm; }
+  .req li { list-style: none; display: flex; align-items: center; gap: 1mm; padding: 0.6mm 1.2mm; margin-bottom: 0.6mm; border-radius: 1mm; background: var(--cyan-l); font-size: 5.8pt; }
+  .req li .n { width: 3mm; height: 3mm; border-radius: 50%; background: var(--cyan); color: #fff; font-size: 4.8pt; display: grid; place-items: center; font-weight: 700; flex: none; }
+  .order { display: flex; align-items: center; gap: 1mm; font-size: 5.8pt; }
+  .pill { padding: 0.5mm 1.3mm; border-radius: 1mm; background: #efeff3; }
+  .hard { color: var(--orange); font-size: 5.3pt; font-weight: 600; }
+  .soft { color: var(--dim); font-size: 5.3pt; }
+  .avoid { display: flex; flex-wrap: wrap; gap: 0.8mm; }
+  .avoid span { padding: 0.4mm 1.2mm; border-radius: 1mm; background: var(--orange-l); color: var(--orange); font-size: 5.5pt; }
+  .sev { display: grid; grid-template-columns: auto 1fr; gap: 0.5mm 1.6mm; margin-top: 1.2mm; font-size: 5.3pt; color: var(--ink2); }
+  .sev b { font-weight: 600; }
+  .dx span { font-size: 5.6pt; }
+
+  /* d — reward */
+  .rw { position: relative; flex: 1; min-height: 46mm; }
+  .rcore { position: absolute; left: 9mm; right: 9mm; top: 0; background: var(--navy); color: #fff; border-radius: 1.8mm; padding: 1.8mm 2.2mm; }
+  .rcore .f { font-size: 6.6pt; font-weight: 600; }
+  .rcore .comp { margin-top: 1mm; display: flex; flex-wrap: wrap; gap: 0.6mm; }
+  .rcore .comp span { background: #3b5f84; border-radius: 0.8mm; padding: 0.25mm 1mm; font-size: 5.2pt; color: #eef2f6; }
+  .rcore .caps { margin-top: 1.2mm; font-size: 5.3pt; color: var(--orange-m); }
+  .use { position: absolute; top: 24mm; bottom: 0; width: 34.5mm; border-radius: 1.8mm; padding: 1.8mm 2mm; display: flex; flex-direction: column; }
+  .use > p:last-child { margin-top: auto !important; }
+  .use .cyc { margin: auto 0; }
+  .use h4 { display: flex; align-items: center; gap: 1mm; font-size: 6.2pt; font-weight: 600; margin-bottom: 1mm; }
+  .use p { color: var(--ink2); font-size: 5.6pt; }
+  .eval { left: 0; background: var(--cyan-l); }
+  .eval h4 { color: var(--cyan-t); }
+  .train { right: 0; background: var(--purple-l); }
+  .train h4 { color: var(--purple); }
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2mm; margin-top: 1.4mm; }
+  .split div { background: #fff; border-radius: 1mm; padding: 1mm; }
+  .split b { display: block; font-size: 9pt; color: var(--cyan-t); line-height: 1; }
+  .split span { display: block; font-size: 5.2pt; line-height: 1.2; color: var(--ink2); margin-top: 0.5mm; }
+  .cyc { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm 5.6mm; margin-top: 2.2mm; }
+  .cyc span { background: #fff; border-radius: 1mm; padding: 0.8mm 1mm; font-size: 5.2pt; color: var(--purple); text-align: center; display: grid; place-items: center; min-height: 6mm; }
+  .loop { margin-top: 1.4mm; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 0.6mm; font-size: 5.3pt; color: var(--purple); text-align: center; }
+  .loop span { background: #fff; border-radius: 0.8mm; padding: 0.4mm 0.6mm; }
+
+  /* e — outcome vs policy */
+  .cmp { display: grid; grid-template-columns: 6mm 89mm 9mm 15mm 22mm minmax(0, 1fr) 15mm; column-gap: 0; align-items: center; }
+  .cmp > * { padding-right: 2mm; }
+  .cmp > .zs { padding-left: 1.5mm; }
+  .cmp .hd { font-size: 5.4pt; color: var(--dim); padding-top: 1mm; padding-bottom: 1.2mm; border-bottom: 0.25mm solid var(--rule); align-self: stretch; display: flex; align-items: flex-end; }
+  .cmp .hd.grp { color: var(--ink2); font-weight: 600; white-space: nowrap; }
+  .grp-h { font-size: 5.8pt; font-weight: 600; color: var(--ink2); border-bottom: 0.35mm solid var(--ink2); padding-bottom: 0.6mm; margin-right: 2mm; }
+  .cmp > .grp-h { padding-right: 0; }
+  .cmp .cell { height: 10.5mm; display: flex; align-items: center; border-bottom: 0.25mm solid #ececf0; }
+  .cmp .id { font-size: 8pt; font-weight: 700; }
+  .wk { display: flex; align-items: center; gap: 0; }
+  .wkc { display: flex; flex-direction: column; gap: 0.9mm; }
+  .wkc .note { margin-left: 0; }
+  .st { display: flex; align-items: center; gap: 0.5mm; padding: 0.5mm 1.1mm; border-radius: 1mm; background: var(--blue-l); color: var(--blue-t); font-size: 5.4pt; white-space: nowrap; }
+  .st.bad { background: var(--orange); color: #fff; }
+  .st.miss { background: none; border: 0.25mm dashed #b5b5bc; color: var(--dim); }
+  .link { width: 1.3mm; height: 0.25mm; background: #c8c8ce; flex: none; }
+  .note { font-size: 5.3pt; margin-left: 1.6mm; }
+  .rank { width: 4.2mm; height: 4.2mm; border-radius: 50%; display: grid; place-items: center; font-size: 5.8pt; font-weight: 700; }
+  .bar { position: relative; height: 2.2mm; width: 100%; background: var(--grey); border-radius: 1.1mm; }
+  .bar i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 1.1mm; }
+  .val { font-weight: 600; margin-left: 1.6mm; font-size: 6.2pt; min-width: 6mm; }
+  .outcome-zone { background: #f7f7f9; }
+</style>
+</head>
+<body data-ready="1">
+<div class="figure" id="fig" data-style="tint">
+
+  <!-- ===================== row 1 ===================== -->
+  <div class="row r1">
+    <section class="panel" data-tone="grey">
+      <div class="ptitle"><b>a</b><span style="font-weight: 700;">Patient data stay in the hospital</span></div>
+      <div class="hosp dash">
+        <div class="hosp-h"><i class="ic s" data-i="building-hospital"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="9.8125" height="9.8125">
+  
+  <path d="M3 21l18 0" fill="none" stroke="rgb(72, 72, 78)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M5 21v-16a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v16" fill="none" stroke="rgb(72, 72, 78)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M9 21v-4a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v4" fill="none" stroke="rgb(72, 72, 78)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M10 9l4 0" fill="none" stroke="rgb(72, 72, 78)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M12 7l0 4" fill="none" stroke="rgb(72, 72, 78)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i>Hospital network</div>
+        <div class="hosp-in">
+          <div class="tile ehr"><div class="sq" id="ehr"><i class="ic xl" data-i="report-medical"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="26.453125" height="26.453125">
+  
+  <path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" fill="none" stroke="rgb(72, 72, 78)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" fill="none" stroke="rgb(72, 72, 78)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M10 14l4 0" fill="none" stroke="rgb(72, 72, 78)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M12 12l0 4" fill="none" stroke="rgb(72, 72, 78)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i></div><span>Patient record</span></div>
+          <div class="tile gpu"><div class="sq" id="gpu"><i class="ic xl" data-i="cpu"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="26.453125" height="26.453125">
+  
+  <path d="M5 5m0 1a1 1 0 0 1 1 -1h12a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-12a1 1 0 0 1 -1 -1z" fill="none" stroke="rgb(255, 255, 255)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M9 9h6v6h-6z" fill="none" stroke="rgb(255, 255, 255)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M3 10h2" fill="none" stroke="rgb(255, 255, 255)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M3 14h2" fill="none" stroke="rgb(255, 255, 255)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M10 3v2" fill="none" stroke="rgb(255, 255, 255)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M14 3v2" fill="none" stroke="rgb(255, 255, 255)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M21 10h-2" fill="none" stroke="rgb(255, 255, 255)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M21 14h-2" fill="none" stroke="rgb(255, 255, 255)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M14 21v-2" fill="none" stroke="rgb(255, 255, 255)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M10 21v-2" fill="none" stroke="rgb(255, 255, 255)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i></div><span>Open model, 4–9 B<br><span class="dim">one 40 GB GPU</span></span></div>
+        </div>
+        <div class="onsite"><i class="ic s" data-i="refresh"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="9.8125" height="9.8125">
+  
+  <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i>evaluation and fine-tuning on site</div>
+      </div>
+      <div class="cloud"><i class="ic" data-i="cloud-off"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12.84375" height="12.84375">
+  
+  <path d="M9.58 5.548c.24 -.11 .492 -.207 .752 -.286c1.88 -.572 3.956 -.193 5.444 1c1.488 1.19 2.162 3.007 1.77 4.769h.99c1.913 0 3.464 1.56 3.464 3.486c0 .957 -.383 1.824 -1.003 2.454m-2.997 1.033h-11.343c-2.572 -.004 -4.657 -2.011 -4.657 -4.487c0 -2.475 2.085 -4.482 4.657 -4.482c.13 -.582 .37 -1.128 .7 -1.62" fill="none" stroke="rgb(225, 94, 50)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M3 3l18 18" fill="none" stroke="rgb(225, 94, 50)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i><span>Frontier APIs would move patient data outside the hospital</span></div>
+      <div class="models">
+        <div class="label">Model panel (native tool calling)</div>
+        <div class="chips"><span class="chip" style="font-weight: 400;">Qwen3.5-9B</span><span class="chip" style="font-weight: 400;">Granite 4.1 8B</span><span class="chip" style="font-weight: 400;">Gemma 4 E4B</span></div>
+      </div>
+    </section>
+
+    <section class="panel" data-tone="blue">
+      <div class="ptitle"><b>b</b><span style="font-weight: 700;">NeuroBench: one typed action per turn, scored against the case</span></div>
+      <div class="env">
+        <div class="card patient" id="patient">
+          <div class="label">Presentation</div>
+          <div class="who" style="margin-top:1.4mm"><div class="av"><i class="ic" data-i="user"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12.84375" height="12.84375">
+  
+  <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" fill="none" stroke="rgb(72, 72, 78)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" fill="none" stroke="rgb(72, 72, 78)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i></div><div><div class="strong" style="font-weight: 700;">Man, 38 years</div><div class="small dim">emergency department</div></div></div>
+          <p>Fever, headache and confusion for 18 h; ventricular shunt since infancy.</p>
+          <div class="vit"><span>T 39.8 °C</span><span>HR 112</span></div>
+          <p>Nuchal rigidity; GCS 9.</p>
+          <div class="lab label">Initial results</div>
+          <p class="small">WBC 22.8 ×10⁹/L<br>CRP 218 mg/L<br>Procalcitonin 8.4 ng/mL</p>
+        </div>
+
+        <div class="agentcol">
+          <div class="agent" id="agent"><div class="sq"><i class="ic l" data-i="cpu"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18.890625" height="18.890625">
+  
+  <path d="M5 5m0 1a1 1 0 0 1 1 -1h12a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-12a1 1 0 0 1 -1 -1z" fill="none" stroke="rgb(255, 255, 255)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M9 9h6v6h-6z" fill="none" stroke="rgb(255, 255, 255)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M3 10h2" fill="none" stroke="rgb(255, 255, 255)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M3 14h2" fill="none" stroke="rgb(255, 255, 255)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M10 3v2" fill="none" stroke="rgb(255, 255, 255)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M14 3v2" fill="none" stroke="rgb(255, 255, 255)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M21 10h-2" fill="none" stroke="rgb(255, 255, 255)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M21 14h-2" fill="none" stroke="rgb(255, 255, 255)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M14 21v-2" fill="none" stroke="rgb(255, 255, 255)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M10 21v-2" fill="none" stroke="rgb(255, 255, 255)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i></div><div><div class="strong" style="font-weight: 700;">Local agent</div><div class="small">one tool call or one assessment per turn</div></div></div>
+          <div class="msg call" id="call"><span class="label">Action, turn 3</span><span class="mono">order_ct_scan(contrast=false)</span></div>
+          <div class="msg obs" id="obs"><span class="label">Observation from the case <span class="cost">$184</span></span>No mass lesion or midline shift; shunt catheter in place.</div>
+          <div class="assess" id="assess"><span class="label">Final assessment</span><br>Bacterial meningitis; emergent; recommendations</div>
+        </div>
+
+        <div class="tools">
+          <div class="head"><span class="strong" style="font-weight: 700;">16 diagnostic tools</span><span class="label">results stored per case</span></div>
+          <div class="tgrid" id="tgrid"><div class="tool img "><i class="ic" data-i="brain"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12.84375" height="12.84375">
+  
+  <path d="M15.5 13a3.5 3.5 0 0 0 -3.5 3.5v1a3.5 3.5 0 0 0 7 0v-1.8" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M8.5 13a3.5 3.5 0 0 1 3.5 3.5v1a3.5 3.5 0 0 1 -7 0v-1.8" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M17.5 16a3.5 3.5 0 0 0 0 -7h-.5" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M19 9.3v-2.8a3.5 3.5 0 0 0 -7 0" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M6.5 16a3.5 3.5 0 0 1 0 -7h.5" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M5 9.3v-2.8a3.5 3.5 0 0 1 7 0v10" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i><span>MRI brain</span></div><div class="tool img on" id="ct"><i class="ic" data-i="scan"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12.84375" height="12.84375">
+  
+  <path d="M4 7v-1a2 2 0 0 1 2 -2h2" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M4 17v1a2 2 0 0 0 2 2h2" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M16 4h2a2 2 0 0 1 2 2v1" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M16 20h2a2 2 0 0 0 2 -2v-1" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M5 12l14 0" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i><span>CT head</span></div><div class="tool img "><i class="ic" data-i="atom"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12.84375" height="12.84375">
+  
+  <path d="M12 12v.01" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M19.071 4.929c-1.562 -1.562 -6 .337 -9.9 4.243c-3.905 3.905 -5.804 8.337 -4.242 9.9c1.562 1.561 6 -.338 9.9 -4.244c3.905 -3.905 5.804 -8.337 4.242 -9.9" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M4.929 4.929c-1.562 1.562 .337 6 4.243 9.9c3.905 3.905 8.337 5.804 9.9 4.242c1.561 -1.562 -.338 -6 -4.244 -9.9c-3.905 -3.905 -8.337 -5.804 -9.9 -4.242" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i><span>Advanced imaging</span></div><div class="tool img "><i class="ic" data-i="body-scan"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12.84375" height="12.84375">
+  
+  <path d="M4 8v-2a2 2 0 0 1 2 -2h2" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M4 16v2a2 2 0 0 0 2 2h2" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M16 4h2a2 2 0 0 1 2 2v2" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M16 20h2a2 2 0 0 0 2 -2v-2" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M12 8m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M10 17v-1a2 2 0 1 1 4 0v1" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M8 10c.666 .666 1.334 1 2 1h4c.666 0 1.334 -.334 2 -1" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M12 11v3" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i><span>Body imaging</span></div><div class="tool phy "><i class="ic" data-i="wave-sine"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12.84375" height="12.84375">
+  
+  <path d="M21 12h-2c-.894 0 -1.662 -.857 -1.761 -2c-.296 -3.45 -.749 -6 -2.749 -6s-2.5 3.582 -2.5 8s-.5 8 -2.5 8s-2.452 -2.547 -2.749 -6c-.1 -1.147 -.867 -2 -1.763 -2h-2" fill="none" stroke="rgb(23, 113, 127)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i><span>EEG</span></div><div class="tool phy "><i class="ic" data-i="heartbeat"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12.84375" height="12.84375">
+  
+  <path d="M19.5 13.572l-7.5 7.428l-2.896 -2.868m-6.117 -8.104a5 5 0 0 1 9.013 -3.022a5 5 0 1 1 7.5 6.572" fill="none" stroke="rgb(23, 113, 127)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M3 13h2l2 3l2 -6l1 3h3" fill="none" stroke="rgb(23, 113, 127)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i><span>ECG</span></div><div class="tool phy "><i class="ic" data-i="heart"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12.84375" height="12.84375">
+  
+  <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" fill="none" stroke="rgb(23, 113, 127)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i><span>Echo-<br>cardiogram</span></div><div class="tool phy "><i class="ic" data-i="device-heart-monitor"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12.84375" height="12.84375">
+  
+  <path d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z" fill="none" stroke="rgb(23, 113, 127)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M4 9h6l1 -2l2 4l1 -2h6" fill="none" stroke="rgb(23, 113, 127)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M4 14h16" fill="none" stroke="rgb(23, 113, 127)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M14 17v.01" fill="none" stroke="rgb(23, 113, 127)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M17 17v.01" fill="none" stroke="rgb(23, 113, 127)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i><span>Cardiac<br>monitoring</span></div><div class="tool lab "><i class="ic" data-i="test-pipe"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12.84375" height="12.84375">
+  
+  <path d="M20 8.04l-12.122 12.124a2.857 2.857 0 1 1 -4.041 -4.04l12.122 -12.124" fill="none" stroke="rgb(110, 36, 102)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M7 13h8" fill="none" stroke="rgb(110, 36, 102)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M19 15l1.5 1.6a2 2 0 1 1 -3 0l1.5 -1.6z" fill="none" stroke="rgb(110, 36, 102)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M15 3l6 6" fill="none" stroke="rgb(110, 36, 102)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i><span>Laboratory<br>panels</span></div><div class="tool lab "><i class="ic" data-i="droplet"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12.84375" height="12.84375">
+  
+  <path d="M7.502 19.423c2.602 2.105 6.395 2.105 8.996 0c2.602 -2.105 3.262 -5.708 1.566 -8.546l-4.89 -7.26c-.42 -.625 -1.287 -.803 -1.936 -.397a1.376 1.376 0 0 0 -.41 .397l-4.893 7.26c-1.695 2.838 -1.035 6.441 1.567 8.546z" fill="none" stroke="rgb(110, 36, 102)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i><span>CSF</span></div><div class="tool lab "><i class="ic" data-i="virus"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12.84375" height="12.84375">
+  
+  <path d="M12 12m-5 0a5 5 0 1 0 10 0a5 5 0 1 0 -10 0" fill="none" stroke="rgb(110, 36, 102)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M12 7v-4" fill="none" stroke="rgb(110, 36, 102)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M11 3h2" fill="none" stroke="rgb(110, 36, 102)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M15.536 8.464l2.828 -2.828" fill="none" stroke="rgb(110, 36, 102)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M17.657 4.929l1.414 1.414" fill="none" stroke="rgb(110, 36, 102)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M17 12h4" fill="none" stroke="rgb(110, 36, 102)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M21 11v2" fill="none" stroke="rgb(110, 36, 102)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M15.535 15.536l2.829 2.828" fill="none" stroke="rgb(110, 36, 102)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M19.071 17.657l-1.414 1.414" fill="none" stroke="rgb(110, 36, 102)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M12 17v4" fill="none" stroke="rgb(110, 36, 102)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M13 21h-2" fill="none" stroke="rgb(110, 36, 102)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M8.465 15.536l-2.829 2.828" fill="none" stroke="rgb(110, 36, 102)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M6.343 19.071l-1.413 -1.414" fill="none" stroke="rgb(110, 36, 102)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M7 12h-4" fill="none" stroke="rgb(110, 36, 102)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M3 13v-2" fill="none" stroke="rgb(110, 36, 102)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M8.464 8.464l-2.828 -2.828" fill="none" stroke="rgb(110, 36, 102)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M4.929 6.343l1.414 -1.413" fill="none" stroke="rgb(110, 36, 102)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i><span>Microbiology</span></div><div class="tool lab "><i class="ic" data-i="microscope"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12.84375" height="12.84375">
+  
+  <path d="M5 21h14" fill="none" stroke="rgb(110, 36, 102)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M6 18h2" fill="none" stroke="rgb(110, 36, 102)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M7 18v3" fill="none" stroke="rgb(110, 36, 102)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M9 11l3 3l6 -6l-3 -3z" fill="none" stroke="rgb(110, 36, 102)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M10.5 12.5l-1.5 1.5" fill="none" stroke="rgb(110, 36, 102)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M17 3l3 3" fill="none" stroke="rgb(110, 36, 102)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M12 21a6 6 0 0 0 3.715 -10.712" fill="none" stroke="rgb(110, 36, 102)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i><span>Tissue<br>diagnosis</span></div><div class="tool kno "><i class="ic" data-i="stethoscope"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12.84375" height="12.84375">
+  
+  <path d="M6 4h-1a2 2 0 0 0 -2 2v3.5h0a5.5 5.5 0 0 0 11 0v-3.5a2 2 0 0 0 -2 -2h-1" fill="none" stroke="rgb(72, 72, 78)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M8 15a6 6 0 1 0 12 0v-3" fill="none" stroke="rgb(72, 72, 78)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M11 3v2" fill="none" stroke="rgb(72, 72, 78)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M6 3v2" fill="none" stroke="rgb(72, 72, 78)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M20 10m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" fill="none" stroke="rgb(72, 72, 78)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i><span>Clinical<br>assessment</span></div><div class="tool kno "><i class="ic" data-i="ripple"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12.84375" height="12.84375">
+  
+  <path d="M3 7c3 -2 6 -2 9 0s6 2 9 0" fill="none" stroke="rgb(72, 72, 78)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M3 17c3 -2 6 -2 9 0s6 2 9 0" fill="none" stroke="rgb(72, 72, 78)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M3 12c3 -2 6 -2 9 0s6 2 9 0" fill="none" stroke="rgb(72, 72, 78)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i><span>Specialised<br>tests</span></div><div class="tool kno "><i class="ic" data-i="book"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12.84375" height="12.84375">
+  
+  <path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0" fill="none" stroke="rgb(72, 72, 78)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0" fill="none" stroke="rgb(72, 72, 78)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M3 6l0 13" fill="none" stroke="rgb(72, 72, 78)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M12 6l0 13" fill="none" stroke="rgb(72, 72, 78)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M21 6l0 13" fill="none" stroke="rgb(72, 72, 78)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i><span>Literature</span></div><div class="tool kno "><i class="ic" data-i="pill"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12.84375" height="12.84375">
+  
+  <path d="M4.5 12.5l8 -8a4.94 4.94 0 0 1 7 7l-8 8a4.94 4.94 0 0 1 -7 -7" fill="none" stroke="rgb(72, 72, 78)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M8.5 8.5l7 7" fill="none" stroke="rgb(72, 72, 78)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i><span>Drug<br>interactions</span></div></div>
+          <div class="legend">
+            <span><i style="background:var(--blue-l);border-color:var(--blue-m)"></i>imaging</span>
+            <span><i style="background:var(--cyan-l);border-color:var(--cyan-m)"></i>physiology</span>
+            <span><i style="background:var(--purple-l);border-color:var(--purple-m)"></i>laboratory</span>
+            <span><i style="background:var(--grey);border-color:var(--rule)"></i>clinical</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ===================== row 2 ===================== -->
+  <div class="row r2">
+    <section class="panel" data-tone="navy">
+      <div class="ptitle"><b>c</b><span style="font-weight: 700;">Each case carries an executable policy reviewed by physicians</span></div>
+      <div class="policy">
+        <div class="policy-h">
+          <div class="t" style="font-weight: 700;"><i class="ic" data-i="report-medical"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12.84375" height="12.84375">
+  
+  <path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" fill="none" stroke="rgb(28, 68, 106)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" fill="none" stroke="rgb(28, 68, 106)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M10 14l4 0" fill="none" stroke="rgb(28, 68, 106)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M12 12l0 4" fill="none" stroke="rgb(28, 68, 106)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i>Case policy · BACT-MEN-RS02</div>
+          <div class="badge"><i class="ic" data-i="users"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12.84375" height="12.84375">
+  
+  <path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" fill="none" stroke="rgb(28, 68, 106)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" fill="none" stroke="rgb(28, 68, 106)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M16 3.13a4 4 0 0 1 0 7.75" fill="none" stroke="rgb(28, 68, 106)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M21 21v-2a4 4 0 0 0 -3 -3.85" fill="none" stroke="rgb(28, 68, 106)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i>two independent physicians · seven dimensions</div>
+        </div>
+        <div class="policy-b">
+          <div>
+            <div class="sec">
+              <div class="sec-h" style="color: var(--cyan-t); font-weight: 700;"><i class="ic s" data-i="list-check"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="9.8125" height="9.8125">
+  
+  <path d="M3.5 5.5l1.5 1.5l2.5 -2.5" fill="none" stroke="rgb(23, 113, 127)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M3.5 11.5l1.5 1.5l2.5 -2.5" fill="none" stroke="rgb(23, 113, 127)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M3.5 17.5l1.5 1.5l2.5 -2.5" fill="none" stroke="rgb(23, 113, 127)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M11 6l9 0" fill="none" stroke="rgb(23, 113, 127)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M11 12l9 0" fill="none" stroke="rgb(23, 113, 127)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M11 18l9 0" fill="none" stroke="rgb(23, 113, 127)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i>Required work-up</div>
+              <ul class="req">
+                <li><span class="n">1</span>Blood cultures before antibiotics</li>
+                <li><span class="n">2</span>CBC, CRP, procalcitonin, coagulation, HIV</li>
+                <li><span class="n">3</span>CT head without contrast (GCS below 10)</li>
+                <li><span class="n">4</span>CSF cells, protein, glucose, pathogens</li>
+                <li><span class="n">5</span>MRI brain with contrast</li>
+              </ul>
+            </div>
+            <div class="sec dx">
+              <div class="sec-h" style="font-weight: 700;"><i class="ic s" data-i="check"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="9.8125" height="9.8125">
+  
+  <path d="M5 12l5 5l10 -10" fill="none" stroke="rgb(47, 47, 47)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i>Diagnosis</div>
+              <span><span class="strong" style="font-weight: 700;">accepted</span> bacterial, pneumococcal meningitis, …</span><br>
+              <span><span class="strong" style="color: var(--orange); font-weight: 700;">vetoed</span> viral, listerial, TB meningitis, abscess, …</span>
+            </div>
+          </div>
+          <div>
+            <div class="sec">
+              <div class="sec-h" style="color: var(--orange); font-weight: 700;"><i class="ic s" data-i="arrows-shuffle"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="9.8125" height="9.8125">
+  
+  <path d="M18 4l3 3l-3 3" fill="none" stroke="rgb(225, 94, 50)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M18 20l3 -3l-3 -3" fill="none" stroke="rgb(225, 94, 50)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M3 7h3a5 5 0 0 1 5 5a5 5 0 0 0 5 5h5" fill="none" stroke="rgb(225, 94, 50)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M21 7h-5a4.978 4.978 0 0 0 -3 1m-4 8a4.984 4.984 0 0 1 -3 1h-3" fill="none" stroke="rgb(225, 94, 50)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i>Order</div>
+              <div class="order"><span class="pill">CT head</span><span class="oarr"></span><span class="pill">lumbar puncture</span><span class="hard" style="font-weight: 700;">hard</span></div>
+              <div class="order" style="margin-top:0.9mm"><span class="pill">cultures</span><span class="oarr"></span><span class="pill">CT head</span><span class="soft">soft</span></div>
+            </div>
+            <div class="sec">
+              <div class="sec-h" style="color: var(--orange); font-weight: 700;"><i class="ic s" data-i="ban"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="9.8125" height="9.8125">
+  
+  <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" fill="none" stroke="rgb(225, 94, 50)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M5.7 5.7l12.6 12.6" fill="none" stroke="rgb(225, 94, 50)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i>Avoid</div>
+              <div class="avoid"><span>ECG</span><span>echocardiogram</span><span>cardiac monitoring</span><span>FDG-PET</span></div>
+              <div class="sev"><b style="font-weight: 700;">waste</b><span>lowers the waste score</span><b style="font-weight: 700;">harmful</b><span>caps the reward at 0.35</span><b style="font-weight: 700;">contraindicated</b><span>caps it at 0.10</span></div>
+            </div>
+            <div class="sec">
+              <div class="sec-h" style="font-weight: 700;"><i class="ic s" data-i="player-play" style="transform:rotate(90deg)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="9.8125" height="9.8125">
+  
+  <path d="M7 4v16l13 -8z" fill="none" stroke="rgb(47, 47, 47)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i>Stop</div>
+              <span class="small ink2">No further tests after the required set.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" data-tone="purple">
+      <div class="ptitle"><b>d</b><span style="font-weight: 700;">One verifiable reward for evaluation and for training</span></div>
+      <div class="rw">
+        <div class="rcore" id="rcore">
+          <div class="f" style="font-weight: 700;">Policy reward R ∈ [0, 1]</div>
+          <div class="comp"><span>diagnosis</span><span>required coverage</span><span>tool accuracy</span><span>safety</span><span>waste</span><span>sequence</span><span>stopping</span><span>cost</span><span>tokens</span></div>
+          <div class="caps">caps: contraindicated 0.10 · harmful 0.35 · hard order 0.50</div>
+        </div>
+        <div class="use eval" id="eval">
+          <h4 style="font-weight: 700;"><i class="ic s" data-i="list-check"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="9.8125" height="9.8125">
+  
+  <path d="M3.5 5.5l1.5 1.5l2.5 -2.5" fill="none" stroke="rgb(23, 113, 127)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M3.5 11.5l1.5 1.5l2.5 -2.5" fill="none" stroke="rgb(23, 113, 127)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M3.5 17.5l1.5 1.5l2.5 -2.5" fill="none" stroke="rgb(23, 113, 127)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M11 6l9 0" fill="none" stroke="rgb(23, 113, 127)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M11 12l9 0" fill="none" stroke="rgb(23, 113, 127)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M11 18l9 0" fill="none" stroke="rgb(23, 113, 127)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i>Benchmark score</h4>
+          <p>Deterministic; no model judge.</p>
+          <div class="split"><div><b>40</b><span>test cases, conditions seen in training</span></div><div><b>60</b><span>test cases, two unseen conditions</span></div></div>
+          <p style="margin-top:1mm" class="small">Approved policies only.</p>
+        </div>
+        <div class="use train" id="train">
+          <h4 style="font-weight: 700;"><i class="ic s" data-i="refresh"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="9.8125" height="9.8125">
+  
+  <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" fill="none" stroke="rgb(110, 36, 102)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" fill="none" stroke="rgb(110, 36, 102)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i>RL on site (GRPO)</h4>
+          <div class="cyc" id="cyc"><span id="c1">local model</span><span id="c2">rollouts on a training case</span><span id="c4">LoRA update</span><span id="c3">policy reward per episode</span></div>
+          
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ===================== row 3 ===================== -->
+  <section class="panel" data-tone="cyan">
+    <div class="ptitle"><b>e</b><span style="font-weight: 700;">Accuracy and cost cannot see an unsafe or incomplete work-up</span></div>
+    <div class="cmp" id="cmp"><div></div><div class="grp-h" style="font-weight: 700;">Work-up of the same patient; all three diagnose bacterial meningitis</div><div class="grp-h" style="grid-column: span 3; font-weight: 700;">Outcome metrics</div><div class="grp-h" style="grid-column: span 2; color: var(--cyan-t); border-color: var(--cyan-t); font-weight: 700;">Policy metric</div>
+    <div class="hd"></div><div class="hd">Actions in the order taken</div>
+    <div class="hd outcome-zone zs">Dx</div><div class="hd outcome-zone">Cost</div><div class="hd grp outcome-zone" style="font-weight: 700;">Accuracy + cost rank</div>
+    <div class="hd zs">Policy reward</div><div class="hd grp" style="font-weight: 700;">Policy rank</div><div class="cell id">A</div>
+      <div class="cell"><div class="wkc"><div class="wk"><span class="st "><i class="ic s" data-i="virus"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="9.8125" height="9.8125">
+  
+  <path d="M12 12m-5 0a5 5 0 1 0 10 0a5 5 0 1 0 -10 0" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M12 7v-4" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M11 3h2" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M15.536 8.464l2.828 -2.828" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M17.657 4.929l1.414 1.414" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M17 12h4" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M21 11v2" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M15.535 15.536l2.829 2.828" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M19.071 17.657l-1.414 1.414" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M12 17v4" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M13 21h-2" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M8.465 15.536l-2.829 2.828" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M6.343 19.071l-1.413 -1.414" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M7 12h-4" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M3 13v-2" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M8.464 8.464l-2.828 -2.828" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M4.929 6.343l1.414 -1.413" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i>Blood cultures</span><span class="link"></span><span class="st "><i class="ic s" data-i="test-pipe"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="9.8125" height="9.8125">
+  
+  <path d="M20 8.04l-12.122 12.124a2.857 2.857 0 1 1 -4.041 -4.04l12.122 -12.124" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M7 13h8" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M19 15l1.5 1.6a2 2 0 1 1 -3 0l1.5 -1.6z" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M15 3l6 6" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i>Labs</span><span class="link"></span><span class="st "><i class="ic s" data-i="scan"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="9.8125" height="9.8125">
+  
+  <path d="M4 7v-1a2 2 0 0 1 2 -2h2" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M4 17v1a2 2 0 0 0 2 2h2" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M16 4h2a2 2 0 0 1 2 2v1" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M16 20h2a2 2 0 0 0 2 -2v-1" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M5 12l14 0" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i>CT head</span><span class="link"></span><span class="st "><i class="ic s" data-i="needle"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="9.8125" height="9.8125">
+  
+  <path d="M3 21c-.667 -.667 3.262 -6.236 11.785 -16.709a3.5 3.5 0 1 1 5.078 4.791c-10.575 8.612 -16.196 12.585 -16.863 11.918z" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M17.5 6.5l-1 1" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i>Lumbar puncture</span><span class="link"></span><span class="st "><i class="ic s" data-i="brain"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="9.8125" height="9.8125">
+  
+  <path d="M15.5 13a3.5 3.5 0 0 0 -3.5 3.5v1a3.5 3.5 0 0 0 7 0v-1.8" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M8.5 13a3.5 3.5 0 0 1 3.5 3.5v1a3.5 3.5 0 0 1 -7 0v-1.8" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M17.5 16a3.5 3.5 0 0 0 0 -7h-.5" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M19 9.3v-2.8a3.5 3.5 0 0 0 -7 0" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M6.5 16a3.5 3.5 0 0 1 0 -7h.5" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M5 9.3v-2.8a3.5 3.5 0 0 1 7 0v10" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i>MRI</span></div><span class="note" style="color:var(--cyan)">complete, in order</span></div></div>
+      <div class="cell outcome-zone zs"><i class="ic" data-i="check" style="color:var(--cyan-t)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12.84375" height="12.84375">
+  
+  <path d="M5 12l5 5l10 -10" fill="none" stroke="rgb(23, 113, 127)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i></div>
+      <div class="cell outcome-zone mono" style="font-size:5.8pt">$1,313</div>
+      <div class="cell outcome-zone"><span class="rank" style="background:var(--grey2);color:var(--ink2)">2</span></div>
+      <div class="cell zs"><div class="bar"><i style="width:95.00000000000001%;background:var(--cyan)"></i></div><span class="val" style="color: var(--cyan); font-weight: 700;">0.95</span></div>
+      <div class="cell"><span class="rank" style="background:var(--cyan);color:#fff">1</span></div><div class="cell id">B</div>
+      <div class="cell"><div class="wkc"><div class="wk"><span class="st "><i class="ic s" data-i="virus"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="9.8125" height="9.8125">
+  
+  <path d="M12 12m-5 0a5 5 0 1 0 10 0a5 5 0 1 0 -10 0" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M12 7v-4" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M11 3h2" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M15.536 8.464l2.828 -2.828" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M17.657 4.929l1.414 1.414" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M17 12h4" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M21 11v2" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M15.535 15.536l2.829 2.828" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M19.071 17.657l-1.414 1.414" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M12 17v4" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M13 21h-2" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M8.465 15.536l-2.829 2.828" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M6.343 19.071l-1.413 -1.414" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M7 12h-4" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M3 13v-2" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M8.464 8.464l-2.828 -2.828" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M4.929 6.343l1.414 -1.413" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i>Blood cultures</span><span class="link"></span><span class="st "><i class="ic s" data-i="test-pipe"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="9.8125" height="9.8125">
+  
+  <path d="M20 8.04l-12.122 12.124a2.857 2.857 0 1 1 -4.041 -4.04l12.122 -12.124" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M7 13h8" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M19 15l1.5 1.6a2 2 0 1 1 -3 0l1.5 -1.6z" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M15 3l6 6" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i>Labs</span><span class="link"></span><span class="st bad" id="lpB"><i class="ic s" data-i="needle"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="9.8125" height="9.8125">
+  
+  <path d="M3 21c-.667 -.667 3.262 -6.236 11.785 -16.709a3.5 3.5 0 1 1 5.078 4.791c-10.575 8.612 -16.196 12.585 -16.863 11.918z" fill="none" stroke="rgb(255, 255, 255)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M17.5 6.5l-1 1" fill="none" stroke="rgb(255, 255, 255)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i>Lumbar puncture</span><span class="link"></span><span class="st " id="ctB"><i class="ic s" data-i="scan"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="9.8125" height="9.8125">
+  
+  <path d="M4 7v-1a2 2 0 0 1 2 -2h2" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M4 17v1a2 2 0 0 0 2 2h2" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M16 4h2a2 2 0 0 1 2 2v1" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M16 20h2a2 2 0 0 0 2 -2v-1" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M5 12l14 0" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i>CT head</span><span class="link"></span><span class="st "><i class="ic s" data-i="brain"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="9.8125" height="9.8125">
+  
+  <path d="M15.5 13a3.5 3.5 0 0 0 -3.5 3.5v1a3.5 3.5 0 0 0 7 0v-1.8" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M8.5 13a3.5 3.5 0 0 1 3.5 3.5v1a3.5 3.5 0 0 1 -7 0v-1.8" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M17.5 16a3.5 3.5 0 0 0 0 -7h-.5" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M19 9.3v-2.8a3.5 3.5 0 0 0 -7 0" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M6.5 16a3.5 3.5 0 0 1 0 -7h.5" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M5 9.3v-2.8a3.5 3.5 0 0 1 7 0v10" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i>MRI</span></div><span class="note" style="color:var(--orange)">lumbar puncture before CT</span></div></div>
+      <div class="cell outcome-zone zs"><i class="ic" data-i="check" style="color:var(--cyan-t)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12.84375" height="12.84375">
+  
+  <path d="M5 12l5 5l10 -10" fill="none" stroke="rgb(23, 113, 127)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i></div>
+      <div class="cell outcome-zone mono" style="font-size:5.8pt">$1,313</div>
+      <div class="cell outcome-zone"><span class="rank" style="background:var(--grey2);color:var(--ink2)">2</span><span class="note dim">tied</span></div>
+      <div class="cell zs"><div class="bar"><i style="width:50%;background:var(--orange)"></i></div><span class="val" style="color: var(--orange); font-weight: 700;">0.50</span></div>
+      <div class="cell"><span class="rank" style="background:var(--grey2);color:var(--ink2)">3</span></div><div class="cell id">C</div>
+      <div class="cell"><div class="wkc"><div class="wk"><span class="st "><i class="ic s" data-i="test-pipe"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="9.8125" height="9.8125">
+  
+  <path d="M20 8.04l-12.122 12.124a2.857 2.857 0 1 1 -4.041 -4.04l12.122 -12.124" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M7 13h8" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M19 15l1.5 1.6a2 2 0 1 1 -3 0l1.5 -1.6z" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M15 3l6 6" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i>Labs</span><span class="link"></span><span class="st "><i class="ic s" data-i="needle"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="9.8125" height="9.8125">
+  
+  <path d="M3 21c-.667 -.667 3.262 -6.236 11.785 -16.709a3.5 3.5 0 1 1 5.078 4.791c-10.575 8.612 -16.196 12.585 -16.863 11.918z" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M17.5 6.5l-1 1" fill="none" stroke="rgb(0, 51, 160)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i>Lumbar puncture</span><span class="link"></span><span class="st miss"><i class="ic s" data-i="virus"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="9.8125" height="9.8125">
+  
+  <path d="M12 12m-5 0a5 5 0 1 0 10 0a5 5 0 1 0 -10 0" fill="none" stroke="rgb(133, 133, 140)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M12 7v-4" fill="none" stroke="rgb(133, 133, 140)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M11 3h2" fill="none" stroke="rgb(133, 133, 140)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M15.536 8.464l2.828 -2.828" fill="none" stroke="rgb(133, 133, 140)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M17.657 4.929l1.414 1.414" fill="none" stroke="rgb(133, 133, 140)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M17 12h4" fill="none" stroke="rgb(133, 133, 140)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M21 11v2" fill="none" stroke="rgb(133, 133, 140)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M15.535 15.536l2.829 2.828" fill="none" stroke="rgb(133, 133, 140)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M19.071 17.657l-1.414 1.414" fill="none" stroke="rgb(133, 133, 140)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M12 17v4" fill="none" stroke="rgb(133, 133, 140)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M13 21h-2" fill="none" stroke="rgb(133, 133, 140)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M8.465 15.536l-2.829 2.828" fill="none" stroke="rgb(133, 133, 140)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M6.343 19.071l-1.413 -1.414" fill="none" stroke="rgb(133, 133, 140)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M7 12h-4" fill="none" stroke="rgb(133, 133, 140)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M3 13v-2" fill="none" stroke="rgb(133, 133, 140)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M8.464 8.464l-2.828 -2.828" fill="none" stroke="rgb(133, 133, 140)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M4.929 6.343l1.414 -1.413" fill="none" stroke="rgb(133, 133, 140)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i>Blood cultures</span><span class="link"></span><span class="st miss"><i class="ic s" data-i="scan"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="9.8125" height="9.8125">
+  
+  <path d="M4 7v-1a2 2 0 0 1 2 -2h2" fill="none" stroke="rgb(133, 133, 140)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M4 17v1a2 2 0 0 0 2 2h2" fill="none" stroke="rgb(133, 133, 140)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M16 4h2a2 2 0 0 1 2 2v1" fill="none" stroke="rgb(133, 133, 140)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M16 20h2a2 2 0 0 0 2 -2v-1" fill="none" stroke="rgb(133, 133, 140)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M5 12l14 0" fill="none" stroke="rgb(133, 133, 140)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i>CT head</span><span class="link"></span><span class="st miss"><i class="ic s" data-i="brain"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="9.8125" height="9.8125">
+  
+  <path d="M15.5 13a3.5 3.5 0 0 0 -3.5 3.5v1a3.5 3.5 0 0 0 7 0v-1.8" fill="none" stroke="rgb(133, 133, 140)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M8.5 13a3.5 3.5 0 0 1 3.5 3.5v1a3.5 3.5 0 0 1 -7 0v-1.8" fill="none" stroke="rgb(133, 133, 140)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M17.5 16a3.5 3.5 0 0 0 0 -7h-.5" fill="none" stroke="rgb(133, 133, 140)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M19 9.3v-2.8a3.5 3.5 0 0 0 -7 0" fill="none" stroke="rgb(133, 133, 140)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M6.5 16a3.5 3.5 0 0 1 0 -7h.5" fill="none" stroke="rgb(133, 133, 140)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M5 9.3v-2.8a3.5 3.5 0 0 1 7 0v10" fill="none" stroke="rgb(133, 133, 140)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i>MRI</span></div><span class="note" style="color:var(--orange)">cultures, CT and MRI skipped</span></div></div>
+      <div class="cell outcome-zone zs"><i class="ic" data-i="check" style="color:var(--cyan-t)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12.84375" height="12.84375">
+  
+  <path d="M5 12l5 5l10 -10" fill="none" stroke="rgb(23, 113, 127)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></i></div>
+      <div class="cell outcome-zone mono" style="font-size:5.8pt">$682</div>
+      <div class="cell outcome-zone"><span class="rank" style="background:var(--navy);color:#fff">1</span><span class="note dim">cheapest correct</span></div>
+      <div class="cell zs"><div class="bar"><i style="width:73.40000000000002%;background:#9a9aa2"></i></div><span class="val" style="color: rgb(154, 154, 162); font-weight: 700;">0.73</span></div>
+      <div class="cell"><span class="rank" style="background:var(--grey2);color:var(--ink2)">2</span></div></div>
+  </section>
+<svg class="arrow" style="left:0;top:0;width:100%;height:100%"><g><path d="M81.57763287401575,85.46875 L98.53174212598425,85.46875" fill="none" stroke="#48484e" stroke-width="0.75" stroke-dasharray="none"></path><path d="M103.0671751968504,85.46875 L98.53174212598425,87.73646653543307 L98.53174212598425,83.20103346456693 Z" fill="#48484e"></path><path d="M77.0421998031496,85.46875 L81.57763287401575,83.20103346456693 L81.57763287401575,87.73646653543307 Z" fill="#48484e"></path></g><g><path d="M242.109375,340.015625 L250.41769192913387,340.015625" fill="none" stroke="#48484e" stroke-width="0.75" stroke-dasharray="none"></path><path d="M254.953125,340.015625 L250.41769192913387,342.28334153543307 L250.41769192913387,337.74790846456693 Z" fill="#48484e"></path></g><g><path d="M239.671875,356.8125 L247.98019192913387,356.8125" fill="none" stroke="#48484e" stroke-width="0.75" stroke-dasharray="none"></path><path d="M252.515625,356.8125 L247.98019192913387,359.08021653543307 L247.98019192913387,354.54478346456693 Z" fill="#48484e"></path></g><g><path d="M319.69844980314963,47.27306840551181 L327.25049212598424,47.27306840551181" fill="none" stroke="#48484e" stroke-width="0.75" stroke-dasharray="none"></path><path d="M331.78592519685037,47.27306840551181 L327.25049212598424,49.54078494094488 L327.25049212598424,45.005351870078734 Z" fill="#48484e"></path></g><g><path d="M397.546875,78.2609498031496 L397.546875,83.92236712598425" fill="none" stroke="#0033A0" stroke-width="0.75" stroke-dasharray="none"></path><path d="M397.546875,88.4578001968504 L395.27915846456693,83.92236712598425 L399.81459153543307,83.92236712598425 Z" fill="#0033A0"></path></g><g><path d="M463.30782480314963,107.9453125 L470.85986712598424,107.9453125" fill="none" stroke="#0033A0" stroke-width="0.75" stroke-dasharray="none"></path><path d="M475.39530019685037,107.9453125 L470.85986712598424,110.21302903543307 L470.85986712598424,105.67759596456693 Z" fill="#0033A0"></path></g><g><path d="M475.39530019685037,160.859375 L467.84325787401576,160.859375" fill="none" stroke="#2a9fb0" stroke-width="0.75" stroke-dasharray="none"></path><path d="M463.30782480314963,160.859375 L467.84325787401576,158.59165846456693 L467.84325787401576,163.12709153543307 Z" fill="#2a9fb0"></path></g><g><path d="M331.78592519685037,160.859375 L328.57332677165357,160.859375 Q325.3607283464567,160.859375 325.3607283464567,156.32394192913387 L325.3607283464567,66.17070620078741 Q325.3607283464567,61.63527312992126 326.30561023622045,61.63527312992126 L327.25049212598424,61.63527312992126" fill="none" stroke="#2a9fb0" stroke-width="0.75" stroke-dasharray="none"></path><path d="M331.78592519685037,61.63527312992126 L327.25049212598424,63.90298966535433 L327.25049212598424,59.367556594488185 Z" fill="#2a9fb0"></path></g><g><path d="M397.546875,184.0890748031496 L397.546875,189.75049212598427" fill="none" stroke="#48484e" stroke-width="0.75" stroke-dasharray="2.2 2"></path><path d="M397.546875,194.2859251968504 L395.27915846456693,189.75049212598427 L399.81459153543307,189.75049212598427 Z" fill="#48484e"></path></g><g><path d="M464.6484375,354.54219980314963 L464.6484375,368.84424212598424" fill="none" stroke="#2a9fb0" stroke-width="0.75" stroke-dasharray="none"></path><path d="M464.6484375,373.37967519685037 L462.38072096456693,368.84424212598424 L466.91615403543307,368.84424212598424 Z" fill="#2a9fb0"></path></g><g><path d="M606.8203125,354.54219980314963 L606.8203125,368.84424212598424" fill="none" stroke="#6E2466" stroke-width="0.75" stroke-dasharray="none"></path><path d="M606.8203125,373.37967519685037 L604.5525959645669,368.84424212598424 L609.0880290354331,368.84424212598424 Z" fill="#6E2466"></path></g><g><path d="M599.6359498031496,413.40625 L609.4536171259842,413.40625" fill="none" stroke="#6E2466" stroke-width="0.75" stroke-dasharray="none"></path><path d="M613.9890501968504,413.40625 L609.4536171259842,415.67396653543307 L609.4536171259842,411.13853346456693 Z" fill="#6E2466"></path></g><g><path d="M640.9296875,428.49532480314963 L640.9296875,436.04736712598424" fill="none" stroke="#6E2466" stroke-width="0.75" stroke-dasharray="none"></path><path d="M640.9296875,440.58280019685037 L638.6619709645669,436.04736712598424 L643.1974040354331,436.04736712598424 Z" fill="#6E2466"></path></g><g><path d="M613.9890501968504,460.0078125 L604.1713828740158,460.0078125" fill="none" stroke="#6E2466" stroke-width="0.75" stroke-dasharray="none"></path><path d="M599.6359498031496,460.0078125 L604.1713828740158,457.74009596456693 L604.1713828740158,462.27552903543307 Z" fill="#6E2466"></path></g><g><path d="M572.703125,440.58280019685037 L572.703125,433.03075787401576" fill="none" stroke="#6E2466" stroke-width="0.75" stroke-dasharray="none"></path><path d="M572.703125,428.49532480314963 L574.9708415354331,433.03075787401576 L570.4354084645669,433.03075787401576 Z" fill="#6E2466"></path></g><g><path d="M179.265625,608.8171751968504 L179.265625,605.6045767716535 Q179.265625,602.3919783464567 183.80105807086613,602.3919783464567 L240.60519192913387,602.3919783464567 Q245.140625,602.3919783464567 245.140625,603.3368602362204 L245.140625,604.2817421259842" fill="none" stroke="#E15E32" stroke-width="0.75" stroke-dasharray="none"></path><path d="M245.140625,608.8171751968504 L242.87290846456693,604.2817421259842 L247.40834153543307,604.2817421259842 Z" fill="#E15E32"></path></g></svg><span style="position: absolute; font-family: Arial; white-space: nowrap; line-height: normal; font-size: 6.66667px; color: rgb(23, 113, 127); opacity: 1; left: 318.703px; top: 111.625px; transform: translate(-50%, -50%) rotate(-90deg);">next turn</span><span style="position: absolute; font-family: Arial; white-space: nowrap; line-height: normal; font-size: 6.66667px; color: rgb(133, 133, 140); opacity: 1; left: 413.934px; top: 189.333px; transform: translate(-50%, -50%);">last turn</span><span style="position: absolute; font-family: Arial; white-space: nowrap; line-height: normal; font-size: 6.66667px; color: rgb(23, 113, 127); opacity: 1; left: 481.778px; top: 364.107px; transform: translate(-50%, -50%);">evaluate</span><span style="position: absolute; font-family: Arial; white-space: nowrap; line-height: normal; font-size: 6.66667px; color: rgb(110, 36, 102); opacity: 1; left: 595.8px; top: 364.107px; transform: translate(-50%, -50%);">train</span></div>
+
+
+
+
+
+</body></html>

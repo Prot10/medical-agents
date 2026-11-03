@@ -1,0 +1,97 @@
+# FEPI-TEMP-RP04
+Reviewer status: no reviewer notes for FEPI-TEMP (R1 and R2 never reviewed this condition in a notes round) | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| (none) | n/a | No reviewer notes for this case. Physician input is the July 2026 tool guidance (plan 1.3), applied through plans/FEPI-TEMP.md. |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| C | major | `patient.history_present_illness`, `patient.clinical_history.past_medical_history[4]` | The label and musts call him drug-resistant, but both earlier trials were stopped for adverse effects (levetiracetam after three months for mood, oxcarbazepine for hyponatremia), which ILAE 2010 counts as uninformative; only the lamotrigine plus carbamazepine schedule was an efficacy failure. | FIXED (data, not label): levetiracetam was titrated to 1500 mg twice daily for a year with ongoing monthly seizures before it was stopped for irritability and low mood; oxcarbazepine stopped within two months. Two informative failures now meet Kwan 2010; KCE says the oxcarbazepine trial was uninformative. |
+| B | major | `initial_tool_outputs.mri` (class F) | The MRI the agent orders was a 1.5T "standard" study whose temporopolar finding was "suspicious but not conclusive" and that recommended a 3T epilepsy protocol, while also saying the change was "clearer on 3T"; gadolinium lines in a non-lesional study (class E). | FIXED: 3T epilepsy-protocol MRI (technique and comparison lines; outside 1.5T study six years ago); definite left HS (fact 4) and left temporopolar gray-white blurring with faint FLAIR signal "possibly FCD type IIIa" (fact 13); gadolinium lines removed; volumes 2.2 / 3.3 cm3 (asymmetry index 0.20, 33% smaller) so the pair is not shared with S01; numbered impression. |
+| B | major | `initial_tool_outputs.labs` (new), `followup_outputs` drug check (class S) | The drug output quoted lamotrigine 3.2 and carbamazepine 9.8 levels that no output reported, and diagnosed adherence ("not a sign of non-adherence"). | FIXED: new initial labs (lamotrigine 3.2, carbamazepine 9.8, sodium 134 low, glucose 118, GGT 88, normal CBC and renal and liver tests) and a recommended criterion `action-labs-aed-levels` (`AED_levels`, `sodium` or `BMP`); drug output explains induction without numbers or adherence verdicts, adds carbamazepine-amlodipine, clobazam and lacosamide facts, sodium warning; trigger kept. |
+| C | major | `ground_truth.key_clinical_evidence`, `.assessment`, `.differential` (classes M, S) | KCE, a must, a prohibition and the PNES differential relied on a "normal prolactin drawn 3 hours post-event" the case does not contain. | FIXED: every prolactin mention deleted; the difficulty description no longer lists it as a distractor. |
+| D | minor | `followup_outputs` video-EEG | Impression stated an interpretation ("does not represent an independent epileptic focus"); artifact text claimed generalization in "all 17 events" (two generalized); em dashes in the finding types. | FIXED: numbered impression of the recorded patterns; artifact limited to the two bilateral seizures; finding types reworded; limitations "ASMs were tapered during monitoring". |
+| B | minor | `followup_outputs` FDG-PET | Impression repeated threshold text; asymmetry index -22% shared with three other FEPI cases. | FIXED: index -19%, numbered within-imaging impression. Optional criterion kept. |
+| E | minor | `followup_outputs` neuropsychology | "Low-average to average" functioning with FSIQ 104 and PRI 110. | FIXED: "average to high-average"; summary kept in neuropsychologist voice. |
+| D | major | `followup_outputs` literature (classes A, O) | Required; four results without authors, one an "ILAE 2017 guideline" with wrong evidence levels, and an expected evidence quoting case statistics. | FIXED: optional, last; Kwan 2010, Wiebe 2001, Engel 2012 (ERSET), Blumcke 2011; general statements; trigger renamed. |
+| A | major | `ground_truth.action_criteria` (classes A, D, E, H) | MRI `{contrast: true, protocol: epilepsy}`; literature required; neuropsychology optional; PET recommended; template video-EEG evidence (PNES); doubled citations. | FIXED: order MRI, video-EEG, labs, PET, neuropsychology, drug check, literature. Required: MRI `{protocol: epilepsy}`, video-EEG, drug check. Recommended: labs, neuropsychology. Optional: PET, literature. One key each; case-specific evidence. |
+| A | minor | `ground_truth.sequence_constraints`, `.stop_rule` (classes C, D) | Template reason; literature in the stop rule; max 0. | FIXED: soft MRI -> drug check with the canonical reason; stop rule MRI, video-EEG, drug check; max 2. |
+| C | major | `ground_truth.assessment` (class L) | Musts were work-up steps (3T MRI, video-EEG, PET, neuropsychology) and two insights; no SUDEP; generic LP prohibition. | FIXED: musts: epilepsy surgery conference for left anterior temporal resection (ILAE 2010 drug resistance), resection including the temporal pole after language lateralization with verbal memory and naming risk counseling, a non-inducing add-on while waiting and sodium monitoring, SUDEP, driving and classroom safety. Prohibitions: bitemporal conclusion (kept, reworded), indefinite escalation (kept), hippocampus-only resection (reworded), reading the lamotrigine level as non-adherence. LP prohibition removed (CSF waste covers it). |
+| C | major | `ground_truth.differential` (class P) | HS single pathology `high` and bitemporal `moderate` after the work-up; tumor coded D33.2 (brain, unspecified). | FIXED: HS single pathology `moderate` (temporopolar blurring may be white matter change; histology decides); bitemporal `low`; PNES, autoimmune encephalitis and tumor (D33.0) `very_low`. |
+| E | minor | `ground_truth.key_clinical_evidence` (class G) | Two July-review engineering lines; KCE "right temporal delta on initial inpatient EEG" (there is no inpatient routine EEG). | FIXED: six case-specific statements referring to the outpatient EEG and the video-EEG. |
+| B | major | `ground_truth.red_herrings` | The only red herring pointed at `followup_outputs[3].output.findings[1]` (the seizures, not the right temporal delta) and cited a "routine EEG" that does not exist. | FIXED: three entries: outpatient EEG in the HPI, `followup_outputs[0].output.findings[3].type` (right temporal delta) and `initial_tool_outputs.labs.panels.AED Levels[0]` (lamotrigine level); paths verified. |
+| C | minor | `ground_truth.avoided_actions` | Template rationales, all cited [AAN_2007]. | FIXED: case-specific rationales; CT cites [ILAE_MRI_2019], the others [NICE_NG217_2025]. CT stays waste (elective presurgical admission, fact 3). |
+| B | minor | `patient.neurological_exam.additional` | Exam text classified the seizure ("consistent with recovery from a focal impaired-awareness seizure"). | FIXED: "fully oriented with intact language". |
+| A | minor | `fallback_tool_outputs.echo` | No `echo_type`. | FIXED: `TTE`. |
+| E | minor | `metadata.difficulty_description`, `.difficulty_rationale` | Prolactin distractor and "six required tools". | FIXED: rewritten. |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+
+A 47-year-old right-handed teacher with six years of stereotyped left temporal seizures (epigastric rising, deja vu, lip smacking, right-hand fumbling, two bilateral tonic-clonic seizures) is admitted for presurgical evaluation. The history now makes him drug-resistant by ILAE 2010: levetiracetam 1500 mg twice daily failed over a year before it was stopped for mood effects, oxcarbazepine was stopped early for hyponatremia (uninformative), and lamotrigine with carbamazepine at therapeutic levels has failed. Required: a 3T epilepsy-protocol MRI, now the dedicated study (definite left hippocampal sclerosis, 2.2 vs 3.3 cm3, with left temporopolar gray-white blurring, possibly FCD type IIIa); the 5-day video-EEG (17 habitual seizures, all left anterior temporal onset; right temporal slowing without a right-sided onset); and the drug check (carbamazepine induction of lamotrigine and amlodipine). Recommended: new ASM levels and sodium (lamotrigine 3.2, carbamazepine 9.8, sodium 134) and neuropsychology (verbal memory and naming deficit). PET and literature are optional. All prolactin content is gone. Musts: epilepsy surgery conference for left anterior temporal resection including the temporal pole after language lateralization, a non-inducing add-on and sodium monitoring meanwhile, SUDEP, driving and classroom safety; prohibitions on a bitemporal conclusion, indefinite escalation, a hippocampus-only resection and reading the lamotrigine level as non-adherence.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+
+- Label (plan CENTRAL 5): `accepted[0]` still reads "... dual pathology (left mesial temporal sclerosis and adjacent left temporal focal cortical dysplasia, FCD Type IIIa)". HS with an associated temporal cortical abnormality is FCD type IIIa, not dual pathology, and it is a histological diagnosis (Blumcke 2011). Plan decision: "left hippocampal sclerosis with associated left temporopolar cortical abnormality (suspected FCD type IIIa)"; ICD unchanged. Not edited here (ruling 3).
+- Router: `analyze_eeg` is not routed by `eeg_type`, so a routine or sleep-deprived EEG order in this case receives the 5-day video-EEG report (the only stored EEG). Suggest adding `analyze_eeg: eeg_type` to the MockServer discriminators, with the library answering an unstored EEG type.
+- Citation keys used that are not yet in the pack allow-list (plan CENTRAL 2): `[ILAE_MRI_2019]`, `[IFCN_ILAE_EEG_2023]`, `[NICE_NG217_2025]`.
+- Synonyms (plan CENTRAL 6): the idiopathic G40.009/G40.019 codes do not fit this structural epilepsy.
+
+## Open questions for Andrea (judgment calls you could not settle)
+
+None open. Decisions taken and their reasons:
+- Drug resistance was fixed in the history rather than in the label: the label, the surgical pathway and the plan all assume drug resistance, and a one-year adequate levetiracetam trial with ongoing seizures is the smallest change that makes it true under ILAE 2010.
+- Labs recommended with a new initial output, as the plan asks: the stored drug output depended on levels no output reported; GGT 88 was added as the usual induction effect of carbamazepine and is not used by any criterion.
+- No functional MRI criterion: language lateralization before a dominant temporal resection is named in the surgical must; the case fallback library already answers a functional MRI order with left hemispheric language dominance, consistent with a right-handed man.
+
+## Verification
+Adversarial verifier, 24 Oct 2026. Read the log, the diff against master and the whole final case. Checked: drug resistance now meets Kwan 2010 in the history (levetiracetam 1500 mg twice daily for a year, lamotrigine with carbamazepine; oxcarbazepine uninformative) and KCE, musts and literature say the same; 3T epilepsy-protocol MRI with definite left HS (2.2 / 3.3 cm3: 33% smaller, index 0.20, pair unique in FEPI) and temporopolar blurring "possibly FCD type IIIa"; new labs (lamotrigine 3.2, carbamazepine 9.8, sodium 134) back the drug output, which no longer quotes levels; prolactin gone; video-EEG impression and artifact text; neuropsychology wording against FSIQ 104 / PRI 110; red-herring paths (`followup_outputs[0].output.findings[3].type`, `labs.panels.AED Levels[0]`) exist; tiers and stop rule per plan.
+Found and fixed:
+- Video-EEG interictal "sharp waves" had a duration of 60-100 ms, which starts in the spike range (sharp waves are 70-200 ms): now 80-120 ms.
+- ERSET literature summary ("fewer seizures over two years") misstated the outcome: now the trial's result, 11 of 15 surgical and 0 of 23 medical patients free of disabling seizures in year 2 (Engel 2012).
+Left for close-out: label wording (plan CENTRAL 5) and the `analyze_eeg` routing by `eeg_type` (a routine EEG order receives the video-EEG report), both already in the log's CENTRAL list. perfect_agent, case_io check and the case guards are clean.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026. Checked uniformity of the plan's decisions across the 30 cases and the FND and MS-RR audit classes (engineering text, any-query outputs, second-tier labs, copied numbers, sharp-wave durations, differential codes). After the changes below, `perfect_agent.py` and `case_io.py check` are clean for all 30 cases and `test_case_guards.py -k FEPI-TEMP` passes.
+
+- `initial_tool_outputs.literature_search.general`: neutral focal-epilepsy block added (definition, classification, MRI protocol, first-line ASM, drug resistance), so a literature query that names no case-specific topic no longer receives a stored follow-up.
+- `action-6-order-advanced-imaging.rationale`: engineering prefix or tier wording removed (was "Optional here: MRI and video-EEG already...").
+- `action-4-search-medical-literature.rationale`: engineering prefix or tier wording removed (was "Optional background; the diagnosis rests...").
+- Literature follow-up (served for any query): the query named "hippocampal sclerosis and temporopolar abnormality" and a result and summary line described FCD IIIa, i.e. this case's MRI and diagnosis; now drug-resistance definition and surgical trials only.
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (`plans/FEPI-TEMP-decisions.md`). What changed and why:
+
+- Diagnosis synonyms (`diagnosis_synonyms.yaml` G40 entries, re-applied with `--prune --conditions focal_epilepsy_temporal`): labels now focal epilepsy, temporal lobe epilepsy, TLE, epilepsy temporal lobe, mesial temporal lobe epilepsy, MTLE (added), mesial temporal sclerosis epilepsy; removed focal seizures; focal onset seizures; focal impaired awareness seizures (seizure-type labels, retired: their tokens occur in an acute symptomatic or functional-seizure answer). Codes: G40.2, G40.1, G40.9 plus G40.219, G40.119, G40.919 (drug-resistant, Kwan 2010); the idiopathic G40.009 and G40.019 removed and the not-intractable codes removed.
+- Label (summary CENTRAL 5): "dual pathology (left mesial temporal sclerosis and adjacent left temporal focal cortical dysplasia, FCD Type IIIa)" -> "left hippocampal sclerosis and an associated left temporopolar cortical abnormality (suspected FCD type IIIa)": HS with an associated cortical lesion is FCD IIIa, a histological diagnosis, not dual pathology (Blumcke 2011). Code unchanged (G40.219).
+- Soft MRI -> drug check constraint: citation `[ILAE_MRI_2019]` -> `[NICE_NG217_2025]`, as in the other cases (ASM choice is what the constraint is about; auditor flag).
+- Checks: `perfect_agent.py -v` and `case_io.py check` clean; `test_case_guards.py -k FEPI-TEMP-` passes, now with the discriminator guard and the FEPI-TEMP banned strings.
+
+## Lab evidence (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited results its own order (the first alternative) no longer returned; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-labs-aed-levels]`.alternatives: was [AED_levels] | [sodium] | [BMP]; now [AED_levels, BMP] | [AED_levels] | [sodium] | [BMP].
+- `ground_truth.action_criteria[action-labs-aed-levels]`.expected_evidence: was "Lamotrigine 3.2 and carbamazepine 9.8 mcg/mL within range; sodium 134 mEq/L on carbamazepine; GGT 88 U/L."; now "Lamotrigine 3.2 and carbamazepine 9.8 mcg/mL within range; sodium 134 mEq/L on carbamazepine.".
+- Decision: serve: new first alternative (old order kept as an alternative) + trim evidence. The label asks for ASM levels and sodium, and a must monitors sodium on carbamazepine. GGT (enzyme induction) is incidental to the criterion and is trimmed; it stays servable to a liver-panel order.
+- Scoring: none (recommended criterion: coverage unchanged, not in the cost reference).
+
+Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.
+
+## Library contradictions (25 Oct 2026)
+
+Orders the benchmark library answered with a normal report that contradicts this case now get a case-specific report (term: gist, where stored):
+
+- analyze_eeg routine: This is an ABNORMAL EEG due to: 1. Left anterior temporal sharp waves (phase reversal at F7), increasing in drowsiness. 2. Intermittent left temporal  (fallback_tool_outputs.eeg)
+- analyze_eeg ambulatory: This is an ABNORMAL 48-hour ambulatory EEG due to: 1. Frequent left anterior temporal sharp waves (phase reversal at F7), maximal in NREM sleep. 2. In (followup request_ambulatory_eeg)
+- obtain_tissue_diagnosis resection: Hippocampal sclerosis, ILAE type 1, with focal cortical dysplasia ILAE type IIIa of the temporal pole (fallback_tool_outputs.tissue_diagnosis)
+- obtain_tissue_diagnosis stereotactic_biopsy: Hippocampal neuronal loss with fibrillary gliosis (followup request_stereotactic_biopsy)
+- obtain_tissue_diagnosis open_biopsy: Hippocampal neuronal loss with fibrillary gliosis (followup request_open_biopsy)
+- interpret_labs valproate_level: valproate not detected (fallback_tool_outputs.labs[valproate_level])
+- interpret_labs HbA1c: Hemoglobin A1c 6.9%, in the diabetic range. (fallback_tool_outputs.labs[HbA1c])
+
+Checks: `perfect_agent.py` passes; the criterion snapshot of the case is unchanged; `pytest agent-platform/tests -k FEPI-TEMP` (case guards included), `test_reports_do_not_fabricate.py` and `apply_diagnosis_synonyms.py --check` pass; no new report repeats a 60-character window of any criterion's expected evidence.

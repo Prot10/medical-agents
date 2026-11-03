@@ -1,0 +1,104 @@
+# MS-RR-RP03
+Reviewer status: R1 not reviewed, R2 not reviewed (no MS-RR notes file this round) | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| (none) | - | No reviewer notes for this case. |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| C | blocker | `initial_tool_outputs.csf`, `action_criteria[action-5-analyze-csf]`, `sequence_constraints` | A normal CSF was served from the initial work-up and CSF was recommended in a GCS 8 patient with a 3.8 cm posterior fossa lesion compressing the fourth ventricle (class L). | FIXED: CSF criterion and constraint deleted; avoided action `avoid-contra-lp-mass-effect` (contraindicated); CSF moved to `fallback_tool_outputs.csf` with a kFLC index 3.1 (reference <6.1) and a pattern interpretation. |
+| C | blocker | `followup_outputs` `request_repeat_mri_post_steroids`, literature `request_steroid_trial` | The pathway served a post-steroid MRI and a "steroid trial" search: future data and treatment response (ruling 4, class F); the label rested on them. | FIXED: both deleted. Label support now comes from tissue: new `obtain_tissue_diagnosis` `stereotactic_biopsy` follow-up of the right temporal lesion (non-dominant, accessible) showing active demyelination, CD20/IDH1/EBER, histology-only impression; recommended `action-biopsy`; soft constraint MRI before biopsy. |
+| C | major | `patient.history_present_illness`, `neurological_exam.additional` | A 3.8 cm brainstem lesion in a patient "neurologically intact preoperatively" is implausible; HPI ended with a differential paragraph; onset timing inconsistent (PACU vs "6 hours after"). | FIXED: three-week prodrome of unsteadiness, slurred speech and dysphagia (attributed to illness and poor intake), reasoning sentence deleted, exam "additional" states deficits noted in the recovery unit and neurology consulted at 3 hours. |
+| B | major | `patient.neurological_exam.mental_status`, HPI, `chief_complaint` | "Globally aphasic" cannot be assessed at GCS 8 (V2). | FIXED: deleted; chief complaint "Unresponsiveness and quadriparesis noted in the recovery unit after abdominal surgery". |
+| B | major | `initial_tool_outputs.mri.findings[0]` | A lesion confined to the left peduncle and left medulla does not explain quadriparesis with reduced consciousness. | FIXED: lesion described as extending into the left pons and the medulla with the medullary component reaching the midline ventrally (bilateral corticospinal involvement); "No tonsillar descent" added. |
+| D | major | `initial_tool_outputs.mri.impression` | Differential essay (glioblastoma, lymphoma, abscess). | FIXED: numbered findings and one hedged read with "Tissue diagnosis recommended"; "Cervical spine not included" replaced by "Spinal cord not assessed on this study". |
+| C | major | `avoided_actions[avoid-waste-1-analyze-eeg]`, `[avoid-waste-2-order-ct-scan]`, `fallback_tool_outputs.ct`, `.eeg` | Head CT and EEG called waste in postoperative coma (non-convulsive status and an acute structural cause must be excluded); CT fallback normal with an incidental granuloma, EEG fallback normal (N, M). | FIXED: both avoidances deleted; CT fallback shows the posterior fossa and right temporal hypodensities with fourth ventricular effacement; EEG fallback shows diffuse slowing without seizures. |
+| B | minor | `followup_outputs` MRS | Signal string full of interpretation ("argues against necrotic GBM"), impression "clinical correlation is essential". | FIXED: values and quantitative data kept, within-modality impression. Optional `action-mrs`. |
+| C | minor | `followup_outputs` drug check | IVIg offered as an alternative for an MS attack; levothyroxine, pantoprazole and the sulfonamide allergy not listed; metformin withholding in critical illness absent. | FIXED: each medicine and the allergy against methylprednisolone, insulin and hypoglycaemia points, PLEX as the alternative. Criterion recommended (plan 3.2). |
+| D | major | `followup_outputs` literature (remaining) | Unverifiable sources (Kalanie 2012, Altintas 2012) and the claim that anaesthesia is a recognised MS relapse trigger. | FIXED: three verifiable sources (Lucchinetti 2008, Masdeu 2000, Hardy and Chataway 2013) with general findings; last in pathway. |
+| D | minor | `initial_tool_outputs.labs` | AQP4 and HIV rows with leaked significance; MOG in its own panel; abnormal summary with causal labels ("postoperative", "stress response"). | FIXED: Neuroimmunology and Infectious panels, significance null; summary and interpretation plain; BUN 14 -> 10 (plan E). |
+| A | major | `ground_truth.action_criteria`, `stop_rule` | Template criteria and stop rule (literature and drug check required, labs needing 11 analytes, max 0). | FIXED: canonical criteria; labs `[CBC, vitamin_B12, TSH, HIV]` and `action-aqp4-mog-cba` required; MRS optional; biopsy and drug check recommended; literature optional last; stop rule brain MRI, spine MRI, labs, AQP4/MOG; max 3. |
+| C | major | `ground_truth.differential` | Lymphoma and glioblastoma "high", NMOSD/MOGAD "moderate" (ruling 7); the stroke, cord infarction and anaesthesia explanations raised by the HPI absent. | FIXED: ten entries, all low with the case's results: lymphoma, glioma, posterior circulation stroke, cord infarction, abscess, NMOSD (noting OCB absence does not count against it), MOGAD, ADEM, metabolic encephalopathy, non-convulsive status. |
+| E | major | `ground_truth.key_clinical_evidence` | Template lines (three regions establish DIS, OCB substitute for DIT, black holes, DMT choice, engineering lines). | FIXED: six observable lines (syndrome and prodrome, earlier episodes, DIS 4 of 5, histology, CBA, LP unsafe). |
+| C | major | `ground_truth.assessment.required_recommendations` | Generic IVMP with no instruction to wait for tissue; no airway or ICU measures at GCS 8 with a medullary lesion; no plan for metformin/glibenclamide during the pulse; diagnostic musts. | FIXED: formulation must; ICU airway, nil by mouth, hydrocephalus monitoring; urgent biopsy before steroids (dexamethasone only for hydrocephalus or herniation); IVMP after histology with early PLEX; stop oral hypoglycaemics, variable-rate insulin, hypoglycaemia plan; DMT by activity; pre-DMT screening. |
+| C | minor | `ground_truth.assessment.prohibited_recommendations` | Natalizumab and fingolimod prohibitions without case basis. | FIXED: deleted; added LP, anaesthesia attribution, steroids before tissue and resection/oncological treatment prohibitions; T7, T10, T11, T12, T13 kept. |
+| B | minor | `ground_truth.red_herrings` | Empty although the case is built on the postoperative setting. | FIXED: one red herring on the postoperative timing. |
+| B | minor | `metadata.difficulty_description`, `difficulty_rationale` | Built on the deleted steroid response and on avoiding biopsy. | FIXED: rewritten. |
+| E | minor | `fallback_tool_outputs.echo` | `echo_type` missing. | FIXED: `TTE`. |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+
+The case no longer depends on a steroid response the agent could only see in the future: the post-steroid MRI and the "steroid trial" search are gone, and the diagnosis now rests on a stereotactic biopsy of the accessible right temporal lesion showing active demyelination (recommended) after serum AQP4/MOG CBA (required, negative). Lumbar puncture is contraindicated (fourth ventricular compression, GCS 8): the old normal CSF is only a fallback. The story is plausible now: a three-week prodrome of unsteadiness, slurred speech and dysphagia preceded surgery, the dominant lesion extends into the pons and medulla to the midline (quadriparesis, reduced consciousness), and "globally aphasic" was removed. Head CT and EEG are appropriate in postoperative coma and their fallbacks fit the case. Dissemination in space is in four regions (infratentorial, right temporal cortical-juxtacortical, periventricular, C3-C4). The musts cover ICU airway care, biopsy before steroids (dexamethasone only for hydrocephalus or herniation), IV methylprednisolone after histology with early plasma exchange, switching metformin and glibenclamide to insulin during the pulse, DMT and pre-DMT screening; prohibitions include LP and blaming residual anaesthesia. The differential adds the stroke, cord infarction, metabolic and non-convulsive status explanations the setting raises, all low with reasons.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+
+- Citation keys `[McDonald_2024]`, `[Wattjes_2021]`, `[NICE_NG220]` to the MS-RR criteria pack (plan 5.1).
+- Diagnosis synonyms: G35.B/G35.C and "demyelinating disease" (plan Q, 5.2).
+- `condition_tool_guidance.yaml` claims: EEG and CT no longer avoided in RP03 (plan 5.3).
+
+## Open questions for Andrea (judgment calls you could not settle)
+
+- None needing Andrea's information. Decided: the prodrome omits hiccups and nausea (the plan's example) because together with a dorsal medullary lesion they would describe an area postrema syndrome and make seronegative NMOSD a serious contender; unsteadiness, dysarthria and dysphagia fit the peduncular and lateral medullary lesion without that. The lesion was extended to the pons and medullary midline so the quadriparesis and reduced consciousness have an anatomical basis; GCS 8 was kept.
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. Read the log, the diff against `b8be2153^` and the whole final case. Checked: post-steroid MRI and steroid-trial literature deleted; CSF criterion gone, LP contraindicated and prohibited consistently; biopsy follow-up of the right temporal lesion (cortical/juxtacortical, matches the MRI) with CD20, IDH1 and EBER and histology-only impression; CT and EEG fallbacks fit the case and are no longer avoided; "globally aphasic" removed; prodrome added without area postrema features (sound reasoning); lesion extension to the pontine/medullary midline explains quadriparesis; drug check covers metformin, glibenclamide, levothyroxine, pantoprazole and the sulfonamide allergy correctly and is recommended (tier table); musts (ICU airway, biopsy before steroids, IVMP then early PLEX, insulin plan) do not contradict prohibitions; literature sources exist; differential all low with reasons.
+Found and fixed:
+- B minor, `fallback_tool_outputs.csf.glucose`, `.glucose_ratio`, `.interpretation`: the CSF fallback gave "serum glucose 110 mg/dL at time of LP" (CSF 72) while the stored blood glucose is 188 mg/dL in this diabetic, postoperative patient; with the real serum value the ratio would read as low. Now CSF glucose 118 mg/dL, ratio 0.63 with serum glucose 186 mg/dL, interpretation "normal protein and CSF/serum glucose ratio".
+Re-ran `perfect_agent.py MS-RR-RP03 -v` (pass), `case_io.py check` (clean for the case) and `test_case_guards -k MS-RR-RP03` (pass).
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026 (uniformity scripts over all 30 MS-RR cases; edits through `case_io`; perfect agent, `case_io check` and the case guards clean afterwards).
+
+- `ground_truth.differential[7].icd_code` G04.81 -> G04.00: G04.81 is other encephalitis; ADEM is G04.00, as in the other 8 MS-RR cases.
+- `action-3-search-medical-literature.label` "Literature search (background only)" -> "Literature search on tumefactive demyelination": engineering text replaced by the topic of the stored output.
+- `assessment.prohibited_recommendations[6]` chronic-steroid prohibition set to the condition's canonical text (was "Do not use chronic oral corticosteroids as a maintenance treatment for MS").
+- `assessment.prohibited_recommendations[8]` spinal-cord prohibition set to the condition's canonical text (was "Do not omit spinal-cord MRI in a patient with myelopathic signs even if the brain MRI alone meets DIS criteria").
+- `initial_tool_outputs.labs`: the AQP4-IgG and MOG-IgG rows moved to a new `followup_outputs` entry (`interpret_labs`, trigger `request_aqp4_mog_cell_based_assay`, panel `Neuroimmunology`, placed after the imaging follow-ups). Served in the initial labs payload, they answered the mimic-exclusion panel order as well, so an agent learned the result of `action-aqp4-mog-cba` without ordering it (perfect-agent warning "answered with the same stored report"); the MockServer now serves them only to an order that names the assays (checked for all three alternatives and both orders). Initial labs interpretation edited to drop the antibody results: removed "AQP4-IgG and MOG-IgG negative by cell-based assay.".
+- `action-biopsy.citations` was empty; set to `[McDonald_2024]` (the criteria require that no better explanation remains, which the biopsy settles), as on RM01's biopsy criterion. A tumefactive-specific key (Hardy and Chataway 2013) is requested under CENTRAL in the condition summary.
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (`plans/MS-RR-decisions.md`). What changed and why:
+
+- Diagnosis synonyms (`diagnosis_synonyms.yaml` G35 entry, re-applied with `apply_diagnosis_synonyms.py --prune --conditions multiple_sclerosis`): removed the label "demyelinating disease" (G37.9 is an Excludes1 of G35.A, and its tokens occur in an NMOSD, MOGAD or ADEM answer, which would have scored as correct) and the codes G35.B and G35.C (primary and secondary progressive MS in FY2026 ICD-10-CM, a different course from this relapsing-remitting case). Accepted now: the label, multiple sclerosis, MS, relapsing(-)remitting multiple sclerosis, RRMS; codes G35.A, G35, G35.D.
+- `action-mrs` and `action-biopsy`: added `[Hardy_2013]` (Hardy TA, Chataway J. Tumefactive demyelination: an approach to diagnosis and management. JNNP 2013;84(9):1047-1053), the review that governs the work-up of a tumefactive lesion and the decision to biopsy; now in the pack's allow-list.
+- Checks: `perfect_agent.py` pass, `case_io.py check` clean for the case, `test_case_guards.py -k MS-RR-` passes with MS-RR now in `DISCRIMINATOR_CONDITIONS`.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, decided by reading the report.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Lab evidence (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited results its own order (the first alternative) no longer returned; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-6-interpret-labs]`.alternatives: was [CBC, vitamin_B12, TSH, HIV]; now [CBC, vitamin_B12, TSH, HIV, BMP, CRP] | [CBC, vitamin_B12, TSH, HIV].
+- `ground_truth.action_criteria[action-6-interpret-labs]`.expected_evidence: was "Glucose 188 mg/dL and postoperative leukocytosis with CRP 12.4 mg/L; sodium, TSH, B12 normal; HIV non-reactive; ANA, ANCA and ACE normal"; now "Glucose 188 mg/dL and postoperative leukocytosis with CRP 12.4 mg/L; sodium, TSH, B12 normal; HIV non-reactive".
+- Decision: serve: new first alternative (old order kept as an alternative) + trim evidence. The rationale needs glucose and sodium in a postoperative coma and CRP for the abscess differential; a must and the metabolic differential rely on glucose 188. ANA, ANCA and ACE are incidental here and are trimmed.
+- Scoring: coverage unchanged (any call matching the old order still matches); the cost reference of the required work-up now uses the new first order.
+
+Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 20, ECOG 4: completely disabled, bedbound and fully dependent. (fallback_tool_outputs.clinical_assessment). Why: rule d: ICU patient with GCS 8 and quadriparesis; the library reports a normal study.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: Timed gait and balance assessment could not be performed: the patient is bedbound and unable to sit unsupported (Berg 0/56). (followup_outputs[request_gait_and_balance_timed]). Why: rule d: bedbound, quadriparetic; the library reports a normal study.
+- `perform_clinical_assessment {assessment_type: cognitive_screen}`: Cognitive screening not possible because of a depressed level of consciousness (GCS 8). (followup_outputs[request_cognitive_screen]). Why: rule d: GCS 8: a MoCA of 28/30 is impossible; the library reports a normal study.
+- `order_specialized_test {test_type: neuropsych_battery}`: Neuropsychological assessment could not be performed because of a depressed level of consciousness. (fallback_tool_outputs.specialized_test). Why: rule c: GCS 8: a normal battery is impossible; the library reports a normal study.
+- `order_specialized_test {test_type: speech_language_evaluation}`: Formal speech and language assessment not possible: no intelligible speech and no command following at a depressed level of consciousness. (followup_outputs[request_speech_language_evaluation]). Why: rule c: GCS 8 with incomprehensible sounds (and slurred speech and dysphagia before surgery); the library reports a normal study.
+- `analyze_eeg {eeg_type: continuous_icu}`: continuous diffuse theta and delta slowing, reactive to stimulation, without sleep architecture. No electrographic seizures, periodic discharges or rhythmic patterns on the ictal-interictal continuum. (followup_outputs[request_continuous_icu]). Why: rule c: the stored routine EEG shows continuous diffuse slowing at GCS 8: a prolonged recording cannot show a normal reactive background with sleep-wake cycling; the library reports a normal study.
+- `analyze_eeg {eeg_type: ambulatory}`: continuous diffuse theta and delta slowing, reactive to stimulation. No electrographic seizures. (followup_outputs[request_ambulatory]). Why: rule c: the stored routine EEG shows continuous diffuse slowing at GCS 8; the library reports a normal study.
+- `order_advanced_imaging {modality: DTI_tractography}`: 1. Disruption of the left middle cerebellar peduncle and transverse pontine fibres within the brainstem lesion. 2. Reduced fractional anisotropy of both pontine corticospinal tracts, left more than right. 3. Reduced... (fallback_tool_outputs.advanced_imaging). Why: rule c: 3.8 cm left middle cerebellar peduncle, pontine and medullary lesion with quadriparesis; the library reports a normal study.
+- `order_advanced_imaging {modality: perfusion_MRI}`: Mildly raised rCBV at the enhancing rim of the left middle cerebellar peduncle and pontine lesion (ratio 1.3) with a hypoperfused centre; no neovascular pattern. (followup_outputs[request_perfusion_mri]). Why: rule c: 3.8 cm enhancing brainstem lesion on the stored MRI; the library reports a normal study.
+- `order_advanced_imaging {modality: FDG_PET}`: Left middle cerebellar peduncle and pontine lesion and right temporal lesion with mild marginal FDG uptake below cortical level and central hypometabolism; no intensely hypermetabolic focus. (followup_outputs[request_fdg_pet]). Why: rule c: 3.8 cm brainstem and 2.1 cm right temporal lesions on the stored MRI; the library reports a normal study.
+
+Checks: perfect agent ok; case guards pass; snapshot diff shows no criterion answer changed; map verified (served without the library).

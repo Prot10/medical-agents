@@ -1,0 +1,95 @@
+# BACT-MEN-S03
+Reviewer status: R1 not reviewed, R2 needs_changes | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| 575f933d-efaf-4ee0-b722-ffd5bca2057e | FIXED | Plan C14. New required criteria `action-6-analyze-brain-mri-contrast` (`analyze_brain_mri {contrast: true}`) and `action-7-order-mr-venography` (`order_advanced_imaging {modality: MR_venography}`), each answered by a new follow-up (`request_mri_brain_contrast`: diffuse leptomeningeal enhancement, focal dural enhancement over the eroded right ethmoid roof, no subdural empyema, epidural abscess, cerebritis or abscess; `request_mr_venography`: patent dural and cavernous sinuses). CT kept required as decision B, relabelled as non-contrast CT with bone windows through the paranasal sinuses and anterior skull base; the CT now reports definite erosion of the posterior wall and roof of the right ethmoid sinus adjacent to the anterior cranial fossa (no pneumocephalus), and "recommend ENT evaluation" left the impression. New must: ENT assessment for drainage of the sinus source and of the bony defect, with follow-up for CSF rhinorrhoea and recurrent meningitis. Both new criteria are in `stop_rule.required_before_assessment`. |
+| a20ec899-5b21-412b-958f-51268a8bac67 | FIXED | Plan C1. Post-treatment `request_repeat_lp` deleted with its four wrong comparators. Index CSF moved from `initial_tool_outputs.csf` (now null) to `followup_outputs[1]`, trigger `request_lumbar_puncture`; `-v` confirms action-3 receives it. |
+| f73b0114-418c-40ae-98fc-628eac2aea85 | FIXED | Plan C2, decision B. HARD CT-before-CSF constraint deleted; SOFT blood cultures before CT added; CT ordered after the CSF in criteria and pathway; "age >60" removed everywhere; IDSA must, prohibition and key evidence line replaced by the canonical "Proceed to lumbar puncture without prior cranial imaging ... (GCS 12, ...)" texts. The CT stays required for the skull-base source (note 575f933d), not as an LP prerequisite. |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| B | major | `followup_outputs[0].output.collected_before_antimicrobials` | `true` with "taken before the first antimicrobial dose, so the isolate is interpretable", although the HPI records a course of amoxicillin-clavulanate completed 3 days before presentation (plan C6). | FIXED: `false`; impression opens "Collected before the first IV dose; patient had taken oral amoxicillin-clavulanate for 7 days, completed 3 days before collection." |
+| B | major | blood cultures | MICs listed as findings rows while `susceptibility` was null; four bottles with "no growth at 5 days"; no intervals. | FIXED: two sets positive at 15 and 18 hours, susceptibilities (CLSI meningitis interpretation for penicillin and ceftriaxone) in `susceptibility`, reported at 48 hours; canonical impression. |
+| C | major | `ground_truth.assessment.required_recommendations` | Template vancomycin plus ceftriaxone; no Listeria cover at 62 with diabetes (plan 4.0 S03). | FIXED: canonical base regimen; ampicillin "because of age over 60 and diabetes mellitus"; narrowing must. |
+| C | major | `ground_truth.assessment` | Dexamethasone template must and "Do NOT discontinue dexamethasone ... Gram stain" prohibition (plan C5). | FIXED: prohibition deleted; canonical C5 must with "Continue for 4 days: Streptococcus pneumoniae is identified." |
+| A | major | `request_pcr_panel`, `request_audiometry`, literature follow-up and criterion | Plan C8, C9. | FIXED: deleted; PCR result now in the index CSF report; hearing must added, asking for comparison with his known right-sided hearing loss. |
+| D | major | index CSF | "consistent with Streptococcus pneumoniae", latex antigen, culture "preliminary growth at 12 hours", RBC 5 "likely traumatic", ratio reference ">0.6" and ratio 0.07 (15.3/191 is 0.08), lactate with two references (plan C7). | FIXED: canonical strings, ratio 0.08 recomputed, culture "Pending", latex removed, values-only interpretation. |
+| B | minor | `initial_tool_outputs.labs` | Anion gap 19 (133 - 94 - 20) above what lactate 3.8 explains; no HIV or liver tests (plan C12). | FIXED: chloride 98 (anion gap 15); HIV 1/2 Ag/Ab non-reactive; ALT 34, AST 29, ALP 82, bilirubin 0.8, albumin 3.8 (all in range). Calculated osmolality 286 against measured 291 checked. |
+| B | minor | `patient.history_present_illness` | "the worst headache of his life" undeclared (plan C11). | FIXED: "a severe, rapidly worsening diffuse headache". |
+| C | major | `ground_truth.differential` | Boilerplate (viral meningitis and HSV moderate) after a pyogenic CSF with S. pneumoniae; the complications the eroded ethmoid raises were absent; cryptococcal entry irrelevant. | FIXED: subdural empyema or abscess (low) and septic venous sinus thrombosis (low) added with the MRI and MRV results; viral entries low with excluding data; TB and SAH very low; cryptococcal removed (immunocompetent, HIV negative, panel negative). |
+| B | minor | red herrings | Sinus thickening "on MRI" with no MRI (plan C11); SIADH interpretation prescribing fluid restriction. | FIXED: points at the CT findings (`followup_outputs[2].output.findings`) and names the recent antibiotic course; hyponatraemia interpretation as in S01. |
+| C | minor | `followup_outputs[5]` (drug check) | Checked dexamethasone only, with a vancomycin line (plan C9). | FIXED: checks ceftriaxone, ampicillin, dexamethasone against metformin, glipizide (hypoglycaemia while vomiting), gadolinium with eGFR about 62, latex allergy; criterion recommended with concrete expected evidence. |
+| E | minor | CT `findings[0].location` | "Mild diffuse cerebral swelling" in the location field. | FIXED: "Diffuse, bilateral cerebral hemispheres". |
+| A | minor | citations, key evidence, metadata | IDSA 2004 and free-text citations; C17 template lines; "5 required tools". | FIXED: `[WHO_Meningitis_2025]` (MRI and MRV criteria cite `[Brouwer_2012]`, the pack's source for complication imaging); C17 replacements plus a skull-base erosion pearl; "6 required tools; 2 red herrings". |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+The pathway is blood tests, blood cultures, the index LP without prior imaging (no WHO 2025 Annex A.4 criterion at GCS 12 without focal weakness, papilloedema, seizures or severe immunocompromise), then a required non-contrast CT with bone windows that shows erosion of the posterior wall and roof of the right ethmoid sinus, then a required contrast MRI (focal dural enhancement over the defect, no empyema or abscess) and MR venography (no sinus thrombosis), then a drug check. The post-treatment repeat LP, PCR-as-lab, audiometry and literature steps are gone; the PCR result is in the CSF report. Blood cultures are now marked as taken after a recent amoxicillin-clavulanate course. Musts: ceftriaxone with ampicillin (age over 60, diabetes), dexamethasone for 4 days, ENT drainage and repair of the bony defect with follow-up for CSF leak, droplet precautions, audiology compared with his baseline hearing loss. Chloride was corrected (anion gap 15) and HIV and liver tests added.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+- Citation keys `[NICE_NG240]` and `[WHO_Meningitis_2025]` for the pack allow-list (plan 5.1).
+
+## Open questions for Andrea (judgment calls you could not settle)
+- The mental status records "occasional paraphasic errors" and right-sided dysmetria "likely due to inattention". Reviewer 2 ruled that no WHO 2025 criterion is met (note f73b0114) and I applied it; paraphasias could be read as a focal cortical sign, which would make this an A case. I left the examination unchanged.
+
+## Verification
+Adversarial verification, 23 October 2026. Checked: all three note ids present; MRI and MR venography criteria required, answered by their own follow-ups (`-v`), in `stop_rule`; CT required as B with bone windows and the erosion on the CT; ENT must; repeat LP gone; no HARD constraint; "age >60" gone everywhere. `collected_before_antimicrobials` false agrees with the HPI (amoxicillin-clavulanate for 7 days, completed 3 days before). Recomputed anion gap 15 (133 - 98 - 20), osmolality about 286, ratio 0.08 (15.3/191), eGFR about 62 (CKD-EPI 2021, creatinine 1.3, male, 62) as the drug step states. `[Brouwer_2012]` on the MRI and MRV criteria is allowed by the criteria pack for complication imaging.
+Found and changed:
+- `patient.neurological_exam.mental_status`: "Unable to follow two-step commands consistently" implies one-step commands are obeyed (M6, GCS 13) against the recorded GCS 12 (E3 V4 M5) that the reviewer's note and the musts use. Now "Does not obey commands; localizes to a central painful stimulus.", which derives M5 (consistent with the HPI's "reaching for his head").
+- `patient.neurological_exam.sensory`: "Withdraws to pain" beside M5, as in S01 and S02; now "Responds to painful stimuli symmetrically in all extremities."
+- MRI `additional_observations`: "Normal flow voids ... on post-contrast images" mixed a T2 sign with a post-contrast sequence; now "Normal enhancement of the dural venous sinuses on post-contrast images".
+- `metadata.clinical_pearls` (shown to reviewers): "giving [dexamethasone] hours later provides no benefit and may be harmful" contradicts NICE NG240, which allows a late start when it was missed; replaced with "started shortly before or with the first antibiotic dose (WHO 2025; NICE NG240)". The unsourced "approximately 3% per hour" mortality figure removed (ruling 8: no invented numbers). Jolt accentuation no longer called highly sensitive (later studies found low sensitivity); now "supports meningitis when present, but a negative test does not exclude it".
+Re-run: `perfect_agent.py BACT-MEN-S03 -v` ok; `case_io.py check` clean for the case.
+
+## Condition audit (23 October 2026)
+- Changed `ground_truth.action_criteria[action-2-order-microbiology].alternatives[0].required_arguments`: removed `before_antimicrobials: true` (specimen and tests kept). Reason: the blood culture report sets `collected_before_antimicrobials: false` because an antimicrobial was taken in the 7 days before collection, so `true` is not the truthful value of the parameter ("whether the specimen is being taken before the first antimicrobial dose") and an agent that orders the cultures truthfully would miss a required criterion. Condition-wide rule settled at the audit: the argument is required only where the report flag is true (16 cases) and absent where it is false (14 cases: M01, M02, M03, M05, P02, P04, RM01, RM03, RP01, RP02, RP03, RP05, RS04, S03). Draw-before-treatment timing stays in the musts and in the SOFT blood-cultures-before-CT constraint where one exists. `perfect_agent.py` and `case_io.py check` clean after the edit.
+
+## Open questions resolved (24 Oct 2026)
+
+Andrea's ruling of 24 Oct 2026 (resolve open points for dataset quality); decisions and sources in `plans/BACT-MEN-decisions.md`.
+
+- 'WHO 2025 Annex A.4' renamed 'WHO 2025 section A.4' (5 strings): the cranial imaging recommendations are section A.4 of chapter 3 of the guideline, not an annex
+- Hearing must cites WHO 2025 (strong recommendation: formal audiological screening before discharge, or within four weeks of discharge), which covers every adult with acute meningitis, instead of NICE NG240, which excludes immunocompromised and neurosurgical patients
+- Paraphasic errors (a focal cortical sign under WHO 2025 section A.4) removed from the mental status, so the record agrees with Reviewer 2's ruling (f73b0114) that no imaging-first criterion is present; MRI shows no cortical lesion
+
+Re-run: `perfect_agent.py` ok; `case_io.py check` clean for the case; BACT-MEN case guards pass; synonym `--check` clean.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+- `fallback_tool_outputs.advanced_imaging` set to null: a generic report (modality 'MRI', impression 'No abnormality identified.') that names no one study and so answered every variant; the benchmark library now answers each study with its own normal report.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 20, ECOG 4 (fallback_tool_outputs.clinical_assessment). Why: rule 3: lethargic and disoriented (GCS 12), febrile (39.5 C) and tachycardic (HR 125), unable to walk; the library's Karnofsky 100 describes a person without disease.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: not testable (lethargic, unable to walk) (followup_outputs[6] request_gait_and_balance_timed). Why: rule 3: the stored exam records that he cannot walk safely because of altered mental status and generalised weakness.
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: no parkinsonian signs; challenge not performed; gait and postural reflexes not assessable (followup_outputs[7] request_levodopa_challenge). Why: rule 3: the library describes a full normal motor examination and gait in a lethargic patient who does not obey commands.
+- `perform_clinical_assessment {assessment_type: structured_headache_history_ichd3}`: new acute headache with red flags; criteria for a primary headache disorder not met (followup_outputs[8] request_structured_headache_history_ichd3). Why: rule 1 and 3: an acute febrile headache with neck stiffness, photophobia and falling consciousness; the library elicits no red flags.
+- `analyze_eeg {eeg_type: sleep_deprived}`: continuous generalised theta-delta slowing; no epileptiform discharges or seizures (followup_outputs[9] request_sleep_deprived). Why: rule 3: the patient is lethargic and oriented to self only (GCS 12); a normal background contradicts the stored exam.
+- `analyze_eeg {eeg_type: continuous_icu}`: continuous generalised theta-delta slowing; no epileptiform discharges or seizures (followup_outputs[10] request_continuous_icu). Why: rule 3: the patient is lethargic and oriented to self only (GCS 12); a normal background contradicts the stored exam.
+- `analyze_eeg {eeg_type: ambulatory}`: continuous generalised theta-delta slowing; no epileptiform discharges or seizures (followup_outputs[11] request_ambulatory). Why: rule 3: the patient is lethargic and oriented to self only (GCS 12); a normal background contradicts the stored exam.
+- `perform_clinical_assessment {assessment_type: cognitive_screen}`: not completed (lethargic, inattentive); oriented to self only (followup_outputs[12] request_cognitive_screen). Why: rule 3: GCS 12, oriented to self only and not obeying commands; the library reports MoCA 28/30.
+- `order_specialized_test {test_type: neuropsych_battery}`: not completed (reduced arousal, inattention) (fallback_tool_outputs.specialized_test). Why: rule 3: a lethargic, disoriented patient cannot complete a battery in the average range.
+- `order_specialized_test {test_type: speech_language_evaluation}`: slow confused speech, no dysphasia; testing limited (followup_outputs[13] request_speech_language_evaluation). Why: rule 3: the stored exam records slow, confused speech and failure to obey commands; the library reports normal speech and language.
+- `order_specialized_test {test_type: audiometry}`: mild right conductive hearing loss (followup_outputs[14] request_audiometry). Why: rule 2 and 3: mild right hearing loss after childhood otitis media, and hearing grossly reduced on the right on the stored exam; the library reports normal hearing.
+- `order_specialized_test {test_type: baep}`: prolonged right wave I; normal interpeak latencies (followup_outputs[15] request_baep). Why: rule 2 and 3: mild right hearing loss after childhood otitis media; the library reports normal waves.
+- `order_microbiology {specimen: whole_blood_pcr}`: Streptococcus pneumoniae DNA detected (fallback_tool_outputs.microbiology). Why: rule 3: blood cultures grow S. pneumoniae in 2 of 2 sets, a target of the panel; collected 3 days after a course of oral amoxicillin-clavulanate.
+- `perform_clinical_assessment {assessment_type: orthostatic_blood_pressure}`: supine BP 133/74, HR 125; standing not performed (followup_outputs[16] request_orthostatic_blood_pressure). Why: rule 3: vitals HR 125 and a lethargic patient who cannot stand; the library reports HR 68 and 3 minutes of standing.
+- Case fallback replaced, `analyze_eeg {eeg_type: routine}`: routine EEG now shows continuous generalised theta-delta slowing; no epileptiform discharges or seizures (was a normal awake and drowsy EEG) (fallback_tool_outputs.eeg). Why: rule 3: the patient is lethargic and oriented to self only (GCS 12); a normal background contradicts the stored exam.
+- Case fallback replaced, `analyze_ecg`: sinus tachycardia at 125 bpm, otherwise normal (was a normal ECG) (fallback_tool_outputs.ecg). Why: presenting heart rate 125 bpm.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

@@ -1,0 +1,94 @@
+# PD-RP02
+Reviewer status: R1 none, R2 none (PD has no notes file; only the July 2026 tool review, `condition_tool_guidance.yaml` key `parkinsons`) | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| (none) | - | No physician note exists for PD. The case was corrected against plans/PD.md (classes C1 to C23, per-case entry PD-RP02) and the July 2026 tool review (MRI required; ECG, EEG, autonomic and tilt testing removed; labs, neuropsychology and genetics optional and targeted). |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| C | blocker | `patient.neurological_exam.motor`, `.gait`, `.coordination`, `.cranial_nerves`, `.sensory`, `patient.history_present_illness`, `initial_tool_outputs.mri` | Labelled PD, but the data met at least three MDS red flags and read as MSA: symmetric bradykinesia and rigidity with prominent nuchal and axial rigidity, no rest tremor, an irregular postural tremor, a fall plus a second frank fall and five near-falls within 18 months, falls on every pull-test trial, freezing, wide-based gait, impossible tandem, clumsy heel-to-shin, positive Romberg, slow vertical pursuit, and P01's MSA MRI template (putaminal atrophy, rim, iron, equivocal hot cross bun, low pontine and cerebellar volumes) (C21, C12, ruling 3). | FIXED: right-predominant bradykinesia with decrement and rigidity, a 4-5 Hz right-hand rest tremor (re-emergent), mild bilateral postural tremor (not "irregular"); nuchal and axial rigidity deleted; one fall at 18 months, the bathroom fall deleted, "five near-falls" now two near-falls on standing; freezing deleted; narrow-based gait, pull test three steps with unaided recovery, tandem mildly unsteady, heel-to-shin intact, Romberg negative, normal-speed vertical saccades; HPI notes right-hand predominance and a rest tremor seen by his wife. MRI normal for age (normal putamina, pons, cerebellum, volumetrics within normal limits) with bilateral nigrosome-1 loss on SWI, left more than right; "post-gadolinium" deleted. Orthostatic figures and cardiac history kept. |
+| C | minor | `patient.neurological_exam.additional`, `.history_present_illness` | "Blunted heart rate response" stated as a sign in a man on metoprolol. | FIXED: deleted from the exam; HPI states that metoprolol limits his heart-rate response on standing. |
+| E | minor | `patient.chief_complaint` | "Recurrent near-falls" as the lead complaint after the falls were reduced. | FIXED: "Progressive slowing of movements, worsening balance and light-headedness on standing over the past 2 years". |
+| A | major | `action-3-search-medical-literature`, `followup_outputs[0]` | Required literature criterion with an exact `query`; output cites Gilman 2008 as current, a Wenning "Clinical differentiation" Lancet Neurology 2022 paper that does not exist as cited, and states fixed MIBG cut-offs as fact (C1, ruling 5). | FIXED: criterion and follow-up deleted, id removed from the stop rule; initial and fallback literature null. |
+| A | major | `action-2-check-drug-interactions`, `followup_outputs[1]` | Drug criterion with the exact `drug`; output asserted a sertraline-levodopa serotonin-syndrome risk (false, F7) and suggested domperidone beside flecainide; evidence "Identify metoclopramide if present" (C2). | FIXED: `check_drug_interactions {}`, `recommended`; one stored output `initial_tool_outputs.drug_interactions.general` (metoprolol with orthostasis and the masked heart rate; sertraline with a future MAO-B inhibitor; clonazepam; domperidone not advised with flecainide; midodrine and fludrocortisone cautions, hypokalaemia with flecainide); follow-up deleted, fallback null; criterion last. |
+| A | major | `action-1-analyze-brain-mri` | Required `{"contrast": false, "protocol": "standard"}` (C5); `expected_evidence` "no putaminal slit" over a report with putaminal atrophy and rim (C12). | FIXED: `analyze_brain_mri {}`; canonical label and rationale, `[Postuma_2015]` and `[Schwarz_2014]` (SWI nigrosome finding); evidence restates the new report. |
+| D | major | `followup_outputs` MIBG; `action-5-order-advanced-imaging` | MIBG impression "as is typically seen in Lewy-body parkinsonism, rather than a preganglionic or central process" (Kind 1); no quantitative block; criterion `optional` while the label rests on it (C11, plan). | FIXED: binary C11 report "Reduced cardiac MIBG uptake (early H/M 1.42, delayed H/M 1.21, washout 38%): cardiac sympathetic denervation." with normal values; criterion `recommended` (it provides the second supportive criterion that counterbalances the autonomic red flag); trigger `request_mibg`. |
+| B | major | `followup_outputs` (missing) | No stored PSG (dream enactment with injuries, RBD diagnosed only from his wife's report), DaTscan or orthostatic report: the library answers normal PSG, normal DaTscan (an absolute exclusion of the label) and "no orthostatic fall" (against 42/30 mmHg) (C8, C9). | FIXED: stored PSG (RSWA 39%, AHI 2.6, PLMI 7; C10 impression) with an `optional` criterion `action-psg-rbd` (dream enactment not PSG-confirmed, per plan C9 and 3.1); C8 DaTscan (left putamen worse, right-sided signs) with DaTscan `waste` (does not separate PD from MSA or PSP); orthostatic report with the exam figures, no criterion (F9). |
+| B | minor | `fallback_tool_outputs.ecg` (null) | No case ECG; plan: ECG not waste, store a normal report (WPW ablated, AF on flecainide). | FIXED: fallback ECG "Sinus rhythm 64/min, no pre-excitation, QRS 0.10 s" (PR 192, QTc 432); `fallback_tool_kinds.ecg` normal; ECG not listed in `avoided_actions`. |
+| C | major | `followup_outputs` neuropsychological battery | Auto-generated "Abnormal values" impression with inverted flags (clock 8/10 "(H)", Trail Making "(H)") (C10). | FIXED: C10 impression (executive, speed, fluency, learning and recall impaired; multi-domain MCI; BDI-II 16 mild); values and flags unchanged (they agree with the ranges); trigger `request_neuropsych_testing`; criterion `optional`, case-specific. |
+| C | major | `ground_truth.assessment.required_recommendations` | Six generic musts, including "Document levodopa responsiveness: robust improvement favors PD, modest or absent favors MSA-P" (the label must not wait on it) and "autonomic neurology" (C16). | FIXED: five musts: clinically probable PD (one red flag counterbalanced by rest tremor and MIBG denervation); orthostatic hypotension treatment with metoprolol review, post-prandial advice, then midodrine or fludrocortisone with supine BP and potassium monitoring; canonical levodopa start, agonist caution [NICE_NG71]; RBD bedroom safety and clonazepam review; physiotherapy for falls. |
+| C | minor | `ground_truth.assessment.prohibited_recommendations` | Overlapping antiemetic and antipsychotic prohibitions with em dash; vague orthostasis prohibition. | FIXED: canonical D2-blocker prohibition; "Do not prescribe domperidone while he takes flecainide"; anticholinergic prohibition. |
+| C | major | `ground_truth.differential` | MSA `high`, pure autonomic failure `moderate`; drug-induced parkinsonism argued from a "brief metoclopramide mention" that the history denies; ET (the PCP's label) absent (C13, C14). | FIXED: MSA `low` and PAF `very_low` with excluding data; drug-induced parkinsonism deleted; metoprolol-related orthostatic hypotension added `low` "coexists"; ET added `low`; DLB `low`, PSP `very_low`; ICD codes added where certain. |
+| D | major | `ground_truth.key_clinical_evidence` | Generic lines and the two "July 2026" sentences (C4). | FIXED: six case-specific lines. |
+| B | major | `ground_truth.red_herrings` | "Brief metoclopramide mention in history": absent from the patient block (C14). | FIXED: replaced by the father's and brother's ET (`family_history[0]`, the PCP's initial label) and the post-viral attribution of the anosmia (`past_medical_history[5]`). |
+| B | minor | `ground_truth.avoided_actions` | One-phrase rationales; no DaTscan, autonomic or tilt guard (3.3). | FIXED: EEG, CSF and echo kept with case-specific rationales; DaTscan, autonomic and tilt `waste` added. |
+| B | minor | `ground_truth.sequence_constraints`, `.stop_rule` | MRI-before-"DaTscan" constraint pointed at the MIBG criterion and cited Schwarz; literature and drug ids in the stop rule; `max_additional_actions` 0 (C20). | FIXED: constraint deleted (DaTscan is waste); stop rule MRI only; `max_additional_actions` 2. |
+| E | minor | `metadata.difficulty_description`, `.difficulty_rationale`, `.revision_reason`, `.last_revised` | "Symmetric parkinsonism ... poor acute levodopa response" (no trial in the case); shared engineering text (C19). | FIXED: rewritten for the edited case (1 required, 2 recommended), 2026-10-24. |
+| - | check | plan 3.6 | perfect_agent ok (MRI from the initial output, MIBG from `request_mibg`, medication review from the initial drug output); case_io check: no failure names PD-RP02; test_case_guards pass; discriminator_defects empty. Routing: MIBG, DaTscan, PSG, battery and orthostatic BP return the case reports; ECG, echo and Holter the case fallbacks; amyloid and FDG the library; `drug: levodopa`, `drug: rasagiline` and `{}` the case output. | - |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+
+This 63-year-old retired dentist with an ablated WPW pathway and paroxysmal AF (flecainide, metoprolol, apixaban) has 2 years of motor slowing, RBD diagnosed from his wife's report, constipation, smell loss and severe orthostatic hypotension (42/30 mmHg at 3 minutes). The old data described MSA (symmetric, axial, no rest tremor, recurrent falls, freezing, cerebellar hints, an MSA-type MRI) under a PD label; following the seed's resolution, the data now describe PD: right-predominant bradykinesia with decrement, a right-hand rest tremor, one fall and two near-falls, no freezing, normal pull-test recovery, no cerebellar signs and a normal-for-age MRI with nigrosome-1 loss. The diagnosis is clinically probable PD: the autonomic red flag is counterbalanced by rest tremor and reduced cardiac MIBG uptake (now a recommended study with a binary report). The policy is a required MRI, recommended MIBG and medication review, optional video-PSG and neuropsychological battery; literature is gone; DaTscan, autonomic and tilt testing, EEG, CSF and echo are waste. The medication review no longer claims a sertraline-levodopa serotonin syndrome and flags domperidone with flecainide. The musts are: diagnose probable PD; treat the orthostatic hypotension with a metoprolol review; start levodopa with lying and standing BP; RBD safety with a clonazepam review; physiotherapy for falls.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+
+- Plan R1: `[NICE_NG71]` is not yet in the PD criteria pack.
+- Plan R5: the library orthostatic-assessment default ("no orthostatic fall") would contradict any case whose exam documents orthostatic hypotension; this case now stores its own report.
+
+## Open questions for Andrea (judgment calls you could not settle)
+
+- PSG: the plan's per-case entry does not mention a PSG for RP02, but its C9 rule (dream enactment reported, not PSG-confirmed) applies, so an optional PSG criterion was added. Decided; listed only so the lead can confirm the count in the guidance answers (plan R9).
+- Plan Q2 applies (data fixed to PD rather than relabelling MSA-P).
+
+## Verification (adversarial verifier, 24 Oct 2026)
+Read the log, the diff against master and the whole final case. Checked: the C21 data fix (right decrement and rest tremor, one fall and two near-falls, pull test 3 steps with recovery, no freezing, normal MRI with nigrosome loss left more than right), red flag (42/30 mmHg) counterbalanced by rest tremor and reduced MIBG, orthostatic report against the exam (36/26 at 1 minute, 42/30 at 3 minutes), DaTscan laterality (left putamen for right signs), the metoclopramide red herring gone, domperidone with flecainide, no serotonin-syndrome claim for levodopa, ECG fallback (no pre-excitation after ablation), PSG optional criterion justified by the history (RBD diagnosed from the wife's report only).
+Found and fixed:
+- `differential[MSA].key_features` asserted "no urinary incontinence" with no urinary data in the patient block. HPI now states that he denies urinary urgency, incontinence or difficulty emptying his bladder; key feature "no urinary urgency or incontinence".
+- `avoided_actions` autonomic and tilt rationales said the bedside measurement documents "neurogenic" orthostatic hypotension, while `key_clinical_evidence[1]` and the HPI say metoprolol makes the heart-rate response uninterpretable. Now "already documents the orthostatic hypotension".
+For the close-out (not changed): cardiac MIBG is read in a man on sertraline with paroxysmal AF; neither is a recognised major cause of a reduced H/M ratio, so the report stands, but a reviewer may ask.
+Checks after the verification: `perfect_agent.py -v` ok, `case_io.py check` no failure names the case (the one suite failure is elsewhere), `test_case_guards` pass; MockServer routing re-checked by hand for the stored outputs named above.
+
+## Condition audit
+
+2026-10-24, PD condition auditor.
+
+- `patient.neurological_exam.mental_status`: MoCA 23/30 named three items. Now one point each on trail-making, clock drawing, serial subtraction and letter fluency, and three on delayed recall (23/30), agreeing with the battery (clock 8/10, slowed Trail Making B, reduced fluency and delayed recall) and the MMSE losses. The MoCA verbal fluency item is worth 1 point, abstraction 2, delayed recall 5, serial subtraction 3, clock 3 and trail-making 1, so the losses must be itemised within these maxima and add up to the stated total.
+
+After the edits: `perfect_agent.py` 30/30 PD pass; every stored follow-up of the 30 cases is served for its own discriminator (MockServer probe); `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k PD-` 60 passed.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/PD-decisions.md`.
+
+- Accepted codes are now G20.A1 (PD without dyskinesia, without mention of fluctuations; also PD NOS) and G20; G20.A2, G20.B1, G20.B2 (motor complications the case does not have) and G20.C ("Parkinsonism, unspecified", not PD) are no longer accepted. Labels unchanged.
+- MIBG report (delayed H/M 1.21 on sertraline, paroxysmal AF, EF 65%) kept as the auditor decided; listed for the physician reviewer in plans/PD-decisions.md.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Batch-5 vocabulary (25 Oct 2026)
+
+Commit c02f3050 added `cysticercosis_serology`, `IGRA` (interpret_labs), `olfactory_test` (order_specialized_test) and `levodopa_challenge` (perform_clinical_assessment); `HBV_DNA` (interpret_labs) was added the same day for this round. The requests are now wired into the case.
+
+- New optional criterion `olfactory-test` (`order_specialized_test {test_type: olfactory_test}`, `action_criteria[4]`, before the medication review) and its follow-up `request_olfactory_test_upsit` (`followup_outputs[5]`): UPSIT 14/40, in the anosmic range, below the normal range for age and sex. Before, an olfactory order got the library's normosmia (35/40), which contradicts the smell loss in the history. Optional: the test can add an MDS supportive criterion but changes no management. No scoring change for an agent that does not order it.
+- `ground_truth.assessment.required_recommendations[0]`: rewritten so the smell loss counts as a supportive criterion once a validated test confirms it (UPSIT 14/40), instead of saying it cannot be tested.
+- `ground_truth.key_clinical_evidence[4]`: rewritten so the smell loss counts as a supportive criterion once a validated test confirms it (UPSIT 14/40), instead of saying it cannot be tested.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: MDS-UPDRS III 35/132 OFF, 20/132 ON (43%) (fallback_tool_outputs.clinical_assessment). Why: rule 3: the stored exam documents parkinsonism; the library reports MDS-UPDRS III 3/132 with no parkinsonian signs.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: TUG 13.1 s, 10 m 0.98 m/s, Berg 49/56 (followup request_gait_and_balance_timed). Why: rule 3: the stored gait exam (arm swing, stride, turns, pull test) is abnormal; the library reports a normal gait, turns in 3 steps and Berg 56/56.
+- `perform_clinical_assessment {assessment_type: cognitive_screen}`: MoCA 23/30 as in the exam (followup request_cognitive_screen). Why: rule 3: the stored exam records this MoCA and its items; the library reports MoCA 28/30 with other items.
+- `order_specialized_test {test_type: speech_language_evaluation}`: hypophonia, articulation precise (64 dB SPL), no aphasia (fallback_tool_outputs.specialized_test). Why: rule 3: the stored exam records hypophonia; the library reports no motor speech disorder.
+- `order_specialized_test {test_type: autonomic_testing}`: tilt fall 44/30 mmHg, HR +6/min, Valsalva ratio 1.10 (followup request_autonomic_testing). Why: rule 3: the stored orthostatic test shows orthostatic hypotension; the library reports normal autonomic function.
+- `order_specialized_test {test_type: tilt_table}`: fall 48/32 mmHg, HR +6 bpm (followup request_tilt_table). Why: rule 3: the stored orthostatic test shows orthostatic hypotension; the library reports a normal tilt.
+
+Checks: `perfect_agent.py` 30/30 PD pass; `test_case_guards.py -k PD-` and `pytest agent-platform/tests -k PD-` 300 passed (`test_grpo_rollout.py` not collected: training extra not installed); every criterion's served output unchanged (snapshot before/after); synonym guard 0 changes; no new report repeats a 60-character window of any `expected_evidence`; every listed term is answered without the library.

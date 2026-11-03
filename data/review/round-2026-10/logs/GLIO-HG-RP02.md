@@ -1,0 +1,126 @@
+# GLIO-HG-RP02
+Reviewer status: R1 none, R2 needs_changes | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| 39e8c0d3-a507-4ea2-ac10-1f12a22510e3 | FIXED | `initial_tool_outputs.tissue_diagnosis` set to null; the layered report is now served only by `obtain_tissue_diagnosis` follow-ups (`followup_outputs[6]` resection, `[7]` stereotactic biopsy), identical integrated diagnosis and molecular results; template meta-text removed from the impression. |
+| 41984330-e782-4dbc-9aec-4a629240e197 | FIXED | `action-1-analyze-brain-mri.expected_evidence` written from this MRI (incomplete irregular ring, medial nodule, central FLAIR hypointensity, no central restriction, minimal rim restriction, edema, 3 mm shift, separate 8 mm left frontal lesion); the old pearl is replaced by `key_clinical_evidence[2]` with the same description. |
+| 2b8748f1-95d6-4909-86ce-7aa1ff7cf15a | FIXED (both options, as the plan decides) | Differential: tumefactive demyelination (low; incomplete ring, second lesion and sister's MS for; rCBV 4.2, Cho/NAA 5.2, histology against) and tuberculoma (low; treated TB and calcified granulomas for; perfusion, spectroscopy, histology against) with discriminators. Red herrings added for the sister's MS with the second lesion, the treated tuberculosis, and the sinusitis with raised ESR/CRP. The MRI impression keeps the imaging differential but no longer cites the family history. |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| B | major | `patient.neurological_exam.cranial_nerves` | "Right lower facial droop" with a right frontal lesion and left arm and leg weakness (laterality flip). | FIXED: "Left lower facial droop". |
+| D | major | `patient.history_present_illness` | "initial imaging, which revealed an intracranial abnormality" (C8). | FIXED: outside non-contrast CT with a right frontal hypodense lesion, edema and 3 mm shift. |
+| C | major | `action-9-obtain-tissue-diagnosis` | Biopsy only (C3); 1p/19q required in an IDH-wildtype case, no ATRX (C4). | FIXED: group A, `resection` then `stereotactic_biopsy`; minimum `IDH1_IHC, IDH1_IDH2_sequencing, ATRX_IHC, MGMT_methylation` (age 44); report adds ATRX (retained) and renames "IDH2 sequencing" to IDH1/IDH2 sequencing; GFAP moved into the Histology row. |
+| C | major | `action-3-search-medical-literature`, `followup_outputs[4]` | Literature as a required step; output with invented claims ("pathognomonic", "95% specific") (C1). | FIXED: deleted. |
+| C | major | `followup_outputs[6]` (CSF) | LP performed in a patient with mass effect and a harm entry for it (C17). | FIXED: CSF follow-up deleted; harm kept with the canonical rationale (3 mm shift, frontal horn effacement, right disc blurring). |
+| C | major | `followup_outputs[3]` | fMRI filed as `perfusion_MRI`, DTI only in the impression (C6). | FIXED: retagged `functional_MRI` (hand area 8 mm, LI 0.82); new `DTI_tractography` follow-up (CST displaced, 5 mm, preserved); both recommended criteria, soft constraints to tissue. |
+| C | major | `assessment.required_recommendations` | No plan for the staring spell; biopsy and resection interchangeable; template Stupp and dexamethasone musts; no contraception note before temozolomide at 44. | FIXED: uncertain-class must 3 and recommended `action-eeg-characterise-spells`; must 1 group A with fMRI, DTI, mapping; canonical dexamethasone; must 6 contraception; must 7 entity-specific (KPS 80). |
+| C | minor | `assessment.prohibited_recommendations` | No guard against empirical treatment of the mimics. | FIXED: prohibition 4 (no demyelination or tuberculoma treatment without tissue). |
+| D | minor | `initial_tool_outputs.eeg.impression` | Clinical essay; equivocal sharp transients over the left temporal region with no laterality statement (C9). | FIXED: ACNS list; the transients are stated as contralateral to the focal slowing and not meeting epileptiform criteria (data kept). |
+| B | minor | `initial_tool_outputs.mri.findings[2]` | Ovoid lesion "oriented parallel to the lateral ventricle", while the report uses it to raise demyelination (typical ovoid demyelinating lesions are perpendicular). | FIXED: "perpendicular"; impression numbered. |
+| C | minor | new `action-performance-status`, `followup_outputs[3]` | Performance status absent (C7). | FIXED: recommended; KPS 80, ECOG 1. |
+| C | minor | `initial_tool_outputs.labs` | No type and screen in the panel although the criterion orders it; no pregnancy test in a 44-year-old before contrast CT and surgery. | FIXED: "Baseline workup" panel with type and screen and negative beta-hCG; summary and interpretation recomputed (anion gap 12, MCHC 33.5). |
+| C | major | `followup_outputs[5]` (DDI) | Temozolomide check; penicillin allergy conflated with sulfonamide; lomustine, bevacizumab, TTFields alternatives. | FIXED: dexamethasone plus levetiracetam-if-seizure with her medicines (SSRI-steroid GI bleeding, sertraline-sumatriptan, levetiracetam and anxiety), penicillin allergy stated correctly, TB reactivation warning. New optional criterion `action-check-drug-interactions`, last. |
+| D | minor | `followup_outputs[1]`, `[2]` | "(normal < 1.5)" and "suggesting tumor infiltration" in the MRS signal; CT impression "consistent with prior tuberculous infection and not active disease". | FIXED: values kept, interpretive clauses removed; numbered impressions. |
+| C | minor | `ground_truth.differential` | Lymphoma and demyelination keyed on a "closed ring", which this MRI does not have; no entry above low and no tuberculoma (see 2b8748f1). | FIXED: rewritten from this case's findings. |
+| B | minor | criteria citations, rationales, sequence, stop rule, metadata | Duplicate bare keys; rationales copied from labels; one soft constraint; literature in the stop rule. | FIXED: one bracketed key; case-specific rationales; hard MRI and labs to tissue, soft fMRI and DTI to tissue; stop rule MRI, labs, tissue; metadata updated. |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+
+A 44-year-old woman with a right precentral glioblastoma, IDH-wildtype, mimicking tumefactive demyelination (sister with MS, second small white matter lesion) and tuberculoma (treated TB). The facial weakness is now on the left, as the lesion requires, and the HPI has an outside CT instead of an unstated "initial imaging". Work-up: contrast MRI (required), perfusion (rCBV 4.2) and spectroscopy (Cho/NAA 5.2), EEG for the single staring spell (recommended; right frontocentral slowing, equivocal contralateral transients), staging CT (optional), labs with type and screen and a negative beta-hCG (required), performance status (KPS 80), functional MRI and DTI of the motor system, then tissue by maximal safe resection or stereotactic biopsy (required; IDH1 IHC, IDH sequencing, ATRX, MGMT), drug check optional and last. The CSF study is gone and LP stays harmful. Musts: resection with fMRI, DTI and mapping; EEG and levetiracetam only if the spell is a seizure; dexamethasone; contraception before temozolomide; MDT for 60 Gy with temozolomide. The differential now carries demyelination and tuberculoma at low likelihood with their discriminators, and three new red herrings explain the MS, TB and sinusitis clues.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+
+- `[AIOM_brain]` used in the tissue and EEG criteria (plan 5.1).
+- Synonyms: "astrocytoma grade 4" is wrong for an IDH-wildtype glioblastoma (plan 5.2); accepted[0] "WHO grade 4" to "CNS WHO grade 4" if the synonym tool allows.
+
+## Open questions for Andrea (judgment calls you could not settle)
+
+None. Decided in-round: the equivocal sharp transients stay where they were recorded (left temporal) and the report now states that they are contralateral, rather than moving recorded data to the lesion side.
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. All three note ids are in the table and applied (tissue only in two follow-ups; action-1 evidence matching the MRI's incomplete ring and absent central restriction; tumefactive demyelination and tuberculoma at low with discriminators, plus red herrings for the sister's MS with the second lesion, the treated TB and the sinusitis). Checked the left facial droop fix against the right precentral lesion and left hemiparesis, the outside CT in the HPI, the 3 mm shift, frontal horn effacement and right disc blurring against the LP harm entry, labs flags and the added beta-hCG, KPS 80 against the treatment must, fMRI and DTI outputs against their criteria, the EEG laterality statement, and identical tissue reports. Found and fixed:
+- `patient.history_present_illness` said the sister "was recently diagnosed" with MS, while `family_history[2]` gives the diagnosis at 35 in a sister now 40: now "Her younger sister has multiple sclerosis, diagnosed five years ago."
+- `action-eeg-characterise-spells.rationale` called the spell "unwitnessed-onset", which the HPI does not say (the husband witnessed it): now "A single witnessed 10-second staring spell with amnesia".
+- `metadata.difficulty_rationale` said "seven recommended" while listing and having six: corrected.
+Re-ran perfect-agent (pass), `case_io.py check` (no failure names the case) and the case guards (pass).
+
+## Condition audit (24 Oct 2026)
+
+Condition auditor, cross-case uniformity pass. Changed:
+- `ground_truth.red_herrings[0].field_path` was empty: now `patient.clinical_history.past_medical_history[1]`.
+- `patient.neurological_exam.mental_status`: language now "Speech is fluent with normal rate and prosody. No paraphasic errors. Naming intact ..."; a right frontal lesion with left-dominant language does not explain aphasic signs.
+Re-ran perfect-agent (30/30 pass), `case_io.py check` (no failure names the case) and the case guards (60 passed).
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/GLIO-HG-decisions.md` (Andrea, 24 Oct 2026: open points resolved for dataset quality).
+
+- accepted[0]: 'Glioblastoma, IDH-wildtype, WHO grade 4 (right frontal)' -> 'Glioblastoma, IDH-wildtype, CNS WHO grade 4 (right frontal)' (summary CENTRAL 3: WHO CNS5 writes "CNS WHO grade"; ruling 3 label correction)
+- action-performance-status: recommended -> required (Q3: KPS selects the treatment branch in every case, EANO 2021; Reviewer 2 RP04 0289beef applied as a class)
+- stop rule: + action-performance-status (Q3: KPS selects the treatment branch in every case, EANO 2021; Reviewer 2 RP04 0289beef applied as a class)
+- must removed: 'Obtain MRI brain with and without gadolinium contrast (tumor protocol) before any invasive procedure' (Q9: diagnostic step restating a required criterion; musts are management, ruling 4)
+- must removed: 'Obtain pre-operative labs (CBC, BMP, coagulation, type & screen) before craniotomy/biopsy' (Q9: diagnostic step restating a required criterion; musts are management, ruling 4)
+- AIOM question numbers removed from the text (edition 2026 numbering unverified) (Q1: AIOM cited as the 2026 update; Quesito numbering not verifiable)
+- fallback specialized_test (generic 'Minor non-specific finding.', test_type '') -> null; the library answers by test_type (auditor flag, S01 class: a case fallback is served for any order of the tool, whatever the test type)
+- Synonyms re-expanded from `diagnosis_synonyms.yaml` (`--prune --conditions brain_tumor_glioma`): removed ['astrocytoma grade 4']; added ['glioblastoma idh wildtype'] (entity, grade and H3 scoping; summary CENTRAL 2).
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `initial_tool_outputs.eeg`: `eeg_type` set to `routine`, named in the report's own text.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Lab evidence (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited results its own order (the first alternative) no longer returned; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-2-interpret-labs]`.alternatives: was [CBC, BMP, coagulation, type_and_screen]; now [CBC, BMP, coagulation, type_and_screen, ESR, CRP] | [CBC, BMP, coagulation, type_and_screen].
+- Decision: serve: new first alternative (old order kept as an alternative). Recent sinusitis: the brain-abscess differential and the red herring rely on ESR 28 and CRP 8.2.
+- Scoring: coverage unchanged (any call matching the old order still matches); the cost reference of the required work-up now uses the new first order.
+
+Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.
+
+## Engineering text (25 Oct 2026)
+
+Review-process wording (references to the round's rulings, the round policy file, the criteria packs, and tier markers such as "(optional)" in criterion labels and rationales) is shown to physicians in the review app, so it was rewritten in clinical language. The tier stays in the criterion's `importance` field; scoring is unchanged. `test_case_guards.py::test_no_review_process_text` now fails on any of it.
+
+- criterion `action-8-order-body-imaging` rationale: "Optional: no known primary; the chest CT also shows whether the old tuberculosis is inactive." -> "No known primary; the chest CT also shows whether the old tuberculosis is inactive."
+- criterion `action-check-drug-interactions` rationale: "Optional: no interaction changes the diagnostic plan." -> "No interaction changes the diagnostic plan."
+
+## Library contradictions (25 Oct 2026)
+
+Case-specific reports stored where the benchmark library's normal report contradicted the case. Why: the stored MRI shows a mass in the right frontal lobe (precentral and middle frontal gyri) (3.8 x 3.2 x 3.5 cm) with an abnormal routine EEG and a focal history and exam; the library reports a normal head CT, a non-diagnostic biopsy, normal brain metabolism, perfusion and vessels, a normal prolonged EEG, no headache and normal bedside and neurophysiological tests where the exam is abnormal.
+
+- order_ct_scan: CT showing the stored lesion(s) instead of a normal head CT (fallback_tool_outputs.ct)
+- obtain_tissue_diagnosis open_biopsy: the stored integrated diagnosis on this procedure's specimen (fallback_tool_outputs.tissue_diagnosis)
+- FDG_PET: hypermetabolic lesion(s) (fallback_tool_outputs.advanced_imaging)
+- amino_acid_PET: FET-avid lesion(s) (followup request_amino_acid_pet)
+- CT_perfusion: lesion perfusion matching the stored perfusion MRI (followup request_ct_perfusion)
+- perfusion_SPECT: regional hypoperfusion over the lesion (followup request_perfusion_spect)
+- cerebral_angiography: mass effect and lesion vascularity (followup request_cerebral_angiography)
+- video EEG: the stored routine EEG's abnormalities over 24 h (fallback_tool_outputs.eeg)
+- ambulatory EEG: the stored routine EEG's abnormalities over 48 h (followup request_ambulatory_eeg)
+- structured_headache_history_ichd3: the case's headache, prior primary headache and red flags (fallback_tool_outputs.clinical_assessment)
+- cognitive_screen: MoCA matching the exam (followup request_cognitive_screen)
+- gait_and_balance_timed: matching the exam (followup request_timed_gait_balance)
+- neuropsych_battery: domain deficits matching the exam (fallback_tool_outputs.specialized_test)
+- chest_xray: the stored right upper lobe calcified granulomas (fallback_tool_outputs.body_imaging)
+- chest_CTA: the stored right upper lobe calcified granulomas (followup request_chest_cta)
+- labs IGRA: IGRA positive (TB1 1.84, TB2 2.21 IU/mL). (fallback_tool_outputs.labs[IGRA])
+
+Checks: `perfect_agent.py` pass; `test_case_guards.py -k GLIO-HG-RP02` pass; no fixed order still answered by the library (`lib4.source`); no 60-character window of any criterion's expected_evidence in the added text, except tissue copies that repeat the stored tissue report verbatim; every criterion's served output unchanged (snapshot diff against the baseline).

@@ -1,0 +1,90 @@
+# MS-RR-RS02
+Reviewer status: R1 not reviewed, R2 not reviewed (no MS-RR notes file in this round) | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| (none) | - | No reviewer notes for this case. |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| D | major | `initial_tool_outputs.mri.findings[3]`, `[5]`, `.additional_observations[2]`, `.impression`, `.volumetrics` | Brain MRI reported thoracic T9-T10 and cervical C2-C3 cord lesions (a thoracic cord lesion is outside any brain field of view) and "No longitudinally extensive transverse myelitis": it showed the result of the spine study the agent must order (plan H). | FIXED: both cord findings and the LETM line removed; observation "Spinal cord not assessed on this study."; lesion count "12 supratentorial, 1 infratentorial"; numbered brain-only impression. The cord lesions live only in the spine follow-up. |
+| C | major | `followup_outputs[request_repeat_mri_3months]` | Future 3-month MRI with a new lesion (plan F). | FIXED: deleted. |
+| C | minor | `followup_outputs[search_mcdonald_criteria_2017]`, `[search_nmosd_vs_ms_differentiation]` | Two literature outputs: 2017 criteria presented as current; a second citing "Cacciaguerra L, Flanagan EP, Contemporary Clinical Neuroscience 2024", which could not be verified as cited. | FIXED: one general follow-up (`search_ms_diagnostic_criteria`, last) with the canonical 2024 text, Montalban 2025, Wattjes 2021 and Wingerchuk 2015 (NMOSD criteria, worded as the paper states them). |
+| B | minor | `patient.neurological_exam.sensory` | Pinprick loss in the left leg ipsilateral to a left dorsal-column cord lesion (spinothalamic fibres cross; a left lesion gives right-sided pain loss), while the exam already records intact temperature sensation. | FIXED: "Decreased light touch over the left lower extremity from the knee distally; pinprick intact." (dorsal column plus corticospinal, ipsilateral, matching the lesion). |
+| A | major | `ground_truth.action_criteria[action-3]`, `[action-4]` | Literature required with a typed query; drug check required with non-schema keys (plan A4, A5). | FIXED: both optional, `required_arguments {}`, after the diagnostic core, out of the stop rule. |
+| A | major | `ground_truth.action_criteria[action-6]`, `[action-5]` | Labs demanded 9 analytes; CSF demanded three assays together. | FIXED: labs `{panels: [CBC, vitamin_B12, TSH, HIV]}`; CSF two alternatives (OCB or kFLC), optional (two attacks, four regions). Soft MRI-before-CSF constraint with the canonical reason. |
+| C | major | `ground_truth.action_criteria`, `initial_tool_outputs.labs` | No AQP4/MOG criterion or result, while a must asked for the test (plan B). | FIXED: `action-aqp4-mog-cba` recommended (optic neuritis plus myelitis, no red flag); "Neuroimmunology" rows negative by CBA; test-as-must deleted. |
+| A | minor | `ground_truth.action_criteria[*]`, `.stop_rule` | Label equals rationale; free-text citations; stop rule 0 with literature and drug check required. | FIXED: canonical labels, case-specific rationales, bracketed keys; order brain MRI, spine, labs, AQP4/MOG, CSF, drug, literature; stop rule brain MRI, spine, labs, allowance 2. |
+| B | minor | `followup_outputs[0].output` (spine) | Empty lesion descriptions; the mild focal swelling of the T9-T10 lesion was only in the brain report. | FIXED: descriptions with position, cross-section, enhancement and swelling; numbered impression. |
+| C | major | `initial_tool_outputs.csf` | Myelin basic protein reported (F6); no kFLC; "(N/A PMN/N/A lymph)" recital; "1 cell/microL (traumatic, not significant)"; WBC 12, 5 bands, IgG index 0.78 and synthesis 10.8 identical to RS01 (template carry-over). | FIXED: MBP deleted; kFLC 18.7 (reference < 6.1); WBC 9, 7 bands, IgG index 0.91, synthesis 13.2; RBC "1 cell/microL"; canonical pattern interpretation. |
+| D | minor | `initial_tool_outputs.labs.panels["Mimic exclusion"]` | HIV row with leaked significance text. | FIXED: panel "Serology", significance null. |
+| B | minor | `initial_tool_outputs.labs.panels.Other[2]`, summary, interpretation, `red_herrings[0]` | Vitamin D 18 ng/mL copied across cases. | FIXED: 24 ng/mL wherever it appears. |
+| C | major | `followup_outputs[check_drug_interactions].output` | Ocrelizumab "300 mg every 6 months" (wrong); empty `interactions` list; TB screening stated as required. | FIXED: correct dosing; each medicine (ibuprofen, COC, ferrous sulfate) and the sulfonamide allergy listed with no relevant interaction; HBV screening, vaccine timing and contraception kept. |
+| C | major | `ground_truth.assessment.required_recommendations` | Template musts (DIS/DIT interpretation, AQP4 test as a must, IV-only steroid, generic lifestyle); no infection check despite urinary urgency; no bladder management; NSAID during steroids not addressed. | FIXED: formulation must (two attacks, four regions); steroid must with urine dipstick first, stop ibuprofen and consider PPI, PLEX if refractory; post-void residual and antimuscarinic or catheterisation; Uhthoff counselling (reported); DMT must with pregnancy and contraception clause; pre-DMT screening (F11); vitamin D replacement. |
+| C | minor | `ground_truth.assessment.prohibited_recommendations` | T8 natalizumab/JCV and T9 fingolimod prohibitions with no case trigger. | FIXED: deleted; kept T7, T10 (woman of child-bearing potential), T11, T12, T13 (myelopathic signs); added "Do not treat heat-triggered transient blurring (Uhthoff phenomenon) as a new relapse requiring further steroids". |
+| C | major | `ground_truth.differential` | NMOSD and MOGAD "high", neurosarcoidosis "moderate" after a work-up that excludes them; no B12 entry in a myelopathy; no lupus entry despite an ANA row. | FIXED: all low with the case's discriminating results; B12 deficiency myelopathy (E53.8) and CNS lupus (M32.19) added. |
+| E | major | `ground_truth.key_clinical_evidence` | Engineering lines, F2 and F5 wrong facts, tumefactive, ELISA, DMT-choice and vitamin D template lines. | FIXED: six case-observable lines (myelitis and lesion, prior optic neuritis, DIS 4 of 5, DIT, AQP4/MOG negative with short lesions, bladder and Uhthoff). |
+| C | minor | `ground_truth.avoided_actions[*]` | Generic rationales; citations that do not govern. | FIXED: case-tied rationales; `[Wattjes_2021]` for CT and PET. |
+| E | minor | `fallback_tool_outputs.echo` | No `echo_type`. | FIXED: `TTE`. |
+| E | minor | `metadata.difficulty_rationale` | "McDonald 2017". | FIXED: 2024 wording. |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+
+A 27-year-old woman with a left T9-T10 myelitis eight months after a right optic neuritis. The brain MRI now reports the brain only (periventricular, left frontal and right parietal juxtacortical, right MCP/dorsal pontine lesions; one open-ring enhancing left periventricular lesion) and says the cord was not assessed; the cord lesions (enhancing left dorsal T9-T10 with mild swelling, non-enhancing dorsal C2-C3) are in the spine MRI alone. The 3-month repeat MRI is gone. The sensory exam no longer has ipsilateral pinprick loss. CSF: 7 restricted bands, kFLC 18.7, no MBP, values no longer copied from RS01. Labs add negative AQP4-IgG/MOG-IgG by CBA; vitamin D 24 ng/mL. Pathway: brain MRI, spine MRI, labs (required), AQP4/MOG (recommended), CSF, drug check (ocrelizumab dose corrected, each medicine listed) and literature (optional). Musts: RRMS by two attacks and four regions; steroids after a urine dipstick, stopping ibuprofen; bladder residual; Uhthoff counselling; DMT with pregnancy planning; pre-DMT screening; vitamin D. All mimics are low with the results that exclude them.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+
+- Citation keys `[McDonald_2024]`, `[Wattjes_2021]`, `[NICE_NG220]` (plan CENTRAL 1).
+- Diagnosis synonyms G35.B/G35.C and "demyelinating disease" (plan CENTRAL 2); not hand-edited.
+
+## Open questions for Andrea (judgment calls you could not settle)
+
+None. One deviation from the plan's per-case line, decided on the criteria: the plan counts DIS as 5 regions including the optic nerve. In the 2024 criteria the optic nerve counts as a DIS region when shown by MRI, OCT or VEP, and this case serves none of them (plan tier table: no VEP or OCT for RS02). The KCE therefore counts 4 MRI regions and records the optic neuritis as the prior clinical attack with objective residual signs. The diagnosis does not change (two attacks and four regions).
+
+## Verification
+
+`perfect_agent.py MS-RR-RS02 -v`: pass; brain MRI <- `initial_tool_outputs.mri`, spine <- `followup[0] request_spine_mri`, labs and AQP4/MOG <- `initial_tool_outputs.labs` (expected shared-report warning). Brain MRI output contains no T9, C2 or cord lesion text. `case_io.py check`: schema and synonym guard OK, no failure naming MS-RR-RS02. `test_case_guards.py -k MS-RR-RS02`: 2 passed.
+
+## Verification (adversarial verifier, 24 Oct 2026)
+
+Checked against the committed worker version (b8be2153): every own-finding row against the case file (field by field read of the whole final case), the plan tier table (section 3.5), the stop rule, the sequence constraint, laterality and lesion-to-exam fit, timeline, allergies against drug outputs, leakage in the brain MRI (no cord text) and the literature/drug outputs (guards pass), PATTERNS classes (template numbers across RS01-RS06, 2017 facts, test-as-must, F2/F5 wrong facts), and the differential against the final results. No reviewer notes exist for MS-RR, so no note id can be missing. Re-run after the changes below: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, `test_case_guards.py -k` pass.
+
+Found: no error. The DIS count of 4 (not the plan's 5) is correct: the case serves no VEP, OCT or orbital MRI, and the 2024 criteria count the optic nerve on paraclinical evidence; the prior optic neuritis still counts as an attack. Sensory exam now fits a left dorsal column lesion; vitamin D 24 and CSF values are case-specific. Changed: nothing.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026 (uniformity scripts over all 30 MS-RR cases; edits through `case_io`; perfect agent, `case_io check` and the case guards clean afterwards).
+
+- `ground_truth.differential[3].icd_code` D86.85 -> D86.89: D86.85 is sarcoid myocarditis; neurosarcoidosis is D86.89, as in the other 11 MS-RR cases.
+- `ground_truth.differential[6].icd_code` G04.81 -> G04.00: G04.81 is other encephalitis; ADEM is G04.00, as in the other 8 MS-RR cases.
+- `action-3-search-medical-literature.label` "Literature search (background evidence only)" -> "Literature search on the MS diagnostic criteria and NMOSD": engineering text replaced by the topic of the stored output.
+- `assessment.prohibited_recommendations[3]` chronic-steroid prohibition set to the condition's canonical text (was "Do not use chronic oral corticosteroids as a maintenance treatment for MS [em dash] they are ineffective long-term and carry significant harm").
+- `assessment.prohibited_recommendations[5]` spinal-cord prohibition set to the condition's canonical text (was "Do not omit spinal-cord MRI in a patient with myelopathic signs even if the brain MRI alone meets DIS criteria [em dash] cord lesions change relapse counting and management").
+- `initial_tool_outputs.labs`: the AQP4-IgG and MOG-IgG rows moved to a new `followup_outputs` entry (`interpret_labs`, trigger `request_aqp4_mog_cell_based_assay`, panel `Neuroimmunology`, placed after the imaging follow-ups). Served in the initial labs payload, they answered the mimic-exclusion panel order as well, so an agent learned the result of `action-aqp4-mog-cba` without ordering it (perfect-agent warning "answered with the same stored report"); the MockServer now serves them only to an order that names the assays (checked for all three alternatives and both orders).
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (`plans/MS-RR-decisions.md`). What changed and why:
+
+- Diagnosis synonyms (`diagnosis_synonyms.yaml` G35 entry, re-applied with `apply_diagnosis_synonyms.py --prune --conditions multiple_sclerosis`): removed the label "demyelinating disease" (G37.9 is an Excludes1 of G35.A, and its tokens occur in an NMOSD, MOGAD or ADEM answer, which would have scored as correct) and the codes G35.B and G35.C (primary and secondary progressive MS in FY2026 ICD-10-CM, a different course from this relapsing-remitting case). Accepted now: the label, multiple sclerosis, MS, relapsing(-)remitting multiple sclerosis, RRMS; codes G35.A, G35, G35.D.
+- Checks: `perfect_agent.py` pass, `case_io.py check` clean for the case, `test_case_guards.py -k MS-RR-` passes with MS-RR now in `DISCRIMINATOR_CONDITIONS`.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+- `order_specialized_test {test_type: ssep}`: 1. Prolonged cortical P37 latency on both tibial stimulations (right 45.1 ms, left 48.3 ms) with normal lumbar N22, indicating central somatosensory conduction delay above the lumbar cord. 2. Normal median responses... (fallback_tool_outputs.specialized_test). Why: rule c: vibration reduced to the ankles in both legs and joint position sense reduced at the left great toe with a dorsal C2-C3 and a left dorsal T9-T10 lesion; the library reports a normal study.
+- `order_specialized_test {test_type: vep}`: 1. Prolonged P100 latency, right eye (123 ms; reference < 115 ms), with reduced amplitude (5.2 uV; fellow eye 9.6 uV), consistent with right optic nerve conduction delay. 2. Normal left eye response. (followup_outputs[request_vep]). Why: rule c: right optic neuritis 8 months ago with 20/25 acuity, red desaturation and temporal pallor of the right disc; the library reports a normal study.
+- `order_specialized_test {test_type: optical_coherence_tomography}`: 1. Thinning of the right peripapillary RNFL (average 84 um, temporal 56 um) and right GCIPL (72 um), a pattern of a prior right optic neuropathy. 2. Left eye within normal limits. (followup_outputs[request_optical_coherence_tomography]). Why: rule c: right optic neuritis 8 months ago with temporal disc pallor: RNFL and GCIPL thinning is expected; the library reports a normal study.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: Abnormal timed gait and balance assessment. Timed Up and Go 12.9 s and 10 m walk speed 1.00 m/s are slowed for age; Berg balance 48/56. (fallback_tool_outputs.clinical_assessment). Why: rule d: the examination documents a gait disorder (spastic gait with left leg circumduction); the library reports a normal study.
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 80, ECOG 1: restricted in physically strenuous activity, ambulatory and able to carry out light work. (followup_outputs[request_performance_status]). Why: rule d: inpatient relapse with a documented gait disorder: Karnofsky 100 / ECOG 0 'without evidence of disease' contradicts the case; the library reports a normal study.
+
+Checks: perfect agent ok; case guards pass; snapshot diff shows no criterion answer changed; map verified (served without the library).

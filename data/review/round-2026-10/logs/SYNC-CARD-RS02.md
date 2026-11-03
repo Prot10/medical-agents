@@ -1,0 +1,118 @@
+# SYNC-CARD-RS02
+Reviewer status: R1 none, R2 none (SYNC-CARD was never reviewed) | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| (none) | - | No reviewer notes for this case. |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| C | major | `action-6-search-medical-literature`, `stop_rule`, literature follow-up | Literature required and in the stop rule; follow-up cited a non-existent Brignole 2018 review title and placed Sheldon 2002 (JACC) in "Neurology". | FIXED: optional, canonical rationale, out of the stop rule; follow-up rewritten from ESC 2021 pacing, ACC/AHA/HRS 2018 bradycardia (pacing mode with LVEF 36-50%) and ESC 2018; placed last. |
+| C | major | `action-2-interpret-labs` | Pinned CBC, BMP, Mg, troponin with a generic expected evidence. | FIXED: recommended, `panels: [BMP, troponin]`. Troponin kept as a targeted assay (coronary disease; pembrolizumab four months ago, so immune-checkpoint myocarditis is a reversible cause to exclude); BMP for potassium and CKD 3b. Deviation from plan C (BMP only) explained below. |
+| C | major | `action-9-order-ct-scan` (new), `avoided_actions`, CT output | Head CT was avoided as waste although he is 72, lost consciousness and has a right temporal contusion from the fall: NICE NG232 indicates a CT within 8 hours. | FIXED: new recommended criterion; the CT moved from the fallback to `initial_tool_outputs.ct` and rewritten (no haemorrhage or fracture, right temporal scalp swelling, the incidental 3 mm calcified granuloma kept). The CT waste entry removed. |
+| B | minor | `initial_tool_outputs.ecg`, monitoring `rhythm_summary` | "Junctional escape" with a wide QRS of LBBB morphology; "junctional/ventricular" in the findings. | FIXED: "wide-complex escape rhythm" in ECG and telemetry; ECG interpretation keeps the measured values. |
+| B | major | echo follow-up | No `echo_type`; values without units; wall motion null while the CMR shows basal inferior hypokinesis; no TAPSE, PASP. | FIXED: full TTE report keeping RS02's numbers (LVEF 42%, LVEDD 5.5 cm, LA 4.1 cm, septum 1.3 cm, AVA 1.6 cm2, mean 18 mmHg), with basal inferior hypokinesis, TAPSE 19 mm, PASP 34 mmHg. |
+| B | major | `action-4-order-cardiac-monitoring`, monitoring follow-up | Criterion pinned holter_24h with a "Telemetry + Holter" label; no case fallback; no min/max in `heart_rate_range` (plan E). | FIXED: alternatives telemetry, holter_24h, holter_48h; "Inpatient telemetry, 24 h" with RS02's numbers (average 37, 30-44 bpm, 3.8 s pause at 04:15, two 3-beat NSVT runs); same recording as the monitoring fallback. |
+| C | minor | CMR follow-up | "No features of sarcoidosis, amyloidosis, or acute myocarditis" and "fibrosis in the conduction system region" are interpretation. | FIXED: impression lists the findings (septal mid-wall LGE with T1 1120 ms, no oedema, inferior subendocardial scar, LVEF 42%). Criterion optional (age 72, plan). |
+| C | major | `action-5-check-drug-interactions`, metoprolol follow-up | Required without a drug; output claimed amlodipine adds negative chronotropy (a dihydropyridine has no relevant AV-nodal effect); alternatives "per cardiology evaluation". | FIXED: recommended, `drug: metoprolol`; output in report voice (label contraindication in AV block without a pacemaker, additive hypotension only with amlodipine and lisinopril); medication-list review as the drug fallback. |
+| C | minor | tilt follow-up | "qualitative" garbage values, em dash, "VASIS: not applicable" text. | FIXED: cleaned; tilt avoided as waste with a reason naming the hypotension and coronary disease. |
+| B | minor | exercise follow-up (new) | A wasted exercise order would have received the library's normal sinus-rhythm report. | FIXED: case-consistent exercise follow-up (complete AV block, escape 37 to 46 bpm, flat BP, stopped early). |
+| C | major | `avoided_actions` | Only CT and CSF; EEG, brain MRI, tilt and exercise not penalised; reasons generic. | FIXED: CSF, EEG, brain MRI, tilt, exercise as waste, each naming complete heart block with a wide-complex escape. |
+| C | major | `ground_truth.assessment` | "Permanent pacing" without the urgency of a hypotensive wide-escape block, no pacing-mode decision with LVEF 42%, "Do not perform tilt-table" as a prohibition. | FIXED: musts are recognition, immediate bridge (pads, isoprenaline or temporary wire), monitored bed, permanent pacing this admission (ESC 2021 Class I), physiological ventricular pacing with LVEF 42% (ACC/AHA/HRS 2018 IIa), withhold metoprolol and hold antihypertensives while hypotensive, prophylaxis around the penicillin anaphylaxis, driving. Tilt prohibition deleted (it is an avoided action). |
+| C | major | `ground_truth.differential` | SSS and VT left moderate after telemetry; immune-checkpoint myocarditis (pembrolizumab in the history) and recurrent PE (prior PE, cancer, dyspnoea) absent. | FIXED: all low with the excluding result named; checkpoint myocarditis and recurrent PE added; vasovagal very low. |
+| L | minor | `red_herrings[0]` | data_point "near-syncopes attributed to deconditioning" is not what the HPI says (he attributes the dyspnoea and fatigue). | FIXED: quotes "which he attributes to deconditioning"; pembrolizumab red herring added. |
+| A | minor | all criteria, `stop_rule`, `sequence_constraints` | Free-text section citations, rationale equal to label, `max_additional_actions: 0`, no constraints. | FIXED: keys only, real rationales, stop rule ECG/TTE/monitoring with 3 additional actions, soft ECG before TTE and before monitoring. |
+| B | major | `initial_tool_outputs.drug_interactions` | With no initial drug output, the MockServer served the first stored drug follow-up (e.g. this case's own named-drug review) to a check of any other drug, such as verapamil. | FIXED: the medication-list review is stored as `initial_tool_outputs.drug_interactions` as well as the fallback, so an unnamed drug receives the list review and the named-drug follow-ups still match their own drug. |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+
+The 72-year-old man after pembrolizumab with hypotensive complete heart block (wide LBBB-morphology escape at 38 bpm) now has three required steps (ECG, TTE, inpatient telemetry with Holter accepted) and three recommended ones: BMP with troponin (normal troponin against an infarct or checkpoint myocarditis), a head CT for loss of consciousness with a temporal contusion at 72 (NICE NG232), and a review of metoprolol. His numbers are unchanged (RS03 is the case that changes); the echo now reports units, basal inferior hypokinesis matching the CMR, TAPSE and PASP. CMR and the literature lookup are optional. CSF, EEG, brain MRI, tilt and exercise are waste. The musts add an immediate pacing bridge, physiological pacing for LVEF 42%, withholding metoprolol and the antihypertensives while hypotensive, antibiotic prophylaxis around his penicillin anaphylaxis and driving advice. All alternatives in the differential are low with the excluding result; checkpoint myocarditis and recurrent PE were added.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+
+- Plan C1: generic synonyms and R55 still accepted, and the I44 block accepts "mobitz ii" and "second degree av block" for a complete-block case; not hand-edited.
+- Plan (lead): section 3 lists head CT as avoided in this subtype, but RS02 meets the plan's own NG232 rule (65 or over, loss of consciousness, head strike), as M03 did.
+
+## Open questions for Andrea (judgment calls you could not settle)
+
+None needing Andrea. Deviations from the lead plan, decided for dataset quality:
+- Head CT recommended instead of avoided (NICE NG232, as above).
+- Labs pinned as BMP plus troponin rather than BMP alone, because the pembrolizumab history makes troponin a targeted assay for a reversible cause of the block.
+
+## Verification
+
+Checked (24 Oct 2026, adversarial pass): the log against the diff from fa1d22e6 and the whole final case; head CT tier against NICE NG232 (72, loss of consciousness, temporal contusion: CT within 8 h, so the deviation from the plan's subtype row is correct and follows the plan's own J rule); troponin as a targeted assay (pembrolizumab, coronary disease) is sound; echo vs CMR wall motion; CMR arithmetic ((172-100)/172 = 42%); telemetry (fallback identical); drug outputs against the list; musts vs prohibitions; differential; stop rule; pathway order.
+
+Found and changed:
+- `initial_tool_outputs.ecg.intervals.QTc` still read "492 ms (borderline prolonged)" after the worker fixed the interpretation; 492 ms in a man is prolonged. Now "492 ms (prolonged; the wide escape QRS contributes)".
+- CMR `LV_mass` "148 g (increased)" and "Increased LV mass (148 g)": 148 g is within the normal male CMR range, and the echo reports concentric hypertrophy (septum 1.3 cm). Value set to 188 g (increased) in both places; it remains distinct from RS03 (136 g).
+- Differential, immune-checkpoint myocarditis: "no history of myalgia or ptosis" is not recorded anywhere in the case. Now cites what the record does show (strength 5/5, extraocular movements intact, no dysphagia).
+
+perfect_agent clean, `case_io.py check` clean for this case, leak guard passes.
+
+## Condition audit (24 Oct 2026)
+
+Condition auditor, cross-case pass over the 30 SYNC-CARD cases.
+
+Changed:
+- Added `initial_tool_outputs.literature_search.general` (the neutral syncope evaluation block already used in P02-P04 and RM01-RM03: ESC 2018 and ACC/AHA/HRS 2017 initial evaluation and risk stratification). Why: with no initial literature output, MockServer tier 2 answered any generic query (e.g. "syncope guidelines") with the case's disease-specific follow-up, which names the diagnosis. The block repeats no expected_evidence (leak guard passes).
+
+Re-run after the change: perfect_agent 30/30 clean, case_io check clean for SYNC-CARD, test_case_guards for SYNC-CARD 60 passed, discriminator and hijack guards clean.
+
+## Close-out (24 Oct 2026)
+
+Close-out of the condition (plans/SYNC-CARD-decisions.md). Not a re-review: every change below is cross-case.
+
+- Diagnosis synonyms (`diagnosis_synonyms.yaml` SYNC-CARD block, applied with `apply_diagnosis_synonyms.py --prune --conditions syncope_cardiac`): the generic labels "cardiac syncope", "arrhythmic syncope", "bradyarrhythmia", "tachyarrhythmia" and "conduction disease syncope" are retired (29 of 30 cases accepted "cardiac syncope", so any cardiac answer scored), and R55 is no longer an accepted code.
+- Must 1: the bradycardia bridge no longer offers isoprenaline (he has coronary artery disease; ACC/AHA/HRS 2018 reserves beta-agonists for a low likelihood of ischaemia); temporary transvenous pacing is the bridge.
+- Labels: complete heart block labels only (Mobitz II and second-degree labels removed: a different grade); I44.30 kept, I44.1, I44.39, I45.9 and R55 dropped.
+- Citations now follow the guideline each rationale or reason names (ruling 8; new keys in the criteria pack allow-list): action-9-order-ct-scan citations ['[ESC_2018]'] -> ['[NICE_NG232]']; action-3-order-echocardiogram citations ['[ESC_2018]'] -> ['[ESC_2018]', '[ESC_2021_Pacing]']; action-8-order-advanced-imaging citations ['[ESC_2018]'] -> ['[ESC_2021_Pacing]'].
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; `test_case_guards.py -k SYNC-CARD-RS02` pass (SYNC-CARD now in `DISCRIMINATOR_CONDITIONS`); synonym `--check` clean.
+
+## Vocabulary wiring (24 Oct 2026)
+
+Central vocabulary (batch 4: orthostatic_blood_pressure, electrophysiology_study, sodium_channel_blocker_challenge, genetic_panel:inherited_arrhythmia and :cardiomyopathy, whole_body_FDG_PET; SYNC-CARD decisions CENTRAL 1).
+
+| field path | change |
+| --- | --- |
+| `initial_tool_outputs.clinical_assessment` | added: orthostatic_blood_pressure 'Active stand test not performed. Deferred by the clinical team.' (haemodynamically unstable or high-grade AV block at presentation: standing is not safe); no criterion |
+
+Scoring change for re-review: new criteria are recommended or optional, so no required work-up changed.
+
+| field path | change |
+| --- | --- |
+| `followup_outputs[8]` (`request_electrophysiology_study`) | added: 'Electrophysiology study not performed. Deferred by the clinical team.' The documented rhythm already settles management, and the library's normal study (normal AV conduction and sinus node function, nothing inducible) would contradict the case; no criterion |
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `initial_tool_outputs.eeg`: `eeg_type` set to `routine`, named in the report's own text.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Engineering text (25 Oct 2026)
+
+Review-process wording (references to the round's rulings, the round policy file, the criteria packs, and tier markers such as "(optional)" in criterion labels and rationales) is shown to physicians in the review app, so it was rewritten in clinical language. The tier stays in the criterion's `importance` field; scoring is unchanged. `test_case_guards.py::test_no_review_process_text` now fails on any of it.
+
+- criterion `action-8-order-advanced-imaging` label: "Cardiac MRI to characterise the substrate (optional)" -> "Cardiac MRI to characterise the substrate"
+- criterion `action-6-search-medical-literature` label: "Guideline lookup on pacing mode (optional)" -> "Guideline lookup on pacing mode"
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 70, ECOG 2 (fallback_tool_outputs.clinical_assessment). Why: rule 2: the library reports Karnofsky 100, no complaints and 'working' in a retired man with progressive fatigue, exertional dyspnoea and daily near-syncope.
+- `order_echocardiogram {echo_type: TEE}`: LVEF 42% with basal inferior hypokinesis, mild AS, no thrombus (fallback_tool_outputs.echo). Why: rule 3: the stored TTE shows LVEF 42%, LV dilatation and hypertrophy and mild aortic stenosis; the library TEE reports a normal heart.
+- `order_echocardiogram {echo_type: bubble_study}`: LVEF 42% and mild AS as on the TTE, no shunt (followup_outputs[9] request_bubble_study). Why: rule 3: the stored TTE is abnormal (LVEF 42%, mild AS); the library reports a normal heart.
+- `order_echocardiogram {echo_type: exercise_echo}`: persistent complete AV block, flat BP response, stopped early (followup_outputs[10] request_exercise_echo). Why: rule 3: the stored exercise test shows persistent complete AV block with a flat blood pressure response; the library reports a normal study at 9.5 METs.
+- `order_advanced_imaging {modality: coronary_CTA}`: severe mid RCA and moderate proximal LAD stenoses, calcium score 812 (fallback_tool_outputs.advanced_imaging). Why: rule 2: known two-vessel coronary artery disease at catheterisation and a stored inferior subendocardial scar on cardiac MRI; the library reports no plaque.
+- `order_advanced_imaging {modality: coronary_angiography}`: two-vessel disease (80% RCA, 60% LAD), LVEDP 21 mmHg (followup_outputs[11] request_coronary_angiography). Why: rule 2: two-vessel coronary artery disease on catheterisation five years ago, managed medically; the library reports normal coronaries.
+- `order_body_imaging {study: chest_abdomen_pelvis_CT}`: status post left nephrectomy, no recurrence, mild emphysema (fallback_tool_outputs.body_imaging). Why: rule 2: left radical nephrectomy three years ago; the library reports normal kidneys.
+- `order_body_imaging {study: pelvis_abdomen_CT}`: status post left nephrectomy, no recurrence (followup_outputs[12] request_pelvis_abdomen_ct). Why: rule 2: left radical nephrectomy three years ago; the library reports normal kidneys.
+- `order_body_imaging {study: pelvis_abdomen_MRI}`: status post left nephrectomy, no recurrence (followup_outputs[13] request_pelvis_abdomen_mri). Why: rule 2: left radical nephrectomy three years ago; the library reports normal kidneys.
+- `order_body_imaging {study: pelvis_abdomen_ultrasound}`: surgically absent left kidney, normal right kidney (followup_outputs[14] request_pelvis_abdomen_ultrasound). Why: rule 2: left radical nephrectomy three years ago; the library reports normal kidneys.
+- `interpret_labs {panels: [PTH]}`: intact PTH 96 pg/mL (fallback_tool_outputs.labs['PTH']). Why: rule 2: chronic kidney disease stage 3b (creatinine 1.6-1.7 mg/dL) after nephrectomy; the library reports a normal PTH.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

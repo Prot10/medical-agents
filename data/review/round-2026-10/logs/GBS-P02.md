@@ -1,0 +1,108 @@
+# GBS-P02
+Reviewer status: R1 not reviewed, R2 needs_changes | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| 4a3dc6d5-b69a-44f8-b2b2-1921b2afcdfd | FIXED | The HIV "Non-reactive" entry (`initial_tool_outputs.labs.panels["Exclusion studies"]`, with its leaky clinical_significance) is deleted. The current CD4 count and viral load move out of the baseline labs into their own pathway step (`followup_outputs` trigger `request_hiv_viral_load_cd4_count`: CD4 368 cells/mm3 L, HIV-1 RNA <20 copies/mL). New recommended criterion `action-10-interpret-labs-hiv-control` (`interpret_labs {'panels': ['HIV_viral_load', 'CD4_count']}`) scores the order (plan P02). In the patient block, the earlier CD4 380 and undetectable load are dated as the clinic review 6 months ago, so the history does not hold the scored result. The chief complaint no longer quotes them. |
+| 24f4abe2-1aa4-4007-bc14-3112e507776f | FIXED (cytology) / BLOCKED (CMV PCR) | The CSF follow-up `analyze_csf_gbs` now reports cytology ("no malignant cells; reactive lymphocytes"), a full differential (18 lymphocytes, 4 monocytes, no neutrophils), VDRL, cryptococcal antigen and HSV PCR. `action-3-analyze-csf` asks for `{'special_tests': ['cytology']}`. CSF CMV PCR cannot be added because it is not in the `analyze_csf` vocabulary (plan CENTRAL 4). Per the plan, the must becomes "Exclude CMV polyradiculitis: unlikely with CD4 368 and an undetectable viral load and a lymphocytic, not neutrophilic, CSF with normal glucose; send CSF CMV PCR". The red herring now resolves on CD4, viral load, CSF pattern and negative cytology, VDRL and CrAg, with the CMV PCR sent, instead of on a "negative CMV PCR" that does not exist. |
+| bfc49d34-c6be-433d-996a-c1b365171a2d | FIXED | `action-3-analyze-csf.expected_evidence` is now "Raised protein with 10-50 cells/mm3, compatible with HIV-associated GBS but prompting exclusion of CMV polyradiculitis and lymphoma" (plan P02). The label and rationale name cytology. |
+
+## Own findings
+| dim (A schema, B consistency, C clinical, D leakage, E language) | severity (blocker/major/minor) | field path | finding | action (FIXED/FLAGGED) |
+| --- | --- | --- | --- | --- |
+| B/D | major | `patient.neurological_exam.additional`, respiratory follow-up | The exam gave FVC 2.1 L (62%) and NIF -30 while the respiratory report gave 1.8 L (53%) and -26: two contradicting values, one of them a leak of a4 (C1/C7). The report flagged the low values "(H)" and had no weight. | FIXED: the exam keeps clinical signs only. The report keeps 1.8 L and -26 in the canonical format: FVC 1.8 L (53%; 33.5 mL/kg at 53.8 kg) L, MIP -26 L, MEP 48 L, cough effective. Weight 53.8 kg and height 155 cm added (BMI 22.4; predicted FVC 3.4 L fits). |
+| C | major | `assessment.required_recommendations` | There was no ICU-level must, although FVC is below 60% and MIP is weaker than -30. "IVIG preferred over PLEX in HIV given immune considerations" was unsourced (C8; plan P02). There was no swallow must despite dysphagia. | FIXED: ICU-level monitoring and an elective-intubation plan (trend, bulbar function, cough, secretions; 20 mL/kg written as about 1.1 L). IVIg 2 g/kg (about 21.5 g/day) or PE with the indication, no preference. CMV-exclusion must per the plan. ART continued with the HIV team. Telemetry. Swallow assessment. |
+| C | major | `key_clinical_evidence[3]` | "IVIG is preferred over PLEX in HIV to avoid removing circulating antiretroviral medication" had no source (plan P02). | FIXED: deleted. The real point (bictegravir is protein bound, so dose after PE) is in the DDI output, and a6 is recommended for it. |
+| C | major | `key_clinical_evidence[2]`, ganglioside follow-up | The ganglioside panel (GM1 IgG positive, uninterpreted) and the claim that "antecedent infection workup remains important" go against EAN/PNS 2023 (C2, C3). The Campylobacter IgM was in the current labs. | FIXED: follow-up and serology deleted; KCE replaced with the C3 pearl. The GI history stays. |
+| C | major | `ground_truth.differential` | "HIV-related acute inflammatory neuropathy / CIDP" was "high" (it overlaps the diagnosis itself). CMV was moderate after a lymphocytic CSF at CD4 368. Neurosyphilis was low although the CSF VDRL is non-reactive. Lymphoma, which the reviewer's cytology note raises, was missing (C5). | FIXED: CMV low (reasons given, PCR sent). Lymphomatous polyradiculopathy added, low (negative cytology). Acute-onset CIDP low. Neurosyphilis, ART toxicity and Lyme very_low. |
+| C | minor | `red_herrings` | The left facial palsy with ptosis was unresolved (same class as RM11, plan P02). | FIXED: second red herring added (asymmetric cranial involvement in GBS). "Pupils equal and reactive, full eye movements" added to the exam as the pertinent negatives against Horner or third nerve palsy. |
+| B | minor | CSF follow-up | "Slightly xanthochromic" with 0 RBC and protein 88 has no source. | FIXED: "Clear, colourless". The serum glucose 92 now in the CMP gives the stated ratio 0.65. |
+| B | minor | NCS `quantitative_data.severity` | "Moderate-severe" against a "Severe AIDP" pattern and a severe impression (same class as M02 note 3776d769). | FIXED: "Severe". The median CMAP gets a value and normal limits are added. A needle EMG line is added. |
+| C | major | `initial_tool_outputs.labs` | No CMP, liver tests, albumin, glucose, CK or platelets. | FIXED: added (all normal except sodium 133). |
+| C | minor | telemetry follow-up | 96 h with "IV labetalol given" (C12, ruling 4). | FIXED: the first 24 h, no treatment; a8 expected_evidence is canonical. |
+| D | major | literature follow-up `request_literature_hiv_gbs`, DDI placeholder | The literature follow-up had no sources and an empty summary; the DDI follow-up was an empty template (C9, C11). | FIXED: both deleted. The initial literature output is a sourced general summary (EAN/PNS 2023: 5-50 cells compatible but prompting alternatives; canonical treatment statement). The initial DDI output gives bictegravir with IVIg and PE (dose after exchange, relative caution) and the ART-interruption warning. |
+| C | minor | `action-6-check-drug-interactions` | Importance (ruling 6, plan 3.1). | FIXED: recommended, not required. The ART dosing around PE is a real but minor interaction, and ART is not changed. |
+| A | major | `action_criteria`, `sequence_constraints`, `stop_rule`, citations | Template structure (plan 3.1, 3.3). | FIXED: order a2, a3, a10, a1, a4, a8, a7, a6, a5; canonical texts; constraints removed; stop rule of five required criteria, max 3; plan citation keys. |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+GBS-P02 is HIV-associated AIDP with a lymphocytic CSF pleocytosis (22 cells/mm3). The contradictory HIV-negative result and the Campylobacter IgM are gone. The current CD4 (368) and viral load (undetectable) are now a recommended pathway step, and the earlier values are dated in the history. The CSF report adds cytology and the full differential, and the CSF criterion expects 10-50 cells, which prompts exclusion of CMV polyradiculitis and lymphoma. CSF CMV PCR cannot be ordered in the current vocabulary, so the must requires sending it. The respiratory step uses one consistent set of values (FVC 1.8 L, 53%, 33.5 mL/kg; MIP -26; MEP 48), and the musts require ICU-level monitoring and an intubation plan. IVIg or PE has no unsourced preference, ART continues, and swallow and telemetry musts are added. The differential is the assessment-time view, with lymphoma added. A second red herring covers the asymmetric facial palsy with ptosis.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+- Plan CENTRAL 4: CSF `CMV_PCR` in `analyze_csf` special_tests. Once added, the CSF criterion can require it and the CSF report should state "CMV PCR not detected".
+- Plan CENTRAL 5 (weight field) and 6 (variant synonyms in an AIDP case).
+
+## Open questions for Andrea (judgment calls you could not settle)
+None. I kept the HIV-specific literature claim out of the stored output, because I could not tie it to a source on the plan's allow-list. The output cites only EAN/PNS 2023 statements.
+
+## Verification
+Adversarial verifier, 24 Oct 2026. Read the log, the full diff and the whole final case.
+- Note 4a3dc6d5: confirmed (no HIV non-reactive anywhere; current CD4/viral load are a pathway step with a recommended criterion; earlier values dated 6 months ago in the history). Note 24f4abe2: cytology fixed; CMV PCR BLOCKED on CENTRAL 4 with the must naming it, which is sound. Note bfc49d34: a3 expected_evidence now matches the 22 cells. Probes: the HIV order is served the HIV monitoring follow-up and the baseline order the baseline labs.
+- Arithmetic: BMI 22.4; FVC 1.8/3.4 = 53%, 33.5 mL/kg; 20 mL/kg = 1.1 L; MIP/MEP limits for a 35-year-old woman (45, 75); CSF 60/92 = 0.65; IVIg 21.5 g/day; ECG 106 = vitals. Brighton level 1 is correct (cells below 50 with raised protein). Differential matches the work-up (CMV and lymphoma low with reasons).
+- Found and fixed: she cannot walk unaided and is admitted to ICU-level care, but unlike the other cases of this batch the musts had no venous thromboembolism prophylaxis. Added "DVT prophylaxis appropriate for an immobilised inpatient."
+- Checks: `perfect_agent.py GBS-P02 -v` passes; `case_io.py check` reports no failure naming GBS-P02.
+
+
+## Condition audit (24 Oct 2026)
+Condition auditor, after the worker and the verifier. Changes made through case_io; `perfect_agent.py` and `case_io.py check` re-run clean for all 30 GBS cases afterwards, and `test_case_guards.py -k GBS` passes.
+- B, minor: `action-7-analyze-ecg` expected_evidence was the condition template ("Sinus tachycardia or bradycardia; conduction or repolarisation abnormalities reflecting autonomic involvement") and the rationale repeated the label, while the ECG shows sinus tachycardia 106 bpm with QTc 452 ms. Rewritten to what the ECG shows, with the rationale used in RP12, RP14-RP16 (the RP12 verifier had flagged this template in this case).
+- E, minor: `fallback_tool_outputs.drug_interactions.general.proposed` read "(agent not specified on this case's pathway)", an engineering note served to any off-pathway interaction check (PATTERNS 5). Now "Medication list review", as in S01-S03 and RS18.
+- B, minor: `initial_tool_outputs.ecg` called QTc 452 ms "borderline" in a woman; under AHA/ACCF/HRS 2009 a QTc is prolonged from 460 ms in women, and RM13 and RP14 (same value, women) already read it as normal. Interpretation and finding now "Normal intervals (QTc 452 ms)".
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/GBS-decisions.md` (Andrea, 24 Oct 2026: resolve open points for dataset quality).
+
+- Synonyms (`diagnosis_synonyms.yaml` G61.0 split into scoped entries, expanded with `--prune`): now accepts the generic GBS labels and the three AIDP labels (its NCS is demyelinating); "acute motor axonal neuropathy", "AMAN" and "miller fisher syndrome" are no longer accepted (wrong subtype or variant for this case).
+- `accepted[0]` "Guillain-Barré syndrome, AIDP — HIV-associated (with CSF pleocytosis)" -> "Guillain-Barré syndrome, AIDP, HIV-associated, with CSF pleocytosis" (em dash removed; same diagnosis).
+- Checks: `perfect_agent.py` pass; `case_io.py check` clean for this case; GBS guards pass; synonym `--check` clean.
+
+## Central vocabulary wired (24 Oct 2026)
+Terms added in commit e19131d6 (`interpret_labs` `anti_GQ1b_IgG`, `anti_GT1a_IgG`, `botulinum_toxin_assay`; `analyze_csf` `CMV_PCR`), wired per plan C2/C3/C9 and GBS-decisions CENTRAL 1-3. Checks after the change: `perfect_agent.py -v` pass, `case_io.py check` clean for this case, `test_case_guards -k GBS-` 60 passed; optional criteria probed against the MockServer (served the case's own report, not a fallback).
+
+- `action-3-analyze-csf` now requires `{special_tests: [cytology, CMV_PCR]}` (label and expected_evidence updated; rationale unchanged): one LP sample tests both mimics the pleocytosis prompts in HIV (lymphoma, CMV polyradiculitis). Chosen over a separate CMV criterion, which the perfect-agent check flagged as a second criterion answered by the same LP report.
+- CSF follow-up `analyze_csf_gbs`: `special_tests['CMV PCR'] = 'Not detected'` and "CMV PCR not detected." in the interpretation.
+- Differential 'Opportunistic CMV polyradiculitis': "CSF CMV PCR is still sent." -> "CSF CMV PCR is not detected.", likelihood low -> very_low (excluded by the work-up, ruling 7).
+- Must 4 -> "Exclude CMV polyradiculitis before attributing the pleocytosis to GBS: CSF CMV PCR not detected, with CD4 368, an undetectable viral load and a lymphocytic, not neutrophilic, CSF with normal glucose." Red herring 1 correct_interpretation: "the CSF CMV PCR is sent to close the question" -> "the CSF CMV PCR is not detected".
+- Resolves the BLOCKED part of note 24f4abe2 and CENTRAL 4.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+- follow-up `request_cardiac_monitoring`: `monitor_type` "Continuous telemetry" -> `telemetry`.
+- `initial_tool_outputs.specialized_test.test_type` "Nerve Conduction Studies and EMG" -> `emg_ncs`.
+- `fallback_tool_outputs.advanced_imaging` set to null: a generic report (modality 'MRI brain without contrast', impression 'No intracranial lesion identified. No cranial nerve enhancement. No leptomeningeal signal change. No mass, haemorrhage, or restricted diffusion.') that names no one study and so answered every variant; the benchmark library now answers each study with its own normal report.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Weight and height (25 Oct 2026)
+
+- `patient.demographics`: weight 51.8 -> 53.8 kg, height 152 -> 155 cm, BMI 22.4 -> 22.4 (the prompt shows height, weight and BMI).
+- Why: rule 1: patient.physical_exam.general states weight 53.8 kg, height 155 cm.
+- The FVC mL/kg figures and the weight-based IVIg amounts in the text were checked against this weight: all within rounding, no text change.
+
+Checks: `perfect_agent.py` ok; BMI = weight / height^2 to one decimal.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 40, ECOG 3 (fallback_tool_outputs.clinical_assessment). Why: rule 1: the library reports Karnofsky 100 / ECOG 0 and a working patient; she cannot walk without support, with left facial weakness and dysphagia.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: unable to walk without support; timed gait and balance tests not performed (followup_outputs[4] request_gait_and_balance_timed). Why: rule 1: the library reports a normal timed gait and balance assessment; she cannot walk without support (hip flexion 3+/5).
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: no tremor or rigidity; motor items limited by weakness, response not assessable (followup_outputs[5] request_levodopa_challenge). Why: rule 1: the library describes a normal motor examination, gait and postural reflexes; proximal weakness and a support-dependent gait.
+- `order_body_imaging {study: spine_MRI}`: smooth enhancement of the cauda equina roots, ventral more than dorsal; normal cord (fallback_tool_outputs.body_imaging). Why: rule 1: smooth enhancement of the cauda equina and ventral roots is seen in most patients with this polyradiculoneuropathy (Gorson 1996; Byun 1998), while the library reads the roots as normal.
+- `order_body_imaging {study: peripheral_nerve_MRI}`: smooth enhancement and mild T2 hyperintensity of the lumbosacral roots, no enlargement (followup_outputs[6] request_peripheral_nerve_mri). Why: rule 1 and 3: the library reads the nerve roots as normal; root enhancement as on the spine MRI of this case.
+- `order_specialized_test {test_type: nerve_biopsy}`: segmental demyelination with macrophage infiltration and sparse T-lymphocytes; reduced myelinated fibre density (fallback_tool_outputs.specialized_test). Why: rule 3: the stored nerve conduction study shows absent sural sensory responses bilaterally with a demyelinating pattern; the library sural biopsy is normal.
+- `perform_clinical_assessment {assessment_type: orthostatic_blood_pressure}`: active standing not performed (cannot stand without support); supine BP 136/86 mmHg, HR 104 bpm; sitting BP 130/84 mmHg, HR 112 bpm (followup_outputs[7] request_orthostatic_blood_pressure). Why: rule 3: she cannot stand without support and is tachycardic (HR 106); the library reports 3 minutes of symptom-free standing at a supine heart rate of 68.
+- `order_specialized_test {test_type: autonomic_testing}`: reduced cardiovagal function, distal sudomotor impairment and labile blood pressure on tilt (followup_outputs[8] request_autonomic_testing). Why: rule 3: the stored telemetry shows heart rate 44-128 bpm and a hypertensive episode to 178/100 mmHg
+- `order_specialized_test {test_type: tilt_table}`: Abnormal head-up tilt: resting tachycardia with labile blood pressure; no sustained orthostatic hypotension or vasovagal response (followup_outputs[9] request_tilt_table). Why: rule 3: the stored telemetry shows heart rate 44-128 bpm and a hypertensive episode to 178/100 mmHg
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

@@ -1,0 +1,92 @@
+# SE-S11
+Reviewer status: R1 not reviewed, R2 not reviewed (no notes) | Approved before this round: treated as approved (plan: no notes, counted among the R2 approvals)
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| (none) | - | The notes file has no note for SE-S11. |
+
+## Own findings
+| dim (A schema, B consistency, C clinical, D leakage, E language) | severity (blocker/major/minor) | field path | finding | action (FIXED/FLAGGED) |
+| --- | --- | --- | --- | --- |
+| D | blocker | `initial_tool_outputs.drug_interactions['general']` | This empty block's summary repeated the a5 expected text (the hyperkalemia treatment list). It was served for any drug query (leak guard failed). | FIXED: block deleted (C9). |
+| B | major | HPI, `neurological_exam` | The timeline could not hold: he missed dialysis "yesterday", but it was "his Monday session ... now Wednesday", and the exam said "missed dialysis 2 days". The exam reported "periorbital asterixis" (not a real sign; asterixis cannot be tested during convulsions) and "postictal confusion 30 minutes after seizure termination" while the HPI and motor exam describe ongoing convulsions. | FIXED: he missed Monday (yesterday) after Friday's session; it is now Tuesday, 4 days since dialysis. The exam has multifocal myoclonus between bursts, no asterixis, and GCS 5 during continuous convulsions. The HPI adds poor intake while on insulin (the reason glucose matters). |
+| A/C | major | `initial_tool_outputs.labs` | There was a template "Exclusion studies" block (ammonia, magnesium, lactate, ABG "Within reference range", plan C1). It contradicted bicarbonate 12, and magnesium cannot be normal after a missed dialysis. There was no glucose in an insulin-treated patient, and no albumin for the calcium. The hemoglobin "reference" was the ESRD target. The summary had causal claims ("uremic encephalopathy SE"). | FIXED: block deleted; ammonia, AED_levels, lactate, ABG, troponin and BNP removed from the required arguments (T-LABS: CBC, CMP, magnesium). Full CMP with glucose 142, albumin 3.4, phosphate 8.4, magnesium 2.9 (H); ABG pH 7.15, pCO2 35, lactate 4.6; normal hemoglobin range. BNP and troponin kept as reported values. Factual summary. |
+| D | major | `initial_tool_outputs.ecg` | The ECG quoted the serum potassium and calcium (cross-modality) and prescribed management ("makes calcium gluconate ... urgent"). Its rate was 78 against HR 88. | FIXED: categorical read: sinus 86, flattened P, PR 212, QRS 128, peaked T waves, "pattern consistent with hyperkalemia". ECG criterion placed second, required. |
+| D/B | major | `initial_tool_outputs.ct` | The CT findings named "uremic encephalopathy and hyponatremia Na 128" and "hypertensive + uremic leukoencephalopathy" (cross-modality). Generalized edema from a sodium of 128 is implausible. | FIXED: no hemorrhage or subdural collection; chronic periventricular small vessel hypodensities; no mass effect. a3 expected text updated (SDH excluded). |
+| C/D | major | `initial_tool_outputs.eeg`, EEG follow-up | "Triphasic waves - uremic/metabolic encephalopathy pattern" named a disease. The follow-up was a "post-dialysis improving" record (ruling 4), and its trigger took over the cEEG order (C4). The EEG criterion had no `eeg_type`. | FIXED: follow-up deleted. Initial EEG in ACNS terms: three generalized seizures in 40 minutes without return to baseline; GPDs with triphasic morphology between them; multifocal myoclonus not time-locked. T-EEG criterion. |
+| C | major | follow-ups `request_aed_optimization`, `request_hyperkalemia_urgent_treatment`, `request_uremic_encephalopathy_literature` | Post-dialysis labs reported the effect of treatment (C4). The hyperkalemia "drug check" was a treatment protocol with no interaction content, which the plan deletes (C5). The second literature output had unsourced thresholds ("BUN >100 causes SE"). | FIXED: all three deleted. |
+| C/D | major | a5 drug check | Its expected text was a treatment list; levetiracetam "max 500-1000 mg twice daily" confused loading with maintenance. | FIXED: new follow-up `request_antiseizure_renal_dosing_check` with T-DDI content. Levetiracetam: load unchanged, maintenance 500-1000 mg daily plus a post-dialysis supplement. Fosphenytoin: binding altered, phosphate load, conduction risk. Lacosamide: 300 mg/day maximum, dialyzed, PR. Midazolam metabolite accumulation. Insulin clearance; sevelamer binding. Required (C9). |
+| C/D | major | a6 literature | Literature was required, with patient-specific dosing in its expected text. | FIXED: optional, last; T-LIT output (SE tiers [Glauser_2016, ESETT_2019] and general renal facts). |
+| C | major | a7 MRI, MRI follow-up | The trigger was "request_mri_brain_contrast" in ESRD (gadolinium risk). The expected text "FLAIR changes if PRES" was conditional. The findings did not address PRES. | FIXED: non-contrast; the report states no parieto-occipital vasogenic edema, no infarct and no hemorrhage, with an imaging differential for the white matter change. Recommended. |
+| C | major | `assessment` | There were no doses and no ECG-guided calcium. Sodium polystyrene was offered as emergency therapy. There was no hypoglycemia precaution with insulin in ESRD, no dialysis disequilibrium caution at BUN 142, no BP target and no cEEG. The magnesium/phosphate prohibition was duplicated. | FIXED: T-MUST-BZD; calcium gluconate 10% 30 mL with repeat; insulin 5 units with dextrose and hourly glucose; emergency but gentle first dialysis; levetiracetam 60 mg/kg with renal maintenance, avoiding fosphenytoin (reasons); controlled BP reduction; T-MUST-cEEG. Prohibitions: delaying dialysis, standard maintenance doses, magnesium/phosphate (one), gadolinium unless essential. |
+| C | major | `ground_truth.differential`, `key_clinical_evidence` | "Hyperkalemia / hypocalcemia-driven seizures" was high, but hyperkalemia is not epileptogenic. PRES and SDH stayed moderate after imaging excluded them. "Drug accumulation (cefepime, levetiracetam)" listed drugs he does not take. Hypoglycemia on insulin in ESRD was missing (ruling 7). | FIXED: hypocalcemia alone low (corrected 7.3); PRES low (MRI); SDH low (CT); hypoglycemia low (glucose 142); drug accumulation low; sepsis low. KCE rewritten. |
+| C | minor | `red_herrings` | Only BNP was explained; troponin 0.28 could suggest ACS. | FIXED: the red herring covers BNP and troponin. |
+| A | minor | `fallback_tool_outputs` | `advanced_imaging` "CT angiography" and `specialized_test` "dialysis_adequacy_assessment" are not vocabulary (C10). The normal ECG fallback contradicted the case. The CSF fallback glucose ratio of 0.6 did not match a serum glucose of 142. | FIXED: those three nulled (the initial ECG answers every ECG order). CSF glucose 88, ratio 0.62. `fallback_tool_kinds` updated. |
+| A | minor | `sequence_constraints`, `stop_rule` | ECG-before-DDI and labs-before-DDI were `hard`. `max_additional_actions` was 0. | FIXED: both soft (C13); stop rule lists labs, ECG, CT, EEG and drug check; max 1. |
+| E | minor | `avoid-waste-5`, `avoid-waste-2`, `avoid-waste-6` | The PSG entry carried the DaTscan rationale; the Holter rationale contradicted the ECG; the CSF rationale was terse. | FIXED: T-PSG; Holter and CSF rationales made case-specific. |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+SE-S11 keeps its diagnosis: uremic convulsive SE in a 61-year-old on hemodialysis who missed a session, with the label's values unchanged (BUN 142, K 6.8, Ca 6.8, Na 128). The timeline is now consistent: last dialysis Friday, missed Monday, presenting Tuesday. The exam no longer contains impossible signs. The labs are complete: acidosis pH 7.15 with bicarbonate 12, magnesium 2.9, phosphate 8.4, albumin 3.4, glucose 142. The template exclusion block is gone. The ECG is a plain hyperkalemic read without serum values or management. CT and MRI exclude SDH and PRES in report voice; the MRI is non-contrast. The cEEG shows recurrent generalized seizures with triphasic GPDs between them. The post-dialysis labs and EEG, the leaking "general" drug block and the treatment-protocol "drug check" are gone. A real renal dosing interaction check replaces them, and literature is optional. The musts are a benzodiazepine, calcium gluconate, insulin with dextrose (5 units), emergency but gentle dialysis, levetiracetam with renal maintenance (no fosphenytoin), controlled BP reduction and cEEG. The differential is ranked against the results and adds hypoglycemia on insulin.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+- Plan CENTRAL 1: `[ACNS_2021]` and `[Fugate_2015]` are cited here and need the criteria-pack allow-list.
+
+## Open questions for Andrea (judgment calls you could not settle)
+None.
+
+## Verification
+Adversarial verifier, 24 Oct 2026. Read the log, the diff and the whole final case (large rewrite).
+- No notes. Cross-field checks: the timeline is consistent (dialysis Friday, missed Monday, presenting Tuesday, 4 days) in the HPI and the exam. GCS 5 during convulsions. The label values (BUN 142, K 6.8, Ca 6.8, Na 128) match the labs. Corrected calcium is about 7.3, which matches the differential. The ECG (QRS 128, PR 212, peaked T) matches the expected text and the calcium gluconate must. Levetiracetam renal dosing in the drug check (load unchanged, 500-1000 mg daily plus a post-dialysis supplement) matches the must. The prohibitions on magnesium and phosphate products and on gadolinium agree with the labs and the non-contrast MRI. Both drug-check constraints are soft (plan C13). The hyperkalemia drug-check follow-up and the leaking "general" block are gone. Checks are clean.
+- Changed: only the stale `metadata.revision_reason`, which now points to this log. No clinical error found.
+
+## Close-out (24 Oct 2026)
+Decisions in `plans/SE-decisions.md`.
+- synonyms: the G41 category no longer grants the type codes G41.0, G41.2 and G41.8 (a type code is granted only by the case's own code, so an answer coded with the wrong SE type no longer scores by code); `apply_diagnosis_synonyms.py --prune --conditions status_epilepticus` removed G41.2 and G41.8 from `ground_truth.diagnosis.icd_codes`. Labels unchanged.
+- Checks: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, SE case guards pass, `apply_diagnosis_synonyms.py --check --conditions status_epilepticus` clean.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `initial_tool_outputs.eeg`: `eeg_type` set to `continuous_icu`, decided by reading the report.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## EEG and labs after routing (25 Oct 2026)
+
+Commit 317e46db routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG) and serves an `interpret_labs` order only the stored panels it names. Decisions for the condition in `plans/SE-routing-decisions.md`.
+
+- EEG: a routine order received the library's normal routine EEG, which contradicts the case. Added `fallback_tool_outputs.eeg` with `eeg_type` `routine` (the stored continuous_icu recording cut to a 30-minute portable recording without video, technologist notes for the clinical events, activation not performed): two generalized seizures in 30 minutes without return to background, triphasic GPDs between them, myoclonus not time-locked. No criterion, tiers and the reward-relevant policy unchanged; the clinically correct test stays the continuous EEG of `action-1-analyze-eeg`. A `continuous_icu` or `video` order still receives `initial_tool_outputs.eeg`.
+- Labs `action-2-interpret-labs`: unserved result cited in `expected_evidence`: pH 7.15 (Blood Gas). TRIM: the served bicarbonate 12 shows the acidosis that decides dialysis. Scoring change: no.
+  - action-2-interpret-labs expected_evidence: 'BUN 142 and creatinine 14.8; potassium 6.8; calcium 6.8 with albumin 3.4; phosphate 8.4; sodium 128; bicarbonate 12 with pH 7.15; magnesium 2.9; glucose 142' -> 'BUN 142 and creatinine 14.8; potassium 6.8; calcium 6.8 with albumin 3.4; phosphate 8.4; sodium 128; bicarbonate 12; magnesium 2.9; glucose 142'
+- Checks: `perfect_agent.py -v` pass; `case_io.py check` schema and synonym guard OK, no test failure names the case; probe: routine (omitted and explicit) order -> the new case fallback, `continuous_icu` and `video` -> the stored index recording; every number in each lab criterion's evidence is in what its order returns.
+
+## Library contradictions (25 Oct 2026)
+
+Orders that reached the benchmark library's normal report although this case contradicts it (diagnosis, history, medications or a stored finding) now get a case-specific report; every other off-pathway order still gets the library normal. No tier, criterion, diagnosis or existing output changed.
+
+- `analyze_eeg eeg_type=ambulatory` -> `followup_outputs[order_ambulatory]`: ambulatory EEG mirroring the stored continuous EEG (no video).
+- `perform_clinical_assessment assessment_type=performance_status` -> `followup_outputs[order_performance_status]`: performance status KPS 20, ECOG 4 during the admission.
+- `perform_clinical_assessment assessment_type=gait_and_balance_timed` -> `followup_outputs[order_gait_and_balance_timed]`: timed gait not testable, as on the examination.
+- `perform_clinical_assessment assessment_type=cognitive_screen` -> `followup_outputs[order_cognitive_screen]`: baseline cognitive screen not testable in the documented mental state.
+- `order_specialized_test test_type=neuropsych_battery` -> `followup_outputs[order_neuropsych_battery]`: neuropsychological battery not testable in the documented mental state.
+- `order_specialized_test test_type=speech_language_evaluation` -> `followup_outputs[order_speech_language_evaluation]`: speech and language evaluation not testable in the documented mental state.
+- `labs:lithium_level` -> fallback labs panel `Lithium`: lithium not detected (not prescribed).
+- `labs:AED_levels` -> fallback labs panel `Antiseizure medication levels`: antiseizure drug levels: none detected (no antiseizure drug prescribed).
+- `labs:valproate_level` -> fallback labs panel `Antiseizure medication levels`: antiseizure drug levels: none detected (no antiseizure drug prescribed).
+- `labs:HbA1c` -> fallback labs panel `Glycated haemoglobin`: HbA1c of a patient with treated type 2 diabetes.
+- `order_body_imaging study=pelvis_abdomen_ultrasound` -> `followup_outputs[order_pelvis_abdomen_ultrasound]`: abdominal imaging: small atrophic kidneys of end-stage kidney disease.
+- `order_body_imaging study=pelvis_abdomen_CT` -> `followup_outputs[order_pelvis_abdomen_ct]`: abdominal imaging: small atrophic kidneys of end-stage kidney disease.
+- `order_body_imaging study=pelvis_abdomen_MRI` -> `followup_outputs[order_pelvis_abdomen_mri]`: abdominal imaging: small atrophic kidneys of end-stage kidney disease.
+- `order_body_imaging study=chest_abdomen_pelvis_CT` -> `followup_outputs[order_chest_abdomen_pelvis_ct]`: abdominal imaging: small atrophic kidneys of end-stage kidney disease.
+
+Checks: `perfect_agent.py` ok; `test_case_guards.py -k SE` pass; every order listed in `plans/LIBRARY-group2-map.yaml` for this case is answered without the library; served answers of every other order unchanged against HEAD. Reasons and doubts: `plans/LIBRARY-group2-decisions.md`.

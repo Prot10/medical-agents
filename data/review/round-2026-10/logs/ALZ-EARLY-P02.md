@@ -1,0 +1,103 @@
+# ALZ-EARLY-P02
+Reviewer status: R1 needs_changes, R2 not reviewed | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| e0c624ba-fad9-48e6-92ff-076524c8f2d6 | FIXED | `initial_tool_outputs.clinical_assessment` rewritten from this case's exam: `criteria_met.amnestic_predominant_profile` false; findings now give the full MMSE and MoCA item losses (the MMSE line was truncated "(n..."), a language finding (fluent speech, word-finding pauses, phonological paraphasias, no agrammatism or apraxia of speech, spared single-word comprehension, repetition failing beyond about five words), informant and functional findings; impression rewritten per plan C3 skeleton with no storage-type sentence and no engineering sentence. `delayed_recall_improves_with_cueing` set true because the exam records one further word retrieved with a category cue on both MMSE and MoCA. |
+| bc5b31e8-8950-4df0-94cd-d1abea7d7528 | FIXED | `clinical_assessment.scores["severity stage on the functional criterion"]` now "primary progressive aphasia without dementia-level loss of daily function"; `independence_in_instrumental_activities_lost` stays false; impression states preserved instrumental independence. Label and ICD kept (lvPPA due to AD, G30.0; onset about age 60). Criterion `action-4` expected evidence says preserved independence. |
+| 2b9b571d-deba-473e-8ab0-8db4ff9dae99 | FIXED | The `interpret_labs` "request_speech_eval" follow-up is deleted; its content moved into the neuropsychological battery (`followup_outputs[0].output.findings`: sentence repetition by length, Pyramids and Palm Trees 96%, spontaneous speech analysis with pause rate, paraphasia rate and speech rate; also in `quantitative_data` and the impression). The "PPA Variant Classification" lab row is not carried over (it was the answer). Must added: "Refer to speech and language therapy for assessment and communication strategies [PPA_2011]." No orderable speech-language term exists: CENTRAL. |
+| a433bcb3-61e6-48b0-ba54-d800b64be72f | FIXED | `initial_tool_outputs.mri.additional_observations[1]` "No mass lesions or pathological enhancement post-gadolinium" became "No mass lesion" (`contrast` false in the criterion). |
+| 01a75f3e-b709-46f2-acc3-bd4108fb24c3 | FIXED | `ground_truth.key_clinical_evidence` rebuilt (4 items): canonical lvPPA pearl, preserved hippocampi in atypical variants, biomarkers decide AD versus FTLD in atypical presentations (one test enough), depression misattribution. The hippocampal-atrophy, storage-deficit, APOE, B12 (B12 is 520) and AChEI items are deleted. |
+| 50406d62-4f4e-472f-a7ef-7c53d14987ab | FIXED | Summary comment (generic amnestic clinical assessment): resolved by e0c624ba and bc5b31e8. |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| B | major | `ground_truth.action_criteria[action-9]`, `initial_tool_outputs.csf` | Amyloid PET was the "single optional biological-confirmation route"; a CSF order would get the library's normal CSF, contradicting the case (C2). | FIXED: criterion has two alternatives (CSF Abeta42, Abeta42_40_ratio, phospho_tau, total_tau; amyloid PET), canonical label, rationale, expected evidence. New `initial_tool_outputs.csf`: normal opening pressure, cells, protein, glucose; Abeta42 512, Abeta40 10950, ratio 0.047 decreased, p-tau181 84 and t-tau 538 raised, concordant with the positive PET and FDG. Probe of every alternative: CSF <- `initial_tool_outputs.csf`, amyloid PET <- `followup_outputs[1]`, FDG <- `followup_outputs[2]`, gene panel <- `followup_outputs[3]`; no library answer. |
+| C | major | `action-11-check-drug-interactions`, `fallback_tool_outputs.drug_interactions` | Donepezil interaction check in a patient who is not at the dementia stage and has no planned cholinesterase inhibitor; fallback said "(agent not specified on this case's pathway)" (engineering text). | FIXED: criterion deleted, fallback null (C1, plan 3.2). |
+| D | major | `followup_outputs[4]` (gene panel), `action-6.expected_evidence` | The finding "value" was the criterion's expected-evidence sentence ("Pathogenic variant only in a minority..."), not a result. | FIXED: findings list APP, PSEN1, PSEN2 each without reportable variant; impression states the negative result; expected evidence "No pathogenic or likely pathogenic variant in APP, PSEN1 or PSEN2". |
+| C | minor | `action-6` | Gene panel rationale did not reflect the weak family history (mother with dementia at 82). | FIXED: rationale explains onset about 60, late-onset maternal dementia, result informs family counselling; stays optional; canonical counselling must added (C12.3). |
+| D | minor | `fallback_tool_outputs.literature_search` | Literature fallback (C8). | FIXED: null; `metadata.fallback_tool_kinds` entries for literature and drug interactions removed. |
+| B | minor | `initial_tool_outputs.labs` | Panel named "BMP" for a CMP order with no liver tests; folate reported as "Within reference range" under an "Exclusion studies" panel with an engineering `clinical_significance`; interpretive summary "pre-diabetic range". | FIXED: panel renamed CMP with total protein 7.1, albumin 4.3, ALT 24, AST 22, ALP 71, bilirubin 0.6 (all normal) added; folate 11.4 ng/mL moved to Dementia_screening; every `clinical_significance` null; summary "HbA1c 5.8% (H)"; interpretation names the one abnormal value. All stored values unchanged. |
+| D | minor | `initial_tool_outputs.mri.impression` | Prose impression; no other change of substance. | FIXED: numbered impression with the same findings (left-dominant perisylvian atrophy, MTA 0-1, Fazekas 1, no infarct, mass or microbleeds). |
+| B | minor | `followup_outputs[0..2]` | Neuropsych impression unpunctuated prose; PET and FDG `tracer_or_protocol` null; PET impression only "POSITIVE amyloid PET scan". | FIXED: numbered neuropsych impression; tracers 18F-florbetapir and 18F-FDG; binary PET impression with SUVr and plaque density (no disease name). FDG impression unchanged in substance. |
+| C | major | `ground_truth.differential` | svPPA, nfvPPA and FTLD left moderate after testing that excludes or argues against them (C11). | FIXED: all low with the case data that excludes them (PPVT 85th percentile, Pyramids and Palm Trees 96%, fluent grammatical speech, no apraxia of speech, preserved operculum, temporoparietal FDG, amyloid and p-tau positivity). |
+| C | major | `ground_truth.assessment` | Musts restated tool steps (labs, MRI, battery, FDG) and the engineering "single case-designated optional biomarker route" must; prohibitions were the five-item template (no anticholinergic, benzodiazepine or antipsychotic issue in this case; memantine). | FIXED: musts are informant history, disclosure and planning, SLT referral, canonical biomarker must, canonical genetic counselling must, vascular risk (138/84 on lisinopril, rosuvastatin, HbA1c 5.8%), continue sertraline with mood review, reassessment in 6 to 12 months with driving and financial safety. Prohibitions: do not attribute the aphasia to depression; do not use APOE to diagnose. |
+| C | minor | `ground_truth.red_herrings` | Empty although the case is built on the depression misattribution (metadata.diagnostic_challenge). | FIXED: one red herring on the depression diagnosis (`patient.clinical_history.past_medical_history[3]`). |
+| A | minor | all criteria `citations`, `rationale` | Duplicate bare keys; rationale identical to label (C13). | FIXED: one bracketed key per citation; case-specific rationales; criteria reordered per plan 3.1 (assessment, battery, labs, MRI, biomarker, FDG, gene panel) with ids kept. |
+| A | minor | `sequence_constraints`, `stop_rule` | No constraints; `max_additional_actions` 0. | FIXED: soft MRI before biomarker (LP), clinical assessment before biomarker, battery before gene panel; `max_additional_actions` 1. |
+| E | minor | `metadata.difficulty_rationale`, `key_educational_points` | Engineering wording on the "only biomarker route". | FIXED: rewritten to the new pathway; added the staging point. |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+
+The clinical assessment now describes this man's language syndrome rather than the amnestic template: MMSE 24/30 and MoCA 20/30 with losses on repetition, naming with phonological errors, writing and fluency, fluent grammatical speech without apraxia, spared single-word comprehension, one extra word recalled with category cues, and his wife's report of two years of word-finding decline with intact memory and behaviour. He manages medicines and finances, so the stage is "primary progressive aphasia without dementia-level loss of daily function"; the label lvPPA due to AD (G30.0) is unchanged. The speech-language evaluation filed as a lab test is gone; its measures (repetition by sentence length, Pyramids and Palm Trees, spontaneous speech analysis) are now part of the neuropsychological battery, and speech and language therapy is a must. Amyloid status can be established by CSF or amyloid PET (optional, one test enough); a concordant CSF result was added (Abeta42/40 0.047, p-tau181 84, t-tau 538). The MRI no longer mentions gadolinium. The gene panel reports APP, PSEN1 and PSEN2 negative and stays optional with counselling. The donepezil check and the literature fallback were removed. svPPA, nfvPPA and FTLD are now low with the results that argue against them, and the teaching points are lvPPA-specific. Musts: informant history, disclosure and planning, SLT, biomarker offer, genetic counselling, vascular risk (BP 138/84, HbA1c 5.8%), sertraline with mood review, reassessment in 6 to 12 months; prohibitions: attributing the aphasia to depression, APOE as a diagnostic test.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+
+- Vocabulary: a speech and language assessment term (plan 5.3) so the reviewer's requested evaluation can be ordered as its own step; until then it lives in the neuropsych battery.
+- Synonyms: `diagnosis.accepted` grants "posterior cortical atrophy", "benson syndrome" and "early onset alzheimer" through G30.0 to this lvPPA case (plan 5.1).
+- Citation keys used: `[NIA_AA_MCI_2011]`, `[PPA_2011]`, `[ACMG_NSGC_2011]` (plan 5.2).
+
+## Open questions for Andrea (judgment calls you could not settle)
+
+- None needing Andrea. Decided: no cholinesterase-inhibitor must or prohibition. He is not at the dementia stage, so the dementia must does not apply, and the MCI prohibition does not fit lvPPA, where an off-label trial is a defensible specialist choice. The case is silent on it rather than penalising either choice.
+
+## Verification
+Adversarial verifier, 24 Oct 2026. Checked every note row against the file (e0c624ba, bc5b31e8, 2b9b571d, a433bcb3, 01a75f3e, 50406d62: all present and fixed as described; no gadolinium or enhancement text left, no speech-evaluation `interpret_labs` follow-up, `amnestic_predominant_profile` false, IADL field false and staging text per plan C4, lvPPA pearl present). Read the whole final case: patient block, clinical assessment, labs (values, ranges, flags), CSF (Abeta42/40 = 512/10950 = 0.047, glucose ratio 61/98 = 0.62), MRI, neuropsych, PET, FDG, gene panel, fallbacks, criteria, musts, prohibitions, differential, red herring path (`past_medical_history[3]` is the depression entry), constraints and stop rule. Both biomarker alternatives have case-authored outputs (CSF initial, amyloid PET follow-up).
+
+Found and fixed:
+- B, major, `patient.neurological_exam.mental_status` and `clinical_assessment.findings[1]`, `impression`: the MMSE breakdown lost "2 points on sentence writing", but sentence writing is a 1-point MMSE item, so the listed losses gave 25, not 24. Now 1 point on writing plus 1 point on the three-stage command (two of three steps), which fits his length-dependent comprehension and repetition deficit: repetition 1 + writing 1 + command 1 + recall 2 + naming 1 = 6, 24/30.
+- B, minor, same fields, `findings[2]`: the MoCA deficits listed added up to 7 points for a score of 20/30. Added digit span 0/2 (forward and backward failed, consistent with the phonological short-term memory deficit the battery reports) and abstraction 1/2: recall 3 + repetition 2 + fluency 1 + digits 2 + abstraction 1 + naming 1 = 10, 20/30. Impression updated to name these items.
+No other change. `perfect_agent.py -v` and `case_io.py check` clean for the case; `test_case_guards.py -k ALZ-EARLY` passes.
+
+
+## Condition audit (24 Oct 2026)
+Cross-case consistency pass by the ALZ-EARLY condition auditor, through case_io. Changed:
+- lab panel key `Reviewed_cognitive_panel_additions` renamed `Magnesium_homocysteine_CRP` (the key exposed a review-round artefact to the agent; contents and order unchanged).
+- 'lasting power of attorney' (UK instrument) changed to 'durable power of attorney' in this US-setting case (1 place).
+After the change: perfect_agent.py and case_io.py check clean on all 30 cases; test_case_guards (ALZ-EARLY) pass.
+- Normal values in `Magnesium_homocysteine_CRP` varied (Magnesium 2.0 to 1.9, Homocysteine 10.2 to 12.8, CRP 1.8 to 0.8), all still within the case's reference ranges: the same numbers (magnesium 2.0, homocysteine 10.2, ESR 12, CRP 1.8) had been copied into up to 13 cases, a template artefact raised by the S01 worker; no text cites the changed values.
+- Checks re-run after these additions: perfect_agent.py, case_io.py check and test_case_guards clean.
+
+## Close-out (24 Oct 2026)
+
+- Synonyms re-expanded (`--prune --conditions alzheimers_early`): removed "posterior cortical atrophy" and "benson syndrome"; code G30.1 (onset before 65); "alzheimer dementia", "dementia due to alzheimer" and F00 (lvPPA with instrumental function preserved, not staged as dementia). Added lvPPA labels ("logopenic variant primary progressive aphasia", "logopenic progressive aphasia", "logopenic aphasia", "lvPPA"). Now: codes ['G30.0', 'G30.9', 'G30.8']; labels after accepted[0]: ['alzheimer disease', "alzheimer's disease", 'alzheimers disease', 'early onset alzheimer', 'logopenic variant primary progressive aphasia', 'logopenic progressive aphasia', 'logopenic aphasia', 'lvPPA'].
+- Checks: `perfect_agent.py -v` pass; `case_io.py check` no failure names this case; case guards pass; synonym `--check` clean. Decisions in `plans/ALZ-EARLY-decisions.md`.
+
+## Central vocabulary wired (24 Oct 2026)
+
+Terms added by commit e19131d6 (batch-2 review vocabulary), wired as the plan and this log intended. The earlier CENTRAL vocabulary request in this log is resolved by them.
+
+- New recommended criterion `action-speech-language-evaluation` (`order_specialized_test` `{"test_type": "speech_language_evaluation"}`), after the battery. Reason: reviewer note 2b9b571d asked for the speech evaluation as its own step; Gorno-Tempini 2011 classification needs motor speech, grammar, repetition and connected-speech analysis. Recommended, not required: the battery and the bedside examination already document naming, repetition, fluent grammatical speech and no apraxia of speech.
+- New follow-up `request_speech_language_evaluation` after the battery: motor speech normal (no apraxia, no dysarthria), connected speech fluent and grammatical with 3.2 pauses per 100 words, 12% phonological paraphasias, 85 words/min; TROG-2 65th percentile; sentence repetition by length 100/80/20/0% and nonword repetition 2nd percentile; single-word comprehension intact; impression "consistent with the logopenic variant". These measures moved out of the battery (rows Sentence Repetition by length, nonword repetition, Spontaneous Speech Analysis, Motor Speech Assessment, TROG-2 and their quantitative entries; values unchanged), which keeps BNT, WAB repetition, PPVT, Pyramids and Palm Trees, fluency, CVLT-3, clock and Rey copy; battery impression rewritten without the moved items and without naming the variant.
+- `action-5-order-specialized-test` label, rationale and expected evidence restricted to the battery's content (naming, repetition, fluency, preserved comprehension, semantics and memory).
+- Must "Refer to speech and language therapy for assessment and communication strategies" became therapy only (assessment is now a criterion): communication strategies and word-retrieval practice with his wife as communication partner.
+
+Checks after the change: `perfect_agent.py ALZ-EARLY-P02 -v` ok, `case_io.py check` (schema and synonym guard OK, no failure names the case), `test_case_guards.py -k "GLIO-HG- or ALZ-EARLY-"` 120 passed.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+Orders that reached the benchmark library's normal report although this case contradicts it (diagnosis, history, medications or a stored finding) now get a case-specific report; every other off-pathway order still gets the library normal. No tier, criterion, diagnosis or existing output changed.
+
+- `order_advanced_imaging modality=tau_PET` -> `followup_outputs[order_tau_pet]`: case-specific tau-positive flortaucipir PET with the distribution of the stored FDG-PET pattern.
+- `order_advanced_imaging modality=perfusion_SPECT` -> `followup_outputs[order_perfusion_spect]`: regional hypoperfusion matching the stored FDG-PET hypometabolism.
+- `perform_clinical_assessment assessment_type=performance_status` -> `followup_outputs[order_performance_status]`: dementia-stage performance status (Karnofsky 70/ECOG 1; 60/2 in the rapidly progressive case) instead of Karnofsky 100.
+
+Checks: `perfect_agent.py` ok; `test_case_guards.py -k ALZ-EARLY` pass; every order listed in `plans/LIBRARY-group2-map.yaml` for this case is answered without the library; served answers of every other order unchanged against HEAD. Reasons and doubts: `plans/LIBRARY-group2-decisions.md`.

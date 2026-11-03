@@ -50,7 +50,8 @@ The nine checked YAML profiles live in `agent-platform/config/profiles`. Model s
 
 Components, each in [0, 1]:
 
-- diagnosis: every token of an accepted label occurs in the submitted primary diagnosis, or the submitted `icd10_code` is an accepted code. Accepted labels and codes are seeded per ICD-10 code from `config/policies/diagnosis_synonyms.yaml` (`scripts/validation/apply_diagnosis_synonyms.py`, idempotent) and refined per case by physician review;
+- diagnosis (scorer v2, 25 Oct 2026): every token of an accepted label occurs in the asserted part of the submitted primary diagnosis (denied clauses dropped: "non-X", "not X", "rather than X", "X excluded", "X unlikely", "criteria not met"), no `rejected` label occurs there (a competing diagnosis or wrong subtype named alongside, so "ALS or MS" earns nothing), and each of the case's `required_components` (mixed diagnoses) is named. The ICD code never decides the diagnosis;
+- icd_code, weight 0: the submitted `icd10_code` equals an accepted code at the WHO subcategory level (G43.1 agrees with G43.109). Accepted labels and codes are seeded per ICD-10 code from `config/policies/diagnosis_synonyms.yaml` (`scripts/validation/apply_diagnosis_synonyms.py`, idempotent) and refined per case by physician review;
 - required and recommended action coverage: fraction of criteria satisfied by any alternative pattern;
 - tool accuracy: fraction of actions that were the first to satisfy some criterion (re-ordering a resulted study is unjustified);
 - safety and waste avoidance: harmful / wasteful actions as a fraction of all actions;

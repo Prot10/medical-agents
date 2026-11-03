@@ -11,8 +11,9 @@ class CardiacMonitoringTool(BaseTool):
         "events occur: inpatient telemetry (EUR 92/day) while the patient is at risk, "
         "holter_24h/holter_48h (EUR 138/184) for events at least weekly, an event monitor "
         "(EUR 230/276) when they are weeks apart, an implantable loop recorder (EUR 4600) when "
-        "they are months apart. An unselected 24-hour recording in a patient with rare events "
-        "is diagnostic in a very small minority. For a single 12-lead ECG, use analyze_ecg."
+        "they are months apart; a device already implanted is interrogated (EUR 51). An "
+        "unselected 24-hour recording in a patient with rare events is diagnostic in a very "
+        "small minority. For a single 12-lead ECG, use analyze_ecg."
     )
     parameter_schema = {
         "type": "object",
@@ -29,7 +30,9 @@ class CardiacMonitoringTool(BaseTool):
                     "'event_monitor_14d'/'event_monitor_30d': patient-activated, captures "
                     "infrequent events. 'implantable_loop_recorder': months to years of "
                     "monitoring (cryptogenic stroke, unexplained syncope). "
-                    "'telemetry': inpatient continuous monitoring."
+                    "'telemetry': inpatient continuous monitoring. 'device_interrogation': "
+                    "the stored rhythm diagnostics of a pacemaker, ICD or loop recorder already "
+                    "implanted (atrial high-rate episodes, AF burden)."
                 ),
                 "default": "holter_24h",
             },

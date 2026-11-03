@@ -144,14 +144,27 @@ class TestMockServerIntegration:
                json.dumps(authored.output.model_dump(), sort_keys=True, default=str)
 
     def test_confirmatory_labs_reachable_bact_men(self):
-        # Regression: blood cultures and PCR panel were unreachable (shadowed by the
-        # interpret_labs initial output). Both must now resolve to distinct outputs.
+        # Regression: blood cultures and PCR were unreachable (shadowed by the interpret_labs
+        # initial output). They are no longer laboratory panels (one study, one tool): blood
+        # cultures and whole-blood PCR are `order_microbiology` specimens, the CSF PCR is the
+        # `analyze_csf` `meningitis_panel`. Each must resolve to its own stored report.
         case = _load("BACT-MEN-M03")
         srv = MockServer(case)
         srv.get_output("interpret_labs", {})  # consume initial
-        bc = srv.get_output("interpret_labs", {"panels": ["blood_cultures"]})
-        pcr = srv.get_output("interpret_labs", {"panels": ["pcr_panel"]})
+        bc = srv.get_output("order_microbiology", {"specimen": "blood_culture"})
+        pcr = srv.get_output("analyze_csf", {"special_tests": ["meningitis_panel"]})
         assert bc.success and pcr.success
+        assert not bc.library and not pcr.library
+        assert bc.output["organism"] == "Streptococcus pneumoniae"
+        assert "Streptococcus pneumoniae detected" in pcr.output["special_tests"]["Meningitis_PCR_panel"]
+
+        # Two specimens of the same tool: the blood PCR must not be shadowed by the cultures.
+        srv = MockServer(_load("BACT-MEN-S05"))
+        bc = srv.get_output("order_microbiology", {"specimen": "blood_culture"})
+        pcr = srv.get_output("order_microbiology", {"specimen": "whole_blood_pcr"})
+        assert bc.success and pcr.success and not pcr.library
+        assert bc.output["specimen"] == "blood_culture"
+        assert pcr.output["specimen"] == "whole_blood_pcr"
         assert json.dumps(bc.output, sort_keys=True) != json.dumps(pcr.output, sort_keys=True)
 
     def test_distinct_reorders_get_distinct_followups(self):

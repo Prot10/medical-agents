@@ -1,0 +1,128 @@
+# VASC-DEM-P08
+Reviewer status: R1 none, R2 none (VASC-DEM has no notes file; never reviewed) | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| (none) | - | No reviewer note exists for this case or condition. All changes below come from the condition plan (classes C1-C19) and from my own audit. |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| D | major | `action-9-search-medical-literature`, literature outputs | Plan C2 leak. | FIXED: criterion deleted, initial null, fallback deleted. |
+| C | major | `action-10-check-drug-interactions`, `initial_tool_outputs.drug_interactions`, drug fallback | Plan C3: the interrogation shows AF (2.1% burden), so group R applies. The old criterion was an optional anticholinergic review that did not fit a patient on no anticholinergic drug. | FIXED: recommended, one alternative per drug (apixaban, rivaroxaban, edoxaban, dabigatran, warfarin); case output keyed by each drug (anticoagulant with aspirin roughly doubles major bleeding, stop aspirin; no interaction with ramipril, amlodipine, atorvastatin; dose criteria); fallback deleted. |
+| B | major | `action-6-order-cardiac-monitoring`, `initial_tool_outputs.cardiac_monitoring.monitor_type` | Plan C11: a pacemaker interrogation coded as an implantable loop recorder. | FIXED: criterion `order_cardiac_monitoring {}`; `monitor_type` "pacemaker interrogation, stored device diagnostics"; impression lists the stored data only (no "no external monitor could match", no "anticoagulable second mechanism"); the "six weeks before the second clinical event" link removed from the report. |
+| B | minor | `action-8-order-ct-scan.alternatives` | Plan: `angiography`/`contrast` arguments. | FIXED: `order_ct_scan {}`. |
+| D | major | `patient.neurological_exam.mental_status` | Plan C4: MoCA total and item losses in the exam. | FIXED: bedside observation ending "Formal cognitive screening reported separately". |
+| D | major | `initial_tool_outputs.clinical_assessment` | Plan C5: impression "The clinical evidence for a left hemispheric vascular substrate is strong"; "impaired" and "retrieval pattern" judgments; `criteria_met` carried the history's "stepwise course"; fluency "9 animals" is not the MoCA item. MoCA arithmetic checked: 11 points lost = 19/30; 13 years of education, no point added. | FIXED: results-only impression; findings give item scores (naming 3/3, repetition 2/2, orientation 5/6 added); letter fluency "9 words beginning with F"; stepwise criterion removed. |
+| D | major | `initial_tool_outputs.specialized_test.impression` | "a left-hemisphere-weighted profile matching the two left cortical infarcts seen on CT" (cross-modality). | FIXED: profile with percentiles only; `quantitative_data.pattern` descriptive. |
+| D | major | `initial_tool_outputs.ct` | Plan C5: observations gave the clinical MRI contraindication, "satisfies the vascular attribution" and the antithrombotic consequence; impression "Sufficient to attribute the dementia to cerebrovascular disease". | FIXED: technique and limitations only (microbleeds, siderosis, Fazekas, MTA not assessable); numbered impression; dashes removed from findings. Red herring `findings[3]` unchanged. |
+| C | major | `initial_tool_outputs.advanced_imaging`, criterion evidence, differential, KCE | "60-70% by NASCET" from a duplex with PSV 224 cm/s, EDV 78 cm/s, ICA/CCA 3.8: all three sit in the consensus 50-69% band (PSV 125-230), and duplex does not measure NASCET directly; "60-70%" also straddles the 70% revascularisation threshold. The impression also linked the stenosis to the infarcts and the pacemaker. | FIXED: "50-69% (consensus velocity criteria)" everywhere; impression lists the findings only. |
+| D | minor | `initial_tool_outputs.ecg.interpretation` | "interrogating it is the most informative available test" (recommendation). | FIXED: rhythm, pacing mode and limitation only. |
+| B | major | `initial_tool_outputs.labs` | Plan C6: female Hb/Hct ranges in a man; eGFR 60 against ">60" flagged normal; eGFR inconsistent with creatinine 1.1 at age 79 (CKD-EPI 2021 about 68); template values; interpretive interpretation. | FIXED: male ranges, Hct 41.2; eGFR 68 with range ">=60"; WBC 7.1, Plt 205, MCV 91, Na 140, K 4.5, ALT 18, albumin 3.9, folate 9.4; interpretation lists flagged values (glucose, HbA1c) only. |
+| B | minor | `patient.physical_exam.general` | No weight, needed for DOAC dosing (Cockcroft-Gault). | FIXED: weight 75.1 kg, height 172 cm (BMI 25.4 as recorded); CrCl about 58 mL/min, so standard doses of every DOAC. |
+| B | minor | `ground_truth.action_criteria` | Plan C13 (label = rationale, double citations); order per C16. | FIXED: case rationales and evidence, bracketed keys only; order screen, neuropsych, labs, CT, ECG, carotid, monitoring, drug check. |
+| B | minor | `ground_truth.sequence_constraints`, `.stop_rule` | Plan C16: none; max 0. | FIXED: soft screen before CT and ECG before monitoring; max 1; required set unchanged. |
+| C | major | `ground_truth.assessment.required_recommendations` | Four of seven musts were tool steps (interrogate, image carotids, obtain CT, exclude reversible causes); "refer for revascularisation" of a stenosis whose last event was 8 months ago; no BP, LDL or concrete DOAC must. | FIXED: six musts: record the MRI contraindication and that CT cannot exclude CAA [STRIVE_2]; DOAC with dose reasoning and stop aspirin; best medical therapy for the stenosis with vascular team decision (plan wording); BP below 130/80 gradually; LDL below 70 (96); supervised medication administration (missed doses). |
+| C | minor | `ground_truth.assessment.prohibited_recommendations` | Plan C11 wording; two-part microbleed item; em dashes. | FIXED: loop recorder item per plan; microbleed item "Do not withhold anticoagulation because microbleed status cannot be assessed [ESC_AF_2024]"; others reworded. |
+| C | major | `ground_truth.differential` | Plan C8: AD `moderate` although recall is cue-responsive and recognition preserved. | FIXED: AD `low` with key features; CAA stays `moderate` ("cannot be excluded on CT"); cardioembolism entry updated to 50-69%. |
+| C | minor | `ground_truth.avoided_actions[*].rationale` | Plan C18. | FIXED: case-specific; MRI harm stays. |
+| B | minor | `ground_truth.red_herrings[0].field_path` | Empty. | FIXED: `patient.clinical_history.past_medical_history[0]`. |
+| B | major | `fallback_tool_outputs` | Plan C7: advanced_imaging, labs, literature and drug giveaways; echo impression "No cardioembolic source identified". | FIXED: four fallbacks deleted; echo impression descriptive, pacing lead noted; `metadata.fallback_tool_kinds` updated. No CT fallback (CT is the initial study). |
+| E | minor | `ground_truth.key_clinical_evidence`, `metadata.key_educational_points` | Em dashes. | FIXED: reworded. |
+| E | minor | `ground_truth.diagnosis.accepted[0]` | Em dash in the label (not editable). | FLAGGED. |
+| - | check | plan 3.6 | perfect_agent.py ok (drug check served by key, CT and carotid from initial outputs; probe confirms no fallback or library); `test_case_guards -k VASC-DEM-P08` 2 passed; `case_io.py check` schema OK, no failure names P08. | - |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+
+Same case: a 79-year-old man with a non-MR-conditional pacemaker for complete heart block and a two-step decline after two right-sided events, worked up on CT, carotid duplex and pacemaker interrogation. Reports now describe only their own findings: the CT states its technique and what it cannot show (microbleeds, siderosis, Fazekas grade, medial temporal atrophy), the device report lists the stored AF data, and no report attributes the dementia. The carotid stenosis is now 50-69%, which is what the recorded velocities show. Labs use male ranges and an eGFR that matches the creatinine; a weight was added for DOAC dosing. Alzheimer disease is now low; amyloid angiopathy stays moderate because CT cannot exclude it. Musts are now concrete: record the MRI contraindication and the CT limitation, start a DOAC at standard dose and stop aspirin, best medical therapy for the stenosis (last event 8 months ago) with a vascular team decision, BP below 130/80, LDL below 70, and supervised medication. A drug-interaction check is a recommended step.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+
+- Plan C11: add a `device_interrogation` term to `order_cardiac_monitoring` in `costs.yaml`, the library and the `tool_io.py` mirror. Until then the criterion is `{}` and any `monitor_type` (including `holter_24h`) is served the 12-month interrogation report, which is inconsistent for an external monitor.
+- New citation key used: `[ESC_AF_2024]` (plan 5.4).
+- Synonyms (plan 5.1): `F06.7` should not be credited for this dementia case.
+
+## Open questions for Andrea (judgment calls you could not settle)
+
+- None. (The carotid-grade question raised here was closed at verification: the stored velocities meet the 50-69% consensus band.)
+
+## Verification
+
+Adversarial check, 24 Oct 2026. Read the log, the diff and the whole final case. Verified: carotid grade 50-69% is what the stored velocities give by the consensus criteria (PSV 224 cm/s within 125-230, EDV 78 within 40-100, ICA/CCA 3.8 within 2-4), so the worker's open question is settled in favour of 50-69% and closed; the last event 8 months ago puts it beyond 6 months, matching the best-medical-therapy must; apixaban 5 mg twice daily is right (age 79, weight 75.1 kg, creatinine 1.1: no criterion), Cockcroft-Gault about 58 mL/min; BMI 25.4 matches the added weight and height; eGFR 68 matches CKD-EPI; MoCA arithmetic (11 points lost = 19/30) and exam (month incorrect) agree; left MCA cortical infarcts match the right-sided exam and history; device report gives AF burden and longest episode without management text; ECG before monitoring and screen before CT soft constraints; aspirin-stop must, drug output and prohibition agree; MRI harm kept; red herring `initial_tool_outputs.ct.findings[3]` is the periventricular low attenuation row.
+Found and changed: `patient.clinical_history.past_medical_history[3]` described both events as "transient right arm weakness", contradicting the HPI (the second event was a day of right hand clumsiness with word-finding difficulty, and each left a permanent step down). Rewritten as "Two episodes of right-sided neurological deficit, neither imaged: an hour of right arm weakness 2 years ago and a day of right hand clumsiness with word-finding difficulty 8 months ago". perfect_agent.py pass; case_io.py check: schema OK, no failure names P08; test_case_guards pass.
+
+## Condition audit
+Condition auditor, 24 Oct 2026. Scripted checks over all 30 VASC-DEM cases (plan classes C1-C21, PATTERNS.md, lab arithmetic) found the stragglers below in this case; changed through `case_io`.
+
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| B | minor | `initial_tool_outputs.labs.panels.Vascular_risk[Total cholesterol]` | Total cholesterol 184 mg/dL did not equal LDL + HDL + TG/5 (170.6); the same lab-arithmetic class was fixed in M07-M10, P01, P02 and S06-S11 but not here. | FIXED: total cholesterol 171 mg/dL (flag unchanged; LDL, HDL and TG, which the musts and evidence quote, unchanged). |
+
+perfect_agent.py, case_io.py check and test_case_guards re-run on all 30 VASC-DEM ids: clean.
+
+## Close-out (24 Oct 2026)
+
+Condition close-out per `plans/VASC-DEM-decisions.md`.
+
+- Synonyms (diagnosis_synonyms.yaml, applied with `--prune --conditions vascular_dementia`): F06.7, I67.3 and the umbrella "vascular cognitive impairment" no longer accepted (mild-VCI answers must not score in a dementia case); subtype labels scoped by mechanism, here multi-infarct labels and F01.1. Generic labels "vascular dementia", "major vascular neurocognitive disorder", "major neurocognitive disorder due to vascular disease", "VaD"; codes F01.50, F01.51, F01.5, F01.9, F01.A0-C0.
+- `ground_truth.diagnosis.accepted[0]`: em dash replaced by a colon or semicolon; wording and entity unchanged (no scoring effect: matching ignores punctuation).
+- `action-3-interpret-labs`: RPR and HIV removed from `required_arguments.panels` and the label; `[AAN_dementia_2001]` added. AAN 2001: syphilis screening "is not justified unless clinical suspicion for neurosyphilis is present"; NICE NG97 does not test routinely; this case has no risk factor. The stored labs output keeps its RPR and HIV results, so an agent that orders them still receives them (decision Q1).
+- Lipid must: "Intensify lipid lowering to LDL below 70 mg/dL (current 96 on atorvastatin 40 mg) [AHA_ASA_2021_secondary]" -> "Intensify lipid lowering to LDL below 55 mg/dL (current 96 mg/dL on atorvastatin 40 mg): very high risk after atherosclerotic ischaemic strokes at 79 with hypertension; atorvastatin 80 mg, adding ezetimibe if the goal is not reached [ACC_AHA_dyslipidemia_2026]" Reason: the 2026 ACC/AHA multisociety dyslipidemia guideline (supersedes the 2018 cholesterol guideline on which the AHA 2021 LDL-below-70 figure rests) sets LDL below 55 mg/dL for clinical ASCVD at very high risk (two major ASCVD events, or one plus two or more high-risk conditions).
+- `action-3-interpret-labs.expected_evidence`: "above the 70 mg/dL target" removed (the goal sits in the must).
+- `metadata.revision_reason`: the stale August literature/interaction audit text replaced by the round's (summary CENTRAL 9; not read by the harness).
+
+Checks after the close-out: `perfect_agent.py` and `case_io.py check` clean for this case; `test_case_guards -k VASC-DEM-` clean; `apply_diagnosis_synonyms.py --check --conditions vascular_dementia` clean.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Wiring (`device_interrogation`, plan C11): `initial_tool_outputs.cardiac_monitoring.monitor_type` "pacemaker interrogation, stored device diagnostics" -> `device_interrogation`, and `action-6-order-cardiac-monitoring` now requires `monitor_type: device_interrogation`. A Holter, event-monitor or loop-recorder order no longer receives the 12-month pacemaker data (library normal instead).
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, named in the report's own text.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+A fresh order of each study below was answered by the benchmark-level normal library, which contradicted this patient (age, rhythm, devices, surgery, stored findings). Each now has a case-specific report:
+
+- brain MRI: not performed, non-MR-conditional pacemaker in a pacing-dependent patient (fallback_tool_outputs.mri)
+- FDG_PET: Two focal left middle cerebral territory metabolic defects (frontal operculum-anterior insula; supramarginal gyrus) with mild crossed cerebellar diaschisis and mild patchy frontal hypometabolism. No temporoparietal-predominant pattern. (fallback_tool_outputs.advanced_imaging)
+- perfusion_SPECT: Two focal left middle cerebral territory perfusion defects (frontal operculum-anterior insula; supramarginal gyrus) with mild crossed cerebellar diaschisis and mild patchy frontal hypoperfusion. No temporoparietal-predominant pattern. (followup request_perfusion_spect)
+- performance_status: Karnofsky 70 (cares for self; unable to carry on normal activity or active work), ECOG 1 (restricted in strenuous activity, able to carry out light work). (fallback_tool_outputs.clinical_assessment)
+- exercise_stress_test: Reduced exercise capacity (3.5 METs) with a paced rhythm throughout; non-diagnostic for ischaemia. (fallback_tool_outputs.specialized_test)
+- gait_and_balance_timed: Mildly slowed gait (Timed Up and Go 12.4 s) with reduced right arm swing and imperfect tandem gait. (followup request_gait_and_balance_timed)
+- levodopa_challenge: MDS-UPDRS III 8/132 OFF and 8/132 ON (0% change), below the 30% threshold for a clinically meaningful levodopa response. (followup request_levodopa_challenge)
+- TEE: Pacing leads in the right heart without attached mass; mild concentric left ventricular hypertrophy; aortic valve sclerosis without stenosis. No patent foramen ovale and no left atrial appendage thrombus. (followup request_tee)
+- cardiac_MRI: Not performed: the dual-chamber pacemaker system is not MR-conditional, the device documentation is unavailable and the patient is pacing-dependent. (followup request_cardiac_mri)
+- electrophysiology_study: Complete atrioventricular block with ventricular pacing by the implanted device; no inducible ventricular arrhythmia. (followup request_electrophysiology_study)
+- speech_language_evaluation: Mild aphasia with anomia and reduced repetition of long sentences in fluent speech; comprehension intact; no motor speech disorder. (followup request_speech_language_evaluation)
+- CT_perfusion: Matched perfusion defects confined to chronic tissue loss (left frontal operculum and anterior insula; left supramarginal gyrus); no acute core or penumbral mismatch. (followup request_ct_perfusion)
+- cerebral_angiography: Moderate left internal carotid stenosis (60%, NASCET) with irregular plaque; mild right stenosis (35%); no intracranial stenosis. (followup request_cerebral_angiography)
+- DTI_tractography: Not performed: the dual-chamber pacemaker system is not MR-conditional, the device documentation is unavailable and the patient is pacing-dependent. (followup request_dti_tractography)
+- perfusion_MRI: Not performed: the dual-chamber pacemaker system is not MR-conditional, the device documentation is unavailable and the patient is pacing-dependent. (followup request_perfusion_mri)
+- MR_angiography: Not performed: the dual-chamber pacemaker system is not MR-conditional, the device documentation is unavailable and the patient is pacing-dependent. (followup request_mr_angiography)
+- functional_MRI: Not performed: the dual-chamber pacemaker system is not MR-conditional, the device documentation is unavailable and the patient is pacing-dependent. (followup request_functional_mri)
+- MR_spectroscopy: Not performed: the dual-chamber pacemaker system is not MR-conditional, the device documentation is unavailable and the patient is pacing-dependent. (followup request_mr_spectroscopy)
+- MR_venography: Not performed: the dual-chamber pacemaker system is not MR-conditional, the device documentation is unavailable and the patient is pacing-dependent. (followup request_mr_venography)
+- holter_24h: Normally functioning dual-chamber pacing throughout 24 hours with no intrinsic atrioventricular conduction; no atrial arrhythmia recorded during this recording. (fallback_tool_outputs.cardiac_monitoring)
+- chest_abdomen_pelvis_CT: No mass or lymphadenopathy. Clear lungs without nodule, consolidation or interstitial abnormality; left pectoral pacemaker generator with right atrial and right ventricular leads; mild streak artefact. (fallback_tool_outputs.body_imaging)
+- chest_CTA: No pulmonary embolism or aortic dissection. Clear lungs without nodule, consolidation or interstitial abnormality; left pectoral pacemaker generator with right atrial and right ventricular leads; mild streak artefact. (followup request_chest_cta)
+- mediastinum_CT: No mediastinal mass or lymphadenopathy; left pectoral pacemaker generator with right atrial and right ventricular leads; mild streak artefact. (followup request_mediastinum_ct)
+- chest_xray: No acute cardiopulmonary abnormality; left subclavicular pacemaker generator with right atrial and right ventricular leads in satisfactory position. (followup request_chest_xray)
+- spine_MRI: MRI not performed: the dual-chamber pacemaker system is not MR-conditional, the device documentation is unavailable and the patient is pacing-dependent. (followup request_spine_mri)
+- mediastinum_MRI: MRI not performed: the dual-chamber pacemaker system is not MR-conditional, the device documentation is unavailable and the patient is pacing-dependent. (followup request_mediastinum_mri)
+- pelvis_abdomen_MRI: MRI not performed: the dual-chamber pacemaker system is not MR-conditional, the device documentation is unavailable and the patient is pacing-dependent. (followup request_pelvis_abdomen_mri)
+- peripheral_nerve_MRI: MRI not performed: the dual-chamber pacemaker system is not MR-conditional, the device documentation is unavailable and the patient is pacing-dependent. (followup request_peripheral_nerve_mri)
+
+Checks: `perfect_agent.py` pass; `test_case_guards.py -k VASC-DEM-P08` pass; criterion outputs unchanged against the pre-pass snapshot; no 60-character window of any expected_evidence in the new reports; synonym guard 0 changes.

@@ -1,0 +1,86 @@
+# FTD-M04
+Reviewer status: R1 none, R2 none (no FTD notes file; FTD was never reviewed case by case) | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| none | - | No reviewer note exists for this case. Reviewer 1's July 2026 tool rulings (`condition_tool_guidance.yaml` `ftd:`) are kept: neuropsychology, clinical assessment and labs required; FDG-PET, amyloid PET (active AD differential) and genetics optional. |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| D | major | `patient.history_present_illness` | Last sentence summarised the syndrome for the agent ("progressive behavioral syndrome: anosognosia, stereotyped behavior, and loss of social cognition"). | FIXED: deleted. |
+| B | minor | `patient.neurological_exam.cranial_nerves` | "No primitive reflexes" against a bilateral palmomental reflex on the reflex line (plan C14). | FIXED: "Normal." |
+| B | major | `initial_tool_outputs.clinical_assessment` | Fragments truncated mid-sentence and attached to the wrong feature (repetitive questions as perseveration); fixed lunch order not counted; template impression (plan C3). | FIXED: rebuilt, 6 of 6 features with their own evidence (the same daily lunch order counted as an altered food preference, consistently with FTD-M01; repetitive questioning not used as a feature); informant, screen, functional decline; canonical impression. MoCA items checked: 7 points lost, 23/30. |
+| B | major | `initial_tool_outputs.labs` | Unrequested anti-TPO, anti-thyroglobulin (with an invented "not encephalopathy range" comment), ANA 1:40 marked normal against "<1:40", copper, ceruloplasmin, RPR, HIV, free T4; folate, calcium, glucose, LFTs, albumin, platelets missing; "Reviewed_FTD_panel_additions" (plan C5). | FIXED: five panels with stored values kept (TSH 2.8, B12 520, WBC 6.0, Na 140, creatinine 0.7, ESR 11, CRP 1.6) and normal values added (Hb 12.9, platelets 262, MCV 90, K 4.0, BUN 12, eGFR 103 by CKD-EPI 2021, glucose 86, adjusted calcium 9.4, ALT 19, AST 21, ALP 64, bilirubin 0.5, albumin 4.4, folate 13.0); anti-TPO 320 and anti-thyroglobulin 144 moved to keyed follow-up `request_anti_tpo_thyroglobulin_antibodies`; RPR/HIV to `request_rpr_syphilis_hiv_serology`; ANA, copper, ceruloplasmin, free T4 deleted. |
+| D | major | `followup_outputs` (literature), `action-9-search-medical-literature` | Required and in the stop rule; the only output was an occupational-capacity essay with a verdict on this patient ("the firm was correct to place her on leave"); echo `expected_evidence` (plan C1). | FIXED: essay deleted; canonical text with the AD-versus-FTD variant (`[Foster_2007]`, `[Frisoni_2024]`) in `initial_tool_outputs.literature_search`; criterion optional, last, `required_arguments` {}, out of the stop rule. |
+| C | major | `followup_outputs` (genetics) | APOE e3/e4 reported inside an FTD panel with the impression "All values within normal limits"; GRN rs5848 named "c.1414C>T" (rs5848 is the 3' UTR c.*78C>T). | FIXED: APOE removed (not a diagnostic FTD test; disclosure needs separate counselling, plan 1.2.6); rs5848 named correctly as benign; impression "No pathogenic repeat expansion or variant in C9orf72, GRN or MAPT", limitation sentence, counselling note. |
+| D | minor | `initial_tool_outputs.mri` | Report cited the history ("53 years old without vascular risk factors"); unterminated impression. | FIXED: history removed; numbered impression with pertinent negatives. |
+| B | minor | `followup_outputs` (neuropsych) | Teaching phrases ("distinctive bvFTD pattern"), capitals, truncated impression (plan C13). | FIXED: findings in report voice, values unchanged; numbered impression with canonical ending. |
+| C | minor | `action-7-order-advanced-imaging`, `followup_outputs` (SPECT, FDG) | No SPECT alternative; tautological FDG impression (plan C6, C7). | FIXED: SPECT alternative and authored left-predominant SPECT; FDG impression hedged. |
+| C | minor | `action-8-order-advanced-imaging`, `followup_outputs` (CSF, new) | Amyloid PET without the CSF alternative (plan M04). | FIXED: CSF `Abeta42` + `phospho_tau` declared as alternative 2; authored normal CSF AD profile; amyloid impression cleaned ("Negative amyloid PET: sparse to no neuritic amyloid plaque density"); soft constraint MRI before the biomarker (plan C15). |
+| C | minor | `action-10-check-drug-interactions` (new), `followup_outputs` (sertraline) | The patient takes sumatriptan, a concrete serotonergic interaction for the SSRI the case would plausibly start; the drug fallback was "agent not specified". | FIXED: optional criterion `drug: sertraline`; authored output (sumatriptan serotonin toxicity, levothyroxine no interaction, MAOI/pimozide, hyponatraemia, bleeding, QT); fallback deleted. |
+| C | major | `fallback_tool_outputs.advanced_imaging`, `.ct` | Generic "No abnormality" advanced fallback; normal CT against MRI atrophy (plan C6). | FIXED: deleted; CT with mild bifrontal volume loss (canonical text); `fallback_tool_kinds` updated. |
+| A | minor | `ground_truth.action_criteria[*]` | Rationale equal to label, duplicate citations, `[AAN_dementia_2018]` (plan C4). | FIXED: canonical labels, case-specific rationales (neuropsychology against superior premorbid ability; amyloid for onset at 52 with paternal AD; genetics for young onset) and evidence. Ids kept. |
+| C | minor | `ground_truth.sequence_constraints` | None (plan C15). | FIXED: soft clinical assessment before genetics; soft MRI before the AD biomarker. |
+| C | major | `ground_truth.assessment.required_recommendations` | Duplicated template block; HR must ("Discuss employment ... with HR") outside clinical practice (plan M04); genetic must presumed a result. | FIXED: five musts: Rascovsky with certainty, based on the husband's account; why early-onset AD and Hashimoto encephalopathy are less likely and that a biomarker can settle AD; safety and capacity (fitness to practise law and client protection, driving, finances, power of attorney); canonical genetic counselling; caregiver support without ChEI or memantine. |
+| C | minor | `ground_truth.assessment.prohibited_recommendations[0..1]` | Overstated memantine harm (plan C10). | FIXED: canonical wording. |
+| C | major | `ground_truth.differential` | Early-onset AD "high" after preserved hippocampi and memory; psychiatric "moderate"; "Familial FTD" listed as a competitor (plan C11). | FIXED: early-onset AD low (optional biomarker settles it), psychiatric or burnout low, Hashimoto encephalopathy low (with the antibody caveat), vascular very low. |
+| D | major | `ground_truth.key_clinical_evidence` | "Young onset mandates ... a genetic panel"; "once AD biomarkers are negative" while they are optional (plan C12). | FIXED: lines from history, neuropsychology and MRI, the canonical AD line and the optional-amyloid line. |
+| C | minor | `ground_truth.red_herrings` | Only the paternal-AD red herring ("biomarkers are the discriminator"); the case also carries the anti-TPO result (notes) and repetitive questioning. | FIXED: paternal AD reworded; added anti-TPO/anti-Tg (if ordered) and repetitive questioning. |
+| B | minor | `metadata.notes` | "amyloid exclusion required" and "anti-TPO 320 ≠ Hashimoto's encephalopathy" teaching in a non-ASCII shorthand. | FIXED: notes rewritten; `difficulty_rationale` lists the optional steps. |
+| C | minor | `ground_truth.avoided_actions` (CT, perfusion MRI) | `[AAN_dementia_2018]`; perfusion MRI rationale. | FIXED: `[NICE_NG97]`; reworded. |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+
+Required work-up unchanged (informant assessment, neuropsychological battery, reversible-cause blood tests, MRI brain without contrast); optional steps follow in order: FDG-PET or SPECT, an AD biomarker (amyloid PET or CSF Abeta42/p-tau, both authored negative), counselled FTD gene panel (negative), a sertraline interaction check (sumatriptan serotonin toxicity) and a literature search. The HPI no longer summarises the syndrome. The clinical assessment counts all six Rascovsky features from the husband's account. The core blood panel is complete and normal; the antithyroid antibodies (anti-TPO 320, anti-Tg 144) are served only when ordered and are a red herring for Hashimoto encephalopathy. The gene panel no longer reports APOE and names rs5848 correctly. Musts: Rascovsky with certainty from the informant's account; why early-onset AD and Hashimoto encephalopathy are less likely; fitness to practise, driving, finances and power of attorney; genetic counselling before testing; caregiver support without cholinesterase inhibitors or memantine. Early-onset AD, psychiatric illness and Hashimoto encephalopathy are rated low.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+
+- Citation keys used per plan 1.1: `[SNLG_ISS_2024]`, `[Frisoni_2024]` (new), `[Amyloid_PET_AUC_2025]`, `[ACMG_NSGC_2011]`.
+
+## Open questions for Andrea (judgment calls you could not settle)
+
+- None. Decisions recorded: APOE was removed from the FTD panel report (it does not diagnose AD and is not part of a diagnostic FTD panel); the sertraline check was added as an optional criterion because sumatriptan gives it real content.
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. Read the log, the diff and the whole final case. No reviewer notes apply. Checked: MoCA items sum to 23/30; eGFR 103 recomputed (CKD-EPI 2021, woman of 53, creatinine 0.7); red-herring path `followup_outputs[5].output.panels` points at the antithyroid antibody follow-up; florbetapir SUVR threshold and CSF cut-offs coherent; rs5848 nomenclature correct; sumatriptan interaction is real; soft constraints valid; HPI no longer summarises the syndrome; guards pass. Found and fixed: (1) neuropsychology said "verbal fluency mildly reduced" against a bedside letter fluency of 5 words; now "Letter fluency impaired, category fluency low average". (2) `quantitative_data.executive_percentile` "<3rd percentile (education-corrected)" contradicted the finding (3rd percentile standard, below 1st education-adjusted); corrected. (3) The loss-of-empathy line asserted indifference "to the distress of her husband", which the history does not state; it now cites her indifference to the offence she causes and her lost interest in her children, and the apathy line no longer repeats the children. `perfect_agent.py -v` and `case_io.py check` clean.
+
+## Condition audit (FTD auditor, 24 Oct 2026)
+
+- D, major, `patient.neurological_exam.mental_status`: the examination gave the bedside screen results (MoCA 23/30 with item losses and letter fluency), which the required `perform_clinical_assessment` returns (ROUND_POLICY timeline-leak rule). The other 12 FTD cases, and VASC-DEM and ALZ-EARLY, had already moved them out. Removed the scores and test results; the behavioural observations, insight and frontal signs stay. The clinical assessment output already carries every removed value, so no information is lost. FIXED.
+- E, minor, `initial_tool_outputs.literature_search[*].results[*].source`: the sources were citation keys (`[Rascovsky_2011]` or `Rascovsky_2011`), which a literature tool does not return, and the condition used three styles. They now give the full reference, as in M07-P02 (for example "Rascovsky K et al. Brain 2011;134:2456-2477 (FTDC criteria for bvFTD)"). Findings and summary are unchanged. FIXED.
+- `perfect_agent.py` and `case_io.py check` were re-run on all 30 FTD cases after the changes and are clean; `test_case_guards.py -k FTD` passes (60 tests).
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/FTD-decisions.md`. Changes:
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (the report is a transthoracic study). The MockServer routes echo reports by this field; without it the normal TTE fallback answered a TEE order too (PATTERNS section 5; FTD added to `DISCRIMINATOR_CONDITIONS`).
+- Synonyms (`G31.09` entry, applied with `--prune --conditions ftd`): "pick disease" and "pick's disease" (retired) and the code G31.01 are no longer accepted. Pick disease is one FTLD-tau pathology that no case establishes, and G31.01 is where ICD-10-CM codes primary progressive aphasia, so a PPA answer coded G31.01 scored as correct here.
+
+Checks: `perfect_agent.py` and `case_io.py check` clean; `test_case_guards.py -k FTD-` passes, including `test_routed_outputs_name_their_study`.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Engineering text (25 Oct 2026)
+
+Review-process wording (references to the round's rulings, the round policy file, the criteria packs, and tier markers such as "(optional)" in criterion labels and rationales) is shown to physicians in the review app, so it was rewritten in clinical language. The tier stays in the criterion's `importance` field; scoring is unchanged. `test_case_guards.py::test_no_review_process_text` now fails on any of it.
+
+- criterion `action-9-search-medical-literature` label: "Literature search on young-onset FTD versus early-onset AD (optional)" -> "Literature search on young-onset FTD versus early-onset AD"
+
+## Library contradictions (25 Oct 2026)
+
+Orders that reached the benchmark library's normal report although this case contradicts it (diagnosis, history, medications or a stored finding) now get a case-specific report; every other off-pathway order still gets the library normal. No tier, criterion, diagnosis or existing output changed.
+
+- `order_specialized_test test_type=speech_language_evaluation` -> `followup_outputs[order_speech_language_evaluation]`: speech-language findings matching the stored neuropsychology (reduced verbal fluency; naming as tested).
+- `perform_clinical_assessment assessment_type=performance_status` -> `followup_outputs[order_performance_status]`: performance status of the case's functional decline instead of Karnofsky 100.
+
+Checks: `perfect_agent.py` ok; `test_case_guards.py -k FTD` pass; every order listed in `plans/LIBRARY-group2-map.yaml` for this case is answered without the library; served answers of every other order unchanged against HEAD. Reasons and doubts: `plans/LIBRARY-group2-decisions.md`.

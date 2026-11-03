@@ -1,0 +1,85 @@
+# FTD-S04
+Reviewer status: R1 not reviewed, R2 not reviewed (FTD has no notes file; R1's July 2026 tool rulings in `condition_tool_guidance.yaml` `ftd:` apply) | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| (none) | - | FTD was never annotated; no note ids exist for this case. All changes below come from the condition plan (`plans/FTD.md`, classes C1-C15 and the S04 index entry) and my own reading. |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| D | major | `action_criteria[action-7-search-medical-literature]`, `followup_outputs[request_literature_ftd_behavioral_management]`, `initial_tool_outputs.literature_search` | C1 / ruling 5: literature `required` and in the stop rule; the only stored output was a management essay with the wrong trazodone citation (JNNP instead of Dement Geriatr Cogn Disord). | FIXED: criterion `optional`, last, out of the stop rule; follow-up deleted; canonical bvFTD literature output stored as the initial output under the criterion's query. |
+| C | minor | `followup_outputs[request_drug_interactions]` | C2: drug check with no criterion in a patient on no medications; dosed plan in `proposed`, ChEIs "contraindicated". | FIXED: follow-up deleted (plan S04); a drug check now gets the library answer, which is correct with an empty medication list. |
+| C | major | `initial_tool_outputs.clinical_assessment` | C3: informant marked false although her daughter is the historian; loss of empathy (laughs when told her behaviour is hurtful, steals without compunction) marked false; dysexecutive-with-sparing marked true while MMSE 20/30 loses recall and orientation and the clock is severely abnormal; findings were pasted HPI sentences; fluency filed as the executive feature and duplicated; template impression claiming memory and visuospatial sparing. | FIXED: one finding per feature; informant and empathy true, dysexecutive-with-sparing false (count stays 4 of 6: disinhibition, empathy, compulsions, hyperorality); informant, screen and functional-decline lines; canonical impression, second variant (keeps AD in the differential). |
+| B | major | `followup_outputs[request_reviewed_neuropsych_battery]` | Battery had no visuospatial or language domain although the criterion expects visuospatial sparing; impression truncated (C13). | FIXED: memory (cue-responsive, normal recognition), Language and Visuospatial (VOSP normal, poorly planned Rey copy) domains, Trails B and Stroop added to executive; impression finished with the canonical ending. |
+| C | minor | `patient.neurological_exam.motor`, `red_herrings[0]`, `key_clinical_evidence` | C8: rigidity kept per plan (slow, shuffling gait); red herring said "common in advanced bvFTD"; exam did not state the absence of tremor and bradykinesia the canonical interpretation relies on. | FIXED: exam adds "without rest tremor; no bradykinesia on repetitive finger tapping"; red herring and KCE canonical text; DaTscan rationale case-specific; atypical parkinsonism added to the differential (low). |
+| B | minor | `fallback_tool_outputs.ct`, `metadata.fallback_tool_kinds.ct` | C6: CT fallback reported a 3 mm right frontal calcified granuloma the MRI does not show, and no atrophy. | FIXED: granuloma deleted; CT shows orbitofrontal-predominant bifrontal and anterior temporal volume loss (canonical); kind `case`. |
+| B | minor | `fallback_tool_outputs.advanced_imaging` | C6: off-pathway "No abnormality" for any functional study. | FIXED: deleted; FDG and SPECT authored. |
+| C | minor | `action_criteria[action-6-order-advanced-imaging]`, `followup_outputs` | C6: no SPECT alternative. | FIXED: `perfusion_SPECT` alternative and matching SPECT follow-up; FDG impression em dash removed. |
+| B | minor | `initial_tool_outputs.labs` | C5: platelets, MCV, K, urea, calcium, LFTs, albumin, folate, eGFR missing; `Reviewed_FTD_panel_additions`; unrequested copper; RPR/HIV under "Vitamins". | FIXED: canonical panels, existing values kept; added platelets 256, MCV 91, K 4.2, BUN 13, eGFR 99 (CKD-EPI 2021, 60 F, creatinine 0.7), calcium 9.4, ALT 18, AST 21, ALP 76, bilirubin 0.6, albumin 4.3, folate 12.4; copper deleted; RPR/HIV in keyed follow-up `request_rpr_hiv_syphilis_serology`. |
+| D | minor | `initial_tool_outputs.mri` | No pertinent negatives; one finding located only "anterior temporal lobes" though described as bilateral. | FIXED: Fazekas 0, no microbleeds, no DWI restriction, no mass/haemorrhage/hydrocephalus; location "bilateral anterior temporal lobes"; numbered impression. |
+| C | major | `ground_truth.key_clinical_evidence[1]` | C12: "Negative amyloid biomarkers exclude neurodegenerative pathology": no amyloid study in the case, and the claim is false. | FIXED: deleted; C12 canonical AD line; KCE rebuilt from the required pathway. |
+| C | major | `ground_truth.differential` | C11: AD "moderate" rebutted with non-existent amyloid negativity; vascular entry justified only by parental cardiovascular death in a normotensive woman; elated behaviour (singing, dancing, "finally free") raises mania, which was not addressed. | FIXED: AD low with the memory and MRI reasons; vascular removed; psychiatric entry specified as late-onset mania (low, with reasons); parkinsonism added (low); NPH and FTD-MND very low. |
+| C | major | `ground_truth.assessment.required_recommendations` | C9: template block only; genetic counselling must conditional on an unordered result, in a sporadic case without a genetics criterion. | FIXED: four musts: Rascovsky with certainty level; why late-onset mania does not explain it; safety and capacity including the shoplifting; caregiver plan avoiding ChEI/memantine. Genetic must removed (onset at 58, no family history, no genetics in the case). |
+| C | minor | `ground_truth.assessment.prohibited_recommendations[0,1]` | C10. | FIXED: canonical ChEI and memantine prohibitions. |
+| A | minor | all `action_criteria[*]` | C4: rationale = label, duplicate/free-text citations, `[AAN_dementia_2018]`. | FIXED: canonical labels, rationales, bracketed citations; expected evidence with case values; CT avoided action `[NICE_NG97]`; perfusion MRI rationale neutral. |
+| B | minor | `stop_rule` | Literature id in the stop rule. | FIXED: the four required ids. Criteria order already assessment, neuropsych, labs, MRI, FDG, literature. No genetics criterion, so no C15 constraint. |
+| D | minor | `patient.neurological_exam.mental_status` | Exam carries the screen the assessment reports. | FLAGGED: kept per the plan's C3 design (condition-wide). |
+| - | check | - | perfect_agent ok; probes: FDG, SPECT, serology, literature answered by the case; CT by the case fallback; drug check by the library. test_case_guards pass; `case_io.py check` names no S04 failure. | - |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+
+The case remains probable sporadic bvFTD in a 60-year-old retired literature professor brought by her daughter (offensive remarks in class, public singing and dancing, sexual comments, shoplifting, compulsive collecting and arranging, rice at every meal and continuous eating; severe orbitofrontal and anterior temporal atrophy). The bedside assessment now records the daughter as informant and counts four features (loss of empathy added, the executive-with-sparing feature withdrawn because MMSE 20/30 loses recall and orientation and the clock is severely abnormal), so the impression keeps Alzheimer disease open; neuropsychology then shows normal recognition and preserved visuospatial perception, and the MRI shows normal hippocampi. The mild rigidity is kept with a stated absence of tremor and bradykinesia; atypical parkinsonism and late-onset mania are now explicit, low-likelihood mimics. Labs are the NICE NG97 set; syphilis and HIV serology answer a separate order. The CT fallback no longer invents a granuloma and shows the atrophy; the drug-check and management-essay follow-ups were deleted; the literature search is optional, last and general; FDG-PET has an authored SPECT alternative. The amyloid claim is gone and the musts are four case-specific ones.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+
+- Citation keys `[SNLG_ISS_2024]`, `[NICE_NG97]` per plan 5.2.
+
+## Open questions for Andrea (judgment calls you could not settle)
+
+- None.
+
+## Verification
+Adversarial verifier, 24 Oct 2026.
+
+- What I checked: Read the log, the field-level diff against HEAD (patient block in full, criteria re-order and arguments) and the whole final case. Checked every own-finding row against the file: labs rebuilt to the canonical panels with values and reference ranges consistent (eGFR recomputed with CKD-EPI 2021 and correct), no `Reviewed_FTD_panel_additions`, serology in its own keyed follow-up; clinical assessment one finding per Rascovsky feature with `criteria_met` and the feature count agreeing with the findings and the HPI/exam; MMSE item arithmetic where itemised; neuropsych impression complete with the canonical ending; FDG criterion with the perfusion_SPECT alternative and an authored SPECT follow-up matching the FDG pattern; advanced-imaging and agent-unspecified drug fallbacks gone; CT fallback with the atrophy; ChEI/memantine prohibitions canonical; literature criterion optional, last, out of the stop rule, output the canonical general text; stop rule = exactly the four required ids; KCE and musts do not presume an optional result; differential at assessment time; no amyloid claim. Reviewer notes: none exist for FTD, so no note id can be missing. Also: daughter recorded as informant; empathy added and the executive-with-sparing feature withdrawn (MMSE 20/30 with recall and orientation loss, severely abnormal clock), so the count stays 4 of 6 and the second impression variant is right; CT fallback no longer reports the granuloma; drug-check and management-essay follow-ups deleted (no medications); rigidity kept with "no rest tremor, no bradykinesia" added to the exam, shuffling gait kept and consistent with the red herring; late-onset mania addressed in the differential and a must.
+- Found and changed:
+  1. Scoring defect (introduced or kept by the worker): the optional literature criterion required the exact free-text `query`, and `_contains_required` matches strings exactly, so any real literature call was unmatched, counted as unjustified (tool accuracy, stopping with max_additional_actions 0) although the criterion intends it as optional. The other 24 FTD cases carry no query argument. FIXED: `query` removed from the literature criterion's `required_arguments` (the stored output is served for any query).
+  2. `ground_truth.differential[FTD with motor neuron disease].key_features` said "No fasciculations", which the exam does not record. FIXED: reworded to the documented normal bulk and strength and absence of bulbar symptoms.
+- Left as is (judgment, noted): no genetic-counselling must although onset at 58 is young onset (see the FTD-S01 verification note).
+- After the edits: `perfect_agent.py -v` passes, `case_io.py check` names no failure for the case, `test_case_guards` passes; a literature call with an arbitrary query and a sertraline check with other arguments now match their optional criteria.
+
+## Condition audit (FTD auditor, 24 Oct 2026)
+
+- D, major, `patient.neurological_exam.mental_status`: the examination gave the bedside screen results (MMSE 20/30, FAB 9/18, category fluency and clock), which the required `perform_clinical_assessment` returns (ROUND_POLICY timeline-leak rule). The other 12 FTD cases, and VASC-DEM and ALZ-EARLY, had already moved them out. Removed the scores and test results; the behavioural observations, insight and frontal signs stay. The clinical assessment output already carries every removed value, so no information is lost. This settles the worker's FLAGGED row on the same field. FIXED.
+- E, minor, `initial_tool_outputs.literature_search[*].results[*].source`: the sources were citation keys (`[Rascovsky_2011]` or `Rascovsky_2011`), which a literature tool does not return, and the condition used three styles. They now give the full reference, as in M07-P02 (for example "Rascovsky K et al. Brain 2011;134:2456-2477 (FTDC criteria for bvFTD)"). Findings and summary are unchanged. FIXED.
+- `perfect_agent.py` and `case_io.py check` were re-run on all 30 FTD cases after the changes and are clean; `test_case_guards.py -k FTD` passes (60 tests).
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/FTD-decisions.md`. Changes:
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (the report is a transthoracic study). The MockServer routes echo reports by this field; without it the normal TTE fallback answered a TEE order too (PATTERNS section 5; FTD added to `DISCRIMINATOR_CONDITIONS`).
+- Added optional criterion `action-genetic-panel-optional` (`order_specialized_test` `genetic_panel:FTD`, `[Pottier_2016]` `[Ducharme_2020]` `[ACMG_NSGC_2011]`), placed after imaging and before any drug check or literature step, a soft constraint clinical assessment before genetics, and a negative FTD panel follow-up (`request_optional_counselled_ftd_genetics`). Reason: sporadic bvFTD with young onset (before 65); the FTD consortium advises C9orf72 screening in every possible or probable bvFTD (Ducharme 2020), so a counselled panel is a defensible order that the stop rule should not penalise, while UK eligibility (onset before 55, a suggestive family history or MND; NHS GeneTYPES) is not met, so it is optional and no counselling must is added (FTD-decisions item 7). Onset about 58.
+- Synonyms (`G31.09` entry, applied with `--prune --conditions ftd`): "pick disease" and "pick's disease" (retired) and the code G31.01 are no longer accepted. Pick disease is one FTLD-tau pathology that no case establishes, and G31.01 is where ICD-10-CM codes primary progressive aphasia, so a PPA answer coded G31.01 scored as correct here.
+
+Checks: `perfect_agent.py` and `case_io.py check` clean; `test_case_guards.py -k FTD-` passes, including `test_routed_outputs_name_their_study`.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+Orders that reached the benchmark library's normal report although this case contradicts it (diagnosis, history, medications or a stored finding) now get a case-specific report; every other off-pathway order still gets the library normal. No tier, criterion, diagnosis or existing output changed.
+
+- `order_specialized_test test_type=speech_language_evaluation` -> `followup_outputs[order_speech_language_evaluation]`: speech-language findings matching the stored neuropsychology (reduced verbal fluency; naming as tested).
+- `perform_clinical_assessment assessment_type=performance_status` -> `followup_outputs[order_performance_status]`: performance status of the case's functional decline instead of Karnofsky 100.
+- `perform_clinical_assessment assessment_type=gait_and_balance_timed` -> `followup_outputs[order_gait_and_balance_timed]`: timed gait matching the examined gait abnormality.
+
+Checks: `perfect_agent.py` ok; `test_case_guards.py -k FTD` pass; every order listed in `plans/LIBRARY-group2-map.yaml` for this case is answered without the library; served answers of every other order unchanged against HEAD. Reasons and doubts: `plans/LIBRARY-group2-decisions.md`.

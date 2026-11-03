@@ -1,0 +1,107 @@
+# GLIO-HG-S03
+Reviewer status: R1 not reviewed, R2 not reviewed (no notes for this case) | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| (none) | n/a | The notes file has no note for GLIO-HG-S03. The condition classes of the plan were applied (below). |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| C | major | `patient.history_present_illness` | Seizure from a right frontal focus with "eyes deviated to the right": ictal version is away from the focus, so a right frontal seizure turns the eyes to the left. | FIXED: "his eyes and head turned to the left". Kept in the treat must. |
+| B | major | `patient.history_present_illness`, `initial_tool_outputs.mri.findings[0].mass_effect` | "8 mm of left-to-right midline shift" for a right frontal mass (the shift is leftward). | FIXED: "leftward midline shift" in both. |
+| B | major | `patient.neurological_exam.mental_status`, HPI | Word-finding difficulty and paraphasic errors in a right-handed man with a right frontal tumour while fMRI shows left language dominance remote from the tumour (template copied from S02). | FIXED: HPI "slower to respond in conversations"; exam "fluent with intact naming and repetition and no paraphasic errors; responses are slow". The ictal speech arrest stays (supplementary motor seizures can arrest speech from either side). |
+| B | major | `patient.neurological_exam.cranial_nerves` | Left homonymous hemianopia that the lesion (superior and middle frontal gyri, edema to the parietal white matter and internal capsule, no temporal or occipital involvement) does not explain; template from S02. | FIXED: "Visual fields full to confrontation." |
+| E | minor | HPI | "uncharacteristic for him as a teacher" while the occupation is high school principal. | FIXED: "as a school principal". |
+| C | major | `followup_outputs` drug check | Check of temozolomide before any tissue diagnosis (treatment the agent cannot yet recommend), with "patient has sulfa allergy" while the only allergy is latex (plan C13, ruling 6). | FIXED: replaced by a dexamethasone and levetiracetam check against metformin, amlodipine, lisinopril, atorvastatin and tamsulosin; no allergy line. Criterion stays optional and last; guard passes. |
+| C | major | `required_recommendations` | Latex allergy not addressed although surgery is planned. | FIXED: must "Record the latex allergy (contact dermatitis) for a latex-safe operating theatre and ward." |
+| C | major | `required_recommendations` | HPI states levetiracetam and dexamethasone were started in the ED, but the musts "initiate" both (plan C5 continue form, C8). | FIXED: "Continue levetiracetam ... review the dose", canonical treat wording; "Continue dexamethasone ... lowest effective dose ... taper after surgery". |
+| C | major | `action-3-search-medical-literature`, literature follow-up | Required literature step (ruling 5, plan C1). | FIXED: criterion, follow-up and stop-rule entry deleted. |
+| D | major | `initial_tool_outputs.tissue_diagnosis` | Tissue served upfront; template impression (plan C2). | FIXED: initial null; resection and stereotactic-biopsy follow-ups; `Histology` row; canonical impression with MGMT. |
+| C | major | `action-10-obtain-tissue-diagnosis` | Biopsy only; assay list without IDH or ATRX and with 1p/19q (plan C3, C4; age 52). | FIXED: `resection` then `stereotactic_biopsy`, each `IDH1_IHC`, `IDH1_IDH2_sequencing`, `ATRX_IHC`, `MGMT_methylation`; IDH1 R132H negative, sequencing wildtype and ATRX retained rows added to both reports. |
+| A | major | `followup_outputs` `request_functional_mri` | `fMRI_BOLD` out of vocabulary, unscored; a meaningless motor "laterality index" (plan C6). | FIXED: tumour reaches the precentral gyrus and edema the posterior limb, so both apply. `functional_MRI` (left-hand focus 8 mm from the margin, language LI 0.85 left) and new `DTI_tractography` (CST continuous through the edematous corona radiata, 9 mm from the margin; reduced callosal FA). Recommended criteria and soft constraints to tissue. |
+| C | major | `ground_truth.action_criteria` | No performance status (plan C7). | FIXED: recommended criterion; KPS 70, ECOG 2. |
+| C | major | `required_recommendations` | Template Stupp and surgery musts; test musts (plan C3, C11; ruling 4). | FIXED: canonical group A surgery must with fMRI and DTI; entity-specific treatment must (age 52, KPS 70); MRI and labs musts deleted. |
+| E | major | `prohibited_recommendations[0]` | Broken "Do not perform lumbar puncture with herniation risk [em dash] herniation risk". | FIXED: names the 8 mm shift and bilateral papilledema; canonical CSF harm rationale. |
+| D | major | `initial_tool_outputs.eeg.impression` | Template impression omitting the focal delta, IRDA and the F4 sharp waves (plan C9). | FIXED: numbered ABNORMAL EEG impression from its own findings. |
+| D | minor | `initial_tool_outputs.mri.impression`, perfusion impression | MRI impression lacked the precentral, callosal and capsular extent; perfusion graded the tumour against the 1.75 threshold (plan C12). | FIXED: numbered imaging-only MRI impression; perfusion "consistent with a high-grade neoplasm". |
+| B | minor | MRS follow-up | Impression described a peritumoral choline rise with no finding row. | FIXED: peritumoral row (Cho/Cr 1.7, NAA/Cr 1.2, Cho/NAA 1.4); numbered impression. |
+| B | minor | `initial_tool_outputs.labs.panels.CBC` | RBC 4.7 x MCV 95.6 implies Hct 44.9 against 43.0. | FIXED: MCV 91.5. Type and screen `clinical_significance` null with a blood group. |
+| C | minor | criteria 1, 2, 6, 7, 8, 9; constraints; stop rule; avoided actions | Template rationales, citations, expected evidence; single soft constraint; literature in stop rule. | FIXED as in S01 (hard MRI and labs to tissue, soft fMRI and DTI; stop rule MRI, labs, tissue; cardiac waste rationale). |
+| C | minor | `differential`, `key_clinical_evidence` | Not at the assessment-time view; template lines. | FIXED: very_low alternatives with the excluding results, IDH-mutant astrocytoma grade 4 added; evidence from this case. |
+| B | minor | `metadata` | "5 required tools". | FIXED: 3; `last_revised`, `revision_reason`. `key_teaching_points` (legacy, not served) left. |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+The history and examination now fit a right frontal tumour in a left-language-dominant man: the seizure turns head and eyes to the left, the shift is leftward, the aphasic features and the left hemianopia (copied from another case and not explained by this lesion) are removed. Levetiracetam and dexamethasone, started in the ED, are continued rather than started; a latex-safe theatre is a new must. The temozolomide drug check with a non-existent sulfa allergy is replaced by a dexamethasone and levetiracetam check against his own medicines. The pathway reads contrast MRI, perfusion, spectroscopy, optional CT staging, labs, performance status (KPS 70, ECOG 2), functional MRI and DTI, then resection or stereotactic biopsy with IDH1 IHC, IDH sequencing (age 52), ATRX and MGMT, giving Glioblastoma, IDH-wildtype, CNS WHO grade 4, MGMT unmethylated; after it, 60 Gy in 30 fractions with temozolomide. Literature is gone.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+- `[AIOM_brain]` citation key needs the pack allow-list (plan 5.1).
+- Synonym "astrocytoma grade 4" is wrong for this IDH-wildtype GBM (plan 5.2).
+- `accepted[0]` "WHO grade 4" versus "CNS WHO grade 4" (plan 5.3).
+
+## Open questions for Andrea (judgment calls you could not settle)
+- None specific to this case.
+
+## Verification
+Adversarial check, 24 Oct 2026. Read the log, the git diff and the whole final case.
+- No reviewer notes. Checked each own finding against the file: leftward version and leftward shift, removal of aphasia and hemianopia (exam now "Visual fields full"), continue forms of the levetiracetam and dexamethasone musts (HPI says both were started in the ED), latex must, drug check against his own medicines with no sulfa line, assay list with IDH sequencing at 52 in both alternatives and in both reports, fMRI and DTI, KPS 70 / ECOG 2, labs (gap 140 - 105 - 26 = 9, RBC 4.7 x MCV 91.5 = 43.0).
+- Found and fixed (B, minor, class fixed by the worker in S02, S04 and S06 but missed here): `fallback_tool_outputs.csf` opening pressure 16 cm H2O and "Unremarkable CSF" in a patient with bilateral papilledema and 8 mm shift. Now 26 cm H2O, "Elevated opening pressure. Normal cell count, protein and glucose." (The LP itself stays harm; the fallback only answers an off-pathway order.)
+- perfect_agent.py and case_io.py check clean after the edit.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/GLIO-HG-decisions.md` (Andrea, 24 Oct 2026: open points resolved for dataset quality).
+
+- accepted[0]: 'Glioblastoma, IDH-wildtype, WHO grade 4' -> 'Glioblastoma, IDH-wildtype, CNS WHO grade 4' (summary CENTRAL 3: WHO CNS5 writes "CNS WHO grade"; ruling 3 label correction)
+- action-performance-status: recommended -> required (Q3: KPS selects the treatment branch in every case, EANO 2021; Reviewer 2 RP04 0289beef applied as a class)
+- stop rule: + action-performance-status (Q3: KPS selects the treatment branch in every case, EANO 2021; Reviewer 2 RP04 0289beef applied as a class)
+- AIOM question numbers removed from the text (edition 2026 numbering unverified) (Q1: AIOM cited as the 2026 update; Quesito numbering not verifiable)
+- fallback specialized_test (generic 'Study within normal limits.', test_type 'neuropsychological_screening') -> null; the library answers by test_type (auditor flag, S01 class: a case fallback is served for any order of the tool, whatever the test type)
+- Synonyms re-expanded from `diagnosis_synonyms.yaml` (`--prune --conditions brain_tumor_glioma`): removed ['astrocytoma grade 4']; added ['glioblastoma idh wildtype'] (entity, grade and H3 scoping; summary CENTRAL 2).
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `initial_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Lab evidence (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited results its own order (the first alternative) no longer returned; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-2-interpret-labs]`.alternatives: was [CBC, BMP, coagulation, type_and_screen]; now [CBC, BMP, coagulation, type_and_screen, HbA1c] | [CBC, BMP, coagulation, type_and_screen].
+- Decision: serve: new first alternative (old order kept as an alternative). Known type 2 diabetes before dexamethasone and surgery: the evidence and the glucose-monitoring must read the HbA1c, which a pre-operative order in a diabetic patient includes.
+- Scoring: coverage unchanged (any call matching the old order still matches); the cost reference of the required work-up now uses the new first order.
+
+Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.
+
+## Library contradictions (25 Oct 2026)
+
+Case-specific reports stored where the benchmark library's normal report contradicted the case. Why: the stored MRI shows a mass in the right frontal lobe (superior and middle frontal gyri), extending to the precentral gyrus and corpus callosum (5.8 x 4.3 x 4.1 cm) with an abnormal routine EEG and a focal history and exam; the library reports a normal head CT, a non-diagnostic biopsy, normal brain metabolism, perfusion and vessels, a normal prolonged EEG, no headache and normal bedside and neurophysiological tests where the exam is abnormal.
+
+- order_ct_scan: CT showing the stored lesion(s) instead of a normal head CT (fallback_tool_outputs.ct)
+- obtain_tissue_diagnosis open_biopsy: the stored integrated diagnosis on this procedure's specimen (fallback_tool_outputs.tissue_diagnosis)
+- FDG_PET: hypermetabolic lesion(s) (fallback_tool_outputs.advanced_imaging)
+- amino_acid_PET: FET-avid lesion(s) (followup request_amino_acid_pet)
+- CT_perfusion: lesion perfusion matching the stored perfusion MRI (followup request_ct_perfusion)
+- perfusion_SPECT: regional hypoperfusion over the lesion (followup request_perfusion_spect)
+- cerebral_angiography: mass effect and lesion vascularity (followup request_cerebral_angiography)
+- video EEG: the stored routine EEG's abnormalities over 24 h (fallback_tool_outputs.eeg)
+- ambulatory EEG: the stored routine EEG's abnormalities over 48 h (followup request_ambulatory_eeg)
+- structured_headache_history_ichd3: the case's headache, prior primary headache and red flags (fallback_tool_outputs.clinical_assessment)
+- cognitive_screen: MoCA matching the exam (followup request_cognitive_screen)
+- gait_and_balance_timed: matching the exam (followup request_timed_gait_balance)
+- neuropsych_battery: domain deficits matching the exam (fallback_tool_outputs.specialized_test)
+
+Checks: `perfect_agent.py` pass; `test_case_guards.py -k GLIO-HG-S03` pass; no fixed order still answered by the library (`lib4.source`); no 60-character window of any criterion's expected_evidence in the added text, except tissue copies that repeat the stored tissue report verbatim; every criterion's served output unchanged (snapshot diff against the baseline).

@@ -1,0 +1,95 @@
+# BACT-MEN-S01
+Reviewer status: R1 not reviewed, R2 needs_changes | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| 7a299941-e461-4153-87d4-2cd3be3784a9 | FIXED | Plan C4/C9. `ground_truth.assessment.required_recommendations`: vancomycin plus ceftriaxone must replaced by "meropenem 2 g IV every 8 hours with vancomycin within 60 minutes ... withholding ceftriaxone for the documented cephalosporin urticaria"; new narrowing must "benzylpenicillin (penicillin G) or ampicillin IV ... penicillin MIC 0.06 mg/L (susceptible by CLSI meningitis breakpoints)"; new prohibition "Do not give ceftriaxone, cefotaxime or any other cephalosporin". Drug-interaction step rebuilt (`followup_outputs[3]`, trigger `check_antibiotic_allergy_and_interactions`): proposed meropenem plus vancomycin with dexamethasone, cephalosporins under contraindications, carbapenem and penicillin cross-reactivity, dexamethasone with metformin, vancomycin with lisinopril, metformin withheld. `action-5-check-drug-interactions` now required with a label and expected evidence naming the allergy. Blood culture impression no longer presents the ceftriaxone MIC as the basis for narrowing. |
+| 8f123213-29b0-45d0-b081-df1013d4bb05 | FIXED | Plan C1. Index CSF moved from `initial_tool_outputs.csf` (now null) to `followup_outputs[1]` (`analyze_csf`, trigger `request_lumbar_puncture`); post-treatment `request_repeat_lp` deleted (no indication: the patient is not failing treatment). `-v` confirms action-3 is answered by `request_lumbar_puncture`. The hard CT-before-CSF constraint is gone (note 1491cdf3). |
+| 7e72aa2c-a9db-4ad5-8f48-18fe26b39079 | FIXED | Ruling on the label (ruling 3): `ground_truth.diagnosis.accepted[0]` "Acute bacterial meningitis due to Streptococcus pneumoniae (otogenic/sinugenic source)" changed to "(sinugenic source)"; no other "otogenic" text in the case. `icd_codes[0]` stays G00.1, so the appended synonyms are unaffected. Listed under CENTRAL. |
+| 1491cdf3-4b2c-4b48-8981-e8764909734d | FIXED | Plan C2, decision B. HARD constraint `action-4-order-ct-scan` before `action-3-analyze-csf` deleted; SOFT constraint blood cultures before CT added (canonical reason). CT criterion kept as `recommended` for the sinus source, after the CSF in criteria and pathway order, with the canonical B label, `[WHO_Meningitis_2025]` and source-focused expected evidence; removed from `stop_rule.required_before_assessment`. IDSA 2004 must and prohibition replaced by the canonical "Proceed to lumbar puncture without prior cranial imaging ... (GCS 12, ...)" must and "Do not delay lumbar puncture or antibiotics to obtain a CT head" prohibition; key evidence line replaced. |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| C | major | `ground_truth.assessment` | Template prohibition "Do NOT discontinue dexamethasone solely because the Gram stain is negative" and a dexamethasone must without a stop rule (plan C5). | FIXED: prohibition deleted; canonical C5 must plus "Continue for 4 days: Streptococcus pneumoniae is identified." |
+| A | major | `followup_outputs` (`request_pcr_panel`, `request_audiometry`) | CSF PCR filed under `interpret_labs`; audiometry filed as `order_specialized_test` `baep` (plan C8). | FIXED: both deleted; the PCR result now sits in the index CSF report (`special_tests.Meningitis_PCR_panel`), answering the `meningitis_panel` the criterion orders; canonical hearing must added. |
+| D | major | `followup_outputs` literature; `action-6-search-medical-literature` | Literature criterion (recommended) expected IDSA 2004, ESCMID 2016, De Gans 2002; stored output recommended vancomycin plus ceftriaxone and "age >50" (plan C9, ruling 5). | FIXED: criterion and follow-up deleted. |
+| B | major | `followup_outputs[0]` (blood cultures) | Organism "speciation pending" beside a full susceptibility panel; "Bottle 1/2 aerobic" plus a separate anaerobic bottle against the must's two sets; anaerobic "no growth at 5 days" not available at the work-up; narrowing and interpretability boilerplate (plan C6). | FIXED: organism Streptococcus pneumoniae; two sets positive at 14 and 16 hours, identified at 24 hours; susceptibilities reported at 48 hours, interpreted with CLSI meningitis breakpoints; canonical impression. `collected_before_antimicrobials` true kept (only ibuprofen and paracetamol before arrival). |
+| D | major | index CSF (`followup_outputs[1]`) | Interpretation concluded "consistent with Streptococcus pneumoniae"; latex antigen used as confirmation; culture "preliminary growth at 18 hours" at the index LP; RBC 5 "likely traumatic tap"; ratio reference "normal >0.6"; lactate reference not the canonical one (plan C7). | FIXED: interpretation lists values and pattern only; latex agglutination removed; culture "Pending"; RBC "within normal limits"; ratio 0.06 recomputed from 13.0/212 with the WHO reference; lactate with local reference <3.5 mmol/L. |
+| D | major | CT (`followup_outputs[2]`) | "LP is safe to proceed; no contraindication to lumbar puncture identified" (plan C3). | FIXED: deleted; impression states findings only; bone-window line added because the recommended CT is now ordered for the sinus source (no erosion, consistent with the original "no skull base fracture"). |
+| B | minor | `patient.history_present_illness` | HPI called him a "high school basketball coach" while `social_history.occupation` is "IT project manager" and exercise "coaches basketball"; HPI arrival temperature 39.7 against `vitals.temp` 39.5. | FIXED: "IT project manager who also coaches high school basketball"; temperature 39.5. |
+| B | minor | `initial_tool_outputs.labs` | action-1 orders CMP and HIV but no liver tests or HIV result (plan C12 extension). | FIXED: added Liver Function (ALT 28, AST 31, ALP 78, bilirubin 0.9, albumin 3.6, all in range) and HIV 1/2 Ag/Ab non-reactive. Anion gap 15 with lactate 3.1 checked; calculated osmolality 281 against measured 286 checked. |
+| C | major | `ground_truth.differential` | Viral meningitis and HSV encephalitis left moderate after a pyogenic CSF with S. pneumoniae on PCR (plan C10); the complication the sinus source raises was absent. | FIXED: viral meningitis and HSV low with the excluding results; TB, cryptococcal, SAH very low with case data; added "Subdural empyema or brain abscess complicating sinusitis" (low, G06.2). |
+| B | minor | `ground_truth.red_herrings[1]` | Sinus thickening "on MRI" pointing at `initial_tool_outputs.mri`, which does not exist (plan C11). | FIXED: data point and `field_path` now point at the CT findings (`followup_outputs[2].output.findings`). |
+| C | minor | `ground_truth.red_herrings[0].correct_interpretation` | Hyponatraemia labelled SIADH with "treat with fluid restriction", while vomiting, fever and urea 26 point to volume depletion as an equal cause. | FIXED: names both mechanisms; "assess volume status before any fluid restriction". |
+| C | minor | `ground_truth.assessment.required_recommendations` | No source-control action for the maxillary and ethmoid sinusitis that is the source of the meningitis. | FIXED: must "ENT assessment for drainage of the maxillary and ethmoid sinus source." |
+| A | minor | citations | `[IDSA_2004]` and free-text duplicates ("WHO meningitis guideline 2025", "IDSA 2004 §V", "De Gans 2002") in criteria and avoided actions. | FIXED: `[WHO_Meningitis_2025]` only. |
+| C | minor | `ground_truth.key_clinical_evidence` | Template lines (IDSA imaging list with age >60, vancomycin plus ceftriaxone, Gram stain 60-90%, ratio <0.4, "MUST precede", De Gans dose line) and a duplicated WHO timing line. | FIXED per C17; duplicate removed; added the cephalosporin-allergy regimen pearl. |
+| B | minor | `metadata.difficulty_rationale` | "5 required tools" no longer true. | FIXED: 4 required tools; `last_revised`, `revision_reason` updated. |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+The work-up now reads blood tests, blood cultures, then the index lumbar puncture (the post-treatment repeat LP is gone), then a recommended non-contrast CT with bone windows for the sinus source, then a required drug check. No CT is required before the LP: at GCS 12 with no focal signs, cranial nerve deficit, papilloedema, seizure or severe immunocompromise there is no WHO 2025 Annex A.4 criterion, so the hard constraint is removed and blood cultures precede imaging (soft). The index CSF reports values and pattern only, culture pending, and the multiplex PCR (S. pneumoniae detected) inside the CSF report; the latex antigen is removed. Blood cultures grow S. pneumoniae in both sets (14 and 16 hours, identified at 24 hours), penicillin MIC 0.06 susceptible by CLSI meningitis breakpoints. Because of his cephalosporin urticaria the empirical must is meropenem 2 g IV every 8 hours with vancomycin, ceftriaxone is prohibited, and therapy narrows to benzylpenicillin or ampicillin; dexamethasone continues 4 days for pneumococcus. New musts: ENT drainage of the sinus source and formal audiology. The label reads "(sinugenic source)". The HPI occupation and arrival temperature now agree with the record; HIV (non-reactive) and liver tests were added to the labs; the differential is updated to the results.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+- Label change (ruling 3, note 7e72aa2c): `accepted[0]` now "Acute bacterial meningitis due to Streptococcus pneumoniae (sinugenic source)"; `icd_codes[0]` G00.1 unchanged, so `diagnosis_synonyms.yaml` needs no change.
+- Citation key `[NICE_NG240]` and `[WHO_Meningitis_2025]` for the criteria pack allow-list (plan 5.1); NICE is cited in must text only.
+- Drug-interaction vocabulary has no structured allergy field; the cephalosporin contraindication is carried as text in `contraindications`.
+
+## Open questions for Andrea (judgment calls you could not settle)
+- The HPI describes a progressive fall in consciousness overnight (confused and agitated, then curled and moaning by 05:30, GCS 12 on arrival). NICE NG240 1.4.7 lists "a progressive and sustained or rapid fall in level of consciousness" as an imaging trigger, the limb the plan uses for M01. Reviewer 2 ruled for this case that no criterion applies and that the hard constraint be removed; WHO 2025 governs the benchmark (plan Q3), so I applied the ruling. If the benchmark should honour the NICE limb, S01 would become an A case like M01.
+- Narrowing to benzylpenicillin or ampicillin in a patient with cephalosporin urticaria follows the reviewer's note; the drug step states that the cross-reactivity is low and side-chain dependent and that the first dose is given under observation. An allergist might prefer to stay on meropenem.
+
+## Verification
+Adversarial verification, 23 October 2026. Checked: all four note ids present and each FIXED claim against the file (no `request_repeat_lp`, `request_pcr_panel`, `request_audiometry` or literature output left; `initial_tool_outputs.csf` null; `-v` serves `request_lumbar_puncture` to action-3; no HARD constraint, SOFT blood cultures before CT; label "(sinugenic source)" with no "otogenic" anywhere; meropenem plus vancomycin must, cephalosporin prohibition, drug step built on the allergy). Recomputed anion gap 15 (130 - 97 - 18), calculated osmolality 281, CSF:blood glucose ratio 0.06 (13/212, same blood glucose as the BMP). Grepped for IDSA 2004, "age >", ">0.6", "traumatic", LP-safety sentences, narrowing boilerplate, "worst headache", em dashes in new text: none. Differential, red herring field paths and stop rule agree with the pathway.
+Found and changed:
+- `patient.neurological_exam.sensory`: "Withdraws to pain symmetrically" sat beside GCS 12 with M5 (localises), the same contradiction the worker fixed in S02 and S03's class (plan C12). Now "Responds to painful stimuli symmetrically in all four extremities."
+Accepted as logged: the NICE "progressive fall in consciousness" open question (the reviewer ruled no criterion; WHO governs).
+Re-run: `perfect_agent.py BACT-MEN-S01 -v` ok; `case_io.py check` clean for the case.
+
+## Open questions resolved (24 Oct 2026)
+
+Andrea's ruling of 24 Oct 2026 (resolve open points for dataset quality); decisions and sources in `plans/BACT-MEN-decisions.md`.
+
+- 'WHO 2025 Annex A.4' renamed 'WHO 2025 section A.4' (5 strings): the cranial imaging recommendations are section A.4 of chapter 3 of the guideline, not an annex
+- Hearing must cites WHO 2025 (strong recommendation: formal audiological screening before discharge, or within four weeks of discharge), which covers every adult with acute meningitis, instead of NICE NG240, which excludes immunocompromised and neurosurgical patients
+
+Re-run: `perfect_agent.py` ok; `case_io.py check` clean for the case; BACT-MEN case guards pass; synonym `--check` clean.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+- `fallback_tool_outputs.advanced_imaging` set to null: a generic report (modality 'MRI', impression 'No abnormality identified.') that names no one study and so answered every variant; the benchmark library now answers each study with its own normal report.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 20, ECOG 4 (fallback_tool_outputs.clinical_assessment). Why: rule 3: lethargic and disoriented (GCS 12), febrile (39.5 C) and tachycardic (HR 117), unable to stand; the library's Karnofsky 100 describes a person without disease.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: not testable (lethargic, unable to stand) (followup_outputs[4] request_gait_and_balance_timed). Why: rule 3: the stored exam records gait not assessable because the patient is too lethargic and unsteady to walk.
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: no parkinsonian signs; challenge not performed; gait and postural reflexes not assessable (followup_outputs[5] request_levodopa_challenge). Why: rule 3: the library describes a full normal motor examination and gait in a lethargic patient with marked nuchal rigidity.
+- `perform_clinical_assessment {assessment_type: structured_headache_history_ichd3}`: new acute headache with red flags; criteria for a primary headache disorder not met (followup_outputs[6] request_structured_headache_history_ichd3). Why: rule 1 and 3: an acute febrile headache with neck stiffness, photophobia and falling consciousness; the library elicits no red flags.
+- `analyze_brain_mri`: diffuse leptomeningeal enhancement, mild oedema, maxillary and ethmoid sinusitis (fallback_tool_outputs.mri). Why: rule 1 and 3: no MRI is stored; the stored CT shows mild diffuse cerebral oedema and maxillary and ethmoid sinus disease.
+- `analyze_eeg {eeg_type: sleep_deprived}`: continuous generalised theta-delta slowing; no epileptiform discharges or seizures (followup_outputs[7] request_sleep_deprived). Why: rule 3: the patient is lethargic and oriented to self only (GCS 12); a normal background contradicts the stored exam.
+- `analyze_eeg {eeg_type: continuous_icu}`: continuous generalised theta-delta slowing; no epileptiform discharges or seizures (followup_outputs[8] request_continuous_icu). Why: rule 3: the patient is lethargic and oriented to self only (GCS 12); a normal background contradicts the stored exam.
+- `analyze_eeg {eeg_type: ambulatory}`: continuous generalised theta-delta slowing; no epileptiform discharges or seizures (followup_outputs[9] request_ambulatory). Why: rule 3: the patient is lethargic and oriented to self only (GCS 12); a normal background contradicts the stored exam.
+- `perform_clinical_assessment {assessment_type: cognitive_screen}`: not completed (lethargic, inattentive); oriented to self only (followup_outputs[10] request_cognitive_screen). Why: rule 3: GCS 12, oriented to self only and unable to perform serial sevens; the library reports MoCA 28/30.
+- `order_specialized_test {test_type: neuropsych_battery}`: not completed (reduced arousal, inattention) (fallback_tool_outputs.specialized_test). Why: rule 3: a lethargic, disoriented patient cannot complete a battery in the average range.
+- `order_specialized_test {test_type: speech_language_evaluation}`: dysarthria; language content intact; testing limited by lethargy (followup_outputs[11] request_speech_language_evaluation). Why: rule 3: the stored exam records slow, dysarthric speech.
+- `order_microbiology {specimen: whole_blood_pcr}`: Streptococcus pneumoniae DNA detected (fallback_tool_outputs.microbiology). Why: rule 3: blood cultures grow S. pneumoniae in 2 of 2 sets, a target of the panel; no antibiotics before presentation.
+- `perform_clinical_assessment {assessment_type: orthostatic_blood_pressure}`: supine BP 135/90, HR 117; standing not performed (followup_outputs[12] request_orthostatic_blood_pressure). Why: rule 3: vitals HR 117 and a lethargic patient who cannot stand; the library reports HR 68 and 3 minutes of standing.
+- `interpret_labs {panels: [ABG]}`: metabolic acidosis with partial respiratory compensation (fallback_tool_outputs.labs['ABG']). Why: rule 3: stored bicarbonate 18, lactate 3.1 and RR 23 in sepsis; the library reports a normal gas.
+- Case fallback replaced, `analyze_eeg {eeg_type: routine}`: routine EEG now shows continuous generalised theta-delta slowing; no epileptiform discharges or seizures (was a normal awake and drowsy EEG) (fallback_tool_outputs.eeg). Why: rule 3: the patient is lethargic and oriented to self only (GCS 12); a normal background contradicts the stored exam.
+- Case fallback replaced, `analyze_ecg`: sinus tachycardia at 117 bpm, otherwise normal (was a normal ECG) (fallback_tool_outputs.ecg). Why: presenting heart rate 117 bpm.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

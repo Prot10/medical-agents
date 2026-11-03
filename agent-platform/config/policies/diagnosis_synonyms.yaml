@@ -5,50 +5,143 @@
 # migration `scripts/validation/apply_diagnosis_synonyms.py` appends `labels` to
 # `ground_truth.diagnosis.accepted` and `codes` to `ground_truth.diagnosis.icd_codes`; the case
 # file remains the scored artefact. A submitted diagnosis matches when every token of an accepted
-# label appears in it, or when the submitted ICD-10 code is one of the accepted codes.
+# label appears in its asserted part (denied clauses such as "rather than MS" dropped) and no label
+# in `rejected` does; an entry's `rejected` labels go to `ground_truth.diagnosis.rejected`. Since
+# scorer v2 (25 Oct 2026) the ICD code never decides the diagnosis; it is a separate weight-0
+# component, so `codes` matter for that component only.
 #
 # STATUS: draft, authored 2026-09-02 for the migration; every entry is subject to physician review
 # together with the case policies. Entity-specific puzzles (e.g. LGI1 encephalitis filed under
 # G04.81) keep only their case-specific label and need per-case synonyms from the reviewers.
+#
+# Scoping (October 2026 review round): a category entry carries only generic labels and codes.
+# A label naming a specific organism, mechanism, variant, grade or another disease goes on the
+# specific code, or is scoped with `cases: [...]`, so it is accepted only where the case is that
+# thing; `except_cases: [...]` removes a generic label from the cases it contradicts.
+
+# Labels the table granted once and no longer grants; `--prune` strips them from every case.
+RETIRED:
+  retired_labels: [stroke, carotid stenosis stroke, internal carotid artery stenosis, large artery atherosclerotic stroke, perioperative stroke, postprocedural stroke, astrocytoma grade 4, spinal cord glioma, intramedullary glioma, cns lymphoma, pyridoxine deficiency seizures, cholinergic toxidrome, migraine aura, PCA territory infarct, vascular cognitive impairment, cardiac syncope, arrhythmic syncope, bradyarrhythmia, tachyarrhythmia, conduction disease syncope, second degree av block, torsades de pointes, long qt syndrome, LQTS, brugada, cardiac tumor, cardiac tumour, central sleep apnea, central sleep apnoea, sleep apnea syncope, nocturnal asystole, sleep related bradyarrhythmia, sarcoid myocarditis, pick disease, pick's disease, MG, demyelinating disease, focal seizures, focal onset seizures, focal impaired awareness seizures]
 
 G12.21:
   labels: [amyotrophic lateral sclerosis, ALS, motor neuron disease, motor neurone disease, MND]
   codes: [G12.2, G12.20, G12.23, G12.24, G12.25]
+# ALS-P02: the ALS mimic is the diagnosis (relabelled October 2026).
+E05.90:
+  conditions: [als]
+  # 24 Oct 2026: thyroid hormone excess is the decisive finding; TSI stays positive after radioiodine,
+  # so residual Graves activity cannot be excluded from the case data and is credited too.
+  labels: [thyrotoxicosis, levothyroxine over-replacement, iatrogenic thyrotoxicosis, levothyroxine induced thyrotoxicosis, exogenous thyrotoxicosis, hyperthyroidism, graves disease, graves hyperthyroidism]
+  codes: [E05.9, E05.00, T38.1X5A]
+# ALS-P08: SOD1 A4V carrier with suspected early ALS, Gold Coast not met (recoded October 2026, so a
+# plain "ALS" answer is an overcall); cautious labels only.
+Z15.89:
+  conditions: [als]
+  cases: [ALS-P08]
+  labels: [suspected ALS, prodromal ALS, possible ALS, suspected motor neuron disease, mild motor impairment]
 
+# ALZ-EARLY (October 2026 close-out). G30.0 (onset under 65) and G30.1 (onset 65 or later) do not
+# grant each other: the onset code is part of the label. The category grants the disease name and
+# the unspecified code; stage, onset and phenotype labels sit on scoped entries.
 G30:
-  labels: [alzheimer disease, alzheimer's disease, alzheimers disease, alzheimer dementia, dementia due to alzheimer]
-  codes: [G30.0, G30.1, G30.8, G30.9, F00]
+  labels: [alzheimer disease, alzheimer's disease, alzheimers disease]
+  codes: [G30.9]
+# Dementia-stage labels: every G30 case is staged mild dementia except ALZ-EARLY-P02 (lvPPA with
+# instrumental function preserved).
+G30+dementia:
+  except_cases: [ALZ-EARLY-P02]
+  labels: [alzheimer dementia, dementia due to alzheimer]
+  codes: [F00]
 G30.0:
-  labels: [posterior cortical atrophy, benson syndrome, early onset alzheimer]
+  labels: [early onset alzheimer]
+G30.1:
+  labels: [late onset alzheimer]
+# Atypical phenotypes, each only where the case is that phenotype (G30.8 is the code some coders
+# use for atypical presentations).
+G30.0+pca:
+  cases: [ALZ-EARLY-P01, ALZ-EARLY-RP01, ALZ-EARLY-RP02, ALZ-EARLY-RP03]
+  labels: [posterior cortical atrophy, benson syndrome]
+  codes: [G30.8]
+G30.0+lvppa:
+  cases: [ALZ-EARLY-P02]
+  labels: [logopenic variant primary progressive aphasia, logopenic progressive aphasia, logopenic aphasia, lvPPA]
+  codes: [G30.8]
+G30.0+frontal:
+  cases: [ALZ-EARLY-P03]
+  labels: [frontal variant alzheimer, behavioral variant alzheimer, behavioural variant alzheimer, dysexecutive alzheimer]
+  codes: [G30.8]
+# MCI due to AD (ALZ-EARLY M01-M04, RM04, S06): MCI labels only. A bare "alzheimer disease" label
+# is not granted (every "dementia due to Alzheimer disease" answer contains its tokens), nor are
+# dementia labels or G30 codes, so a dementia answer to an MCI case does not score.
 G31.84:
-  labels: [mild cognitive impairment, MCI, amnestic mild cognitive impairment, amnestic MCI, prodromal alzheimer, mild cognitive impairment due to alzheimer, alzheimer disease, alzheimer's disease]
-  codes: [G30.0, G30.1, G30.9]
+  labels: [mild cognitive impairment, MCI, amnestic mild cognitive impairment, amnestic MCI, prodromal alzheimer, mild cognitive impairment due to alzheimer]
+# FTD (24 Oct 2026 close-out, plans/FTD-decisions.md). "Pick disease" names one FTLD-tau
+# pathology (Pick bodies) that no case establishes and that the C9orf72 and GRN cases (TDP-43)
+# cannot have; ICD-10-CM G31.01 (Pick's disease) is also where primary progressive aphasia is
+# coded, so neither is granted to bvFTD. The two PPA cases are coded G31.01 and accept only their
+# own variant (every token of "frontotemporal dementia" occurs in a bvFTD answer). FTD-P08 needs
+# both components, as SE-P06 and HEP-ENC-P04 do.
 G31.09:
-  labels: [frontotemporal dementia, FTD, behavioral variant frontotemporal dementia, behavioural variant frontotemporal dementia, bvFTD, frontotemporal lobar degeneration, pick disease, pick's disease]
-  codes: [G31.0, G31.01]
+  except_cases: [FTD-P08]
+  labels: [frontotemporal dementia, FTD, behavioral variant frontotemporal dementia, behavioural variant frontotemporal dementia, bvFTD, frontotemporal lobar degeneration]
+  codes: [G31.0]
+G31.09+mnd:
+  cases: [FTD-P08]
+  labels: [FTD-MND, FTD-ALS, ALS-FTD, bvFTD MND, bvFTD ALS, ALS-FTSD, frontotemporal dementia motor neuron disease, frontotemporal dementia motor neurone disease, frontotemporal dementia ALS, frontotemporal dementia amyotrophic lateral sclerosis, bvFTD motor neuron disease, bvFTD motor neurone disease]
+G31.01+svppa:
+  cases: [FTD-S11]
+  labels: [semantic variant primary progressive aphasia, semantic variant PPA, svPPA, semantic PPA, semantic primary progressive aphasia, semantic dementia]
+G31.01+nfvppa:
+  cases: [FTD-S12]
+  labels: [nonfluent variant primary progressive aphasia, non-fluent variant primary progressive aphasia, nfvPPA, agrammatic variant primary progressive aphasia, agrammatic primary progressive aphasia, agrammatic PPA, nonfluent PPA, non-fluent PPA, progressive nonfluent aphasia, progressive non-fluent aphasia, PNFA]
 G31.83:
   labels: [dementia with lewy bodies, lewy body dementia, DLB]
 
 G04.81:
+  # NMDAR-ENC close-out (24 Oct 2026): the generic labels are not granted in the anti-NMDAR cases.
+  # Every token of "autoimmune encephalitis" or "antibody mediated encephalitis" occurs in
+  # "anti-LGI1 autoimmune encephalitis" or "seronegative autoimmune encephalitis", the alternatives
+  # each case's work-up excludes; "autoimmune limbic encephalitis" is a different syndrome (Graus
+  # 2016); G04.90 is unspecified encephalitis. The case's antibody is what the CSF order establishes.
+  except_cases: [NMDAR-ENC-M01, NMDAR-ENC-M02, NMDAR-ENC-M03, NMDAR-ENC-M04, NMDAR-ENC-M05, NMDAR-ENC-P01, NMDAR-ENC-P02, NMDAR-ENC-P03, NMDAR-ENC-P04, NMDAR-ENC-P05, NMDAR-ENC-P06, NMDAR-ENC-P07, NMDAR-ENC-P08, NMDAR-ENC-RM01, NMDAR-ENC-RM02, NMDAR-ENC-RM03, NMDAR-ENC-RP01, NMDAR-ENC-RP02, NMDAR-ENC-RP03, NMDAR-ENC-RS01, NMDAR-ENC-RS02, NMDAR-ENC-RS03, NMDAR-ENC-RS04, NMDAR-ENC-S01, NMDAR-ENC-S02, NMDAR-ENC-S03, NMDAR-ENC-S04, NMDAR-ENC-S06, NMDAR-ENC-S09, NMDAR-ENC-S10, FEPI-TEMP-P02]
   labels: [autoimmune encephalitis, antibody mediated encephalitis, autoimmune limbic encephalitis]
   codes: [G04.8, G04.90]
 G04.81+nmdar:
   conditions: [autoimmune_encephalitis_nmdar]
-  labels: [anti nmda receptor encephalitis, anti-nmda receptor encephalitis, anti nmdar encephalitis, anti-nmdar encephalitis, nmdar encephalitis, nmda receptor encephalitis, nmda encephalitis]
+  labels: [anti nmda receptor encephalitis, anti-nmda receptor encephalitis, anti nmdar encephalitis, anti-nmdar encephalitis, nmdar encephalitis, nmda receptor encephalitis, nmda encephalitis, glun1 encephalitis, nr1 encephalitis]
+  codes: [G04.8]
 
 G00:
-  labels: [bacterial meningitis, acute bacterial meningitis, pyogenic meningitis, community acquired bacterial meningitis]
+  labels: [bacterial meningitis, acute bacterial meningitis, pyogenic meningitis]
   codes: [G00.9]
+G00+community:
+  # healthcare-associated (M05 post-neurosurgical, RS04) and post-traumatic CSF-leak (RP02) cases
+  except_cases: [BACT-MEN-M05, BACT-MEN-RS04, BACT-MEN-RP02]
+  labels: [community acquired bacterial meningitis]
 G00.1:
   labels: [pneumococcal meningitis, streptococcus pneumoniae meningitis]
 G00.0:
   labels: [haemophilus meningitis, haemophilus influenzae meningitis, hib meningitis]
 G00.2:
-  labels: [streptococcal meningitis, group b streptococcus meningitis]
+  labels: [streptococcal meningitis]
+# Organism labels scoped to their case (October 2026): RS01 is group B streptococcus, RM04 S. suis
+G00.2+gbs:
+  cases: [BACT-MEN-RS01]
+  labels: [group b streptococcus meningitis, group b streptococcal meningitis, streptococcus agalactiae meningitis]
+G00.2+suis:
+  cases: [BACT-MEN-RM04]
+  labels: [streptococcus suis meningitis]
 G00.3:
   labels: [staphylococcal meningitis, post neurosurgical meningitis, healthcare associated meningitis, ventriculitis]
 G00.8:
-  labels: [listeria meningitis, listeria monocytogenes meningitis, listeria meningoencephalitis]
+  labels: [other bacterial meningitis]
+G00.8+gram-negative:
+  cases: [BACT-MEN-RP05, BACT-MEN-RS04]
+  labels: [gram negative bacillary meningitis, gram-negative bacillary meningitis, gram negative meningitis]
+A32:
+  conditions: [bacterial_meningitis]
+  labels: [listeria meningitis, listeria monocytogenes meningitis, listeria meningoencephalitis, listerial meningitis, bacterial meningitis, acute bacterial meningitis, community acquired bacterial meningitis]
+  codes: [A32.1, A32.11, A32.12, G00.9]
 A39.0:
   labels: [meningococcal meningitis, neisseria meningitidis meningitis, bacterial meningitis]
 A17.0:
@@ -56,53 +149,219 @@ A17.0:
 B45.1:
   labels: [cryptococcal meningitis, cryptococcal meningoencephalitis, cryptococcus meningitis]
 
+# High-grade glioma (GLIO-HG close-out, 24 Oct 2026). ICD-10 C71 codes the site, not the entity, so
+# the category carries only labels true of every high-grade glioma in the condition; entity names are
+# scoped so that glioblastoma is not accepted for an IDH-mutant astrocytoma or a diffuse midline
+# glioma (WHO CNS5), and a grade label is not accepted where the grade or the H3 status differs.
 C71:
-  labels: [glioblastoma, GBM, high grade glioma, glioma who grade 4, grade 4 glioma, malignant glioma, astrocytoma grade 4]
+  conditions: [brain_tumor_glioma]
+  labels: [high grade glioma, malignant glioma]
   codes: [C71.9]
-C71.0:
-  labels: [diffuse midline glioma, h3 k27m altered glioma]
+C71+glioblastoma:
+  conditions: [brain_tumor_glioma]
+  # IDH-mutant astrocytomas (M04, M05, RP03) and the H3 K27-altered diffuse midline glioma (P05)
+  except_cases: [GLIO-HG-M04, GLIO-HG-M05, GLIO-HG-RP03, GLIO-HG-P05]
+  labels: [glioblastoma, GBM, glioblastoma idh wildtype]
+C71+grade4:
+  conditions: [brain_tumor_glioma]
+  # not the grade 3 astrocytoma (M05), nor the H3-wildtype midline glioblastomas (RM01 pons, RM03
+  # cerebellum and vermis), where "diffuse midline glioma ... grade 4" is the wrong answer
+  except_cases: [GLIO-HG-M05, GLIO-HG-RM01, GLIO-HG-RM03]
+  labels: [grade 4 glioma, glioma who grade 4]
+C71+gliosarcoma:
+  cases: [GLIO-HG-RM04]
+  labels: [gliosarcoma]
+C71+astrocytoma-idh-mutant-4:
+  cases: [GLIO-HG-M04, GLIO-HG-RP03]
+  labels: [astrocytoma idh mutant grade 4]
+C71+astrocytoma-idh-mutant-3:
+  cases: [GLIO-HG-M05]
+  labels: [astrocytoma idh mutant grade 3]
+C71+diffuse-midline-glioma:
+  cases: [GLIO-HG-P05]
+  labels: [diffuse midline glioma, h3 k27 altered glioma, h3 k27m altered glioma]
 C72.0:
-  labels: [spinal cord glioblastoma, spinal cord glioma, intramedullary glioma]
+  conditions: [brain_tumor_glioma]
+  # RM02 is H3-wildtype: generic "spinal cord glioma" would accept a diffuse midline glioma answer
+  labels: [spinal cord glioblastoma, intramedullary glioblastoma, glioblastoma, GBM, high grade glioma, malignant glioma]
 C83.390:
-  labels: [primary cns lymphoma, PCNSL, cns lymphoma, primary central nervous system lymphoma]
+  # "cns lymphoma" alone would accept secondary CNS lymphoma, a different disease
+  labels: [primary cns lymphoma, PCNSL, primary central nervous system lymphoma, primary cns diffuse large b cell lymphoma]
   codes: [C83.39, C85.80]
+C83.390+hiv:
+  cases: [GLIO-HG-P02]
+  labels: [hiv associated cns lymphoma, aids related cns lymphoma, ebv positive diffuse large b cell lymphoma cns]
 
+# FEPI-TEMP (24 Oct 2026 close-out, plans/FEPI-TEMP-decisions.md). The category grants the generic
+# epilepsy labels and the category codes only. The seizure-type labels (focal seizures, focal onset
+# seizures, focal impaired awareness seizures) are retired: an acute symptomatic seizure answer, or a
+# functional-seizure answer naming the seizure type it mimics, contains their tokens. The mesial
+# labels go only where the onset zone is mesial, the sclerosis label only where the MRI shows
+# hippocampal sclerosis, the intractable codes only in the four drug-resistant cases (Kwan 2010), and
+# the idiopathic G40.0 codes nowhere (every case is structural or of unknown cause).
 G40:
-  labels: [focal epilepsy, temporal lobe epilepsy, mesial temporal lobe epilepsy, mesial temporal sclerosis epilepsy, focal onset seizures, focal impaired awareness seizures, focal seizures, TLE, epilepsy temporal lobe]
-  codes: [G40.2, G40.209, G40.219, G40.1, G40.109, G40.119, G40.009, G40.019, G40.9, G40.909]
+  conditions: [focal_epilepsy_temporal]
+  labels: [focal epilepsy, temporal lobe epilepsy, TLE, epilepsy temporal lobe]
+  codes: [G40.2, G40.1, G40.9]
+G40+not-intractable:
+  conditions: [focal_epilepsy_temporal]
+  except_cases: [FEPI-TEMP-P04, FEPI-TEMP-RP04, FEPI-TEMP-RS01, FEPI-TEMP-RS04]
+  codes: [G40.209, G40.109, G40.909]
+G40+intractable:
+  cases: [FEPI-TEMP-P04, FEPI-TEMP-RP04, FEPI-TEMP-RS01, FEPI-TEMP-RS04]
+  codes: [G40.219, G40.119, G40.919]
+# Mesial onset zone: hippocampal sclerosis, a lesion in the amygdala or hippocampus (M05 cavernoma,
+# S02 and S03 DNET), mesial semiology with a mesial and lateral lesion (RP03) or with a normal MRI
+# (RP02). Not the lateral neocortical (M04, RM04), temporopolar or inferior temporal (P01, RP05, S06)
+# or MRI-negative anterior temporal (P04) cases.
+G40+mesial:
+  cases: [FEPI-TEMP-M01, FEPI-TEMP-M02, FEPI-TEMP-M03, FEPI-TEMP-M05, FEPI-TEMP-P05, FEPI-TEMP-RM01, FEPI-TEMP-RM02, FEPI-TEMP-RM03, FEPI-TEMP-RP02, FEPI-TEMP-RP03, FEPI-TEMP-RP04, FEPI-TEMP-RS01, FEPI-TEMP-RS02, FEPI-TEMP-RS03, FEPI-TEMP-RS04, FEPI-TEMP-RS05, FEPI-TEMP-S01, FEPI-TEMP-S02, FEPI-TEMP-S03, FEPI-TEMP-S04, FEPI-TEMP-S05]
+  labels: [mesial temporal lobe epilepsy, MTLE]
+# Hippocampal sclerosis on the epilepsy-protocol MRI.
+G40+hs:
+  cases: [FEPI-TEMP-M01, FEPI-TEMP-M02, FEPI-TEMP-M03, FEPI-TEMP-P05, FEPI-TEMP-RM01, FEPI-TEMP-RM02, FEPI-TEMP-RM03, FEPI-TEMP-RP04, FEPI-TEMP-RS01, FEPI-TEMP-RS02, FEPI-TEMP-RS03, FEPI-TEMP-RS04, FEPI-TEMP-RS05, FEPI-TEMP-S01, FEPI-TEMP-S04, FEPI-TEMP-S05]
+  labels: [mesial temporal sclerosis epilepsy]
+# FEPI-TEMP-RP01 (relabelled 24 Oct 2026): HSV-1 encephalitis with acute symptomatic NCSE, not
+# epilepsy (Beghi 2010). The encephalitis is what the case scores: "NCSE" or "acute symptomatic
+# seizures" alone, or an epilepsy code (G40.901), would credit the epilepsy answer the case tests.
+# No "herpes encephalitis" or "herpesviral encephalitis": their tokens occur in a VZV answer.
+B00.4:
+  cases: [FEPI-TEMP-RP01]
+  labels: [HSV encephalitis, HSV-1 encephalitis, herpes simplex encephalitis, herpes simplex virus encephalitis, HSE]
+# FEPI-TEMP-P02: anti-LGI1 encephalitis. The generic labels of the G04.81 entry are not granted:
+# their tokens occur in "anti-NMDAR autoimmune encephalitis" or "GAD65 autoimmune limbic
+# encephalitis", alternatives the case excludes.
+G04.81+lgi1:
+  cases: [FEPI-TEMP-P02]
+  labels: [LGI1 encephalitis, anti-LGI1 encephalitis, LGI1 antibody encephalitis, LGI1 limbic encephalitis, leucine rich glioma inactivated 1 encephalitis]
+# FEPI-TEMP-P03: functional seizures in a patient with controlled mesial TLE. No "non-epileptic
+# seizures" (its tokens occur in "focal non-motor epileptic seizures") and no F44.4 or F44.7 (motor
+# and mixed presentations).
+F44.5+fepi:
+  cases: [FEPI-TEMP-P03]
+  labels: [psychogenic non-epileptic seizures, psychogenic nonepileptic seizures, PNES, functional seizures, dissociative seizures, nonepileptic seizures]
 F44.5:
+  # The three pure functional-seizure FND cases take their labels and codes from the FND entries
+  # below (F44.4 motor and F44.7 mixed name another presentation there); FEPI-TEMP-P03 from F44.5+fepi.
+  except_cases: [FND-M04, FND-M06, FND-RP01, FEPI-TEMP-P03]
   labels: [psychogenic non-epileptic seizures, psychogenic nonepileptic seizures, PNES, functional seizures, dissociative seizures, non-epileptic seizures]
   codes: [F44.4, F44.7]
+# FND (24 Oct 2026 close-out, plans/FND-decisions.md): the category grants the generic labels and
+# the unspecified code; phenotype labels and codes go only where the case has that phenotype, so a
+# motor-only case does not credit a functional-seizure answer (or F44.5), a pure functional-seizure
+# case does not credit "functional weakness", and the diplopia case credits neither.
 F44:
   conditions: [functional_neurological_disorder]
-  labels: [functional neurological disorder, functional neurological symptom disorder, conversion disorder, FND, functional movement disorder, functional weakness, psychogenic non-epileptic seizures, PNES, functional seizures]
-  codes: [F44.4, F44.5, F44.6, F44.7, F44.9]
+  labels: [functional neurological disorder, functional neurological symptom disorder, conversion disorder, FND]
+  codes: [F44.9]
+# Paroxysmal phenotype: the 22 cases with functional seizures.
+F44+seizures:
+  conditions: [functional_neurological_disorder]
+  except_cases: [FND-M05, FND-M09, FND-P07, FND-P08, FND-RM02, FND-RP02, FND-S07, FND-S10]
+  # Not "non-epileptic seizures": its tokens (non, epileptic, seizures) occur in an epilepsy answer
+  # such as "focal non-motor epileptic seizures"; "nonepileptic" is one token.
+  labels: [psychogenic non-epileptic seizures, psychogenic nonepileptic seizures, PNES, functional seizures, dissociative seizures, nonepileptic seizures]
+  codes: [F44.5]
+# Motor phenotype (functional limb weakness, with or without tremor and sensory loss): every case
+# except the pure functional-seizure cases and the diplopia case.
+F44+motor:
+  conditions: [functional_neurological_disorder]
+  except_cases: [FND-M04, FND-M06, FND-RP01, FND-RM02]
+  labels: [functional weakness, functional limb weakness, functional motor disorder]
+  codes: [F44.4, F44.6, F44.7]
+# Functional tremor (entrainment or a distractible tremor on examination).
+F44+movement:
+  conditions: [functional_neurological_disorder]
+  cases: [FND-M01, FND-M02, FND-M03, FND-P01, FND-P07, FND-RM03, FND-RS03, FND-S04, FND-S05, FND-S06, FND-S09]
+  labels: [functional movement disorder, functional tremor]
+# FND-RM02: functional diplopia with convergence spasm.
+F44+diplopia:
+  conditions: [functional_neurological_disorder]
+  cases: [FND-RM02]
+  labels: [functional diplopia, functional convergence spasm, functional eye movement disorder]
+  codes: [F44.4, F44.6]
 
+# G41 (24 Oct 2026, SE close-out): the category grants the generic labels and the unspecified codes
+# only. The type codes (G41.0 convulsive, G41.2 complex partial / focal NCSE, G41.8 other) and their
+# labels come from the specific code, so a convulsive case no longer accepts an NCSE label or code
+# and an NCSE case no longer accepts a convulsive one. G41.8 holds several phenotypes, so each of
+# its labels is scoped to the cases that are that phenotype.
 G41:
+  except_cases: [SE-P06]
   labels: [status epilepticus, SE]
-  codes: [G41.9, G41.0, G41.2, G41.8, G40.901, G40.911]
+  codes: [G41.9, G40.901, G40.911]
 G41.2:
+  except_cases: [SE-P06]
   labels: [non-convulsive status epilepticus, nonconvulsive status epilepticus, NCSE]
+# SE-P06: probable sporadic CJD is already in the history; the superimposed NCSE is what the case
+# scores, so it is coded G41.2 and an answer must name both (HEP-ENC-P04 precedent).
+G41.2+cjd:
+  cases: [SE-P06]
+  labels: [CJD status epilepticus, sCJD status epilepticus, creutzfeldt jakob disease status epilepticus, prion disease status epilepticus, CJD NCSE, sCJD NCSE, creutzfeldt jakob disease NCSE, prion disease NCSE]
 G41.0:
   labels: [generalized convulsive status epilepticus, convulsive status epilepticus, GCSE, tonic clonic status epilepticus]
-G41.8:
-  labels: [non-convulsive status epilepticus, nonconvulsive status epilepticus, NCSE, status epilepticus]
+G41.8+ncse:
+  # generalized NCSE (post-anoxic in SE-M07; HEP-ENC-P06)
+  cases: [SE-M07, HEP-ENC-P06]
+  labels: [non-convulsive status epilepticus, nonconvulsive status epilepticus, NCSE]
+G41.8+myoclonic:
+  cases: [SE-P03]
+  labels: [myoclonic status epilepticus]
+G41.8+fbds:
+  # faciobrachial dystonic seizure status from anti-LGI1 encephalitis: motor, not NCSE
+  # (anti-LGI1 encephalitis itself is in the history, so it is not a label here)
+  cases: [SE-S12]
+  labels: [faciobrachial dystonic seizures]
+# No case is coded A81.09 since SE-P06 was recoded G41.2 (24 Oct 2026); kept for future CJD cases.
 A81.09:
   labels: [creutzfeldt jakob disease, creutzfeldt-jakob disease, CJD, sporadic CJD, prion disease]
   codes: [A81.00, A81.0]
+# "pyridoxine deficiency seizures" (dietary or inherited pyridoxine deficiency) and "cholinergic
+# toxidrome" (carbamates, nerve agents, muscarinic mushrooms, cholinesterase-inhibitor drugs) name
+# other causes; retired 24 Oct 2026 (SE close-out).
 T37.1X1A:
-  labels: [isoniazid toxicity, isoniazid induced seizures, isoniazid poisoning, pyridoxine deficiency seizures]
+  labels: [isoniazid toxicity, isoniazid induced seizures, isoniazid poisoning]
   codes: [T37.1X1]
 T60.0X1A:
-  labels: [organophosphate poisoning, organophosphate toxicity, cholinergic toxidrome, organophosphate intoxication]
+  labels: [organophosphate poisoning, organophosphate toxicity, organophosphate intoxication]
   codes: [T60.0X1]
+# SE-P04: the left MCA stroke is in the chief complaint; what the case scores is the post-stroke
+# seizures with LPDs on the ictal-interictal continuum (not NCSE), so it is coded R56.9 (24 Oct 2026)
+# and an answer must name the seizure component.
+R56.9:
+  cases: [SE-P04]
+  labels: [stroke lateralized periodic discharges, stroke LPDs, stroke ictal interictal continuum, stroke seizures, stroke seizure, acute symptomatic seizures, acute symptomatic seizure]
 
-G43:
-  labels: [migraine with aura, migraine with typical aura, classic migraine, migraine aura]
-  codes: [G43.1, G43.109, G43.119, G43.909]
+# MIG-AURA (24 Oct 2026 close-out, plans/MIG-AURA-decisions.md). No G43 category entry: the
+# subtype is what the hemiplegic and brainstem-aura cases score (triptan avoidance, genetics), so
+# a generic "migraine with aura" answer or a G43.1 code does not credit them. "migraine aura" is
+# retired: its tokens are a subset of "migraine without aura".
+G43.109:
+  codes: [G43.1, G43.119, G43.909]
+G43.109+aura:
+  # MIG-AURA-M04 is migraine with brainstem aura (ICHD-3 1.2.2), not typical aura
+  except_cases: [MIG-AURA-M04]
+  labels: [migraine with aura, migraine with typical aura, classic migraine]
+G43.109+brainstem:
+  cases: [MIG-AURA-M04]
+  labels: [migraine with brainstem aura, basilar migraine, basilar type migraine]
+G43.109+acephalgic:
+  cases: [MIG-AURA-M05]
+  labels: [typical aura without headache, acephalgic migraine]
+G43.109+probable:
+  # single attacks relabelled ICHD-3 1.5.2
+  cases: [MIG-AURA-M01, MIG-AURA-M07]
+  labels: [probable migraine with aura]
 G43.409:
   labels: [hemiplegic migraine, sporadic hemiplegic migraine, migraine with motor aura]
   codes: [G43.4, G43.419]
+# MIG-AURA-P03: migrainous infarction (ICHD-3 1.4.3), recoded G43.609 (ICD-10-CM codes the
+# migrainous infarction under G43.6 with I63 as the additional code). Stroke labels and I63 codes
+# are not granted: a cardioembolic, lacunar or cryptogenic stroke answer is the error the case tests.
+G43.609:
+  cases: [MIG-AURA-P03]
+  labels: [migrainous infarction, migrainous stroke, migraine induced stroke, migraine related stroke, persistent migraine aura with cerebral infarction, persistent aura with infarction]
+  codes: [G43.6, G43.601, G43.611, G43.619]
 E88.41:
   labels: [MELAS, mitochondrial encephalomyopathy lactic acidosis and stroke-like episodes, mitochondrial encephalomyopathy]
   codes: [E88.4]
@@ -110,112 +369,383 @@ I67.850:
   labels: [CADASIL, cerebral autosomal dominant arteriopathy with subcortical infarcts and leukoencephalopathy]
   codes: [I67.85]
 
+# MS-RR (24 Oct 2026 close-out, plans/MS-RR-decisions.md). Every MS-RR case is relapsing-remitting
+# (G35.A, FY2026 ICD-10-CM). The progressive-course subcategories G35.B (primary progressive,
+# G35.B0-B2) and G35.C (secondary progressive, G35.C0-C2) are a different course and not granted;
+# G35 (the pre-FY2026 code) and G35.D (MS, unspecified) are. "demyelinating disease" is not
+# granted: G37.9 is an Excludes1 of G35.A and its tokens occur in an NMOSD, MOGAD or ADEM answer
+# ("an inflammatory demyelinating disease").
 G35:
-  labels: [multiple sclerosis, MS, relapsing remitting multiple sclerosis, relapsing-remitting multiple sclerosis, RRMS, demyelinating disease]
-  codes: [G35, G35.A, G35.B, G35.C, G35.D]
+  labels: [multiple sclerosis, MS, relapsing remitting multiple sclerosis, relapsing-remitting multiple sclerosis, RRMS]
+  codes: [G35, G35.A, G35.D]
 
+# PD close-out (24 Oct 2026, plans/PD-decisions.md). FY2024+ ICD-10-CM splits G20 by motor
+# complication: G20.A1 PD without dyskinesia, without mention of fluctuations (also PD NOS), G20.A2
+# without dyskinesia with fluctuations, G20.B1 with dyskinesia without mention of fluctuations,
+# G20.B2 with dyskinesia and fluctuations. G20.C is "Parkinsonism, unspecified", not PD: it is not
+# granted (it would credit a nonspecific or drug-induced parkinsonism answer by its code alone). The
+# complication codes are granted only where the case has the complication: G20.A1 in every case
+# without dyskinesia, G20.A2 only in the fluctuating case (PD-RM05), G20.B1/B2 only in the case with
+# dyskinesia and fluctuations (PD-RP04, which does not take G20.A1 "without dyskinesia").
 G20:
   labels: [parkinson disease, parkinson's disease, parkinsons disease, idiopathic parkinson disease, idiopathic parkinson's disease, PD]
-  codes: [G20, G20.A1, G20.A2, G20.B1, G20.B2, G20.C]
+  codes: [G20]
+G20.A2:
+  codes: [G20.A1]
+G20.B2:
+  codes: [G20.B1]
 G23.1:
   labels: [progressive supranuclear palsy, PSP, richardson syndrome]
+# MSA (PD-P01 MSA-P, PD-RP03 mixed parkinsonian and cerebellar MSA; both stay in condition
+# parkinsons). ICD-10-CM FY2026 still codes MSA to G90.3 (multi-system degeneration of the
+# autonomic nervous system), the primary code. WHO ICD-10 (2016 update onward) and ICD-10-GM code
+# MSA-P G23.2 and MSA-C G23.3; in ICD-10-CM G23.2 is striatonigral degeneration (the MSA-P
+# pathology) and G23.3 does not exist. Both are accepted as codes of the subtype the case has.
 G90.3:
-  labels: [multiple system atrophy, MSA, MSA-P, multiple system atrophy parkinsonian type]
+  labels: [multiple system atrophy, MSA]
+G90.3+p:
+  cases: [PD-P01, PD-RP03]
+  labels: [MSA-P, multiple system atrophy parkinsonian type, striatonigral degeneration]
+  codes: [G23.2]
+G90.3+c:
+  cases: [PD-RP03]
+  labels: [MSA-C, multiple system atrophy cerebellar type]
+  codes: [G23.3]
 
 G61.0:
-  labels: [guillain barre syndrome, guillain-barre syndrome, guillain-barré syndrome, GBS, acute inflammatory demyelinating polyneuropathy, AIDP, acute inflammatory demyelinating polyradiculoneuropathy, acute motor axonal neuropathy, AMAN, miller fisher syndrome]
+  labels: [guillain barre syndrome, guillain-barre syndrome, guillain-barré syndrome, GBS]
+# GBS variant and subtype labels scoped to the cases whose findings meet them (24 Oct 2026,
+# plans/GBS-decisions.md): an AIDP answer is wrong for Miller Fisher, PCB, bifacial, ptosis and
+# AMAN cases, and "Miller Fisher syndrome" is wrong for AIDP. The ICD code G61.0 still credits any
+# GBS-spectrum answer that submits it (ICD-10 files every variant under G61.0).
+G61.0+aidp:
+  conditions: [guillain_barre]
+  except_cases: [GBS-P01, GBS-RM12, GBS-RM15, GBS-RS11, GBS-RS15, GBS-RP16]
+  labels: [acute inflammatory demyelinating polyneuropathy, AIDP, acute inflammatory demyelinating polyradiculoneuropathy]
+G61.0+aman:
+  cases: [GBS-RP16]
+  labels: [acute motor axonal neuropathy, AMAN]
+G61.0+mfs:
+  cases: [GBS-P01]
+  labels: [miller fisher syndrome, fisher syndrome, MFS]
+G61.0+gq1b:
+  cases: [GBS-RM15]
+  labels: [anti gq1b syndrome, incomplete miller fisher syndrome]
+G61.0+pcb:
+  cases: [GBS-RM12, GBS-RS15]
+  labels: [pharyngeal cervical brachial]
+G61.0+bifacial:
+  cases: [GBS-RS11]
+  labels: [bifacial weakness with paraesthesias, bifacial weakness with paresthesias]
 
+# MG (24 Oct 2026 close-out, plans/MG-decisions.md). The category grants the disease name and
+# the WHO code only. Distribution, serotype and exacerbation labels are scoped to the cases whose
+# data meet them, so a generalized case no longer lists "ocular myasthenia gravis" and an ocular
+# case no longer lists "generalized". Bare "MG" is retired (a one-token label matches any text
+# that mentions MG, including a LEMS answer "not MG"); two-token forms ("ocular MG") replace it.
+# Residual limit: a wrong-subtype answer that contains "myasthenia gravis" still scores through
+# the generic label (needs per-case rejected tokens, CENTRAL_PENDING).
 G70:
-  labels: [myasthenia gravis, MG, generalized myasthenia gravis, generalised myasthenia gravis, ocular myasthenia gravis, autoimmune myasthenia]
-  codes: [G70.0, G70.00, G70.01]
+  labels: [myasthenia gravis, autoimmune myasthenia]
+  codes: [G70.0]
+# Stable presentations: G70.00 first; G70.01 is also credited (a coding nuance of a worsening
+# new presentation, not a different entity).
+G70.00:
+  codes: [G70.00, G70.01]
+# Exacerbation and crisis (MG-M04 impending crisis, MG-RM14 and MG-RM15 crisis): G70.00 ("without
+# exacerbation") is not credited.
+G70.01+crisis:
+  conditions: [myasthenia_gravis]
+  cases: [MG-M04, MG-RM14, MG-RM15]
+  labels: [myasthenic crisis, myasthenic exacerbation, impending myasthenic crisis, MG crisis, MG exacerbation]
+G70+generalized:
+  conditions: [myasthenia_gravis]
+  except_cases: [MG-RS11, MG-S05]
+  labels: [generalized myasthenia gravis, generalised myasthenia gravis, generalized MG, generalised MG]
+G70.00+ocular:
+  conditions: [myasthenia_gravis]
+  cases: [MG-RS11, MG-S05]
+  labels: [ocular myasthenia gravis, ocular myasthenia, ocular MG]
+G70.00+seronegative:
+  conditions: [myasthenia_gravis]
+  cases: [MG-P01, MG-RP14]
+  labels: [seronegative myasthenia gravis, seronegative MG]
+G70.00+double_seronegative:
+  conditions: [myasthenia_gravis]
+  cases: [MG-P01, MG-P04, MG-RP14]
+  labels: [double seronegative myasthenia gravis, double seronegative MG]
+G70.00+lrp4:
+  conditions: [myasthenia_gravis]
+  cases: [MG-P04]
+  labels: [LRP4 myasthenia gravis, LRP4 antibody positive myasthenia gravis, LRP4 MG]
+G70.00+musk:
+  conditions: [myasthenia_gravis]
+  cases: [MG-RS14]
+  labels: [MuSK myasthenia gravis, MuSK antibody positive myasthenia gravis, anti-MuSK myasthenia gravis, MuSK MG]
+# LEMS (MG-P02, MG-RM13, both paraneoplastic with SCLC): G73.1 is "Lambert-Eaton syndrome in
+# neoplastic disease", G70.80 "Lambert-Eaton syndrome, unspecified".
 G73.1:
-  labels: [lambert eaton myasthenic syndrome, lambert-eaton myasthenic syndrome, LEMS, lambert eaton syndrome]
+  labels: [lambert eaton myasthenic syndrome, lambert-eaton myasthenic syndrome, LEMS, lambert eaton syndrome, paraneoplastic lambert eaton myasthenic syndrome, LEMS with small cell lung cancer]
   codes: [G73.1, G70.80]
 
+# NPH (24 Oct 2026 close-out). G91.2 is (idiopathic) NPH and G91.0 communicating hydrocephalus,
+# which ICD-10-CM uses for secondary NPH: they no longer grant each other. The secondary cases
+# (G91.0) do not take the bare "normal pressure hydrocephalus" / "NPH" labels, because with token
+# matching they would credit "idiopathic NPH", the wrong answer those cases test (an antecedent
+# excludes iNPH); they take "secondary" and antecedent-specific labels instead.
 G91.2:
   labels: [normal pressure hydrocephalus, NPH, idiopathic normal pressure hydrocephalus, iNPH]
-  codes: [G91.2, G91.0, G91.9]
+  codes: [G91.9]
 G91.0:
-  labels: [normal pressure hydrocephalus, NPH, secondary normal pressure hydrocephalus, communicating hydrocephalus]
-  codes: [G91.0, G91.2, G91.9]
+  labels: [secondary normal pressure hydrocephalus, secondary NPH, communicating hydrocephalus]
+  codes: [G91.9]
+G91.0+subdural:
+  cases: [NPH-M06]
+  labels: [subdural NPH, subdural normal pressure hydrocephalus]
+G91.0+meningitic:
+  cases: [NPH-M08]
+  labels: [post-meningitic NPH, post-meningitic normal pressure hydrocephalus, meningitis NPH, meningitis normal pressure hydrocephalus]
+# G91.3 is post-traumatic hydrocephalus, unspecified (plan R1).
+G91.0+traumatic:
+  cases: [NPH-M09]
+  labels: [traumatic NPH, traumatic normal pressure hydrocephalus, TBI NPH, TBI normal pressure hydrocephalus]
+  codes: [G91.3]
+G91.0+sah:
+  cases: [NPH-P05]
+  labels: [SAH NPH, SAH normal pressure hydrocephalus, haemorrhagic NPH, hemorrhagic NPH, subarachnoid NPH, subarachnoid normal pressure hydrocephalus]
 
+# I60 (24 Oct 2026, SAH close-out): the category serves the aneurysmal cases, so it no longer
+# grants I60.8 (other nontraumatic SAH, the non-aneurysmal code). SAH-P02 (perimesencephalic
+# non-aneurysmal SAH, I60.8) is excluded from the category: with token matching, a generic
+# "subarachnoid hemorrhage" or "SAH" label would credit an answer of aneurysmal rupture, which is
+# the error the case tests, and I60.9 or a location code would do the same through the code.
 I60:
+  except_cases: [SAH-P02]
   labels: [subarachnoid hemorrhage, subarachnoid haemorrhage, SAH, aneurysmal subarachnoid hemorrhage, aneurysmal subarachnoid haemorrhage, ruptured intracranial aneurysm, ruptured cerebral aneurysm]
-  codes: [I60.9, I60.7, I60.0, I60.1, I60.2, I60.3, I60.4, I60.5, I60.6, I60.8]
+  codes: [I60.9, I60.7, I60.0, I60.1, I60.2, I60.3, I60.4, I60.5, I60.6]
 I60.8:
-  labels: [perimesencephalic subarachnoid hemorrhage, perimesencephalic subarachnoid haemorrhage, non-aneurysmal subarachnoid hemorrhage]
+  cases: [SAH-P02]
+  labels: [perimesencephalic subarachnoid hemorrhage, perimesencephalic subarachnoid haemorrhage, perimesencephalic SAH, perimesencephalic hemorrhage, perimesencephalic haemorrhage, pretruncal subarachnoid hemorrhage, non-aneurysmal subarachnoid hemorrhage, non-aneurysmal subarachnoid haemorrhage, nonaneurysmal subarachnoid hemorrhage, non-aneurysmal SAH, angiogram negative subarachnoid hemorrhage]
 
+# I63 category: generic labels and the unspecified code only; mechanism labels (embolic,
+# lacunar, dissection, moyamoya) and the mechanism code families sit on the specific codes.
 I63:
-  labels: [acute ischemic stroke, acute ischaemic stroke, ischemic stroke, ischaemic stroke, cerebral infarction, cerebral infarct, embolic stroke, cardioembolic stroke, lacunar stroke, lacunar infarct, stroke]
-  codes: [I63.9, I63.4, I63.5, I63.3, I63.2, I63.0, I63.1, I63.8, I63.81, I63.89]
+  # MIG-AURA-P07 tests cardioembolic stroke against migrainous infarction: generic stroke labels
+  # and I63.9 would credit the wrong mechanism (24 Oct 2026).
+  except_cases: [MIG-AURA-P07]
+  labels: [acute ischemic stroke, acute ischaemic stroke, ischemic stroke, ischaemic stroke, cerebral infarction, cerebral infarct]
+  codes: [I63.9]
+I63.9+paradoxical:
+  cases: [ISCH-STR-P05, ISCH-STR-RP03]
+  labels: [paradoxical embolism, paradoxical embolic stroke, embolic stroke]
 I63.011:
-  labels: [lateral medullary syndrome, wallenberg syndrome, lateral medullary infarct, vertebral artery dissection]
+  labels: [vertebral artery dissection]
+  codes: [I63.0, I63.01]
+I63.011+wallenberg:
+  cases: [ISCH-STR-M04]
+  labels: [lateral medullary syndrome, wallenberg syndrome, lateral medullary infarct]
+I63.011+pica:
+  cases: [ISCH-STR-RM04]
+  labels: [PICA infarct, cerebellar infarct]
 I63.012:
   labels: [vertebral artery dissection, PICA infarct, cerebellar infarct]
+  codes: [I63.0, I63.01]
 I63.22:
   labels: [basilar artery occlusion, basilar artery thrombosis, posterior circulation stroke]
+  codes: [I63.2]
 I63.232:
+  codes: [I63.2, I63.23]
+I63.232+moyamoya:
+  cases: [ISCH-STR-P02]
   labels: [moyamoya disease, moyamoya]
+I63.232+dissection:
+  cases: [ISCH-STR-RM01, ISCH-STR-RS02]
+  labels: [carotid artery dissection, internal carotid artery dissection, cervical artery dissection]
 I63.231:
-  labels: [carotid stenosis stroke, internal carotid artery stenosis, large artery atherosclerotic stroke]
+  codes: [I63.2, I63.23]
+I63.231+dissection:
+  cases: [ISCH-STR-RP02]
+  labels: [carotid artery dissection, internal carotid artery dissection, cervical artery dissection]
 I63.031:
   labels: [watershed infarct, borderzone infarct, watershed stroke, hypoperfusion stroke]
+  codes: [I63.0, I63.03]
 I63.40:
-  labels: [septic embolic stroke, septic emboli, infective endocarditis stroke, infective endocarditis]
+  labels: [septic embolic stroke, septic emboli, infective endocarditis stroke, infective endocarditis, embolic stroke]
+  codes: [I63.4]
+I63.411:
+  labels: [cardioembolic stroke, embolic stroke]
+  codes: [I63.4, I63.41]
+I63.412:
+  labels: [cardioembolic stroke, embolic stroke]
+  codes: [I63.4, I63.41]
+I63.431:
+  labels: [cardioembolic stroke, embolic stroke]
+  codes: [I63.4, I63.43]
+I63.511:
+  codes: [I63.5, I63.51]
+I63.512:
+  codes: [I63.5, I63.51]
 I63.81:
-  labels: [CADASIL, lacunar stroke, lacunar infarct]
+  labels: [lacunar stroke, lacunar infarct, small vessel stroke]
+  codes: [I63.8]
+I63.81+cadasil:
+  cases: [ISCH-STR-RP05]
+  labels: [CADASIL]
 I77.71:
   labels: [carotid artery dissection, internal carotid artery dissection, cervical artery dissection]
-  codes: [I77.71, I63.231]
-I97.811:
-  labels: [perioperative stroke, iatrogenic stroke, postprocedural stroke, ischemic stroke, ischaemic stroke]
+# MIG-AURA-P07 only (right PCA cardioembolic infarct from paroxysmal AF; a small PFO is the red
+# herring). Mechanism labels only: "embolic stroke" would credit paradoxical embolism, generic
+# stroke or "PCA territory infarct" labels would credit migrainous infarction; I63.432 is the left
+# PCA and I63.9 the unspecified code.
 I63.4:
-  labels: [cardioembolic stroke, PCA territory infarct, ischemic stroke, ischaemic stroke]
-  codes: [I63.4, I63.43, I63.431, I63.432, I63.9]
+  cases: [MIG-AURA-P07]
+  labels: [cardioembolic stroke, cardioembolic infarct, cardioembolic infarction, atrial fibrillation stroke, atrial fibrillation infarct]
+  codes: [I63.43, I63.431]
 
-I44:
-  labels: [cardiac syncope, arrhythmic syncope, high grade av block, high-grade atrioventricular block, complete heart block, third degree av block, third-degree atrioventricular block, mobitz ii, mobitz type ii, second degree av block, bradyarrhythmia, conduction disease syncope]
-  codes: [I44.1, I44.2, I44.30, I44.39, I45.9, R55]
+# SYNC-CARD (24 Oct 2026 close-out, plans/SYNC-CARD-decisions.md). No generic "cardiac syncope",
+# "arrhythmic syncope", "bradyarrhythmia" or "tachyarrhythmia" label (29 of 30 cases accepted
+# "cardiac syncope", so the diagnosis score was trivial), and no R55. Each entry names the
+# mechanism or substrate the case scores; a label whose tokens occur in a mimic the work-up
+# excludes (e.g. "ventricular tachycardia" in idiopathic RVOT VT against ARVC, "long QT syndrome"
+# in acquired LQTS against congenital, "central sleep apnoea" in heart-failure CSA against anti-Hu
+# brainstem encephalitis) is not granted.
+# AV block: grades do not grant each other. Second-degree (Mobitz II, high-grade) cases do not
+# accept complete heart block unless the monitoring captures it (M03); complete heart block cases
+# do not accept Mobitz II. Bare "second degree av block" is retired (it credits Mobitz I).
+I44.1:
+  labels: [mobitz ii, mobitz type ii, mobitz 2, high grade av block, high-grade atrioventricular block, high degree av block, advanced av block]
+  codes: [I44.30]
+I44.1+chb:
+  # M03: telemetry captures transient complete heart block besides the Mobitz II block
+  cases: [SYNC-CARD-M03]
+  labels: [complete heart block, complete av block, complete atrioventricular block, third degree av block, third-degree atrioventricular block]
+  codes: [I44.2]
+I44.2:
+  # RM02 scores the rheumatic cause (chloroquine toxicity and familial conduction disease are its mimics)
+  except_cases: [SYNC-CARD-RM02]
+  labels: [complete heart block, complete av block, complete atrioventricular block, third degree av block, third-degree atrioventricular block, third degree heart block]
+  codes: [I44.30]
+I44.2+rheumatic:
+  cases: [SYNC-CARD-RM02]
+  labels: [rheumatic carditis, rheumatic fever carditis, rheumatic carditis with heart block, rheumatic heart block, rheumatic heart disease heart block, rheumatic av block]
+  codes: [I01.8, I01.9]
 I45.6:
-  labels: [cardiac syncope, wolff parkinson white, wolff-parkinson-white syndrome, WPW, pre-excitation syndrome]
-I45.81:
-  labels: [cardiac syncope, long qt syndrome, congenital long qt, LQTS]
-T46.2X5A:
-  labels: [cardiac syncope, drug induced long qt, drug-induced long qt syndrome, torsades de pointes, acquired long qt]
-  codes: [T46.2X5, I45.81]
-I47:
-  labels: [cardiac syncope, arrhythmic syncope, supraventricular tachycardia, SVT, AVNRT, ventricular tachycardia, VT, tachyarrhythmia]
-  codes: [I47.1, I47.2, I47.9, I47.20]
+  labels: [wolff parkinson white, wolff-parkinson-white syndrome, WPW, pre-excitation syndrome]
+# I45.81: congenital (P04) and drug-induced (M04, recoded from T46.2X5A) long QT do not grant each
+# other; bare "long qt syndrome", "LQTS" and "torsades de pointes" are retired (their tokens occur
+# in the other mechanism). M04 codes: torsades (I47.21) and the adverse effect of each drug.
+I45.81+congenital:
+  cases: [SYNC-CARD-P04]
+  labels: [congenital long qt syndrome, congenital long qt, congenital LQTS, inherited long qt syndrome, hereditary long qt syndrome, long qt syndrome type 1, LQT1, kcnq1 long qt syndrome]
+I45.81+drug:
+  cases: [SYNC-CARD-M04]
+  labels: [drug induced long qt syndrome, drug induced long qt, drug-induced long qt syndrome, acquired long qt syndrome, acquired long qt, drug induced torsades de pointes, medication induced long qt]
+  codes: [I47.21, T36.3X5A, T45.0X5A, T43.225A]
+# I47 split: SVT (I47.1, M05) and VT (I47.2) do not grant each other, and VT is a label only where
+# VT itself is the diagnosis (RS05); ARVC (P01) and CPVT (RP03) must be named.
+I47.1:
+  labels: [supraventricular tachycardia, SVT, paroxysmal supraventricular tachycardia, AVNRT, av nodal reentrant tachycardia, atrioventricular nodal reentrant tachycardia, av nodal re-entrant tachycardia]
+  codes: [I47.10, I47.19]
+I47.2+vt:
+  cases: [SYNC-CARD-RS05]
+  labels: [ventricular tachycardia, VT, sustained ventricular tachycardia, monomorphic ventricular tachycardia]
+  codes: [I47.20, I47.29]
+I47.2+arvc:
+  cases: [SYNC-CARD-P01]
+  labels: [arrhythmogenic right ventricular cardiomyopathy, ARVC, arrhythmogenic cardiomyopathy]
+  codes: [I42.8]
+I47.2+cpvt:
+  cases: [SYNC-CARD-RP03]
+  labels: [catecholaminergic polymorphic ventricular tachycardia, CPVT, catecholaminergic polymorphic vt]
 I48.3:
-  labels: [cardiac syncope, atrial flutter, atrial flutter with rapid ventricular response]
+  labels: [atrial flutter, atrial flutter with rapid ventricular response, typical atrial flutter, atrial flutter with 1:1 conduction]
+  codes: [I48.92]
 I49.5:
-  labels: [cardiac syncope, sick sinus syndrome, sinus node dysfunction, tachy brady syndrome]
+  labels: [sick sinus syndrome, sinus node dysfunction, tachy brady syndrome, tachycardia bradycardia syndrome]
 I49.8:
-  labels: [cardiac syncope, brugada syndrome, brugada]
+  # bare "brugada" is retired: it credits "Brugada phenocopy"
+  labels: [brugada syndrome]
 I42.1:
-  labels: [cardiac syncope, hypertrophic cardiomyopathy, HCM, hypertrophic obstructive cardiomyopathy, HOCM]
+  labels: [hypertrophic cardiomyopathy, HCM, hypertrophic obstructive cardiomyopathy, HOCM, obstructive hypertrophic cardiomyopathy]
 I42.8:
-  labels: [cardiac syncope, arrhythmogenic right ventricular cardiomyopathy, ARVC, arrhythmogenic cardiomyopathy]
+  labels: [arrhythmogenic right ventricular cardiomyopathy, ARVC, arrhythmogenic cardiomyopathy]
 I35.0:
-  labels: [cardiac syncope, aortic stenosis, severe aortic stenosis]
+  labels: [aortic stenosis, severe aortic stenosis]
 I26.09:
-  labels: [pulmonary embolism, acute pulmonary embolism, PE, cardiac syncope]
-  codes: [I26.0, I26.9]
+  # PE with acute cor pulmonale (RV strain): I26.9 (without acute cor pulmonale) is not granted
+  labels: [pulmonary embolism, acute pulmonary embolism, PE]
+  codes: [I26.0]
 D15.1:
-  labels: [cardiac myxoma, cardiac tumor, cardiac tumour, right ventricular myxoma, cardiac syncope]
+  # "cardiac tumour" is retired: it credits a malignant primary cardiac tumour, the mimic
+  labels: [cardiac myxoma, right ventricular myxoma, rvot myxoma, right ventricular outflow tract myxoma]
 D86.85:
-  labels: [cardiac sarcoidosis, sarcoid heart block, cardiac syncope, complete heart block]
+  # complete heart block alone does not name the sarcoid cause; "sarcoid myocarditis" is retired
+  # (its tokens occur in "non-sarcoid myocarditis", a mimic in RP05)
+  labels: [cardiac sarcoidosis, cardiac sarcoid, sarcoid heart block, sarcoid heart disease]
 G13.1:
-  labels: [central sleep apnea, central sleep apnoea, sleep apnea syncope, nocturnal asystole, sleep related bradyarrhythmia]
-  codes: [G47.31, G47.37]
+  # SYNC-CARD-RM01 scores the paraneoplastic cause: central sleep apnoea and nocturnal asystole alone
+  # credit heart-failure CSA, OSA or intrinsic sinus node disease; G47.31 is idiopathic CSA and
+  # G47.37 covers CSA from other causes.
+  labels: [anti hu brainstem encephalitis, anti hu encephalitis, anti hu encephalomyelitis, paraneoplastic brainstem encephalitis, anti hu paraneoplastic syndrome, paraneoplastic central sleep apnea, paraneoplastic central sleep apnoea]
 
+# K72: grade-specific labels and codes are scoped. K72.90/K72.91 split hepatic failure without/with
+# coma; K76.82 is hepatic encephalopathy itself and is the generic code.
 K72:
-  labels: [hepatic encephalopathy, HE, overt hepatic encephalopathy, portosystemic encephalopathy, hepatic coma]
-  codes: [K72.90, K72.91, K76.82]
+  labels: [hepatic encephalopathy, HE, portosystemic encephalopathy]
+  codes: [K76.82]
+K72+overt:
+  # every West Haven grade II-IV case; HEP-ENC-P07 is covert
+  except_cases: [HEP-ENC-P07]
+  labels: [overt hepatic encephalopathy]
+K72+covert:
+  cases: [HEP-ENC-P07]
+  labels: [covert hepatic encephalopathy, minimal hepatic encephalopathy]
+K72.91+coma:
+  # West Haven grade IV
+  cases: [HEP-ENC-S06]
+  labels: [hepatic coma]
+# HEP-ENC-P04 (October 2026): HE revealing unrecognised Wilson disease. Wilson disease is the
+# missing diagnosis the case scores, so the case is coded E83.01 and an answer must name both.
+E83.01:
+  cases: [HEP-ENC-P04]
+  labels: [wilson disease hepatic encephalopathy, wilson disease HE, wilsons disease hepatic encephalopathy, hepatolenticular degeneration hepatic encephalopathy]
 
+# VASC-DEM (October 2026 close-out, plans/VASC-DEM-decisions.md). Severity is part of the label:
+# F01 (major, dementia) and F06.7 (mild) do not grant each other, and the umbrella "vascular
+# cognitive impairment" (both severities) is retired. Subtype labels are scoped to the cases of
+# that mechanism; the five mixed cases do not accept a vascular-only answer.
 F01:
-  labels: [vascular dementia, vascular cognitive impairment, major vascular neurocognitive disorder, subcortical vascular dementia, multi-infarct dementia, multi infarct dementia, small vessel disease dementia, VaD]
-  codes: [F01.50, F01.51, F01.5, F01.A0, F01.B0, F01.C0, F06.7, I67.3]
+  conditions: [vascular_dementia]
+  except_cases: [VASC-DEM-M05, VASC-DEM-M07, VASC-DEM-M08, VASC-DEM-P01, VASC-DEM-P02]
+  labels: [vascular dementia, major vascular neurocognitive disorder, major neurocognitive disorder due to vascular disease, VaD]
+  codes: [F01.50, F01.51, F01.5, F01.9, F01.A0, F01.B0, F01.C0]
+F01+svd:
+  cases: [VASC-DEM-M02, VASC-DEM-P06, VASC-DEM-P07, VASC-DEM-S01, VASC-DEM-S02, VASC-DEM-S03, VASC-DEM-S04, VASC-DEM-S05]
+  labels: [subcortical vascular dementia, subcortical ischaemic vascular dementia, subcortical ischemic vascular dementia, small vessel disease dementia]
+  codes: [F01.2, I67.3]
+F01+multi_infarct:
+  cases: [VASC-DEM-M03, VASC-DEM-M10, VASC-DEM-P08, VASC-DEM-S06, VASC-DEM-S07, VASC-DEM-S08]
+  labels: [multi-infarct dementia, multi infarct dementia]
+  codes: [F01.1]
+F01+strategic:
+  cases: [VASC-DEM-M04, VASC-DEM-P09, VASC-DEM-S09, VASC-DEM-S10]
+  labels: [strategic infarct dementia]
+F01+post_stroke:
+  cases: [VASC-DEM-M09, VASC-DEM-S11]
+  labels: [post-stroke dementia]
+F01+caa:
+  cases: [VASC-DEM-P03, VASC-DEM-P04]
+  labels: [cerebral amyloid angiopathy, CAA]
+  codes: [I68.0]
+# Mixed Alzheimer and vascular dementia: ICD-10-CM has no single code (G30.x + F02.8x + F01.5x),
+# and G30/F02 alone would credit an Alzheimer-only answer, so only WHO ICD-10 F00.2 (mixed type)
+# is added. The F01.50 primary code still credits a vascular-only answer coded F01.50 (scorer,
+# code-alone matching: CENTRAL_PENDING).
+F01+mixed:
+  cases: [VASC-DEM-M05, VASC-DEM-M07, VASC-DEM-M08, VASC-DEM-P01, VASC-DEM-P02]
+  labels: [mixed dementia, alzheimer vascular dementia, alzheimers vascular dementia, alzheimer cerebrovascular disease, alzheimers cerebrovascular disease]
+  codes: [F00.2]
 F06.7:
-  labels: [mild vascular cognitive impairment, vascular cognitive impairment, mild vascular cognitive disorder, mild neurocognitive disorder due to vascular disease, vascular mild cognitive impairment]
-  codes: [F01.50, G31.84]
+  conditions: [vascular_dementia]
+  labels: [mild vascular cognitive impairment, mild vascular cognitive disorder, mild vascular neurocognitive disorder, mild neurocognitive disorder due to vascular disease, vascular mild cognitive impairment, vascular cognitive impairment no dementia]
+  codes: [F06.70]

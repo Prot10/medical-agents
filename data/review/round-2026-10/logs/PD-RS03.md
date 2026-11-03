@@ -1,0 +1,87 @@
+# PD-RS03
+Reviewer status: R1 none, R2 none (PD has no notes file; only the July 2026 tool review, `condition_tool_guidance.yaml` key `parkinsons`) | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| (none) | - | No physician note exists for PD. The case was corrected against plans/PD.md (classes C1 to C23, per-case entry PD-RS03, C21 data fix) and the July 2026 tool review (MRI required; ECG, EEG, autonomic and tilt testing removed; labs, neuropsychology and genetics optional and targeted). |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| C | blocker | `patient.history_present_illness`, `.chief_complaint`, `.neurological_exam.*`, `.social_history.exercise` | Labelled PD and called straightforward, but the data met more than two MDS red flags and pointed to MSA: a 4-month subacute course, falls once or twice a week within months, a wide-based gait, near-syncope with an orthostatic fall of 30/20 mmHg, urge incontinence, "jerky" bilateral tremor, cold pale extremities, symmetric bradykinesia (C21). | FIXED (plan C21): 20-month history, right-hand rest tremor first and the left hand after a year; no falls (one near-fall on turning); narrow-based gait, turns in 4 steps, pull test two steps with unaided recovery; supine 148/88 HR 68 and standing 136/82 HR 76 at 3 minutes (12/6 fall); urgency without incontinence; brief light-headedness on standing quickly without near-syncope; right-predominant bradykinesia and rigidity; "jerky" and "cold and pale extremities" (MSA supportive features) deleted; Pisa syndrome kept. |
+| B | minor | `patient.neurological_exam.mental_status` | MoCA 22/30 with deficits that the plan's typical-PD rewrite does not support; plan sets MoCA 26. | FIXED: MoCA 26/30 (cube copy 1, delayed recall 2, fluency 1), affect mildly depressed. |
+| A | major | `action-3-search-medical-literature`, `followup_outputs[0]`, `followup_outputs[2]` | Required literature criterion; a "self-mutilation" search carried over from the seed (C1) and an MSA-vs-PD search with a misattributed Fanciulli and Wenning 2015 Lancet Neurol summary. | FIXED: criterion and both follow-ups deleted; initial and fallback literature null. |
+| A | major | `action-2-check-drug-interactions`, drug follow-up | Required, exact `drug` string; false pharmacology ("fluoxetine may reduce levodopa efficacy through serotonergic effects"), warning about "existing autonomic dysfunction" (C2). | FIXED: `check_drug_interactions {}`, `optional`; one stored output: fluoxetine C2 sentence (MAO-B inhibitors), metoprolol orthostatic sentence, fluoxetine CYP2D6 inhibition raising metoprolol, variable levodopa absorption after Roux-en-Y bypass; follow-up deleted, fallback null. |
+| A | major | `action-1-analyze-brain-mri` | Required `{"contrast": false, "protocol": "standard"}` (C5); generic evidence; bare key. | FIXED: `analyze_brain_mri {}`; canonical label and rationale; `[Postuma_2015]`; evidence restates the report. |
+| B | minor | `initial_tool_outputs.mri` | "No ... enhancement post-contrast" on a non-contrast study (C12); impression omitted its own white matter foci; "not suggestive of NPH" (interpretive). | FIXED: enhancement removed; impression names the Fazekas 1 foci; pertinent negatives only. |
+| C | minor | `action-4-interpret-labs`, `initial_tool_outputs.labs` | Generic labs criterion; RPR padding; "Abnormal values" interpretation; no serum copper although copper deficiency after bypass is the reason to test (C11). | FIXED: optional criterion with one-item alternatives (`vitamin_B12`, `copper`, `serum_copper`, `ceruloplasmin`), case-specific rationale (bypass, no myeloneuropathy signs) and evidence; RPR removed; serum copper 94 ug/dL (80-155) added; interpretation values and flags only. |
+| C | major | `followup_outputs` neuropsych | Battery with MoCA 22 and "Abnormal values" impression with inverted flags (Trail A 48 s "(H)") (C10); thin battery. | FIXED: battery rewritten to MoCA 26 (low-average Trail B, phonemic fluency, free recall normalizing on recognition; GDS 7/15 mild depressive symptoms) with the C10 impression; criterion stays `optional` with a case-specific rationale (depression and mild losses); trigger `request_neuropsych_testing`. |
+| C | major | `ground_truth.avoided_actions`, `followup_outputs` (missing) | No stored DaTscan: the library would return "normal" (C8). | FIXED: DaTscan `waste` with a stored C8 report (left putamen 0.98, right 1.27; left deficit opposite the worse right side). |
+| E | minor | every criterion `rationale`, `citations` | Rationale a copy of the label; bare keys (C3). | FIXED. |
+| C | major | `ground_truth.assessment.required_recommendations` | Template musts; "Confirm clinically established PD" (C6, C16). | FIXED: five musts: C6 probable PD (no red flag); levodopa start titrated to response after bypass with lying and standing BP on metoprolol; agonist caution (69 years); active treatment of depression, no MAO-B inhibitor with fluoxetine; physiotherapy for Pisa posture, gait and balance. |
+| C | minor | `ground_truth.assessment.prohibited_recommendations` | Overlapping D2 prohibitions with an em dash. | FIXED: canonical D2 prohibition; anticholinergic prohibition kept (69, depression). |
+| C | major | `ground_truth.differential` | Vascular parkinsonism `moderate` against its own key features; MSA `very_low` against the old autonomic data; no ICD codes; no bypass-related or PSP entry (C13). | FIXED: vascular and MSA `low` with excluding data from the edited case; DIP (SSRI), nutritional deficiency after bypass (E61.0), ET, DLB, PSP `very_low`; ICD codes added. |
+| D | major | `ground_truth.key_clinical_evidence` | Two "July 2026" engineering sentences (C4); "clinically established PD"; "rapid functional decline with falls in 4 months" (no longer true). | FIXED: five case-specific lines. |
+| B | minor | `ground_truth.red_herrings` | Empty. | FIXED: gastric bypass (`past_medical_history[3]`) and fluoxetine (`medications[4]`) with interpretations. |
+| B | minor | `ground_truth.avoided_actions` | One-phrase rationales; no autonomic or tilt guard. | FIXED: case-specific rationales; DaTscan, autonomic and tilt `waste` added. |
+| B | minor | `ground_truth.sequence_constraints`, `.stop_rule` | "Drug check before labs" constraint with a reason that does not fit; stop rule with literature and drug; `max_additional_actions` 0 (C20). | FIXED: no constraint (DaTscan is waste); stop rule MRI; 2. |
+| A | minor | `fallback_tool_outputs.echo` | No `echo_type` (C17). | FIXED: TTE with concrete text. |
+| E | minor | `metadata.difficulty_description`, `.difficulty_rationale`, `.revision_reason`, `.last_revised` | "Levodopa challenge is positive" (no challenge in the case); "orthostatic hypotension" no longer true; shared engineering text (C19). | FIXED. `difficulty` stays `moderate` (bypass, SSRI, depression, Pisa confounders). |
+| - | check | plan 3.6 | perfect_agent ok (MRI from the initial output); case_io check: no failure names PD-RS03; test_case_guards 2 passed. Routing: battery and DaTscan return the case reports; labs return the stored panel; `drug: levodopa` and `drug: rasagiline` return the case output; library PSG (normal) fits a history without dream enactment; orthostatic BP library normal fits the 12/6 exam figures. | - |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+
+This case was labelled straightforward PD, but its data (4-month subacute course with weekly falls, wide-based gait, near-syncope with a 30/20 mmHg orthostatic fall, urge incontinence, jerky bilateral tremor, cold pale hands, symmetric signs) described probable MSA. As plan C21 decided, the label stays and the data now describe clinically probable PD in a 69-year-old woman: 20 months of right-hand pill-rolling rest tremor spreading to the left hand after a year, right-predominant bradykinesia and rigidity, Pisa posture, no falls, a narrow-based gait, an orthostatic fall of 12/6 mmHg, urgency without incontinence, depressed mood on fluoxetine, MoCA 26. The policy is MRI only (required); vitamin B12 and copper after her Roux-en-Y bypass, a neuropsychological battery (rewritten to MoCA 26, GDS 7/15) and a medication review are optional; the seed's self-injury literature is gone and the DaTscan is waste (stored abnormal report). The drug output now gives real interactions (fluoxetine with MAO-B inhibitors and with metoprolol, metoprolol and standing BP, variable levodopa absorption after bypass). The musts are probable PD, levodopa titrated to response, agonist caution, active treatment of depression, and physiotherapy.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+
+- Plan R1: `[NICE_NG71]` (levodopa and agonist musts, DaTscan waste) is not yet in the PD criteria pack.
+- Plan R5: library MIBG default normal (not on this pathway).
+
+## Open questions for Andrea (judgment calls you could not settle)
+
+- Plan Q3 applies: this case was rewritten from a subacute MSA-like course into a typical 20-month PD history rather than relabelled; its seed (`metadata.source_pmcid` PMC8572327, self-injurious behaviour in atypical parkinsonism) no longer describes the case content. The provenance field was kept as the seed record.
+
+## Verification (adversarial verifier, 24 Oct 2026)
+- Read the log, the diff and the whole final case (C21 rewrite: high risk). No PD notes file exists.
+- Checked the C21 data fix field by field: 20-month history, right hand first and left hand at 12 months (HPI "past 8 months" fits), no falls, one near-fall, narrow-based gait, orthostatic 148/88 to 136/82 (12/6), urgency without incontinence, no near-syncope, MoCA 26 with four points listed and a battery that matches it; no "jerky" tremor or cold hands left; lab panel names (`vitamin_B12`, `copper`, `serum_copper`, `ceruloplasmin`) are all in `costs.yaml`; drug output pharmacology correct (fluoxetine CYP2D6 inhibition raises metoprolol; levodopa absorption after Roux-en-Y).
+- Found and FIXED:
+  - `ground_truth.key_clinical_evidence[4]` asserted "B12 and copper normal", which comes from an optional lab criterion (plan C15: evidence restates patient data or required/recommended results only). Now restates the exam: no myelopathy or neuropathy signs, so no clinical picture of copper or B12 deficiency.
+  - `ground_truth.key_clinical_evidence[3]` said Pisa syndrome "does not argue against" PD. An early postural deformity (Pisa) is a supportive MSA feature (MDS 2022), so the line now says Pisa occurs in PD and that MSA criteria are not met without urge incontinence, orthostatic hypotension or cerebellar signs. The MSA differential `key_features` now names the Pisa posture as the feature it weighs (likelihood stays `low`).
+- Checks re-run after verification: `perfect_agent.py -v` pass; `case_io.py check` schema OK, no failure names the case; `test_case_guards -k` pass; MockServer routing: DaTscan, MIBG and amyloid return their own modality (case or library), PSG and battery return the case report where stored, `check_drug_interactions` with `drug: levodopa` and `drug: rasagiline` return the case output, labs route to the stored panel where one exists; grep for established / gadolinium / "Abnormal values:" / Lewy / serotonin syndrome / Tier per / July 2026 / dashes: only allowed hits.
+
+## Condition audit
+
+2026-10-24, PD condition auditor.
+
+- `action-4-interpret-labs.rationale`: "so the check is optional" was tier wording; now "so the check does not change the diagnosis". Tier unchanged.
+- `fallback_tool_outputs.csf`: CSF glucose 62 mg/dL with ratio 0.6 did not fit the stored serum glucose of 142 mg/dL (true ratio 0.44, which would read as low). Glucose now 85 mg/dL (ratio 0.6), interpretation now states the CSF glucose is in proportion to the raised serum glucose.
+- `initial_tool_outputs.drug_interactions.general.interactions[0]`: the fluoxetine sentence said both "use the lowest dose and monitor" and "best avoided", which conflict for fluoxetine; now "serotonin syndrome is rare, but fluoxetine and fluvoxamine are best avoided with rasagiline; at least 5 weeks should pass between stopping fluoxetine and starting rasagiline" (rasagiline product information). The must to avoid adding an MAO-B inhibitor to fluoxetine is unchanged.
+
+After the edits: `perfect_agent.py` 30/30 PD pass; every stored follow-up of the 30 cases is served for its own discriminator (MockServer probe); `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k PD-` 60 passed.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/PD-decisions.md`.
+
+- Accepted codes are now G20.A1 (PD without dyskinesia, without mention of fluctuations; also PD NOS) and G20; G20.A2, G20.B1, G20.B2 (motor complications the case does not have) and G20.C ("Parkinsonism, unspecified", not PD) are no longer accepted. Labels unchanged.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: MDS-UPDRS III 29/132 OFF, 16/132 ON (45%) (fallback_tool_outputs.clinical_assessment). Why: rule 3: the stored exam documents parkinsonism; the library reports MDS-UPDRS III 3/132 with no parkinsonian signs.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: TUG 12.7 s, 10 m 1.01 m/s, Berg 49/56 (followup request_gait_and_balance_timed). Why: rule 3: the stored gait exam (arm swing, stride, turns, pull test) is abnormal; the library reports a normal gait, turns in 3 steps and Berg 56/56.
+- `perform_clinical_assessment {assessment_type: cognitive_screen}`: MoCA 26/30 as in the exam (followup request_cognitive_screen). Why: rule 3: the stored exam records this MoCA and its items; the library reports MoCA 28/30 with other items.
+- `perform_clinical_assessment {assessment_type: orthostatic_blood_pressure}`: 148/88 supine, 136/82 at 3 min (as in the exam) (followup request_orthostatic_blood_pressure). Why: rule 3: the stored exam records orthostatic vitals; the library reports supine 128/78 and other numbers.
+- `order_specialized_test {test_type: olfactory_test}`: UPSIT 26/40 (moderate microsmia) (fallback_tool_outputs.specialized_test). Why: rule 1: olfactory loss is a supportive feature of PD; the library reports normosmia (UPSIT 35/40).
+- `order_advanced_imaging {modality: MIBG_scan}`: early H/M 1.44, delayed 1.25, washout 39% (fallback_tool_outputs.advanced_imaging). Why: rule 1: cardiac sympathetic denervation is a supportive criterion of PD; the library reports normal uptake (H/M 2.4/2.6).
+
+Checks: `perfect_agent.py` 30/30 PD pass; `test_case_guards.py -k PD-` and `pytest agent-platform/tests -k PD-` 300 passed (`test_grpo_rollout.py` not collected: training extra not installed); every criterion's served output unchanged (snapshot before/after); synonym guard 0 changes; no new report repeats a 60-character window of any `expected_evidence`; every listed term is answered without the library.

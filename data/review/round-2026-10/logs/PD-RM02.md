@@ -1,0 +1,101 @@
+# PD-RM02
+Reviewer status: R1 none, R2 none (PD has no notes file; only the July 2026 tool review, `condition_tool_guidance.yaml` key `parkinsons`) | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| (none) | - | No physician note exists for PD. The case was corrected against plan PD (classes C1 to C23, per-case entry PD-RM02) and the July 2026 tool review (MRI required, labs targeted, ECG and EEG removed, autonomic and tilt testing removed). |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| C | critical | `followup_outputs` DaTscan (`request_optional_datscan_for_live_degenerative_differential`) | Laterality reversed: the left putamen was the more reduced (SBR 0.94 vs 1.28) for left-predominant signs; the dopaminergic deficit is contralateral to the worse side. Signal strings in a non-standard format. | FIXED: right putamen 0.94, left 1.28, caudates 2.40 and 2.62; binary C8 report ("more marked in the right posterior putamen ... Presynaptic dopaminergic deficit"); trigger `request_datscan`; tracer "123I-ioflupane SPECT". |
+| C | major | criterion `action-7-order-advanced-imaging` | DaTscan `optional`, while the case turns on degenerative versus drug-related parkinsonism (valproate, past olanzapine) and the musts relied on it (plan RM02). | FIXED: `required`, rationale [Marshall_2009], evidence from the report; in the stop rule; the soft "MRI before DaTscan" constraint kept with the canonical reason. |
+| D | major | `followup_outputs[0]`, `[2]` (literature), criterion `action-3-search-medical-literature` | Required literature criterion; two literature follow-ups whose summaries resolve the case (C1). | FIXED: criterion and both follow-ups deleted; removed from the stop rule. |
+| C | major | `followup_outputs[1]` (`request_valproate_drug_interaction_check`), criterion `action-2-check-drug-interactions` | Required drug criterion with exact `drug` and `current_medications` strings; drug result filed as a follow-up (C2). | FIXED: follow-up deleted; one `initial_tool_outputs.drug_interactions.general` with the canonical valproate, clonazepam and orthostatic-drug (tamsulosin, amlodipine) sentences, proposed "Carbidopa-levodopa (proposed)"; criterion `{}`, `recommended` (plan), last; leak test passes. |
+| A | major | `ground_truth.action_criteria[action-1-analyze-brain-mri]` | MRI argument pinned (C5); rationale copied the label (C3). | FIXED: `analyze_brain_mri {}`; rationale adds the encephalitic sequelae question; evidence restates the report. |
+| C | major | criterion `action-4-interpret-labs`, `initial_tool_outputs.labs` | Labs `optional` with a three-panel argument; RPR without a risk factor; interpretation in the old "Abnormal values:" form (C11). | FIXED: `recommended` with one-item alternatives `valproate_level` and `ammonia`; RPR removed; interpretation "Abnormal: ammonia 58 umol/L (high). Other results within reference ranges." |
+| B | major | `patient.neurological_exam.mental_status` | MoCA losses gave verbal fluency 2 points; the MoCA fluency item is worth 1. | FIXED: trail-making 1, serial 7s 1, fluency 1, abstraction 1, delayed recall 2 (sum 6, total 24/30). |
+| B | major | `initial_tool_outputs.mri` | "No abnormal meningeal enhancement" on a non-contrast study; impression claimed a normal substantia nigra on SWI with no matching finding; Evans index 0.30 called "within normal limits" (0.30 is the threshold); interpretive "not suggestive of NPH"; duplicate small-vessel line; impression omitted its own white matter finding. | FIXED: enhancement and SWI claims removed; Evans "0.30"; observations reworded (thalami, nigra and mesial temporal lobes normal, for the post-encephalitic question); impression lists the Fazekas 1-2 change and the proportionate ventricles. |
+| E | minor | `followup_outputs` neuropsych | Auto-generated "Abnormal values:" impression; em dashes in test names (C10). | FIXED: C10 impression (frontal-subcortical profile, MoCA 24/30, recall and naming preserved); test names cleaned; trigger `request_neuropsych_testing`. |
+| B | minor | `followup_outputs` PSG | Auto-generated impression; REM latency reference "90-120 minutes" (normal is about 70-120); RSWA reference "<5%" instead of the SINBAR cut-off; behaviour row with an em dash (C10). | FIXED: references corrected; C10 impression (RSWA 48%, dream enactment on video, AHI 3.2/h, PLMI 22/h); trigger `request_sleep_study`. |
+| C | major | `ground_truth.assessment.required_recommendations` | Six generic or process musts ("Apply MDS criteria", "Document temporal sequence", "Use DaTscan and RBD evidence"), and levodopa "once underlying PD is confirmed" without a dose (C16). | FIXED: five musts: clinically probable PD (rest tremor the only supportive criterion; no absolute exclusion; the DaTscan deficit is not explained by valproate); mood stabiliser changes with psychiatry (lamotrigine option); canonical levodopa start; RBD bedroom safety (two falls from bed); quetiapine or clozapine if an antipsychotic is ever needed. |
+| C | minor | `ground_truth.assessment.prohibited_recommendations` | D2 prohibitions split in two with pimavanserin; anticholinergic wording generic. | FIXED: canonical D2 prohibition; abrupt valproate withdrawal; anticholinergics in this older patient with cognitive slowing. |
+| C | major | `ground_truth.differential` | Valproate parkinsonism `high` and olanzapine `moderate` although the work-up shows a presynaptic deficit (C13); post-encephalitic parkinsonism, the case's main named confounder, missing. | FIXED: all `low` (MSA `very_low`) with their excluding data; valproate "coexisting contributor"; post-encephalitic parkinsonism and valproate hyperammonaemia added. |
+| E | minor | `ground_truth.key_clinical_evidence` | Two "July 2026" lines (C4); em dashes; "current regimen must still be screened" (policy, not evidence). | FIXED: six case items (signs, timeline, exclusions, DaTscan, levels, bipolar treatment limits). |
+| B | minor | `ground_truth.red_herrings` | Relied on "abnormal DaTscan would establish"; encephalitis anchor missing; field paths not indexed. | FIXED: valproate, olanzapine and encephalitis red herrings with indexed field paths. |
+| A | minor | `ground_truth.sequence_constraints`, `.stop_rule` | Labs-before-drug constraint (plan: delete); stop rule held literature and drug ids (C20). | FIXED: only MRI before DaTscan (soft); stop rule MRI and DaTscan, `max_additional_actions` 2. |
+| A | minor | `ground_truth.avoided_actions` | Generic rationales; no autonomic or tilt guard (plan 3.3). | FIXED: EEG, CSF, echo, monitoring and ECG rationales case-specific; autonomic testing and tilt table `waste` added. |
+| A | minor | `fallback_tool_outputs.echo`, `.ecg` | Echo without `echo_type` (C17); ECG with the removed `clinical_correlation` key. | FIXED: "TTE" with concrete findings; key removed, findings "Sinus rhythm 63/min, normal axis and intervals, no ST change." |
+| B | minor | `metadata.difficulty_description`, `.difficulty_rationale`, revision fields | "premotor features predated these exposures": valproate has been taken for 20 years, so only the encephalitis is predated; "3 required tool actions" text (C19). | FIXED: description states that RBD and constipation predate the illness and the motor onset follows olanzapine withdrawal; rationale, citation gap ([NICE_NG71]), revision fields and `last_revised` 2026-10-24. |
+| E | minor | `patient.neurological_exam.additional` | Em dash in the glabellar sentence. | FIXED: "(Myerson sign: fails to habituate)". |
+| - | check | plan 3.6 | perfect_agent ok (MRI and labs `<- ?` are the dump-comparison labels; the routing probe confirms the case MRI and labs answer); case_io check clean (3 failures elsewhere, none names this case); test_case_guards pass; routing: DaTscan, PSG, battery and drug (levodopa, rasagiline, none) from the case; MIBG, FDG, amyloid, genetics and orthostatic from the library (consistent: no orthostatic symptom or figure in the case). No em dash left in the file. | - |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+
+The DaTscan now shows the deficit on the correct side, the right posterior putamen for his left-sided signs, and it is required: it is what separates PD from a parkinsonism caused by valproate or past olanzapine. Literature and the drug follow-up are gone; the medication review is recommended and names valproate (parkinsonism, raised ammonia, switch only with psychiatry), clonazepam (falls) and tamsulosin with amlodipine (orthostatic fall with levodopa). Labs are recommended for the valproate level or the ammonia. The MoCA items now add up correctly (fluency is a 1-point item), and the MRI no longer reports contrast enhancement or an SWI nigra finding it did not have. Musts: clinically probable PD with no absolute exclusion, mood stabiliser changes through psychiatry, levodopa started at 150 mg/day and increased to 300 mg/day, RBD bedroom safety after two falls from bed, and quetiapine or clozapine if an antipsychotic is ever needed. Valproate and olanzapine parkinsonism and post-encephalitic parkinsonism are all low, each with its excluding evidence.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+
+- Plan R1: `[NICE_NG71]` used per the plan; not yet in the PD pack.
+- Plan R5: the library DaTscan (normal), PSG and neuropsychological defaults would contradict this case; it stores its own reports.
+
+## Open questions for Andrea (judgment calls you could not settle)
+
+- Labs are `recommended`, not required: the valproate level and ammonia tell how much valproate contributes, but they do not change the diagnosis once the DaTscan is abnormal. Raise to required if you want the agent to document the level before any switch.
+- The ammonia of 58 umol/L is mild and asymptomatic beyond slowing; the musts do not ask for a specific action on it beyond psychiatric planning. Say if you want a repeat-ammonia must.
+
+## Verification
+Adversarial verifier, 24 Oct 2026. Read the log, the checkpoint diff (b8be2153) and the whole final case. Checked: the laterality correction is right (left-predominant signs, right posterior putamen most reduced; the plan header "DaTscan asymmetric L>R" described the old, reversed report); DaTscan required and in the stop rule, soft MRI-before-DaTscan constraint valid; timeline (olanzapine stopped about 20 months ago, motor onset 10 to 12 months ago, RBD 24 months and constipation 36 months before, illness 18 months ago) consistent across HPI, must, differential, evidence and red herrings; MoCA 24 sums (1+1+1+1+2 lost) and matches the battery; valproate 72 and ammonia 58 consistent in labs, criterion, musts and evidence, ammonia flagged correctly; valproate and olanzapine ICD codes (G21.19, G21.11) correct; drug output uses the canonical sentences and only his own medicines; routing serves the case labs (valproate and ammonia orders), DaTscan, PSG, battery and drug output.
+No defect found; no change made. The two open questions in the log (labs recommended rather than required; no repeat-ammonia must) are sound defaults and stay as recorded.
+
+## Condition audit
+
+2026-10-24, PD condition auditor.
+
+- `fallback_tool_outputs.csf.glucose_ratio`: 0.6 against CSF 62 / stored serum 94 mg/dL; now 0.66.
+
+After the edits: `perfect_agent.py` 30/30 PD pass; every stored follow-up of the 30 cases is served for its own discriminator (MockServer probe); `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k PD-` 60 passed.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/PD-decisions.md`.
+
+- Accepted codes are now G20.A1 (PD without dyskinesia, without mention of fluctuations; also PD NOS) and G20; G20.A2, G20.B1, G20.B2 (motor complications the case does not have) and G20.C ("Parkinsonism, unspecified", not PD) are no longer accepted. Labels unchanged.
+- `metadata.citation_gap` cleared: `[NICE_NG71]` is in the PD pack now.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Lab evidence (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited results its own order (the first alternative) no longer returned; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-4-interpret-labs]`.alternatives: was [valproate_level] | [ammonia]; now [valproate_level, ammonia] | [valproate_level] | [ammonia].
+- Decision: serve: new first alternative (old order kept as an alternative). The label is valproate level and ammonia; a must, the key evidence and the hyperammonaemia differential rely on ammonia 58. The first order named only the level.
+- Scoring: none (recommended criterion: coverage unchanged, not in the cost reference).
+
+Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.
+
+## Batch-5 vocabulary (25 Oct 2026)
+
+Commit c02f3050 added `cysticercosis_serology`, `IGRA` (interpret_labs), `olfactory_test` (order_specialized_test) and `levodopa_challenge` (perform_clinical_assessment); `HBV_DNA` (interpret_labs) was added the same day for this round. The requests are now wired into the case.
+
+- New optional criterion `olfactory-test` (`order_specialized_test {test_type: olfactory_test}`, `action_criteria[5]`, before the medication review) and its follow-up `request_olfactory_test_upsit` (`followup_outputs[3]`): UPSIT 23/40, severe microsmia, below the normal range for age and sex. Before, an olfactory order got the library's normosmia (35/40), which contradicts the smell loss in the history. Optional: the test can add an MDS supportive criterion but changes no management. No scoring change for an agent that does not order it.
+- `ground_truth.assessment.required_recommendations[0]`: rewritten so the smell loss counts as a supportive criterion once a validated test confirms it (UPSIT 23/40), instead of saying it cannot be tested.
+- `ground_truth.key_clinical_evidence[0]`: rewritten so the smell loss counts as a supportive criterion once a validated test confirms it (UPSIT 23/40), instead of saying it cannot be tested.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: MDS-UPDRS III 34/132 OFF, 19/132 ON (44%) (fallback_tool_outputs.clinical_assessment). Why: rule 3: the stored exam documents parkinsonism; the library reports MDS-UPDRS III 3/132 with no parkinsonian signs.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: TUG 13.6 s, 10 m 0.95 m/s, Berg 48/56 (followup request_gait_and_balance_timed). Why: rule 3: the stored gait exam (arm swing, stride, turns, pull test) is abnormal; the library reports a normal gait, turns in 3 steps and Berg 56/56.
+- `perform_clinical_assessment {assessment_type: cognitive_screen}`: MoCA 24/30 as in the exam (followup request_cognitive_screen). Why: rule 3: the stored exam records this MoCA and its items; the library reports MoCA 28/30 with other items.
+- `order_specialized_test {test_type: speech_language_evaluation}`: hypophonia, articulation precise (63 dB SPL), no aphasia (fallback_tool_outputs.specialized_test). Why: rule 3: the stored exam records hypophonia; the library reports no motor speech disorder.
+- `order_advanced_imaging {modality: MIBG_scan}`: early H/M 1.36, delayed 1.16, washout 43% (fallback_tool_outputs.advanced_imaging). Why: rule 1: cardiac sympathetic denervation is a supportive criterion of PD; the library reports normal uptake (H/M 2.4/2.6).
+
+Checks: `perfect_agent.py` 30/30 PD pass; `test_case_guards.py -k PD-` and `pytest agent-platform/tests -k PD-` 300 passed (`test_grpo_rollout.py` not collected: training extra not installed); every criterion's served output unchanged (snapshot before/after); synonym guard 0 changes; no new report repeats a 60-character window of any `expected_evidence`; every listed term is answered without the library.

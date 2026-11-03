@@ -33,12 +33,12 @@ list, which reported legal values as illegal:
 
 | Tool | Parameter | Values |
 | --- | --- | --- |
-| `order_advanced_imaging` | `modality` | 17 (`amyloid_PET`, `tau_PET`, `FDG_PET`, `amino_acid_PET`, `cardiac_FDG_PET`, `DaTscan`, `MIBG_scan`, `perfusion_MRI`, `CT_perfusion`, `cardiac_MRI`, `coronary_CTA`, `coronary_angiography`, `MR_spectroscopy`, `MR_angiography`, `MR_venography`, `carotid_duplex`, `transcranial_doppler`) |
-| `order_specialized_test` | `test_type` | 21, plus `genetic_panel:<panel>` for 15 panels |
-| `order_body_imaging` | `study` | 12 (`<region>_<modality>` over pelvis/abdomen, chest, chest-abdomen-pelvis, mediastinum, spine, peripheral nerve) |
-| `order_microbiology` | `specimen` | 5 |
-| `obtain_tissue_diagnosis` | `procedure` | 3 (`resection`, `stereotactic_biopsy`, `lymph_node_biopsy`), plus 11 molecular assays |
-| `perform_clinical_assessment` | `assessment_type` | 4 |
+| `order_advanced_imaging` | `modality` | 22 (`amyloid_PET`, `tau_PET`, `FDG_PET`, `perfusion_SPECT`, `amino_acid_PET`, `cardiac_FDG_PET`, `DaTscan`, `MIBG_scan`, `perfusion_MRI`, `CT_perfusion`, `cardiac_MRI`, `coronary_CTA`, `coronary_angiography`, `cerebral_angiography`, `MR_spectroscopy`, `MR_angiography`, `MR_venography`, `carotid_duplex`, `transcranial_doppler`, `functional_MRI`, `DTI_tractography`, `whole_body_FDG_PET`) |
+| `order_specialized_test` | `test_type` | 24, plus `genetic_panel:<panel>` for 19 panels |
+| `order_body_imaging` | `study` | 16 (`<region>_<modality>` over pelvis/abdomen, testis, chest, chest-abdomen-pelvis, mediastinum, spine, peripheral nerve, leg veins, temporal arteries) |
+| `order_microbiology` | `specimen` | 10 |
+| `obtain_tissue_diagnosis` | `procedure` | 5 (`resection`, `stereotactic_biopsy`, `open_biopsy`, `lymph_node_biopsy`, `temporal_artery_biopsy`), plus 21 molecular assays |
+| `perform_clinical_assessment` | `assessment_type` | 7, and `timing` (`baseline`, `post_intervention`) |
 
 `order_ct_scan` images the **head and neck only** and has no region parameter, so its
 discriminators (`contrast`, `angiography`) cannot distinguish a head-and-neck CTA from a
@@ -75,6 +75,102 @@ some cases). Library answers carry `from_fallback` and `library` on the observat
 `status: draft` until physicians have reviewed it; `tests/test_fallback_library.py` proves every
 legal order is answered in every case.
 
+### Which stored report answers an order
+
+The MockServer (`tools/mock_server.py`, with `tools/followup_matcher.py`) never answers one study
+with another study's report. Where a stored report names its study with a vocabulary term (the
+discriminator field: `specimen`, `modality`, `echo_type`, `eeg_type`, `test_type`, `procedure`,
+`assessment_type`, `monitor_type`; region and modality for `order_body_imaging`), it answers only
+an order for that study. This holds for initial outputs, follow-ups and, since the October 2026
+review, the case's own `fallback_tool_outputs`: a case fallback written as an `amino_acid_PET`
+report is not served for an `FDG_PET` order, which gets the library normal. A report that names
+its study in prose, or not at all, is not adjudicated and answers any variant, so case authors
+should write the term.
+
+- Follow-ups that do not describe the study ordered are dropped *before* the trigger matcher
+  chooses among siblings (SE-M05: the MRI follow-up won a tie against the ultrasound one and was
+  then refused, leaving the ultrasound order to the library).
+- The tool's own enum terms (`continuous_icu`, `lumbar_puncture`, `pelvis_abdomen_MRI`) route as
+  study identities. A trigger token belonging to a term the call does not name never counts, so
+  free text recalling another study of the same tool does not route to it; a term the call
+  implies through the schema default counts only when the trigger names it whole; a term named
+  explicitly counts unless the initial output already is that study.
+- `analyze_eeg` is routed by `eeg_type` (24 Oct 2026), read with its schema default: an order
+  without it is a routine EEG, so a routine order is not answered with a stored video-EEG or ICU
+  recording. `video` and `continuous_icu` are one study for routing (`MockServer._SAME_STUDY`,
+  prolonged video-EEG monitoring per the ACNS 2015 consensus). When the initial output is the
+  study named, the first order gets it and a repeat order the follow-up of that study, so a
+  trigger repeating the index term (`request_continuous_eeg_monitoring` behind a `continuous_icu`
+  index) no longer captures the index order. Every stored EEG report and EEG case fallback names
+  its `eeg_type` (`test_case_guards.py`); a fallback that cannot name one recording is null.
+- `analyze_brain_mri.contrast` defaults to false: gadolinium is given on an indication. A report
+  stating `contrast_used` answers only an order with that value (`MockServer._FLAG_DISCRIMINATOR`);
+  `None`, the default, is not adjudicated. Only ALZ-EARLY-RS06 states it, because it is the one
+  case storing both a non-contrast and a contrast MRI; elsewhere there is one stored MRI and no
+  other study to route a mismatched order to. Library MRI reports set it from the order and drop
+  their post-gadolinium sentences for a plain order.
+- `order_cardiac_monitoring` routes by tier: hours to a week (telemetry, Holter), weeks (event
+  monitors), months (loop recorder). A stored recording answers an order of its own tier or a
+  longer one, never a shorter one: a Holter order is not answered by a 30-day monitor or a loop
+  recorder, whose paroxysmal AF the short recording might miss. The tier is read from
+  `duration_hours`, else from `monitor_type`. `device_interrogation` answers, and is answered by,
+  only its own type.
+- Two tools have a second routed parameter, read with its schema default
+  (`MockServer._SECONDARY_DISCRIMINATOR`, 24 Oct 2026): `perform_clinical_assessment.timing`
+  (`baseline` unless stated) and `analyze_csf.source` (`lumbar_puncture` unless stated). A stored
+  report whose field names a term answers only an order of that term, and an order that leaves the
+  parameter out names the default: the NPH baseline gait order is not answered by the stored
+  post-tap reassessment, and a tap test is not answered by NPH-P08's lumbar drainage. An empty
+  field is not adjudicated.
+- A plain re-order follow-up escalates past the initial output only on a repeat order of the same
+  study (same routed parameters, defaults resolved). A first order of one study after another
+  study of the same tool is not a repeat (NPH R5).
+- An `interpret_labs` order receives only the stored panels that answer the assays it names
+  (24 Oct 2026, `tools/lab_matching.py`): a panel answers an assay when its name is the assay or
+  one of its rows is a component the library reports for it (`CBC` is WBC, haemoglobin,
+  platelets...); urinalysis, blood gas, BAL and protein electrophoresis answer by name only.
+  Interpretation sentences and summary lines that name only dropped tests are dropped with them.
+  An ordered assay no stored panel answers gets the case fallback's panel, else the library
+  normal, or a "not available" sentence in a recorded case; it never gets the first-line labs
+  again. A criterion therefore sees only the panels its own order names: its
+  `expected_evidence` should not cite a result of a panel the order does not name.
+- One `interpret_labs` order naming assays stored in different payloads receives each of them:
+  the served payload, plus the panels of the initial output or of the follow-up whose trigger
+  names that assay alone, for every ordered assay the served payload does not name in its panel
+  names and row tests (`MockServer._merge_lab_order`; MG-P04, SE-P05, SE-M08, FTD-M05). A repeat
+  measurement of an assay the served payload already carries is not merged.
+
+A library normal answers a study the case does not store, and for an alternative study on the
+case's own pathway it can contradict the case (a normal FDG-PET where the case stores an abnormal
+amyloid PET). A criterion alternative should therefore be a study the case stores; the monitoring
+tiers above are the one place where the MockServer bridges the gap itself.
+
+### Recorded cases: "not available"
+
+A case with `provenance: record` (a real admission, e.g. MIMIC-IV) holds the results of what
+the clinicians ordered and nothing else. It may not carry `fallback_tool_outputs` (the schema
+refuses it), and the library tier is skipped: an order with no recorded result fails with
+`Not available: <tool> (<parameter>=<value>) was not performed during this recorded encounter`,
+flagged `unavailable` on the observation. A normal library report would invent the patient's
+data. The price is that the agent learns the study was not done, which a synthetic case hides on
+purpose; that is a property of real records, and analyses of recorded cases should say so. The
+order is still placed and billed. `search_medical_literature` and `check_drug_interactions` read
+no patient data and are answered by the library as in any case.
+
+### Vocabulary packs
+
+`costs.yaml` has a `packs:` block below `tools:`. A pack adds rows to the vocabularies above and
+may not re-price a term under any spelling (`vocabulary.merge_packs` raises). The case's
+`domain` picks the packs its catalogue advertises (`vocabulary.DOMAIN_PACKS`): a `neurology`
+case (every NeuroBench case) sees `tools:` alone, so its catalogue is unchanged by any pack; a
+`general_medicine` case also sees the `general_medicine` pack (abdominal and limb X-ray,
+endoscopy, pleural, synovial and bronchoalveolar microbiology, percutaneous and endoscopic biopsy,
+lipase, ...). A tool declares which schema properties are vocabularies (`BaseTool.vocabulary`)
+and what to tell the agent about each pack's terms (`BaseTool.pack_notes`). The cost registry
+prices every pack. The review app's mirror covers the NeuroBench catalogue only. The pack's
+rates are provisional (see the comment in `costs.yaml`): verify them before a cost result on
+general-medicine cases is reported. `tests/test_general_medicine_harness.py` pins all of this.
+
 ### Execution-time validation
 
 The catalogue the agent sees is the contract. `BaseTool.execute` validates every call against
@@ -95,6 +191,13 @@ fallback rates: an unpriced value that reaches it is a configuration error.
 `analyze_csf.base`, and bills each entry of `special_tests` separately. Put the always-done
 panel in the `basic` annotation and only billable assays in `special_tests`. Merging them
 charges the basics a second time.
+
+`source` says where the fluid was drawn: `lumbar_puncture` (the default), `shunt_tap`,
+`external_ventricular_drain` or `lumbar_drain` (extended lumbar drainage, NPH-P08). It is an enum
+from the `analyze_csf.sources` block, priced at 0 like the MRI protocols except `lumbar_drain`,
+which adds the catheter procedure (CPT 62272) to `base`. A criterion names it only when the sample
+is not a lumbar puncture (shunt tap, EVD, lumbar drain). A stored CSF report carries `source` only
+when it is not a lumbar puncture, and the MockServer then serves it only for that source.
 
 ## Useless and harmful tools are parameter-scoped
 

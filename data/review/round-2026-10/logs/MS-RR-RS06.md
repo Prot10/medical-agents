@@ -1,0 +1,98 @@
+# MS-RR-RS06
+Reviewer status: R1 not reviewed, R2 not reviewed (no MS-RR notes file in this round) | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| (none) | - | No reviewer notes for this case. |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| D | major | `initial_tool_outputs.mri.findings[4]`, `.additional_observations[2]`, `.impression`, `.volumetrics` | Brain MRI reported the C3-C4 cord lesion, "No longitudinally extensive transverse myelitis" and the cervical cord in its impression (plan H). | FIXED: removed; "Spinal cord not assessed on this study."; count "8 supratentorial, 2 infratentorial"; numbered brain-only impression. |
+| B | minor | `initial_tool_outputs.mri.findings[2].location`, `.additional_observations` | "Left middle cerebellar peduncle and brachium pontis" (the same structure); "No restricted diffusion to suggest acute ischemia" and "No involvement of the area postrema..." phrased as answers to the differential. | FIXED: "Left middle cerebellar peduncle (infratentorial)"; observations as findings ("No restricted diffusion", "Area postrema, periaqueductal grey and hypothalamus normal"). |
+| B | major | `patient.neurological_exam.sensory` | Light touch and pinprick loss over the left arm with dorsal column loss: a left dorsolateral C3-C4 lesion gives ipsilateral touch, vibration and position loss, not ipsilateral pinprick loss below the level. | FIXED: light touch, vibration and joint position loss in the left hand and forearm; vibration and position reduced at the left great toe; pinprick and temperature intact. |
+| B | minor | `patient.neurological_exam.gait` | Spastic gait only, although the HPI describes a wide-based ataxic gait veering left; "Unable to walk on heels bilaterally" with right ankle dorsiflexion 5/5. | FIXED: wide-based spastic-ataxic gait with left circumduction and veering left; heel walking impaired on the left. |
+| B | minor | `patient.history_present_illness`, `patient.clinical_history.past_medical_history[1]`, `.medications[1]` | Worsening "after jogging" in a woman who takes light walks and has fallen twice in 3 days; fatigue "over the past year" in the PMH versus "6-8 months" in the HPI; ferrous sulfate listed as a current medicine although the PMH says the anaemia resolved 4 months ago. | FIXED: "after climbing the stairs at school"; fatigue 6-8 months; ferrous sulfate removed from current medicines (kept in the PMH). |
+| C | major | `followup_outputs[search_mcdonald_criteria_2017]`, `[search_nmosd_mogad_differentiation]` | 2017 criteria (4 regions, OCB substitute for DIT) presented as current; Filippi 2016 and Reich 2018 entries; second output with a NMOSD/MOGAD teaching summary. | FIXED: one general follow-up (`search_ms_diagnostic_criteria`, last) with the canonical 2024 text, Montalban 2025, Wattjes 2021, Wingerchuk 2015. |
+| A | major | `ground_truth.action_criteria[action-3]`, `[action-4]` | Literature search and drug check required with a typed 2017 query and non-schema keys (`proposed_class`, `screen_for`); free-text citations. | FIXED: both optional with `{}`; drug check cites `[NICE_NG220]`. |
+| A | major | `ground_truth.action_criteria[action-6]` | Labs criterion demanded 9 analytes (ESR, CRP, CMP, calcium, glucose; ESR and CRP are not even in the labs output). | FIXED: `{panels: [CBC, vitamin_B12, TSH, HIV]}`; evidence states the served results. |
+| A | major | `initial_tool_outputs.labs.panels`, `ground_truth.action_criteria` | The case claimed "AQP4-IgG and MOG-IgG negative" (metadata, KCE, differential) but no antibody row and no criterion existed. | FIXED: "Neuroimmunology" panel with "AQP4-IgG (cell-based assay)" and "MOG-IgG (live cell-based assay)", negative; new `action-aqp4-mog-cba` recommended (myelitis, plan tier). |
+| A | minor | `ground_truth.action_criteria[action-5]`, `[*]`, `.stop_rule`, `.sequence_constraints` | CSF required three assays together; label equal to rationale; stop rule 0 with literature and drug check; pre-LP constraint cited McDonald 2017. | FIXED: CSF optional with OCB or kFLC alternatives; canonical labels and case rationales; order brain MRI, spine, labs, AQP4/MOG, CSF, drug, literature; stop rule brain MRI, spine, labs, allowance 2; canonical soft constraint. |
+| B | minor | `followup_outputs[request_spine_mri].output` | Empty lesion descriptions. | FIXED: descriptions; numbered impression. |
+| C | major | `initial_tool_outputs.csf` | Myelin basic protein (F6); no kFLC; WBC 9, 4 bands, IgG index 0.74, synthesis 9.2 identical to RS05 (template carry-over); HSV and VZV PCR in an afebrile woman without encephalitis or rash; recital interpretation. | FIXED: WBC 7, protein 38, 5 bands, IgG index 0.88, synthesis 10.4, kFLC 27.6 (reference < 6.1); MBP and PCRs removed (VDRL and cytology kept); canonical interpretation. |
+| B | minor | vitamin D row, summary, interpretation, musts | 21 ng/mL, the same as RS01; labs interpretation pointed at the B12 value. | FIXED: 19 ng/mL; interpretation lists abnormal values only. |
+| C | major | `followup_outputs[check_drug_interactions].output` | Ofatumumab "no hepatitis B screen required" (HBV screening is required); ocrelizumab "REMS program" (none); teriflunomide said not to interact with oral contraceptives (it raises ethinylestradiol and levonorgestrel exposure); contraindications listed for other drugs instead of natalizumab; JCV retesting "every 6 months in JCV-positive patients" (retesting applies to seronegative or low-index patients); penicillin allergy under warnings. | FIXED: SmPC natalizumab contraindications; ocrelizumab, ofatumumab, DMF, glatiramer and cladribine dosing and safety per F11; formulary without REMS for ocrelizumab; teriflunomide line corrected; JCV wording by risk factor; contraceptive and allergy under interactions. |
+| C | major | `ground_truth.assessment.required_recommendations` | DIT must "the positive OCBs satisfy DIT" (2017 logic, F3); AQP4/MOG must with no stored result; IV-only steroid; smoking cessation in a never smoker; no physiotherapy for two falls. | FIXED: formulation must (two attacks, four regions, no separate DIT needed); oral or IV methylprednisolone per NG220 after excluding infection; physiotherapy and falls; Uhthoff counselling (worse after a hot shower); DMT with pregnancy planning; pre-DMT screening; vitamin D. |
+| C | minor | `ground_truth.assessment.prohibited_recommendations` | T8 (natalizumab JCV) and T9 (fingolimod ECG) without a decision in the case; the cervical radiculopathy label, the case's second distractor, not covered. | FIXED: T8, T9 removed; T7, B12, T10, T11, T12, T13 kept (B12 reworded); radiculopathy prohibition added. |
+| C | major | `ground_truth.differential` | NMOSD and MOGAD "high" and neurosarcoidosis "moderate" after a work-up that excludes them; neurosarcoidosis cited an elevated ACE and vasculitis "normal ESR/CRP not ordered" although neither was measured; no radiculopathy entry. | FIXED: all low with discriminating data from the case; unmeasured tests stated as not measured; cervical radiculopathy (M54.12) added. |
+| E | major | `ground_truth.key_clinical_evidence` | "2017 McDonald ... OCB fulfil DIT" (F3); OCT left RNFL thinning line although no OCT is served and the fundi are normal; ELISA teaching line; "carefully planted distractor"; engineering lines ("Tier per the July 2026 clinical review", "July 2026 review applied end to end"). | FIXED: six case-observable lines (cerebellar relapse and lesion, prior cord attack, DIS 4 of 5, CSF, AQP4/MOG negative, B12 low-normal). |
+| D | minor | `ground_truth.red_herrings` | "Carefully planted" style wording; the radiculopathy label not recorded. | FIXED: B12 red herring reworded; second red herring at `patient.clinical_history.past_medical_history[0]`. |
+| C | minor | `ground_truth.avoided_actions[*]` | Generic rationales; citations `[McDonald_2017]`, `[MAGNIMS_2016]`, `[Reich_2018]`. | FIXED: case-tied; `[Wattjes_2021]` for CT and PET. |
+| E | minor | `fallback_tool_outputs.echo`, `metadata.mcdonald_criteria_met`, `.difficulty_*`, `.educational_value` | No `echo_type`; "2017 McDonald criteria met ... all 4 regions"; "subclinical optic pathway involvement on OCT/VEP" (no such data). | FIXED: `TTE`; 2024 wording (4 of 5 regions); OCT/VEP claim removed. |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+
+A 32-year-old woman with 8 days of left limb and gait ataxia, left arm numbness and Lhermitte sign, after a 3-week left arm episode 11 months ago that was called cervical radiculopathy. The sensory exam now matches the left dorsolateral C3-C4 lesion (touch, vibration and position loss on the left, pinprick intact) and the gait is spastic-ataxic, as the history describes. The brain MRI reports the brain only (open-ring enhancing left middle cerebellar peduncle lesion, non-enhancing periventricular, juxtacortical and pontine lesions); the C3-C4 and T6 lesions are in the spine report. CSF values are no longer copied from RS05 (5 bands, kFLC 27.6), without MBP or PCRs. AQP4-IgG and MOG-IgG by CBA now exist as negative rows under a recommended criterion. The literature output is the 2024 summary, and the drug check is corrected (HBV screening for ofatumumab, teriflunomide and oral contraceptive, no ocrelizumab REMS). Musts: RRMS by two attacks and four regions; methylprednisolone oral or IV; physiotherapy; Uhthoff counselling; DMT with pregnancy planning; pre-DMT screening; vitamin D 19. The differential is all low and adds cervical radiculopathy; B12 228 and the radiculopathy label are the red herrings.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+
+- Citation keys `[McDonald_2024]`, `[Wattjes_2021]`, `[NICE_NG220]` (plan CENTRAL 1).
+- Diagnosis synonyms G35.B/G35.C and "demyelinating disease" (plan CENTRAL 2); not hand-edited.
+
+## Open questions for Andrea (judgment calls you could not settle)
+
+- The current left arm numbness and Lhermitte sign are 8 days old, but the only cervical lesion (C3-C4) does not enhance, and the only enhancing lesion is the cerebellar one. I kept it: symptomatic cord lesions do not always enhance, and the heat-sensitive return of an old lesion's symptoms during a new relapse is common. If you prefer the cord lesion to be active, faint enhancement at C3-C4 could be added to the spine report without changing the diagnosis or DIT.
+- B12 228 pg/mL is in the indeterminate range where many laboratories confirm with methylmalonic acid or holotranscobalamin. The labs have no MMA, so per the plan I did not add one, and I did not make it a must; a reviewer may want MMA as an optional check.
+- Kept wording: the T11 and T13 prohibition texts and `metadata.condition_name` carry em dashes from the original case text; I did not reword them.
+
+## Verification
+
+`perfect_agent.py MS-RR-RS06 -v`: pass; brain MRI <- initial MRI, spine <- `followup[0]`, labs and AQP4/MOG <- initial labs (expected shared-report warning; probe shows the Neuroimmunology rows served). Probes: CSF returns the initial CSF with kFLC 27.6, the drug check and literature their follow-ups. Brain MRI output has no cord lesion text. `case_io.py check`: schema and synonym guard OK, no test failure names MS-RR-RS06. `test_case_guards.py -k MS-RR-RS06`: 2 passed.
+
+## Verification (adversarial verifier, 24 Oct 2026)
+
+Checked against the committed worker version (b8be2153): every own-finding row against the case file (field by field read of the whole final case), the plan tier table (section 3.5), the stop rule, the sequence constraint, laterality and lesion-to-exam fit, timeline, allergies against drug outputs, leakage in the brain MRI (no cord text) and the literature/drug outputs (guards pass), PATTERNS classes (template numbers across RS01-RS06, 2017 facts, test-as-must, F2/F5 wrong facts), and the differential against the final results. No reviewer notes exist for MS-RR, so no note id can be missing. Re-run after the changes below: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, `test_case_guards.py -k` pass.
+
+Found: (1) CBC shared WBC 6.8, haemoglobin 13.1 and MCV 88.2 with RS02 (template carry-over, plan E): now WBC 6.3, haemoglobin 12.9, MCV 89.6 (no other field cites them). (2) The worker's two open questions are decided, not left to Andrea: the non-enhancing C3-C4 lesion stays (the current attack is carried by the enhancing cerebellar lesion; a symptomatic cord lesion need not enhance, and the diagnosis, DIS and scoring do not depend on it), and no MMA row or must is added (B12 228 is within the reference range, a test is not a must under plan B, and the lesion pattern and CSF exclude subacute combined degeneration). Drug output, contraception clause, sensory and gait fit the left dorsolateral C3-C4 and left MCP lesions. Changed: the three CBC values.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026 (uniformity scripts over all 30 MS-RR cases; edits through `case_io`; perfect agent, `case_io check` and the case guards clean afterwards).
+
+- `ground_truth.differential[4].icd_code` D86.85 -> D86.89: D86.85 is sarcoid myocarditis; neurosarcoidosis is D86.89, as in the other 11 MS-RR cases.
+- `ground_truth.differential[6].icd_code` G04.81 -> G04.00: G04.81 is other encephalitis; ADEM is G04.00, as in the other 8 MS-RR cases.
+- `action-3-search-medical-literature.label` "Literature search (background evidence only)" -> "Literature search on the current MS diagnostic criteria": engineering text replaced by the topic of the stored output.
+- `assessment.prohibited_recommendations[4]` chronic-steroid prohibition set to the condition's canonical text (was "Do not use chronic oral corticosteroids as a maintenance treatment for MS [em dash] they are ineffective long-term and carry significant harm").
+- `assessment.prohibited_recommendations[6]` spinal-cord prohibition set to the condition's canonical text (was "Do not omit spinal-cord MRI in a patient with myelopathic signs even if the brain MRI alone meets DIS criteria [em dash] cord lesions change relapse counting and management").
+- `initial_tool_outputs.labs`: the AQP4-IgG and MOG-IgG rows moved to a new `followup_outputs` entry (`interpret_labs`, trigger `request_aqp4_mog_cell_based_assay`, panel `Neuroimmunology`, placed after the imaging follow-ups). Served in the initial labs payload, they answered the mimic-exclusion panel order as well, so an agent learned the result of `action-aqp4-mog-cba` without ordering it (perfect-agent warning "answered with the same stored report"); the MockServer now serves them only to an order that names the assays (checked for all three alternatives and both orders).
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (`plans/MS-RR-decisions.md`). What changed and why:
+
+- Diagnosis synonyms (`diagnosis_synonyms.yaml` G35 entry, re-applied with `apply_diagnosis_synonyms.py --prune --conditions multiple_sclerosis`): removed the label "demyelinating disease" (G37.9 is an Excludes1 of G35.A, and its tokens occur in an NMOSD, MOGAD or ADEM answer, which would have scored as correct) and the codes G35.B and G35.C (primary and secondary progressive MS in FY2026 ICD-10-CM, a different course from this relapsing-remitting case). Accepted now: the label, multiple sclerosis, MS, relapsing(-)remitting multiple sclerosis, RRMS; codes G35.A, G35, G35.D.
+- Checks: `perfect_agent.py` pass, `case_io.py check` clean for the case, `test_case_guards.py -k MS-RR-` passes with MS-RR now in `DISCRIMINATOR_CONDITIONS`.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Batch-5 vocabulary (25 Oct 2026)
+
+Commit c02f3050 added `cysticercosis_serology`, `IGRA` (interpret_labs), `olfactory_test` (order_specialized_test) and `levodopa_challenge` (perform_clinical_assessment); `HBV_DNA` (interpret_labs) was added the same day for this round. The requests are now wired into the case.
+
+- New optional criterion `action-7-interpret-labs-mma` (`{panels: [MMA]}`, after the AQP4/MOG criterion) and its follow-up `request_mma_methylmalonic_acid` (panel `MMA`, methylmalonic acid 0.22 umol/L, reference 0.00-0.40), placed after the AQP4/MOG follow-up and before the drug check. Optional, not recommended: B12 228 pg/mL is inside the reference range and the enhancing lesions and oligoclonal bands already exclude subacute combined degeneration, so the test confirms rather than decides; ordering it is no longer unjustified. No scoring change for an agent that does not order it.
+- `ground_truth.differential[B12 deficiency myelopathy].key_features`: the normal methylmalonic acid added to the Against list.
+
+## Library contradictions (25 Oct 2026)
+
+- `order_specialized_test {test_type: ssep}`: 1. Prolonged left tibial cortical P37 latency (47.0 ms) with a normal lumbar N22, indicating central somatosensory conduction delay above the lumbar cord. 2. Prolonged left median N13-N20 interpeak latency with... (fallback_tool_outputs.specialized_test). Why: rule c: reduced vibration and joint position sense in the left hand and forearm and at the left great toe with a left dorsolateral C3-C4 and a dorsal-column T6 lesion; the library reports a normal study.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: Abnormal timed gait and balance assessment. Timed Up and Go 15.1 s and 10 m walk speed 0.84 m/s are slowed for age; Berg balance 42/56. (fallback_tool_outputs.clinical_assessment). Why: rule d: the examination documents a gait disorder (wide-based spastic-ataxic gait with left leg circumduction, veering to the left); the library reports a normal study.
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 70, ECOG 2: ambulatory and capable of all self-care, unable to carry out work activities, up and about more than half of waking hours. (followup_outputs[request_performance_status]). Why: rule d: inpatient relapse with a documented gait disorder: Karnofsky 100 / ECOG 0 'without evidence of disease' contradicts the case; the library reports a normal study.
+
+Checks: perfect agent ok; case guards pass; snapshot diff shows no criterion answer changed; map verified (served without the library).

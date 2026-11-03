@@ -48,6 +48,10 @@ tools:
       thyroid: 28
       TSH: 23
       lipid: 18
+      # One assay under two spellings: `vitamin_B12` is the advertised name and `B12` resolves to
+      # it through vocabulary._ANALYTE_SYNONYMS (October 2026 review, VASC-DEM), so ground truth
+      # naming either is satisfied by an agent naming the other. Both rows stay so every case's
+      # spelling is still priced; one assay, one price (CPT 82607).
       B12: 18
       vitamin_B12: 18
       folate: 14
@@ -224,6 +228,10 @@ tools:
       Lyme_serology: 28
       hepatitis_B_surface_antigen: 18
       anti_HBc_IgG: 18
+      # HBV viral load (quantitative PCR), 25 Oct 2026 (labs-evidence CENTRAL): HEP-ENC-S05 stores HBV
+      # DNA 340 IU/mL on tenofovir and a must acts on it, but no term ordered it. CPT 87517
+      # (hepatitis B, amplified probe, quantification); recalled, to verify.
+      HBV_DNA: 43
       hepatitis_C_antibody: 18
       anti_JCV_antibody: 100
       BAL: 100
@@ -240,6 +248,72 @@ tools:
       urine_porphyrins: 37
       fecal_porphyrins: 37
       plasma_porphyrins: 37
+      # Requested by the October 2026 case review. HIV monitoring: ALS-P05 reported the viral load
+      # and CD4 count inside an `HIV` screen that names neither, and the immunocompromised
+      # meningitis cases (BACT-MEN P02, P03, RS04) turn on the CD4 count.
+      HIV_viral_load: 184        # CPT 87536, HIV-1 RNA quantification; priced as the CSF HIV_RNA
+      CD4_count: 46              # CPT 86361, absolute CD4 count by flow cytometry
+      # Beta-2 transferrin on a nasal or ear fluid: the CSF-leak test of recurrent meningitis
+      # (BACT-MEN-RP04 had no action to order it). CPT 86335, immunofixation of another fluid.
+      beta2_transferrin: 46
+      # Serum CrAg screening before antiretroviral therapy at CD4 < 200 (WHO 2022 cryptococcal
+      # guideline; BACT-MEN RS04, P03). Kept apart from the CSF assay, which `analyze_csf` prices
+      # as `cryptococcal_antigen`: one specimen, one tool. CPT 87327, priced as the CSF assay.
+      serum_cryptococcal_antigen: 46
+      # Moved from the general_medicine pack on 2026-10-24: alpha-fetoprotein, the hepatocellular
+      # carcinoma surveillance assay in cirrhosis (October 2026 review, HEP-ENC-M08). CPT 82105.
+      AFP: 21
+      # Requested by the October 2026 case review of Guillain-Barré syndrome: the Miller Fisher,
+      # pharyngeal-cervical-brachial and ophthalmoplegic cases (GBS P01, RM12, RM15, RS15) state
+      # an anti-GQ1b or anti-GT1a result that no assay could order (only `anti-GM1 IgM`, the
+      # AMAN / multifocal motor neuropathy antibody, was priced). Two terms, not one ganglioside
+      # panel, because a panel would price anti-GM1 a second time. CPT 83516 per antibody,
+      # send-out ELISA, priced as `anti-GM1 IgM`.
+      anti_GQ1b_IgG: 100
+      anti_GT1a_IgG: 100
+      # Botulinum neurotoxin in serum (and stool or gastric aspirate) by mouse bioassay or mass
+      # spectrometry, the confirmatory test of botulism, the descending-paralysis mimic of GBS
+      # (October 2026 review, GBS RM12, RS15). Done by public-health reference laboratories with
+      # no CMS rate (CPT 87798 at most covers a toxin-gene PCR); reference estimate, priced as a
+      # single-target PCR.
+      botulinum_toxin_assay: 184
+      # Plasma free metanephrines (metanephrine and normetanephrine), the screening test for a
+      # catecholamine-secreting paraganglioma before any anaesthesia (October 2026 review,
+      # GLIO-HG-RS01). CPT 83835.
+      plasma_free_metanephrines: 22
+      # Requested by the October 2026 case review of status epilepticus (SE-P05, organophosphate
+      # poisoning with electrographic status): the stored labs report plasma and RBC cholinesterase
+      # activities that no assay could order. Two terms, because they are two assays read
+      # differently: plasma (butyryl) cholinesterase falls first and recovers in weeks, RBC
+      # acetylcholinesterase mirrors synaptic inhibition [Eddleston_2008]. CPT 82480 and 82482.
+      plasma_cholinesterase: 9
+      RBC_cholinesterase: 18
+      # Serum neuron-specific enolase at 48 and 72 hours, the biomarker of the ERC-ESICM 2021
+      # multimodal prognosis after cardiac arrest (October 2026 review, SE-P03 and SE-M07 name it
+      # in their prognostication plan). CPT 86316.
+      NSE: 23
+      # Toxoplasma gondii IgG, the serostatus that makes toxoplasmic encephalitis likely in
+      # advanced HIV (October 2026 review, SE-M08). CPT 86777. IgM is not added: reactivation is
+      # IgM-negative and the opportunistic-infection guideline does not use it.
+      toxoplasma_IgG: 18
+      # Spot urine sodium, with serum and urine osmolality the SIADH work-up of hyponatraemia
+      # (October 2026 review, SE-M04 [Spasovski_2014]). CPT 84300, priced as serum sodium.
+      urine_sodium: 7
+      # Carbohydrate-deficient transferrin (% of total transferrin), the biomarker of sustained
+      # heavy drinking over the preceding two to three weeks (October 2026 review, FTD-M07: an
+      # alcohol use disorder beside a behavioural-variant FTD, whose value was removed for want of
+      # a term). CPT 82373.
+      CDT: 21
+      # Batch 5 (25 Oct 2026), requested by the FEPI-TEMP close-out (FEPI-TEMP-RS02: calcified
+      # neurocysticercosis, whose infectious panel was reachable only through the HIV, syphilis and
+      # hepatitis orders). Serum Taenia solium antibody by EITB (immunoblot) or ELISA; a negative
+      # result is common with single or only calcified cysts (IDSA/ASTMH 2017). CPT 86682
+      # (antibody, helminth, not elsewhere specified); recalled, to verify.
+      cysticercosis_serology: 15
+      # Interferon-gamma release assay (QuantiFERON-TB Gold Plus or T-SPOT.TB), the test of latent
+      # or past tuberculous infection behind a calcified-granuloma or tuberculoma differential
+      # (same request, FEPI-TEMP-RS02). CPT 86480 (QuantiFERON; T-SPOT is 86481); recalled, to verify.
+      IGRA: 71
     default_panel: 23
 
   analyze_csf:
@@ -275,6 +349,43 @@ tools:
       # Bilirubin/oxyhaemoglobin spectrophotometry after a negative or inconclusive NCCT in
       # suspected aSAH. This is a distinct priced assay; visual inspection is not a substitute.
       xanthochromia_spectrophotometry: 46
+      # Requested by the October 2026 case review of bacterial meningitis: the tuberculous and
+      # cryptococcal mimics (BACT-MEN P02, P03) stored their decisive CSF results with no assay
+      # an agent could name. One term for the mycobacterial work-up the WHO TB guideline sends
+      # together: AFB smear (CPT 87206), Xpert MTB/RIF Ultra (CPT 87556) and mycobacterial
+      # culture (CPT 87116).
+      mycobacterial_panel: 230
+      fungal_culture: 28        # CPT 87102, fungal culture with identification
+      india_ink: 9              # CPT 87210, wet mount with India ink
+      ADA: 37                   # CSF adenosine deaminase, CPT 82657 (enzyme activity)
+      # CSF cytomegalovirus PCR, requested by the October 2026 review of Guillain-Barré syndrome
+      # (GBS-P02: CMV polyradiculitis in advanced HIV; RM16, RP15 and RS18 stored a CMV PCR
+      # result that no order could name). CPT 87496, priced as HSV_PCR.
+      CMV_PCR: 184
+      # CSF Toxoplasma gondii and Epstein-Barr virus PCR, which separate toxoplasmic
+      # encephalitis from primary CNS lymphoma in a ring-enhancing lesion in advanced HIV
+      # (October 2026 review, SE-M08; NIH/CDC/IDSA opportunistic-infection guideline). CPT 87798
+      # each (single-target amplified probe), priced as HSV_PCR.
+      toxoplasma_PCR: 184
+      EBV_PCR: 184
+    # Where the CSF comes from. Billing does not change (`base` prices the sampling with the
+    # basic studies), as for the MRI `protocols` block; the block is the source of the
+    # `source` enum. Requested by the October 2026 review (BACT-MEN RS02: a shunt tap could not
+    # be told apart from a lumbar puncture, so it could not be scored). A shunt tap (CPT 61070)
+    # is priced like the LP it replaces; a sample drawn from an EVD has no procedure fee, so its
+    # bill is over-stated by the LP share of `base`.
+    #
+    # `lumbar_drain` (24 Oct 2026, NPH-P08): extended lumbar drainage through an indwelling
+    # catheter, about 10 mL/h for 72 h, the drainage trial after a negative tap test (Marmarou
+    # 2005). The one source billed on top of `base`: CPT 62272 (therapeutic spinal puncture for
+    # drainage of CSF, by catheter), recalled rather than looked up; the inpatient stay the trial
+    # needs is not billed, as for every other order. A source is named in a criterion only for a
+    # shunt tap, an EVD sample or a lumbar drain.
+    sources:
+      lumbar_puncture: 0
+      shunt_tap: 0
+      external_ventricular_drain: 0
+      lumbar_drain: 184
 
   order_ct_scan:
     # CPT 70450 (without contrast), 70460 (with contrast), 70496 (CTA head)
@@ -310,6 +421,13 @@ tools:
       # no honest substitute among the external monitors, so it gets its own row rather
       # than being mis-mapped onto a 30-day event monitor.
       implantable_loop_recorder: 4600
+      # Interrogation of an implanted pacemaker, ICD or loop recorder: the stored diagnostics
+      # (atrial high-rate episodes, AF burden, ventricular episodes) since the last check.
+      # Requested by the October 2026 review of vascular dementia (VASC-DEM-P08: a dual-chamber
+      # pacemaker's 12 months of atrial data was coded as an implantable loop recorder, so the
+      # study priced 4600 for a device already in place). CPT 93288 (in-person interrogation
+      # evaluation, pacemaker).
+      device_interrogation: 51
 
   order_advanced_imaging:
     # Closed vocab defined in dataset-generation/TOOL_PARAMETER_VOCABULARY.md
@@ -367,6 +485,20 @@ tools:
       MR_venography: 506
       carotid_duplex: 322
       transcranial_doppler: 230
+      # Pre-surgical functional imaging, requested by the October 2026 case review of high-grade
+      # glioma: 19 of 30 cases returned BOLD activation maps or tractography inside a report
+      # ordered as `perfusion_MRI` (or as `analyze_brain_mri`), and several required functional
+      # mapping that no action could order.
+      # Eloquence decides how much of a tumour can be removed (AIOM / EANO: resection as
+      # extensive as safely possible), so the study the decision rests on must be orderable.
+      functional_MRI: 552        # CPT 70555, BOLD fMRI with physician-administered paradigms
+      DTI_tractography: 368      # diffusion acquisition + CPT 76377 tractography post-processing
+      # Whole-body 18F-FDG PET/CT, skull base to mid-thigh: the occult-malignancy search of a
+      # paraneoplastic syndrome when CT is negative (October 2026 review, SYNC-CARD-RM01, anti-Hu
+      # brainstem encephalitis; Graus 2021). `FDG_PET` is the cerebral study and
+      # `cardiac_FDG_PET` the myocardial one: same tracer, three different acquisitions and
+      # questions. CPT 78815, priced as the brain study.
+      whole_body_FDG_PET: 1840
 
   order_specialized_test:
     # Closed vocab defined in dataset-generation/TOOL_PARAMETER_VOCABULARY.md
@@ -390,6 +522,38 @@ tools:
       ice_pack_test: 0
       respiratory_function: 92
       exercise_stress_test: 230
+      # Pure-tone and speech audiometry with tympanometry (CPT 92557 + 92567). Reinstated on
+      # 2026-10-24 (it was retired on 2026-08-05 as `pure_tone_audiometry`, unreferenced): the
+      # October 2026 review of bacterial meningitis requires a hearing test before discharge or
+      # within four weeks (WHO 2025, NICE NG240), and the cases could only state it as a must.
+      audiometry: 55
+      # Formal speech and language evaluation by a speech-language pathologist: motor speech
+      # (apraxia of speech, dysarthria), grammar, repetition, single-word comprehension and
+      # connected-speech analysis, which classify primary progressive aphasia into its variants
+      # (Gorno-Tempini 2011). Requested by the October 2026 review of early Alzheimer's disease
+      # (ALZ-EARLY-P02, logopenic PPA). Not a second `neuropsych_battery`: the battery screens
+      # language as one cognitive domain and does not assess motor speech. CPT 92523.
+      speech_language_evaluation: 175
+      # Requested by the batch-4 close-out of cardiac syncope (24 Oct 2026). Invasive
+      # electrophysiology study: HV interval, sinus node recovery, programmed stimulation for
+      # inducible VT, accessory-pathway refractory period (ESC 2018 syncope, Class IIa in
+      # bifascicular block and in syncope with prior infarction; ESC 2019 SVT for WPW risk
+      # stratification; SYNC-CARD RS04, M01, M02, RM03, P01). CPT 93620 (comprehensive EPS with
+      # induction), professional + facility; reference estimate, priced as cerebral angiography's
+      # catheter band.
+      electrophysiology_study: 2300
+      # Sodium-channel blocker challenge (ajmaline, flecainide or procainamide) under continuous
+      # 12-lead ECG with high precordial leads, to unmask a type 1 Brugada pattern (ESC 2022
+      # VA/SCD). No specific CPT code (an ECG-monitored drug infusion); reference estimate,
+      # priced as autonomic testing.
+      sodium_channel_blocker_challenge: 368
+      # Batch 5 (25 Oct 2026), requested by the PD close-out: a quantitative smell test (UPSIT,
+      # 40-item scratch-and-sniff, or Sniffin' Sticks threshold, discrimination and identification)
+      # scored against age and sex norms. Olfactory loss on a validated test is a supportive MDS
+      # criterion for Parkinson's disease (Postuma 2015); PD-M04 and RP01 could only state it in the
+      # examination. No specific CPT code (billed as unlisted 92700); reference estimate for the
+      # test kit and technician time, to verify.
+      olfactory_test: 46
     genetic_panels:
       ALS: 1840
       FTD: 1840
@@ -406,6 +570,26 @@ tools:
       porphyria: 1656           # HMBS, ALAS1, CPOX, PPOX
       small_fiber_neuropathy: 1380  # SCN9A, SCN10A, SCN11A
       PD: 1840                  # PRKN, PINK1, DJ-1, LRRK2, GBA, SNCA
+      # SDHA/B/C/D, SDHAF2, VHL, RET, NF1, TMEM127, MAX, FH. Requested by the October 2026 case
+      # review (GLIO-HG-RS01: a jugular foramen paraganglioma in a patient with a paraganglioma,
+      # a phaeochromocytoma and two affected relatives had no germline test to order).
+      hereditary_paraganglioma: 1380
+      # CACNA1A, ATP1A2, SCN1A and PRRT2, the familial and sporadic hemiplegic migraine genes
+      # (ICHD-3 1.2.3.1). Requested by the October 2026 review of migraine with aura (MIG-AURA
+      # M03, RM11, RS11, P09), where the test could only be written as a referral. CPT 81479
+      # (unlisted) for a four-gene panel; reference estimate, priced as the CADASIL panel.
+      hemiplegic_migraine: 1104
+      # Inherited arrhythmia syndromes: KCNQ1, KCNH2, SCN5A (long QT, Brugada), RYR2, CASQ2
+      # (CPVT) and the minor channelopathy genes. Requested by the batch-4 close-out of cardiac
+      # syncope (SYNC-CARD P03, P04, RP03; ESC 2022 VA/SCD, Class I in a proband with a clinical
+      # diagnosis). CPT 81413 (cardiac ion channelopathy panel, at least 10 genes); recalled,
+      # priced as the ALS panel.
+      inherited_arrhythmia: 1840
+      # Inherited cardiomyopathy: PKP2, DSP, DSG2, DSC2, TMEM43 (ARVC), LMNA, MYH7, MYBPC3, TNNT2,
+      # FLNC and the sarcomere genes (ESC 2023 cardiomyopathy, Class I in a patient with a
+      # diagnosed cardiomyopathy; SYNC-CARD P01, P02 and the conduction-disease cases). CPT 81439
+      # (inherited cardiomyopathy panel, at least 5 genes); recalled, priced as the ALS panel.
+      cardiomyopathy: 1840
 
   # --- Tools added after the July 2026 clinical tool review -------------------------------
   # The reviewers' structural finding: the action space could only image the brain and could
@@ -444,18 +628,53 @@ tools:
       spine_CT: 322
       peripheral_nerve_MRI: 460
       peripheral_nerve_ultrasound: 184
+      # Moved from the general_medicine pack on 2026-10-23: the October 2026 case review
+      # (ISCH-STR-P05) asked for the venous source of a paradoxical embolism to be imaged, and
+      # the case could only gesture at it from the D-dimer. CPT 93970, bilateral.
+      lower_extremity_venous_duplex: 170
+      # Moved from the general_medicine pack on 2026-10-24: the October 2026 review of hepatic
+      # encephalopathy (HEP-ENC M04, M08, S02, S06) needed a chest radiograph in the infection
+      # screen. CPT 71046, two views.
+      chest_xray: 28
+      # Temporal artery ultrasound (halo sign) for giant cell arteritis, requested by the October
+      # 2026 review (BACT-MEN-RS03) so that a GCA question can be ordered and scored. Billed as a
+      # bilateral extracranial arterial duplex, CPT 93880.
+      temporal_artery_ultrasound: 184
     modifiers:
       contrast: 116
 
   order_microbiology:
     by_type:
       blood_culture: 37
+      # EDTA whole-blood PCR: N. meningitidis (the blood meningococcal PCR of NICE NG240,
+      # which keeps the organism test available while lumbar puncture is deferred), with
+      # S. pneumoniae and H. influenzae. CPT 87798 per target; priced as the CSF single-target
+      # PCRs (HSV_PCR). Confirmed as the term for blood meningococcal PCR on 2026-10-24
+      # (BACT-MEN-S05): a second spelling would price one study twice.
       whole_blood_pcr: 184
       throat_swab: 28
       urine: 28
       # Diagnostic paracentesis: the procedure plus its fluid studies (PMN count, protein,
       # culture into blood-culture bottles at the bedside), per EASL 2022.
       ascitic_fluid: 276
+      # Moved from the general_medicine pack on 2026-10-24, rates unchanged. The October 2026
+      # review asked for them in the core vocabulary: a culture of the ulcer that was the portal
+      # of entry (BACT-MEN-RS01), sputum in the tuberculous meningitis mimic (BACT-MEN-P02), and
+      # C. difficile testing in the infection screen of hepatic encephalopathy (HEP-ENC).
+      sputum: 18                    # CPT 87070 culture + 87205 Gram stain
+      stool: 46                     # CPT 87493 C. difficile toxin PCR
+      wound_swab: 12                # CPT 87070
+      # Gram stain and aerobic and anaerobic culture of material aspirated from a brain lesion
+      # (October 2026 review, GLIO-HG-P04: an abscess on the differential of a ring-enhancing
+      # mass). The laboratory work only: the aspiration is ordered and billed through
+      # obtain_tissue_diagnosis (stereotactic_biopsy, resection), so one procedure is priced
+      # once. CPT 87205 + 87070 + 87075.
+      brain_aspirate: 30
+      # Lower respiratory tract secretions aspirated through the endotracheal tube of a ventilated
+      # patient: Gram stain and semi-quantitative culture (October 2026 review, MG-RM15, a
+      # ventilator-associated pneumonia in myasthenic crisis that could only be ordered as
+      # `sputum`). CPT 87070 + 87205, priced as sputum.
+      tracheal_aspirate: 18
 
   obtain_tissue_diagnosis:
     # Two-part, like analyze_csf: the procedure, then the assays run on the specimen.
@@ -471,6 +690,15 @@ tools:
       # objected to in glioma — a mandatory step with no callable act. Histology here is a
       # pattern (non-necrotising granulomas), so no molecular assay is implied.
       lymph_node_biopsy: 1840
+      # Temporal artery biopsy for giant cell arteritis (October 2026 review, BACT-MEN-RS03).
+      # CPT 37609 + 88305 histology.
+      temporal_artery_biopsy: 644
+      # Open surgical biopsy, through a laminectomy and myelotomy or a craniotomy, of a lesion a
+      # stereotactic needle cannot reach safely and that is not to be resected (October 2026
+      # review, GLIO-HG-RM02: a cervical intramedullary tumour modelled as `resection`). CPT 63285
+      # (intramedullary, cervical) or 61140 (craniotomy for biopsy) + 88307 histology; reference
+      # estimate between the stereotactic biopsy and the resection.
+      open_biopsy: 5520
     by_molecular_assay:
       IDH1_IHC: 138
       IDH1_IDH2_sequencing: 552
@@ -483,6 +711,33 @@ tools:
       H3K27_status: 276
       MGMT_methylation: 460
       BRAF_V600: 276
+      # Requested by the October 2026 case review of high-grade glioma: the lymphoma and
+      # metastatic-melanoma mimics were scored on a tissue action that could only order glioma
+      # markers (GLIO-HG-P02, an EBV-associated DLBCL diagnosed from IDH1 IHC alone; GLIO-HG-RP04,
+      # a must requiring SOX10 that no action could request). CPT 88342 / 88341 per antibody,
+      # 88365 for in situ hybridisation.
+      CD20_IHC: 92
+      EBER_ISH: 184
+      SOX10_IHC: 92
+      Melan_A_HMB45_IHC: 138    # two antibodies, one melanocytic panel
+      # Requested by the October 2026 case review of high-grade glioma. Neuroendocrine markers of
+      # a paraganglioma (GLIO-HG-RS01, a jugular foramen mass): two antibodies, one panel, as for
+      # the melanocytic one. CPT 88342 + 88341.
+      chromogranin_A_synaptophysin_IHC: 138
+      # The metastasis work-up of a brain lesion (GLIO-HG-RP01): PAX8 (renal, thyroid, Mullerian),
+      # TTF-1 (lung, thyroid) and thyroglobulin (thyroid). Three terms, because each answers a
+      # different primary. CPT 88342 / 88341 per antibody.
+      PAX8_IHC: 92
+      TTF1_IHC: 92
+      thyroglobulin_IHC: 92
+      # H3 G34R/V, the defining alteration of the diffuse hemispheric glioma, H3 G34-mutant (WHO
+      # CNS5; GLIO-HG RS01, RS03). Immunohistochemistry or sequencing; priced as H3K27_status.
+      H3G34_status: 276
+      # Genome-wide DNA methylation profiling (EPIC array with the brain-tumour classifier), for
+      # a tumour whose class histology and the targeted assays leave open (WHO CNS5 essential or
+      # desirable criterion in several entities; GLIO-HG RM02, RM03). No CMS rate (CPT 81479,
+      # unlisted); reference estimate in the band of the gene panels.
+      DNA_methylation_profiling: 1840
     # Rate for an assay with no row above (warned at execute time and here).
 
   perform_clinical_assessment:
@@ -496,9 +751,91 @@ tools:
       structured_headache_history_ichd3: 138
       gait_and_balance_timed: 92           # TUG / timed walk; the NPH tap test is two of these
       functional_neuro_signs: 138          # Hoover, entrainment — the positive signs of FND
+      # Karnofsky / ECOG scored at the visit. Treatment planning in high-grade glioma turns on it
+      # (EANO 2021: KPS < 70 is the unfavourable threshold), and the October 2026 review found
+      # it only as a pre-illness line in the social history (GLIO-HG-RP04).
+      performance_status: 46
+      # Orthostatic blood pressure and heart rate by active standing: supine for 5 minutes, then
+      # readings at 1 and 3 minutes of standing (ESC 2018 syncope, Class I in the initial
+      # evaluation; SYNC-CARD, batch-4 close-out). Part of the visit, with no CPT code of its own;
+      # reference estimate for the nurse time.
+      orthostatic_blood_pressure: 23
+      # Batch 5 (25 Oct 2026), requested by the PD close-out (PD-RP04 requires it; any DBS or MSA
+      # "poor levodopa response" case): acute levodopa challenge, MDS-UPDRS part III in the
+      # practically defined OFF state after an overnight withdrawal, then again at peak effect of a
+      # supra-threshold levodopa dose (about 1.5 times the morning dose), with the percent
+      # improvement (at least 30% supports DBS candidacy; CAPSIT-PD, Defer 1999). One assessment with
+      # its own OFF and ON scores, so it is not ordered twice with `timing`. No specific CPT code (an
+      # observed half-day visit); reference estimate, priced as two scored motor examinations
+      # (twice `gait_and_balance_timed`), to verify.
+      levodopa_challenge: 184
+    # When the assessment is made, relative to an intervention whose effect it measures (24 Oct
+    # 2026, NPH: the baseline timed gait and the reassessment after the tap test are the same
+    # assessment twice, and the case must serve each one for its own order). Priced at 0 like the
+    # MRI `protocols` and the CSF `sources`: each assessment is billed once at its `by_type` rate.
+    # The block is the source of the `timing` enum; `baseline` is the schema default.
+    timings:
+      baseline: 0
+      post_intervention: 0
 
   search_medical_literature:
     base: 0
 
   check_drug_interactions:
     base: 0
+
+# --- Vocabulary packs ---------------------------------------------------------------------------
+# Rows a case sees only through its domain (`NeuroBenchCase.domain`, `tools/vocabulary.py::
+# DOMAIN_PACKS`). A pack adds terms to the blocks above and never re-prices one
+# (`vocabulary.merge_packs` refuses a clash), so the NeuroBench catalogue, its prices and its
+# 600 cases are untouched by anything below. The cost registry prices every pack.
+packs:
+  # Studies general medicine orders and neurology never needed, so that a recorded admission
+  # (MIMIC-IV) or a general-medicine case can be ordered, priced and scored step by step.
+  # PROVISIONAL rates: EUR from 2024 Medicare national amounts at 0.92, read from memory of
+  # the fee schedule rather than looked up, pending the same coding sign-off as the rest of this
+  # file. Check them against the CMS PFS / CLFS look-up before any cost result is reported.
+  general_medicine:
+    tools:
+      interpret_labs:
+        by_panel:
+          lipase: 8                  # CPT 83690
+          amylase: 8                 # CPT 82150
+          hepatitis_panel_acute: 60  # CPT 80074: HAV IgM, HBsAg, anti-HBc IgM, anti-HCV
+          uric_acid: 6               # CPT 84550
+          cortisol: 20               # CPT 82533
+          CEA: 23                    # CPT 82378
+          CA_19_9: 25                # CPT 86301
+          CA_125: 25                 # CPT 86304
+          PSA: 23                    # CPT 84153
+          fecal_occult_blood: 18     # CPT 82274, immunochemical
+      order_body_imaging:
+        by_type:
+          abdomen_xray: 32                   # CPT 74019, two views (obstruction, free air)
+          extremity_xray: 30                 # CPT 73030 / 73560 / 73610, two to three views
+          hepatobiliary_ultrasound: 87       # CPT 76705, limited abdomen (right upper quadrant)
+          renal_ultrasound: 106              # CPT 76770
+          neck_ultrasound: 101               # CPT 76536, thyroid and cervical soft tissue
+      order_microbiology:
+        by_type:
+          synovial_fluid: 92            # CPT 20610 arthrocentesis + cell count, crystals, culture
+          pleural_fluid: 193            # CPT 32555 image-guided thoracentesis + fluid studies
+          nasopharyngeal_swab: 129      # CPT 87636 / 87631 respiratory pathogen PCR
+          bronchoalveolar_lavage: 368   # CPT 31624 bronchoscopy with lavage + culture, cytology
+      order_specialized_test:
+        by_type:
+          upper_endoscopy: 322          # CPT 43235 / 43239, professional + facility estimate
+          colonoscopy: 368              # CPT 45378 / 45380
+          pulmonary_function_tests: 138 # CPT 94010 + 94726 + 94729: spirometry, volumes, DLCO
+          ABPM: 55                      # CPT 93784, 24-hour ambulatory blood pressure
+          DXA: 37                       # CPT 77080
+      obtain_tissue_diagnosis:
+        by_type:
+          image_guided_core_biopsy: 644 # CPT 10005-10012 / 20206 / 47000 + 88305
+          endoscopic_biopsy: 64         # CPT 88305 histology only; the endoscopy bills itself
+          skin_biopsy: 156              # CPT 11102 + 88305
+          bone_marrow_biopsy: 276       # CPT 38222 + 88305
+      order_advanced_imaging:
+        by_type:
+          VQ_scan: 230                  # CPT 78582
+          HIDA_scan: 258                # CPT 78226

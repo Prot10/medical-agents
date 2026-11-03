@@ -1,0 +1,116 @@
+# SAH-P05
+Reviewer status: R1 none, R2 approved | Approved before this round: yes
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| f6edc7fb-b9d3-4a48-85ae-1ea4a27a6cb1 | FIXED | `ground_truth.assessment.required_recommendations[5]`: MUST-BP-A "Lower blood pressure now with a short-acting titratable intravenous agent (labetalol boluses or nicardipine infusion) until the aneurysm is secured, avoiding hypotension; ... [Hoh_2023] ... below 160 mmHg ... [Connolly_2012]" (postpartum agents per plan). The "SBP target generally <160" clause left the ICU must (now MUST-ICU) and the BP prohibition is the canonical one (`prohibited_recommendations[6]`). |
+| f8f0befa-3974-4122-8d3f-23329c837a5d | FIXED | Both 24-72 h securing musts replaced by one MUST-SECURE for the right MCA bifurcation aneurysm ("as early as feasible, preferably within 24 hours of onset [Hoh_2023]", `required_recommendations[3]`); securing pearl replaced (`key_clinical_evidence[8]`); new recommended DSA criterion `dsa-aneurysm-anatomy` with a diagnostic DSA follow-up (`followup_outputs[1]`), soft constraint CTA before DSA; TCD re-dated to an admission baseline so the timeline no longer runs past the securing window. |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| B | minor | `patient.history_present_illness` | "2 hours after the seizure" while delivery was 2 h ago and the seizure happened 2 h after delivery (impossible timeline). | FIXED: phrase removed ("She currently has severe headache 8/10, photophobia, and neck stiffness."). |
+| C | major | `followup_outputs[TCD]` | "Day 3 TCD" with borderline right MCA vasospasm in a patient whose ictus was about 2 hours earlier (C2). | FIXED: baseline TCD post-ictus day 0, normal velocities (right MCA 82, left 76 cm/s, Lindegaard 1.9 and 1.7, ACA and basilar normal), canonical protocol and recommended action, `quantitative_data` `{"post_ictus_day": "0"}`. |
+| C | major | `ground_truth.action_criteria`, `followup_outputs` | No catheter angiography before securing (C3). | FIXED: `dsa-aneurysm-anatomy` (recommended) and a diagnostic DSA report: 4.3 x 3.8 mm irregular aneurysm with daughter sac, neck 2.6 mm, dome-to-neck 1.7, superior M2 origin at the neck, no other aneurysm, no vasospasm; no treatment content. |
+| C | major | `ground_truth.action_criteria`, `followup_outputs[MRI]` | The labelled diagnosis names co-existing PRES, which the CT only suggests, but the PRES MRI follow-up had no criterion (plan 3.1 item 8 assumed one existed). | FIXED: new recommended criterion `mri-brain-pres`, placed after the DSA. |
+| B | minor | `followup_outputs[MRI].impression`, `.findings` | Impression said "GRE/SWI confirms" but no SWI finding was stored; "vasogenic edema" written into the FLAIR signal; em dash. | FIXED: DWI (no restriction) and SWI signal added to the findings; impression rewritten as a numbered list without the dash; pertinent negative on venous sinuses and venous infarct added; recommendation changed from CTA (already done) to follow-up MRI. |
+| C | major | `ground_truth.differential` | Postpartum seizure with headache, and no cerebral venous sinus thrombosis in the differential; RCVS key features omitted the postpartum trigger; pituitary entry cited a "pituitary MRI" that was never done; template key features. | FIXED: CVST added (low, with CT and MRI evidence); RCVS, dissection, apoplexy and migraine key features cite the case's results; PRES `high` as co-existing per plan. |
+| C | major | `followup_outputs[drug check]` | Magnesium ranges in mEq/L with "4-8" therapeutic and "7-10" reflex loss while the labs report mg/dL; "proposed" was the infusion alone. | FIXED: proposed "Magnesium sulfate infusion for eclampsia with nimodipine"; therapeutic 4.8-8.4 mg/dL, reflex loss about 9.6-12 mg/dL, respiratory depression above about 12 mg/dL, bedside checks (reflexes, respiratory rate, urine output), calcium gluconate. |
+| C | major | `ground_truth.action_criteria[action-7]`, `required_recommendations[6]` | Drug check recommended with the template expected evidence; the magnesium-nimodipine interaction changes management (C10). | FIXED: `required`, relabelled, second alternative `drug: magnesium sulfate`, case-specific expected evidence and rationale; must added for magnesium monitoring and additive hypotension with nimodipine. Added to the stop rule. |
+| B | minor | `initial_tool_outputs.labs` | No potassium or magnesium (C9); "Exclusion studies" BNP "Within reference range" and type-and-screen engineering sentence (C14); abnormal summary with interpretive words ("(HELLP)", "(hemolysis)") and missing WBC, Hb, glucose; panel named "HELLP_check". | FIXED: potassium 3.9 mEq/L; magnesium 5.4 mg/dL flagged high (she received a magnesium loading dose, so a normal value would be impossible); BNP 64 pg/mL in Cardiac; type-and-screen significance null; panel renamed "Liver and hemolysis" (values unchanged); summary and interpretation list the same abnormal values. |
+| D | minor | `initial_tool_outputs.ecg.findings` | "Note: magnesium IV can affect ECG" (commentary in a report). | FIXED: deleted; em dashes removed from the interpretation. |
+| D | minor | `initial_tool_outputs.ct` | Subtle hypodensity called "consistent with PRES" with a type label "Posterior reversible encephalopathy"; no statement on intraventricular blood or hydrocephalus. | FIXED: "suggestive of posterior reversible encephalopathy syndrome", MRI recommended; pertinent negative "No intraventricular hemorrhage or hydrocephalus" added (LP avoided action stays `harm`). |
+| D | minor | `followup_outputs[CTA]` | "radiation exposure discussed with patient post-delivery" and "(excludes RCVS)" in the report (C14). | FIXED: deleted; "No arterial beading or segmental narrowing". |
+| B | minor | `followup_outputs[telemetry]` | Template telemetry with management words and 24-hour duration (C12). | FIXED: 3-hour report, sinus tachycardia 94-118 bpm, 7 isolated PVCs, no sustained arrhythmia, no pauses, QTc 488 ms, no torsades. |
+| D | major | `followup_outputs[literature]` | Postpartum literature follow-up with no summary and case-steering findings; literature criterion recommended (C7). | FIXED: deleted; canonical literature output last; criterion `optional`, last, canonical rationale, evidence and citations. |
+| C | major | `required_recommendations`, `prohibited_recommendations`, `key_clinical_evidence` | 24-72 h musts, daily TCD must, "never IV" nimodipine prohibition, CT 98%/80-85% and LP 6-12 h pearls (C1, C4, C7). | FIXED: MUST-NIMO, MUST-SECURE, MUST-ICU, MUST-BP-A, MUST-DCI; canonical nimodipine and BP prohibitions; CT, LP, securing and DCI pearls per plan 1.3. NCCT, CTA, sodium and obstetric musts kept. |
+| C | minor | `ground_truth.avoided_actions` | EEG listed as waste although she had a seizure and post-ictal drowsiness (C16). | FIXED: entry deleted. |
+| B | minor | `ground_truth.red_herrings` | Only one red herring while `metadata.difficulty_rationale` states at least three; the case's central trap (eclampsia history) not recorded. | FIXED: red herring added for the prior eclampsia and the seizure at 182/110. |
+| A | minor | `ground_truth.action_criteria[*]` | Rationale copied from the label; duplicate unbracketed citations; ECG, telemetry and echo cited Connolly. | FIXED: canonical rationales, `["[Hoh_2023]"]`, case-specific expected evidence; criteria reordered per plan 3.1; constraints NCCT before CTA and CTA before DSA (soft); stop rule = the five required criteria, `max_additional_actions` 1. |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+
+The case is unchanged in substance: a 35-year-old woman 2 hours after delivery with thunderclap headache, an eclamptic-looking seizure, Fisher 3 SAH and a 4.2 mm right MCA bifurcation aneurysm with a daughter sac, plus co-existing PRES. The work-up now reads NCCT, labs, ECG, CTA, then catheter DSA (diagnostic report only, matching the CTA), brain MRI for the PRES named in the diagnosis (now a recommended criterion), the magnesium-nimodipine interaction check (now required, with mg/dL magnesium thresholds matching the labs), echo, telemetry (a real 3-hour report), baseline TCD at day 0 (normal velocities instead of a "day 3" vasospasm study 2 hours after the bleed) and the canonical literature search last (optional). Labs gain potassium 3.9 and magnesium 5.4 mg/dL (after the loading dose) and a numeric BNP. The CT now states no IVH or hydrocephalus and calls the posterior hypodensity only suggestive of PRES; the MRI shows vasogenic edema without diffusion restriction, SWI blood and no venous infarct. The musts now secure the right MCA aneurysm as early as feasible, preferably within 24 hours, lower BP now with labetalol boluses or nicardipine infusion (no numeric target in 2023, below 160 commonly used), give enteral nimodipine with the 30 mg every 2 hours option, monitor magnesium and additive hypotension, use the canonical ICU and DCI wording, and keep the obstetric must. The differential adds CVST (postpartum, seizure) and cites the case's results for each mimic; a red herring records the eclampsia anchoring trap; the EEG waste entry is gone.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+
+- New citation keys used per plan section 1.1: `[Molyneux_2002]` (canonical literature output) and `[Connolly_2012]` in MUST-BP-A; `[Molyneux_2002]` needs the allow-list addition the plan requests (plan section 5.1b).
+- Review UI: show initial outputs and follow-ups in criterion order (plan section 5.5).
+
+## Open questions for Andrea (judgment calls you could not settle)
+
+- Plan section 3.1 item 8 says "MRI: P05 (PRES) recommended as now", but P05 had no MRI criterion, only an unscored MRI follow-up. I added `mri-brain-pres` as recommended because the labelled diagnosis names PRES, which only MRI establishes. Decided; no input needed.
+- Magnesium thresholds in the drug check follow the usual obstetric tables (therapeutic 4.8-8.4 mg/dL; reflex loss about 9.6-12; respiratory depression above about 12). Sources vary slightly at the toxic thresholds; the text uses "about".
+
+## Verification
+
+Adversarial check (24 Oct 2026). Read the log, the diff and the whole final case. Both note ids present and verified FIXED in the file: MUST-BP-A with labetalol boluses or nicardipine infusion, one MUST-SECURE with the Hoh window, securing pearl replaced, `dsa-aneurysm-anatomy` with a diagnostic-only DSA (4.3 x 3.8 mm vs CTA 4.2 x 3.8 mm, within 0.3 mm), TCD re-dated to day 0. Checked cross-field: magnesium 5.4 mg/dL flagged against 1.7-2.2 and inside the 4.8-8.4 therapeutic range the drug check states; QTc 488 identical in ECG, telemetry and criteria; HR ranges match vitals and ECG; no IVH on CT, LP `harm`; stop rule equals the five required criteria; constraints valid; leak, followup and banned-string guards pass; fallbacks hold no drug or literature block.
+Found and fixed: `ground_truth.red_herrings[0]` was still the condition template ("echocardiogram showing apical ballooning confirms etiology", "30-40%") although this echo shows only mild anterior apical hypokinesis with LVEF 54%; the worker fixed the same template in P07, P08, RM11 and RP11 but not here. Data point now "Troponin I 0.16 ng/mL with T-wave inversions V1-V4 and QTc 488 ms"; interpretation cites the case's echo.
+Left as is (pre-existing in an approved case, not errors that change a ruling): echo text "EF 54% mildly reduced" and "Cardiology consultation recommended"; generic fallback EEG.
+perfect_agent.py SAH-P05 -v: pass; case_io.py check: clean for SAH-P05.
+
+## Close-out (24 Oct 2026)
+
+Condition close-out after Andrea's ruling of 24 Oct 2026 (open questions decided for dataset quality); decisions and sources in `plans/SAH-decisions.md`.
+
+- `echo.findings[0]`: an echo reports the wall-motion pattern; a mild apical hypokinesis with preserved EF is not Takotsubo, grading labels such as 'classic' or 'severe Takotsubo' are diagnoses, and cardiology consultation is management (Q10).
+- `echo.impression (Takotsubo overcall and consultation advice removed)`: an echo reports the wall-motion pattern; a mild apical hypokinesis with preserved EF is not Takotsubo, grading labels such as 'classic' or 'severe Takotsubo' are diagnoses, and cardiology consultation is management (Q10).
+- `echo.recommended_actions`: an echo reports the wall-motion pattern; a mild apical hypokinesis with preserved EF is not Takotsubo, grading labels such as 'classic' or 'severe Takotsubo' are diagnoses, and cardiology consultation is management (Q10).
+- `action_criteria[echo].expected_evidence`: an echo reports the wall-motion pattern; a mild apical hypokinesis with preserved EF is not Takotsubo, grading labels such as 'classic' or 'severe Takotsubo' are diagnoses, and cardiology consultation is management (Q10).
+- `echo.findings[1]`: an echo reports the wall-motion pattern; a mild apical hypokinesis with preserved EF is not Takotsubo, grading labels such as 'classic' or 'severe Takotsubo' are diagnoses, and cardiology consultation is management (Q10).
+- fallback_tool_outputs.cardiac_monitoring: 24 h Holter replaced by the case's own telemetry report: a 24-hour Holter cannot exist at assessment time; an off-pathway monitoring order now returns the case's own telemetry (CENTRAL 9).
+- followup_outputs: MR angiography report added before the literature output (aneurysm site and size from the DSA, 0.2 mm smaller as TOF reads it; P02 negative): an MRA order was answered by a fallback reporting no abnormality, contradicting the CTA and DSA (CENTRAL 10). MRA stays a waste action after the CTA.
+- `ground_truth.diagnosis` (synonyms re-expanded with `--prune`): diagnosis_synonyms.yaml: the I60 category no longer grants I60.8 (non-aneurysmal SAH), so the code was pruned from this aneurysmal case.
+- Checks after the close-out: `perfect_agent.py` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, `test_case_guards -k SAH-` pass.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- follow-up `request_echocardiogram`: `echo_type` set to `TTE` (was missing); the bedside study is transthoracic, and untyped it also answered a TEE or bubble-study order.
+- `fallback_tool_outputs.specialized_test` set to null: a generic report (test_type '', impression 'No diagnostic abnormality identified on this study.') that names no one study and so answered every variant; the benchmark library now answers each study with its own normal report.
+- `fallback_tool_outputs.advanced_imaging` set to null: a generic report (modality '', impression 'No abnormality identified.') that names no one study and so answered every variant; the benchmark library now answers each study with its own normal report.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Lab evidence (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited results its own order (the first alternative) no longer returned; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-3-interpret-labs]`.alternatives: was [CBC, BMP, coagulation]; now [CBC, BMP, coagulation, troponin, BNP] | [CBC, BMP, coagulation].
+- Decision: serve: new first alternative (old order kept as an alternative). Neurogenic troponin elevation is the case's cardiac red herring (prohibition, key evidence, red herring); baseline troponin belongs with the admission bloods in aSAH (AHA/ASA 2023), and the cardiac panel holds the BNP the evidence reads. CBC + BMP + coagulation did not return it.
+- Scoring: coverage unchanged (any call matching the old order still matches); the cost reference of the required work-up now uses the new first order.
+- Approved case: changed for a real inconsistency (the policy's own order did not return what its evidence cites), so it goes back to re-review for this criterion only.
+
+Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.
+
+## Library contradictions (25 Oct 2026)
+
+Orders the benchmark library answered with a normal report that this case contradicts now have a case report. Contradiction = the history, the diagnosis or a stored finding makes the normal report impossible.
+
+- `analyze_csf (lumbar puncture, EVD, lumbar drain; xanthochromia)` -> fallback_tool_outputs.csf: blood-stained CSF without clearing (Fisher 3), xanthochromia result per time from onset. The library returned clear acellular CSF in a patient with subarachnoid blood on CT.
+- `perform_clinical_assessment {assessment_type: performance_status}` -> fallback_tool_outputs.clinical_assessment: Karnofsky 40, ECOG 3. The library returned Karnofsky 100, ECOG 0, working, in an acutely ill inpatient.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}` -> followup_outputs[request_gait_and_balance_timed]: assessment not completed, patient unable to stand safely; the library returned a normal Timed Up and Go in a patient whose gait the exam could not test or found abnormal.
+- `order_echocardiogram {echo_type: TEE}` -> fallback_tool_outputs.echo: stored TTE wall motion and LVEF 54% carried over; no thrombus or shunt. The library TEE was normal against an abnormal stored TTE.
+- `order_echocardiogram {echo_type: bubble_study}` -> followup_outputs[request_bubble_study]: same wall motion and LVEF, no right-to-left shunt at rest. The library bubble study called the echocardiogram normal.
+- `order_advanced_imaging {modality: cardiac_MRI}` -> fallback_tool_outputs.advanced_imaging: wall motion and LVEF as on the stored TTE, oedema in the dysfunctional segments, no late enhancement. The library cardiac MRI reported no structural heart disease.
+- `order_body_imaging {study: chest_abdomen_pelvis_CT / pelvis_abdomen_CT}` -> fallback_tool_outputs.body_imaging: enlarged postpartum uterus 2 hours after vaginal delivery; the library returned a normal pelvis.
+- `order_body_imaging {study: pelvis_abdomen_ultrasound}` -> followup_outputs[request_pelvis_abdomen_ultrasound]: enlarged postpartum uterus 2 hours after vaginal delivery; the library returned a normal pelvis.
+- `order_body_imaging {study: pelvis_abdomen_MRI}` -> followup_outputs[request_pelvis_abdomen_mri]: enlarged postpartum uterus 2 hours after vaginal delivery; the library returned a normal pelvis.
+- `interpret_labs {panels: [beta-hCG]}` -> fallback_tool_outputs.labs: beta-hCG 18,600 mIU/mL, 2 hours after delivery; the library returned 1 mIU/mL.
+- `interpret_labs {panels: [urinalysis]}` -> fallback_tool_outputs.labs: proteinuria 2+ and haematuria 1+; history and presentation of eclampsia with a seizure; the library returned a normal urinalysis.
+- `order_specialized_test {test_type: optical_coherence_tomography}` -> fallback_tool_outputs.specialized_test: mild bilateral RNFL thickening; the stored exam documents mild bilateral papilledema.
+- `perform_clinical_assessment {assessment_type: structured_headache_history_ichd3}` -> followup_outputs[request_structured_headache_history_ichd3]: sudden, of thunderclap quality, about 30 minutes after vaginal delivery; red flags: thunderclap onset, postpartum onset, seizure, altered consciousness. The library reported no thunderclap onset, no red flags and no nausea or photophobia, against the history.
+- `perform_clinical_assessment {assessment_type: orthostatic_blood_pressure}` -> followup_outputs[request_orthostatic_blood_pressure]: standing not attempted, supine BP 176/106 as at arrival. The library reported 3 minutes of symptom-free standing at BP 128/78.
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}` -> followup_outputs[request_levodopa_challenge]: no parkinsonian signs, challenge not performed. The library reported normal gait and postural reflexes and no nausea in a patient who cannot stand and is vomiting.
+
+Checks: `perfect_agent.py` ok; `test_case_guards.py -k SAH-P05` passed; no criterion answer changed (snapshot diff); every mapped order is answered without the library (`verify.py`).

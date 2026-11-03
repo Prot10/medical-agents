@@ -29,7 +29,7 @@ from __future__ import annotations
 
 
 from .base import BaseTool
-from .vocabulary import assessment_types
+from .vocabulary import assessment_timings, assessment_types
 
 
 class ClinicalAssessmentTool(BaseTool):
@@ -37,7 +37,9 @@ class ClinicalAssessmentTool(BaseTool):
     description = (
         "Perform a structured bedside assessment and receive the findings and scores: a "
         "cognitive screen, an ICHD-3 headache and aura history, timed gait and balance "
-        "testing, or examination for positive functional neurological signs. These are "
+        "testing, examination for positive functional neurological signs, a performance "
+        "status, orthostatic blood pressure by active standing or an acute levodopa "
+        "challenge. These are "
         "clinical acts, not instrumental tests — for several conditions they are the "
         "confirmatory step, and for a purely clinical diagnosis they are the whole pathway."
     )
@@ -61,15 +63,29 @@ class ClinicalAssessmentTool(BaseTool):
                     "red flags. 'gait_and_balance_timed': Timed Up and Go and timed walk; "
                     "run before and after a CSF tap test in suspected NPH. "
                     "'functional_neuro_signs': Hoover's sign, entrainment and the other "
-                    "positive signs of a functional disorder."
+                    "positive signs of a functional disorder. "
+                    "'performance_status': Karnofsky and ECOG scored at the visit, on which treatment "
+                    "planning in a brain tumour depends. "
+                    "'orthostatic_blood_pressure': blood pressure and heart rate supine and at 1 and "
+                    "3 minutes of active standing — orthostatic hypotension in the initial evaluation "
+                    "of syncope. "
+                    "'levodopa_challenge': MDS-UPDRS part III in the OFF state and again at peak "
+                    "effect of a supra-threshold levodopa dose, with the percent improvement (30% or "
+                    "more supports DBS candidacy); one assessment that reports both states."
                 ),
             },
+            # Closed since 24 Oct 2026 (NPH): the MockServer serves the stored assessment of the
+            # timing ordered, so a baseline order no longer receives the post-tap reassessment.
             "timing": {
                 "type": "string",
+                "enum": assessment_timings(),
                 "description": (
-                    "Optional label for when the assessment was performed, e.g. 'baseline' "
-                    "or 'post_tap_test' — the NPH tap test is interpreted as a pair."
+                    "When the assessment is made relative to an intervention whose effect it "
+                    "measures. 'baseline' (default): before it. 'post_intervention': the same "
+                    "assessment repeated after it, e.g. the timed gait 2 to 24 hours after a "
+                    "CSF tap test, to be compared with the baseline."
                 ),
+                "default": "baseline",
             },
         },
         "required": ["clinical_context", "assessment_type"],

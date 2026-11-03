@@ -18,6 +18,7 @@ that were perfectly legal became "invalid" against the tool the agent actually c
 
 from __future__ import annotations
 
+import copy
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
@@ -30,28 +31,68 @@ DEFAULT_COSTS_PATH = Path(__file__).resolve().parents[3] / "config" / "tools" / 
 # `genetic_panels` block, and the tool schema advertises one enum member per priced panel.
 GENETIC_PANEL_PREFIX = "genetic_panel:"
 
+# Vocabulary packs advertised for each case domain (`NeuroBenchCase.domain`). A neurology case
+# sees the `tools` block alone, so the NeuroBench catalogue does not change when a pack grows;
+# a general-medicine case also sees the rows of the `general_medicine` pack.
+DOMAIN_PACKS: dict[str, tuple[str, ...]] = {
+    "neurology": (),
+    "general_medicine": ("general_medicine",),
+}
 
-@lru_cache(maxsize=4)
-def _load_tools(costs_path: Path = DEFAULT_COSTS_PATH) -> dict[str, Any]:
+
+def merge_packs(config: dict[str, Any], packs: tuple[str, ...] | list[str]) -> dict[str, Any]:
+    """The `tools` block of a costs.yaml document with the named packs' rows merged in.
+
+    A pack only adds rows. A row that names an existing term, under any spelling that
+    normalises to it, is a configuration error: the same study would carry two prices and the
+    pack would silently re-price the NeuroBench catalogue.
+    """
+    tools = copy.deepcopy(config.get("tools", {}))
+    available = config.get("packs", {})
+    for pack in packs:
+        if pack not in available:
+            raise KeyError(f"unknown vocabulary pack {pack!r}; costs.yaml defines {sorted(available)}")
+        for tool, blocks in (available[pack].get("tools") or {}).items():
+            if tool not in tools:
+                raise KeyError(f"pack {pack!r} adds rows to {tool!r}, which costs.yaml does not price")
+            for block, rows in blocks.items():
+                existing = tools[tool].setdefault(block, {})
+                clash = {normalize_analyte(str(k)) for k in existing} & {normalize_analyte(str(k)) for k in rows}
+                if clash:
+                    raise ValueError(f"pack {pack!r} re-prices {tool}.{block}: {sorted(clash)}")
+                existing.update(rows)
+    return tools
+
+
+def all_packs(costs_path: Path = DEFAULT_COSTS_PATH) -> tuple[str, ...]:
+    """Every pack costs.yaml defines. The cost registry prices all of them."""
+    if not costs_path.exists():
+        return ()
+    with open(costs_path) as f:
+        return tuple(sorted((yaml.safe_load(f) or {}).get("packs", {})))
+
+
+@lru_cache(maxsize=8)
+def _load_tools(costs_path: Path = DEFAULT_COSTS_PATH, packs: tuple[str, ...] = ()) -> dict[str, Any]:
     if not costs_path.exists():
         return {}
     with open(costs_path) as f:
-        return (yaml.safe_load(f) or {}).get("tools", {})
+        return merge_packs(yaml.safe_load(f) or {}, packs)
 
 
-def specialized_test_types(costs_path: Path = DEFAULT_COSTS_PATH) -> list[str]:
+def specialized_test_types(costs_path: Path = DEFAULT_COSTS_PATH, packs: tuple[str, ...] = ()) -> list[str]:
     """The closed `order_specialized_test.test_type` vocabulary (excluding genetic panels)."""
-    return sorted(_load_tools(costs_path).get("order_specialized_test", {}).get("by_type", {}))
+    return sorted(_load_tools(costs_path, tuple(packs)).get("order_specialized_test", {}).get("by_type", {}))
 
 
-def genetic_panels(costs_path: Path = DEFAULT_COSTS_PATH) -> list[str]:
+def genetic_panels(costs_path: Path = DEFAULT_COSTS_PATH, packs: tuple[str, ...] = ()) -> list[str]:
     """Allowed `<panel>` suffixes for `genetic_panel:<panel>`."""
-    return sorted(_load_tools(costs_path).get("order_specialized_test", {}).get("genetic_panels", {}))
+    return sorted(_load_tools(costs_path, tuple(packs)).get("order_specialized_test", {}).get("genetic_panels", {}))
 
 
-def advanced_imaging_modalities(costs_path: Path = DEFAULT_COSTS_PATH) -> list[str]:
+def advanced_imaging_modalities(costs_path: Path = DEFAULT_COSTS_PATH, packs: tuple[str, ...] = ()) -> list[str]:
     """The closed `order_advanced_imaging.modality` vocabulary."""
-    return by_type_values("order_advanced_imaging", costs_path)
+    return by_type_values("order_advanced_imaging", costs_path, packs)
 
 
 # Different *names* for one assay, as opposed to different spellings of one name. Punctuation
@@ -80,6 +121,9 @@ _ANALYTE_SYNONYMS: dict[str, str] = {
     "complement_c3/c4": "complement",
     "smear": "peripheral smear",
     "blood_cultures_x3": "blood_cultures",
+    # October 2026 review (VASC-DEM): 140 case actions said `B12`, 62 `vitamin_B12`, priced as
+    # two rows that did not compare equal. One assay; the named spelling is advertised.
+    "b12": "vitamin_B12",
 }
 
 
@@ -175,27 +219,39 @@ def _canonical_analytes(names: list[str]) -> list[str]:
     )
 
 
-def lab_panels(costs_path: Path = DEFAULT_COSTS_PATH) -> list[str]:
+def lab_panels(costs_path: Path = DEFAULT_COSTS_PATH, packs: tuple[str, ...] = ()) -> list[str]:
     """The priced `interpret_labs.panels` vocabulary, aliases collapsed.
 
     Any spelling that normalises to a member is accepted at execution (`BaseTool.execute`),
     so the score and the bill read the same per-analyte work-up; anything else is rejected.
     """
     return _canonical_analytes(
-        list(_load_tools(costs_path).get("interpret_labs", {}).get("by_panel", {}))
+        list(_load_tools(costs_path, tuple(packs)).get("interpret_labs", {}).get("by_panel", {}))
     )
 
 
-def csf_special_tests(costs_path: Path = DEFAULT_COSTS_PATH) -> list[str]:
+def csf_special_tests(costs_path: Path = DEFAULT_COSTS_PATH, packs: tuple[str, ...] = ()) -> list[str]:
     """The priced `analyze_csf.special_tests` vocabulary."""
     return _canonical_analytes(
-        list(_load_tools(costs_path).get("analyze_csf", {}).get("by_special_test", {}))
+        list(_load_tools(costs_path, tuple(packs)).get("analyze_csf", {}).get("by_special_test", {}))
     )
 
 
-def by_type_values(tool_name: str, costs_path: Path = DEFAULT_COSTS_PATH) -> list[str]:
+def csf_sources(costs_path: Path = DEFAULT_COSTS_PATH, packs: tuple[str, ...] = ()) -> list[str]:
+    """The closed `analyze_csf.source` vocabulary: where the fluid was drawn.
+
+    Read from the `sources` block, priced at 0 like the MRI `protocols`: the sampling is billed
+    in `base`. Added on the October 2026 review so that a shunt tap or an EVD sample can be
+    told apart from a lumbar puncture.
+    """
+    return sorted(_load_tools(costs_path, tuple(packs)).get("analyze_csf", {}).get("sources", {}))
+
+
+def by_type_values(
+    tool_name: str, costs_path: Path = DEFAULT_COSTS_PATH, packs: tuple[str, ...] = ()
+) -> list[str]:
     """Every value priced under a tool's `by_type` block — the tool's legal enum."""
-    return sorted(_load_tools(costs_path).get(tool_name, {}).get("by_type", {}))
+    return sorted(_load_tools(costs_path, tuple(packs)).get(tool_name, {}).get("by_type", {}))
 
 
 # The three enums that were still written out by hand in their tool class, and so could drift
@@ -203,17 +259,17 @@ def by_type_values(tool_name: str, costs_path: Path = DEFAULT_COSTS_PATH) -> lis
 # made `exercise_echo` orderable the moment it was priced.
 
 
-def echocardiogram_types(costs_path: Path = DEFAULT_COSTS_PATH) -> list[str]:
+def echocardiogram_types(costs_path: Path = DEFAULT_COSTS_PATH, packs: tuple[str, ...] = ()) -> list[str]:
     """The closed `order_echocardiogram.echo_type` vocabulary."""
-    return by_type_values("order_echocardiogram", costs_path)
+    return by_type_values("order_echocardiogram", costs_path, packs)
 
 
-def eeg_types(costs_path: Path = DEFAULT_COSTS_PATH) -> list[str]:
+def eeg_types(costs_path: Path = DEFAULT_COSTS_PATH, packs: tuple[str, ...] = ()) -> list[str]:
     """The closed `analyze_eeg.eeg_type` vocabulary."""
-    return by_type_values("analyze_eeg", costs_path)
+    return by_type_values("analyze_eeg", costs_path, packs)
 
 
-def mri_protocols(costs_path: Path = DEFAULT_COSTS_PATH) -> list[str]:
+def mri_protocols(costs_path: Path = DEFAULT_COSTS_PATH, packs: tuple[str, ...] = ()) -> list[str]:
     """The closed `analyze_brain_mri.protocol` vocabulary.
 
     Read from the `protocols` block rather than `by_type`: protocol selection does not change
@@ -221,7 +277,7 @@ def mri_protocols(costs_path: Path = DEFAULT_COSTS_PATH) -> list[str]:
     the MRI's cost comes from `base` + `contrast`. The block is still the source of the enum,
     so a protocol cannot be orderable without being declared.
     """
-    return sorted(_load_tools(costs_path).get("analyze_brain_mri", {}).get("protocols", {}))
+    return sorted(_load_tools(costs_path, tuple(packs)).get("analyze_brain_mri", {}).get("protocols", {}))
 
 
 # --- Tools added after the July 2026 clinical tool review ----------------------------------
@@ -232,28 +288,40 @@ def mri_protocols(costs_path: Path = DEFAULT_COSTS_PATH) -> list[str]:
 # can be orderable without a price.
 
 
-def body_imaging_studies(costs_path: Path = DEFAULT_COSTS_PATH) -> list[str]:
+def body_imaging_studies(costs_path: Path = DEFAULT_COSTS_PATH, packs: tuple[str, ...] = ()) -> list[str]:
     """The closed `order_body_imaging.study` vocabulary (`<region>_<modality>`)."""
-    return by_type_values("order_body_imaging", costs_path)
+    return by_type_values("order_body_imaging", costs_path, packs)
 
 
-def microbiology_specimens(costs_path: Path = DEFAULT_COSTS_PATH) -> list[str]:
+def microbiology_specimens(costs_path: Path = DEFAULT_COSTS_PATH, packs: tuple[str, ...] = ()) -> list[str]:
     """The closed `order_microbiology.specimen` vocabulary."""
-    return by_type_values("order_microbiology", costs_path)
+    return by_type_values("order_microbiology", costs_path, packs)
 
 
-def tissue_procedures(costs_path: Path = DEFAULT_COSTS_PATH) -> list[str]:
+def tissue_procedures(costs_path: Path = DEFAULT_COSTS_PATH, packs: tuple[str, ...] = ()) -> list[str]:
     """The closed `obtain_tissue_diagnosis.procedure` vocabulary."""
-    return by_type_values("obtain_tissue_diagnosis", costs_path)
+    return by_type_values("obtain_tissue_diagnosis", costs_path, packs)
 
 
-def molecular_assays(costs_path: Path = DEFAULT_COSTS_PATH) -> list[str]:
+def molecular_assays(costs_path: Path = DEFAULT_COSTS_PATH, packs: tuple[str, ...] = ()) -> list[str]:
     """The priced `obtain_tissue_diagnosis.molecular_assays` vocabulary."""
     return sorted(
-        _load_tools(costs_path).get("obtain_tissue_diagnosis", {}).get("by_molecular_assay", {})
+        _load_tools(costs_path, tuple(packs)).get("obtain_tissue_diagnosis", {}).get("by_molecular_assay", {})
     )
 
 
-def assessment_types(costs_path: Path = DEFAULT_COSTS_PATH) -> list[str]:
+def assessment_types(costs_path: Path = DEFAULT_COSTS_PATH, packs: tuple[str, ...] = ()) -> list[str]:
     """The closed `perform_clinical_assessment.assessment_type` vocabulary."""
-    return by_type_values("perform_clinical_assessment", costs_path)
+    return by_type_values("perform_clinical_assessment", costs_path, packs)
+
+
+def assessment_timings(costs_path: Path = DEFAULT_COSTS_PATH, packs: tuple[str, ...] = ()) -> list[str]:
+    """The closed `perform_clinical_assessment.timing` vocabulary: before or after an intervention.
+
+    Read from the `timings` block, priced at 0 like the MRI `protocols`. Added on 24 Oct 2026 so
+    that the NPH baseline gait assessment and its reassessment after the tap test, the same
+    assessment twice, are told apart by the MockServer and by the scorer.
+    """
+    return sorted(
+        _load_tools(costs_path, tuple(packs)).get("perform_clinical_assessment", {}).get("timings", {})
+    )

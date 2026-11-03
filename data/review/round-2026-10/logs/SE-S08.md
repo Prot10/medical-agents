@@ -1,0 +1,99 @@
+# SE-S08
+Reviewer status: R1 not reviewed, R2 needs_changes | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| 7fb2fc52-87d3-4104-a2e3-b6460207a16c | FIXED | Deleted the orphan `analyze_csf` follow-up (`request_lp_autoimmune`). No criterion covered it, and it ran an LP the case prohibits. Added avoided action `avoid-harm-1-analyze-csf` (severity `harm`) with the plan's corrected rationale. The "HELLP coagulopathy" wording was false (INR 1.0, now also aPTT 28 and fibrinogen 382), so the LP prohibition, its duplicate and `key_clinical_evidence[2]` now say LP is not indicated and platelets are 88 in HELLP. |
+| 09924507-a7db-44f6-865e-303eb0ed1c34 | FIXED | Deleted the literature finding "Avoid nimodipine in pregnancy - teratogenic". Also deleted the fabricated delivery thresholds ("deliver if platelets <50 ... stabilize if >50") and the "target lamotrigine >6" figure in the drug check and the post-treatment labs. The literature output is rewritten per T-LIT from the plan's eclampsia facts [ACOG_PB222_2020, Magpie_2002]. Nimodipine is not mentioned anywhere in the case. |
+
+## Own findings
+| dim (A schema, B consistency, C clinical, D leakage, E language) | severity (blocker/major/minor) | field path | finding | action (FIXED/FLAGGED) |
+| --- | --- | --- | --- | --- |
+| B | major | `patient.chief_complaint`, HPI, `neurological_exam` | The CC and HPI said the seizure was ongoing ("not stopping"), while the exam said it had been stopped with lorazepam 4 mg en route. GCS 7 with eyes open to voice is not a possible sum. The home BP was taken "on the floor" during the convulsion. | FIXED: the CC and HPI state that paramedics gave lorazepam 4 mg IV at about 10 minutes and she has not woken. The exam reads GCS 9 (E3 V1 M5). The BP history becomes rising home readings over 3 days, with headache and blurred vision since the morning (prodrome; no test result disclosed). Because first line was given, the benzodiazepine must is replaced by the next tier. |
+| B/C | major | `initial_tool_outputs.labs` | There was a template "Exclusion studies" block (magnesium, beta-hCG, haptoglobin "Within reference range") in a known 28-week pregnancy with hemolysis (plan C1, C2). The CMP had three analytes. There were no hemolysis markers apart from LDH, and no aPTT or fibrinogen. | FIXED: block deleted; beta-hCG removed from the panel, the label and the arguments. Full CMP with pregnancy ranges, magnesium 1.7, total bilirubin 1.6 (H). New "Hemolysis" panel: LDH 684 and haptoglobin 14 (L). Coagulation: INR 1.0, aPTT 28, fibrinogen 382. Lactate 3.4 after the convulsion. The summary and interpretation are factual. T-LABS criterion adds `coagulation` (HELLP, per plan) and `LDH` (see Open questions). |
+| C | major | follow-up `request_aed_optimization_pregnancy` | A "12 h post-dose increase" lamotrigine level and falling platelets reported the response to treatment (ruling 4, plan C4). | FIXED: deleted. |
+| C/D | major | `initial_tool_outputs.eeg`, follow-up `request_continuous_eeg_monitoring` | The follow-up was a post-treatment "improving pattern", and its trigger took over the cEEG order (plan C4). The EEG criterion had no `eeg_type`. | FIXED: follow-up deleted. The initial EEG is rewritten in ACNS terms: diffuse posterior-predominant 2-3 Hz delta with a reactive background, no epileptiform discharges and no seizures in 6 hours. T-EEG with `continuous_icu` or `video`. |
+| D | major | `initial_tool_outputs.ct` | A finding said "consistent with PRES from eclampsia", and the additional observations named "PRES from eclampsia" (clinical diagnosis from CT, Kind 1). | FIXED: subtle bilateral parieto-occipital subcortical hypodensity, no hemorrhage. The imaging differential (vasogenic edema, PRES) stays in the impression. MRI is recommended. |
+| D | major | MRI follow-up | "confirms PRES not infarction" and "classic PRES distribution" were in the signal fields (plan C7). | FIXED: FLAIR hyperintensity with increased ADC and no restricted diffusion, SWI with no blood, impression "consistent with PRES". Non-contrast study (pregnancy). The a4 expected text no longer refers to MRV. |
+| C/D | major | DDI follow-up, a5 | The output was a treatment plan ("Magnesium ... first-line for eclampsia", "target >6"), not interactions (C4, C9). | FIXED: T-DDI. Magnesium with nifedipine (hypotension), with lorazepam (respiratory depression) and with neuromuscular blockers. Valproate doubles lamotrigine; phenytoin lowers it; levetiracetam has no interaction. Valproate and ACE inhibitors/ARBs are contraindicated in pregnancy. Magnesium renal-excretion warning. Tier `required` per plan C9. |
+| C | major | `assessment.required_recommendations` | The magnesium must gave no maintenance rate and no renal caution. There was no second-line ASM, no fetal monitoring and no cEEG. Lorazepam came "if seizures persist despite magnesium", although she had already received 4 mg. | FIXED: magnesium 4-6 g then 1-2 g/h at the lower rate for creatinine 1.1, with monitoring; prompt treatment of severe-range BP; levetiracetam 60 mg/kg (max 4500 mg), avoiding valproate and fosphenytoin with the reasons; lamotrigine increase with levels; delivery after stabilization (steroids must not delay it); continuous fetal monitoring; T-MUST-cEEG. |
+| C | major | `assessment.prohibited_recommendations` | The valproate and LP prohibitions were each duplicated. "Phenytoin without obstetric monitoring" was vague. | FIXED: one valproate prohibition, one LP prohibition, no benzodiazepine or phenytoin in place of magnesium [ACOG_PB222_2020], no delay of delivery, no ACE inhibitor or ARB. |
+| C | major | `ground_truth.differential` | CVST stayed moderate although the MR venography is normal. "Lamotrigine breakthrough alone" was high. TTP, a HELLP mimic with hemolysis, thrombocytopenia and seizures, was missing (ruling 7). | FIXED: eclampsia alone moderate (an incomplete explanation); lamotrigine alone low; TTP low (platelets 88, transaminases, hypertension); CVST low (MRV); stroke low (MRI). |
+| A/C | minor | a8 MR venography | Its citations were `[LICE_NORSE_2024]`, which is not allow-listed, and an unbracketed duplicate (C11). The label was a long sentence. | FIXED: `[Fugate_2015]`; short label; rationale in one sentence; still optional, ordered after MRI. Protocol is non-contrast TOF (pregnancy). |
+| C/D | major | a6 literature | Literature was required. | FIXED: optional, last, out of the stop rule. |
+| A | minor | `fallback_tool_outputs` | `advanced_imaging` "MRI brain" and `specialized_test` "fetal_monitoring" are not vocabulary (C10). The ECG fallback had rate 69 against HR 118. | FIXED: both nulled. ECG is sinus tachycardia 112. `fallback_tool_kinds` updated. |
+| A | minor | `sequence_constraints` | Labs before drug check was `hard`, with a beta-hCG reason in a known pregnancy. | FIXED: deleted per plan C13 (S08 is not in the labs-before-DDI list). |
+| E | minor | `avoid-waste-5-order-specialized-test` | It carried the DaTscan rationale. | FIXED: T-PSG. |
+| A | minor | `stop_rule`, `metadata` | `max_additional_actions` was 0, and literature was in the stop rule. | FIXED: labs, CT, EEG, MRI and drug check; max 1; metadata updated. |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+SE-S08 keeps its diagnosis: convulsive SE at 28 weeks from eclampsia with HELLP, plus a lamotrigine breakthrough. The story is now coherent. Paramedics stopped the convulsion with lorazepam 4 mg, and she has not woken (GCS 9). A 3-day rise in home BP with headache and blurred vision is the prodrome. The labs are complete and consistent. HELLP shows as platelets 88, AST 142, ALT 118, LDH 684, haptoglobin 14 and bilirubin 1.6. Coagulation is normal, creatinine is 1.1, the urine protein:creatinine ratio is 4.2, magnesium is 1.7 and lamotrigine is 2.8. The template exclusion block, beta-hCG and the post-treatment panel are gone. CT and MRI describe their findings without naming eclampsia, and the MRI is consistent with PRES with no infarct or blood. The cEEG shows posterior-predominant slowing without seizures. The orphan LP is gone; LP is an avoided action (harm, not indicated). The false "coagulopathy" wording is corrected. The drug check now lists real interactions, the nimodipine and fabricated threshold content is removed, and literature is optional. The musts are magnesium with renal caution, severe-range BP treatment, a levetiracetam load (avoiding valproate and fosphenytoin), a lamotrigine increase, delivery after stabilization, fetal monitoring and cEEG. TTP is added to the differential, and CVST is low after the normal MRV.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+- Plan CENTRAL 1: `[ACNS_2021]`, `[ACOG_PB222_2020]`, `[Magpie_2002]` and `[Fugate_2015]` are cited here and need the criteria-pack allow-list.
+
+## Open questions for Andrea (judgment calls you could not settle)
+None open. One deviation from the plan, decided here: T-LABS lists the only allowed extras (AED_levels, tox_screen, ammonia, coagulation, beta-hCG). I also kept `LDH` as a required panel. LDH (hemolysis) is one of the three HELLP criteria and cannot be derived from the CBC or CMP, so a work-up without it cannot establish the diagnosis this case is built on. Haptoglobin and the urine protein ratio are reported but not required.
+
+## Verification
+Adversarial verifier, 24 Oct 2026. Read the log, the diff and the whole final case (large rewrite; R2 needs changes).
+- Note 7fb2fc52: confirmed. There is no CSF follow-up. `avoid-harm-1-analyze-csf` is `harm`, with the plan's rationale (INR 1.0, platelets 88). The LP prohibition and `key_clinical_evidence` no longer claim a coagulopathy. Coagulation is reported as normal (INR 1.0, aPTT 28, fibrinogen 382).
+- Note 09924507: confirmed. "Nimodipine" appears nowhere in the case. There are no delivery platelet thresholds, and no "lamotrigine >6" target.
+- Cross-field checks: the HPI says lorazepam 4 mg was given before arrival, so the must starts at the next tier (magnesium) and no benzodiazepine must remains. GCS 9 = E3 V1 M5. Lamotrigine is 2.8 against a range of 3-15, and the prior level of 4.2 was at the low end, which is consistent. The pregnancy reference ranges are consistent, with creatinine 1.1 flagged high, which matches the reduced magnesium maintenance must. The HELLP values are the same in the labs, the expected text, the red herring and the differential. The valproate and fosphenytoin avoidance agrees between the musts, the prohibitions and the drug check. Loading levetiracetam after a terminated SE in known epilepsy is consistent with [Brophy_2012] urgent control therapy. Keeping `LDH` as a required panel is clinically justified (HELLP criterion) and the perfect agent accepts it. Checks are clean.
+- Changed: only the stale `metadata.revision_reason`, which now points to this log. No clinical error found.
+
+## Close-out (24 Oct 2026)
+Decisions in `plans/SE-decisions.md`.
+- synonyms: the G41 category no longer grants the type codes G41.0, G41.2 and G41.8 (a type code is granted only by the case's own code, so an answer coded with the wrong SE type no longer scores by code); `apply_diagnosis_synonyms.py --prune --conditions status_epilepticus` removed G41.2 and G41.8 from `ground_truth.diagnosis.icd_codes`. Labels unchanged.
+- Checks: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, SE case guards pass, `apply_diagnosis_synonyms.py --check --conditions status_epilepticus` clean.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `initial_tool_outputs.eeg`: `eeg_type` set to `continuous_icu`, decided by reading the report.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## EEG and labs after routing (25 Oct 2026)
+
+Commit 317e46db routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG) and serves an `interpret_labs` order only the stored panels it names. Decisions for the condition in `plans/SE-routing-decisions.md`.
+
+- EEG: a routine order received the library's normal routine EEG, which contradicts the case. Added `fallback_tool_outputs.eeg` with `eeg_type` `routine` (the stored continuous_icu recording cut to a 30-minute portable recording without video, technologist notes for the clinical events, activation not performed): diffuse posterior-predominant 2-3 Hz delta, reactive, no epileptiform discharges or seizures in 30 minutes. No criterion, tiers and the reward-relevant policy unchanged; the clinically correct test stays the continuous EEG of `action-1-analyze-eeg`. A `continuous_icu` or `video` order still receives `initial_tool_outputs.eeg`.
+- Labs: no SE lab criterion of this case cites a result its own order does not return; no change.
+- Checks: `perfect_agent.py -v` pass; `case_io.py check` schema and synonym guard OK, no test failure names the case; probe: routine (omitted and explicit) order -> the new case fallback, `continuous_icu` and `video` -> the stored index recording; every number in each lab criterion's evidence is in what its order returns.
+
+## Matcher fix (25 Oct 2026)
+
+The lab matcher now keeps a urine or CSF row out of a blood order: a urinalysis, urine sodium or urine osmolality row answers only an order that names the urine assay, so a CBC or CMP order no longer returns the urine results. The lab criterion therefore names the urine assays its expected evidence cites.
+
+- `ground_truth.action_criteria[action-2-interpret-labs]`: new first alternative `{panels: ['CBC', 'CMP', 'magnesium', 'AED_levels', 'coagulation', 'LDH', 'urinalysis']}` (adds `urinalysis`); the previous orders stay as alternatives, so every call that matched before still matches. The expected evidence reads urine protein:creatinine 4.2, which the first order received only through two matcher defects fixed on 25 Oct 2026: a urine row answered a blood-count or metabolic order (`Urine WBC` as WBC, `Urine sodium` as sodium, a urine creatinine ratio as creatinine), and the unit `mg/dL` read as magnesium. Scoring: cost reference only (the policy's reference order is fuller); coverage unchanged. `initial_tool_outputs.labs.panels.Urine` renamed `Urinalysis` so a urinalysis order returns the protein:creatinine ratio (no vocabulary term names it alone).
+
+## Library contradictions (25 Oct 2026)
+
+Orders that reached the benchmark library's normal report although this case contradicts it (diagnosis, history, medications or a stored finding) now get a case-specific report; every other off-pathway order still gets the library normal. No tier, criterion, diagnosis or existing output changed.
+
+- `analyze_eeg eeg_type=ambulatory` -> `followup_outputs[order_ambulatory]`: ambulatory EEG mirroring the stored continuous EEG (no video).
+- `perform_clinical_assessment assessment_type=performance_status` -> `followup_outputs[order_performance_status]`: performance status KPS 20, ECOG 4 during the admission.
+- `perform_clinical_assessment assessment_type=gait_and_balance_timed` -> `followup_outputs[order_gait_and_balance_timed]`: timed gait not testable, as on the examination.
+- `perform_clinical_assessment assessment_type=cognitive_screen` -> `followup_outputs[order_cognitive_screen]`: baseline cognitive screen not testable in the documented mental state.
+- `order_specialized_test test_type=neuropsych_battery` -> `followup_outputs[order_neuropsych_battery]`: neuropsychological battery not testable in the documented mental state.
+- `order_specialized_test test_type=speech_language_evaluation` -> `followup_outputs[order_speech_language_evaluation]`: speech and language evaluation not testable in the documented mental state.
+- `labs:lithium_level` -> fallback labs panel `Lithium`: lithium not detected (not prescribed).
+- `labs:valproate_level` -> fallback labs panel `Valproate`: valproate not detected (not prescribed).
+- `labs:beta-hCG` -> fallback labs panel `Beta-hCG`: beta-hCG positive at 28 weeks of pregnancy.
+- `order_body_imaging study=pelvis_abdomen_ultrasound` -> `followup_outputs[order_pelvis_abdomen_ultrasound]`: abdominal and pelvic imaging: gravid uterus at 28 weeks.
+- `order_body_imaging study=pelvis_abdomen_CT` -> `followup_outputs[order_pelvis_abdomen_ct]`: abdominal and pelvic imaging: gravid uterus at 28 weeks.
+- `order_body_imaging study=pelvis_abdomen_MRI` -> `followup_outputs[order_pelvis_abdomen_mri]`: abdominal and pelvic imaging: gravid uterus at 28 weeks.
+- `order_body_imaging study=chest_abdomen_pelvis_CT` -> `followup_outputs[order_chest_abdomen_pelvis_ct]`: abdominal and pelvic imaging: gravid uterus at 28 weeks.
+
+Checks: `perfect_agent.py` ok; `test_case_guards.py -k SE` pass; every order listed in `plans/LIBRARY-group2-map.yaml` for this case is answered without the library; served answers of every other order unchanged against HEAD. Reasons and doubts: `plans/LIBRARY-group2-decisions.md`.

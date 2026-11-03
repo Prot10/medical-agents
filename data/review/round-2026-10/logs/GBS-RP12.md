@@ -1,0 +1,106 @@
+# GBS-RP12
+Reviewer status: R1 not reviewed, R2 needs_changes | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| 8e2833d3-10bd-48c5-8534-cab79697b031 | FIXED | Label changed to the examination (the reviewer ruled the label wrong): `ground_truth.diagnosis.accepted[0]` "Guillain-Barré syndrome, severe acute inflammatory demyelinating polyradiculoneuropathy with left ptosis" (was "... cranial-nerve variant (unilateral facial involvement)"). The facial-palsy-derived differential entries (Lyme polyradiculitis with facial palsy, sarcoid cranial neuropathy) and pearl 1 were removed or rewritten; `metadata.difficulty_description` without em dash. |
+| d4baaeb9-ead9-4dae-b089-ab2fcfe8fb3c | FIXED | `followup_outputs[3]` (respiratory) rewritten in the canonical format: FVC 2.2 L (58% predicted; 30 mL/kg at 74 kg) L, MIP -28 cmH2O L, MEP 52 cmH2O L, change from 2.4 L / -32 cmH2O on arrival over 4 h (8% fall), cough effective. The arrival values sat in `neurological_exam.additional` and now appear only in the report. Weight and height added (`patient.physical_exam.general` "Weight 74 kg, height 170 cm", BMI 25.6 agrees). Must 1 is ICU-level monitoring now (FVC <60% predicted, MIP weaker than -30, falling trend) with the intubation criteria (FVC <20 mL/kg, about 1.5 L; worsening MIP/MEP; bulbar weakness with weak cough or secretions; distress, hypoxaemia, hypercapnia). a4 canonical. |
+| e5ca0f0c-2750-4743-9e2b-8ebb8de3ab25 | FIXED | Edrophonium follow-up (`request_tensilon_test`, which also repeated the ice pack test) deleted; a prohibition explains why no edrophonium test. Single-fibre EMG and the ice pack test removed from the NCS report (not part of an NCS order); RNS stays in the NCS report (median-APB and facial-nasalis). AChR/MuSK moved from the initial labs to their own follow-up with a recommended criterion `action-10-interpret-labs-anti-achr`; the ice pack test became its own follow-up (`request_ice_pack_test`, `test_type: ice_pack_test`) with an optional criterion `action-11-order-specialized-test-ice-pack`. Ptosis resolved: red herring "New unilateral left ptosis" plus differential entries myasthenia gravis (low), Horner syndrome (very_low, pupils equal, no anisocoria in dim light) and partial oculomotor palsy (very_low, full eye movements, pupils spared). The HPI sentence naming the MG/Horner/oculomotor work-up was removed (C7). |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| C | major | `initial_tool_outputs.labs` | HIV with the leaky clinical_significance (C10); Campylobacter and EBV IgM (C3); no platelets, glucose, liver tests, albumin or CK although a1 expects them. | FIXED: HIV and infection serology removed; CBC platelets, CMP with glucose, BUN, ALT, AST, ALP, bilirubin and albumin, CK 142 added (all normal); CRP and ESR kept; `clinical_significance: null`. |
+| A | major | `followup_outputs` | Ganglioside follow-up (anti-GM1 IgG 1:80) in typical sensorimotor GBS (C2); empty literature and DDI placeholder follow-ups (C9). | FIXED: all three deleted; `anti-GM1 IgM` removed from a1. |
+| D | major | `initial_tool_outputs.literature_search` | Literature output echoed a5's expected_evidence (C11). | FIXED: canonical general output [EAN_PNS_2023, Walgaard_2021]; a5 optional and last. |
+| C | minor | `initial_tool_outputs.specialized_test` | "with conduction block" without conduction-block data; no needle EMG; `test_type` in prose. | FIXED: pattern "Demyelinating polyradiculoneuropathy", severity Severe, CMAPs labelled reduced, needle EMG line added, `test_type` "emg_ncs". |
+| C | minor | `followup_outputs` telemetry | 72-hour report; "Mild autonomic dysfunction" is an interpretation (C12). | FIXED: first 24 h, sinus 64-88 bpm, BP 132/80 to 184/106 mmHg with hourly swings (admission BP 162/102 with well-controlled hypertension before); a8 expected_evidence canonical with these values. |
+| C | major | `ground_truth.assessment` | Musts generic ("Initiate IVIG / plasma exchange", ICU without criteria); "Brainstem MRI given asymmetric cranial findings" with no criterion and no indication once the ptosis is pupil-sparing with full eye movements; "corticosteroids as monotherapy" prohibition (C8). | FIXED: ICU-level and intubation must; IVIg 2 g/kg (about 30 g/day at 74 kg) with the indication (GBS disability 4, day 5) and PE alternative; telemetry with cautious treatment of autonomic BP surges [Leonhard_2019]; LMWH prophylaxis. Brain MRI must and pearl 2 deleted (plan option; brain MRI stays waste with a case-specific rationale). Prohibitions: canonical steroid text, no edrophonium test, renal function before IVIg, no succinylcholine. |
+| C | major | `ground_truth.differential` | Brainstem stroke and acute-onset CIDP moderate after the work-up (C5); Lyme and sarcoid entries built on a facial palsy the patient does not have. | FIXED: brainstem stroke very_low, CIDP low, vasculitic very_low with reasons; Lyme and sarcoid removed; MG, Horner, oculomotor added. |
+| B | minor | `patient.neurological_exam` | `additional` repeated vitals, spirometry and history; motor exam gave no distal arm strength; no plantar responses or pupil detail for the ptosis. | FIXED: `additional` keeps the upgaze fatigability test; finger abduction 4/5, flexor plantars, "no anisocoria in dim light", palate and cough normal added; em dashes removed. |
+| B | minor | `followup_outputs[0]` CSF | "N/A PMN/N/A lymph" placeholder; em dash; ratio 0.71 vs serum glucose. | FIXED: interpretation rewritten; ratio 0.68 with serum glucose 94. |
+| C | minor | `ground_truth.action_criteria` a6 | DDI required with amlodipine only. | FIXED: optional (amlodipine changes neither the choice nor the dose of IVIg or PE; ruling 6); DDI output category-level (no interaction with IVIg, hypotension with PE as relative caution) without the templated "which agents to taper" warning. |
+| B | minor | `ground_truth.sequence_constraints`, `stop_rule` | Template constraints (EMG named for a respiratory reason; labs before an optional DDI); stop rule with literature and 0 extra actions. | FIXED: constraints deleted; stop rule = five required criteria, `max_additional_actions` 3. |
+| E | minor | `patient.chief_complaint`, `patient.history_present_illness` | Exam findings and em dashes in the chief complaint; editorial "this is an isolated unilateral ptosis". | FIXED: rewritten in the patient's terms. |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+
+The case is now labelled as what it shows: severe AIDP in a 57-year-old man (74 kg) with a pupil-sparing, non-fatigable left ptosis and no facial weakness. The patient block no longer carries spirometry or the list of tests the ptosis prompted. The edrophonium challenge is gone; myasthenia is addressed by RNS in the NCS report (no decrement), AChR/MuSK antibodies as a recommended order and an optional ice pack test, all negative. The ptosis is a red herring resolved by equal pupils, full eye movements and no fatigability, with Horner syndrome and oculomotor palsy in the differential at very low. Respiratory function reads FVC 2.2 L (58%, 30 mL/kg), MIP -28, MEP 52 cmH2O, falling over 4 h, so must 1 admits him to ICU-level monitoring with explicit intubation criteria; IVIg 2 g/kg is given because he cannot walk at day 5. Baseline labs are complete and normal; the ganglioside panel and infection serology are gone; telemetry reports 24 hours with blood pressure lability. The brain MRI must is gone because nothing in the findings calls for it.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+
+- `ground_truth.diagnosis.accepted[0]` changed (note 8e2833d3: label did not match the exam); synonyms untouched.
+- Plan CENTRAL 5 (weight field) and 10 (respiratory-report guard) apply.
+
+## Open questions for Andrea (judgment calls you could not settle)
+
+- None.
+
+## Verification (adversarial verifier, 24 Oct 2026)
+
+Checked: all three note ids present; label now matches the exam (left ptosis, no facial weakness); edrophonium follow-up gone and the ice pack test is its own optional follow-up; RNS in the NCS report; AChR/MuSK follow-up with a recommended criterion; Horner and oculomotor entries and the ptosis red herring present. Respiratory arithmetic (2.2 L / 74 kg = 30 mL/kg; 2.4 to 2.2 L = 8% fall; BMI 74 / 1.70^2 = 25.6), ICU and intubation must, CSF ratio 64/94 = 0.68, complete normal labs, telemetry 24 h, no residual serology, HIV or ganglioside text, stop rule = the five required criteria.
+
+Found and fixed:
+- C, minor: must 2 gave "GBS disability score 4" while the exam and HPI say he walks only with bilateral support (score 3). Changed to 3 (indication unchanged).
+- B, minor: a7 expected_evidence was the template "Sinus tachycardia or bradycardia; conduction or repolarisation abnormalities" while the ECG is normal sinus rhythm 76 with QTc 422 ms, and the rationale repeated the label. Both rewritten to what the ECG shows. Same template remains in M01, M02, M03, P02, RM11-RM16 (outside this batch): tell the lead.
+- C, minor: differential "Partial oculomotor nerve palsy" very_low with "isolated levator weakness is part of the cranial involvement" was self-contradictory (levator ptosis in GBS is partial oculomotor involvement). Renamed "Compressive or microvascular oculomotor nerve palsy" with the pupil and eye-movement reasons.
+
+Checks run after the edits: `perfect_agent.py -v` passes (every required and recommended criterion served by its own report), `case_io.py check` clean for the case (schema, synonym guard, no test failure naming it), `test_case_guards.py` leak, follow-up and banned-string guards pass.
+
+
+## Condition audit (24 Oct 2026)
+Condition auditor, after the worker and the verifier. Changes made through case_io; `perfect_agent.py` and `case_io.py check` re-run clean for all 30 GBS cases afterwards, and `test_case_guards.py -k GBS` passes.
+- E, minor: `fallback_tool_outputs.drug_interactions.general.proposed` read "(agent not specified on this case's pathway)", an engineering note served to any off-pathway interaction check (PATTERNS 5). Now "Medication list review", as in S01-S03 and RS18.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/GBS-decisions.md` (Andrea, 24 Oct 2026: resolve open points for dataset quality).
+
+- Synonyms (`diagnosis_synonyms.yaml` G61.0 split into scoped entries, expanded with `--prune`): now accepts the generic GBS labels and the three AIDP labels (its NCS is demyelinating); "acute motor axonal neuropathy", "AMAN" and "miller fisher syndrome" are no longer accepted (wrong subtype or variant for this case).
+- Checks: `perfect_agent.py` pass; `case_io.py check` clean for this case; GBS guards pass; synonym `--check` clean.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+- follow-up `request_cardiac_monitoring`: `monitor_type` "Continuous telemetry" -> `telemetry`.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Engineering text (25 Oct 2026)
+
+Review-process wording (references to the round's rulings, the round policy file, the criteria packs, and tier markers such as "(optional)" in criterion labels and rationales) is shown to physicians in the review app, so it was rewritten in clinical language. The tier stays in the criterion's `importance` field; scoring is unchanged. `test_case_guards.py::test_no_review_process_text` now fails on any of it.
+
+- criterion `action-6-check-drug-interactions` rationale: "Amlodipine does not change the choice or the dosing of IVIg or plasma exchange (ROUND_POLICY ruling 6)." -> "Amlodipine does not change the choice or the dosing of IVIg or plasma exchange."
+
+## Weight and height (25 Oct 2026)
+
+- `patient.demographics`: weight 70.5 -> 74 kg, height 166 -> 170 cm, BMI 25.6 -> 25.6 (the prompt shows height, weight and BMI).
+- Why: rule 1: patient.physical_exam.general states weight 74 kg, height 170 cm.
+- The FVC mL/kg figures and the weight-based IVIg amounts in the text were checked against this weight: all within rounding, no text change.
+
+Checks: `perfect_agent.py` ok; BMI = weight / height^2 to one decimal.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 40, ECOG 3 (fallback_tool_outputs.clinical_assessment). Why: rule 1: the library reports Karnofsky 100 / ECOG 0 and a working patient; he cannot walk independently, with four-limb weakness.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: unable to walk independently; timed gait and balance tests not performed (followup_outputs[5] request_gait_and_balance_timed). Why: rule 1: the library reports a normal timed gait and balance assessment; he cannot walk without bilateral support (knee extension and ankle dorsiflexion 3/5).
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: no tremor or rigidity; motor items limited by weakness, response not assessable (followup_outputs[6] request_levodopa_challenge). Why: rule 1: the library describes a normal motor examination, gait and postural reflexes; four-limb weakness 3-4/5 and a support-dependent gait.
+- `order_body_imaging {study: spine_MRI}`: smooth enhancement of the cauda equina roots, ventral more than dorsal; normal cord (fallback_tool_outputs.body_imaging). Why: rule 1: smooth enhancement of the cauda equina and ventral roots is seen in most patients with this polyradiculoneuropathy (Gorson 1996; Byun 1998), while the library reads the roots as normal.
+- `order_body_imaging {study: peripheral_nerve_MRI}`: smooth enhancement and mild T2 hyperintensity of the lumbosacral roots, no enlargement (followup_outputs[7] request_peripheral_nerve_mri). Why: rule 1 and 3: the library reads the nerve roots as normal; root enhancement as on the spine MRI of this case.
+- `order_specialized_test {test_type: nerve_biopsy}`: segmental demyelination with macrophage infiltration and sparse T-lymphocytes; reduced myelinated fibre density (fallback_tool_outputs.specialized_test). Why: rule 3: the stored nerve conduction study shows absent sural sensory responses with a demyelinating pattern; the library sural biopsy is normal.
+- `perform_clinical_assessment {assessment_type: orthostatic_blood_pressure}`: active standing not performed (cannot stand without bilateral support); supine BP 160/100 mmHg, HR 76 bpm; sitting BP 148/96 mmHg, HR 82 bpm (followup_outputs[8] request_orthostatic_blood_pressure). Why: rule 3: he cannot stand without bilateral support and has hourly blood pressure swings of up to 40 mmHg on telemetry; the library reports 3 minutes of symptom-free standing at a supine heart rate of 68.
+- `order_specialized_test {test_type: autonomic_testing}`: reduced cardiovagal function, distal sudomotor impairment and labile blood pressure on tilt (followup_outputs[9] request_autonomic_testing). Why: rule 3: the stored telemetry shows blood pressure 132/80-184/106 mmHg with hourly systolic swings of up to 40 mmHg
+- `order_specialized_test {test_type: tilt_table}`: Abnormal head-up tilt: labile blood pressure; no sustained orthostatic hypotension or vasovagal response (followup_outputs[10] request_tilt_table). Why: rule 3: the stored telemetry shows blood pressure 132/80-184/106 mmHg with hourly systolic swings of up to 40 mmHg
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

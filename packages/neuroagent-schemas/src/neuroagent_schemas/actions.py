@@ -104,6 +104,7 @@ class ObservationReceived(EventBase):
     from_fallback: bool = False
     library: bool = False  # the fallback came from the benchmark-level library, not the case
     rejected: bool = False  # the call violated the tool's schema and was never placed
+    unavailable: bool = False  # a recorded case holds no result for this order (never performed)
 
 
 class AssessmentSubmitted(EventBase):

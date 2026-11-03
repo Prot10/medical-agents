@@ -1,0 +1,100 @@
+# SE-P03
+Reviewer status: R1 not reviewed, R2 not reviewed (no notes) | Approved before this round: per plan
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| (none) | n/a | The notes file has no note for SE-P03. |
+
+## Own findings
+| dim (A schema, B consistency, C clinical, D leakage, E language) | severity (blocker/major/minor) | field path | finding | action (FIXED/FLAGGED) |
+| --- | --- | --- | --- | --- |
+| D | major | `patient.chief_complaint`, HPI | The CC stated the EEG result ("EEG shows burst-suppression, unsure if NCSE or post-anoxic sedation"). The HPI listed the answer options (A) to (C) with prognostic commentary, and it misnamed action myoclonus-renal failure syndrome as a benign post-anoxic myoclonus (plan C7). | FIXED: the CC is the presenting problem. The HPI is a plain timeline (collapse, VF, ROSC at about 11 minutes, amiodarone, TTM at 36 C, propofol 10 mcg/kg/min, jerks noticed about 24 hours after ROSC, no benzodiazepine or ASM yet). |
+| B | major | HPI, `neurological_exam`, EEG outputs | The bursts and sharp waves are left-hemisphere predominant (T3), yet the arm flexion and facial twitching were on the LEFT (plan C6). | FIXED: right arm and right face in the HPI, the exam and both EEG reports. |
+| D | minor | `neurological_exam` | "These movements are the reason for urgent EEG consultation" and "(consistent with sedation)" were commentary. | FIXED: removed; oculocephalic responses are reported as not elicited. |
+| C/D | major | `initial_tool_outputs.eeg` | The report called stimulus-induced bursts "reactivity (favorable prognostic sign)", and recommended a repeat EEG. | FIXED: ACNS description. Burst-suppression with near-identical epileptiform bursts, left predominant (T3, C3), suppression below 10 microvolts, and right arm and face myoclonus time-locked to bursts on video. There is no background reactivity (stimulus-induced bursts only). No recommendation. |
+| C/A | major | EEG follow-up `request_continuous_eeg_monitoring` | The weaning recording reported "drug-induced contribution excluded" and a progressive loss of reactivity as a course over time. Its trigger took over every cEEG order (plan C4). | FIXED: kept as the diagnostic manoeuvre with trigger `sedation_wean`. The report gives propofol off for 2 hours with the pattern unchanged, without interpretation. A plain cEEG order gets the initial EEG. |
+| B/C | major | `initial_tool_outputs.ecg` | ECG rate 88 contradicted vitals HR 58 on metoprolol and amiodarone. The interpretation was advice ("constrains antiseizure drug selection"). | FIXED: sinus bradycardia 58/min; QT 506 ms gives QTc 498 ms (Bazett); a plain read. |
+| A/C | major | `initial_tool_outputs.labs` | Template "Exclusion studies" (ammonia, lactate, ABG without values, C1). There was no CMP or liver function. NSE 18 at 24 hours was outside the prognostic window and is not in the lab vocabulary. | FIXED: block and NSE deleted. CMP with chloride, BUN, ALT 98 and AST 142 (post-arrest), albumin; magnesium as its own panel; ABG on FiO2 0.40 and lactate 2.6 (H). The summary and interpretation are a recital. |
+| A | major | `action-2-interpret-labs`, `action-7-interpret-labs`, follow-up `request_nse_serial` | a2 asked for ammonia, AED levels (no ASM), lactate, ABG, troponin and BNP. a7 was serial NSE at 24, 48 and 72 hours, a future time course, with a ">33 = very poor prognosis" threshold inside the reference range (plan 3.2). | FIXED: a2 is T-LABS (CBC, CMP, magnesium). a7 and its follow-up deleted. NSE at 48 and 72 hours is named in the prognostication must. |
+| B/C | major | SSEP follow-up, `action-5` | The SSEP was "at 56 hours ... after reduction of sedating infusion", which is after the encounter, with an essay in the impression. | FIXED: recorded at about 26 hours (ERC-ESICM allows SSEP from 24 hours), with N9, N13 and N20 by side, latencies and a technical-adequacy line. a5 stays required with a rationale on its place in multimodal prognostication. |
+| C | minor | CT, MRI follow-up, `action-4` | The CT recommended an MRI. The MRI was required. | FIXED: the CT has no recommendation, and its findings describe reduced grey-white differentiation and patent cisterns. MRI is recommended (plan 3.1), with trigger `request_mri_brain_dwi` and cleaned signal descriptions. |
+| C/D | major | DDI follow-up, `action-6` | It was built around lacosamide, with a PR of 240 ms that contradicted the ECG (168 ms). The expected text claimed amiodarone QT prolongation as the reason to avoid phenytoin, and a "propofol weaning protocol" (plan C9). | FIXED: T-DDI. Amiodarone inhibits CYP2C9 and raises phenytoin; fosphenytoin loading with amiodarone and metoprolol risks hypotension, bradycardia and AV block; lacosamide adds PR prolongation. Levetiracetam and valproate have no conduction interaction. Propofol adds hypotension and sedation. Also amiodarone with atorvastatin and with metoprolol. Required. Leak guard passes. |
+| D | major | literature follow-up, `action-8` | Literature was required. Its source was an unverifiable "Resuscitation 2022" and its summary was empty. | FIXED: optional and last. T-LIT on ERC-ESICM 2021 timing and modalities; trigger renamed. |
+| C | major | `assessment` | There was no benzodiazepine and no levetiracetam dose. The TTM must was vague. Phenytoin was linked to QT prolongation. Prognostication had two duplicate prohibitions with a 72-96 hour window. There was no cardiac must. | FIXED: T-MUST-BZD; T-MUST-2L levetiracetam 60 mg/kg (valproate as alternative), avoiding fosphenytoin and lacosamide with reasons; propofol weaning under video-EEG with 24 hours of monitoring; temperature control at 36 C and fever prevention for 72 hours; multimodal prognostication no earlier than 72 hours and after sedation is cleared, with myoclonus never deciding alone [ERC_ESICM_2021]; QTc, K and Mg monitoring; cardiology work-up of the VF; family meeting. The prohibitions forbid early withdrawal, fosphenytoin and QT-prolonging drugs. The GPD prohibition was removed (this EEG has no GPDs). |
+| C | major | `differential` | Propofol and hypothermia burst-suppression were "high", and the case said TTM at 33 C while the HPI said 36 C. GPDs on the IIC were listed although the EEG has none (plan C14). | FIXED: propofol effect low (light dose, unchanged off propofol); temperature effect very low (36 C); Lance-Adams low; structural or metabolic cause low; sepsis low. The GPD entry was removed. |
+| A | minor | sequence constraint, stop rule, avoided actions | The ECG-before-DDI constraint was hard. The stop rule listed 9 criteria with max 0. The echo was "waste" although an echo after VF arrest is indicated, and the case contained none. | FIXED: soft. Stop rule lists the 6 required criteria, max 1. Echo avoided action deleted. Amyloid PET and carotid duplex rationales rewritten. |
+| B | minor | `fallback_tool_outputs` | There was an FDG-PET "Not performed" fallback (C10). The ECG fallback (59/min, QTc 425) contradicted the case. The echo and Holter were normal in a post-CABG VF arrest with BNP 2840. | FIXED: advanced_imaging null. ECG fallback is a copy of the case ECG. Holter shows sinus bradycardia with isolated ventricular ectopy. Echo shows LVEF 38% with inferior and inferolateral hypokinesis. `fallback_tool_kinds` updated. |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+SE-P03 keeps its diagnosis: post-anoxic myoclonic status epilepticus about 24 hours after an 11-minute VF arrest in a 62-year-old man on amiodarone, metoprolol and light propofol sedation under temperature control at 36 C. The chief complaint and HPI no longer give the EEG or the answer options. The jerks are now on the right, matching the left-predominant bursts. The EEG is an ACNS description of burst-suppression with near-identical epileptiform bursts, time-locked myoclonus and no background reactivity. The weaning recording (propofol off for 2 hours, pattern unchanged) is kept as a diagnostic manoeuvre. The SSEP (bilaterally absent N20) is dated at 26 hours, inside the encounter. The serial NSE and its criterion are gone. The ECG now matches the heart rate. The drug check gives the correct amiodarone-phenytoin interaction (CYP2C9, and conduction risk with fosphenytoin loading, not QT). The plan gives a benzodiazepine, levetiracetam 60 mg/kg, propofol weaning under video-EEG, fever prevention, cardiology work-up and a family meeting. It defers multimodal prognostication to at least 72 hours with sedation cleared and forbids early withdrawal or deciding on myoclonus alone [ERC_ESICM_2021]. MRI is recommended and literature optional.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+- Plan CENTRAL 1: `[ERC_ESICM_2021]`, `[ACNS_2021]`, `[Glauser_2016]` and `[ESETT_2019]` are cited and need the allow-list.
+- Plan CENTRAL 2: lab `NSE` would let the case report NSE at 48 and 72 hours if the case were later set at 72 hours; not needed for the current timeline.
+- Label note: `accepted[0]` says "concurrent propofol sedation and hypothermia confounding EEG interpretation". The case runs temperature control at 36 C, which is not hypothermia and does not suppress the EEG. A central label edit to "... with concurrent propofol sedation during targeted temperature management ..." would be more accurate. Not changed here (ruling 3).
+
+## Open questions for Andrea (judgment calls you could not settle)
+- The encounter is set at about 24 hours after ROSC so that the SSEP (allowed from 24 hours) and the MRI fall inside it, while prognostication stays deferred to 72 hours or later. If you prefer the encounter at 72 hours (the formal prognostication point), the SSEP and MRI fit unchanged, but the NSE at 48 and 72 hours would need the `NSE` lab term (CENTRAL 2).
+
+## Verification
+Adversarial verification, 24 Oct 2026. Checked: laterality (left-predominant bursts, T3/C3; right arm and face jerks in HPI, exam and both EEG reports); CC and HPI free of EEG results; ECG QTc by Bazett (QT 506 ms at 58/min gives 498 ms) and HR matching vitals; drug-check content (CYP2C9, conduction with fosphenytoin loading, lacosamide PR); SSEP timing (26 h, allowed from 24 h) and prognostication deferred to 72 h or later [ERC_ESICM_2021]; fever prevention 72 h; temperature 36 C consistent across HPI, exam, EEG and differential; deleted NSE criterion and follow-up; tiers per plan (SSEP and ECG required, MRI recommended, literature optional); lab flags; leak guard. Found and changed: (1) the EEG reported 8-12 bursts per minute with "each burst" accompanied by a jerk (a jerk every 5-7 s), while the HPI and exam give a jerk every 15-20 seconds; the initial EEG and the weaning EEG now say every second or third burst carries a jerk, about every 15-20 seconds, which reconciles both without touching the patient block. (2) Pathway order: the drug-check follow-up sat second, before the SSEP and MRI, while its criterion is seventh; moved after the MRI, before the literature. perfect_agent ok; case guards pass; case_io check clean for this case.
+
+## Close-out (24 Oct 2026)
+Decisions in `plans/SE-decisions.md`.
+- label: "..., with concurrent propofol sedation and hypothermia confounding EEG interpretation" -> "..., on light propofol sedation during targeted temperature management at 36 C". The case runs TTM at 36 C, which does not meaningfully confound the EEG; propofol is at 10 mcg/kg/min (SE summary CENTRAL 3c).
+- synonyms: G41.8 no longer grants NCSE labels; myoclonic SE with prominent motor jerks is not NCSE (ILAE 2015). Now accepts the generic labels plus "myoclonic status epilepticus" (entry G41.8+myoclonic); codes G41.8, G41.9, G40.901, G40.911 (G41.0 and G41.2 removed).
+- Checks: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, SE case guards pass, `apply_diagnosis_synonyms.py --check --conditions status_epilepticus` clean.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+NSE decision: not wired. The encounter is at about 24 h after ROSC; ERC-ESICM 2021 uses NSE at 48 and 72 h, so a value now has no prognostic meaning, and the prognostication must already defers it [ERC_ESICM_2021]. Re-timing an approved case to 72 h would change every report for no diagnostic gain.
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+- follow-up `request_somatosensory_evoked_potentials`: `test_type` "Short-latency somatosensory evoked potentials (median nerve SSEP)" -> `ssep`.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `initial_tool_outputs.eeg`: `eeg_type` set to `continuous_icu`, decided by reading the report.
+- follow-up EEG `sedation_wean`: `eeg_type` set to `continuous_icu`, decided by reading the report.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## EEG and labs after routing (25 Oct 2026)
+
+Commit 317e46db routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG) and serves an `interpret_labs` order only the stored panels it names. Decisions for the condition in `plans/SE-routing-decisions.md`.
+
+- EEG: a routine order received the library's normal routine EEG, which contradicts the case. Added `fallback_tool_outputs.eeg` with `eeg_type` `routine` (the stored continuous_icu recording cut to a 30-minute portable recording without video, technologist notes for the clinical events, activation not performed): burst-suppression with near-identical left-predominant epileptiform bursts, right arm and face myoclonus with bursts, no reactivity, on propofol. No criterion, tiers and the reward-relevant policy unchanged; the clinically correct test stays the continuous EEG of `action-1-analyze-eeg`. A `continuous_icu` or `video` order still receives `initial_tool_outputs.eeg`, and a repeat order the follow-up `sedation_wean`.
+- Labs `action-2-interpret-labs`: unserved result cited in `expected_evidence`: troponin I 12.8, BNP 2840 (Cardiac markers), lactate 2.6 (Arterial blood gas and lactate). TRIM: post-arrest markers, incidental to the seizure work-up. Scoring change: no.
+  - action-2-interpret-labs expected_evidence: 'Sodium, potassium, calcium and magnesium normal; glucose 168 mg/dL; ALT 98 and AST 142 U/L; creatinine 1.2 mg/dL; troponin I 12.8 ng/mL; lactate 2.6 mmol/L' -> 'Sodium, potassium, calcium and magnesium normal; glucose 168 mg/dL; ALT 98 and AST 142 U/L; creatinine 1.2 mg/dL'
+- Checks: `perfect_agent.py -v` pass; `case_io.py check` schema and synonym guard OK, no test failure names the case; probe: routine (omitted and explicit) order -> the new case fallback, `continuous_icu` and `video` -> the stored index recording, repeat `continuous_icu` -> the follow-up; every number in each lab criterion's evidence is in what its order returns.
+
+## Library contradictions (25 Oct 2026)
+
+Orders that reached the benchmark library's normal report although this case contradicts it (diagnosis, history, medications or a stored finding) now get a case-specific report; every other off-pathway order still gets the library normal. No tier, criterion, diagnosis or existing output changed.
+
+- `analyze_eeg eeg_type=ambulatory` -> `followup_outputs[order_ambulatory]`: ambulatory EEG mirroring the stored continuous EEG (no video).
+- `perform_clinical_assessment assessment_type=performance_status` -> `followup_outputs[order_performance_status]`: performance status KPS 20, ECOG 4 during the admission.
+- `perform_clinical_assessment assessment_type=gait_and_balance_timed` -> `followup_outputs[order_gait_and_balance_timed]`: timed gait not testable, as on the examination.
+- `perform_clinical_assessment assessment_type=cognitive_screen` -> `followup_outputs[order_cognitive_screen]`: baseline cognitive screen not testable in the documented mental state.
+- `order_specialized_test test_type=neuropsych_battery` -> `followup_outputs[order_neuropsych_battery]`: neuropsychological battery not testable in the documented mental state.
+- `order_specialized_test test_type=speech_language_evaluation` -> `followup_outputs[order_speech_language_evaluation]`: speech and language evaluation not testable in the documented mental state.
+- `perform_clinical_assessment assessment_type=cognitive_screen timing=post_intervention` -> `followup_outputs[order_cognitive_screen_post_intervention]`: repeat cognitive screen impaired or not testable, in keeping with the documented dementia or brain injury.
+- `labs:lithium_level` -> fallback labs panel `Lithium`: lithium not detected (not prescribed).
+- `labs:AED_levels` -> fallback labs panel `Antiseizure medication levels`: antiseizure drug levels: none detected (no antiseizure drug prescribed).
+- `labs:valproate_level` -> fallback labs panel `Antiseizure medication levels`: antiseizure drug levels: none detected (no antiseizure drug prescribed).
+- `order_advanced_imaging modality=FDG_PET` -> `followup_outputs[order_fdg_pet]`: brain FDG-PET abnormal where the stored MRI shows the lesion.
+- `order_echocardiogram echo_type=TEE` -> `followup_outputs[order_tee]`: TEE consistent with the stored TTE.
+- `order_echocardiogram echo_type=bubble_study` -> `followup_outputs[order_bubble_study]`: bubble study consistent with the stored TTE.
+- `order_advanced_imaging modality=cardiac_MRI` -> `followup_outputs[order_cardiac_mri]`: cardiac MRI consistent with the stored TTE and coronary disease.
+- `order_advanced_imaging modality=coronary_angiography` -> `followup_outputs[order_coronary_angiography]`: coronary imaging showing the documented coronary artery disease.
+- `order_advanced_imaging modality=coronary_CTA` -> `followup_outputs[order_coronary_cta]`: coronary imaging showing the documented coronary artery disease.
+- `order_body_imaging study=chest_xray` -> `followup_outputs[order_chest_xray]`: chest radiograph showing the documented device or surgical hardware.
+
+Checks: `perfect_agent.py` ok; `test_case_guards.py -k SE` pass; every order listed in `plans/LIBRARY-group2-map.yaml` for this case is answered without the library; served answers of every other order unchanged against HEAD. Reasons and doubts: `plans/LIBRARY-group2-decisions.md`.

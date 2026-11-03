@@ -1,0 +1,52 @@
+% Abstract plan: the narrative of the paper and what it must prove. The 150-word abstract is
+% written last, one sentence per narrative move below.
+
+\section*{Abstract (150 words, no references)}
+
+\role{The whole paper in six moves; the reader must leave with the thesis and the central number.}
+
+\content
+\begin{itemize}
+\item \textbf{Thesis.} A diagnostic agent a hospital can run is a small open model on local hardware;
+it learns a safe work-up, not only the right answer, when it is trained on an executable,
+physician-reviewed clinical policy instead of accuracy and cost.
+\item \textbf{General claim for NMI readers.} Process rewards beat outcome rewards for agents in
+high-stakes domains when the process is an executable specification experts can audit. Neurology
+is the testbed.
+\end{itemize}
+
+\structure
+\begin{enumerate}
+\item \textbf{Constraint}: patient data cannot leave the hospital, so the agent is a 4--9\,B open model.
+\item \textbf{Gap}: sequential-diagnosis benchmarks score outcome (accuracy, cost) and cannot tell a
+safe work-up from a lucky or harmful one; as a reward, outcome invites shortcuts.
+\item \textbf{Idea}: one executable policy per case, approved by two physicians, used as metric and as
+RL reward.
+\item \textbf{Resource}: NeuroBench, 600 cases, 20 conditions, 16 tools, [N] approved policies.
+\item \textbf{Central result}: policy-reward RL vs outcome-reward RL, effect sizes, held-out conditions.
+\item \textbf{Implication}: executable process rewards as a verifiable training signal.
+\end{enumerate}
+
+\artefacts
+What we must prove, each claim with the experiment that tests it and the result that would refute it.\par\smallskip
+\noindent{\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.05\linewidth}>{\raggedright\arraybackslash}p{0.34\linewidth}>{\raggedright\arraybackslash}p{0.16\linewidth}>{\raggedright\arraybackslash}X@{}}
+\toprule
+& Claim & Evidence & Refuted if \\ \midrule
+C1 & Outcome metrics hide unsafe and incomplete work-ups and change the ranking of models
+   & E4, Fig.~3 & correct diagnoses rarely come with violations; Kendall $\tau\approx1$ \\
+C2 & Policy-reward RL lowers safety violations and raises required coverage at equal accuracy,
+     vs outcome-reward RL & E1, Fig.~4 & no paired difference, or accuracy drops \\
+C3 & Physicians agree with the policy reward more than with accuracy+cost or an LLM judge
+   & E2, Fig.~5 & $\rho_{\text{policy}}\le\rho_{\text{outcome}}$ \\
+C4 & The gains hold on unseen conditions and on real records & E1 held-out, E3, Fig.~6
+   & gain vanishes on held-out or MIMIC-IV \\
+C5 & The agent runs on one GPU at a cost per case far below frontier APIs & E5, Fig.~6
+   & latency or cost not compatible with use \\
+\bottomrule
+\end{tabularx}}
+\par\smallskip
+\textbf{Not claimed:} clinical readiness, superiority over physicians or frontier models,
+generality beyond neurology. Never ``concurrent'' for SDBench.
+
+\status{Every number waits for runs on the frozen dataset after the leakage fixes.}

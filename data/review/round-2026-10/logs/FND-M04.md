@@ -1,0 +1,89 @@
+# FND-M04
+Reviewer status: R1 none, R2 none (no notes file for FND) | Approved before this round: no
+
+## Reviewer notes
+No reviewer notes for this case. The physician input for FND is the July 2026 tool guidance (plan 1.3), applied through the plan.
+
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| (none) | - | - |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| C | major | `initial_tool_outputs.eeg` (plan J) | Thin report: no activating procedures although events follow bright light and absences are the mimic; impression in capitals ("NO EEG CHANGE"), event without time; em dashes. | FIXED: 24-hour video-EEG with hyperventilation (two trials), photic stimulation 1-30 Hz and eye closure, all without discharges or events; the 32-second habitual event (kept) with time, semiology and no generalized spike-and-wave; canonical impression. |
+| C | major | `initial_tool_outputs.clinical_assessment` (plan H) | Meta keys; "findings" were history items (duration, denial of incontinence) presented as signs; impression said "video-EEG is required in this case rather than optional" (policy leak). | FIXED: canonical shape; normal motor and sensory examination; observed event recorded (`functional_seizure_semiology_observed: true`); no-sign impression adapted to the observed event (exam text describes an event, plan H). |
+| C | major | `initial_tool_outputs.drug_interactions` (plan C) | Medicine list only, with the "prescribing decision" leak; escitalopram + sumatriptan not named. | FIXED: escitalopram + sumatriptan (serotonergic, rare), escitalopram cautions. |
+| D | major | `followup_outputs[0]` `patient_education_fnd_pnes` (plan B, ruling 4) | Patient education disguised as a literature search, with an empty summary and a reused PMID (26276867). | FIXED: deleted; the education content is M-COMM; canonical `initial_tool_outputs.literature_search`. |
+| A | major | `ground_truth.action_criteria` (plan A, 3.2) | Video-EEG optional in a purely paroxysmal case; literature and drug check recommended; template labels and citations. | FIXED: exam required (citations Avbersek 2010, AAN 2025), video-EEG required with an activation-specific expected evidence, drug check optional, optional neuropsychology, literature optional last; stop rule exam + video-EEG. |
+| C | major | `ground_truth.assessment` (plan D) | Template musts including physiotherapy for a patient with no motor symptom, the semiology must and the video-EEG must; template prohibitions. | FIXED: DX (recorded event with normal activation), COMM, PSY (anxiety, fear of epilepsy), RESCUE; prohibitions P1, P2, P3, P5, P6, P7. No PHYSIO (no motor phenotype). |
+| C | major | `ground_truth.differential` (plan F) | Epileptic seizures `moderate`; MS, structural lesion, autoimmune encephalitis and malingering template rows with no basis in the case; the actual mimic (absence epilepsy, eyelid myoclonia) absent. | FIXED: epileptic seizures `low`; new "Absence epilepsy or eyelid myoclonia" `low` citing the recorded event and normal activation; template rows deleted. |
+| D | major | `ground_truth.key_clinical_evidence` (plan E) | Template items with leaks; limb-sign items in a case with no limb sign. | FIXED: five case-specific items. |
+| B | minor | `ground_truth.red_herrings` | Generic data points; stressor field path. | FIXED: febrile convulsions and the aunt with epilepsy (real, kept per plan), anxiety, the stressors (`social_history.recent_stressor`); added the light-triggered events. |
+| C | minor | `ground_truth.avoided_actions` (plan L) | `[Stone_2018]`; generic rationales. | FIXED: patient-specific rationales, `[Espay_2018]` / `[Stone_2016]`. |
+| C | minor | `fallback_tool_outputs.ct` | Off-pathway CT reported a 3 mm right frontal calcified granuloma: a potentially epileptogenic lesion in a woman whose events include head turning, i.e. a mimic created by an unscored report that no part of the policy handles; it also claimed "no enhancement" on a non-contrast CT. | FIXED: normal CT fallback; `fallback_tool_kinds.ct` "normal". |
+| E | minor | `metadata.difficulty_rationale`, `revision_reason` | Template text ("family history of MS, antipsychotic exposure, comorbid SLE"). | FIXED: case-specific; `last_revised` 2026-10-24. |
+| A | minor | `fallback_tool_outputs` (plan G) | `specialized_test`, `advanced_imaging`, `drug_interactions` template fallbacks; echo without `echo_type`. | FIXED: three nulled and removed from `fallback_tool_kinds`; echo `echo_type: TTE` (its named finding, trace physiological mitral regurgitation, kept). |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+
+This is a purely paroxysmal case (eyelid flutter with brief unresponsiveness, some after bright light), so the policy requires the examination and a video-EEG and leaves the drug review, neuropsychology and literature optional; there is no MRI or lab criterion. The video-EEG now reads as a full report: 24 hours, hyperventilation twice, photic stimulation and eye closure without discharges, and the 32-second habitual event without generalized spike-and-wave or other ictal change. The structured examination reports a normal motor and sensory examination and the observed event, without claiming a limb sign. The patient-education "literature" follow-up is gone. Musts: positive diagnosis on the recorded event, explanation, psychological therapy for anxiety and her fear of epilepsy, and an event plan; no physiotherapy, since she has no motor symptom. The differential keeps epileptic seizures `low` and adds absence epilepsy or eyelid myoclonia `low`; febrile convulsions, the aunt with epilepsy and light-triggered events are red herrings. The off-pathway CT no longer shows a frontal calcified granuloma.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+
+- New citation keys used: `[Avbersek_2010]`, `[Stone_2016]` (plan 5.1).
+- EEG routing (plan 5.3): a `routine` EEG order would be served this video-EEG with its event.
+
+## Open questions for Andrea (judgment calls you could not settle)
+
+None. `metadata.notes` (an authoring note from generation) was left as it is.
+
+## Verification
+Checked the log against the file (worker edits are in commit b8be2153; diffed against its parent): read the whole final case, the patient-block diff, criteria tiers and order against plan 3.2 and the case entry in plan 4, sequence constraints and stop rule, musts and prohibitions against avoided actions, differential against the returned results, lab arithmetic and ranges, laterality, leak guard. No reviewer notes exist for FND, so there is no note id to account for. perfect_agent.py -v, case_io.py check and test_case_guards pass after my changes.
+Purely paroxysmal case with no limb sign: the structured exam counts 0 signs, the EEG carries hyperventilation, photic stimulation and eye closure, no PHYSIO must, no MRI or lab criterion, absence epilepsy or eyelid myoclonia added low. The CT fallback granuloma removal is justified (an unscored epileptogenic lesion).
+Found and fixed:
+- (C, minor) M-COMM (`ground_truth.assessment.required_recommendations[1]`) said "show the positive signs", but this patient has none. Now "show how the recorded event and the normal EEG support it".
+- (B, minor) `ground_truth.red_herrings[1].correct_interpretation` said "Diagnosis requires positive rule-in signs on examination", contradicting the case (diagnosis rests on the recorded event). Now: "The diagnosis rests on the habitual event recorded on video-EEG without ictal change; the anxiety is a treatment target."
+Left as is: `red_herrings[0]` combines the febrile convulsions (past medical history) and the aunt (family history) under the family-history field path; the schema allows one path, and the content is correct.
+
+## Condition audit
+
+2026-10-24, FND condition auditor.
+
+- `action-2-check-drug-interactions.label`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+- `action-neuropsych-battery.label`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+- `action-1-search-medical-literature.rationale`: removed engineering text (round/pack references, credit or tier wording); clinical content unchanged.
+
+After the edit: `perfect_agent.py` 30/30 FND pass; `case_io.py check` schema and synonym guard OK, the only suite failure is `test_guidance_claims` (expected); `test_case_guards.py -k FND` 60 passed.
+
+## Close-out (24 Oct 2026)
+
+Andrea's FND ruling of 24 Oct 2026 and the close-out decisions (`plans/FND-decisions.md`). What changed and why:
+
+- `action-4-analyze-eeg` (video-EEG) required -> optional, removed from the stop rule; rationale now says what the diagnosis rests on without the recording (ILAE 2013 levels).
+- M-DX must, COMM must, red-herring interpretations and metadata no longer say the diagnosis rests on the video-EEG: they rest on the positive signs and the event semiology, with video-EEG confirmation where recorded (open question 8).
+- ECG avoided action `avoid-waste-1-analyze-ecg` (waste) replaced by an optional `action-ecg` criterion: the events are apparent unresponsiveness and NICE CG109 / NG217 advise a 12-lead ECG (open question 4).
+- Diagnosis synonyms scoped by phenotype (`diagnosis_synonyms.yaml` F44 entries; a label or code naming another presentation must not score): removed "non-epileptic seizures", "functional movement disorder", "functional weakness"; added "nonepileptic seizures"; codes removed F44.4, F44.7, F44.6.
+- Checks: `perfect_agent.py -v` and `case_io.py check` clean; `test_case_guards.py -k FND-` passes, now including the discriminator guard.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `initial_tool_outputs.eeg`: `eeg_type` set to `video`, named in the report's own text.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Engineering text (25 Oct 2026)
+
+Review-process wording (references to the round's rulings, the round policy file, the criteria packs, and tier markers such as "(optional)" in criterion labels and rationales) is shown to physicians in the review app, so it was rewritten in clinical language. The tier stays in the criterion's `importance` field; scoring is unchanged. `test_case_guards.py::test_no_review_process_text` now fails on any of it.
+
+- metadata.revision_reason: "October 2026 review round: criteria, outputs and assessment rebuilt to the FND criteria pack tiers. Close-out 24 Oct 2026: video-EEG optional and red-flag tests recommended, per the July 2026 agreement with the physicians that the examination is the only required diagnostic act." -> "October 2026 review round: criteria, outputs and assessment rebuilt to the FND required, recommended and optional tiers. Close-out 24 Oct 2026: video-EEG optional and red-flag tests recommended, per the July 2026 agreement with the physicians that the examination is the only required diagnostic act."
+
+## Library contradictions (25 Oct 2026)
+
+Orders that reached the benchmark library's normal report although the case contradicts it now get a case-specific report (library answers stay for everything else).
+
+- `order_specialized_test test_type=neuropsych_battery` -> `followup_outputs[request_neuropsych_battery]`: cognition within normal limits; moderate anxiety, mild depressive symptoms and mildly elevated dissociative experiences; validity passed. Why: the history documents anxiety, depression or trauma-related symptoms; the library reports no significant mood or anxiety symptoms.
+
+Checks: `perfect_agent.py` pass; `test_case_guards.py -k FND-M04` pass; map verify (map_FND) problems 0; criterion-answer snapshot unchanged except `action-neuropsych-battery`, which the library answered before and the new report now answers.

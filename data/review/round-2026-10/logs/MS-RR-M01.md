@@ -1,0 +1,100 @@
+# MS-RR-M01
+Reviewer status: R1 none, R2 none (no MS-RR notes file in this round) | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| (none) | - | No reviewer notes for this case. All changes below are own findings and plan classes. |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| B | minor | `patient.chief_complaint`, `patient.history_present_illness` | "Progressive bilateral leg weakness" while the exam has left leg weakness only (right 5/5) (plan R). | FIXED: "Progressive left leg weakness and urinary urgency over six weeks"; HPI referral sentence says "progressive left leg weakness". |
+| C | minor | `patient.history_present_illness` | Optometrist "noted mild optic disc pallor" during an acute optic neuritis lasting 10 days; pallor appears only after 4-6 weeks (plan F7). | FIXED: "found reduced vision in the left eye". Pallor now recorded where it belongs, at today's exam 8 months later: `neurological_exam.cranial_nerves` "Fundoscopy: mild temporal pallor of the left optic disc; right disc normal." |
+| B | minor | `patient.neurological_exam.sensory`, `followup_outputs[0].output.findings[1]` | Left leg weakness, left Babinski and left vibration loss with a T8-T9 lesion described only in the "posterior columns" (cannot explain the weakness), and pinprick loss on the same left side. | FIXED: T8-T9 lesion placed in the left dorsolateral cord (posterior and lateral columns); pinprick loss below the umbilicus now on the right (partial Brown-Sequard pattern of a left hemicord lesion). Impression and criterion text follow. |
+| B | minor | `followup_outputs[0].output` (spine MRI) | Lesion `description` fields empty; impression without final period. | FIXED: T2 signal and enhancement status written per lesion; impression rewritten with the same content. |
+| B | minor | `initial_tool_outputs.mri.additional_observations`, `.findings` | "No definite Dawson fingers morphology ... not classic ovoid perpendicular orientation" contradicted findings that describe ovoid lesions perpendicular to the ventricles; "several" black holes vs "two" black holes. | FIXED: contradictory observation deleted; T1 signal "Two lesions"; observation "Spinal cord not assessed on this study." added. |
+| D | minor | `initial_tool_outputs.mri.impression`, `.findings[1].borders` | Impression counted McDonald regions ("at least three of four typical MS regions", 2017 framing, criteria application is the clinician's); borders argued "rather than neoplasm or infection". | FIXED: numbered findings-only impression ending "The lesion pattern is suggestive of inflammatory demyelination."; borders "Incomplete (open) ring of enhancement, open toward the cortex". |
+| C | major | `followup_outputs` `request_repeat_mri_3months` | Brain MRI from three months in the future showing a new lesion (plan F). | FIXED: deleted; a repeat brain MRI order now returns the index study. |
+| B | minor | `initial_tool_outputs.labs.panels` | Panels "BMP", "Inflammatory and Autoimmune Markers" holding B12, vitamin D and TSH, "Mimic exclusion" holding HIV with leaked significance "excludes this reversible mimic" (plan E); no liver function; Hct 43.2 inconsistent with RBC 4.8 and MCV 85.6; ANA 1:40 flagged normal against reference "<1:40". | FIXED: panels CBC, CMP (BMP values kept, ALT 21, AST 19, ALP 72, bilirubin 0.5, albumin 4.4 added), Inflammatory markers, Thyroid and vitamins, Autoimmune and infectious serology; HIV `clinical_significance` null; Hct 41.1; ANA `is_abnormal` true, in the summary and interpretation. All other stored values unchanged. |
+| A | major | `initial_tool_outputs.labs.panels.Autoimmune and infectious serology` | AQP4/MOG recommended by the plan but no result stored (plan A8). | FIXED: rows "AQP4-IgG (cell-based assay)" and "MOG-IgG (live cell-based assay)", Negative. |
+| C | minor | `initial_tool_outputs.csf.special_tests`, `.interpretation` | IgG index 0.65 labelled "borderline elevated" against "< 0.70"; obsolete myelin basic protein; no kFLC; interpretation a recital with "(N/A PMN/N/A lymph)" (plan J, F6). | FIXED: IgG index normal; MBP deleted; kFLC index 14.8 (reference < 6.1) added; OCB key names the method; pattern interpretation. OCB 2 bands, cells, protein, glucose unchanged. |
+| C | minor | `followup_outputs` OCT (new), `ground_truth.action_criteria` `action-oct` (new) | An OCT order was answered by the library's normal symmetric report, contradicting the prior left optic neuritis, RAPD and pallor. | FIXED: OCT follow-up added (left pRNFL 78, GCIPL 71, inter-eye 21/13 um; right normal; chronic left optic neuropathy) with an optional criterion. Not in the plan's tier table: see Open questions. |
+| B | minor | `followup_outputs` drug check `.interactions` | Only sertraline listed; vitamin D3, dicyclomine and the cephalosporin allergy absent (plan O). | FIXED: one line each, no clinically significant interaction. |
+| C | minor | `followup_outputs` literature `.results[0..1].title` | Titles misquoted (AAN 2018 summary guideline; Harding 2019 JAMA Neurol). | FIXED: real titles. Content kept (general, population-keyed). |
+| B | minor | `fallback_tool_outputs.ecg`, `.echo` | ECG "Normal sinus rhythm. Sinus bradycardia" at rate 59 (self-contradictory); echo fallback without `echo_type` (discriminator guard). | FIXED: normal sinus rhythm 68 bpm (`metadata.fallback_tool_kinds.ecg` "normal"); `echo_type` "TTE". |
+| A | major | `ground_truth.action_criteria` | Template criteria (plan A1-A9): label = rationale; literature and drug check required with non-schema keys (`proposed_class`, `screen_for`) no agent can match; CSF requiring three assays; labs requiring 9 analytes (CMP does not satisfy calcium/glucose); duplicate free-text citations; pathway order. | FIXED: brain MRI, spine MRI, labs `{CBC, vitamin_B12, TSH, HIV}` (required); `action-aqp4-mog-cba` recommended; CSF optional with OCB or kFLC alternatives; VEP and OCT optional; drug check optional `{}`; literature optional `{}`, last. Case-specific rationales and expected evidence; bracketed citations only. |
+| A | minor | `ground_truth.stop_rule`, `.sequence_constraints` | Literature and drug check in `required_before_assessment`; `max_additional_actions` 0. | FIXED: required = brain MRI, spine MRI, labs; max 2; soft MRI-before-CSF constraint with the canonical reason. |
+| C | major | `ground_truth.assessment.required_recommendations` | Musts T0/T2 restated criteria with "three regions" style; T1 was a test (AQP4/MOG) disguised as a must; relapse must IV only and silent on infection with new bladder urgency; generic lifestyle must (smoking cessation in a never smoker) (plan B, K). | FIXED: formulation must; relapse must (IVMP 1 g 3-5 d inpatient or oral 500 mg 5 d, urine dipstick and culture first, PLEX if refractory); DMT must with her activity markers and pregnancy/contraception; pre-DMT screening; bladder must (PVR, antimuscarinic or mirabegron with the dicyclomine anticholinergic caveat, or ISC); Uhthoff counselling (she reports it). |
+| C | minor | `ground_truth.assessment.prohibited_recommendations` | Natalizumab/JCV and fingolimod prohibitions without any case reason (plan K). | FIXED: deleted; kept T7, T10 (woman of child-bearing age), T11, T12, T13; added "no cephalosporin for a urinary infection" (documented allergy). |
+| C | major | `ground_truth.differential` | NMOSD and MOGAD "high", neurosarcoidosis "moderate" despite negative results; no B12 or ANA-related entry; ADEM coded G04.81, neurosarcoidosis D86.85 (sarcoid myocarditis) (plan C). | FIXED: all entries low with the case's own discriminating results; B12 deficiency myelopathy and CNS lupus added; codes G04.00 and D86.89. |
+| D | major | `ground_truth.key_clinical_evidence` | Engineering lines ("July 2026 review", "Tier per ..."), wrong facts ("three regions establish DIS", black holes as DIT), template tumefactive and ELISA lines, DMT-choice management line (plan D). | FIXED: six observable lines (current attack and lesion, prior attacks, DIS 5 of 5, DIT/CSF supportive, AQP4/MOG negative, distractors). |
+| B | minor | `ground_truth.red_herrings` | Vitamin D field_path pointed at the old panel; ANA distractor not recorded. | FIXED: field_path `...Thyroid and vitamins[2]`; ANA red herring added (`...Autoimmune and infectious serology[0]`). |
+| B | minor | `ground_truth.avoided_actions` | Generic rationales; McDonald 2017 / Reich citations for EEG, echo, monitoring (plan N). | FIXED: one case-tied sentence each; `[Wattjes_2021]` for CT and PET, none for the others. Ids and tool patterns unchanged. |
+| E | minor | `metadata.difficulty_description`, `.difficulty_rationale`, `.clinical_pearls[0]`, `[3]` | "prior subclinical episodes" (both were clinical); "CSF borderline positive"; AQP4/MOG and CSF called required; Uhthoff "nearly pathognomonic"; 2017 OCB-for-DIT pearl. | FIXED: rewritten to the corrected data and the 2024 criteria. |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+
+A 33-year-old woman with six weeks of left leg weakness, urinary urgency and a band-like abdominal sensation, plus two earlier unrecognised attacks (painful left visual loss 8 months ago, right hand tingling 14 months ago). The chief complaint now matches the exam (left leg). The acute-phase "disc pallor" in the history was removed; today's fundoscopy shows left temporal pallor. The T8-T9 lesion is now left dorsolateral and the pinprick loss right-sided, so the lesion explains the deficits. Brain MRI is reported as findings only (periventricular, juxtacortical, left MCP and one open-ring enhancing lesion; spinal cord not on the study). The future 3-month MRI was deleted. Labs were regrouped (values kept, liver tests added, haematocrit corrected, ANA 1:40 flagged) and now carry negative AQP4-IgG and MOG-IgG by cell-based assay. CSF keeps 2 restricted bands and adds a kFLC index of 14.8; MBP was removed. An OCT showing chronic left optic neuropathy was added. Pathway: brain MRI, spine MRI and labs required; AQP4/MOG recommended; CSF, VEP, OCT, drug check and literature optional. DIS is 5 of 5 regions, so neither DIT nor CSF is needed. Musts: formulation, relapse steroids after excluding urinary infection, DMT by activity with contraception discussion, pre-DMT screening, bladder management mindful of dicyclomine, Uhthoff counselling. Differential: all mimics low with reasons.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+
+- Citation keys `[McDonald_2024]`, `[Wattjes_2021]`, `[NICE_NG220]` used per plan 1.1 (plan section 5.1: add to the criteria pack).
+- Diagnosis synonyms G35.B/G35.C and "demyelinating disease" on a relapsing-remitting label (plan section 5.2); not hand-edited.
+- For the lead (class): neurosarcoidosis coded D86.85 (sarcoid myocarditis) and ADEM G04.81 come from the template differential and are probably in other MS-RR cases; D86.89 and G04.00 used here.
+
+## Open questions for Andrea (judgment calls you could not settle)
+
+- None needing Andrea. Decision recorded: the plan's tier table gives M01 no OCT, but the library's normal OCT contradicted the prior left optic neuritis, so a stored OCT follow-up and an optional criterion (`action-oct`) were added; this changes no score for an agent that does not order OCT.
+
+## Verification
+Adversarial verifier, 24 Oct 2026. Read the log, the diff against the pre-round file and the whole final case (patient, every stored output, fallbacks, ground truth, metadata). No reviewer notes exist for MS-RR; the table correctly says so.
+Checked: every FIXED own finding is present in the file (chief complaint and HPI side, acute pallor removed and placed at today's fundoscopy, left dorsolateral T8-T9 lesion with right-sided pinprick loss below T10 as a hemicord pattern, future MRI gone, Hct = RBC x MCV, ANA flagged, AQP4/MOG CBA rows, kFLC added and MBP gone, OCT with chronic left optic neuropathy, drug lines, ECG/echo fallbacks). DIS 5 of 5 matches the reports (PV, JC, left MCP, C3-C4/T8-T9, optic nerve by VEP and OCT). Tiers, order, stop rule and the soft MRI-before-CSF constraint follow the plan; the added optional OCT is justified. Musts agree with the allergy (cephalosporin) and medications (dicyclomine caveat); differential all low with the case's own results; no leakage in the patient block; the brain MRI reports no cord.
+Found and fixed:
+- `metadata.clinical_pearls[3]` said that with two or three regions only CSF completes the criteria; corrected to DIT, positive CSF or the central vein sign (plan F3).
+- `initial_tool_outputs.csf.special_tests["IgG synthesis rate"]` 9.2 mg/day "elevated" beside a normal IgG index, and the same string copied into M02 and M03 (template carry-over): set to 6.9 mg/day (within reference), consistent with the normal IgG index.
+Checks re-run after the changes: `perfect_agent.py -v` pass, `case_io.py check` clean for the case, `test_case_guards.py -k` (leak, follow-up, banned strings) pass.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026 (uniformity scripts over all 30 MS-RR cases; edits through `case_io`; perfect agent, `case_io check` and the case guards clean afterwards).
+
+- `action-4-check-drug-interactions.expected_evidence` was empty; written from the stored drug output in policy voice: "Dimethyl fumarate with sertraline, vitamin D3 and dicyclomine: no relevant interaction; GI effects may aggravate her IBS; lymphocyte monitoring".
+- `assessment.prohibited_recommendations[2]` chronic-steroid prohibition set to the condition's canonical text (was "Do not use chronic oral corticosteroids as a maintenance treatment for MS [em dash] they are ineffective long-term and carry significant harm").
+- `assessment.prohibited_recommendations[4]` spinal-cord prohibition set to the condition's canonical text (was "Do not omit spinal-cord MRI in a patient with myelopathic signs even if the brain MRI alone meets DIS criteria [em dash] cord lesions change relapse counting and management").
+- `assessment.required_recommendations[0]` formulation must made case-specific by appending "(here periventricular, juxtacortical, infratentorial and spinal cord, with the left optic nerve a fifth region by VEP or OCT; four or more regions need no separate DIT)", from the KCE DIS line and the stored outputs, as in the other 18 cases.
+- `initial_tool_outputs.labs`: the AQP4-IgG and MOG-IgG rows moved to a new `followup_outputs` entry (`interpret_labs`, trigger `request_aqp4_mog_cell_based_assay`, panel `Neuroimmunology`, placed after the imaging follow-ups). Served in the initial labs payload, they answered the mimic-exclusion panel order as well, so an agent learned the result of `action-aqp4-mog-cba` without ordering it (perfect-agent warning "answered with the same stored report"); the MockServer now serves them only to an order that names the assays (checked for all three alternatives and both orders).
+- `assessment.required_recommendations[3]` pre-DMT screening: HIV removed from the tests to order and noted as already non-reactive, since the required mimic panel reports it (HIV-1/2 Ag/Ab combination assay: Non-reactive), as the RM, RP and RS cases do.
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (`plans/MS-RR-decisions.md`). What changed and why:
+
+- Diagnosis synonyms (`diagnosis_synonyms.yaml` G35 entry, re-applied with `apply_diagnosis_synonyms.py --prune --conditions multiple_sclerosis`): removed the label "demyelinating disease" (G37.9 is an Excludes1 of G35.A, and its tokens occur in an NMOSD, MOGAD or ADEM answer, which would have scored as correct) and the codes G35.B and G35.C (primary and secondary progressive MS in FY2026 ICD-10-CM, a different course from this relapsing-remitting case). Accepted now: the label, multiple sclerosis, MS, relapsing(-)remitting multiple sclerosis, RRMS; codes G35.A, G35, G35.D.
+- Checks: `perfect_agent.py` pass, `case_io.py check` clean for the case, `test_case_guards.py -k MS-RR-` passes with MS-RR now in `DISCRIMINATOR_CONDITIONS`.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Lab evidence, normal results (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited normal results its own order (the first alternative) did not return; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-6-interpret-labs]`.alternatives: was [CBC, vitamin_B12, TSH, HIV]; now [CBC, vitamin_B12, TSH, HIV, CMP] | [CBC, vitamin_B12, TSH, HIV].
+- Decision: serve: new first alternative (old order kept as an alternative). The evidence reads the calcium, which the differential relies on (neurosarcoidosis); CBC, B12, TSH and HIV did not return them. Same decision as MS-RR-P03.
+- Scoring: coverage unchanged (any call matching the old order still matches); the cost reference of the required work-up now uses the new first order.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the normal-row probe reports nothing for this criterion.
+
+## Library contradictions (25 Oct 2026)
+
+- `order_specialized_test {test_type: visual_field_perimetry}`: 1. Mild central and paracentral depression in the left eye (MD -4.1 dB). 2. Normal right visual field. (fallback_tool_outputs.specialized_test). Why: rule c: left visual acuity 20/40 with a left RAPD and red desaturation: the left field cannot be normal; the library reports a normal study.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: Abnormal timed gait and balance assessment. Timed Up and Go 12.4 s and 10 m walk speed 1.04 m/s are slowed for age; Berg balance 50/56. (fallback_tool_outputs.clinical_assessment). Why: rule d: the examination documents a gait disorder (spastic left leg with circumduction; reduced left foot clearance); the library reports a normal study.
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 80, ECOG 1: restricted in physically strenuous activity, ambulatory and able to carry out light work. (followup_outputs[request_performance_status]). Why: rule d: inpatient relapse with a documented gait disorder: Karnofsky 100 / ECOG 0 'without evidence of disease' contradicts the case; the library reports a normal study.
+
+Checks: perfect agent ok; case guards pass; snapshot diff shows no criterion answer changed; map verified (served without the library).

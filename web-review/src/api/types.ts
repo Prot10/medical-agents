@@ -356,6 +356,8 @@ export interface PatientProfile {
     handedness?: string
     ethnicity?: string
     bmi?: number
+    weight_kg?: number | null
+    height_cm?: number | null
   }
   clinical_history: {
     past_medical_history?: string[]
@@ -425,7 +427,7 @@ export interface SequenceConstraint {
 
 export interface GroundTruth {
   review_status: "draft" | "needs_revision" | "approved"
-  diagnosis: { accepted: string[]; icd_codes: string[] }
+  diagnosis: { accepted: string[]; icd_codes: string[]; rejected?: string[]; required_components?: string[][] }
   differential: Array<{
     diagnosis: string
     likelihood: string

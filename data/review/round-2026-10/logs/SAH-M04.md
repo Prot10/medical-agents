@@ -1,0 +1,107 @@
+# SAH-M04
+Reviewer status: R1 none, R2 needs_changes | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| 03a9ce4b-c764-4ad9-8a57-d602ddd39600 | FIXED | Option "score the reasoning" taken. RCVS key feature now names the coital trigger and the discriminators in this case (basal-cistern blood, saccular right PComA aneurysm on CTA) (`ground_truth.differential[0]`); new red herring "Headache onset during sexual intercourse" (`patient.history_present_illness`) whose correct interpretation is that coital onset also triggers aneurysmal rupture and that the cisternal blood plus saccular aneurysm without segmental vasoconstriction establish aneurysmal SAH. Likelihood kept `low`: ruling 7 makes the differential the assessment-time view, and the work-up (cisternal SAH, saccular aneurysm, DSA without segmental narrowing) excludes RCVS. |
+| 53d4e407-16bc-4eec-ac9f-b80ac3b63e99 | FIXED | Both 24-72 h securing musts replaced by one MUST-SECURE (right PComA, as early as feasible, preferably within 24 h [Hoh_2023]); the 24-72 h pearl replaced by the canonical securing pearl. |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| C | major | `initial_tool_outputs.ct.impression`, `.recommended_actions` | A positive CT recommended lumbar puncture (LP is an avoided action once CT shows SAH). | FIXED: impression ends "CT angiography of the head and neck recommended"; recommended action changed to CTA. |
+| D | minor | `initial_tool_outputs.ct.additional_observations` | "Blood may be near-isodense in higher Hgb patient - but Hgb normal here" cites labs (cross-modality) and is commentary. | FIXED: removed; added "No parenchymal hematoma", sella and venous-sinus negatives, and the comparison line for the outside CT reported in the HPI. |
+| C | major | `ground_truth.action_criteria` | No catheter angiography before securing (C3). | FIXED: new recommended `dsa-aneurysm-anatomy` and follow-up `request_digital_subtraction_angiography` (6.3 x 5.1 mm lobulated right PComA-origin aneurysm, neck 3.4 mm, dome-to-neck 1.9, PComA from the neck, anterior choroidal separate, no other aneurysm, no vasospasm or segmental narrowing); soft constraint CTA before DSA. |
+| B | major | `followup_outputs` TCD | "Day 6" TCD with borderline right MCA vasospasm in a patient 5 h from onset. | FIXED: day-0 baseline, normal velocities, canonical text. |
+| C | major | drug-check output | "Hold metoprolol if ... bradycardia" only, "Never give IV" wording; metformin and contrast not addressed although the plan expects it. | FIXED: metoprolol additive hypotension and bradycardia with no abrupt withdrawal; metformin around iodinated contrast with creatinine 1.1 (no need to stop for contrast alone, commonly held while acutely ill or nil by mouth); atorvastatin no interaction; parenteral-injection and 30 mg every 2 h statements. Tier recommended; rationale and evidence case-specific. |
+| C | major | `ground_truth.assessment` | No BP action (SBP 182), no home-drug decision, misworded nimodipine and BP prohibitions, TCD days 4-14 must. | FIXED: MUST-NIMO, MUST-SECURE, MUST-ICU, MUST-BP-A (default agents), MUST-HOME "Continue metoprolol succinate unless bradycardia or hypotension, without abrupt withdrawal", sodium kept, MUST-DCI; canonical prohibitions. |
+| D | major | literature follow-up `request_family_screening` and criterion | Family-screening output as a pathway step; literature recommended. | FIXED: follow-up deleted; canonical output last; criterion optional, last, canonical text. |
+| B | major | telemetry output | Template text, 24 h. | FIXED: 4 h, sinus 80-108 bpm, 11 PVCs, no sustained arrhythmia or pauses, QTc 488 ms without torsades. |
+| B | minor | `followup_outputs` echo `findings[1]` | "EF mildly reduced 54%"; 54% is within the normal male range (ASE). | FIXED: "LVEF 54% (low-normal)"; impression (mild apical hypokinesis, stress pattern) unchanged. |
+| B | minor | `ground_truth.red_herrings` | The HPI's outside negative CT and near-discharge are a real anchoring trap with no entry; metadata named it. | FIXED: red herring added (outside read negative; repeat NCCT shows the blood, so CTA next, no LP). |
+| C | minor | `initial_tool_outputs.labs` | No magnesium; type-and-screen engineering sentence. | FIXED: magnesium 2.0 mg/dL; significance null. |
+| B | minor | CTA | No neck-vessel statement. | FIXED: cervical vessels patent, no dissection. |
+| C | minor | differential, pearls | Generic key features; outdated pearls. | FIXED: canonical C11 entries; canonical pearls. |
+| A | minor | citations, rationales, order, constraints, stop rule, `metadata.difficulty_rationale` | As in the condition template. | FIXED: bracketed keys; canonical rationales and case evidence; criteria NCCT, labs, ECG, CTA, DSA, drug check, echo, telemetry, TCD, literature; NCCT before CTA and CTA before DSA (soft); stop rule four required, allowance 1; rationale rewritten. |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+55-year-old man with poorly controlled hypertension, diabetes and a sister with an unruptured aneurysm; explosive coital headache 5 h before arrival, outside CT read negative, HH2, very subtle Fisher 2 SAH here, 6.2 mm lobulated right PComA aneurysm, SBP 182. The CT no longer recommends LP (it recommends CTA). The coital trigger is now in the RCVS key features and a red herring that scores the discriminating reasoning; RCVS stays low because the work-up excludes it. The pathway is NCCT, labs (magnesium added), ECG, CTA, a new diagnostic DSA, the nimodipine check (metoprolol continued, metformin around contrast), echo, 4 h telemetry, a day-0 baseline TCD, and the canonical literature last (optional). Musts follow the plan: enteral nimodipine with the 30 mg every 2 h rule, securing as early as feasible and preferably within 24 h, neurocritical care, IV titratable BP lowering, continue metoprolol, sodium and DCI surveillance.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+- As plan section 5 (allow-list `[Molyneux_2002]`).
+
+## Open questions for Andrea (judgment calls you could not settle)
+None.
+
+## Verification
+Adversarial check (24 Oct 2026): diff, full final case, perfect-agent `-v`, `case_io.py check`, `test_case_guards -k SAH-M04`.
+- Note 03a9ce4b: confirmed FIXED (coital trigger in the RCVS key features, new red herring with the plan's wording, RCVS kept `low` per ruling 7). Note 53d4e407: confirmed FIXED (one MUST-SECURE, canonical pearl, no 24-72 h text).
+- Confirmed: CT now recommends CTA, not LP; Hgb commentary removed; DSA 6.3 x 5.1 mm vs CTA 6.2 x 5.1 mm, ratio 6.3/3.4 = 1.9; TCD day 0 with a right extracranial ICA velocity that gives the stated right Lindegaard ratio (88/38 = 2.3); metoprolol continued (MUST-HOME) consistent with the drug check; MUST-BP-A fits SBP 182 and LVEF 54%.
+- Found and FIXED: `initial_tool_outputs.ecg` called a rate of 98 "Sinus tachycardia" (same template error as SAH-M01; vitals HR 96): rhythm and interpretation now "Sinus rhythm, rate 98"; ECG criterion evidence updated.
+- Found and FIXED: the RCVS red herring and DSA rely on "no segmental vasoconstriction", but the required CTA was silent on it: added `angiography_findings["Intracranial arteries"]` "No segmental narrowing or beading" to the CTA output, so the discriminator is available from the required work-up.
+- Both checks clean after the edits.
+
+
+## Condition audit (auditor, 24 Oct 2026)
+
+- `ground_truth.red_herrings[0].correct_interpretation` still carried the condition template "echocardiogram showing apical ballooning confirms etiology", while this echo shows only mild apical hypokinesis (LVEF 54%). Now ends "...the echocardiogram shows only mild apical hypokinesis with an LVEF of 54% and no primary cardiac lesion, and the focus remains on aneurysm securing." Same fix as the verifiers made in S01, S04, P05 and P06.
+- MUST-HOME now "Continue metoprolol succinate unless bradycardia or hypotension, without abrupt withdrawal; hold metformin while in critical care and treat hyperglycemia (glucose 198 mg/dL) with insulin, avoiding hypoglycemia; continue atorvastatin." The must decided only metoprolol although the patient also takes metformin and atorvastatin and has glucose 198; the wording matches the home-drug musts of S02, RS12 and S09 (metformin held for critical illness, not for contrast alone).
+- Checks after the audit: `perfect_agent.py` 30/30 pass; `case_io.py check` schema and synonym guard OK, no test failure names an SAH case; `test_case_guards -k SAH` 60 passed.
+
+## Close-out (24 Oct 2026)
+
+Condition close-out after Andrea's ruling of 24 Oct 2026 (open questions decided for dataset quality); decisions and sources in `plans/SAH-decisions.md`.
+
+- `patient.neurological_exam.additional (Hunt-Hess grade removed)`: the Hunt-Hess grade is a SAH grading scale, so stating it in the patient block presupposes the diagnosis and does the agent's grading (decision Q8).
+- `echo.impression (Takotsubo overcall removed)`: an echo reports the wall-motion pattern; a mild apical hypokinesis with preserved EF is not Takotsubo, grading labels such as 'classic' or 'severe Takotsubo' are diagnoses, and cardiology consultation is management (Q10).
+- fallback_tool_outputs.mri: SAH-consistent brain MRI instead of the library normal report: an off-pathway brain MRI was answered by the library normal report (no blood on SWI), contradicting the CT; the case fallback now reports the CT's blood on FLAIR and SWI (CENTRAL 10).
+- fallback_tool_outputs.cardiac_monitoring: 24 h Holter replaced by the case's own telemetry report: a 24-hour Holter cannot exist at assessment time; an off-pathway monitoring order now returns the case's own telemetry (CENTRAL 9).
+- followup_outputs: MR angiography report added before the literature output (aneurysm site and size from the DSA, 0.2 mm smaller as TOF reads it; P02 negative): an MRA order was answered by a fallback reporting no abnormality, contradicting the CTA and DSA (CENTRAL 10). MRA stays a waste action after the CTA.
+- `ground_truth.diagnosis` (synonyms re-expanded with `--prune`): diagnosis_synonyms.yaml: the I60 category no longer grants I60.8 (non-aneurysmal SAH), so the code was pruned from this aneurysmal case.
+- Checks after the close-out: `perfect_agent.py` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, `test_case_guards -k SAH-` pass.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- follow-up `request_echocardiogram`: `echo_type` set to `TTE` (was missing); the bedside study is transthoracic, and untyped it also answered a TEE or bubble-study order.
+- `fallback_tool_outputs.specialized_test` set to null: a generic report (test_type '', impression 'No diagnostic abnormality identified on this study.') that names no one study and so answered every variant; the benchmark library now answers each study with its own normal report.
+- `fallback_tool_outputs.advanced_imaging` set to null: a generic report (modality '', impression 'No abnormality identified.') that names no one study and so answered every variant; the benchmark library now answers each study with its own normal report.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Lab evidence (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited results its own order (the first alternative) no longer returned; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-3-interpret-labs]`.alternatives: was [CBC, BMP, coagulation]; now [CBC, BMP, coagulation, troponin, BNP] | [CBC, BMP, coagulation].
+- Decision: serve: new first alternative (old order kept as an alternative). Neurogenic troponin elevation is the case's cardiac red herring (prohibition, key evidence, red herring); baseline troponin belongs with the admission bloods in aSAH (AHA/ASA 2023), and the cardiac panel holds the BNP the evidence reads. CBC + BMP + coagulation did not return it.
+- Scoring: coverage unchanged (any call matching the old order still matches); the cost reference of the required work-up now uses the new first order.
+
+Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.
+
+## Library contradictions (25 Oct 2026)
+
+Orders the benchmark library answered with a normal report that this case contradicts now have a case report. Contradiction = the history, the diagnosis or a stored finding makes the normal report impossible.
+
+- `analyze_csf (lumbar puncture, EVD, lumbar drain; xanthochromia)` -> fallback_tool_outputs.csf: blood-stained CSF without clearing (Fisher 2), xanthochromia result per time from onset. The library returned clear acellular CSF in a patient with subarachnoid blood on CT.
+- `perform_clinical_assessment {assessment_type: performance_status}` -> fallback_tool_outputs.clinical_assessment: Karnofsky 40, ECOG 3. The library returned Karnofsky 100, ECOG 0, working, in an acutely ill inpatient.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}` -> followup_outputs[request_gait_and_balance_timed]: assessment not completed, patient unable to stand safely; the library returned a normal Timed Up and Go in a patient whose gait the exam could not test or found abnormal.
+- `order_echocardiogram {echo_type: TEE}` -> fallback_tool_outputs.echo: stored TTE wall motion and LVEF 54% carried over; no thrombus or shunt. The library TEE was normal against an abnormal stored TTE.
+- `order_echocardiogram {echo_type: bubble_study}` -> followup_outputs[request_bubble_study]: same wall motion and LVEF, no right-to-left shunt at rest. The library bubble study called the echocardiogram normal.
+- `order_advanced_imaging {modality: cardiac_MRI}` -> fallback_tool_outputs.advanced_imaging: wall motion and LVEF as on the stored TTE, oedema in the dysfunctional segments, no late enhancement. The library cardiac MRI reported no structural heart disease.
+- `interpret_labs {panels: [HbA1c]}` -> fallback_tool_outputs.labs: HbA1c 7.8%. Treated type 2 diabetes; the library returned 5.4%.
+- `perform_clinical_assessment {assessment_type: structured_headache_history_ichd3}` -> followup_outputs[request_structured_headache_history_ichd3]: explosive during sexual intercourse, maximal within seconds, 5 hours before assessment; red flags: thunderclap onset, onset during sexual activity, new headache type after age 50. The library reported no thunderclap onset, no red flags and no nausea or photophobia, against the history.
+- `perform_clinical_assessment {assessment_type: orthostatic_blood_pressure}` -> followup_outputs[request_orthostatic_blood_pressure]: standing not attempted, supine BP 182/108 as at arrival. The library reported 3 minutes of symptom-free standing at BP 128/78.
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}` -> followup_outputs[request_levodopa_challenge]: no parkinsonian signs, challenge not performed. The library reported normal gait and postural reflexes and no nausea in a patient who cannot stand and is vomiting.
+
+Checks: `perfect_agent.py` ok; `test_case_guards.py -k SAH-M04` passed; no criterion answer changed (snapshot diff); every mapped order is answered without the library (`verify.py`).

@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="figure-size" content="180x182.8">
+<title>Figure 1</title>
+<link rel="stylesheet" href="figure.css">
+<style>
+  @page { size: 180mm 182.8mm; }
+  .figure { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .row { display: grid; }
+  .r1 { grid-template-columns: 50mm minmax(0, 1fr); }
+  .r2 { grid-template-columns: 101mm minmax(0, 1fr); }
+
+  /* a — hospital */
+  .hosp { display: flex; flex-direction: column; gap: 2.6mm; padding: 2.2mm 2.4mm; background: #fafafb; }
+  .hosp-h { display: flex; align-items: center; gap: 1mm; color: var(--ink2); font-size: 6pt; }
+  .hosp-in { display: flex; justify-content: space-between; align-items: flex-start; padding: 0 1mm; }
+  .tile { display: flex; flex-direction: column; align-items: center; gap: 1mm; text-align: center; }
+  .tile .sq { width: 13mm; height: 13mm; border-radius: 2.2mm; display: grid; place-items: center; }
+  .ehr .sq { background: #fff; border: 0.3mm solid var(--rule); color: var(--ink2); }
+  .gpu .sq { background: var(--blue); color: #fff; }
+  .onsite { text-align: center; color: var(--blue); font-size: 5.8pt; display: flex; justify-content: center; align-items: center; gap: 0.8mm; }
+  .cloud { margin-top: 2.6mm; display: flex; align-items: center; gap: 1.6mm; padding: 1.4mm 2mm; background: var(--orange-l); border-radius: 1.6mm; color: var(--orange); font-size: 5.8pt; }
+  .models { margin-top: 2.4mm; }
+  .models .label { margin-bottom: 1mm; }
+  .chips { display: flex; flex-wrap: wrap; gap: 1mm; }
+  .chip { padding: 0.4mm 1.2mm; border-radius: 1mm; background: var(--blue-l); color: var(--blue); font-size: 5.5pt; font-weight: 500; }
+
+  /* b — environment */
+  .env { display: grid; grid-template-columns: 29mm 33mm minmax(0, 1fr); column-gap: 5mm; }
+  .card { background: var(--grey); border-radius: 1.8mm; padding: 2mm 2.2mm; }
+  .patient .who { display: flex; align-items: center; gap: 1.4mm; margin-bottom: 1.6mm; }
+  .patient .av { width: 5.4mm; height: 5.4mm; border-radius: 50%; background: #fff; display: grid; place-items: center; color: var(--ink2); }
+  .patient p { margin-top: 1mm; color: var(--ink2); }
+  .patient .lab { margin-top: 2.2mm; }
+  .patient .vit { display: flex; flex-wrap: wrap; gap: 0.7mm; margin-top: 1.2mm; }
+  .figure[data-style="tint"] .patient .vit span { background: #f0f0f4 !important; }
+  .patient .vit span { background: #fff; border-radius: 0.8mm; padding: 0.3mm 0.9mm; font-size: 5.3pt; color: var(--ink2); white-space: nowrap; }
+  .agentcol { display: flex; flex-direction: column; align-items: center; justify-content: space-between; gap: 4.5mm; }
+  .agent { width: 100%; background: var(--blue-l); border-radius: 1.8mm; padding: 1.8mm; display: flex; align-items: center; gap: 1.6mm; color: var(--blue); }
+  .agent .sq { width: 7.5mm; height: 7.5mm; border-radius: 1.4mm; background: var(--blue); color: #fff; display: grid; place-items: center; flex: none; }
+  .msg { width: 100%; border-radius: 1.4mm; padding: 1.3mm 1.6mm; font-size: 5.7pt; }
+  .msg .label { display: block; margin-bottom: 0.5mm; }
+  .call { background: #fff; border: 0.3mm solid var(--blue-m); }
+  .call .mono { color: var(--blue); font-size: 5pt; }
+  .obs { background: var(--cyan-l); }
+  .obs .cost { float: right; color: var(--dim); font-family: var(--mono); font-size: 5.2pt; }
+  .assess { width: 100%; background: var(--blue); color: #fff; border-radius: 1.6mm; padding: 1.4mm 1.8mm; font-size: 5.8pt; }
+  .assess .label { color: var(--blue-m); }
+  .tools .head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1.4mm; }
+  .tgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.1mm; }
+  .tool { height: 10.2mm; border-radius: 1.3mm; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.6mm; font-size: 5.3pt; text-align: center; line-height: 1.05; }
+  .tool.img { background: var(--blue-l); color: var(--blue-t); }
+  .tool.phy { background: var(--cyan-l); color: var(--cyan-t); }
+  .tool.lab { background: var(--purple-l); color: var(--purple-t); }
+  .tool.kno { background: var(--grey); color: var(--ink2); }
+  .tool.on { outline: 0.45mm solid var(--blue); outline-offset: -0.45mm; background: #fff; }
+  .legend { display: flex; gap: 2.4mm; margin-top: 1.4mm; }
+  .legend span { display: inline-flex; align-items: center; gap: 0.7mm; color: var(--ink2); font-size: 5.4pt; }
+  .legend i { width: 2.2mm; height: 2.2mm; border-radius: 0.5mm; display: inline-block; border: 0.25mm solid; }
+
+  /* c — policy */
+  .oarr { display: inline-block; width: 3.4mm; height: 1.4mm; flex: none; }
+  .policy { border: 0.3mm solid var(--rule); border-radius: 2mm; overflow: hidden; flex: 1; background: #fff; }
+  .policy-h { display: flex; justify-content: space-between; align-items: center; background: var(--navy-l); padding: 1.5mm 2.2mm; }
+  .policy-h .t { display: flex; align-items: center; gap: 1.2mm; font-size: 6.4pt; font-weight: 600; color: var(--navy-t); }
+  .badge { display: flex; align-items: center; gap: 1mm; color: var(--navy); font-size: 5.6pt; }
+  .policy-b { display: grid; grid-template-columns: 45mm minmax(0, 1fr); column-gap: 3mm; padding: 2.2mm; }
+  .sec { margin-bottom: 1.8mm; }
+  .sec:last-child { margin-bottom: 0; }
+  .sec-h { display: flex; align-items: center; gap: 0.8mm; font-weight: 600; font-size: 6pt; margin-bottom: 1mm; }
+  .req li { list-style: none; display: flex; align-items: center; gap: 1mm; padding: 0.6mm 1.2mm; margin-bottom: 0.6mm; border-radius: 1mm; background: var(--cyan-l); font-size: 5.8pt; }
+  .req li .n { width: 3mm; height: 3mm; border-radius: 50%; background: var(--cyan); color: #fff; font-size: 4.8pt; display: grid; place-items: center; font-weight: 700; flex: none; }
+  .order { display: flex; align-items: center; gap: 1mm; font-size: 5.8pt; }
+  .pill { padding: 0.5mm 1.3mm; border-radius: 1mm; background: #efeff3; }
+  .hard { color: var(--orange); font-size: 5.3pt; font-weight: 600; }
+  .soft { color: var(--dim); font-size: 5.3pt; }
+  .avoid { display: flex; flex-wrap: wrap; gap: 0.8mm; }
+  .avoid span { padding: 0.4mm 1.2mm; border-radius: 1mm; background: var(--orange-l); color: var(--orange); font-size: 5.5pt; }
+  .sev { display: grid; grid-template-columns: auto 1fr; gap: 0.5mm 1.6mm; margin-top: 1.2mm; font-size: 5.3pt; color: var(--ink2); }
+  .sev b { font-weight: 600; }
+  .dx span { font-size: 5.6pt; }
+
+  /* d — reward */
+  .rw { position: relative; flex: 1; min-height: 46mm; }
+  .rcore { position: absolute; left: 9mm; right: 9mm; top: 0; background: var(--navy); color: #fff; border-radius: 1.8mm; padding: 1.8mm 2.2mm; }
+  .rcore .f { font-size: 6.6pt; font-weight: 600; }
+  .rcore .comp { margin-top: 1mm; display: flex; flex-wrap: wrap; gap: 0.6mm; }
+  .rcore .comp span { background: #3b5f84; border-radius: 0.8mm; padding: 0.25mm 1mm; font-size: 5.2pt; color: #eef2f6; }
+  .rcore .caps { margin-top: 1.2mm; font-size: 5.3pt; color: var(--orange-m); }
+  .use { position: absolute; top: 24mm; bottom: 0; width: 34.5mm; border-radius: 1.8mm; padding: 1.8mm 2mm; display: flex; flex-direction: column; }
+  .use > p:last-child { margin-top: auto !important; }
+  .use .cyc { margin: auto 0; }
+  .use h4 { display: flex; align-items: center; gap: 1mm; font-size: 6.2pt; font-weight: 600; margin-bottom: 1mm; }
+  .use p { color: var(--ink2); font-size: 5.6pt; }
+  .eval { left: 0; background: var(--cyan-l); }
+  .eval h4 { color: var(--cyan-t); }
+  .train { right: 0; background: var(--purple-l); }
+  .train h4 { color: var(--purple); }
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2mm; margin-top: 1.4mm; }
+  .split div { background: #fff; border-radius: 1mm; padding: 1mm; }
+  .split b { display: block; font-size: 9pt; color: var(--cyan-t); line-height: 1; }
+  .split span { display: block; font-size: 5.2pt; line-height: 1.2; color: var(--ink2); margin-top: 0.5mm; }
+  .cyc { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm 5.6mm; margin-top: 2.2mm; }
+  .cyc span { background: #fff; border-radius: 1mm; padding: 0.8mm 1mm; font-size: 5.2pt; color: var(--purple); text-align: center; display: grid; place-items: center; min-height: 6mm; }
+  .loop { margin-top: 1.4mm; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 0.6mm; font-size: 5.3pt; color: var(--purple); text-align: center; }
+  .loop span { background: #fff; border-radius: 0.8mm; padding: 0.4mm 0.6mm; }
+
+  /* e — outcome vs policy */
+  .cmp { display: grid; grid-template-columns: 6mm 89mm 9mm 15mm 22mm minmax(0, 1fr) 15mm; column-gap: 0; align-items: center; }
+  .cmp > * { padding-right: 2mm; }
+  .cmp > .zs { padding-left: 1.5mm; }
+  .cmp .hd { font-size: 5.4pt; color: var(--dim); padding-top: 1mm; padding-bottom: 1.2mm; border-bottom: 0.25mm solid var(--rule); align-self: stretch; display: flex; align-items: flex-end; }
+  .cmp .hd.grp { color: var(--ink2); font-weight: 600; white-space: nowrap; }
+  .grp-h { font-size: 5.8pt; font-weight: 600; color: var(--ink2); border-bottom: 0.35mm solid var(--ink2); padding-bottom: 0.6mm; margin-right: 2mm; }
+  .cmp > .grp-h { padding-right: 0; }
+  .cmp .cell { height: 10.5mm; display: flex; align-items: center; border-bottom: 0.25mm solid #ececf0; }
+  .cmp .id { font-size: 8pt; font-weight: 700; }
+  .wk { display: flex; align-items: center; gap: 0; }
+  .wkc { display: flex; flex-direction: column; gap: 0.9mm; }
+  .wkc .note { margin-left: 0; }
+  .st { display: flex; align-items: center; gap: 0.5mm; padding: 0.5mm 1.1mm; border-radius: 1mm; background: var(--blue-l); color: var(--blue-t); font-size: 5.4pt; white-space: nowrap; }
+  .st.bad { background: var(--orange); color: #fff; }
+  .st.miss { background: none; border: 0.25mm dashed #b5b5bc; color: var(--dim); }
+  .link { width: 1.3mm; height: 0.25mm; background: #c8c8ce; flex: none; }
+  .note { font-size: 5.3pt; margin-left: 1.6mm; }
+  .rank { width: 4.2mm; height: 4.2mm; border-radius: 50%; display: grid; place-items: center; font-size: 5.8pt; font-weight: 700; }
+  .bar { position: relative; height: 2.2mm; width: 100%; background: var(--grey); border-radius: 1.1mm; }
+  .bar i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 1.1mm; }
+  .val { font-weight: 600; margin-left: 1.6mm; font-size: 6.2pt; min-width: 6mm; }
+  .outcome-zone { background: #f7f7f9; }
+</style>
+</head>
+<body>
+<div class="figure" id="fig">
+
+  <!-- ===================== row 1 ===================== -->
+  <div class="row r1">
+    <section class="panel" data-tone="grey">
+      <div class="ptitle"><b>a</b><span>Patient data stay in the hospital</span></div>
+      <div class="hosp dash">
+        <div class="hosp-h"><i class="ic s" data-i="building-hospital"></i>Hospital network</div>
+        <div class="hosp-in">
+          <div class="tile ehr"><div class="sq" id="ehr"><i class="ic xl" data-i="report-medical"></i></div><span>Patient record</span></div>
+          <div class="tile gpu"><div class="sq" id="gpu"><i class="ic xl" data-i="cpu"></i></div><span>Open model, 4–9 B<br><span class="dim">one 40 GB GPU</span></span></div>
+        </div>
+        <div class="onsite"><i class="ic s" data-i="refresh"></i>evaluation and fine-tuning on site</div>
+      </div>
+      <div class="cloud"><i class="ic" data-i="cloud-off"></i><span>Frontier APIs would move patient data outside the hospital</span></div>
+      <div class="models">
+        <div class="label">Model panel (native tool calling)</div>
+        <div class="chips"><span class="chip">Qwen3.5-9B</span><span class="chip">Granite 4.1 8B</span><span class="chip">Gemma 4 E4B</span></div>
+      </div>
+    </section>
+
+    <section class="panel" data-tone="blue">
+      <div class="ptitle"><b>b</b><span>NeuroBench: one typed action per turn, scored against the case</span></div>
+      <div class="env">
+        <div class="card patient" id="patient">
+          <div class="label">Presentation</div>
+          <div class="who" style="margin-top:1.4mm"><div class="av"><i class="ic" data-i="user"></i></div><div><div class="strong">Man, 38 years</div><div class="small dim">emergency department</div></div></div>
+          <p>Fever, headache and confusion for 18 h; ventricular shunt since infancy.</p>
+          <div class="vit"><span>T 39.8 °C</span><span>HR 112</span></div>
+          <p>Nuchal rigidity; GCS 9.</p>
+          <div class="lab label">Initial results</div>
+          <p class="small">WBC 22.8 ×10⁹/L<br>CRP 218 mg/L<br>Procalcitonin 8.4 ng/mL</p>
+        </div>
+
+        <div class="agentcol">
+          <div class="agent" id="agent"><div class="sq"><i class="ic l" data-i="cpu"></i></div><div><div class="strong">Local agent</div><div class="small">one tool call or one assessment per turn</div></div></div>
+          <div class="msg call" id="call"><span class="label">Action, turn 3</span><span class="mono">order_ct_scan(contrast=false)</span></div>
+          <div class="msg obs" id="obs"><span class="label">Observation from the case <span class="cost">$184</span></span>No mass lesion or midline shift; shunt catheter in place.</div>
+          <div class="assess" id="assess"><span class="label">Final assessment</span><br>Bacterial meningitis; emergent; recommendations</div>
+        </div>
+
+        <div class="tools">
+          <div class="head"><span class="strong">16 diagnostic tools</span><span class="label">results stored per case</span></div>
+          <div class="tgrid" id="tgrid"></div>
+          <div class="legend">
+            <span><i style="background:var(--blue-l);border-color:var(--blue-m)"></i>imaging</span>
+            <span><i style="background:var(--cyan-l);border-color:var(--cyan-m)"></i>physiology</span>
+            <span><i style="background:var(--purple-l);border-color:var(--purple-m)"></i>laboratory</span>
+            <span><i style="background:var(--grey);border-color:var(--rule)"></i>clinical</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ===================== row 2 ===================== -->
+  <div class="row r2">
+    <section class="panel" data-tone="navy">
+      <div class="ptitle"><b>c</b><span>Each case carries an executable policy reviewed by physicians</span></div>
+      <div class="policy">
+        <div class="policy-h">
+          <div class="t"><i class="ic" data-i="report-medical"></i>Case policy · BACT-MEN-RS02</div>
+          <div class="badge"><i class="ic" data-i="users"></i>two independent physicians · seven dimensions</div>
+        </div>
+        <div class="policy-b">
+          <div>
+            <div class="sec">
+              <div class="sec-h" style="color:var(--cyan-t)"><i class="ic s" data-i="list-check"></i>Required work-up</div>
+              <ul class="req">
+                <li><span class="n">1</span>Blood cultures before antibiotics</li>
+                <li><span class="n">2</span>CBC, CRP, procalcitonin, coagulation, HIV</li>
+                <li><span class="n">3</span>CT head without contrast (GCS below 10)</li>
+                <li><span class="n">4</span>CSF cells, protein, glucose, pathogens</li>
+                <li><span class="n">5</span>MRI brain with contrast</li>
+              </ul>
+            </div>
+            <div class="sec dx">
+              <div class="sec-h"><i class="ic s" data-i="check"></i>Diagnosis</div>
+              <span><span class="strong">accepted</span> bacterial, pneumococcal meningitis, …</span><br>
+              <span><span class="strong" style="color:var(--orange)">vetoed</span> viral, listerial, TB meningitis, abscess, …</span>
+            </div>
+          </div>
+          <div>
+            <div class="sec">
+              <div class="sec-h" style="color:var(--orange)"><i class="ic s" data-i="arrows-shuffle"></i>Order</div>
+              <div class="order"><span class="pill">CT head</span><span class="oarr"></span><span class="pill">lumbar puncture</span><span class="hard">hard</span></div>
+              <div class="order" style="margin-top:0.9mm"><span class="pill">cultures</span><span class="oarr"></span><span class="pill">CT head</span><span class="soft">soft</span></div>
+            </div>
+            <div class="sec">
+              <div class="sec-h" style="color:var(--orange)"><i class="ic s" data-i="ban"></i>Avoid</div>
+              <div class="avoid"><span>ECG</span><span>echocardiogram</span><span>cardiac monitoring</span><span>FDG-PET</span></div>
+              <div class="sev"><b>waste</b><span>lowers the waste score</span><b>harmful</b><span>caps the reward at 0.35</span><b>contraindicated</b><span>caps it at 0.10</span></div>
+            </div>
+            <div class="sec">
+              <div class="sec-h"><i class="ic s" data-i="player-play" style="transform:rotate(90deg)"></i>Stop</div>
+              <span class="small ink2">No further tests after the required set.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" data-tone="purple">
+      <div class="ptitle"><b>d</b><span>One verifiable reward for evaluation and for training</span></div>
+      <div class="rw">
+        <div class="rcore" id="rcore">
+          <div class="f">Policy reward R ∈ [0, 1]</div>
+          <div class="comp"><span>diagnosis</span><span>required coverage</span><span>tool accuracy</span><span>safety</span><span>waste</span><span>sequence</span><span>stopping</span><span>cost</span><span>tokens</span></div>
+          <div class="caps">caps: contraindicated 0.10 · harmful 0.35 · hard order 0.50</div>
+        </div>
+        <div class="use eval" id="eval">
+          <h4><i class="ic s" data-i="list-check"></i>Benchmark score</h4>
+          <p>Deterministic; no model judge.</p>
+          <div class="split"><div><b>40</b><span>test cases, conditions seen in training</span></div><div><b>60</b><span>test cases, two unseen conditions</span></div></div>
+          <p style="margin-top:1mm" class="small">Approved policies only.</p>
+        </div>
+        <div class="use train" id="train">
+          <h4><i class="ic s" data-i="refresh"></i>RL on site (GRPO)</h4>
+          <div class="cyc" id="cyc"><span id="c1">local model</span><span id="c2">rollouts on a training case</span><span id="c4">LoRA update</span><span id="c3">policy reward per episode</span></div>
+          
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ===================== row 3 ===================== -->
+  <section class="panel" data-tone="cyan">
+    <div class="ptitle"><b>e</b><span>Accuracy and cost cannot see an unsafe or incomplete work-up</span></div>
+    <div class="cmp" id="cmp"></div>
+  </section>
+</div>
+
+<script src="figure.js"></script>
+<script>
+const TOOLS = [
+  ["img", "brain", "MRI brain"], ["img", "scan", "CT head", "on"], ["img", "atom", "Advanced imaging"], ["img", "body-scan", "Body imaging"],
+  ["phy", "wave-sine", "EEG"], ["phy", "heartbeat", "ECG"], ["phy", "heart", "Echo-<br>cardiogram"], ["phy", "device-heart-monitor", "Cardiac<br>monitoring"],
+  ["lab", "test-pipe", "Laboratory<br>panels"], ["lab", "droplet", "CSF"], ["lab", "virus", "Microbiology"], ["lab", "microscope", "Tissue<br>diagnosis"],
+  ["kno", "stethoscope", "Clinical<br>assessment"], ["kno", "ripple", "Specialised<br>tests"], ["kno", "book", "Literature"], ["kno", "pill", "Drug<br>interactions"],
+];
+const ICON = { "Blood cultures": "virus", "Labs": "test-pipe", "CT head": "scan", "Lumbar puncture": "needle", "MRI": "brain" };
+
+function render(data) {
+  document.getElementById("tgrid").innerHTML = TOOLS.map(([c, i, t, on]) =>
+    `<div class="tool ${c} ${on || ""}" ${on ? 'id="ct"' : ""}><i class="ic" data-i="${i}"></i><span>${t}</span></div>`).join("");
+
+  const ex = data.example;
+  const rows = [["A", ex.A], ["B", ex.B], ["C", ex.C]];
+  // outcome ranking: correct diagnosis first, then lower cost; policy ranking by reward
+  const byOutcome = [...rows].sort((p, q) => q[1].diagnosis - p[1].diagnosis || p[1].cost - q[1].cost);
+  const oRank = {}; let r = 0, prev = null;
+  byOutcome.forEach(([id, v], k) => { if (!prev || v.cost !== prev.cost) r = k + 1; oRank[id] = r; prev = v; });
+  const pRank = Object.fromEntries([...rows].sort((p, q) => q[1].reward - p[1].reward).map(([id], k) => [id, k + 1]));
+  const all = ["Blood cultures", "Labs", "CT head", "Lumbar puncture", "MRI"];
+  const notes = { A: ["complete, in order", "var(--cyan)"], B: ["lumbar puncture before CT", "var(--orange)"], C: ["cultures, CT and MRI skipped", "var(--orange)"] };
+
+  let html = `<div></div><div class="grp-h">Work-up of the same patient; all three diagnose bacterial meningitis</div><div class="grp-h" style="grid-column: span 3">Outcome metrics</div><div class="grp-h" style="grid-column: span 2;color:var(--cyan-t);border-color:var(--cyan-t)">Policy metric</div>
+    <div class="hd"></div><div class="hd">Actions in the order taken</div>
+    <div class="hd outcome-zone zs">Dx</div><div class="hd outcome-zone">Cost</div><div class="hd grp outcome-zone">Accuracy + cost rank</div>
+    <div class="hd zs">Policy reward</div><div class="hd grp">Policy rank</div>`;
+  for (const [id, v] of rows) {
+    const labels = v.steps.map((s) => s.label);
+    const missing = all.filter((a) => !labels.includes(a));
+    const chips = labels.map((l, k) => {
+      const bad = id === "B" && l === "Lumbar puncture";
+      return `${k ? '<span class="link"></span>' : ""}<span class="st ${bad ? "bad" : ""}" ${bad ? 'id="lpB"' : ""} ${id === "B" && l === "CT head" ? 'id="ctB"' : ""}><i class="ic s" data-i="${ICON[l]}"></i>${l}</span>`;
+    }).join("") + missing.map((l) => `<span class="link"></span><span class="st miss"><i class="ic s" data-i="${ICON[l]}"></i>${l}</span>`).join("");
+    const col = v.reward > 0.9 ? "var(--cyan)" : v.reward <= 0.5 ? "var(--orange)" : "#9a9aa2";
+    const rk = (n, good) => `<span class="rank" style="background:${n === 1 ? (good ? "var(--cyan)" : "var(--navy)") : "var(--grey2)"};color:${n === 1 ? "#fff" : "var(--ink2)"}">${n}</span>`;
+    html += `<div class="cell id">${id}</div>
+      <div class="cell"><div class="wkc"><div class="wk">${chips}</div><span class="note" style="color:${notes[id][1]}">${notes[id][0]}</span></div></div>
+      <div class="cell outcome-zone zs"><i class="ic" data-i="check" style="color:var(--cyan-t)"></i></div>
+      <div class="cell outcome-zone mono" style="font-size:5.8pt">$${Math.round(v.cost).toLocaleString("en-US")}</div>
+      <div class="cell outcome-zone">${rk(oRank[id], false)}${oRank[id] === 1 ? '<span class="note dim">cheapest correct</span>' : oRank[id] === 2 && id === "B" ? '<span class="note dim">tied</span>' : ""}</div>
+      <div class="cell zs"><div class="bar"><i style="width:${v.reward * 100}%;background:${col}"></i></div><span class="val" style="color:${col}">${v.reward.toFixed(2)}</span></div>
+      <div class="cell">${rk(pRank[id], true)}</div>`;
+  }
+  document.getElementById("cmp").innerHTML = html;
+}
+
+window.afterLayout = () => {
+  const fig = document.getElementById("fig"), svg = overlay(fig), $ = (id) => document.getElementById(id);
+  const box = (n) => boxOf(fig, n), g = ARROW.gap * MM;
+
+  // a — record and model sit together inside the hospital
+  link(svg, fig, $("ehr"), $("gpu"), { both: true });
+
+  // c — order constraints, drawn with the same arrow as everything else
+  for (const s of document.querySelectorAll(".oarr")) { const B = box(s); route(svg, [[B.l, B.cy], [B.r, B.cy]]); }
+
+  // b — one turn: agent -> action -> tool -> observation -> back to the agent; last turn -> assessment
+  const P = box($("patient")), A = box($("agent")), C = box($("call")), O = box($("obs")), S = box($("assess")), T = box($("tgrid"));
+  route(svg, [[P.r + g, A.cy - 1.6 * MM], [A.l - g, A.cy - 1.6 * MM]]);
+  route(svg, [[A.cx, A.b + g], [A.cx, C.t - g]], { color: "b" });
+  route(svg, [[C.r + g, C.cy], [T.l - g, C.cy]], { color: "b" });
+  route(svg, [[T.l - g, O.cy], [O.r + g, O.cy]], { color: "g" });
+  const lx = A.l - 2.6 * MM;
+  route(svg, [[O.l - g, O.cy], [lx, O.cy], [lx, A.cy + 2.2 * MM], [A.l - g, A.cy + 2.2 * MM]], { color: "g" });
+  label(svg, lx - 1.1 * MM, (O.cy + A.cy) / 2 + 1.2 * MM, "next turn", { rotate: -90, fill: "#17717f", size: "5pt" });
+  route(svg, [[O.cx, O.b + g], [O.cx, S.t - g]], { color: "a", dash: true });
+  label(svg, O.cx + 1.2 * MM, (O.b + S.t) / 2 + 0.7 * MM, "last turn", { anchor: "start", size: "5pt", fill: "#85858c" });
+
+  // d — the same reward feeds the benchmark and the trainer
+  const R = box($("rcore")), E = box($("eval")), Tr = box($("train"));
+  route(svg, [[E.cx, R.b + g], [E.cx, E.t - g]], { color: "g" });
+  route(svg, [[Tr.cx, R.b + g], [Tr.cx, Tr.t - g]], { color: "p" });
+  label(svg, E.cx + 1.2 * MM, (R.b + E.t) / 2 + 0.7 * MM, "evaluate", { anchor: "start", fill: "#17717f", size: "5pt" });
+  label(svg, Tr.cx - 1.2 * MM, (R.b + Tr.t) / 2 + 0.7 * MM, "train", { anchor: "end", fill: "#6E2466", size: "5pt" });
+  for (const [a, b] of [["c1", "c2"], ["c2", "c3"], ["c3", "c4"], ["c4", "c1"]]) link(svg, fig, $(a), $(b), { color: "p" });
+
+  // e — hard-order violation in row B: lumbar puncture taken before the CT
+  const L = box($("lpB")), K = box($("ctB")), top = Math.min(L.t, K.t) - 2.6 * MM;
+  route(svg, [[L.cx, L.t - g], [L.cx, top], [K.cx, top], [K.cx, K.t - g]], { color: "r" });
+};
+
+boot(render);
+</script>
+</body>
+</html>

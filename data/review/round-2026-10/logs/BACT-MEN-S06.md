@@ -1,0 +1,83 @@
+# BACT-MEN-S06
+Reviewer status: R1 not reviewed, R2 needs_changes | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| 9dbac2c3-8927-4f9b-9bdb-b47a78656ba6 | FIXED | Plan C1, C6, C7. `initial_tool_outputs.csf` set to null; the index CSF is now `followup_outputs[1]` (`analyze_csf`, trigger `request_lumbar_puncture`), so nothing names the organism before the agent orders the LP. In it: `special_tests.CSF_culture` "Pending" (the "preliminary growth at 12 hours" is gone); the pneumococcal latex agglutination is deleted (plan C7: antigen is never the confirming test); the Gram stain and the multiplex PCR stay because they are the LP the criterion orders (`special_tests: [meningitis_panel]`), and the PCR now lists every target. Blood cultures (`followup_outputs[0]`): each set states its interval (positive at 11 and 13 hours, identified at 24 hours), susceptibilities "reported at 48 hours", a collection line, MICs moved into `susceptibility`. |
+| 01bdb495-bfb3-4588-a022-02fdadebcdd0 | FIXED | `patient.neurological_exam.mental_status`: "GCS 14 (E4 V4 M6)" to "GCS 15 (E4 V5 M6)", matching "alert and oriented to person, place, and time" and "speech fluent and appropriate". The no-CT must, the CT avoided action and the key evidence now cite GCS 15. |
+| 4bb54e3c-d711-48a2-b480-737bc71867d9 | FIXED | Plan C9. The literature follow-up (with the fabricated ESCMID sentence) and criterion `action-4-search-medical-literature` are deleted. The principle the reviewer states is now in `key_clinical_evidence[6]`: "Antibiotics are given within 60 minutes of suspicion; neither imaging nor lumbar puncture may delay them (WHO 2025; NICE NG240 1.4.1)." |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| C | major | `action_criteria[action-6-order-ct-scan]`, `followup_outputs[request_ct_head]` | Optional CT criterion based on IDSA 2004, with "No contraindication to lumbar puncture identified on this study" in the impression (plan C2, C3). No WHO 2025 Annex A.4 criterion is present (GCS 15, no focal signs, no cranial nerve deficit, no papilledema, no seizure, immunocompetent). | FIXED, plan decision C: criterion and follow-up deleted; avoided action `avoid-waste-6-order-ct-scan` (waste, canonical rationale) added; canonical no-CT must and prohibition added. The CT report, reduced to findings, is kept as `fallback_tool_outputs.ct` (kind `incidental`) so an agent that orders it receives a report consistent with the ear history (left mastoid partial opacification, no erosion) rather than a library normal. No sequence constraint existed; none added. |
+| C | major | `assessment.required_recommendations` | Template "vancomycin 15-20 mg/kg plus ceftriaxone 2 g" (plan C4); dexamethasone must without a stop rule (C5); de-escalation "to ceftriaxone monotherapy" assumes vancomycin. | FIXED: canonical base regimen (no Listeria risk factor: 50, immunocompetent, no diabetes, not pregnant); canonical dexamethasone must plus "Continue for 4 days: Streptococcus pneumoniae is identified."; narrowing must "ceftriaxone, or benzylpenicillin for this penicillin-susceptible S. pneumoniae (penicillin MIC 0.06 mg/L, CLSI meningitis breakpoint); stop vancomycin if it was added" (no duration added: the case stated none). |
+| C | minor | `assessment.required_recommendations` | ENT must conditional on "no clinical improvement" and tied to the deleted CT; no hearing assessment after pneumococcal meningitis. | FIXED: ENT assessment of the left middle ear and mastoid as the probable source, temporal bone imaging and drainage only if ENT finds active otomastoiditis or he fails to improve; canonical hearing must added. |
+| D | major | index CSF | RBC 4 "likely traumatic tap artifact", ratio reference "normal >0.6", lactate reference without "local laboratory", interpretation naming the organism three ways and concluding "consistent with bacterial infection" (plan C7). | FIXED: canonical RBC, ratio (0.18 from 18.2/104, the same paired glucose as the BMP) and lactate strings; values-only interpretation ending "Culture pending." |
+| B | minor | blood cultures `impression` | "The specimen was taken before the first antimicrobial dose, so the isolate is interpretable" (plan C6 boilerplate); em dashes in results. | FIXED: impression "S. pneumoniae isolated from 2 of 2 sets ... susceptibilities, reported at 48 hours, as listed (CLSI meningitis breakpoints)". `collected_before_antimicrobials` stays true: the amoxicillin course ended more than 7 days before collection (treated about 3 weeks ago, 10-day course), stated in a collection line. Penicillin MIC 0.06 susceptible and ceftriaxone 0.5 or less susceptible agree with CLSI meningitis breakpoints. |
+| C | minor | `followup_outputs[check_drug_interactions]`, `action-5` | Drug check of vancomycin plus ceftriaxone with formulary text and a hypothetical cephalosporin allergy; expected evidence "No prohibitive interactions" (plan C9). | FIXED: checks ceftriaxone and dexamethasone against amlodipine, hydrochlorothiazide (additive potassium loss; thiazide may contribute to sodium 132), no allergies and eGFR about 92 (CKD-EPI 2021 from creatinine 1.0, male, 50); criterion stays recommended with concrete expected evidence; trigger renamed `check_antibiotic_interactions`; it is the last pathway step. |
+| B | minor | `initial_tool_outputs.labs` | `action-1` orders HIV and CMP but no HIV result and no liver tests (plan C12 labs). Anion gap 132 - 98 - 21 = 13, consistent. | FIXED: HIV 1/2 Ag/Ab non-reactive; ALT 28, AST 31, ALP 78, bilirubin 0.8, albumin 3.9; interpretation updated. |
+| C | minor | `ground_truth.differential` | Viral meningitis `moderate` although its own key features say excluded; HSV "MRI changes not present" with no MRI; SAH cited "CT shows no hemorrhage" with no CT in the pathway; meningococcal disease missing although droplet precautions are a must (plan C10). | FIXED: all alternatives low or very low with the excluding result; meningococcal meningitis added (low: no rash, Gram-positive diplococci, N. meningitidis not detected on PCR); SAH excluded on tempo, fever, CSF without xanthochromia and RBC 4. |
+| D | minor | `patient.history_present_illness` | "The worst headache of his life" undeclared SAH signal (plan C11); "Black man" irrelevant to the case (class of note c4589441). | FIXED: "a severe, rapidly worsening diffuse headache"; ethnicity removed from the HPI (the demographics field is unchanged). |
+| E | minor | `patient.neurological_exam.cranial_nerves` | "no papilledema, no venous pulsations absent" is a garbled double negative. | FIXED: "optic discs sharp, no papilledema". |
+| B | minor | `red_herrings[0].data_point` | "course completed 3 weeks prior" contradicts the history (treated about 3 weeks ago, 10-day course). | FIXED: "treated with a 10-day amoxicillin course about 3 weeks ago, with reported resolution of ear pain"; interpretation names the PCR. `field_path` verified (past_medical_history[1] is the otitis). |
+| C | minor | `key_clinical_evidence` | IDSA 2004 imaging line, De Gans dexamethasone line, "left mastoid opacification on CT" (no CT now), "An agent that anchors ..." authoring language, ratio "<0.4 threshold" (plan C17). | FIXED: canonical no-CT must, canonical C5 sentence, otitis line rewritten clinically, ratio line per C17, antibiotic timing line per C17. |
+| A | minor | citations, metadata | `[IDSA_2004]` and free-text duplicates in criteria and avoided actions; IDSA 2004 pearl; "4 required tools"; em dash in `difficulty_description`. | FIXED: `[WHO_Meningitis_2025]` only; pearl rewritten on WHO 2025 Annex A.4; "3 required tools"; `last_revised`, `revision_reason` updated. |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+Only the blood tests are available upfront (now including HIV and liver tests). The pathway is blood cultures (S. pneumoniae in both sets at 11 and 13 hours, identified at 24 hours, penicillin- and ceftriaxone-susceptible at 48 hours), then the index LP without imaging, then a drug check. The CSF reports values and pattern, Gram-positive lancet-shaped diplococci, S. pneumoniae on the multiplex PCR, culture pending; the latex antigen and the 12-hour culture growth are gone. The record now gives GCS 15 (E4 V5 M6). No WHO 2025 Annex A.4 criterion is present, so the optional CT is deleted and a CT is now waste (its report, findings only with the left mastoid opacification, answers an agent that orders it anyway). The literature step with the fabricated ESCMID sentence is deleted. Musts: ceftriaxone within 60 minutes without routine vancomycin; dexamethasone 10 mg every 6 hours for 4 days because S. pneumoniae is identified; LP without prior imaging; narrowing to ceftriaxone or benzylpenicillin; ENT assessment of the left ear as the source; droplet precautions until meningococcus is excluded; audiology. The differential now reflects the results and adds meningococcal meningitis.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+- Citation keys `[NICE_NG240]` and `[WHO_Meningitis_2025]` (plan 5.1); `[CLSI_M100]` if the susceptibility wording should be cited.
+
+## Open questions for Andrea (judgment calls you could not settle)
+- Plan Q2, with a case-specific nuance: the plan rules S06 imaging C and makes `order_ct_scan {contrast: false}` waste. That is right for a CT before LP. But this patient has a recent left otitis media with a residual middle-ear effusion, and some clinicians would image the temporal bones after the LP to look for otomastoiditis. The avoided action cannot tell the two apart, so a post-LP source CT is also counted as waste. I followed the plan and put the source question in the ENT must ("temporal bone imaging ... only if ENT finds active otomastoiditis or he fails to improve"). The alternative is plan B: an optional CT for the mastoid after the CSF, with no waste item. S02 (active sinusitis) took that route.
+- The prohibition "Do not discontinue dexamethasone because the ear infection was treated previously" is kept unchanged. It is not wrong, but it guards against reasoning few clinicians would use. Delete it if the re-reviewer finds it artificial.
+
+## Verification
+Adversarial verification, 23 October 2026. Checked: all three note ids present; `initial_tool_outputs.csf` null, culture "Pending", latex gone, PCR in the index CSF report served to action-3 (`-v`); blood cultures state their intervals and a collection line consistent with the history (10-day amoxicillin course ended about 11 days before); GCS 15 (E4 V5 M6) in the record, the must, the CT waste item and the key evidence; literature criterion and output gone. Recomputed anion gap 13, ratio 0.18 (18.2/104), eGFR about 92 (CKD-EPI 2021, creatinine 1.0, male, 50). Fallback CT carries findings only.
+Found and changed:
+- `metadata.clinical_pearls`: De Gans 2002 measured outcome at 8 weeks; "3-month mortality" corrected to "8-week mortality".
+Accepted as logged: the CT-as-waste versus optional source CT question (plan Q2) and the artificial dexamethasone prohibition, both left for the lead.
+Re-run: `perfect_agent.py BACT-MEN-S06 -v` ok; `case_io.py check` clean for the case.
+
+## Open questions resolved (24 Oct 2026)
+
+Andrea's ruling of 24 Oct 2026 (resolve open points for dataset quality); decisions and sources in `plans/BACT-MEN-decisions.md`.
+
+- 'WHO 2025 Annex A.4' renamed 'WHO 2025 section A.4' (4 strings): the cranial imaging recommendations are section A.4 of chapter 3 of the guideline, not an annex
+- Hearing must cites WHO 2025 (strong recommendation: formal audiological screening before discharge, or within four weeks of discharge), which covers every adult with acute meningitis, instead of NICE NG240, which excludes immunocompromised and neurosurgical patients
+- CT waste avoided action removed: with a residual middle-ear effusion after recent otitis in pneumococcal meningitis a temporal bone CT is a defensible source study (the case stores one), so it is neither required nor penalised; the ENT must stays
+- 'Annex A.4' renamed 'section A.4' in metadata text as well
+
+Re-run: `perfect_agent.py` ok; `case_io.py check` clean for the case; BACT-MEN case guards pass; synonym `--check` clean.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+- `fallback_tool_outputs.advanced_imaging` set to null: a generic report (modality 'MRI', impression 'No abnormality identified.') that names no one study and so answered every variant; the benchmark library now answers each study with its own normal report.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 30, ECOG 4 (fallback_tool_outputs.clinical_assessment). Why: rule 3: febrile (39.2 C), tachycardic (HR 112) and in severe distress, declining to walk; the library's Karnofsky 100 describes a person without disease.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: not performed (headache, dizziness); brief standing steady (followup_outputs[3] request_gait_and_balance_timed). Why: rule 3: the stored exam records that the patient declines to walk because of headache and dizziness.
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: no parkinsonian signs; challenge not performed; gait and postural reflexes not assessable (followup_outputs[4] request_levodopa_challenge). Why: rule 3: the library describes a normal neck, gait and postural reflexes in a patient with marked nuchal rigidity who declines to walk.
+- `perform_clinical_assessment {assessment_type: structured_headache_history_ichd3}`: new acute headache with red flags; criteria for a primary headache disorder not met (followup_outputs[5] request_structured_headache_history_ichd3). Why: rule 1 and 3: an acute febrile headache with neck stiffness, photophobia and a recent ear infection; the library elicits no red flags.
+- `analyze_brain_mri`: diffuse leptomeningeal enhancement; partial left mastoid opacification; no complication (fallback_tool_outputs.mri). Why: rule 1 and 3: no MRI is stored; the stored CT shows partial opacification of the left mastoid air cells.
+- `order_microbiology {specimen: whole_blood_pcr}`: Streptococcus pneumoniae DNA detected (fallback_tool_outputs.microbiology). Why: rule 3: blood cultures grow S. pneumoniae in 2 of 2 sets, a target of the panel; no antibiotics since an amoxicillin course completed more than a week earlier.
+- `perform_clinical_assessment {assessment_type: orthostatic_blood_pressure}`: supine BP 148/92, HR 112; standing not performed (followup_outputs[6] request_orthostatic_blood_pressure). Why: rule 3: vitals HR 112 and dizziness in a patient who declines to stand; the library reports HR 68 and 3 minutes of standing without symptoms.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

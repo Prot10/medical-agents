@@ -1,0 +1,105 @@
+# SYNC-CARD-RP04
+Reviewer status: R1 none, R2 none (SYNC-CARD was never reviewed) | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| (none) | - | No reviewer notes for this case. |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| L | major | `patient.history_present_illness` | The HPI gave the ECG result ("which shows normal sinus rhythm") and cued the answer ("Her husband raises an important point"). | FIXED (plan N): "has ordered a 12-lead ECG and called cardiology"; the husband "mentions" the pacemaker. |
+| C | major | `action-4`, `action-5`, `action-6` (monitoring) | Holter 24 h, 28-day event monitor and ILR were all required as a stepwise escalation, with a `duration_days` pin and a must restating the escalation. | FIXED (plan E): ILR required (ESC 2018 Class I); event_monitor_30d recommended (inter-event interval about 4 weeks or less, Class IIa); short monitoring recommended with alternatives telemetry, holter_24h, holter_48h; escalation must deleted. |
+| B | major | `followup_outputs` (monitoring), `fallback_tool_outputs.cardiac_monitoring` | Event monitor stored as `event_monitor` (not a vocabulary value); the 24 h Holter referred to diary entries; fallback null (library normal recording); ILR impression interpretive ("Symptom-rhythm correlation is definitively established"), mixed time formats. | FIXED: "Inpatient telemetry, 24 h" (same recording as the case fallback), `event_monitor_30d` report with a day-17 strip, ILR report in device voice with asystole 18, 23 and 27 s and continuing sinus P waves, 24 h times. |
+| B | minor | `initial_tool_outputs.labs` | AED levels mixed into a "Metabolic" panel with em-dash test names; "Troponin I (high sensitivity)" with a conventional ng/mL range. | FIXED: own `AED_levels` panel ("Levetiracetam level", "Lamotrigine level"); "Troponin I"; factual interpretation. |
+| C | major | `action-2-interpret-labs` | Required, pinning CBC, BMP, Mg, troponin, AED levels and beta-hCG. | FIXED (plan C): recommended, `panels: [AED_levels]`. |
+| C | minor | `followup_outputs[0]` (TTE) | PFO and ASD framing in findings and impression; no echo_type or wall thickness; "Normal transthoracic echocardiogram" and "No evidence of HCM" verdicts. | FIXED (plan G): PFO text removed; echo_type TTE, wall thickness, LA, PASP; numbered findings-only impression. |
+| C | major | `action-8-check-drug-interactions`, drug follow-up, drug initial and fallback | Required with a `current_medications` pin; one combined report; nothing in initial or fallback, so an unnamed drug got the library's "no interaction". | FIXED (plan B): alternatives lamotrigine and levetiracetam, one report each (lamotrigine class IB sodium-channel effect and the 2021 FDA labelling warning in heart block, taper advice; levetiracetam no conduction effect); medication-list review in initial and fallback. |
+| C | major | `action-7-search-medical-literature`, literature follow-ups | Required and in the stop rule; two follow-ups, one with an unverifiable "Neurology 2021" study, one attributing pacing recommendations to an "ESC 2018 pacing" guideline (the pacing guideline is ESC 2021). | FIXED: optional, canonical rationale; one follow-up, last, with ESC 2018 syncope content (loop recorder indications, convulsive syncope features, pacing in paroxysmal AV block) and ESC 2021 pacing content. |
+| C | major | `action-9-order-advanced-imaging` (new), `followup_outputs[4]` | No search for a specific cause of AV block in a patient under 60 (plan tier table: CMR recommended). | FIXED: cardiac MRI recommended with a normal report (no LGE, no oedema), excluding sarcoid and myocarditis on the pathway. |
+| A | minor | `sequence_constraints`, `stop_rule`, `citations`, `rationale` | Hard ECG-before-Holter and hard labs-before-monitoring constraints; stop rule of all eight criteria with `max_additional_actions: 0`; "§" and Locati citations; rationale equal to label. | FIXED: soft ECG before TTE and before the loop recorder; labs constraint deleted; stop rule ECG, TTE, ILR, drug check, 3; keys only; real rationales. |
+| C | blocker | `ground_truth.assessment` | No pacing must (only an "EP consult"); no driving advice; no genetic evaluation despite a father paced at 58 and an aunt's sudden death; "Do not call `order_specialized_test`" engineering text and tilt prohibitions (tests). | FIXED (plan): musts are diagnosis, monitored bed with transcutaneous pacing, permanent dual-chamber pacemaker this admission, neurology-led taper of the antiseizure drugs beginning with lamotrigine and stopping the surgery evaluation, genetic counselling and testing (LMNA, SCN5A) with family screening, driving. Prohibitions: escalating antiseizure drugs or surgery, discharge before pacing, lamotrigine withdrawal alone without pacing. |
+| C | major | `ground_truth.avoided_actions` | No EEG, tilt or exercise penalty; CT and CSF rationales did not name the diagnosis. | FIXED (plan J): EEG, tilt and exercise waste added; all reasons name paroxysmal complete AV block; CT reason applies NICE NG232. |
+| C | major | `ground_truth.differential` | Refractory epilepsy high and vasovagal moderate after the ILR; sinus node dysfunction argued from "baseline bradycardia at 62 bpm and sinus pauses" that the case does not contain; vasovagal argued from a "tilt-table negative" result not on the pathway. | FIXED (plan K): epilepsy, reflex syncope, sinus node dysfunction, lamotrigine effect and tachyarrhythmia low with the excluding results; inherited conduction disease (moderate), cardiac sarcoid or myocarditis (low, normal CMR) and psychogenic attacks (low) added. |
+| L | minor | `ground_truth.red_herrings` | Red herring 2 cited the initial EEG (not a criterion tool); red herring 1 paraphrased and pointed to the Holter; data_points not quoted. | FIXED: EEG red herring replaced by the quoted "ringing in the left ear" aura; event monitor impression quoted at its new index; epilepsy label quoted. |
+| E | minor | `expected_evidence` (all), `key_clinical_evidence`, `metadata.difficulty_*` | "LOAD-BEARING:" prefix and policy text in expected evidence; generic key evidence centred on stepwise escalation. | FIXED: expected evidence from the stored values; key evidence and description rewritten from the pathway. |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+
+The 41-year-old woman with a 12-year label of refractory focal epilepsy and a fifth convulsive episode in two months now has four required steps: ECG (sinus rhythm, PR 192 ms), TTE (normal), an implantable loop recorder and a review of the antiseizure drugs. The loop recorder records three episodes of abrupt complete AV block with asystole of 18, 23 and 27 s, with sinus P waves continuing, during witnessed collapses with jerking. Inpatient telemetry and a 30-day event monitor are recommended and non-diagnostic, cardiac MRI is recommended and normal, the drug levels are recommended, and the literature lookup is optional. EEG, tilt, exercise test, brain MRI, head CT, CSF and MR angiography are waste. The musts are: convulsive syncope from paroxysmal complete AV block rather than epilepsy, monitored bed with transcutaneous pacing, permanent dual-chamber pacemaker this admission, neurology-led taper of the antiseizure drugs beginning with lamotrigine (sodium-channel effect, labelling warning in heart block), genetic counselling and testing for inherited conduction disease with family screening (an LMNA variant would favour an ICD with pacing), and driving advice. Epilepsy, reflex syncope, sinus node disease and a lamotrigine effect are now low; inherited conduction disease is moderate.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+
+- Plan C1: `accepted` carries the generic "cardiac syncope", "arrhythmic syncope", "bradyarrhythmia", "conduction disease syncope" and also "mobitz ii" and "second degree av block", which the loop recorder does not show; the codes include R55. Not hand-edited.
+- Citation registry: there is no key for the 2021 ESC pacing guideline (Glikson M et al., Eur Heart J 2021;42:3427-3520), which this case relies on for pacing, CMR and LMNA; the criteria cite [ESC_2018] only.
+- Plan C2: no genetic panel for inherited conduction disease (LMNA, SCN5A) exists in the vocabulary, so genetic testing is a must only.
+
+## Open questions for Andrea (judgment calls you could not settle)
+
+- Deviation from plan E: the short monitoring (telemetry or Holter) is recommended, not optional, because one episode occurred during sleep, a high-risk feature for which ESC 2018 advises in-hospital monitoring at presentation. Please confirm.
+- Added cardiac MRI as recommended (plan tier table for AV block under 60) with a normal report. Inherited conduction disease is left moderate because the CMR cannot exclude it.
+
+## Verification
+
+Adversarial verification, 24 Oct 2026 (diff against fa1d22e6; the batch-4 checkpoint commit holds the worker's edit).
+
+Checked: no reviewer notes for SYNC-CARD. Plan items: HPI ECG result removed; ILR required with asystole of at least 6 s during typical events (18, 23, 27 s, each with a witnessed collapse, sinus P waves continuing at 68-72 bpm, no sinus slowing, which also excludes a vagal mechanism); event_monitor_30d recommended; stepwise-escalation must deleted; labs recommended AED_levels; drug check required on lamotrigine or levetiracetam with no current_medications pin; hard labs-before-monitoring deleted; PFO framing gone; EEG waste; refractory epilepsy low. Lamotrigine facts (in vitro class IB activity, 2021 FDA labelling warning in second- or third-degree heart block, taper over at least 2 weeks) are correct; driving advice (Group 1, 1 week after pacing) matches ESC 2018; the LMNA and CMR statements match ESC 2021 pacing. Event-monitor red herring quotes `followup_outputs[2].output.impression` verbatim at the right index. Telemetry, event monitor and ILR numbers agree with the ECG (PR 190-200 ms, no second-degree block). Guards pass.
+
+Open question settled (ROUND_POLICY: decide it): keeping the short in-hospital monitoring `recommended` rather than the plan's `optional` holter is correct. One of her events occurred during sleep, i.e. supine, and syncope in the supine position is an ESC 2018 major high-risk feature for which immediate in-hospital ECG monitoring is indicated; the low yield of 24 h for her event frequency is why it is recommended and not required. No question for Andrea remains in this case.
+
+Changed: nothing in the case file.
+
+perfect_agent.py SYNC-CARD-RP04 -v: ok. case_io.py check: clean for this case.
+
+## Condition audit (24 Oct 2026)
+
+Condition auditor, cross-case pass over the 30 SYNC-CARD cases.
+
+Changed:
+- Added `initial_tool_outputs.literature_search.general` (the neutral syncope evaluation block already used in P02-P04 and RM01-RM03: ESC 2018 and ACC/AHA/HRS 2017 initial evaluation and risk stratification). Why: with no initial literature output, MockServer tier 2 answered any generic query (e.g. "syncope guidelines") with the case's disease-specific follow-up, which names the diagnosis. The block repeats no expected_evidence (leak guard passes).
+- Literature follow-up trigger `search_convulsive_syncope_loop_recorder_av_block_pacing` renamed to `search_loop_recorder_paroxysmal_av_block_pacing`. Why: the old trigger's meaningful tokens were generic (management, guidelines, diagnosis, syncope, literature), so a generic query hit the disease-specific report; the new tokens are the condition names, so only a query naming the condition reaches it.
+
+Re-run after the change: perfect_agent 30/30 clean, case_io check clean for SYNC-CARD, test_case_guards for SYNC-CARD 60 passed, discriminator and hijack guards clean.
+
+## Close-out (24 Oct 2026)
+
+Close-out of the condition (plans/SYNC-CARD-decisions.md). Not a re-review: every change below is cross-case.
+
+- Diagnosis synonyms (`diagnosis_synonyms.yaml` SYNC-CARD block, applied with `apply_diagnosis_synonyms.py --prune --conditions syncope_cardiac`): the generic labels "cardiac syncope", "arrhythmic syncope", "bradyarrhythmia", "tachyarrhythmia" and "conduction disease syncope" are retired (29 of 30 cases accepted "cardiac syncope", so any cardiac answer scored), and R55 is no longer an accepted code.
+- Labels: complete heart block labels only; Mobitz II and second-degree labels removed (the loop recorder shows neither).
+- Citations now follow the guideline each rationale or reason names (ruling 8; new keys in the criteria pack allow-list): action-9-order-advanced-imaging citations ['[ESC_2018]'] -> ['[ESC_2021_Pacing]']; avoid-waste-2-order-ct-scan citations ['[ESC_2018]'] -> ['[NICE_NG232]'].
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; `test_case_guards.py -k SYNC-CARD-RP04` pass (SYNC-CARD now in `DISCRIMINATOR_CONDITIONS`); synonym `--check` clean.
+
+## Vocabulary wiring (24 Oct 2026)
+
+Central vocabulary (batch 4: orthostatic_blood_pressure, electrophysiology_study, sodium_channel_blocker_challenge, genetic_panel:inherited_arrhythmia and :cardiomyopathy, whole_body_FDG_PET; SYNC-CARD decisions CENTRAL 1).
+
+| field path | change |
+| --- | --- |
+| `initial_tool_outputs.clinical_assessment` | added: orthostatic_blood_pressure report, supine values = the presenting vitals; No orthostatic fall in blood pressure and no excessive heart rate rise on active standing. |
+| `ground_truth.action_criteria[action-orthostatic-blood-pressure]` | added, recommended, after the ECG criterion [ESC_2018] (decisions CENTRAL 1: orthostatic BP in every initial evaluation) |
+
+Scoring change for re-review: new criteria are recommended or optional, so no required work-up changed.
+
+| field path | change |
+| --- | --- |
+| `followup_outputs[8]` (`request_electrophysiology_study`) | added: 'Electrophysiology study not performed. Deferred by the clinical team.' The documented rhythm already settles management, and the library's normal study (normal AV conduction and sinus node function, nothing inducible) would contradict the case; no criterion |
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `initial_tool_outputs.eeg`: `eeg_type` set to `routine`, named in the report's own text.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 80, ECOG 1 (fallback_tool_outputs.clinical_assessment). Why: rule 2: the library reports Karnofsky 100 with no complaints in a woman who avoids exertion after five collapses in two months.
+- `order_specialized_test {test_type: exercise_stress_test}`: normal at the patient's own rates (rest 62 bpm, PR 192 ms), 1:1 conduction throughout (fallback_tool_outputs.specialized_test). Why: the library answers with a generic study (resting HR 68, 10.4 METs) unrelated to this patient; an exercise order gets the patient's own rates and baseline PR, and the result stays normal, as paroxysmal AV block need not appear on exercise.
+- `order_specialized_test {test_type: tilt_table}`: negative passive tilt at the patient's own rates (122/74 mmHg, 62 bpm) (followup_outputs[9] request_tilt_table). Why: the library answers with a generic study (118/74 mmHg, 68 bpm) unrelated to this patient; a tilt order gets the patient's own rates, and the result stays negative.
+- `order_echocardiogram {echo_type: exercise_echo}`: normal at the patient's own rates (9.4 METs, 62 to 166 bpm), 1:1 conduction (fallback_tool_outputs.echo). Why: the library answers with a generic study (9.5 METs, 90% of the predicted heart rate) unrelated to this patient; an exercise echo gets the rates and workload of the patient's own exercise test, and the result stays as that test.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

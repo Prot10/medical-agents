@@ -1,0 +1,108 @@
+# GLIO-HG-RP04
+Reviewer status: R1 none, R2 needs_changes | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| 0c2fc022-a855-4f5a-9293-b22780913ad3 | FIXED | `action-9-obtain-tissue-diagnosis` assays now `IDH1_IHC, IDH1_IDH2_sequencing, ATRX_IHC, MGMT_methylation, SOX10_IHC, Melan_A_HMB45_IHC` in both alternatives; tissue follow-ups (`followup_outputs[4]` biopsy, `[5]` resection) report SOX10 negative and Melan-A and HMB-45 negative, one row per assay (S100 kept as an extra row); must 7 names SOX10, Melan-A and HMB-45, all now orderable and reported. `H3K27_status` dropped from the required list (no midline lesion: the dominant mass is hemispheric with extension into the splenium); the report still states H3 K27M not detected, H3K27me3 retained. |
+| eb3f1800-42e2-4dcb-a081-48d4d69effb1 | FIXED | Treat class (C5): must 3 starts levetiracetam for the documented focal seizure (15 s speech arrest with staring and unawareness), as treatment, with enzyme inducers avoided. `avoid-waste-1-analyze-eeg` deleted; new recommended `action-eeg-characterise-spells`; new `initial_tool_outputs.eeg` (right parieto-occipital delta slowing, occasional left mid temporal sharp waves, no electrographic seizure); the normal fallback EEG set to null. The drug check proposes levetiracetam for the seizure, not "prophylaxis/treatment". |
+| 0289beef-683c-41fa-b52e-02116219c4d4 | FIXED | New required `action-performance-status` (in the stop rule) with a follow-up from the current examination: KPS 70, ECOG 2 (independent in self-care, unable to work because of memory and executive lapses, mild left hemiparesis, quadrantanopia). `social_history.functional_status` now reads "Before the current illness: Karnofsky Performance Status 80 ...". Must 9 reads the regimen from the current KPS. |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| B | major | `patient.neurological_exam.cranial_nerves` | "right homonymous inferior quadrantanopia" with a right parieto-occipital lesion (laterality flip). | FIXED: "left homonymous inferior quadrantanopia". |
+| B | minor | `patient.history_present_illness` | "completed the recommended five-year surveillance protocol" for a melanoma excised three years ago. | FIXED: "remains in the recommended five-year surveillance protocol"; em dashes in the edited sentence removed. |
+| D | blocker | `initial_tool_outputs.tissue_diagnosis` | Integrated diagnosis served upfront (C2); template meta-text; site listing all three lesions for one biopsy. | FIXED: two follow-ups, biopsy of the dominant rim and cytoreductive resection with an extent row; integrated diagnosis "Glioblastoma, IDH-wildtype, CNS WHO grade 4"; impression one line with MGMT and the melanocytic markers. |
+| C | major | `action-9` alternatives | Biopsy only; 1p/19q required in an IDH-wildtype case (C3, C4). | FIXED: group C, `stereotactic_biopsy` then `resection` (cytoreduction of the dominant lesion); list per plan; label, evidence and rationale rewritten. |
+| C | major | `action-3-search-medical-literature`, `followup_outputs[3]` | Literature as a required step and in the stop rule (C1). | FIXED: deleted; the perilesional rCBV and choline discriminator moved into the perfusion and spectroscopy rationales. |
+| C | major | `assessment.required_recommendations` | No antiseizure must; no aspirin plan; template dexamethasone; no treatment must; biopsy without resection alternative. | FIXED: must 1 group C; must 3 levetiracetam (treat); must 4 canonical dexamethasone; must 8 stop aspirin 7 days before surgery and no driving; must 9 entity-specific (age 52, KPS 70: 60 Gy covering all three lesions with temozolomide, MGMT unmethylated, hypofractionated if KPS falls below 70). |
+| C | major | `ground_truth.differential` | Melanoma metastasis "high" and unknown-primary metastasis "moderate" after the work-up excluded them. | FIXED: melanoma metastasis low, the others very low, with this case's discriminators including SOX10. |
+| C | major | `followup_outputs[4]` (DDI) | "Levetiracetam (seizure prophylaxis/treatment)"; alternatives with em dashes; no aspirin timing. | FIXED: rewritten for dexamethasone and levetiracetam with amlodipine, hydrochlorothiazide and aspirin (potassium, blood pressure, GI bleeding, aspirin before surgery); new optional `action-check-drug-interactions`, last. |
+| D | minor | `initial_tool_outputs.mri.impression`, finding types | Prose impression ending "Tissue diagnosis is required"; em dashes in the finding types. | FIXED: numbered imaging-only impression with the differential; types reworded. |
+| D | minor | `followup_outputs[0]`, `[1]`, `[2]` | Interpretive clauses in perfusion and MRS signals ("indicating tumor infiltration", "above what would be expected"); CT impression "MRI liver recommended" (management advice). | FIXED: values kept, clauses removed, numbered impressions. |
+| C | minor | `avoided_actions` | LP harm rationale generic; cardiac waste rationales cite NCCN. | FIXED: canonical C17 (6 mm shift, right occipital horn effacement); "No cardiac question in this presentation". |
+| B | minor | `initial_tool_outputs.labs` | Interpretive summary ("borderline", "likely non-fasting"). | FIXED: plain summary and interpretation. Values checked (anion gap 10, MCHC 33.0, PT/INR concordant). |
+| C | minor | `key_clinical_evidence`, `red_herrings`, citations, sequence, stop rule, metadata | Unsupported "2-5%" figures; markers without SOX10; duplicate bare keys; single soft constraint; metadata "neurosurgery consult, neuro-oncology consult" as tools. | FIXED: case-specific evidence; SOX10 in the red herrings; one bracketed key; hard MRI and labs to tissue; stop rule MRI, labs, CT CAP, performance status, tissue; difficulty rationale rewritten. |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+
+A 52-year-old man with a prior cutaneous melanoma and three enhancing lesions (dominant right parieto-occipital, right frontal, left superior temporal) that prove to be a multicentric glioblastoma, IDH-wildtype. The quadrantanopia is now on the left, as the right parietal lesion requires. The speech arrest with staring is treated as a focal seizure: an EEG is recommended (right posterior slowing, left temporal sharp waves) and levetiracetam is a must. Work-up: contrast MRI, labs, staging CT and current performance status (all required; KPS 70, ECOG 2, down from a pre-illness 80), perfusion and spectroscopy showing infiltration beyond enhancement (recommended), then tissue by stereotactic biopsy of the dominant lesion or its cytoreduction (required; IDH1 IHC and sequencing, ATRX, MGMT, SOX10, Melan-A and HMB-45). The pathology now reports SOX10, so the melanoma-exclusion must can be met. Drug check is optional and last. Musts add aspirin withdrawal before surgery, no driving, and a regimen chosen by the current KPS (60 Gy covering all lesions with temozolomide, MGMT unmethylated).
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+
+- Synonyms (plan 5.2): "astrocytoma grade 4" is wrong for an IDH-wildtype glioblastoma; accepted[0] "WHO grade 4" to "CNS WHO grade 4" if the synonym tool allows.
+- `[AIOM_brain]` used in the tissue and EEG criteria (plan 5.1).
+
+## Open questions for Andrea (judgment calls you could not settle)
+
+None. Decided in-round: `H3K27_status` not required, because the splenial extension of a hemispheric mass is not a midline diffuse glioma site (the report still states the result); KPS 70 rather than 60, because he is independent in self-care and stopped working only because of the cognitive lapses; the speech arrest is attributed to the left superior temporal lesion, which the new EEG supports with left temporal sharp waves.
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. All three note ids are in the table and applied: SOX10_IHC and Melan_A_HMB45_IHC in both tissue alternatives and reported negative in both tissue follow-ups, must 7 naming only orderable markers; treat-class levetiracetam must, recommended EEG with a new report, no EEG waste entry and no normal fallback EEG; required performance status in the stop rule with KPS 70 / ECOG 2 derived from the exam and the pre-illness KPS 80 labelled as such. Checked the left inferior quadrantanopia against the right parietal lesion, the left temporal sharp waves against the left superior temporal lesion and the speech arrest, the 6 mm shift against the LP harm entry, the required CT CAP and its hepatic red-herring path, labs flags, aspirin and hydrochlorothiazide in the drug check, the treatment must against KPS 70 and MGMT unmethylated, identical tissue reports, and the decision not to require H3 K27 status (hemispheric mass with splenial extension; H3 K27M still reported not detected): defensible. Found nothing that needed a change; no edit made.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/GLIO-HG-decisions.md` (Andrea, 24 Oct 2026: open points resolved for dataset quality).
+
+- accepted[0]: 'Glioblastoma, IDH-wildtype, WHO grade 4, multicentric (right parieto-occipital dominant lesion with right frontal and left temporal satellite lesions)' -> 'Glioblastoma, IDH-wildtype, CNS WHO grade 4, multicentric (right parieto-occipital dominant lesion with right frontal and left temporal satellite lesions)' (summary CENTRAL 3: WHO CNS5 writes "CNS WHO grade"; ruling 3 label correction)
+- must removed: 'Obtain MRI brain with and without gadolinium contrast (tumor protocol) as the first step to characterize the multifocal lesions and define biopsy target' (Q9: diagnostic step restating a required criterion; musts are management, ruling 4)
+- must removed: 'Perform systemic staging CT chest/abdomen/pelvis with contrast to exclude active extracranial primary malignancy before diagnosing primary brain tumor' (Q9: diagnostic step restating a required criterion; musts are management, ruling 4)
+- must removed: 'Order pre-operative labs (CBC, CMP, coagulation, type and screen) before any surgical intervention' (Q9: diagnostic step restating a required criterion; musts are management, ruling 4)
+- fallback specialized_test (generic 'No abnormality identified on this study.', test_type '') -> null; the library answers by test_type (auditor flag, S01 class: a case fallback is served for any order of the tool, whatever the test type)
+- Synonyms re-expanded from `diagnosis_synonyms.yaml` (`--prune --conditions brain_tumor_glioma`): removed ['astrocytoma grade 4']; added ['glioblastoma idh wildtype'] (entity, grade and H3 scoping; summary CENTRAL 2).
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `initial_tool_outputs.eeg`: `eeg_type` set to `routine`, named in the report's own text.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Lab evidence (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited results its own order (the first alternative) no longer returned; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-2-interpret-labs]`.alternatives: was [CBC, CMP, coagulation, type_and_screen]; now [CBC, CMP, coagulation, type_and_screen, LDH] | [CBC, CMP, coagulation, type_and_screen].
+- Decision: serve: new first alternative (old order kept as an alternative). Prior melanoma: the metastasis differential, key evidence and red herring rely on LDH 312 and S100B 0.18, stored together.
+- Scoring: coverage unchanged (any call matching the old order still matches); the cost reference of the required work-up now uses the new first order.
+
+Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.
+
+## Engineering text (25 Oct 2026)
+
+Review-process wording (references to the round's rulings, the round policy file, the criteria packs, and tier markers such as "(optional)" in criterion labels and rationales) is shown to physicians in the review app, so it was rewritten in clinical language. The tier stays in the criterion's `importance` field; scoring is unchanged. `test_case_guards.py::test_no_review_process_text` now fails on any of it.
+
+- criterion `action-check-drug-interactions` rationale: "Optional: no interaction changes the diagnostic plan." -> "No interaction changes the diagnostic plan."
+
+## Library contradictions (25 Oct 2026)
+
+Case-specific reports stored where the benchmark library's normal report contradicted the case. Why: the stored MRI shows a mass in the right parieto-occipital lobe, extending into the splenium (4.8 cm) with an abnormal routine EEG and a focal history and exam; the library reports a normal head CT, a non-diagnostic biopsy, normal brain metabolism, perfusion and vessels, a normal prolonged EEG, no headache and normal bedside and neurophysiological tests where the exam is abnormal.
+
+- order_ct_scan: CT showing the stored lesion(s) instead of a normal head CT (fallback_tool_outputs.ct)
+- obtain_tissue_diagnosis open_biopsy: the stored integrated diagnosis on this procedure's specimen (fallback_tool_outputs.tissue_diagnosis)
+- FDG_PET: hypermetabolic lesion(s) (fallback_tool_outputs.advanced_imaging)
+- amino_acid_PET: FET-avid lesion(s) (followup request_amino_acid_pet)
+- CT_perfusion: lesion perfusion matching the stored perfusion MRI (followup request_ct_perfusion)
+- perfusion_SPECT: regional hypoperfusion over the lesion (followup request_perfusion_spect)
+- cerebral_angiography: mass effect and lesion vascularity (followup request_cerebral_angiography)
+- DTI_tractography: tracts displaced or infiltrated by the lesion (followup request_dti_tractography_tracts)
+- video EEG: the stored routine EEG's abnormalities over 24 h (fallback_tool_outputs.eeg)
+- ambulatory EEG: the stored routine EEG's abnormalities over 48 h (followup request_ambulatory_eeg)
+- structured_headache_history_ichd3: the case's headache, prior primary headache and red flags (fallback_tool_outputs.clinical_assessment)
+- cognitive_screen: MoCA matching the exam (followup request_cognitive_screen)
+- gait_and_balance_timed: matching the exam (followup request_timed_gait_balance)
+- neuropsych_battery: domain deficits matching the exam (fallback_tool_outputs.specialized_test)
+- visual_field_perimetry: the exam's field defect or blind-spot enlargement (followup request_visual_field_perimetry)
+
+Checks: `perfect_agent.py` pass; `test_case_guards.py -k GLIO-HG-RP04` pass; no fixed order still answered by the library (`lib4.source`); no 60-character window of any criterion's expected_evidence in the added text, except tissue copies that repeat the stored tissue report verbatim; every criterion's served output unchanged (snapshot diff against the baseline).

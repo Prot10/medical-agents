@@ -1,0 +1,97 @@
+# NPH-P09
+Reviewer status: R1 not reviewed, R2 not reviewed (NPH has no notes file) | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| (none) | n/a | NPH was never annotated; the only physician input is the July 2026 tool review (`condition_tool_guidance.yaml` key `nph`), applied through plan NPH sections 2 to 4. |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| C | major | `ground_truth.action_criteria[action-1-search-medical-literature]`, `stop_rule`, `followup_outputs[request_literature_nph_cognitive_predominant]` | Literature search was a required clinical step and in the stop rule (plan C1, ruling 5). | FIXED: criterion, follow-up and stop-rule id deleted; literature initial and fallback null. |
+| D | major | `initial_tool_outputs.clinical_assessment` | The baseline gait report held the post-tap result (`pre_post_comparison` with TUG 19 s, "positive tap test"), `criteria_met` engineering keys and a "shunt responsiveness" impression (C5, C6). | FIXED: baseline only (TUG 28 s; 10-m walk 22 s, 30 steps; turn 6 steps; MoCA 17/30 same session); qualitative findings; descriptive impression; `criteria_met` and `pre_post_comparison` null. Post-tap values moved to a new follow-up `request_post_reassessment`. |
+| D | major | `patient.neurological_exam.gait`, `.mental_status` | Exam gave the TUG, 10-m walk and the MoCA with subscores, which are the results of the scored assessments (C4). | FIXED: gait qualitative only; mental status "formal cognitive screening reported separately"; MoCA subscores moved to the cognitive-screen follow-up. |
+| D | major | `patient.history_present_illness` | Daughter "reading about NPH online" names the diagnosis (C3); prior MoCA 17/30 identical to the baseline score (C4). | FIXED: daughter "concerned that the walking change did not fit the diagnosis"; prior screen described as "a low score on a bedside cognitive screen". Em dashes removed. |
+| B | minor | `patient.history_present_illness`, `ground_truth.red_herrings[1].data_point` | "family history of dementia (mother and sister)" while the family history lists the sister with mild cognitive impairment, not dementia. | FIXED: "mother with dementia, sister with mild cognitive impairment" in both. |
+| B | minor | `patient.neurological_exam.additional` | "Snout reflex positive. ... No evidence of cortical release signs beyond frontal grasp" contradicts itself (the snout is a release sign). | FIXED: "Mild bilateral grasp reflex and a positive snout reflex. No nuchal rigidity." |
+| D | major | `initial_tool_outputs.mri` | No technique line, no temporal horn or MTA statement, interpretive text ("consistent with transventricular pressure effect", "above the diagnostic threshold"); "mild-to-moderate cortical atrophy" sat poorly with tight high-convexity sulci (C7). | FIXED: rebuilt with the C7 elements: technique, Evans 0.36, DESH both components, callosal angle 74 degrees, temporal horns out of proportion to hippocampi (MTA 1), Fazekas 2 periventricular / 1 subcortical, patent aqueduct with flow void, normal fourth ventricle, no obstruction, mild generalised volume loss; canonical impression. |
+| D | major | `initial_tool_outputs.csf.interpretation`, `.special_tests` | Interpretive labels ("high-volume tap trial"), em dash. | FIXED: C5 canonical interpretation with the case's figures (28 to 22 s at 2 h, 19 s at 24 h, 32%; 10-m 22 to 16 s; MoCA 17 to 20); special_tests factual; RBC unit added. |
+| D | minor | `initial_tool_outputs.labs.interpretation` | Interpretation named the mimics excluded ("neurosyphilis, HIV not identified") (C9). | FIXED: pattern only. Criterion now `interpret_labs {}` optional, label "Targeted labs for reversible contributors". |
+| C | major | `followup_outputs` | No cognitive-screen, post-tap, AD-biomarker or neuropsychology output, so the library would answer a battery and a MoCA with normal reports, and the recognition-memory prohibition referred to data no tool returned (C6, C10, C17). | FIXED: four follow-ups in plan order: MoCA 17/30 with domain subscores (`request_moca_cognitive_screen`); post-tap reassessment (`request_post_reassessment`); full tap report plus Abeta42 640 pg/mL, Abeta42/40 0.091, p-tau181 29 pg/mL, A-T- (`request_targeted_csf_abeta42_phospho_tau`); neuropsychological battery with a frontal-subcortical profile, FCSRT free 16/48, total 43/48, recognition 16/16 (`request_neuropsych_battery`, `test_type: neuropsych_battery`). |
+| C | major | `ground_truth.action_criteria` | Tiers and order did not follow the July 2026 review; labs with fixed HIV/RPR panels; labels equal to rationales; citations "NPH_pack" and an unbracketed duplicate (C19). | FIXED: MRI (req), labs (opt), baseline gait (req), cognitive screen (opt, new `action-cognitive-screen`), CSF (req), post-tap gait (rec, new `action-post-tap-gait-reassessment`), CSF AD biomarkers (opt, new `action-csf-ad-biomarkers`), neuropsych battery (opt, new `action-neuropsych-battery`); case-specific rationales; bracketed keys only. |
+| C | major | `ground_truth.assessment.required_recommendations` | Musts were process steps (MRI before LP, baseline gait, 30-50 mL, reassess at 2-4 and 24 h) and P09 had no referral must (C11). | FIXED: referral for shunting with programmable valve on the 32% TUG response, DESH MRI and normal-pressure CSF; revisit the prior Alzheimer's diagnosis with patient and daughter; falls prevention (two near-falls, osteoporosis). |
+| C | minor | `ground_truth.assessment.prohibited_recommendations` | AD and family-history prohibitions were long and rested on DESH as mandatory; canonical ventriculomegaly prohibition missing (C12). | FIXED: canonical iNPH prohibition added; AD, cognitive-profile and family-history prohibitions reworded; MRI-before-tap kept (5 total). |
+| C | major | `ground_truth.differential` | Alzheimer's disease "high" after DESH, MTA 1 and a 32% tap response (C13, ruling 7). | FIXED: AD low with case data; VCI moderate (Fazekas 2); DLB, bvFTD, ex-vacuo low, each one sentence from the case. |
+| C | minor | `ground_truth.key_clinical_evidence` | Tier engineering sentence; "constitute the imaging diagnosis of probable iNPH" contradicts F5 (probable needs normal-pressure CSF plus DESH or a positive tap). | FIXED: four pearls; probable iNPH stated with CSF and tap. |
+| C | minor | `ground_truth.avoided_actions` | Advanced imaging and generic CSF assays not marked waste (C10, 3.3); generic rationales. | FIXED: `avoid-waste-advanced-imaging` and `avoid-waste-generic-csf-assays` (14-3-3, RT-QuIC, OCB, meningitis panel, HSV PCR) added; rationales case-specific. No battery waste entry (P09 makes it optional). |
+| B | minor | `ground_truth.sequence_constraints`, `stop_rule` | Gait constraint cited Relkin twice; stop rule had the literature id and `max_additional_actions` 0. | FIXED: canonical hard MRI-before-CSF and soft baseline-gait-before-CSF; stop rule MRI, baseline gait, CSF with allowance 1. |
+| B | minor | `fallback_tool_outputs.ct` | CT fallback "without acute intracranial abnormality" against ventriculomegaly (C18). | FIXED: enlarged lateral and third ventricles, Evans about 0.35, no mass, haemorrhage or shift. |
+| D | minor | `fallback_tool_outputs.cardiac_monitoring.impression`, `.echo` | "only benign incidental findings"; echo without `echo_type` (C18, discriminator). | FIXED: findings stated; `echo_type: TTE`. |
+| C | minor | `fallback_tool_outputs.drug_interactions` | Generic placeholder drug check (C2). | FIXED: null; `metadata.fallback_tool_kinds.drug_interactions` removed. |
+| E | minor | `metadata.difficulty_rationale`, `.difficulty_variant_description`, `.revision_reason` | Counts of removed tools; stale revision text. | FIXED. |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+
+The patient block no longer names NPH or gives the scored results: the HPI keeps the outside Alzheimer's label (the case's anchor) without the daughter's NPH research or the MoCA score, the family history reads mother with dementia and sister with MCI, and the exam gives only qualitative gait and mental-status findings. The literature step is gone. The pathway is MRI, optional targeted labs, baseline timed gait (TUG 28 s, 10-m walk 22 s), optional MoCA (17/30, dysexecutive, recall 2/5 rising to 4/5 with cues), the tap test (opening pressure 14 cmH2O, normal CSF, 40 mL; TUG 22 s at 2 h and 19 s at 24 h, 32%; 10-m walk 16 s; MoCA 20), a recommended post-tap reassessment with the same figures, and two optional tests that let the agent test the Alzheimer's label: CSF amyloid and tau on the tap specimen (A-T-) and a neuropsychological battery (frontal-subcortical profile with intact recognition). The MRI now reports every iNPH marker (Evans 0.36, DESH, callosal angle 74 degrees, temporal horns out of proportion to MTA 1 hippocampi, Fazekas 2, patent aqueduct) with a descriptive impression. Musts are shunt referral, revisiting the Alzheimer's diagnosis with the family, and falls prevention; prohibitions cover diagnosing iNPH from ventriculomegaly alone, keeping the Alzheimer's label, misreading the profile, anchoring on family history, and a tap before MRI. Alzheimer's disease is now low in the differential, VCI moderate.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+
+- Citation key `[Nakajima_2021]` used per plan 1.1 (plan CENTRAL R2; not yet in the criteria pack allow-list).
+- Post-tap reassessment criterion has the same pattern as the baseline (plan CENTRAL R4). Hijack check: "post-tap reassessment at 24 hours" after the tap returns the follow-up; "repeat gait after lumbar puncture" returns the baseline again (a miss, no leak); a cognitive screen called first does not divert the baseline gait call.
+
+## Open questions for Andrea (judgment calls you could not settle)
+
+- None specific to this case. The CSF biomarker reference limits are written as assay-specific (Lumipulse-type cut-offs); confirm if a particular platform should be named.
+
+## Verification (adversarial verifier, 24 Oct 2026)
+
+What I checked: Read the log and the whole final case. MoCA subscores sum to 17, and the month error matches the exam's orientation. The battery's FCSRT (free 16/48, total 43/48, recognition 16/16) and FAS 19 agree with the MoCA profile, the prohibitions and the musts. CSF Abeta42 640 / Abeta40 7050 gives the stated ratio 0.091. The AD-biomarker follow-up repeats the full tap report. Extra MockServer runs: a tap call that names [Abeta42_40_ratio, phospho_tau] gets the biomarker follow-up with the full tap data; a plain tap call gets the initial report without biomarkers; a later [Abeta42, phospho_tau] call gets the follow-up; the neuropsych battery is served by the case's own output. The differential is AD low, VCI moderate (Fazekas 2), others low, which fits the final evidence. No battery waste entry (plan C10). The red herrings are visible in the HPI and family history. Every log row checked. Checks run after the edits: `perfect_agent.py -v` ok (MRI and baseline gait show `<- ?` only because of null fields; a MockServer run confirmed both come from the case's own initial outputs, not the library), `case_io.py check` clean for the case, `test_case_guards -k` passes. Hijack check (cognitive screen, baseline gait "before tap test", MRI, tap, post-tap reassessment): every call served by the case's own output in the right order, no post-tap leak to the baseline. Discriminator note for the close-out: the post-tap follow-up's `assessment_type` "gait_and_balance_timed (post-tap reassessment)" is the plan's deliberate prose value (C6). It will fail `test_routed_outputs_name_their_study` once NPH joins `DISCRIMINATOR_CONDITIONS`. Renaming it to the bare term would let the discriminator serve it at the baseline call, so this needs plan CENTRAL R4, not a rename.
+
+Found and fixed:
+1. (B, minor) The rationale of `action-3-interpret-labs` said a thyroid and B12 screen "was never done before the Alzheimer's label was given", but the HPI does not say that (it says only that no neuroimaging was obtained). The rationale now gives the general reason (reversible contributors belong in any cognitive work-up) without that claim.
+
+Changed: Edited `action_criteria[action-3-interpret-labs].rationale` only. (The S-case key-evidence sentence is not in P09.) Nothing else changed: no labels, tiers, criteria, sequence or stop rule. 
+
+## Condition audit (NPH auditor, 24 Oct 2026)
+- Lab rows RPR, HIV Ag/Ab (4th generation) moved from the `Metabolic` panel to `Serology`; values unchanged.
+- Checks after the edits: `perfect_agent.py` passes for all 30 NPH cases, `case_io.py check` clean.
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (`plans/NPH-decisions.md`); no clinical data the agent receives changed.
+- Synonyms (`diagnosis_synonyms.yaml`, applied with `--prune --conditions nph`): code G91.0 removed (ICD-10-CM communicating hydrocephalus, which covers secondary NPH, a different entity from iNPH); labels unchanged, G91.2 and G91.9 accepted.
+- Checks: `perfect_agent.py -v` pass, `case_io.py check` clean, `test_case_guards -k NPH-` pass. Not yet in `DISCRIMINATOR_CONDITIONS`: the post-tap follow-up's prose `assessment_type` is deliberate until the timing discriminator lands (CENTRAL C2 in the decisions file).
+
+## Vocabulary wiring (24 Oct 2026)
+
+Central vocabulary (timing discriminator, NPH R4; decisions Q2 and CENTRAL C2). No clinical text changed.
+
+| field path | change |
+| --- | --- |
+| `initial_tool_outputs.clinical_assessment.timing` | added `baseline` |
+| `followup_outputs[1]` (`request_post_reassessment`) | `assessment_type` "gait_and_balance_timed (post-tap reassessment)" -> `gait_and_balance_timed`; `timing: post_intervention` added |
+| `ground_truth.action_criteria[action-5-perform-clinical-assessment]` | `required_arguments.timing: baseline` (the schema default, so a call that omits it still matches; a post-tap call no longer does) |
+| `ground_truth.action_criteria[action-post-tap-gait-reassessment]` | `required_arguments.timing: post_intervention`; importance recommended -> required (Reviewer 1: gait before and after the tap) |
+| `ground_truth.sequence_constraints` | soft: `action-4-analyze-csf` before `action-post-tap-gait-reassessment` [Nakajima_2021] |
+| `ground_truth.stop_rule.required_before_assessment` | `action-post-tap-gait-reassessment` added |
+
+Scoring change for re-review: the post-tap reassessment is now required and is credited only by a call with `timing: post_intervention`; the baseline order is answered by the baseline report and the reassessment order by the post-tap report (MockServer secondary discriminator).
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 60, ECOG 2; requires occasional assistance; able to care for most personal needs (fallback_tool_outputs.clinical_assessment). Why: the library gives Karnofsky 100 / ECOG 0 (no evidence of disease, working) in a symptomatic patient.
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: MDS-UPDRS III 14 to 13 (7%); gait, gait initiation, turning and postural stability unchanged; no clinically meaningful levodopa response (below 30%) (followup_outputs[4] request_levodopa_challenge). Why: the library describes a normal motor examination and gait; this patient has a gait disorder, and the challenge shows little or no levodopa response.
+- `order_specialized_test {test_type: exercise_stress_test}`: submaximal non-diagnostic test, stopped at 2.3 METs for gait unsteadiness with freezing on the moving belt (fallback_tool_outputs.specialized_test). Why: the library describes a 9.5-minute Bruce protocol at 10.4 METs; this patient's gait disorder (magnetic gait with falls) does not allow it.
+- `order_echocardiogram {echo_type: exercise_echo}`: submaximal non-diagnostic study stopped at 2.3 METs; resting findings as on the stored TTE (followup_outputs[5] request_exercise_echo). Why: the library describes 9.5 METs on a treadmill with a normal echo; this patient's gait disorder does not allow it, and the resting images must match the stored TTE.
+- `order_echocardiogram {echo_type: TEE}`: Mildly enlarged left atrium; mildly thickened aortic leaflets without stenosis; trace mitral regurgitation; preserved biventricular systolic function (LVEF 62%) (followup_outputs[6] request_tee). Why: the library describes structurally normal valves and chambers; the stored TTE shows mildly enlarged left atrium; mildly thickened aortic leaflets without stenosis; trace mitral regurgitation; preserved biventricular systolic function (LVEF 62%).
+- `order_echocardiogram {echo_type: bubble_study}`: Mildly enlarged left atrium; mildly thickened aortic leaflets without stenosis; trace mitral regurgitation; preserved biventricular systolic function (LVEF 62%); no right-to-left shunt (followup_outputs[7] request_bubble_study). Why: the library describes structurally normal valves and chambers; the stored TTE shows mildly enlarged left atrium; mildly thickened aortic leaflets without stenosis; trace mitral regurgitation; preserved biventricular systolic function (LVEF 62%).
+- Checks: perfect agent ok; case guards pass; criteria answers unchanged.

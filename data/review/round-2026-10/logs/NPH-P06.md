@@ -1,0 +1,96 @@
+# NPH-P06
+Reviewer status: R1 none, R2 none (NPH was never annotated; no notes file; the only physician input is the July 2026 tool review, `condition_tool_guidance.yaml` key `nph`) | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| (none) | n/a | No reviewer note exists for this case. The July 2026 tool-review rulings (MRI with NPH markers required; tap test with opening pressure and pre/post gait required; generic CSF assays, advanced imaging and neuropsychology removed; labs optional) are applied through the plan classes below; the targeted cytology is kept because it tests the case's own alternative (plan C17). |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| D | major | `patient.clinical_history.past_medical_history[0]` | PMH began "Leptomeningeal carcinomatosis concern" (C3). | FIXED: "Breast cancer (lumpectomy, radiation and chemotherapy 6 years ago, in clinical remission on tamoxifen)". |
+| D | major | `patient.history_present_illness` | HPI gave the index MRI (Evans 0.35, "no enhancement present", "raised ... NPH as concerns") (C3). | FIXED: sentence deleted; the oncology concern (the case's anchor) kept. |
+| D | major | `patient.neurological_exam.gait`, `.mental_status`, `.additional` | Exam gave TUG, 10-m, MoCA and recall; "(would suggest LMC)" reasoning in the exam (C4). | FIXED: qualitative exam, "reported separately"; reasoning parenthesis removed. |
+| D | major | `initial_tool_outputs.clinical_assessment` | Baseline report contained the post-tap results and a "positive tap test" verdict (C6). | FIXED: baseline only (TUG 27 s, 10-m 21 s, MoCA 22/30). |
+| A | major | `followup_outputs`, `ground_truth.action_criteria` | No post-tap reassessment; no case cognitive screen (C6). | FIXED: `request_post_reassessment` (recommended) and `request_moca_cognitive_screen` (optional; subscores sum to 22). |
+| A | major | `followup_outputs[analyze_csf]`, criteria `action-4-analyze-csf` and `action-7-analyze-csf` | The cytology follow-up held only the assay (no opening pressure, cells or tap response), with "NO MALIGNANT CELLS ... negative for leptomeningeal carcinomatosis" in capitals; cytology was a second required CSF criterion (C17). | FIXED: follow-up repeats the full tap report and adds cytology (no malignant cells in three cytospins of 10 mL) and flow cytometry; one required CSF criterion with alternatives `["cytology"]` and `["cytology", "flow_cytometry"]`; `action-7-analyze-csf` removed from criteria and stop rule. Verified that cytology orders (list or context) receive the full report and a plain tap receives the tap report. |
+| C | major | `followup_outputs[check_drug_interactions]` `request_oncology_comanagement` | Fake oncology consult as a drug check, with perioperative advice, and the wrong statement that tamoxifen with duloxetine raises no issue (C2). | FIXED: deleted. |
+| C | major | `initial_tool_outputs.drug_interactions` (new), criterion `action-drug-interaction-tamoxifen` (new, optional), must 3 | The case's own medication list has a real interaction the old output missed: duloxetine, a moderate CYP2D6 inhibitor, can lower endoxifen formation and tamoxifen efficacy (CPIC 2018 advises avoiding moderate and strong CYP2D6 inhibitors). | FIXED: stored medication review with that interaction and venlafaxine as alternative; optional criterion (it does not change the NPH work-up, ruling 6); must to review duloxetine with the oncologist. Deviation from plan C2 (null drug outputs) explained under Open questions. |
+| C | major | `followup_outputs[search_medical_literature]` | Literature step with patient-specific verdict ("effectively excludes LMC") and unsourced sensitivity figures (C1). | FIXED: deleted. |
+| D | major | `initial_tool_outputs.mri` | "Partial DESH" without components; no technique, temporal horns, aqueduct, Fazekas or MTA; "breast metastasis assessment" as a finding type (C7). | FIXED: technique with gadolinium (justified by the cancer history, plan P06); tight high-convexity sulci with Sylvian fissures not enlarged; callosal angle 81; temporal horns; Fazekas 1; patent aqueduct; no leptomeningeal, ependymal, cranial nerve, parenchymal or calvarial enhancement; MTA 1; canonical impression. |
+| B | minor | `initial_tool_outputs.csf` | RBC without unit; interpretation a recital calling the tap "positive" (C5). | FIXED: "RBC 4/mcL"; canonical interpretation; protein 52 with age reference. |
+| B | major | `initial_tool_outputs.labs` | CA 15-3 28 U/mL against reference "<28" flagged abnormal while the summary called it "at upper normal limit, stable per oncology" (cross-modality); tumour marker filed under "Metabolic"; HIV engineering row (C9). | FIXED: CA 15-3 22 U/mL, normal, in a "Tumour markers" panel (plan P06); "Serology" panel; `clinical_significance` null; factual interpretation. |
+| B | minor | `fallback_tool_outputs.ct` | CT fallback normal against ventriculomegaly (C18). | FIXED: enlarged ventricles, Evans about 0.35. |
+| C | major | `ground_truth.assessment` | Four process musts; wrong DESH/triad prohibition; AD and normal-ageing prohibitions (C11, C12). | FIXED: musts are referral with the figures and negative cytology, inform the oncologist and continue tamoxifen and surveillance, review duloxetine, falls prevention (three falls, walker); prohibitions canonical ventriculomegaly, no iNPH without cytology and contrast MRI, no attribution to recurrence without evidence. |
+| C | major | `ground_truth.differential` | VCI high; LMC, PD, AD, atrophy moderate after negative cytology and a positive tap (C13). | FIXED: all low with case-data reasons. |
+| B | minor | `ground_truth.red_herrings[0]` | Data point "Past breast cancer (currently in clinical remission)" not the visible text. | FIXED: quotes the new PMH line; interpretation uses the negative cytology and contrast MRI. |
+| A | minor | `ground_truth.action_criteria`, `avoided_actions`, `sequence_constraints`, `stop_rule`, `key_clinical_evidence` | Literature criterion; four-panel labs; label = rationale; bare citations; missing avoided entries; max 0; tier sentence and "sensitivity 50-80%" (C1, C9, C10, C19). | FIXED: plan 3.1-3.5 structure; key evidence from F1-F4 and the cytology caveat. |
+| E | minor | `metadata.vocab_gap`, `.difficulty_variant_description`, `.difficulty_rationale` | Stale phase-contrast note; "staging CT" and "cytology x3" described a work-up the case does not have. | FIXED. |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+
+A breast cancer survivor in remission on tamoxifen, with a 10-month gait, cognitive and urinary syndrome that her oncologists fear is leptomeningeal disease. The patient block now states the oncology concern but neither the MRI result nor "leptomeningeal carcinomatosis concern" as a diagnosis, and the exam has no scores. The work-up reads contrast brain MRI, optional labs, baseline timed gait, optional MoCA, one required lumbar tap with cytology (and optionally flow cytometry), post-tap reassessment, and an optional medication review. MRI: Evans 0.35, tight high-convexity sulci, callosal angle 81 degrees, temporal horns enlarged, no enhancement anywhere, Fazekas 1, MTA 1. Tap: opening pressure 15 cmH2O, normal CSF, cytology and flow negative, 40 mL removed, TUG 27 to 19 s (30%), 10-m walk 21 to 14 s, MoCA 22 to 25. CA 15-3 is now 22 U/mL (normal). Musts: shunt referral on these data, inform the oncologist and continue tamoxifen and surveillance, review duloxetine because it inhibits CYP2D6 and may weaken tamoxifen, falls prevention. The differential (leptomeningeal or CNS metastasis, VCI, PD, AD, atrophy, secondary hydrocephalus) is all low.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+
+- Citation key `[Nakajima_2021]` used per plan 1.1 (CENTRAL R2). The duloxetine must cites the CPIC 2018 tamoxifen/CYP2D6 guideline in words (Goetz MP et al., Clin Pharmacol Ther 2018;103:770-777); a key such as `[CPIC_tamoxifen_2018]` could be added to the NPH pack.
+- `accepted[0]` "... leptomeningeal carcinomatosis excluded" left unchanged (plan R6).
+- Post-tap criterion pattern equals the baseline criterion (plan R4).
+
+## Open questions for Andrea (judgment calls you could not settle)
+
+None open. Deviation from plan C2 recorded: the plan nulls every NPH drug-interaction output because the old ones wrote perioperative shunt management. In this case the patient's own list holds a genuine, guideline-recognised interaction (duloxetine with tamoxifen), so the stored output now carries that interaction, the check is an optional criterion, and the must asks for review with the oncologist. Cytology stays required inside the tap criterion (plan question 4 answered as the plan proposes): it is the targeted test of the alternative the case raises, done on the same puncture.
+
+## Verification
+Adversarial verifier, 24 Oct 2026. No reviewer notes exist for NPH. Read the log, the diff against the pre-round version and every clinical field of the final case. Checked: tap figures (TUG 27/21/19 s = 22%/30%, 10-m 21/14 s = 33%, MoCA 22/25) identical in the plain tap report, the cytology follow-up (which repeats the full report, plan C17), the post-tap follow-up, criteria and musts; a plain tap call receives the tap report and a cytology call the full report with cytology and flow; CA 15-3 22 U/mL normal; contrast MRI justified and its no-enhancement findings match the differential and the prohibition; leptomeningeal disease low after negative cytology with the single-sample caveat in key evidence.
+Deviation from plan C2 reviewed: the duloxetine-tamoxifen interaction is real (duloxetine is a moderate CYP2D6 inhibitor; CPIC 2018 advises avoiding moderate and strong inhibitors with tamoxifen; venlafaxine is a standard alternative and also covers the back pain and depression), ruling 6 allows an optional criterion for it, the stored output agrees with the medication list and passes the leak guard. Accepted.
+Found and fixed:
+- `followup_outputs[request_moca_cognitive_screen]`: Visuospatial "2/5: trail-making error, clock with misplaced hands, cube copied" scores 3/5 (cube 1 + clock 2); now "2/5: trail-making error, cube copy incorrect, clock with misplaced hands". Attention "5/6: serial 7s with one error" scores 6/6; now "5/6: two errors on letter tapping; serial 7s with one error". MoCA total 22 unchanged.
+- `fallback_tool_outputs.echo`: no `echo_type` (PATTERNS 5). Set to "TTE".
+No other defect found. Checks run after the edits: `perfect_agent.py -v` passes (every required and recommended criterion served by a case output, no fallback or library answer); `case_io.py check` clean for the case; `test_case_guards -k` passes (leak, follow-up and banned-string guards); MockServer hijack sequence (cognitive screen, then baseline gait "before tap test", MRI, CSF "large-volume lumbar puncture", post-tap reassessment, second CSF call) returns the baseline, the tap report and the post-tap follow-up in the right places; patient-block grep for Evans, callosal, DESH, NPH, hydroceph, tap, shunt, TUG, MoCA finds only hits allowed by C3/C4.
+
+## Condition audit (NPH auditor, 24 Oct 2026)
+- `action-post-tap-gait-reassessment.rationale` was the template sentence shared verbatim by P03 to P07; now case-specific (tap volume and what the reassessment separates).
+- Checks after the edits: `perfect_agent.py` passes for all 30 NPH cases, `case_io.py check` clean.
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (`plans/NPH-decisions.md`); no clinical data the agent receives changed.
+- Synonyms (`diagnosis_synonyms.yaml`, applied with `--prune --conditions nph`): code G91.0 removed (ICD-10-CM communicating hydrocephalus, which covers secondary NPH, a different entity from iNPH); labels unchanged, G91.2 and G91.9 accepted.
+- Label (ruling 3, plan R6): `accepted[0]` "Idiopathic normal pressure hydrocephalus (iNPH), dash, leptomeningeal carcinomatosis excluded" -> "Idiopathic normal pressure hydrocephalus (iNPH)". The reasoning stays where it belongs (differential, prohibitions, key evidence); ICD code G91.2 unchanged; scoring unchanged (the synonyms already carried it).
+- `[CPIC_tamoxifen_2018]` added to the optional tamoxifen check criterion and replaces the words "(CPIC 2018 tamoxifen guideline)" in the duloxetine must (summary CENTRAL 9).
+- `key_clinical_evidence`: the 10% TUG threshold is no longer attributed to `[Nakajima_2021]`, which sets no numeric tap-test cut-off; it is stated as a commonly used threshold that no guideline fixes (the tap protocol keeps its Nakajima citation where the sentence states it).
+- Checks: `perfect_agent.py -v` pass, `case_io.py check` clean, `test_case_guards -k NPH-` pass. Not yet in `DISCRIMINATOR_CONDITIONS`: the post-tap follow-up's prose `assessment_type` is deliberate until the timing discriminator lands (CENTRAL C2 in the decisions file).
+
+## Vocabulary wiring (24 Oct 2026)
+
+Central vocabulary (timing discriminator, NPH R4; decisions Q2 and CENTRAL C2). No clinical text changed.
+
+| field path | change |
+| --- | --- |
+| `initial_tool_outputs.clinical_assessment.timing` | added `baseline` |
+| `followup_outputs[2]` (`request_post_reassessment`) | `assessment_type` "gait_and_balance_timed (post-tap reassessment)" -> `gait_and_balance_timed`; `timing: post_intervention` added |
+| `ground_truth.action_criteria[action-6-perform-clinical-assessment]` | `required_arguments.timing: baseline` (the schema default, so a call that omits it still matches; a post-tap call no longer does) |
+| `ground_truth.action_criteria[action-post-tap-gait-reassessment]` | `required_arguments.timing: post_intervention`; importance recommended -> required (Reviewer 1: gait before and after the tap) |
+| `ground_truth.sequence_constraints` | soft: `action-4-analyze-csf` before `action-post-tap-gait-reassessment` [Nakajima_2021] |
+| `ground_truth.stop_rule.required_before_assessment` | `action-post-tap-gait-reassessment` added |
+
+Scoring change for re-review: the post-tap reassessment is now required and is credited only by a call with `timing: post_intervention`; the baseline order is answered by the baseline report and the reassessment order by the post-tap report (MockServer secondary discriminator).
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 60, ECOG 2; requires occasional assistance; ambulatory with a walker (fallback_tool_outputs.clinical_assessment). Why: the library gives Karnofsky 100 / ECOG 0 (no evidence of disease, working) in a symptomatic patient.
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: MDS-UPDRS III 17 to 16 (6%); gait, gait initiation, turning and postural stability unchanged; no clinically meaningful levodopa response (below 30%) (followup_outputs[3] request_levodopa_challenge). Why: the library describes a normal motor examination and gait; this patient has a gait disorder, and the challenge shows little or no levodopa response.
+- `order_specialized_test {test_type: neuropsych_battery}`: frontal-subcortical profile of mild severity (slowed processing, executive and attention deficits, recognition relatively preserved) (fallback_tool_outputs.specialized_test). Why: the library reports normal cognition in every domain; this patient has documented cognitive impairment on the stored bedside screen.
+- `order_specialized_test {test_type: exercise_stress_test}`: submaximal non-diagnostic test, stopped at 2.3 METs for gait unsteadiness with freezing on the moving belt (followup_outputs[4] request_exercise_stress_test). Why: the library describes a 9.5-minute Bruce protocol at 10.4 METs; this patient's gait disorder (magnetic gait with falls) does not allow it.
+- `order_echocardiogram {echo_type: exercise_echo}`: submaximal non-diagnostic study stopped at 2.3 METs; resting findings as on the stored TTE (followup_outputs[5] request_exercise_echo). Why: the library describes 9.5 METs on a treadmill with a normal echo; this patient's gait disorder does not allow it.
+- Checks: perfect agent ok; case guards pass; criteria answers unchanged.

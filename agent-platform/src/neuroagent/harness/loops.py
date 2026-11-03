@@ -62,6 +62,7 @@ class ClinicalPolicyLoop:
                     from_fallback=result.from_fallback,
                     library=result.library,
                     rejected=result.rejected,
+                    unavailable=result.unavailable,
                 )
             )
             total_cost = context.episode_store.load().total_cost_usd

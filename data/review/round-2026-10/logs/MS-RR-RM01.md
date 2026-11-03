@@ -1,0 +1,103 @@
+# MS-RR-RM01
+Reviewer status: R1 not reviewed, R2 not reviewed (no MS-RR notes file in this round) | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| (none) | n/a | No reviewer notes for this case. All changes below are own findings and the condition plan (plans/MS-RR.md). |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| C | major | `patient.history_present_illness`, `patient.clinical_history.past_medical_history` | The history was built toward other diagnoses: a "worst headache of his life" (thunderclap, an SAH cue), months of lethargy and personality change, a 30-45 lb weight loss (lymphoma cue) and a URI three weeks earlier (ADEM cue); no earlier attack, so relapsing-remitting MS had no support. | FIXED: headache building over two to three weeks; weight loss, lethargy, personality change and URI deleted (also from PMH); added a three-week right-hand numbness episode two years ago attributed to carpal tunnel, never imaged. Behcet family history kept with "no oral or genital ulcers, uveitis, skin lesions"; "rheumatologic consultation" removed. |
+| B | minor | `patient.neurological_exam` | Weight-loss line in `additional`; "mild impulsivity ... interrupts examiner" (frontal cue, em dash); `cranial_nerves` "facial sensation intact" against `sensory` "pinprick diminished on the left face"; left acuity 20/25 with no visual history. | FIXED: lines removed; facial light touch intact with reduced left-face pinprick; acuity 20/20 in both eyes. |
+| B | major | `initial_tool_outputs.mri` | Confluent brainstem/MCP signal and a splenial lesion extending into thalamus and basal ganglia (a neuro-Behcet / lymphoma pattern), contradicting the discrete-lesion demyelination the case teaches; an interpretive observation; essay impression with management. | FIXED: tumefactive lesion kept (4.2 cm, open ring toward cortex, peripheral restricted diffusion, intralesional veins, moderate oedema, no shift); discrete lesions: three ovoid periventricular, splenial callososeptal, left paramedian pons (patchy enhancement, explains the left VI palsy), left MCP (explains the left ataxia); impression with findings and a hedged imaging read; `recommended_actions` emptied. |
+| A | major | `initial_tool_outputs.csf` | Obsolete myelin basic protein; junk cell differential "(N/A PMN/N/A lymph)"; no kFLC; glucose ratio 0.49 is low for MS; recital interpretation. | FIXED: MBP and junk removed; OCB wording "4 CSF-restricted bands not found in the paired serum"; kFLC index 22.4 (reference < 6.1); CSF glucose 72 (ratio 0.61); cytology and flow cytometry kept; pattern interpretation. |
+| D | major | `initial_tool_outputs.labs` | AQP4-IgG row in a "Mimic exclusion" panel with interpretive significance, MOG in a separate panel; summary and interpretation listed interpretation, not values. | FIXED: one "Demyelinating antibodies" panel with AQP4-IgG (cell-based) and MOG-IgG (live cell-based), significance null; factual abnormal-values summary; hedged antibody comment. |
+| C | minor | `initial_tool_outputs.labs.panels.Inflammatory Markers` | ESR 48 mm/hr unexplained (ESR does not rise acutely after a seizure) and not discussed. | FIXED: ESR 24 mm/hr (mildly raised, nonspecific), propagated to summary, interpretation, criterion, KCE and red herring. |
+| B | minor | `followup_outputs` spine MRI | Lesion side unstated; "clinically silent" interpretation in the report. | FIXED: right posterior column C2-C3, 10 mm, less than one third of the cross-section, non-enhancing; thoracic cord normal; interpretation removed (the lesion now corroborates the earlier right-hand episode). |
+| A | major | `followup_outputs` MRS | Served by `analyze_brain_mri` as prose with diagnosis-level interpretation. | FIXED: `order_advanced_imaging` MR_spectroscopy follow-up in the advanced-imaging schema with quantitative data (NAA/Cr 1.8, Cho/Cr 1.6, Cho/NAA 0.9, Glx raised, no lipid) and a within-spectroscopy impression that does not exclude lymphoma. |
+| A | major | `followup_outputs` biopsy | Biopsy pathology served by `interpret_labs` (`request_biopsy_pathology`). | FIXED: `obtain_tissue_diagnosis` stereotactic_biopsy follow-up (plan G2): active demyelinating lesion with relative axonal preservation, findings by stain, CD20 and IDH1 immunohistochemistry. |
+| C | major | `followup_outputs` drug check | "Levetiracetam 500 mg BID (seizure prophylaxis)" listed as a current medication although `medications` is empty; prednisone taper. | FIXED: proposed IVMP with levetiracetam (to be started); no interaction; glucose, BP, mood, gastric and electrolyte warnings; steroid-before-biopsy warning; no taper. |
+| C | major | `followup_outputs` literature | Fabricated source ("Defined Expert Group"). | FIXED: Lucchinetti 2008 Brain, Hardy and Chataway 2013 JNNP, NICE NG220; general summary; optional and last. |
+| C | major | `fallback_tool_outputs.ct`, `.eeg` | CT fallback "normal" for a 4.2 cm lesion with oedema; EEG null after a first seizure. | FIXED: CT right parietal hypodensity with oedema, no shift or haemorrhage; EEG abnormal with right temporo-parietal slowing and no epileptiform discharges; `metadata.fallback_tool_kinds` updated. |
+| B | minor | `fallback_tool_outputs.advanced_imaging` | None in the case, so an FDG-PET order got the library's normal brain PET despite a 4.2 cm lesion. | FIXED: case FDG-PET fallback with mild marginal uptake below cortex and central hypometabolism. |
+| C | major | `ground_truth.avoided_actions` | CT after a first seizure listed as waste. | FIXED: CT avoided action deleted; echo and monitoring kept with case-tied rationales. |
+| A | major | `ground_truth.action_criteria` | Template criteria (label = rationale, non-schema keys, literature and drug required). | FIXED per plan 3.2: brain MRI, spine MRI, labs, AQP4/MOG required; CSF recommended; MRS, biopsy, drug and literature optional, literature last. |
+| A | minor | `ground_truth.stop_rule`, `sequence_constraints` | Literature and drug check required before assessment. | FIXED: required criteria only, max 3; soft MRI-before-CSF and soft MRI-before-biopsy. |
+| C | major | `ground_truth.assessment.required_recommendations` | No formulation of DIS/DIT, no antiseizure medicine, steroids without lymphoma precaution, template DMT and screening lines. | FIXED: formulation (3 of 5 regions, DIT, CSF, earlier attack) conditioned on lymphoma being unlikely; levetiracetam with driving advice; IVMP after negative cytology and flow (or after tissue), PLEX if refractory; repeat MRI 4-8 weeks with biopsy for atypical evolution; DMT by activity; pre-DMT screening. |
+| C | major | `ground_truth.assessment.prohibited_recommendations` | Female-only item (male patient), JCV and fingolimod items unrelated to the case, myelopathy item without myelopathic signs. | FIXED: deleted; added steroids-before-cytology/tissue, resection before work-up and neuro-Behcet-on-family-history prohibitions. |
+| C | major | `ground_truth.differential` | Template entries with likelihoods not tied to the results. | FIXED: PCNSL low, glioma low, ADEM low, neuro-Behcet low, MOGAD low, NMOSD low, abscess very low, each with features from the case. |
+| C | minor | `ground_truth.key_clinical_evidence` | "Biopsy as last resort" and template lines. | FIXED: rebuilt (attacks, tumefactive features, DIS 3 of 5, DIT and CSF, lymphoma/glioma exclusion, antibodies, distractors). |
+| B | minor | `ground_truth.red_herrings` | Empty although the case has two distractors. | FIXED: Behcet family history; post-seizure leukocytosis with mildly raised ESR/CRP. |
+| E | minor | `metadata` | Stale pearls; `case_body_concerns` about an ECG that the case does not serve; difficulty text. | FIXED: pearls rewritten; concerns emptied; difficulty fields and revision fields updated. |
+| A | minor | `fallback_tool_outputs.echo.echo_type` | Missing discriminator value. | FIXED: "TTE". |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+
+A 29-year-old man with six weeks of progressive left hemiparesis, left face and arm pinprick loss, left limb ataxia and a left abducens paresis, then a first generalized seizure; two years ago three weeks of right-hand numbness never imaged. The history no longer carries lymphoma, SAH or ADEM cues (weight loss, thunderclap headache, preceding URI). The MRI shows a 4.2 cm right parietal tumefactive lesion with open-ring enhancement, peripheral restricted diffusion and no shift, plus discrete ovoid periventricular, splenial, left pontine (enhancing) and left MCP lesions; the spine shows a right posterior column C2-C3 lesion: DIS 3 of 5 regions with DIT and positive CSF (four restricted bands, kFLC 22.4). CSF cytology and flow cytometry are negative, AQP4/MOG negative, MRS favours demyelination, and an optional stereotactic biopsy shows active demyelination. Required: brain MRI, spine MRI, mimic labs, AQP4/MOG; CSF recommended; MRS, biopsy, drug check and literature optional. Musts: formulation once lymphoma is unlikely, levetiracetam, IVMP only after cytology and flow (or tissue), repeat MRI with biopsy for atypical evolution, DMT by activity, pre-DMT screening. Steroids before cytology or tissue are prohibited. The CT and EEG fallbacks now match the lesion; CT is no longer counted as waste.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+
+- Citation keys `[McDonald_2024]`, `[Wattjes_2021]`, `[NICE_NG220]` (plan 5.1); synonyms (plan 5.2).
+- `test_guidance_claims`: RM01 now has `action-aqp4-mog-cba`, and CT is no longer an avoided action (plan 5.3).
+- Confirm `obtain_tissue_diagnosis` `stereotactic_biopsy` and `order_advanced_imaging` `MR_spectroscopy` are in the vocabulary for this follow-up shape (plan 5.4).
+
+## Open questions for Andrea (judgment calls you could not settle)
+
+- Brainstem lesion sides differ from the plan ("dorsal pons, right MCP"): I placed a left paramedian pontine lesion and a left MCP lesion because the exam has a left abducens paresis and left limb ataxia, both ipsilateral signs; a right MCP lesion would not explain the left dysmetria. Please confirm.
+- The spine lesion was put in the right posterior column so it can explain the earlier right-hand episode; if you prefer the earlier attack to stay unexplained by imaging, the side can be changed without affecting DIS.
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. Read the whole final case against the plan's RM01 rewrite list. Confirmed: thunderclap headache, weight loss, months of lethargy/personality change and the URI are gone from HPI, PMH and exam; an earlier attack (right-hand numbness two years ago) exists and the right posterior column C2-C3 lesion supports it; brainstem signal is now discrete ovoid lesions; the 4.2 cm lesion keeps open-ring enhancement, peripheral restricted diffusion, no shift and no papilloedema, so the recommended LP is consistent with F10 and the soft MRI-before-CSF constraint; CSF glucose ratio 72/118 = 0.61 matches the post-seizure serum glucose; biopsy moved to `obtain_tissue_diagnosis` (optional) with histology-only impression; MRS moved to `order_advanced_imaging`; CT and EEG fallbacks show the lesion and focal slowing, CT avoided action removed (the original case had no EEG avoided action); no female-only prohibition in this man; antiseizure must present; steroid musts and prohibitions agree (steroids only after cytology/flow or tissue). DIS 3 of 5 + DIT + positive CSF is stated identically in must, KCE and metadata.
+
+Open questions in this log, resolved by the verifier (decision, no data change): the left paramedian pontine lesion (left abducens paresis) and the left MCP lesion (left limb ataxia) are the anatomically correct sides for ipsilateral signs, so the plan's "right MCP" is superseded; the right posterior column C2-C3 lesion is kept because it gives the earlier right-hand attack an anatomical substrate. Neither needs information only Andrea has.
+
+Found: no error requiring a change.
+
+perfect_agent.py -v: pass. case_io.py check: clean for this case. Guards: pass.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026 (uniformity scripts over all 30 MS-RR cases; edits through `case_io`; perfect agent, `case_io check` and the case guards clean afterwards).
+
+- `ground_truth.differential[2].icd_code` G04.81 -> G04.00: G04.81 is other encephalitis; ADEM is G04.00, as in the other 8 MS-RR cases.
+- `initial_tool_outputs.labs`: the AQP4-IgG and MOG-IgG rows moved to a new `followup_outputs` entry (`interpret_labs`, trigger `request_aqp4_mog_cell_based_assay`, panel `Neuroimmunology`, placed after the imaging follow-ups). Served in the initial labs payload, they answered the mimic-exclusion panel order as well, so an agent learned the result of `action-aqp4-mog-cba` without ordering it (perfect-agent warning "answered with the same stored report"); the MockServer now serves them only to an order that names the assays (checked for all three alternatives and both orders). Initial labs interpretation edited to drop the antibody results: removed "AQP4-IgG and MOG-IgG not detected by cell-based assay; a negative result does not entirely exclude NMOSD or MOGAD.".
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (`plans/MS-RR-decisions.md`). What changed and why:
+
+- Diagnosis synonyms (`diagnosis_synonyms.yaml` G35 entry, re-applied with `apply_diagnosis_synonyms.py --prune --conditions multiple_sclerosis`): removed the label "demyelinating disease" (G37.9 is an Excludes1 of G35.A, and its tokens occur in an NMOSD, MOGAD or ADEM answer, which would have scored as correct) and the codes G35.B and G35.C (primary and secondary progressive MS in FY2026 ICD-10-CM, a different course from this relapsing-remitting case). Accepted now: the label, multiple sclerosis, MS, relapsing(-)remitting multiple sclerosis, RRMS; codes G35.A, G35, G35.D.
+- `action-mrs` and `action-biopsy`: added `[Hardy_2013]` (Hardy TA, Chataway J. Tumefactive demyelination: an approach to diagnosis and management. JNNP 2013;84(9):1047-1053), the review that governs the work-up of a tumefactive lesion and the decision to biopsy; now in the pack's allow-list.
+- Checks: `perfect_agent.py` pass, `case_io.py check` clean for the case, `test_case_guards.py -k MS-RR-` passes with MS-RR now in `DISCRIMINATOR_CONDITIONS`.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Lab evidence (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited results its own order (the first alternative) no longer returned; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-6-interpret-labs]`.alternatives: was [CBC, vitamin_B12, TSH, HIV]; now [CBC, vitamin_B12, TSH, HIV, ESR, CRP] | [CBC, vitamin_B12, TSH, HIV].
+- Decision: serve: new first alternative (old order kept as an alternative). The key evidence reads the post-seizure ESR and CRP against the abscess and Behcet mimics.
+- Scoring: coverage unchanged (any call matching the old order still matches); the cost reference of the required work-up now uses the new first order.
+
+Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: Abnormal timed gait and balance assessment. Timed Up and Go 13.0 s and 10 m walk speed 1.00 m/s are slowed for age; Berg balance 48/56. (fallback_tool_outputs.clinical_assessment). Why: rule d: the examination documents a gait disorder (unsteady gait veering to the left; unable to hop on the left foot); the library reports a normal study.
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 70, ECOG 2: ambulatory and capable of all self-care, unable to carry out work activities, up and about more than half of waking hours. (followup_outputs[request_performance_status]). Why: rule d: inpatient relapse with a documented gait disorder: Karnofsky 100 / ECOG 0 'without evidence of disease' contradicts the case; the library reports a normal study.
+- `analyze_eeg {eeg_type: video}`: continuous right temporo-parietal polymorphic delta slowing. No interictal epileptiform discharges and no electrographic or clinical seizures were recorded. (followup_outputs[request_video]). Why: rule c: the stored routine EEG shows continuous right temporo-parietal slowing over a 4.2 cm lesion: a prolonged recording cannot be normal; the library reports a normal study.
+- `analyze_eeg {eeg_type: ambulatory}`: continuous right temporo-parietal polymorphic delta slowing. No electrographic seizures and no interictal epileptiform discharges. No events recorded by the patient. (followup_outputs[request_ambulatory]). Why: rule c: the stored routine EEG shows continuous right temporo-parietal slowing; the library reports a normal study.
+- `order_advanced_imaging {modality: DTI_tractography}`: 1. Reduced fractional anisotropy and fibre disruption of the right optic radiation and arcuate fasciculus within the right parieto-temporal lesion. 2. Medial displacement of the right corticospinal tract with reduced... (followup_outputs[request_dti_tractography]). Why: rule c: 4.2 cm right parieto-temporal lesion on the stored MRI with left-sided weakness: tractography cannot be normal; the library reports a normal study.
+- `order_advanced_imaging {modality: perfusion_MRI}`: Mildly raised rCBV at the enhancing rim of the right parietal lesion (ratio 1.3) with a hypoperfused centre; no neovascular pattern. (followup_outputs[request_perfusion_mri]). Why: rule c: 4.2 cm enhancing lesion on the stored MRI: perfusion cannot be symmetric without a focal abnormality; the library reports a normal study.
+
+Checks: perfect agent ok; case guards pass; snapshot diff shows no criterion answer changed; map verified (served without the library).

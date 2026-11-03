@@ -1,0 +1,88 @@
+# FTD-M02
+Reviewer status: R1 none, R2 none (no FTD notes file; FTD was never reviewed case by case) | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| none | - | No reviewer note exists for this case. Reviewer 1's July 2026 tool rulings (`condition_tool_guidance.yaml` `ftd:`) are kept: neuropsychology, clinical assessment and labs required; FDG-PET and genetics optional; EMG not an FTD test. |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| D | major | `followup_outputs` (neuropsych) | The neuropsychology "report" was the criterion's `expected_evidence` pasted as its only finding ("relative sparing of episodic memory"), which also contradicts the bedside recall of 0/5 and "memory disproportionately impaired". | FIXED: authored battery: impaired executive function (TMT-B, Stroop, WCST), fluency and social cognition (Ekman, Faux Pas), impaired CVLT-II free recall with partial recognition benefit, preserved visuospatial function, low-average naming, FBI 30/72, validity passed; numbered impression with the canonical ending and one hedged sentence that the memory deficit does not exclude an Alzheimer-type process. |
+| B | major | `initial_tool_outputs.clinical_assessment` | Apathy marked false (she stopped church after 35 years and needs prompting for hygiene); executive feature marked true although memory is not spared; duplicated fragments; template impression (plan C3). | FIXED: 4 of 6 features (disinhibition, apathy, loss of empathy, perseverative/compulsive); dietary change and executive-with-sparing absent with reasons; informant, screen and functional-decline lines; second canonical impression (memory impaired, AD stays in the differential). |
+| B | minor | `patient.neurological_exam.mental_status` | MoCA itemisation said "3 on memory" for a 0/5 delayed recall (5 points), so the items did not sum to 20/30. | FIXED: 3 executive, 5 delayed recall, 1 naming, 1 attention (10 lost, 20/30). |
+| C | major | `ground_truth.action_criteria` (new `action-9-ad-biomarker`), `followup_outputs` (amyloid PET, CSF) | Memory disproportionately impaired with borderline left hippocampal volume keeps AD in the differential (the metadata itself said the ambiguity is "resolved by FDG-PET and amyloid PET"), but no criterion or authored result existed. | FIXED: optional AD-biomarker criterion (amyloid PET or CSF `Abeta42` + `phospho_tau`, plan C4 label, `[Frisoni_2024]`, `[Amyloid_PET_AUC_2025]`); authored negative florbetaben PET (Centiloid 4) and a normal CSF AD profile; soft constraint MRI before it (plan C15). |
+| D | major | `followup_outputs` (literature), `action-8-search-medical-literature` | Literature criterion required and in the stop rule; its only output was an unsummarised list of two PMIDs served for any query; criterion `expected_evidence` was the shared echo string (plan C1). | FIXED: canonical bvFTD text with the familial variant (`[Pottier_2016]`) in `initial_tool_outputs.literature_search`; follow-up deleted; criterion optional, last, `required_arguments` {}, removed from `required_before_assessment`. |
+| B | major | `followup_outputs` (genetics) | Impression was a template "Abnormal values: ... repeat count (H)"; reference range "<30 normal". | FIXED: report with result (heterozygous expansion >400 repeats; other allele 2), GRN and MAPT negative, one sentence on the FTD-ALS association and 50% inheritance with incomplete penetrance, post-test counselling note; thresholds normal <24, intermediate 24-30, pathogenic >30. |
+| D | minor | `initial_tool_outputs.mri.impression` | "Clinical and metabolic correlation is essential" (cross-modality steering). | FIXED: numbered impression of the stored findings (mild bifrontal, subtle anterior temporal, borderline left hippocampal, preserved posterior cortex, pertinent negatives). |
+| B | major | `initial_tool_outputs.labs` | Folate, calcium, urea, eGFR, potassium, platelets, MCV, AST, ALP, bilirubin, albumin missing; unrequested copper, ceruloplasmin, heavy metals, free T4, RPR, HIV; "Reviewed_FTD_panel_additions" (plan C5). | FIXED: five panels; stored values kept (TSH 2.1, B12 412, WBC 6.8, Hb 13.2, Na 140, creatinine 0.8, glucose 88, ALT 28, ESR 11, CRP 1.6); added normal values (folate 11.6, K 4.1, BUN 13, eGFR 86 by CKD-EPI 2021, adjusted calcium 9.3, AST 24, ALP 72, bilirubin 0.5, albumin 4.3, platelets 251, MCV 89); copper, ceruloplasmin, heavy metals and free T4 deleted; RPR/HIV moved to keyed follow-up `request_rpr_syphilis_hiv_serology`. |
+| C | minor | `action-7-order-advanced-imaging`, `followup_outputs` (SPECT) | No SPECT alternative; FDG impression tautological (plan C6, C7). | FIXED: `perfusion_SPECT` alternative with an authored SPECT matching the symmetric frontal and anterior temporal FDG pattern; FDG impression names the pattern, hedged. FDG stays optional (MRI shows the frontal pattern). |
+| C | minor | `followup_outputs` (sertraline check, new) | No drug-check output existed; the library answers sertraline with "no interaction", which is wrong with her PRN ibuprofen. | FIXED: sertraline follow-up (no criterion): ibuprofen additive bleeding risk, lisinopril no significant interaction, MAOI/pimozide, hyponatraemia and QT warnings. |
+| C | major | `fallback_tool_outputs.advanced_imaging`, `.drug_interactions`, `.ct`, `.ecg` | Generic "No abnormality" advanced-imaging fallback; "agent not specified" drug fallback; normal CT against MRI atrophy; ECG "borderline left-axis deviation" with axis "normal" (plan C6). | FIXED: first two deleted; CT shows mild bifrontal volume loss (canonical text); ECG normal and consistent; `metadata.fallback_tool_kinds` updated. |
+| A | minor | `ground_truth.action_criteria[*]` | Rationale equal to label, duplicate citations, `[AAN_dementia_2018]`, labs label naming RPR/HIV (plan C4). | FIXED: canonical labels, case-specific rationales and evidence, bracketed keys. Ids kept; new id `action-9-ad-biomarker`. |
+| C | minor | `ground_truth.sequence_constraints` | None; plan C15 requires assessment before genetics. | FIXED: soft `action-2` before `action-4` (`[ACMG_NSGC_2011]`) and soft MRI before the AD biomarker (`[NICE_NG97]`). |
+| C | major | `ground_truth.assessment.required_recommendations` | Seven musts with duplicates; "Pursue genetic testing" made an optional test mandatory; "baseline motor / respiratory function" without any motor or respiratory finding (plan C9). | FIXED: six musts: Rascovsky with certainty; why AD is less likely despite the memory deficit and that a biomarker can settle it; genetic counselling before testing (brother's ALS, mother's illness, meaning for her children); motor neuron disease surveillance with EMG if LMN signs appear; safety and capacity (driving, finances, teaching post, power of attorney); caregiver support without ChEI or memantine. |
+| C | minor | `ground_truth.assessment.prohibited_recommendations[0..1]` | Overstated memantine harm (plan C10). | FIXED: canonical wording. |
+| C | major | `ground_truth.differential` | FTD-MND "high" with full strength and no LMN signs; "Sporadic bvFTD" listed as a competitor of bvFTD; AD justified by "negative amyloid biomarkers expected" (plan C11). | FIXED: AD low (for/against, optional biomarker), ALS-FTD low (not established), primary psychiatric low, vascular very low. |
+| D | major | `ground_truth.key_clinical_evidence` | Rigidity line although the exam records no rigidity (plan C8); "must be considered until excluded"; maternal illness asserted as FTD. | FIXED: five lines from the history, MRI, memory profile, pedigree and reflexes. |
+| B | minor | `ground_truth.red_herrings` | Maternal illness interpretation overstated ("most likely an early FTD manifestation") and presumed carrier status. | FIXED: reworded; added the delayed-recall red herring (mental status). |
+| B | minor | `metadata.notes`, `difficulty_rationale` | "ALS family history mandates C9orf72 testing"; "C9orf72-positive" stated as the case although genetics is optional. | FIXED: notes and rationale describe the optional studies. |
+| C | minor | `ground_truth.avoided_actions` (CT, perfusion MRI) | `[AAN_dementia_2018]`; rationale implying FDG/amyloid PET had been done. | FIXED: `[NICE_NG97]`; reworded. Severities unchanged. |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+
+Required work-up unchanged (informant assessment, neuropsychological battery, reversible-cause blood tests, MRI brain without contrast); FDG-PET or SPECT, a new optional AD biomarker step (amyloid PET or CSF Abeta42/p-tau), counselled genetic testing and a literature search are optional, in that order, with soft constraints of MRI before the biomarker and clinical assessment before genetics. The clinical assessment now counts 4 Rascovsky features (disinhibition, apathy, loss of empathy, compulsive collecting and repetitive speech) and does not count the executive feature, because her delayed recall is 0/5; the neuropsychology report is now a real battery showing executive and social-cognition deficits with impaired free recall and partial recognition benefit. Authored optional results are a negative amyloid PET, a normal CSF AD profile, a matching SPECT and a C9orf72 expansion with GRN and MAPT negative. Musts: Rascovsky with certainty level; why AD is less likely despite the memory deficit; genetic counselling before testing; motor neuron disease surveillance with EMG if lower motor neuron signs appear; driving, finances, work and power of attorney; caregiver support without cholinesterase inhibitors or memantine. Motor neuron disease and AD are rated low.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+
+- Citation keys used per plan 1.1: `[SNLG_ISS_2024]`, `[Frisoni_2024]` (new), `[Amyloid_PET_AUC_2025]`, `[ACMG_NSGC_2011]`.
+- Synonyms: if the optional C9orf72 result is obtained, "definite" or "C9orf72-associated bvFTD" answers already score through the token match on "bvFTD"; no change needed.
+
+## Open questions for Andrea (judgment calls you could not settle)
+
+- None that need information only Andrea has. Decision recorded: the AD biomarker step was added as optional (plan 3.1 "wherever AD is in the differential"); with 0/5 delayed recall and a borderline hippocampus it is a reasonable but not mandatory order, since the behaviour-led onset and frontal pattern already support probable bvFTD.
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. Read the log, the diff and the whole final case. No reviewer notes apply. Checked: MoCA items sum to 20/30; eGFR 86 recomputed (CKD-EPI 2021, woman of 57, creatinine 0.8); executive feature correctly absent with 0/5 free recall (4 of 6 features); CSF glucose ratio 62/88 = 0.70; CSF and amyloid cut-offs internally coherent; C9orf72 report and thresholds; sertraline output correct for ibuprofen and lisinopril; both soft constraints point at existing ids in the right direction (MRI before AD biomarker, assessment before genetics); musts depend on no optional result; differential low for AD and ALS-FTD with the case's own for/against; guards pass. Found and fixed two rationale defects: the genetics rationale said the pedigree "make[s] a C9orf72 expansion likely" (presumes the optional result), now "raise the prior probability"; the neuropsychology rationale was the canonical "relative sparing of memory", which contradicts this case's impaired free recall, now "characterises the memory deficit against preserved visuospatial function". `perfect_agent.py -v` and `case_io.py check` clean.
+
+## Condition audit (FTD auditor, 24 Oct 2026)
+
+- D, major, `patient.neurological_exam.mental_status`: the examination gave the bedside screen results (MoCA 20/30 with item losses, letter fluency and clock), which the required `perform_clinical_assessment` returns (ROUND_POLICY timeline-leak rule). The other 12 FTD cases, and VASC-DEM and ALZ-EARLY, had already moved them out. Removed the scores and test results; the behavioural observations, insight and frontal signs stay. The clinical assessment output already carries every removed value, so no information is lost. FIXED.
+- E, minor, `patient.neurological_exam.reflexes`: "Hoffman" corrected to "Hoffmann", as in M09, P04 and P08. FIXED.
+- B, major, `followup_outputs`: an order of `genetic_panel:ALS` fell to the benchmark library, which reports a normal C9orf72 and so contradicted the expansion on this case's FTD panel. Added follow-up `request_als_gene_panel_c9orf72` (`test_type: genetic_panel:ALS`) with the same C9orf72 expansion and SOD1, TARDBP and FUS negative, as P04 and P05 already have. No criterion changed. FIXED.
+- E, minor, `initial_tool_outputs.literature_search[*].results[*].source`: the sources were citation keys (`[Rascovsky_2011]` or `Rascovsky_2011`), which a literature tool does not return, and the condition used three styles. They now give the full reference, as in M07-P02 (for example "Rascovsky K et al. Brain 2011;134:2456-2477 (FTDC criteria for bvFTD)"). Findings and summary are unchanged. FIXED.
+- `perfect_agent.py` and `case_io.py check` were re-run on all 30 FTD cases after the changes and are clean; `test_case_guards.py -k FTD` passes (60 tests).
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/FTD-decisions.md`. Changes:
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (the report is a transthoracic study). The MockServer routes echo reports by this field; without it the normal TTE fallback answered a TEE order too (PATTERNS section 5; FTD added to `DISCRIMINATOR_CONDITIONS`).
+- Synonyms (`G31.09` entry, applied with `--prune --conditions ftd`): "pick disease" and "pick's disease" (retired) and the code G31.01 are no longer accepted. Pick disease is one FTLD-tau pathology that no case establishes, and G31.01 is where ICD-10-CM codes primary progressive aphasia, so a PPA answer coded G31.01 scored as correct here.
+
+Checks: `perfect_agent.py` and `case_io.py check` clean; `test_case_guards.py -k FTD-` passes, including `test_routed_outputs_name_their_study`.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Engineering text (25 Oct 2026)
+
+Review-process wording (references to the round's rulings, the round policy file, the criteria packs, and tier markers such as "(optional)" in criterion labels and rationales) is shown to physicians in the review app, so it was rewritten in clinical language. The tier stays in the criterion's `importance` field; scoring is unchanged. `test_case_guards.py::test_no_review_process_text` now fails on any of it.
+
+- criterion `action-8-search-medical-literature` label: "Literature search on familial FTD and the FTD-ALS spectrum (optional)" -> "Literature search on familial FTD and the FTD-ALS spectrum"
+
+## Library contradictions (25 Oct 2026)
+
+Orders that reached the benchmark library's normal report although this case contradicts it (diagnosis, history, medications or a stored finding) now get a case-specific report; every other off-pathway order still gets the library normal. No tier, criterion, diagnosis or existing output changed.
+
+- `order_specialized_test test_type=speech_language_evaluation` -> `followup_outputs[order_speech_language_evaluation]`: speech-language findings matching the stored neuropsychology (reduced verbal fluency; naming as tested).
+- `perform_clinical_assessment assessment_type=performance_status` -> `followup_outputs[order_performance_status]`: performance status of the case's functional decline instead of Karnofsky 100.
+
+Checks: `perfect_agent.py` ok; `test_case_guards.py -k FTD` pass; every order listed in `plans/LIBRARY-group2-map.yaml` for this case is answered without the library; served answers of every other order unchanged against HEAD. Reasons and doubts: `plans/LIBRARY-group2-decisions.md`.

@@ -1,0 +1,115 @@
+# SAH-RS12
+Reviewer status: R1 none, R2 needs_changes | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| f87e2dd7-98fd-4446-b3b5-39a4c4a9e86f | FIXED (securing, timeline); ALREADY-FIXED (drain must existed), reworded | Securing: the two "24-72 hours" musts replaced by one MUST-SECURE (AComA, as early as feasible, preferably within 24 hours, [Hoh_2023]) in `ground_truth.assessment.required_recommendations`; securing pearl replaced in `key_clinical_evidence`; new recommended criterion `dsa-aneurysm-anatomy` and diagnostic DSA follow-up. Timeline: the "day 8" TCD with "new bifrontal confusion and leg weakness" re-dated to an admission baseline (`followup_outputs` TCD), the "Day 4" sodium follow-up `request_hyponatremia_monitoring` deleted, and the label's "with severe DCI" removed (see Own findings). Drain: the EVD must existed; now MUST-EVD-NOW "for the acute hydrocephalus with intraventricular blood [Hoh_2023]", and the LP avoided action is `contraindicated`. |
+| 03f424a3-fa19-467f-877d-45b88f2492e9 | FIXED | Drug-check follow-up `request_nimodipine_lisinopril_check`: "Target SBP 140-160 before aneurysm secured; 120-140 after" and the bare "Hold lisinopril and HCTZ" deleted; output rewritten (see Own findings). Musts: MUST-BP-A with "nicardipine or clevidipine infusion" (204/122 on arrival after 224/138 in the field; LVEF 38%, so not labetalol) and MUST-HOME withholding lisinopril and hydrochlorothiazide in the acute phase, so a titratable IV agent replaces the held drugs. BP prohibition replaced by the canonical text. |
+
+## Own findings
+| dim (A schema, B consistency, C clinical, D leakage, E language) | severity (blocker/major/minor) | field path | finding | action (FIXED/FLAGGED) |
+| --- | --- | --- | --- | --- |
+| C | major | `ground_truth.diagnosis.accepted[0]` | "from large AComA aneurysm with severe DCI": 8.2 mm is a small aneurysm (below 10 mm, plan 1.2), and DCI cannot exist at a presentation hours after the ictus; it rested only on the impossible day-8 TCD R2 flagged. | FIXED: "Aneurysmal subarachnoid hemorrhage from anterior communicating artery aneurysm (Hunt-Hess 2, Fisher 4)" (same entity, ICD I60.2 unchanged). Listed under CENTRAL. |
+| D | major | `initial_tool_outputs.literature_search` | Initial literature block whose finding and summary are the literature criterion's `expected_evidence` (scoring-key leak, guard failed) (C7). | FIXED: block deleted; canonical literature follow-up last; criterion `optional`. Leak guard passes. |
+| C | major | `required_recommendations` | No K/Mg action with QTc 512 ms; magnesium never measured (C9). | FIXED: magnesium 1.6 mg/dL (L, 1.7-2.2; 3-4 drinks daily and a thiazide) added to BMP, `abnormal_values_summary` and `interpretation`; MUST-QT "QTc 512 ms with potassium 3.8 mmol/L ...". |
+| C | major | `required_recommendations` | LVEF 38% without a cardiac or anesthetic plan (MUST-LVEF); 3-4 drinks daily without thiamine or withdrawal monitoring (MUST-ALCOHOL). | FIXED: both musts added. |
+| C | minor | `required_recommendations` MUST-HOME | Metformin and glucose 228 mg/dL unaddressed. | FIXED: MUST-HOME also holds metformin in critical care with insulin for hyperglycemia, avoiding hypoglycemia. Metformin is not stopped for contrast (creatinine 1.2, eGFR above 30). |
+| C | major | `followup_outputs` drug check, `action-7` | Template expected evidence about DOAC/warfarin reversal (no anticoagulant here); output held the invented SBP targets. | FIXED: tier kept `recommended` (plan C10); case-specific rationale and evidence; output lists lisinopril and HCTZ additive hypotension, thiazide natriuresis with low K and Mg (QTc relevance), metformin and contrast, the codeine intolerance for analgesia, BP check with the 30 mg every 2 hours adjustment, no parenteral injection, CYP3A4. |
+| C | major | `required_recommendations`, `prohibited_recommendations` | Nimodipine must without the hypotension adjustment; "Do not administer nimodipine intravenously" wrong as written; "daily TCD days 4-14" must; ICU must with an SBP target (C4, C5). | FIXED: MUST-NIMO, MUST-ICU, MUST-DCI, canonical nimodipine and BP prohibitions. |
+| B | major | `followup_outputs` TCD | Day 8 with severe vasospasm, clinical deficits inside the report, CT perfusion advice (C2). | FIXED: day 0 baseline, normal velocities (MCA 68 to 71 cm/s, Lindegaard 1.7 to 1.8), canonical protocol and impression. |
+| B | major | `followup_outputs` telemetry, `action-8` | Template text in all 30 cases, management words, 24 h (C12). | FIXED: 3 h since arrival, sinus tachycardia 94 to 116 bpm, 22 PVCs and one couplet, no sustained arrhythmia or pauses, QTc 508 ms, no torsades. |
+| D | minor | `initial_tool_outputs.ct.additional_observations` | "Classic presentation" is clinical commentary in a CT report (C14). | FIXED: removed; added "Sella normal in size without mass; no hyperdense dural venous sinus" so the differential's statements are supported by the CT. |
+| E | minor | CTA `angiography_findings`, `impression` | "Large ruptured saccular aneurysm" for 8.2 mm (C13); rupture asserted. | FIXED: "Saccular aneurysm ..." in both; added cervical carotid and vertebral arteries patent, no dissection (the differential cites it). |
+| B | minor | echo follow-up | LVEF 38% called "severely reduced" (30 to 40% is moderately reduced); "Severe Takotsubo cardiomyopathy" and "classic Takotsubo" are diagnostic labels rather than findings. | FIXED: "moderately reduced", findings "Apical akinesis with basal hyperkinesis", "LVEF 38%", "Mild MR"; wall motion "Takotsubo pattern"; no em dashes. |
+| A | minor | `ground_truth.avoided_actions` LP | Severity `harm` with IVH and hydrocephalus on CT (C6). | FIXED: `contraindicated`, rationale names the IVH and hydrocephalus. |
+| E | minor | `metadata.case_body_concerns` | Stale concerns about a TCD tool tag and a CSF block that no longer exist (C14). | FIXED: emptied. |
+| E | minor | labs `Baseline workup` type and screen | Engineering sentence (C14). | FIXED: `clinical_significance` null. |
+| B | minor | `ground_truth.differential` | Generic key features (C11). | FIXED: canonical key features (exertional trigger, basal-cistern blood, AComA aneurysm). |
+| C | minor | `key_clinical_evidence` | 24-72 h, TCD days 4-14, CT 98%/80-85%, xanthochromia 6-12 h pearls. | FIXED: the four canonical pearls. |
+| A | minor | `action_criteria`, `followup_outputs` order, `sequence_constraints`, `stop_rule` | Label-copied rationales, free-text citations, literature recommended, no constraints, allowance 0. | FIXED: canonical rationales and citations; criteria NCCT, labs, ECG, CTA, DSA, drug check, echo, telemetry, TCD (optional), literature (optional); follow-ups CTA, DSA, drug check, echo, telemetry, TCD, literature; soft NCCT before CTA and CTA before DSA; stop rule NCCT, labs, ECG, CTA, allowance 1. Labels kept. |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+
+The patient, exam (GCS 15, HH2), CT (Fisher 4 with third-ventricle blood and early hydrocephalus), CTA (8.2 x 7.1 mm AComA aneurysm, now not called "large"), ECG (QTc 512 ms) and echo (LVEF 38%, now "moderately reduced") are unchanged in substance. The labelled diagnosis no longer claims severe DCI, which was impossible at a presentation within hours of the ictus. Magnesium 1.6 mg/dL is now measured. The day-8 vasospasm TCD became an optional admission baseline with normal velocities, and the day-4 sodium panel was deleted. A diagnostic catheter angiography (wide neck, right A2 origin in the neck, no second aneurysm, no vasospasm) was added before securing, and the leaking initial literature block was replaced by one general, optional literature output at the end. The musts now require: enteral nimodipine with the 30 mg every 2 hours adjustment; securing the AComA aneurysm as early as feasible, preferably within 24 hours; neurocritical care; an EVD for the hydrocephalus with intraventricular blood; BP lowering now with nicardipine or clevidipine; withholding lisinopril and HCTZ, with insulin instead of metformin; potassium and magnesium repletion with QTc monitoring; a cardiology and neuroanesthesia plan for LVEF 38%; thiamine and withdrawal monitoring; sodium monitoring; and DCI surveillance. LP is now contraindicated in the avoided actions.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+
+- `ground_truth.diagnosis.accepted[0]` corrected within the condition (ruling 3): from "Aneurysmal subarachnoid hemorrhage from large AComA aneurysm with severe DCI (Hunt-Hess 2, Fisher 4)" to "Aneurysmal subarachnoid hemorrhage from anterior communicating artery aneurysm (Hunt-Hess 2, Fisher 4)". `icd_codes[0]` I60.2 unchanged; synonyms untouched.
+- `[Molyneux_2002]` and `[Drew_2010]` are cited (canonical literature output, MUST-QT); add them to the SAH criteria-pack allow-list (plan 5.1b).
+
+## Open questions for Andrea (judgment calls you could not settle)
+
+- EVD with GCS 15: the EVD must follows the plan (hydrocephalus with intraventricular blood) and R2's note on this case; if Andrea answers plan section 6 question 1 against it, replace it with MUST-EVD-WATCH.
+
+## Verification (adversarial verifier, 24 Oct 2026)
+
+Checked: both notes against the file (one MUST-SECURE with the Hoh window, DSA criterion and output, day-0 TCD, day-4 sodium follow-up gone, MUST-EVD-NOW, LP `contraindicated`; target sentence gone from the drug check, MUST-BP-A without labetalol for LVEF 38%, MUST-HOME withholding lisinopril and HCTZ); no "Large", "DCI", "day 8", "140-160" left anywhere; CTA vs DSA (8.2 x 7.1 vs 8.3 x 7.0 mm, neck 4.6 mm); telemetry vs ECG (QTc 508 vs 512); MUST-QT values vs labs (K 3.8, Mg 1.6 flagged low); MUST-LVEF and MUST-ALCOHOL vs echo and social history; differential vs reports; stop rule and constraints. The label change of `accepted[0]` (removing "large" and "with severe DCI") is justified: after the impossible day-8 TCD is re-dated per the note, nothing in the case supports DCI, and 8.2 mm is not large; ICD I60.2 and the synonyms are unchanged and the change is listed under CENTRAL, as ruling 3 requires.
+Found: `initial_tool_outputs.labs.abnormal_values_summary` omitted BUN 22 mg/dL, which the panel flags abnormal and the interpretation and the labs criterion list (minor, structured summary vs panel).
+- FLAGGED for the lead (condition-wide, not changed here): `fallback_tool_outputs.cardiac_monitoring` is a 24-hour Holter report, which cannot exist at assessment time (same reasoning as C12); it answers only a non-telemetry order, but the class spans all 30 cases.
+Changed: added "BUN 22 mildly elevated" to `abnormal_values_summary`. Checks re-run after verification: `perfect_agent.py -v` passes (NCCT and labs show the known `<- ?` display artefact; the initial CT and labs carry the expected evidence by content), `case_io.py check` clean for the case, `test_case_guards.py -k` passes (no leak in the literature or drug-check outputs).
+
+
+## Condition audit (auditor, 24 Oct 2026)
+
+- `initial_tool_outputs.labs.abnormal_values_summary` rewritten to values and flags only. It named interpretations ("leukocytosis", "stress hyperglycemia", "neurogenic" troponin); "neurogenic" gives away the troponin red herring's answer, and the labs report carries no cross-modality interpretation. Same class as the fix already made in S05 to S10. Values, flags and the labs criterion unchanged.
+- Checks after the audit: `perfect_agent.py` 30/30 pass; `case_io.py check` schema and synonym guard OK, no test failure names an SAH case; `test_case_guards -k SAH` 60 passed.
+
+## Close-out (24 Oct 2026)
+
+Condition close-out after Andrea's ruling of 24 Oct 2026 (open questions decided for dataset quality); decisions and sources in `plans/SAH-decisions.md`.
+
+- `patient.neurological_exam.additional (Hunt-Hess grade removed)`: the Hunt-Hess grade is a SAH grading scale, so stating it in the patient block presupposes the diagnosis and does the agent's grading (decision Q8).
+- `required_recommendations (EVD-NOW -> EVD-WATCH)`: the patient is alert (GCS 15); Hoh 2023 recommends urgent CSF diversion for symptomatic hydrocephalus, so the must is urgent neurosurgical review with hourly checks, repeat CT on decline and EVD if it becomes symptomatic (Q1).
+- `echo.wall_motion`: an echo reports the wall-motion pattern; a mild apical hypokinesis with preserved EF is not Takotsubo, grading labels such as 'classic' or 'severe Takotsubo' are diagnoses, and cardiology consultation is management (Q10).
+- `red_herrings[0].correct_interpretation (echo does not confirm etiology)`: an echocardiogram does not confirm the etiology of neurogenic myocardial injury; the interpretation now states the case's own echo (audit class, Q10).
+- fallback_tool_outputs.mri: SAH-consistent brain MRI instead of the library normal report: an off-pathway brain MRI was answered by the library normal report (no blood on SWI), contradicting the CT; the case fallback now reports the CT's blood on FLAIR and SWI (CENTRAL 10).
+- fallback_tool_outputs.cardiac_monitoring: 24 h Holter replaced by the case's own telemetry report: a 24-hour Holter cannot exist at assessment time; an off-pathway monitoring order now returns the case's own telemetry (CENTRAL 9).
+- followup_outputs: MR angiography report added before the literature output (aneurysm site and size from the DSA, 0.2 mm smaller as TOF reads it; P02 negative): an MRA order was answered by a fallback reporting no abnormality, contradicting the CTA and DSA (CENTRAL 10). MRA stays a waste action after the CTA.
+- `ground_truth.diagnosis` (synonyms re-expanded with `--prune`): diagnosis_synonyms.yaml: the I60 category no longer grants I60.8 (non-aneurysmal SAH), so the code was pruned from this aneurysmal case.
+- Checks after the close-out: `perfect_agent.py` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, `test_case_guards -k SAH-` pass.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- follow-up `request_echocardiogram`: `echo_type` set to `TTE` (was missing); the bedside study is transthoracic, and untyped it also answered a TEE or bubble-study order.
+- `fallback_tool_outputs.specialized_test` set to null: a generic report (test_type '', impression 'No diagnostic abnormality identified on this study.') that names no one study and so answered every variant; the benchmark library now answers each study with its own normal report.
+- `fallback_tool_outputs.advanced_imaging` set to null: a generic report (modality '', impression 'No abnormality identified.') that names no one study and so answered every variant; the benchmark library now answers each study with its own normal report.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Lab evidence (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited results its own order (the first alternative) no longer returned; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-3-interpret-labs]`.alternatives: was [CBC, BMP, coagulation]; now [CBC, BMP, coagulation, troponin, BNP] | [CBC, BMP, coagulation].
+- Decision: serve: new first alternative (old order kept as an alternative). Neurogenic troponin elevation is the case's cardiac red herring (prohibition, key evidence, red herring); baseline troponin belongs with the admission bloods in aSAH (AHA/ASA 2023), and the cardiac panel holds the BNP the evidence reads. CBC + BMP + coagulation did not return it.
+- Scoring: coverage unchanged (any call matching the old order still matches); the cost reference of the required work-up now uses the new first order.
+
+Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.
+
+## Library contradictions (25 Oct 2026)
+
+Orders the benchmark library answered with a normal report that this case contradicts now have a case report. Contradiction = the history, the diagnosis or a stored finding makes the normal report impossible.
+
+- `analyze_csf (lumbar puncture, EVD, lumbar drain; xanthochromia)` -> fallback_tool_outputs.csf: blood-stained CSF without clearing (Fisher 4), xanthochromia result per time from onset. The library returned clear acellular CSF in a patient with subarachnoid blood on CT.
+- `perform_clinical_assessment {assessment_type: performance_status}` -> fallback_tool_outputs.clinical_assessment: Karnofsky 40, ECOG 3. The library returned Karnofsky 100, ECOG 0, working, in an acutely ill inpatient.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}` -> followup_outputs[request_gait_and_balance_timed]: assessment not completed, patient unable to stand safely; the library returned a normal Timed Up and Go in a patient whose gait the exam could not test or found abnormal.
+- `order_echocardiogram {echo_type: TEE}` -> fallback_tool_outputs.echo: stored TTE wall motion and LVEF 38% carried over; no thrombus or shunt. The library TEE was normal against an abnormal stored TTE.
+- `order_echocardiogram {echo_type: bubble_study}` -> followup_outputs[request_bubble_study]: same wall motion and LVEF, no right-to-left shunt at rest. The library bubble study called the echocardiogram normal.
+- `order_advanced_imaging {modality: cardiac_MRI}` -> fallback_tool_outputs.advanced_imaging: wall motion and LVEF as on the stored TTE, oedema in the dysfunctional segments, no late enhancement. The library cardiac MRI reported no structural heart disease.
+- `interpret_labs {panels: [HbA1c]}` -> fallback_tool_outputs.labs: HbA1c 8.6%. Treated type 2 diabetes; the library returned 5.4%.
+- `perform_clinical_assessment {assessment_type: structured_headache_history_ichd3}` -> followup_outputs[request_structured_headache_history_ichd3]: instantaneous while lifting a heavy crate; red flags: thunderclap onset, onset during exertion, new headache type after age 50. The library reported no thunderclap onset, no red flags and no nausea or photophobia, against the history.
+- `perform_clinical_assessment {assessment_type: orthostatic_blood_pressure}` -> followup_outputs[request_orthostatic_blood_pressure]: standing not attempted, supine BP 204/122 as at arrival. The library reported 3 minutes of symptom-free standing at BP 128/78.
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}` -> followup_outputs[request_levodopa_challenge]: no parkinsonian signs, challenge not performed. The library reported normal gait and postural reflexes and no nausea in a patient who cannot stand and is vomiting.
+
+Checks: `perfect_agent.py` ok; `test_case_guards.py -k SAH-RS12` passed; no criterion answer changed (snapshot diff); every mapped order is answered without the library (`verify.py`).

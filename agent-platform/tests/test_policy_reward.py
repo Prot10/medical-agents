@@ -9,10 +9,12 @@ from neuroagent_schemas import (
     ActionProposed,
     AssessmentSubmitted,
     ClinicalEpisode,
+    DiagnosisCriterion,
     NeuroBenchCase,
     ObservationReceived,
     PolicyReviewStatus,
     RunCompleted,
+    SequenceConstraint,
     SubmitAssessment,
     ToolAction,
 )
@@ -22,11 +24,26 @@ CASE_PATH = ROOT / "data/neurobench/cases/FEPI-TEMP-M01.json"
 
 
 def approved_case() -> NeuroBenchCase:
+    """The fixture case with the policy shape these tests rely on, whatever the case file holds.
+
+    Reviews change the case's tiers, stop rule and constraints; the tests below need no extra
+    action allowance and one constraint between two required criteria.
+    """
     case = NeuroBenchCase.model_validate_json(CASE_PATH.read_text())
+    policy = case.ground_truth
+    first, second = [c.criterion_id for c in policy.action_criteria if c.importance.value == "required"][:2]
     return case.model_copy(
         update={
-            "ground_truth": case.ground_truth.model_copy(
-                update={"review_status": PolicyReviewStatus.APPROVED}
+            "ground_truth": policy.model_copy(
+                update={
+                    "review_status": PolicyReviewStatus.APPROVED,
+                    "stop_rule": policy.stop_rule.model_copy(update={"max_additional_actions": 0}),
+                    "sequence_constraints": [
+                        SequenceConstraint(
+                            before_criterion_id=first, after_criterion_id=second, reason="test fixture"
+                        )
+                    ],
+                }
             )
         }
     )
@@ -138,12 +155,69 @@ def test_hard_sequence_violation_caps_at_half():
     assert "hard_sequence_violation" in reversed_.caps_applied
 
 
-def test_diagnosis_matches_synonyms_and_icd_codes():
+def test_diagnosis_matches_synonyms_never_the_code_alone():
     diagnosis = approved_case().ground_truth.diagnosis  # FEPI-TEMP-M01: G40.209 + synonyms
     assert diagnosis.matches("Focal impaired awareness seizures, likely temporal lobe epilepsy")
     assert diagnosis.matches("Mesial temporal lobe epilepsy")
-    assert diagnosis.matches("Seizure disorder", "g40.209")
-    assert diagnosis.matches("Seizure disorder", "G40-209")
+    assert not diagnosis.matches("Seizure disorder")
     assert not diagnosis.matches("Psychogenic non-epileptic seizures")
-    assert not diagnosis.matches("Migraine with aura", "G43.109")
     assert not diagnosis.matches("Temporal")
+    assert diagnosis.code_matches("g40.209") and diagnosis.code_matches("G40-209")
+    assert diagnosis.code_matches("G40.2")  # the WHO subcategory of G40.209
+    assert not diagnosis.code_matches("G43.109") and not diagnosis.code_matches(None)
+
+
+def test_diagnosis_drops_denied_clauses():
+    sah = DiagnosisCriterion(accepted=["aneurysmal subarachnoid hemorrhage", "aneurysmal SAH"])
+    assert sah.matches("Aneurysmal SAH, Hunt-Hess 3")
+    assert not sah.matches("Non-aneurysmal SAH")
+    assert not sah.matches("Non aneurysmal subarachnoid hemorrhage")
+    assert not sah.matches("Perimesencephalic SAH, not aneurysmal")
+    ms = DiagnosisCriterion(accepted=["multiple sclerosis", "MS"])
+    assert not ms.matches("MOGAD rather than MS")
+    assert not ms.matches("Multiple sclerosis excluded; MOG antibody disease")
+    assert not ms.matches("Not multiple sclerosis")
+    assert ms.matches("Relapsing-remitting MS; NMOSD unlikely")
+    als = DiagnosisCriterion(accepted=["amyotrophic lateral sclerosis", "ALS"])
+    assert not als.matches("Thyrotoxicosis, ALS criteria not met")
+    assert not als.matches("Cervical myelopathy mimicking ALS")
+    assert not als.matches("Cervical myelopathy, previously misdiagnosed as ALS")
+    assert DiagnosisCriterion(accepted=["ALS"], rejected=["bell palsy"]).matches("ALS, initially diagnosed as Bell palsy")
+
+
+def test_rejected_labels_and_mixed_components():
+    pd = DiagnosisCriterion(accepted=["parkinson disease", "PD"], rejected=["PD dementia", "parkinson disease dementia"])
+    assert pd.matches("Idiopathic PD")
+    assert not pd.matches("PD dementia")
+    assert pd.matches("PD, no dementia")
+    assert pd.matches("PD without dementia")
+    lgi1 = DiagnosisCriterion(accepted=["autoimmune encephalitis"], rejected=["LGI1 encephalitis"])
+    assert lgi1.matches("Seronegative autoimmune encephalitis, LGI1-negative")
+    assert DiagnosisCriterion(accepted=["myasthenia gravis"]).matches("AChR-negative myasthenia gravis")
+    aura = DiagnosisCriterion(accepted=["migraine with aura"])
+    assert not aura.matches("Migraine without aura")
+    als = DiagnosisCriterion(accepted=["ALS"], rejected=["multiple sclerosis", "MS"])
+    assert not als.matches("ALS or MS")
+    assert als.matches("ALS rather than MS")
+    mixed = DiagnosisCriterion(
+        accepted=["hepatic encephalopathy"], required_components=[["wernicke encephalopathy", "wernicke"]]
+    )
+    assert mixed.matches("Wernicke encephalopathy with concurrent hepatic encephalopathy")
+    assert not mixed.matches("Hepatic encephalopathy")
+    assert not mixed.matches("Hepatic encephalopathy; Wernicke unlikely")
+
+
+def test_icd_code_is_reported_without_weight():
+    case = approved_case()
+    required = [criterion_action(c) for c in by_importance(case, "required")]
+    scorer = ClinicalPolicyReward()
+    right = make_episode(case, required)
+    code = case.ground_truth.diagnosis.icd_codes[0]
+    for event in right.events:
+        if isinstance(event, AssessmentSubmitted):
+            event.assessment.icd10_code = code
+    coded, uncoded = scorer.score(right, case), scorer.score(make_episode(case, required), case)
+    assert coded.icd_code == 1 and uncoded.icd_code == 0
+    assert coded.scalar == uncoded.scalar
+    wrong_label = scorer.score(make_episode(case, required, diagnosis="Seizure disorder"), case)
+    assert wrong_label.diagnosis == 0

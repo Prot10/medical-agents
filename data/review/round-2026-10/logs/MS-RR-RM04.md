@@ -1,0 +1,104 @@
+# MS-RR-RM04
+Reviewer status: R1 not reviewed, R2 not reviewed (no MS-RR notes file this round) | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| (none) | - | No reviewer notes for this case. |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| A | major | `ground_truth.action_criteria[action-4]` | Drug check required non-schema keys `proposed_class`, `screen_for` (no agent call can match). | FIXED: `required_arguments {}`, optional, placed after the diagnostic core (plan A5). |
+| A | major | `ground_truth.action_criteria[action-6]` | Labs required nine analytes (`CMP` does not satisfy `calcium`/`glucose`). | FIXED: `{panels: [CBC, vitamin_B12, TSH, HIV]}`, canonical label, case rationale (plan A7). |
+| A | minor | `ground_truth.action_criteria[action-5]` | CSF required all three of OCB, IgG index and kFLC. | FIXED: two alternatives (OCB or kFLC), canonical label, optional (5 regions; plan A6, 3.2). |
+| C | major | `ground_truth.action_criteria[action-3]`, `stop_rule` | Literature search required and in the stop rule (ruling 5); its query named McDonald 2017. | FIXED: optional, `{}`, empty expected_evidence, last; removed from stop rule. |
+| A | minor | `ground_truth.action_criteria[*].label/rationale/citations` | Label equal to rationale; free-text citation strings ("MAGNIMS-CMSC-NAIMS 2024/2025", "Reich 2018 NEJM review"). | FIXED: canonical labels, one case-specific rationale each, bracketed keys only (`[McDonald_2024]`, `[Wattjes_2021]`, `[Petzold_2017]`, `[Wingerchuk_2015]`, `[Banwell_2023_MOGAD]`, `[NICE_NG220]`). |
+| C | major | `ground_truth.action_criteria` | No AQP4/MOG criterion although a must required the test (class B); no stored result. | FIXED: new `action-aqp4-mog-cba` (recommended: myelitis plus previous optic neuritis, no red flag); two negative CBA rows in `initial_tool_outputs.labs.panels.Neuroimmunology`; the must deleted. |
+| B | major | `ground_truth.key_clinical_evidence`, `required_recommendations[7]` | KCE and a must relied on OCT RNFL/GCL thinning and a prolonged VEP that no study served (a VEP order returned the library's normal VEP, contradicting the right RAPD and pallor). | FIXED: OCT follow-up (right pRNFL 74 um, GCIPL 64 um; left 97/81; inter-eye 23/17 um) and VEP follow-up (right P100 128 ms, left 104 ms), each with an optional criterion (`action-oct`, `action-vep`). |
+| C | major | `initial_tool_outputs.labs.panels["Thyroid and Metabolic"]` PTH, `red_herrings[0]`, HPI, PMH | Calcium 10.7 with PTH 28 pg/mL (mid-normal) was called "PTH-independent": an unsuppressed PTH in hypercalcaemia is PTH-dependent, so the sarcoid distractor was physiologically wrong. | FIXED: PTH 12 pg/mL (below 15-65, flagged); HPI and PMH now say the earlier PTH was "not elevated"; red herring data point and interpretation updated. |
+| B | minor | `initial_tool_outputs.labs` | Differential cited normal ESR/CRP and the red herring "normal complement", none stored. | FIXED: ESR 11 mm/h and CRP 0.2 mg/dL added (Inflammatory markers panel); "normal complement" removed. |
+| D | minor | `initial_tool_outputs.labs.interpretation` | Interpretation carried a reasoning label ("PTH-independent hypercalcemia pattern", "low-titer borderline"). | FIXED: plain recital of abnormal values, AQP4/MOG result, "all other results within reference ranges". |
+| C | minor | `initial_tool_outputs.csf.special_tests` | Myelin basic protein (obsolete, F6); no kFLC index. | FIXED: MBP deleted; `kappa_free_light_chain_index` 18.4 (reference <6.1) added. |
+| D | minor | `initial_tool_outputs.csf.interpretation` | Interpretation was a recital of every value. | FIXED: pattern statement (lymphocytic pleocytosis, CSF-restricted OCB, raised IgG and kFLC index: intrathecal synthesis; ACE normal, cytology and culture negative). |
+| B | minor | `initial_tool_outputs.mri.additional_observations` | "One active enhancing lesion ... non-T1 black hole" contradicted the finding's T1 hypointensity; "consistent with chronic demyelinating injury" was interpretive. | FIXED: "One enhancing lesion in the left corona radiata (nodular enhancement); all other lesions are non-enhancing"; "Two periventricular lesions are mildly T1 hypointense". Impression kept. |
+| B | minor | `followup_outputs[0].output.findings[0..1]` (spine) | Lesion rows had empty descriptions; enhancement status only in the impression. | FIXED: position, cross-section and enhancement in each row. |
+| D | major | `followup_outputs` literature | Literature output had unverifiable titles and an invented prevalence ("11%"), a late-onset MS section unrelated to a 46-year-old whose first attack was at 42, and a DMT sentence. | FIXED: general evidence from three verifiable sources (Montalban 2025 Lancet Neurol, Kim 2012 Arch Neurol on painful tonic spasms in NMO, Wingerchuk 2015); last in the pathway. |
+| D | minor | `followup_outputs` drug check | Output argued the DMT choice ("preferred if JCV Ab positive"), duplicated the amlodipine line, omitted the penicillin allergy. | FIXED: each medicine and allergy against natalizumab, contraindications and warnings (anti-JCV index, LFTs, live vaccines), alternatives without choice argument. |
+| D | minor | `patient.history_present_illness` | "In retrospect, both episodes likely represented right-sided optic neuritis" gave the interpretation of the prior attacks. | FIXED: sentence deleted. |
+| C | major | `ground_truth.differential` | Neurosarcoidosis "high", NMOSD and MOGAD "moderate" after negative CBA, normal ACE and typical lesions (ruling 7); no B12 entry in a myelopathy; seizures (raised by the red herring) absent. | FIXED: all low with the case's discriminating results; B12 deficiency and focal motor seizures added (low); lupus ICD set to M32.19. |
+| E | major | `ground_truth.key_clinical_evidence` | Two engineering lines ("Tier per the July 2026...", "July 2026 review applied..."), a framework line, "pathognomonic" tonic spasms, management ("respond to carbamazepine"), generic late-onset and CBA-method lines. | FIXED: rebuilt to seven observable lines (syndrome, DIS 5 of 5, no DIT needed, prior attacks, NMOSD/MOGAD exclusion, distractors, tonic spasms "characteristic"). |
+| C | major | `ground_truth.assessment.required_recommendations` | Musts were diagnostic tests (ACE, CBA) or interpretation (DIS, DIT); relapse must without infection exclusion; no bladder must despite near-incontinence. | FIXED: formulation must (5 regions), relapse (IVMP or oral MP after urine dipstick/culture; PLEX if refractory), bladder (PVR, antimuscarinic/mirabegron or ISC), tonic spasms (carbamazepine with sodium and BP check: CYP3A4 induction of amlodipine), DMT by activity with contraception, pre-DMT screening. |
+| C | minor | `ground_truth.assessment.prohibited_recommendations` | Natalizumab and fingolimod prohibitions without a case basis (no anti-JCV result, no cardiac issue); EEG prohibition phrased as a test. | FIXED: kept non-specific-lesion, seizure-labelling, hypercalcaemia and chronic-steroid prohibitions; added "no vitamin D supplementation while PTH-independent hypercalcaemia is unexplained". |
+| A | minor | `ground_truth.sequence_constraints`, `stop_rule` | Constraint cited McDonald 2017; `max_additional_actions 0`; stop rule listed literature and drug check. | FIXED: soft MRI-before-CSF with canonical reason; stop rule = brain MRI, spine MRI, labs; max 2. |
+| C | minor | `ground_truth.avoided_actions[*]` | Rationales generic, citations McDonald 2017/Reich 2018. | FIXED: one case-tied sentence each; `[Wattjes_2021]` for CT and PET, none for EEG, echo, monitoring. |
+| E | minor | `fallback_tool_outputs.echo` | `echo_type` missing (discriminator). | FIXED: `TTE`. |
+| B | minor | `ground_truth.red_herrings[1..2]` | Interpretation cited complement (not stored) and a treatment. | FIXED: reworded to stored data only. |
+| E | minor | `metadata.difficulty_rationale` | Listed six required tools including literature and drug check. | FIXED: three required actions plus recommended CBA. |
+| B | minor | `metadata.real_seed` vs `real_seed_note`, `source_pmid` | One says PMID 41497910 "could not be independently verified and was removed", the others give it as verified. | FLAGGED (provenance, no clinical effect; not changed). |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+
+The pathway now reads brain MRI, cervical and thoracic cord MRI, mimic-exclusion labs (required), AQP4/MOG cell-based assays (recommended), then CSF, VEP and OCT (optional), the natalizumab safety check and a background literature search (optional, last). The case data were made coherent: the hypercalcaemia distractor now has a suppressed PTH (12 pg/mL), so "PTH-independent" is true; ESR, CRP and negative AQP4/MOG CBA rows were added to the labs; the CSF lost myelin basic protein and gained a kFLC index of 18.4 with four restricted bands; the OCT (right pRNFL 74 um, GCIPL 64 um) and VEP (right P100 128 ms) that the old evidence relied on now exist. Dissemination in space is in all five regions (periventricular, juxtacortical, right medulla, C4-C5 and T4-T5 cord, right optic nerve), so no separate DIT or CSF is needed, with two prior right optic neuritis episodes mislabelled as migraine. The differential now gives neurosarcoidosis, NMOSD, MOGAD, lupus, small-vessel disease, B12 deficiency and focal seizures all low with the results that exclude them. Musts: diagnosis by the 2024 criteria, methylprednisolone after excluding urinary infection, bladder assessment, carbamazepine for the tonic spasms (watching sodium and the amlodipine interaction), high-efficacy DMT by activity with contraception discussion, and pre-DMT screening; prohibitions add not starting vitamin D while the hypercalcaemia is unexplained.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+
+- Citation keys `[McDonald_2024]`, `[Wattjes_2021]`, `[NICE_NG220]` to the MS-RR criteria pack (plan section 5.1).
+- Diagnosis synonyms: G35.B/G35.C and "demyelinating disease" in the accepted list (plan Q, 5.2).
+- Add MS-RR to `DISCRIMINATOR_CONDITIONS` once the batch lands (this case passes the guard).
+
+## Open questions for Andrea (judgment calls you could not settle)
+
+- Deviation from the plan's tier table: the table lists no VEP for RM04. A VEP order returned the library's normal VEP, which contradicts the right RAPD, pallor and OCT, and the old must already cited a prolonged P100, so I added a VEP follow-up and an optional `action-vep`.
+- PTH value changed from 28 to 12 pg/mL so that the distractor is physiologically correct (an unsuppressed PTH would point to hyperparathyroidism, not granulomatous disease). Decided; noted for the re-reviewer.
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. Read the log, the diff against the pre-round version (`b8be2153^`) and the whole final case. Checked: every own finding marked FIXED against the file (PTH 12 pg/mL flagged low in labs, HPI/PMH "not elevated", red herring field path `labs.panels.CMP[7]` = calcium; ESR/CRP and CBA rows present; MBP gone, kFLC 18.4; OCT and VEP follow-ups with both eyes and inter-eye differences above the F1 thresholds, consistent with the right RAPD, red desaturation and temporal pallor; no cord findings in the brain MRI; literature sources verifiable, no DIT/2017 framing). Cross-field: laterality (right eye, right-sided spasms with a left corona radiata enhancing lesion, right leg signs), allergy (penicillin, no penicillin mandated), amlodipine/carbamazepine CYP3A4 point correct, musts do not contradict prohibitions or avoided actions (EEG avoided and seizure labelling prohibited, consistent), differential all low with the case's own results, stop rule = required criteria only, max 2, tier table (AQP4/MOG recommended, CSF/OCT optional) respected; the extra optional VEP is justified. Fallback `monitor_type: holter_24h` is in the vocabulary.
+Found: nothing requiring a change. The worker's open questions (VEP added beyond the tier table; PTH 28 -> 12) are sound decisions, not questions for Andrea.
+Changed: nothing. `perfect_agent.py MS-RR-RM04 -v` passes (the AQP4/MOG-shares-the-lab-report warning is by design, plan A8); `case_io.py check` clean for the case; `test_case_guards -k MS-RR-RM04` passes.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026 (uniformity scripts over all 30 MS-RR cases; edits through `case_io`; perfect agent, `case_io check` and the case guards clean afterwards).
+
+- `ground_truth.differential[0].icd_code` D86.85 -> D86.89: D86.85 is sarcoid myocarditis; neurosarcoidosis is D86.89, as in the other 11 MS-RR cases.
+- `action-3-search-medical-literature.label` "Literature search (background only)" -> "Literature search on painful tonic spasms in MS and NMOSD": engineering text replaced by the topic of the stored output.
+- `assessment.prohibited_recommendations[4]` chronic-steroid prohibition set to the condition's canonical text (was "Do not use chronic oral corticosteroids as maintenance treatment for MS").
+- `initial_tool_outputs.mri.recommended_actions` emptied: "Spinal cord MRI recommended to complete demyelinating disease evaluation" pointed the agent at a required order.
+- `initial_tool_outputs.labs`: the AQP4-IgG and MOG-IgG rows moved to a new `followup_outputs` entry (`interpret_labs`, trigger `request_aqp4_mog_cell_based_assay`, panel `Neuroimmunology`, placed after the imaging follow-ups). Served in the initial labs payload, they answered the mimic-exclusion panel order as well, so an agent learned the result of `action-aqp4-mog-cba` without ordering it (perfect-agent warning "answered with the same stored report"); the MockServer now serves them only to an order that names the assays (checked for all three alternatives and both orders). Initial labs interpretation edited to drop the antibody results: removed "AQP4-IgG and MOG-IgG negative by cell-based assay.".
+- `assessment.required_recommendations[5]` pre-DMT screening: HIV noted as already negative (the required mimic panel reports it) instead of ordered again.
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (`plans/MS-RR-decisions.md`). What changed and why:
+
+- Diagnosis synonyms (`diagnosis_synonyms.yaml` G35 entry, re-applied with `apply_diagnosis_synonyms.py --prune --conditions multiple_sclerosis`): removed the label "demyelinating disease" (G37.9 is an Excludes1 of G35.A, and its tokens occur in an NMOSD, MOGAD or ADEM answer, which would have scored as correct) and the codes G35.B and G35.C (primary and secondary progressive MS in FY2026 ICD-10-CM, a different course from this relapsing-remitting case). Accepted now: the label, multiple sclerosis, MS, relapsing(-)remitting multiple sclerosis, RRMS; codes G35.A, G35, G35.D.
+- Checks: `perfect_agent.py` pass, `case_io.py check` clean for the case, `test_case_guards.py -k MS-RR-` passes with MS-RR now in `DISCRIMINATOR_CONDITIONS`.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Lab evidence (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited results its own order (the first alternative) no longer returned; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-6-interpret-labs]`.alternatives: was [CBC, vitamin_B12, TSH, HIV]; now [CBC, vitamin_B12, TSH, HIV, CMP] | [CBC, vitamin_B12, TSH, HIV].
+- Decision: serve: new first alternative (old order kept as an alternative). The rationale documents the calcium with PTH and ACE for sarcoidosis; the key evidence and the neurosarcoidosis differential rely on calcium 10.7.
+- Scoring: coverage unchanged (any call matching the old order still matches); the cost reference of the required work-up now uses the new first order.
+
+Checks: `perfect_agent.py` ok (the order returns every result its evidence cites); `case_io.py check` clean for this case.
+
+## Library contradictions (25 Oct 2026)
+
+- `order_specialized_test {test_type: ssep}`: 1. Prolonged right tibial cortical P37 latency (46.9 ms) with a normal lumbar N22, indicating central somatosensory conduction delay above the lumbar cord. 2. Normal left tibial and bilateral median responses. (fallback_tool_outputs.specialized_test). Why: rule c: reduced vibration and joint position sense at the right great toe with dorsolateral C4-C5 and dorsal T4-T5 cord lesions; the library reports a normal study.
+- `order_specialized_test {test_type: visual_field_perimetry}`: 1. Mild paracentral depression in the right eye (MD -2.9 dB). 2. Normal left visual field. (followup_outputs[request_visual_field_perimetry]). Why: rule c: right acuity 20/30 with a right RAPD and temporal pallor; stored VEP and OCT show a right optic neuropathy; the library reports a normal study.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: Abnormal timed gait and balance assessment. Timed Up and Go 12.5 s and 10 m walk speed 1.03 m/s are slowed for age; Berg balance 49/56. (fallback_tool_outputs.clinical_assessment). Why: rule d: the examination documents a gait disorder (spastic gait with right leg circumduction; heel-walking impaired on the right); the library reports a normal study.
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 80, ECOG 1: restricted in physically strenuous activity, ambulatory and able to carry out light work. (followup_outputs[request_performance_status]). Why: rule d: inpatient relapse with a documented gait disorder: Karnofsky 100 / ECOG 0 'without evidence of disease' contradicts the case; the library reports a normal study.
+
+Checks: perfect agent ok; case guards pass; snapshot diff shows no criterion answer changed; map verified (served without the library).

@@ -1,0 +1,105 @@
+# ALZ-EARLY-RP05
+Reviewer status: R1 not reviewed, R2 not reviewed (no entry in notes/ALZ-EARLY.md) | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| (none) | - | No reviewer note names this case. Condition classes C2, C3, C5, C7.2, C7.3, C8, C10, C11, C12, C13, C16 of plans/ALZ-EARLY.md applied (see below). |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| A/B | major | action-9-order-advanced-imaging; initial_tool_outputs.csf | Amyloid PET was the "single optional route"; a CSF order would have returned the library's normal CSF (C2). | FIXED: CSF and amyloid PET alternatives with the canonical label, rationale and expected evidence; concordant CSF authored (Abeta42 521, Abeta40 12400, ratio 0.042 low, p-tau181 81 high, t-tau 560 high; CSF glucose 79 with serum 128). |
+| A | major | fallback_tool_outputs.advanced_imaging; .drug_interactions; .literature_search; metadata.fallback_tool_kinds | An MR spectroscopy report answered every advanced-imaging modality; the drug-check fallback had "(agent not specified on this case's pathway)" engineering text; generic literature fallback (C2.3, 3.2, C8). | FIXED: all three null; kinds entries removed. The DaTscan stays as its own follow-up. |
+| A | major | action-11-search-medical-literature; followup_outputs (literature) | Recommended literature criterion and follow-up (C8). | FIXED: deleted. |
+| C | major | initial_tool_outputs.labs; new action-12-interpret-labs-mma; followup_outputs | B12 248 pg/mL on 9 years of metformin with reduced ankle vibration, without MMA (C7.2). | FIXED: recommended MMA criterion after the labs criterion. The follow-up gives MMA 0.52 umol/L, raised: a mild functional deficiency, which fits the long metformin use. Homocysteine 13.4, still normal (it was 10.2, a value copied across cases). Replacement must added (C7.3). |
+| B | minor | initial_tool_outputs.labs.interpretation | "B12 ... at the low end of the normal range" was an interpretive phrase. | FIXED: plain recital of the abnormal values. |
+| B/C | major | initial_tool_outputs.clinical_assessment | Template impression with "the pattern of Alzheimer pathology" and engineering sentences; findings copied from the HPI; no record of the fluctuation, parkinsonian or autonomic signs that the DLB question needs (C3). | FIXED: MMSE and MoCA breakdowns, the observed pauses, motor signs, orthostatic BP (no drop), informant and IADL findings; impression per the skeleton, mild dementia. |
+| B | minor | patient.neurological_exam.mental_status; .motor; .cranial_nerves | The MMSE breakdown summed to 8 without the three-step command that the exam said he failed; digit span forward 5 was called "low normal" although the battery flags it; "Tone normal throughout" alongside cogwheel rigidity; "No anosmia formally tested". | FIXED: breakdown includes the three-stage command (orientation 2, serial sevens 2, recall 2, command 1, copy 1); MoCA breakdown adds to 12 points lost; rigidity is described as appearing only on activation; smell "not formally tested". |
+| B | minor | initial_tool_outputs.eeg; fallback_tool_outputs.eeg | The ambulatory EEG was classified "abnormal" with "mild diffuse slowing" that no finding reported; hyperventilation and photic results were given for an ambulatory recording; the fallback's PDR was 8.5 Hz against 8 Hz. | FIXED: classified normal, captured events described, ECG channel sinus rhythm, activation "not performed (ambulatory)", 48-hour duration; fallback PDR 8 Hz. |
+| B | minor | initial_tool_outputs.mri.additional_observations | Post-gadolinium and leptomeningeal statements with contrast false (C5). | FIXED: removed. |
+| B | minor | followup_outputs[amyloid PET] | No tracer or protocol was stated, and the report called the amyloid distribution "amnestic-predominant", although amyloid PET does not track the clinical phenotype. | FIXED: tracer and timing; binary visual read; SUVr and an approximate Centiloid. |
+| E | minor | all criteria | Rationale equal to label; duplicated citations (C13). | FIXED: case-specific rationales; DaTscan cited to `[DLB_2017]`; EEG to `[NICE_NG217]`. |
+| A | minor | sequence_constraints; stop_rule | None; max 0 (C16). | FIXED: soft MRI before biomarker, clinical assessment before biomarker; max 1. |
+| C | major | assessment.required_recommendations | Musts restated the DaTscan, labs, MRI and neuropsych steps; "this case's optional amyloid PET route" was engineering text; there was no treatment, no B12 plan, no plan for the spells and no vascular targets (C12). | FIXED: DLB core-feature follow-up with the informant, AChEI (pulse 71), B12 replacement, vascular targets for an older adult with dementia (HbA1c below about 8.0%, BP below 140/90), the spells plan after the EEG, the canonical biomarker must, safety (hearing aids included), disclosure and advance planning. |
+| C | minor | assessment.prohibited_recommendations | A generic anticholinergic item (he takes none); two overlapping DLB items. | FIXED: one DLB-from-soft-features item, an antipsychotic item with the reason, no antiseizure drug after a negative capture, and memantine at the mild stage. |
+| C | major | ground_truth.differential | DLB was `high` after a normal DaTscan, a storage-type profile and positive amyloid; epilepsy (the reason for the EEG) and B12 deficiency were missing; FTD cited "CSF biomarkers" the pathway did not require (C11). | FIXED: DLB low, with the excluding data and the caveat about Lewy co-pathology; focal epilepsy and metformin-associated B12 deficiency added, both low; the other entries were updated. |
+| D/C | major | ground_truth.key_clinical_evidence | Six items. Two were false: "a single, isolated" misperception (the case records two), and "must not be duplicated with CSF". | FIXED: four case-true items (DaTscan pearl, AD signature, seizures in AD and the EEG capture, B12 with MMA). |
+| C | minor | ground_truth.red_herrings | Same "single misperception" error; the B12 item did not reflect the MMA. | FIXED: data points and interpretations updated; field paths unchanged. |
+| C | minor | avoided_actions | ECG and cardiac-monitoring rationales did not address the spells or the dizziness in the social history; CT rationale said MRI "has already been obtained". | FIXED: rationales now cite the sinus rhythm through the captured spells and the absent orthostatic drop; CT rationale reworded. |
+| - | check | 3.6 check | perfect_agent -v ok (neuropsych and MMA from follow-ups; assessment, labs and MRI initial). Probe: CSF -> initial csf; amyloid PET and DaTscan -> their follow-ups; ambulatory EEG -> initial eeg; none from the library. FDG-PET and MR spectroscopy -> library defaults. | OK |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+Mild Alzheimer dementia in a 72-year-old man with staring spells and soft Lewy-type features (label and G30.1 unchanged). DLB is now `low` in the differential, because the DaTscan is normal, memory storage leads the profile and the hippocampi are atrophic. Focal epilepsy and metformin-associated B12 deficiency were added at low. Amyloid status can now be shown by CSF or amyloid PET, with a concordant CSF report authored. A recommended methylmalonic acid step was added for B12 248 pg/mL on metformin: the result is raised, and a B12 replacement must follows. The ambulatory EEG now reads normal, with the habitual spells captured and sinus rhythm on its ECG channel. The clinical assessment records the pauses, the activated rigidity and a lying and standing blood pressure. The exam's MMSE breakdown now adds up. The literature step and the MR spectroscopy, drug-check and literature fallbacks were removed. The musts now cover treatment, B12, vascular targets suited to dementia, the plan for the spells, follow-up of the DLB core features, safety and advance planning. The prohibitions now bar a DLB diagnosis from soft features, an antipsychotic, an antiseizure drug and memantine at the mild stage.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+- Citation keys: `[DLB_2017]` = McKeith IG et al., Diagnosis and management of dementia with Lewy bodies: fourth consensus report of the DLB Consortium, Neurology 2017;89:88-100 (new). `[ADA_older_adults_2024]` = ADA Standards of Care in Diabetes 2024, section 13 Older Adults, Diabetes Care 2024;47(Suppl 1):S244-S257 (also requested for RP04). `[BSH_B12_2014]` and `[NICE_NG97]` are from plan section 5.2.
+- Synonyms: this amnestic late-onset case accepts "posterior cortical atrophy", "benson syndrome" and "early onset alzheimer" through the G30.0 code (plan section 5.1).
+- Library (plan Q4): FDG-PET ordered here returns the library's normal study. The MR spectroscopy avoided action is now answered by the library default instead of the case fallback; that default should be checked as normal and non-contributory.
+
+## Open questions for Andrea (judgment calls you could not settle)
+- MMA result: I made it raised (0.52 umol/L) with a normal homocysteine, because of 9 years of metformin and the ankle vibration loss. RP04, in a similar situation, got a normal MMA. If you prefer a normal MMA here, the B12 replacement must, the B12 differential entry, the fourth key evidence item and the third red herring would change with it.
+
+## Verification
+Adversarial check, 24 Oct 2026. Read the log, the full diff and the whole final case. No reviewer note names this case.
+- Checked: MMSE breakdown sums to 22 (orientation 2, serial sevens 2, recall 2, command 1, copy 1) and MoCA breakdown to 18 (recall 5, naming 1, clock 1, abstraction 2, serial sevens 1, orientation 2); clinical assessment fields agree; ambulatory EEG is internally consistent (normal, events captured, activation not performed, ECG channel sinus) and the avoided ECG and cardiac-monitoring rationales rely on it correctly; amyloid PET and CSF alternatives both case-authored and concordant (521/12400 = 0.042; glucose 79/128 = 0.62); DaTscan kept as its own follow-up with fallback advanced_imaging null; MMA raised with normal homocysteine is plausible (MMA is the more sensitive marker) and is carried through the must, differential, key evidence and red herring; DLB low after a normal DaTscan with the Lewy co-pathology caveat; ADA targets for complex/intermediate health (HbA1c below 8.0%, BP below 140/90) correct; antipsychotic prohibition reasoned.
+- Open question in the log (raised versus normal MMA): this is a judgment the worker already made on clinical grounds and needs no information only Andrea has; per ROUND_POLICY it stands as decided (raised MMA), not as an open question.
+- Found nothing to change. perfect_agent.py -v and case_io.py check clean.
+
+
+## Condition audit (24 Oct 2026)
+Cross-case consistency pass by the ALZ-EARLY condition auditor, through case_io. Changed:
+- lab panel key `Reviewed_cognitive_panel_additions` renamed `Magnesium_homocysteine_ESR_CRP` (the key exposed a review-round artefact to the agent; contents and order unchanged).
+- 'the reviewed cognitive laboratory panel' reworded 'the cognitive laboratory panel' (the labs criterion label), the wording the other six cases already use.
+- `BMP` completed to `CMP` with normal liver tests (total protein 6.7, albumin 3.8, AST 24, ALT 27, ALP 88, bilirubin 0.9): the labs criterion orders a CMP, so the authored report has to carry the hepatic part; no field_path points into the panel.
+- 'lasting power of attorney' (UK instrument) changed to 'durable power of attorney' in this US-setting case (1 place).
+- citation key [ADA_older_adults_2024] harmonised to [ADA_older_adults_2025] as in M05 (1 place); the text (HbA1c target below about 8.0% avoiding hypoglycaemia) matches the 2025 Older Adults section.
+After the change: perfect_agent.py and case_io.py check clean on all 30 cases; test_case_guards (ALZ-EARLY) pass.
+- Normal values in `Magnesium_homocysteine_ESR_CRP` varied (ESR 12 to 15, CRP 1.8 to 2.2), all still within the case's reference ranges: the same numbers (magnesium 2.0, homocysteine 10.2, ESR 12, CRP 1.8) had been copied into up to 13 cases, a template artefact raised by the S01 worker; no text cites the changed values.
+- Checks re-run after these additions: perfect_agent.py, case_io.py check and test_case_guards clean.
+
+## Close-out (24 Oct 2026)
+
+- Synonyms re-expanded (`--prune --conditions alzheimers_early`): removed "posterior cortical atrophy" and "benson syndrome"; "early onset alzheimer" and code G30.0 (onset at 65 or later); code G30.8 (atypical presentations only). Added "late onset alzheimer". Now: codes ['G30.1', 'G30.9', 'F00']; labels after accepted[0]: ['alzheimer disease', "alzheimer's disease", 'alzheimers disease', 'alzheimer dementia', 'dementia due to alzheimer', 'late onset alzheimer'].
+- Added follow-up `order_advanced_imaging` FDG_PET (trigger `order_fdg_pet`, no criterion), after the amyloid-status follow-ups: a case-specific Alzheimer-type metabolic report concordant with the MRI and stage. Before, an FDG order returned the library's normal scan, contradicting the case (summary Q4). Probed: FDG and amyloid PET orders each return their own report, in either order.
+- Citation `[ADA_older_adults_2025]` -> `[ADA_older_adults_2026]` (same target, current edition).
+- Checks: `perfect_agent.py -v` pass; `case_io.py check` no failure names this case; case guards pass; synonym `--check` clean. Decisions in `plans/ALZ-EARLY-decisions.md`.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `initial_tool_outputs.eeg`: `eeg_type` set to `ambulatory`, decided by reading the report.
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, named in the report's own text.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Lab evidence, normal results (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited normal results its own order (the first alternative) did not return; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-12-interpret-labs-mma]`.expected_evidence: was "Methylmalonic acid 0.52 umol/L, raised: mild functional B12 deficiency to treat"; now "Methylmalonic acid 0.52 umol/L, raised: mild functional deficiency to treat".
+- Decision: reword evidence (cited result comes from another criterion's order). The criterion is the MMA order: the B12 level comes from the dementia screen order, so the evidence now reads only the MMA result and what it means.
+- Scoring: none (evidence only; the reward does not read it).
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the normal-row probe reports nothing for this criterion.
+
+## Library contradictions (25 Oct 2026)
+
+Orders that reached the benchmark library's normal report although this case contradicts it (diagnosis, history, medications or a stored finding) now get a case-specific report; every other off-pathway order still gets the library normal. No tier, criterion, diagnosis or existing output changed.
+
+- `order_advanced_imaging modality=tau_PET` -> `followup_outputs[order_tau_pet]`: case-specific tau-positive flortaucipir PET with the distribution of the stored FDG-PET pattern.
+- `order_advanced_imaging modality=perfusion_SPECT` -> `followup_outputs[order_perfusion_spect]`: regional hypoperfusion matching the stored FDG-PET hypometabolism.
+- `order_specialized_test test_type=speech_language_evaluation` -> `followup_outputs[order_speech_language_evaluation]`: language findings of the stored neuropsychological battery (naming, fluency) in the speech-language format.
+- `perform_clinical_assessment assessment_type=performance_status` -> `followup_outputs[order_performance_status]`: dementia-stage performance status (Karnofsky 70/ECOG 1; 60/2 in the rapidly progressive case) instead of Karnofsky 100.
+- `perform_clinical_assessment assessment_type=gait_and_balance_timed` -> `followup_outputs[order_gait_and_balance_timed]`: timed gait matching the examined gait abnormality.
+
+Checks: `perfect_agent.py` ok; `test_case_guards.py -k ALZ-EARLY` pass; every order listed in `plans/LIBRARY-group2-map.yaml` for this case is answered without the library; served answers of every other order unchanged against HEAD. Reasons and doubts: `plans/LIBRARY-group2-decisions.md`.

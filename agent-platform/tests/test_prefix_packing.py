@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from types import SimpleNamespace
+
 import pytest
 
 torch = pytest.importorskip("torch")
@@ -116,6 +118,15 @@ def test_wide_heads_get_smaller_flex_tiles():
     assert packing_config(Cfg())["kernel_options"] == {"BLOCK_M": 16, "BLOCK_N": 16, "num_stages": 1}
     Cfg.global_head_dim = 256
     assert packing_config(Cfg())["kernel_options"] == {"BLOCK_M": 32, "BLOCK_N": 32}
+
+    class PerLayer:
+        layer_types = ["sliding_attention", "full_attention"]
+        sliding_window = 512
+        per_layer_attributes = {"head_dim"}
+        num_hidden_layers = 2
+        per_layer_config = [SimpleNamespace(head_dim=256), SimpleNamespace(head_dim=512)]
+
+    assert packing_config(PerLayer())["kernel_options"] == {"BLOCK_M": 16, "BLOCK_N": 16, "num_stages": 1}
 
 
 def test_split_by_budget_keeps_sub_groups_under_the_token_budget():

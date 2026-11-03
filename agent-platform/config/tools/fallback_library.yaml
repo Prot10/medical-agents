@@ -12,6 +12,7 @@ tools:
     by:
       eeg_type:
         routine:
+          eeg_type: routine
           classification: normal
           background:
             overall: normal organisation for age
@@ -26,6 +27,7 @@ tools:
           limitations: Approximately 25 minutes of recording; a normal routine EEG does not exclude epilepsy.
           recommended_actions: []
         sleep_deprived:
+          eeg_type: sleep_deprived
           classification: normal
           background:
             overall: normal organisation for age in wakefulness and sleep
@@ -43,6 +45,7 @@ tools:
           limitations: A normal interictal recording does not exclude epilepsy.
           recommended_actions: []
         ambulatory:
+          eeg_type: ambulatory
           classification: normal
           background:
             overall: normal organisation throughout the recording
@@ -58,6 +61,7 @@ tools:
           limitations: No push-button events captured; sampled behaviour without concurrent video.
           recommended_actions: []
         video:
+          eeg_type: video
           classification: normal
           background:
             overall: normal organisation for age in wakefulness and sleep
@@ -74,6 +78,7 @@ tools:
             does not exclude epilepsy.
           recommended_actions: []
         continuous_icu:
+          eeg_type: continuous_icu
           classification: normal
           background:
             overall: continuous, symmetric and reactive background
@@ -155,8 +160,7 @@ tools:
           - No abnormal enhancement following gadolinium; no leptomeningeal enhancement.
           - No restricted diffusion, no elevated relative cerebral blood volume on perfusion, no susceptibility.
           - No midline shift, hydrocephalus or transtentorial herniation.
-          impression: Normal tumour-protocol MRI of the brain with and without contrast. No mass lesion or abnormal
-            enhancement.
+          impression: Normal tumour-protocol MRI of the brain. No mass lesion.
           recommended_actions: []
   analyze_ecg:
     default:
@@ -189,6 +193,7 @@ tools:
     by:
       echo_type:
         TTE:
+          echo_type: TTE
           chambers:
             LA: normal size
             LV: normal size, wall thickness and systolic function
@@ -207,6 +212,7 @@ tools:
           impression: Normal transthoracic echocardiogram.
           recommended_actions: []
         TEE:
+          echo_type: TEE
           chambers:
             LA: normal size; left atrial appendage free of thrombus with normal emptying velocities
             LV: normal size and systolic function
@@ -227,6 +233,7 @@ tools:
           impression: Normal transoesophageal echocardiogram. No cardioembolic source identified.
           recommended_actions: []
         bubble_study:
+          echo_type: bubble_study
           chambers:
             LA: normal size
             LV: normal size and systolic function
@@ -247,6 +254,7 @@ tools:
             detected.
           recommended_actions: []
         exercise_echo:
+          echo_type: exercise_echo
           chambers:
             LA: normal size
             LV: normal size and resting systolic function
@@ -354,6 +362,21 @@ tools:
           - No ventricular tachycardia episodes. Device sensing and R-wave amplitude satisfactory.
           impression: Normal implantable loop recorder interrogation over 6 months of monitoring.
           recommended_actions: []
+        device_interrogation:
+          duration_hours: 4320
+          monitor_type: device_interrogation
+          rhythm_summary: Stored device diagnostics since the last interrogation 6 months ago show sinus rhythm throughout
+          heart_rate_range:
+            min: 52
+            max: 124
+            average: 70
+          events: []
+          findings:
+          - No atrial high-rate episodes and no mode switches. Atrial fibrillation burden 0%.
+          - No ventricular high-rate or tachycardia episodes stored. Battery, sensing, pacing thresholds and lead
+            impedances within normal limits.
+          impression: Normal device interrogation. No stored atrial or ventricular arrhythmia episodes over 6 months.
+          recommended_actions: []
   order_advanced_imaging:
     by:
       modality:
@@ -380,6 +403,24 @@ tools:
             striatal_binding_ratio: within normal limits for age bilaterally
             putamen_caudate_ratio: normal
           impression: Normal DaTscan. No evidence of presynaptic nigrostriatal dopaminergic deficit.
+          recommended_actions: []
+        whole_body_FDG_PET:
+          modality: whole_body_FDG_PET
+          tracer_or_protocol: F-18 fluorodeoxyglucose PET with low-dose CT, skull base to mid-thigh
+          findings:
+          - region: neck, thorax and mediastinum
+            finding: no hypermetabolic lymph node, lung or mediastinal lesion
+            interpretation: physiological uptake only
+          - region: abdomen and pelvis
+            finding: physiological uptake in the liver, bowel, kidneys and bladder; no focal hypermetabolic lesion
+            interpretation: unremarkable
+          - region: skeleton and bone marrow
+            finding: homogeneous marrow uptake; no focal lesion
+            interpretation: unremarkable
+          quantitative_data:
+            liver_SUVmean: '2.1'
+            mediastinal_blood_pool_SUVmean: '1.6'
+          impression: Normal whole-body FDG-PET/CT. No hypermetabolic lesion to suggest malignancy.
           recommended_actions: []
         FDG_PET:
           modality: FDG_PET
@@ -451,6 +492,22 @@ tools:
             interpretation: normal
           quantitative_data: null
           impression: Normal MR venography. No dural venous sinus or cortical vein thrombosis.
+          recommended_actions: []
+        DTI_tractography:
+          modality: DTI_tractography
+          tracer_or_protocol: diffusion tensor imaging, 64 directions, deterministic tractography
+          findings:
+          - region: corticospinal tracts
+            finding: symmetric course from the motor cortex through the posterior limb of the internal capsule to the
+              brainstem; normal fractional anisotropy
+            interpretation: intact, not displaced or infiltrated
+          - region: arcuate fasciculi and optic radiations
+            finding: symmetric, continuous tracts with normal fractional anisotropy
+            interpretation: intact
+          quantitative_data:
+            fractional_anisotropy_asymmetry: < 5% between hemispheres (normal)
+          impression: Normal diffusion tractography. Corticospinal tracts, arcuate fasciculi and optic radiations
+            intact and symmetric.
           recommended_actions: []
         amino_acid_PET:
           modality: amino_acid_PET
@@ -563,6 +620,21 @@ tools:
             LVEDP: 10 mmHg
           impression: Normal coronary angiogram. No obstructive coronary artery disease.
           recommended_actions: []
+        functional_MRI:
+          modality: functional_MRI
+          tracer_or_protocol: BOLD fMRI, block-design finger tapping, foot movement, verb generation and semantic
+            decision paradigms
+          findings:
+          - region: primary motor cortex
+            finding: hand, foot and face activation in the expected precentral locations bilaterally
+            interpretation: normal somatotopic motor representation
+          - region: language network
+            finding: left-predominant activation of the inferior frontal and posterior superior temporal gyri
+            interpretation: left hemispheric language dominance
+          quantitative_data:
+            language_laterality_index: 0.72 (left dominant)
+          impression: Normal functional MRI. Normal motor somatotopy and left hemispheric language dominance.
+          recommended_actions: []
         perfusion_MRI:
           modality: perfusion_MRI
           tracer_or_protocol: dynamic susceptibility contrast perfusion with arterial spin labelling
@@ -618,6 +690,23 @@ tools:
   order_body_imaging:
     by:
       study:
+        chest_xray:
+          region: chest
+          modality: xray
+          contrast: false
+          findings:
+          - region: lungs
+            finding: clear lung fields without consolidation, mass or nodule
+            interpretation: normal
+          - region: pleura
+            finding: sharp costophrenic angles; no effusion or pneumothorax
+            interpretation: normal
+          - region: heart and mediastinum
+            finding: normal cardiac size (cardiothoracic ratio below 0.5); normal mediastinal contour
+            interpretation: normal
+          measurements: null
+          impression: Normal posteroanterior and lateral chest radiograph.
+          recommended_actions: []
         chest_CT:
           region: chest
           modality: CT
@@ -670,6 +759,20 @@ tools:
             interpretation: normal
           measurements: null
           impression: Normal contrast-enhanced CT of the chest, abdomen and pelvis. No mass or lymphadenopathy.
+          recommended_actions: []
+        lower_extremity_venous_duplex:
+          region: lower_extremities
+          modality: ultrasound
+          contrast: false
+          findings:
+          - region: common femoral, femoral and popliteal veins, bilateral
+            finding: fully compressible with phasic, augmentable Doppler flow; no intraluminal thrombus
+            interpretation: normal
+          - region: calf veins, bilateral
+            finding: posterior tibial and peroneal veins compressible with normal flow
+            interpretation: normal
+          measurements: null
+          impression: No deep vein thrombosis in either leg.
           recommended_actions: []
         mediastinum_CT:
           region: mediastinum
@@ -810,6 +913,21 @@ tools:
           impression: Normal MRI of the spine with and without contrast. No cord signal abnormality, compression
             or enhancement.
           recommended_actions: []
+        temporal_artery_ultrasound:
+          region: temporal arteries
+          modality: ultrasound
+          contrast: false
+          findings:
+          - region: common superficial temporal arteries and frontal and parietal branches, bilateral
+            finding: thin, compressible vessel walls; no halo sign; no stenosis or occlusion on colour Doppler
+            interpretation: normal
+          - region: axillary arteries, bilateral
+            finding: no concentric wall thickening; normal triphasic flow
+            interpretation: normal
+          measurements:
+            intima_media_thickness_temporal: 0.2 mm bilaterally
+          impression: Normal temporal and axillary artery ultrasound. No halo sign, stenosis or occlusion.
+          recommended_actions: []
         testicular_ultrasound:
           region: testicular
           modality: ultrasound
@@ -832,6 +950,22 @@ tools:
   order_specialized_test:
     by:
       test_type:
+        audiometry:
+          test_type: audiometry
+          findings:
+          - ear: right
+            result: pure-tone air- and bone-conduction thresholds 10-20 dB HL from 250 to 8000 Hz; no air-bone gap
+          - ear: left
+            result: pure-tone air- and bone-conduction thresholds 10-20 dB HL from 250 to 8000 Hz; no air-bone gap
+          - parameter: speech audiometry
+            result: speech recognition 100 percent bilaterally at comfortable level
+          - parameter: tympanometry
+            result: type A tympanograms bilaterally
+          quantitative_data:
+            PTA_right: 13 dB HL
+            PTA_left: 15 dB HL
+          impression: Normal hearing bilaterally. No conductive or sensorineural hearing loss.
+          recommended_actions: []
         autonomic_testing:
           test_type: autonomic_testing
           findings:
@@ -1124,6 +1258,26 @@ tools:
           impression: Normal intraepidermal nerve fibre density at distal and proximal sites. No evidence of small
             fibre neuropathy.
           recommended_actions: []
+        speech_language_evaluation:
+          test_type: speech_language_evaluation
+          findings:
+          - domain: motor speech
+            result: normal rate, prosody and articulation; no apraxia of speech; no dysarthria
+          - domain: spontaneous and connected speech
+            result: fluent, grammatically complete; normal word-finding pauses; no phonological or semantic paraphasias
+          - domain: naming
+            result: within normal limits
+          - domain: repetition
+            result: single words and sentences repeated accurately
+          - domain: comprehension
+            result: single-word and syntactically complex sentence comprehension intact
+          - domain: reading and writing
+            result: no surface or phonological dyslexia or dysgraphia
+          quantitative_data:
+            Boston_Naming_Test: 57/60
+            WAB_Aphasia_Quotient: 98.6/100
+          impression: Normal speech and language evaluation. No aphasia and no motor speech disorder.
+          recommended_actions: []
         ssep:
           test_type: ssep
           findings:
@@ -1139,6 +1293,55 @@ tools:
             tibial_P37_latency: 37.4 ms right, 37.8 ms left
           impression: Normal median and tibial somatosensory evoked potentials bilaterally. No evidence of peripheral
             or central somatosensory pathway dysfunction.
+          recommended_actions: []
+        electrophysiology_study:
+          test_type: electrophysiology_study
+          findings:
+          - parameter: baseline intervals
+            result: sinus rhythm, AH 92 ms, HV 44 ms, QRS 94 ms
+          - parameter: sinus node function
+            result: corrected sinus node recovery time 310 ms
+          - parameter: atrioventricular conduction
+            result: anterograde AV Wenckebach cycle length 380 ms; no infra-Hisian block with incremental atrial pacing
+          - parameter: programmed ventricular stimulation
+            result: two right ventricular sites, three drive cycle lengths, up to three extrastimuli; no sustained
+              ventricular arrhythmia induced
+          - parameter: programmed atrial stimulation
+            result: no dual AV nodal physiology, no accessory pathway, no supraventricular tachycardia induced, including
+              with isoprenaline
+          quantitative_data:
+            HV_interval: 44 ms
+            corrected_SNRT: 310 ms
+            AV_Wenckebach_cycle_length: 380 ms
+          impression: Normal electrophysiology study. Normal sinus node function and AV conduction (HV 44 ms); no
+            inducible ventricular or supraventricular arrhythmia.
+          recommended_actions: []
+        sodium_channel_blocker_challenge:
+          test_type: sodium_channel_blocker_challenge
+          findings:
+          - parameter: protocol
+            result: ajmaline 1 mg/kg intravenously over 10 minutes, 12-lead ECG with V1 and V2 also recorded in the second
+              and third intercostal spaces
+          - parameter: baseline ECG
+            result: sinus rhythm, QRS 92 ms, no coved or saddleback ST elevation in the right precordial leads
+          - parameter: during and after infusion
+            result: QRS widened to 104 ms; no coved ST elevation of 2 mm or more in any right precordial lead; no ventricular
+              ectopy
+          quantitative_data:
+            ajmaline_dose: 1 mg/kg
+            QRS_widening: 13%
+          impression: Negative sodium-channel blocker challenge. No type 1 Brugada pattern at the full dose.
+          recommended_actions: []
+        olfactory_test:
+          test_type: olfactory_test
+          findings:
+          - parameter: University of Pennsylvania Smell Identification Test (40 items)
+            result: 35 of 40 odours correctly identified
+          - parameter: comparison with normative data
+            result: above the 10th percentile for age and sex
+          quantitative_data:
+            UPSIT_score: 35/40
+          impression: Normosmia on the UPSIT (35/40).
           recommended_actions: []
         tilt_table:
           test_type: tilt_table
@@ -1328,6 +1531,49 @@ tools:
           impression: No pathological repeat expansion and no pathogenic or likely pathogenic variant identified
             in the genes on the hereditary ataxia panel.
           recommended_actions: []
+        genetic_panel:hemiplegic_migraine:
+          test_type: genetic_panel:hemiplegic_migraine
+          findings:
+          - finding: sequencing and copy-number analysis of CACNA1A, ATP1A2, SCN1A and PRRT2
+            interpretation: no pathogenic or likely pathogenic variant identified in the genes on the hemiplegic migraine
+              panel
+          quantitative_data:
+            genes_analysed: '4'
+          impression: No pathogenic or likely pathogenic variant identified in the genes on the hemiplegic migraine panel.
+          recommended_actions: []
+        genetic_panel:hereditary_paraganglioma:
+          test_type: genetic_panel:hereditary_paraganglioma
+          findings:
+          - finding: sequencing and copy-number analysis of SDHA, SDHB, SDHC, SDHD, SDHAF2, VHL, RET, NF1, TMEM127,
+              MAX and FH
+            interpretation: no pathogenic or likely pathogenic variant identified in the genes on the hereditary
+              paraganglioma-phaeochromocytoma panel
+          quantitative_data: null
+          impression: No pathogenic or likely pathogenic germline variant identified in the genes on the hereditary
+            paraganglioma-phaeochromocytoma panel.
+          recommended_actions: []
+        genetic_panel:inherited_arrhythmia:
+          test_type: genetic_panel:inherited_arrhythmia
+          findings:
+          - finding: sequencing and copy-number analysis of KCNQ1, KCNH2, SCN5A, KCNE1, KCNE2, KCNJ2, CACNA1C, CALM1-3,
+              TRDN, RYR2 and CASQ2
+            interpretation: no pathogenic or likely pathogenic variant identified in the genes on the inherited arrhythmia
+              panel
+          quantitative_data: null
+          impression: No pathogenic or likely pathogenic variant identified in the genes on the inherited arrhythmia
+            panel (long QT, Brugada and catecholaminergic polymorphic ventricular tachycardia genes).
+          recommended_actions: []
+        genetic_panel:cardiomyopathy:
+          test_type: genetic_panel:cardiomyopathy
+          findings:
+          - finding: sequencing and copy-number analysis of PKP2, DSP, DSG2, DSC2, JUP, TMEM43, LMNA, FLNC, MYH7, MYBPC3,
+              TNNT2, TNNI3, TPM1, ACTC1, MYL2, MYL3, PLN, RBM20 and TTN
+            interpretation: no pathogenic or likely pathogenic variant identified in the genes on the inherited cardiomyopathy
+              panel
+          quantitative_data: null
+          impression: No pathogenic or likely pathogenic variant identified in the genes on the inherited cardiomyopathy
+            panel.
+          recommended_actions: []
         genetic_panel:mitochondrial:
           test_type: genetic_panel:mitochondrial
           findings:
@@ -1416,6 +1662,74 @@ tools:
             result: no growth at 5 days incubation
           impression: Blood cultures without growth at 5 days.
           recommended_actions: []
+        brain_aspirate:
+          specimen: brain_aspirate
+          tests:
+          - Gram stain
+          - aerobic bacterial culture
+          - anaerobic bacterial culture
+          collected_before_antimicrobials: true
+          organism: no growth
+          gram_stain: no organisms seen; no neutrophils
+          susceptibility: null
+          cell_counts: null
+          findings:
+          - test: aerobic and anaerobic culture
+            result: no growth at 7 days
+          impression: Brain aspirate Gram stain negative; no growth on aerobic or anaerobic culture.
+          recommended_actions: []
+        tracheal_aspirate:
+          specimen: tracheal_aspirate
+          tests:
+          - Gram stain
+          - semi-quantitative bacterial culture
+          collected_before_antimicrobials: true
+          organism: null
+          gram_stain: few neutrophils; no predominant organism
+          susceptibility: null
+          cell_counts: null
+          findings:
+          - test: specimen quality
+            result: endotracheal aspirate with few squamous epithelial cells, adequate for culture
+          - test: culture
+            result: light growth of normal oropharyngeal flora only; no pathogen at 48 hours
+          impression: Tracheal aspirate Gram stain and culture show no predominant organism and no pathogen.
+          recommended_actions: []
+        sputum:
+          specimen: sputum
+          tests:
+          - Gram stain
+          - bacterial culture
+          collected_before_antimicrobials: true
+          organism: null
+          gram_stain: fewer than 10 squamous epithelial cells per low-power field; mixed oropharyngeal flora, no predominant
+            organism
+          susceptibility: null
+          cell_counts: null
+          findings:
+          - test: specimen quality
+            result: adequate lower respiratory sample
+          - test: culture
+            result: normal oropharyngeal flora only; no pathogen isolated at 48 hours
+          impression: Sputum Gram stain and culture show normal oropharyngeal flora only; no pathogen isolated.
+          recommended_actions: []
+        stool:
+          specimen: stool
+          tests:
+          - Clostridioides difficile glutamate dehydrogenase antigen
+          - Clostridioides difficile toxin B gene PCR
+          collected_before_antimicrobials: null
+          organism: null
+          gram_stain: null
+          susceptibility: null
+          cell_counts: null
+          findings:
+          - test: C. difficile GDH antigen
+            result: negative
+          - test: C. difficile toxin B gene PCR
+            result: not detected
+          impression: Stool negative for Clostridioides difficile antigen and toxin gene.
+          recommended_actions: []
         throat_swab:
           specimen: throat_swab
           tests:
@@ -1478,6 +1792,22 @@ tools:
             result: not detected
           impression: Whole-blood bacterial and viral PCR panel negative; no target nucleic acid detected.
           recommended_actions: []
+        wound_swab:
+          specimen: wound_swab
+          tests:
+          - Gram stain
+          - aerobic bacterial culture
+          collected_before_antimicrobials: true
+          organism: null
+          gram_stain: occasional leucocytes; scanty Gram-positive cocci consistent with skin flora
+          susceptibility: null
+          cell_counts: null
+          findings:
+          - test: culture
+            result: mixed skin flora (coagulase-negative staphylococci) only; no Staphylococcus aureus, beta-haemolytic
+              streptococci or Gram-negative bacilli isolated
+          impression: Wound swab grows mixed skin flora only; no pathogen isolated.
+          recommended_actions: []
   obtain_tissue_diagnosis:
     by:
       procedure:
@@ -1525,6 +1855,29 @@ tools:
           impression: Non-diagnostic brain tissue with no neoplastic, inflammatory, demyelinating or infectious
             pathology identified.
           recommended_actions: []
+        open_biopsy:
+          procedure: open_biopsy
+          site: central nervous system parenchyma at the open biopsy site
+          specimen_adequate: true
+          integrated_diagnosis: No diagnostic histopathological abnormality
+          histological_diagnosis: Grey and white matter of the central nervous system with preserved cytoarchitecture;
+            no diagnostic histopathological abnormality
+          who_grade: null
+          molecular_findings: null
+          diagnosis_suffix: null
+          findings:
+          - finding: specimen
+            interpretation: several open-biopsy fragments, aggregate 6 mm, adequate for assessment; frozen section
+              concordant
+          - finding: haematoxylin-eosin
+            interpretation: no neoplastic cells, necrosis, microvascular proliferation or increased cellularity
+          - finding: immunohistochemistry (GFAP, Ki-67, CD3, CD20, CD68)
+            interpretation: no atypical glial population; Ki-67 < 1%; no inflammatory infiltrate
+          - finding: special stains (Luxol fast blue, PAS, Gram, Ziehl-Neelsen, Grocott)
+            interpretation: normal myelin; no organisms
+          impression: Non-diagnostic neural tissue with no neoplastic, inflammatory, demyelinating or infectious
+            pathology identified.
+          recommended_actions: []
         stereotactic_biopsy:
           procedure: stereotactic_biopsy
           site: frontal white matter, frame-based stereotactic needle biopsy
@@ -1547,18 +1900,50 @@ tools:
           impression: Non-diagnostic brain tissue with no neoplastic, inflammatory, demyelinating or infectious
             pathology identified.
           recommended_actions: []
+        temporal_artery_biopsy:
+          procedure: temporal_artery_biopsy
+          site: left superficial temporal artery, frontal branch, 2.0 cm segment
+          specimen_adequate: true
+          integrated_diagnosis: Temporal artery without diagnostic histopathological abnormality
+          histological_diagnosis: Muscular artery with intact intima, internal elastic lamina and media; no diagnostic
+            histopathological abnormality
+          who_grade: null
+          molecular_findings: null
+          diagnosis_suffix: null
+          findings:
+          - finding: specimen
+            interpretation: 2.0 cm segment examined at multiple levels
+          - finding: haematoxylin-eosin
+            interpretation: no transmural or adventitial inflammatory infiltrate; no granulomas or multinucleated giant
+              cells
+          - finding: elastic stain
+            interpretation: internal elastic lamina continuous; no fragmentation
+          impression: Temporal artery without arteritis.
+          recommended_actions: []
     molecular_assays:
       1p_19q_codeletion: intact (no 1p/19q codeletion by FISH)
       ATRX_IHC: retained nuclear expression
       BRAF_V600: not detected (wild-type)
+      CD20_IHC: no CD20-positive B-cell population; scattered reactive B cells only
       CDKN2A_B_deletion: not detected (CDKN2A/B intact)
+      DNA_methylation_profiling: no match to a tumour methylation class (calibrated score < 0.3); profile
+        clusters with non-neoplastic reference tissue; no copy-number alteration
+      EBER_ISH: negative (no Epstein-Barr virus-encoded RNA)
       EGFR_amplification: not detected
+      H3G34_status: H3 G34R/V not detected
       H3K27_status: H3 K27M not detected; H3K27me3 retained
       IDH1_IDH2_sequencing: no IDH1 or IDH2 variant detected (wild-type)
       IDH1_IHC: IDH1 R132H negative
+      Melan_A_HMB45_IHC: negative (no Melan-A or HMB-45 expression)
       MGMT_methylation: not detected
+      PAX8_IHC: negative (no PAX8-positive epithelial population)
+      SOX10_IHC: no SOX10-positive melanocytic population; nuclear staining limited to oligodendroglia
       TERT_promoter: no C228T or C250T variant detected (wild-type)
+      TTF1_IHC: negative (no TTF-1-positive epithelial population)
       chr7_gain_chr10_loss: not detected (chromosomes 7 and 10 balanced)
+      chromogranin_A_synaptophysin_IHC: no chromogranin A- or synaptophysin-positive neuroendocrine cell population;
+        synaptophysin limited to the normal neuropil
+      thyroglobulin_IHC: negative (no thyroglobulin-positive epithelial population)
   perform_clinical_assessment:
     by:
       assessment_type:
@@ -1634,6 +2019,58 @@ tools:
           impression: Normal timed gait and balance assessment. Timed Up and Go 9.1 s and 10 m walk speed 1.28 m/s
             are within normal limits for age.
           recommended_actions: []
+        orthostatic_blood_pressure:
+          assessment_type: orthostatic_blood_pressure
+          scores:
+            supine_after_5_min: BP 128/78 mmHg, HR 68 bpm
+            standing_1_min: BP 124/80 mmHg, HR 76 bpm
+            standing_3_min: BP 126/82 mmHg, HR 74 bpm
+          criteria_met:
+            systolic_fall_20_mmHg_or_more: false
+            diastolic_fall_10_mmHg_or_more: false
+            systolic_below_90_mmHg_standing: false
+            heart_rate_rise_30_bpm_or_more: false
+          pre_post_comparison: null
+          findings:
+          - domain: symptoms on standing
+            result: no light-headedness, visual dimming or presyncope during 3 minutes of active standing
+          impression: No orthostatic fall in blood pressure and no excessive heart rate rise on active standing.
+          recommended_actions: []
+        levodopa_challenge:
+          assessment_type: levodopa_challenge
+          scores:
+            MDS_UPDRS_III_OFF: 3/132
+            MDS_UPDRS_III_ON: 3/132
+            levodopa_dose: levodopa/carbidopa 250/25 mg orally after overnight withdrawal of dopaminergic medication
+          criteria_met: null
+          pre_post_comparison:
+            OFF_state: MDS-UPDRS III 3/132
+            ON_state_60_min: MDS-UPDRS III 3/132
+            change: none
+          findings:
+          - domain: OFF state
+            result: no rest tremor, rigidity or bradykinesia; normal gait, arm swing and postural reflexes
+          - domain: ON state at 60 minutes
+            result: unchanged examination; no dyskinesia
+          - domain: tolerance
+            result: no nausea, orthostatic symptoms or hallucinations during the challenge
+          impression: No parkinsonian motor signs in the OFF state (MDS-UPDRS III 3/132) and no change after
+            levodopa; response not assessable.
+          recommended_actions: []
+        performance_status:
+          assessment_type: performance_status
+          scores:
+            Karnofsky: 100/100
+            ECOG: '0'
+          criteria_met: null
+          pre_post_comparison: null
+          findings:
+          - domain: activity
+            result: fully active, carries on all pre-disease activities without restriction
+          - domain: self-care and work
+            result: independent in self-care; working
+          impression: Karnofsky 100, ECOG 0. Normal activity without evidence of disease-related limitation.
+          recommended_actions: []
         functional_neuro_signs:
           assessment_type: functional_neuro_signs
           scores: null
@@ -1661,6 +2098,22 @@ tools:
             and physiologically plausible.
           recommended_actions: []
   analyze_csf:
+    by:
+      source:
+        lumbar_drain:
+          appearance: clear and colourless
+          opening_pressure: 14 cm H2O at catheter placement
+          cell_count:
+            wbc: 3 /uL
+            rbc: 2 /uL
+            differential: lymphocytes 85%, monocytes 15%
+          protein: 38 mg/dL
+          glucose: 63 mg/dL
+          glucose_ratio: '0.60'
+          special_tests: {}
+          interpretation: Extended lumbar drainage over 72 hours at about 10 mL/h, 720 mL drained, without headache,
+            radicular pain or fever. Drained CSF clear, with normal cell count, protein and glucose; no CSF evidence of
+            infection.
     default:
       appearance: clear and colourless
       opening_pressure: 15 cm H2O
@@ -1678,6 +2131,9 @@ tools:
       ACE_CSF: 1.2 U/L (normal < 2.5 U/L)
       Abeta42: 980 pg/mL (normal range)
       Abeta42_40_ratio: 0.098 (normal > 0.068)
+      ADA: 3 U/L (normal < 10 U/L)
+      CMV_PCR: cytomegalovirus DNA not detected
+      EBV_PCR: Epstein-Barr virus DNA not detected
       HIV_RNA: not detected
       HSV_PCR: not detected
       IgG_index: 0.55 (normal < 0.7)
@@ -1694,11 +2150,16 @@ tools:
       cytology: no malignant cells; occasional mature lymphocytes and monocytes
       flow_cytometry: no clonal or immunophenotypically aberrant lymphoid population; polyclonal B cells and normal
         T-cell subsets
+      fungal_culture: no fungal growth at 21 days
+      india_ink: no encapsulated yeasts seen
       kappa_free_light_chain_index: 2.1 (normal < 6.1)
       meningitis_panel: multiplex PCR negative for all bacterial, viral and fungal targets
+      mycobacterial_panel: 'acid-fast bacilli smear negative; Xpert MTB/RIF Ultra: Mycobacterium tuberculosis not detected;
+        mycobacterial culture: no growth at 42 days'
       oligoclonal_bands: absent; no CSF-restricted bands (pattern 1)
       phospho_tau: 38 pg/mL (normal < 61 pg/mL)
       total_tau: 210 pg/mL (normal < 375 pg/mL)
+      toxoplasma_PCR: Toxoplasma gondii DNA not detected
       xanthochromia_spectrophotometry: no xanthochromia; net bilirubin absorbance < 0.007 AU
   search_medical_literature:
     default:
@@ -2108,6 +2569,46 @@ tools:
         value: 140
         unit: mmol/L
         reference_range: 135-145
+      CDT:
+      - test: Carbohydrate-deficient transferrin (%CDT, HPLC)
+        value: 1.2
+        unit: '%'
+        reference_range: <1.7
+      urine_sodium:
+      - test: Sodium, random urine
+        value: 85
+        unit: mmol/L
+        reference_range: no fixed range; interpret with intake and volume status
+      plasma_cholinesterase:
+      - test: Cholinesterase, plasma (butyrylcholinesterase)
+        value: 8.2
+        unit: U/mL
+        reference_range: 5.3-12.9
+      RBC_cholinesterase:
+      - test: Acetylcholinesterase, red blood cell
+        value: 33.5
+        unit: U/g Hb
+        reference_range: 26.7-49.2
+      NSE:
+      - test: Neuron-specific enolase, serum
+        value: 11.8
+        unit: ug/L
+        reference_range: <17.0
+      toxoplasma_IgG:
+      - test: Toxoplasma gondii IgG
+        value: Negative (<3 IU/mL)
+        unit: ''
+        reference_range: <8 IU/mL
+      cysticercosis_serology:
+      - test: Taenia solium (cysticercosis) IgG antibody, serum (EITB)
+        value: Negative
+        unit: ''
+        reference_range: Negative (no diagnostic glycoprotein band)
+      IGRA:
+      - test: Interferon-gamma release assay (QuantiFERON-TB Gold Plus)
+        value: Negative
+        unit: ''
+        reference_range: Negative (TB1 and TB2 antigen minus nil < 0.35 IU/mL)
       calcium:
       - test: Calcium (total)
         value: 9.4
@@ -2241,6 +2742,49 @@ tools:
         value: 1.6
         unit: mg/L
         reference_range: 0.8-2.2
+      HIV_viral_load:
+      - test: HIV-1 RNA (quantitative PCR)
+        value: Not detected
+        unit: copies/mL
+        reference_range: Not detected (< 20)
+      CD4_count:
+      - test: CD4+ T lymphocytes (absolute)
+        value: 850
+        unit: cells/µL
+        reference_range: 500-1500
+      - test: CD4+ T lymphocytes (percentage)
+        value: 42
+        unit: '%'
+        reference_range: 30-60
+      beta2_transferrin:
+      - test: Beta-2 transferrin (fluid, immunofixation)
+        value: Not detected
+        unit: ''
+        reference_range: Not detected
+      serum_cryptococcal_antigen:
+      - test: Cryptococcal antigen, serum (lateral flow assay)
+        value: Negative
+        unit: ''
+        reference_range: Negative
+      AFP:
+      - test: Alpha-fetoprotein
+        value: 3
+        unit: ng/mL
+        reference_range: <10
+      botulinum_toxin_assay:
+      - test: Botulinum neurotoxin, serum (types A, B, E, F)
+        value: Not detected
+        unit: ''
+        reference_range: Not detected
+      plasma_free_metanephrines:
+      - test: Metanephrine, plasma free
+        value: 0.21
+        unit: nmol/L
+        reference_range: <0.50
+      - test: Normetanephrine, plasma free
+        value: 0.48
+        unit: nmol/L
+        reference_range: <0.90
       ACE:
       - test: Angiotensin-converting enzyme
         value: 35
@@ -2251,11 +2795,6 @@ tools:
         value: 45
         unit: pg/mL
         reference_range: <100
-      B12:
-      - test: Vitamin B12
-        value: 520
-        unit: pg/mL
-        reference_range: 200-900
       vitamin_B12:
       - test: Vitamin B12
         value: 520
@@ -3036,6 +3575,16 @@ tools:
         value: Negative
         unit: ''
         reference_range: Negative
+      anti_GQ1b_IgG:
+      - test: Anti-GQ1b ganglioside IgG (ELISA)
+        value: Negative
+        unit: ''
+        reference_range: Negative
+      anti_GT1a_IgG:
+      - test: Anti-GT1a ganglioside IgG (ELISA)
+        value: Negative
+        unit: ''
+        reference_range: Negative
       anti_MAG:
       - test: Anti-MAG IgM
         value: 250
@@ -3110,6 +3659,11 @@ tools:
         value: Non-reactive
         unit: ''
         reference_range: Non-reactive
+      HBV_DNA:
+      - test: HBV DNA (quantitative PCR)
+        value: Not detected
+        unit: IU/mL
+        reference_range: Not detected (lower limit of quantification 10 IU/mL)
       anti_HBc_IgG:
       - test: Hepatitis B core antibody (total/IgG)
         value: Non-reactive

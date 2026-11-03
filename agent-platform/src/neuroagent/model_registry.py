@@ -29,8 +29,10 @@ AVAILABLE_MODELS: list[dict] = [
             "presence_penalty": 1.5,
             "chat_template_kwargs": {"enable_thinking": False},
         },
-        # Lossless multi-token-prediction draft (model card); +33% decode measured on the A100.
-        "engine_kwargs": {"speculative_config": {"method": "qwen3_next_mtp", "num_speculative_tokens": 2}},
+        # Prefix cache on, MTP off: re-prefilling the transcript every turn is what costs, and MTP
+        # adds no throughput with the cache on. On vLLM 0.23 the two together moved logprobs well
+        # past the batching noise floor (2 Nov 2026); 0.32 does not, vllm#53912 is still open.
+        "engine_kwargs": {"enable_prefix_caching": True},
     },
     {
         "key": "granite-4.1-8b",

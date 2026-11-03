@@ -66,7 +66,9 @@ command wraps both (`cern help`). In short, to choose:
   vocabulary in `tools/vocabulary.py` derives every enum from it
 - `agent-platform/config/policies/diagnosis_synonyms.yaml` — accepted diagnosis labels/codes per
   ICD-10 code, expanded into each case by `scripts/validation/apply_diagnosis_synonyms.py`
-  (idempotent; `--check` in CI). The scorer matches label tokens or the submitted `icd10_code`
+  (idempotent; `--check` in CI). Scorer v2 matches label tokens of the asserted text only (negated
+  clauses dropped, `rejected` labels veto, `required_components` for mixed diagnoses); the
+  submitted `icd10_code` is a separate weight-0 component and never decides the diagnosis
 - `agent-platform/config/hospital_rules/{hospital}/*.yaml` — clinical pathways (served by the API,
   not injected into the harness prompt)
 - `agent-platform/config/tools/fallback_library.yaml` — benchmark-level normal results per tool × parameter
@@ -134,6 +136,13 @@ HF_HOME=/dev/shm/hf uv run python -m neuroagent.training.train_grpo --model qwen
   mirror drifts
 - Read `docs/benchmark/tool-contract.md` before editing a case or a tool schema; a change to the
   policies must keep the perfect-agent check clean (every required action served by the MockServer)
+- External cases are opt-in through two case fields, both defaulting to NeuroBench:
+  `domain: general_medicine` adds the `general_medicine` vocabulary pack of `costs.yaml` to the
+  catalogue (provisional prices), `provenance: record` answers an order with no recorded result
+  "not available" instead of a library normal report. A pack never changes NeuroBench's
+  catalogue or prompts (`tests/test_general_medicine_harness.py`); a term NeuroBench itself needs
+  (e.g. the October 2026 review's fMRI, DTI, lymphoma and melanoma markers) goes in the core
+  `tools:` block, with its library report and the `tool_io.py` mirror
 
 ## Architecture notes
 

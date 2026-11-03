@@ -40,7 +40,33 @@ Two rules the whole laboratory vocabulary rests on:
 `analyze_csf` deserves a note: `costs.yaml` prices the LP procedure together with cell count,
 protein and glucose inside `analyze_csf.base`, and bills each entry of `special_tests`
 separately. Put the always-done panel in the `basic` annotation and only billable assays in
-`special_tests`, or the basics get charged a second time.
+`special_tests`, or the basics get charged a second time. Its optional `source` is
+`lumbar_puncture` (default), `shunt_tap`, `external_ventricular_drain` or `lumbar_drain`
+(extended lumbar drainage through a catheter, the drainage trial after a negative tap test; added
+24 Oct 2026, NPH-P08), from the `analyze_csf.sources` block (priced at 0 except `lumbar_drain`,
+CPT 62272 on top of `base`); a criterion names it only for a shunt tap, an EVD sample or a lumbar
+drain. A stored CSF report states its `source` only when it is not a lumbar puncture. The October 2026 review added `mycobacterial_panel` (AFB smear, Xpert MTB/RIF Ultra,
+mycobacterial culture), `fungal_culture`, `india_ink` and `ADA` to `special_tests`, and
+`HIV_viral_load`, `CD4_count`, `beta2_transferrin`, `serum_cryptococcal_antigen` and `AFP` to the
+laboratory panels (serum CrAg stays apart from the CSF `cryptococcal_antigen`: one specimen, one
+tool). Its batch-2 conditions added `CMV_PCR` to `special_tests`, and `anti_GQ1b_IgG`,
+`anti_GT1a_IgG` (two terms, not a ganglioside panel, which would price `anti-GM1 IgM` again),
+`botulinum_toxin_assay` and `plasma_free_metanephrines` to the laboratory panels. Its batch-3
+conditions added `toxoplasma_PCR` and `EBV_PCR` to `special_tests`, and `plasma_cholinesterase`
+and `RBC_cholinesterase` (two assays, read differently in organophosphate poisoning), `NSE`
+(post-arrest prognosis at 48 and 72 hours), `toxoplasma_IgG` and `urine_sodium` to the laboratory
+panels. `B12` and `vitamin_B12` are one assay: `vitamin_B12` is advertised and `B12` resolves to
+it through `_ANALYTE_SYNONYMS`. Batch 4 (24 Oct 2026) added `CDT` (carbohydrate-deficient
+transferrin, FTD-M07). Batch 5 (25 Oct 2026) added `cysticercosis_serology` (serum Taenia
+solium IgG, EITB or ELISA) and `IGRA` (QuantiFERON-TB Gold Plus or T-SPOT.TB), both for
+FEPI-TEMP-RS02. Methylmalonic acid was already priced as `MMA`. `HBV_DNA` (quantitative hepatitis B viral load, HEP-ENC-S05) was added on the same day. One `panels` order that names assays stored in different payloads (the
+first-line panels and a second-tier assay) receives each of them (`MockServer._merge_lab_order`).
+
+`order_cardiac_monitoring.monitor_type` is `telemetry`, `holter_24h`, `holter_48h`,
+`event_monitor_14d`, `event_monitor_30d`, `implantable_loop_recorder` or `device_interrogation`
+(the stored diagnostics of a pacemaker, ICD or loop recorder already implanted; added on the
+October 2026 review, VASC-DEM-P08). A stored monitoring report must carry its `monitor_type` as
+one of these terms: the MockServer routes on it (see `docs/benchmark/tool-contract.md`).
 
 A policy pattern's `required_arguments` is the minimum executable subset needed to match a
 call. A missing optional runtime argument is expected; an unknown key is not.
@@ -72,6 +98,11 @@ call. A missing optional runtime argument is expected; an unknown key is not.
 | `ice_pack_test` | Bedside ice-pack ptosis test | MG (rapid screen) |
 | `respiratory_function` | FVC, MIP/MEP, NIF | ALS respiratory monitoring, MG crisis risk |
 | `minor_salivary_gland_biopsy` | Lip biopsy, focus score | Sjögren's confirmation |
+| `audiometry` | Pure-tone and speech audiometry, tympanometry | Hearing loss after bacterial meningitis (WHO 2025, NICE NG240) |
+| `speech_language_evaluation` | Speech-language pathology assessment: motor speech, grammar, naming, repetition, comprehension | Primary progressive aphasia variant (Gorno-Tempini 2011); not a second `neuropsych_battery` |
+| `electrophysiology_study` | Invasive EP study: HV interval, sinus node recovery, programmed stimulation, accessory-pathway refractory period | Syncope with bifascicular block or prior infarction (ESC 2018), WPW risk stratification (ESC 2019 SVT) |
+| `sodium_channel_blocker_challenge` | Ajmaline, flecainide or procainamide under 12-lead ECG with high precordial leads | Suspected Brugada syndrome with a non-diagnostic ECG (ESC 2022 VA/SCD) |
+| `olfactory_test` | UPSIT or Sniffin' Sticks against age and sex norms | Hyposmia, a supportive MDS criterion of Parkinson's disease (Postuma 2015) |
 | `genetic_panel:<panel>` | Targeted gene panel | See panel list below |
 
 **Allowed genetic panels** (only these `<panel>` suffix values are valid):
@@ -93,6 +124,10 @@ call. A missing optional runtime argument is expected; an unknown key is not.
 | `porphyria` | Acute intermittent porphyria | HMBS, ALAS1, CPOX, PPOX |
 | `small_fiber_neuropathy` | Hereditary small-fibre neuropathy | SCN9A, SCN10A, SCN11A |
 | `PD` | Young-onset / monogenic Parkinson's | PRKN, PINK1, DJ-1, LRRK2, GBA, SNCA |
+| `hereditary_paraganglioma` | Hereditary paraganglioma-phaeochromocytoma | SDHA/B/C/D, SDHAF2, VHL, RET, NF1, TMEM127, MAX, FH |
+| `hemiplegic_migraine` | Familial and sporadic hemiplegic migraine | CACNA1A, ATP1A2, SCN1A, PRRT2 |
+| `inherited_arrhythmia` | Long QT, Brugada, CPVT | KCNQ1, KCNH2, SCN5A, RYR2, CASQ2 and the minor channelopathy genes |
+| `cardiomyopathy` | Arrhythmogenic, hypertrophic, dilated cardiomyopathy, laminopathy | PKP2, DSP, DSG2, LMNA, FLNC, MYH7, MYBPC3 and the sarcomere genes |
 
 ---
 
@@ -119,6 +154,9 @@ call. A missing optional runtime argument is expected; an unknown key is not.
 | `cardiac_FDG_PET` | 18F-FDG PET/CT, cardiac, with dietary suppression of myocardial glucose uptake | Active myocardial inflammation — cardiac sarcoidosis, myocarditis. A different study from `FDG_PET`, not the same scan read differently |
 | `coronary_CTA` | Coronary CT angiography | Non-invasive coronary anatomy when ischaemia is suspected |
 | `coronary_angiography` | Invasive catheter coronary angiography | Suspected myocardial ischaemia or infarction (ESC 2018 Class IIa in syncope). An angiographic finding alone does not establish the cause of a symptom |
+| `functional_MRI` | BOLD fMRI, motor and language paradigms | Pre-surgical mapping and language lateralisation near eloquent cortex (high-grade glioma) |
+| `DTI_tractography` | Diffusion tensor tractography | Corticospinal tract, arcuate fasciculus, optic radiations before resection |
+| `whole_body_FDG_PET` | 18F-FDG PET/CT, skull base to mid-thigh | Occult-malignancy search in a paraneoplastic syndrome when CT is negative (Graus 2021). A different acquisition from the cerebral `FDG_PET` |
 
 ---
 
@@ -144,6 +182,9 @@ studies at different prices.
 | `mediastinum_CT` / `_MRI` | Anterior mediastinum | Thymoma / thymic hyperplasia in myasthenia gravis — chest radiograph does not substitute |
 | `spine_MRI` / `_CT` | Spinal cord and column | Cord compression, transverse myelitis, spinal tumour — the mimics of ascending flaccid weakness |
 | `peripheral_nerve_MRI` / `_ultrasound` | Nerve / nerve root | Root enhancement, nerve enlargement (GBS vs acute-onset CIDP) |
+| `lower_extremity_venous_duplex` | Compression and Doppler ultrasound of the leg veins | Deep vein thrombosis as the venous source of a paradoxical embolism (stroke with a PFO) |
+| `chest_xray` | Two-view chest radiograph | First-line chest image, e.g. pneumonia in the infection screen of hepatic encephalopathy |
+| `temporal_artery_ultrasound` | Temporal (and axillary) artery ultrasound | Halo sign in suspected giant cell arteritis |
 
 `contrast` is a boolean modifier, as for brain MRI and CT.
 
@@ -152,24 +193,37 @@ studies at different prices.
 | Value | Specimen | When |
 |---|---|---|
 | `blood_culture` | Two sets, with susceptibility | Suspected bacterial meningitis, sepsis, SBP |
-| `whole_blood_pcr` | Meningococcus / pneumococcus PCR | Meningitis where culture may be negative |
+| `whole_blood_pcr` | EDTA whole-blood PCR: N. meningitidis, S. pneumoniae, H. influenzae | Suspected meningococcal disease (NICE NG240), above all when the LP is deferred; meningitis where culture may be negative |
 | `throat_swab` | Meningococcal culture | Suspected meningococcal disease |
 | `urine` | Urinalysis + culture | Infection screen as an HE precipitant |
 | `ascitic_fluid` | Diagnostic paracentesis: PMN count, protein, culture | Every patient with ascites and altered mental status |
+| `sputum` | Gram stain and culture (AFB smear, mycobacterial culture on request) | Pneumonia as an infective precipitant; pulmonary TB with tuberculous meningitis |
+| `stool` | C. difficile toxin PCR | Diarrhoea in the infection screen (hepatic encephalopathy on lactulose) |
+| `wound_swab` | Culture of a wound or ulcer | A skin portal of entry (bacterial meningitis) |
+| `brain_aspirate` | Gram stain, aerobic and anaerobic culture of aspirated brain-lesion material | Brain abscess on the differential of a ring-enhancing lesion. The aspiration is ordered through `obtain_tissue_diagnosis` and billed there |
+| `tracheal_aspirate` | Gram stain and culture of endotracheal aspirate | Ventilator-associated pneumonia in an intubated patient (e.g. myasthenic crisis) |
 
 `before_antimicrobials` is a boolean: yield collapses once treatment has started, and the
 report must state it rather than leave it inferred.
 
 ### `obtain_tissue_diagnosis`
 
-`procedure` is `resection`, `stereotactic_biopsy` or `lymph_node_biopsy` (endobronchial needle
+`procedure` is `resection`, `stereotactic_biopsy`, `open_biopsy` (through a laminectomy or
+craniotomy, for a lesion a needle cannot reach safely and that is not to be resected, e.g. an
+intramedullary spinal cord tumour), `temporal_artery_biopsy` (giant cell
+arteritis) or `lymph_node_biopsy` (endobronchial needle
 aspiration or surgical nodal sampling — the low-risk route to histological confirmation of a
 systemic disease when the accessible node is not the symptomatic organ, e.g. hilar nodes in
 cardiac sarcoidosis rather than an endomyocardial biopsy). A purely histological pattern needs
 no molecular assay. `molecular_assays` is a list drawn from
 `IDH1_IHC`, `IDH1_IDH2_sequencing`, `ATRX_IHC`, `1p_19q_codeletion`, `CDKN2A_B_deletion`,
 `TERT_promoter`, `EGFR_amplification`, `chr7_gain_chr10_loss`, `H3K27_status`,
-`MGMT_methylation`, `BRAF_V600`. Each assay is in the list because it changes management, not
+`MGMT_methylation`, `BRAF_V600`, and for the mimics of a glioma `CD20_IHC` and `EBER_ISH`
+(primary CNS or EBV-associated lymphoma), `SOX10_IHC` and `Melan_A_HMB45_IHC` (metastatic
+melanoma), `chromogranin_A_synaptophysin_IHC` (paraganglioma), `PAX8_IHC`, `TTF1_IHC` and
+`thyroglobulin_IHC` (primary site of a metastatic carcinoma), and `H3G34_status` (diffuse
+hemispheric glioma, H3 G34-mutant) and `DNA_methylation_profiling` (tumour class left open by
+histology and targeted assays). Each assay is in the list because it changes management, not
 to complete a taxonomy. MGMT must not be assessed by immunocytochemistry.
 
 ### `perform_clinical_assessment.assessment_type`
@@ -185,6 +239,16 @@ ground truth.
 | `structured_headache_history_ichd3` | Headache and aura features against ICHD-3 | Migraine with aura — the actual confirmatory step |
 | `gait_and_balance_timed` | Timed Up and Go, timed walk | NPH, before *and* after the CSF tap test (two assessments) |
 | `functional_neuro_signs` | Hoover's sign, entrainment | Functional neurological disorder — a positive clinical diagnosis |
+| `performance_status` | Karnofsky and ECOG at the visit | Treatment planning in high-grade glioma (KPS < 70 unfavourable) |
+| `orthostatic_blood_pressure` | Supine BP and HR, then at 1 and 3 minutes of active standing | Initial evaluation of syncope (ESC 2018, Class I); antihypertensive or diuretic treatment |
+| `levodopa_challenge` | MDS-UPDRS III OFF, then ON at peak effect of a supra-threshold levodopa dose, percent improvement | DBS candidacy (30% or more), a "poor levodopa response" red flag (MSA). One report with both states, not two `timing` orders |
+
+`timing` (24 Oct 2026) is `baseline` (default) or `post_intervention`, from the `timings` block
+(priced at 0). A stored assessment that repeats another after an intervention (the NPH gait after
+the tap test) carries `timing: post_intervention`, the baseline report carries `timing: baseline`,
+and the MockServer serves each for its own order. A criterion for the reassessment names
+`timing: post_intervention`; one for the baseline may name `timing: baseline`, which the schema
+default satisfies when the call leaves it out.
 
 ---
 

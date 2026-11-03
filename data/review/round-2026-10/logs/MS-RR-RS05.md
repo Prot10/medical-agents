@@ -1,0 +1,87 @@
+# MS-RR-RS05
+Reviewer status: R1 not reviewed, R2 not reviewed (no MS-RR notes file in this round) | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| (none) | - | No reviewer notes for this case. |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| C | major | `followup_outputs[search_mcdonald_criteria_2017]` | 2017 criteria (4 regions, OCB substitute for DIT) presented as current; Reich 2018 DMT summary; the output repeated the brain MRI criterion's expected evidence (leak guard failure). | FIXED: one general follow-up (`search_ms_diagnostic_criteria`, last) with the canonical 2024 text, Montalban 2025 and Wattjes 2021; leak guard no longer names this case. |
+| A | major | `ground_truth.action_criteria[action-3]`, `[action-4]` | Literature search and drug check required, with a typed 2017 query and non-schema keys (`proposed_class`, `screen_for`); free-text citations `Reich 2018 NEJM review`. | FIXED: both optional with `{}`; drug check cites `[NICE_NG220]`; case-specific rationale and evidence. |
+| A | major | `ground_truth.action_criteria[action-6]` | Labs criterion demanded 9 analytes (ESR, CRP, CMP, calcium, glucose among them) and its evidence mentioned AQP4/MOG. | FIXED: `{panels: [CBC, vitamin_B12, TSH, HIV]}`; evidence states the served results (ANA 1:80 with negative dsDNA and Smith). |
+| A | minor | `ground_truth.action_criteria[action-5]` | CSF criterion required OCB and IgG index together; label equal to rationale. | FIXED: optional, OCB or kFLC alternatives; case rationale (four regions plus MRI DIT already meet the criteria; CSF also excludes infection and malignant cells next to an enhancing lesion). |
+| A | minor | `ground_truth.action_criteria[*]`, `.stop_rule`, `.sequence_constraints` | Label equal to rationale; citations "2024 revised McDonald criteria; MAGNIMS-CMSC-NAIMS 2024/2025"; stop rule 0 with literature and drug check required; pre-LP constraint cited McDonald 2017. | FIXED: canonical labels; `[McDonald_2024]`, `[Wattjes_2021]`; pathway order brain MRI, spine, labs, CSF, drug, literature; stop rule brain MRI, spine, labs, allowance 2; canonical soft MRI-before-CSF constraint. No AQP4/MOG criterion (plan 3.2). |
+| B | minor | `patient.neurological_exam.additional`, `.gait` | Localisation glosses in the exam ("consistent with right cerebellar hemisphere and middle cerebellar peduncle involvement", "confirming cerebellar rather than sensory ataxia"). | FIXED: removed; findings kept. |
+| D | minor | `initial_tool_outputs.mri.additional_observations`, `.findings[*].signal_characteristics`, `.impression` | Radiologist interpretation that answers the differential ("ischemia excluded", "No mass lesion or neoplastic features", "Dawson fingers morphology distinct from small vessel disease", black holes "indicating chronic axonal damage"); impression unnumbered and not stating the fourth ventricle. | FIXED: observations as findings only; fourth ventricle not effaced stated; numbered impression with lesion morphology, no diagnosis. The brain MRI reports no cord. |
+| B | minor | `followup_outputs[request_spine_mri].output` | Empty lesion description. | FIXED: description; numbered impression. |
+| C | major | `initial_tool_outputs.csf` | Myelin basic protein reported (F6); no kFLC index; interpretation recited every value. | FIXED: MBP removed; kFLC index 14.9 (reference < 6.1); canonical interpretation. Other values (WBC 9, protein 46.2, 4 bands, IgG index 0.74) were already case-specific and kept. |
+| C | minor | `followup_outputs[check_drug_interactions].output` | Amlodipine check filed as a contraindication; PML line duplicated as a contraindication; cladribine "JCV monitoring required" (it needs lymphocyte monitoring); JCV index rule ">0.9" as a hard threshold; "must be administered via a REMS program". | FIXED: amlodipine and allergy under interactions; SmPC contraindications (PML, combination immunosuppression); cladribine lymphocyte monitoring; JCV index wording by risk factor (index above 1.5, more than 2 years, prior immunosuppressant); risk-management programme wording. |
+| C | major | `ground_truth.assessment.required_recommendations` | Template musts (DIS "2 of 4 regions", OCB as DIT, AQP4/MOG test before diagnosis with no stored result, ANA restatement, IV-only steroid, natalizumab-or-ocrelizumab preference); no physiotherapy for a man who cannot tandem walk; no vitamin D replacement despite 16 ng/mL. | FIXED: formulation must (two attacks, four regions, enhancing and non-enhancing lesions); oral or IV methylprednisolone per NG220 after excluding infection with BP monitoring, plasma exchange if refractory; physiotherapy and falls; DMT by activity; pre-DMT screening (JCV, hepatitis, VZV, live vaccines); vitamin D. |
+| C | minor | `ground_truth.assessment.prohibited_recommendations` | Natalizumab JCV ">0.9" and fingolimod ECG prohibitions without a decision in the case (T8, T9); open-ring item phrased as a teaching statement. | FIXED: T8, T9 removed; ANA and open-ring prohibitions reworded as actions (no SLE label; no surgery or biopsy); kept the single-event, T11 and T12 prohibitions. |
+| C | major | `ground_truth.differential` | NMOSD and MOGAD "high" and neurosarcoidosis and lupus "moderate" after a work-up that excludes them; NMOSD/MOGAD claimed "negative here" although no antibody result exists in the case; no neoplasm or small-vessel entry for an enhancing 18 mm lesion with mass effect in a hypertensive man. | FIXED: all low with discriminating data; NMOSD/MOGAD state that the antibodies were not tested and what argues against them; added posterior fossa neoplasm (D43.1) and small-vessel disease (code null); neurosarcoidosis D86.85. |
+| E | major | `ground_truth.key_clinical_evidence` | Engineering lines ("Tier per the July 2026 clinical review", "July 2026 review applied end to end"), teaching lines (open-ring sensitivity, ACR/EULAR, JCV monitoring). | FIXED: six case-observable lines (presentation and lesion, prior cord attack, DIS 4 of 5, DIT and CSF, ANA, mimics excluded). |
+| D | minor | `ground_truth.red_herrings` | Red herring claimed "normal complement" (not measured); the earlier leg episode labelled disc disease, the case's second distractor, not recorded. | FIXED: complement removed; second red herring at `patient.clinical_history.past_medical_history[0]`. |
+| E | minor | `fallback_tool_outputs.ct`, `metadata.fallback_tool_kinds.ct` | CT fallback "normal" with "Age-appropriate appearances" in a patient with an 18 mm posterior fossa lesion with mass effect. | FIXED: case CT (subtle right MCP hypodensity, beam-hardening artefact, no haemorrhage, hydrocephalus or fourth ventricle effacement); kind `case`. |
+| E | minor | `fallback_tool_outputs.echo` | No `echo_type`. | FIXED: `TTE`. |
+| C | minor | `ground_truth.avoided_actions[*]` | Generic rationales; citations `[McDonald_2017]`, `[MAGNIMS_2016]`, `[Reich_2018]`. | FIXED: case-tied rationales; `[Wattjes_2021]` for CT and PET, none for the others. |
+| E | minor | `metadata.difficulty_*` | DIS stated as established "on the initial brain MRI" including the cord; OCB "confirming". | FIXED: cord on the spine MRI; OCB supportive; prior cord attack named. |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+
+A 43-year-old Ghanaian teacher with two weeks of right hemiataxia, scanning dysarthria and nystagmus, and a 6-week left leg episode 14 months ago that a GP called disc disease. The brain MRI now reports findings only (open-ring enhancing 18 mm right middle cerebellar peduncle lesion without restricted diffusion, fourth ventricle not effaced, non-enhancing periventricular, juxtacortical and left peduncle lesions); the left dorsolateral C3-C4 lesion is in the spine report. CSF: 4 bands and kFLC 14.9, no MBP. The literature output is the canonical 2024 summary, and the CT fallback shows the peduncle hypodensity instead of a normal scan. Pathway: brain MRI, spine MRI and labs required; CSF, drug check and literature optional; no AQP4/MOG criterion. Musts: RRMS by two attacks, four regions and MRI DIT; methylprednisolone oral or IV after excluding infection, with BP monitoring; physiotherapy and falls; DMT by activity; pre-DMT screening including JCV; vitamin D 16. Prohibitions: no MS from a single event, no lupus label for ANA 1:80, no surgery or biopsy of the open-ring lesion. All mimics low; neoplasm and small-vessel disease added.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+
+- Citation keys `[McDonald_2024]`, `[Wattjes_2021]`, `[NICE_NG220]` (plan CENTRAL 1).
+- Diagnosis synonyms G35.B/G35.C and "demyelinating disease" (plan CENTRAL 2); not hand-edited.
+
+## Open questions for Andrea (judgment calls you could not settle)
+
+- AQP4-IgG and MOG-IgG: the plan sets no AQP4/MOG criterion for this case and I followed it, because the cord lesion is short, peripheral and less than half the cross-section, the brain lesions are MS-typical and the CSF has restricted bands. A reviewer could argue that a prior probable myelitis in a man of West African ancestry (higher NMOSD prevalence) justifies a recommended CBA test as in RS02, RS03 and RS06; that would need stored negative rows in the labs output.
+- Kept wording: the T11 prohibition text and `metadata.condition_name` carry em dashes from the original case text; I did not reword them.
+
+## Verification
+
+`perfect_agent.py MS-RR-RS05 -v`: pass; brain MRI <- initial MRI, spine <- `followup[0]`, labs <- initial labs (shown "?", served in full by probe). Probes: CSF returns the initial CSF with kFLC, `order_ct_scan` the new case fallback, literature the canonical follow-up. Brain MRI output has no cord text. `case_io.py check`: schema and synonym guard OK; the remaining leak failure names MS-RR-P02 (not mine), none names MS-RR-RS05. `test_case_guards.py -k MS-RR-RS05`: 2 passed.
+
+## Verification (adversarial verifier, 24 Oct 2026)
+
+Checked against the committed worker version (b8be2153): every own-finding row against the case file (field by field read of the whole final case), the plan tier table (section 3.5), the stop rule, the sequence constraint, laterality and lesion-to-exam fit, timeline, allergies against drug outputs, leakage in the brain MRI (no cord text) and the literature/drug outputs (guards pass), PATTERNS classes (template numbers across RS01-RS06, 2017 facts, test-as-must, F2/F5 wrong facts), and the differential against the final results. No reviewer notes exist for MS-RR, so no note id can be missing. Re-run after the changes below: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, `test_case_guards.py -k` pass.
+
+Found: the worker left the AQP4/MOG tier as an open question. Decided (ROUND_POLICY, 24 Oct: decide for dataset quality): the plan's own rule in 3.2 makes AQP4/MOG `recommended` when myelitis is part of the history, and this case defines the 14-month-old left leg episode as a myelitis (KCE[1], red herring 2, must[0]); NMOSD is also relatively more frequent in people of African ancestry. The plan's per-case "none" for RS05 contradicts its rule, so the rule governs. Added `action-aqp4-mog-cba` (recommended, after labs, same three alternatives and citations as the condition template, not in the stop rule) and `initial_tool_outputs.labs.panels.Neuroimmunology` with "AQP4-IgG (cell-based assay)" and "MOG-IgG (live cell-based assay)" negative; NMOSD and MOGAD differential entries now cite the negative CBA results instead of "not tested". The open question above is resolved. Everything else checked: open-ring MCP lesion, CT fallback, natalizumab output, ANA prohibition, vitamin D 16 consistent. CENTRAL for the lead: plan 3.5 and A8 list RS05 as "no AQP4/MOG"; update them to `rec`.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026 (uniformity scripts over all 30 MS-RR cases; edits through `case_io`; perfect agent, `case_io check` and the case guards clean afterwards).
+
+- `ground_truth.differential[4].icd_code` D86.85 -> D86.89: D86.85 is sarcoid myocarditis; neurosarcoidosis is D86.89, as in the other 11 MS-RR cases.
+- `ground_truth.differential[7].icd_code` G04.81 -> G04.00: G04.81 is other encephalitis; ADEM is G04.00, as in the other 8 MS-RR cases.
+- `action-3-search-medical-literature.label` "Literature search (background evidence only)" -> "Literature search on the current MS diagnostic criteria": engineering text replaced by the topic of the stored output.
+- `assessment.prohibited_recommendations[3]` chronic-steroid prohibition set to the condition's canonical text (was "Do not use chronic oral corticosteroids as a maintenance treatment for MS [em dash] they are ineffective long-term and carry significant harm").
+- `initial_tool_outputs.labs`: the AQP4-IgG and MOG-IgG rows moved to a new `followup_outputs` entry (`interpret_labs`, trigger `request_aqp4_mog_cell_based_assay`, panel `Neuroimmunology`, placed after the imaging follow-ups). Served in the initial labs payload, they answered the mimic-exclusion panel order as well, so an agent learned the result of `action-aqp4-mog-cba` without ordering it (perfect-agent warning "answered with the same stored report"); the MockServer now serves them only to an order that names the assays (checked for all three alternatives and both orders).
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (`plans/MS-RR-decisions.md`). What changed and why:
+
+- Diagnosis synonyms (`diagnosis_synonyms.yaml` G35 entry, re-applied with `apply_diagnosis_synonyms.py --prune --conditions multiple_sclerosis`): removed the label "demyelinating disease" (G37.9 is an Excludes1 of G35.A, and its tokens occur in an NMOSD, MOGAD or ADEM answer, which would have scored as correct) and the codes G35.B and G35.C (primary and secondary progressive MS in FY2026 ICD-10-CM, a different course from this relapsing-remitting case). Accepted now: the label, multiple sclerosis, MS, relapsing(-)remitting multiple sclerosis, RRMS; codes G35.A, G35, G35.D.
+- Checks: `perfect_agent.py` pass, `case_io.py check` clean for the case, `test_case_guards.py -k MS-RR-` passes with MS-RR now in `DISCRIMINATOR_CONDITIONS`.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: Abnormal timed gait and balance assessment. Timed Up and Go 16.2 s and 10 m walk speed 0.78 m/s are slowed for age; Berg balance 38/56. (fallback_tool_outputs.clinical_assessment). Why: rule d: the examination documents a gait disorder (wide-based, unsteady cerebellar gait veering to the right); the library reports a normal study.
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 70, ECOG 2: ambulatory and capable of all self-care, unable to carry out work activities, up and about more than half of waking hours. (followup_outputs[request_performance_status]). Why: rule d: inpatient relapse with a documented gait disorder: Karnofsky 100 / ECOG 0 'without evidence of disease' contradicts the case; the library reports a normal study.
+- `order_specialized_test {test_type: speech_language_evaluation}`: Mild ataxic dysarthria with a scanning quality. No aphasia. (fallback_tool_outputs.specialized_test). Why: rule c: scanning dysarthria in the stored examination; the library reports a normal study.
+
+Checks: perfect agent ok; case guards pass; snapshot diff shows no criterion answer changed; map verified (served without the library).

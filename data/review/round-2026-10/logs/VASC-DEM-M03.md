@@ -1,0 +1,113 @@
+# VASC-DEM-M03
+Reviewer status: R1 not reviewed, R2 not reviewed (VASC-DEM has no notes file) | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| (none) | - | VASC-DEM was never annotated; no note ids exist for this case. All changes below come from the condition plan and my own reading. |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| A | blocker | `action_criteria[action-4-analyze-brain-mri].alternatives` | Plan C1: non-schema `sequences` key made the required MRI unmatchable. | FIXED: `analyze_brain_mri {}`. |
+| D | major | `action-8-search-medical-literature`, `initial_tool_outputs.literature_search`, `fallback_tool_outputs.literature_search` | Plan C2 leak. | FIXED: criterion deleted; initial null; fallback deleted. |
+| C | major | `action-9-check-drug-interactions`, `initial_tool_outputs.drug_interactions`, `fallback_tool_outputs.drug_interactions` | Plan C3 group R: a concrete interaction changes management (aspirin with the anticoagulant she needs), but the criterion was optional `{}` with generic evidence and the fallback said "no prohibitive interaction". | FIXED: criterion `recommended`, five alternatives (`drug` warfarin, apixaban, rivaroxaban, edoxaban, dabigatran); case-specific initial outputs keyed by each drug: warfarin with aspirin (additive bleeding, avoid without separate indication), atorvastatin (minor INR effect), alendronate and the others none, supervised dosing warning; DOAC entries with aspirin and their dosing rules (apixaban: no reduction criterion at age 77, creatinine 0.96). Generic fallback deleted. Placed last in the pathway. |
+| D | major | `patient.neurological_exam.mental_status` | Plan C4: MoCA total and item losses in the exam. | FIXED: bedside observation only. |
+| B | major | `initial_tool_outputs.clinical_assessment.findings`, `.impression`, `.criteria_met` | MoCA arithmetic: the listed losses (trail, cube, clock 1/3, digit span, serial sevens, recall 3/5, month) give 21 raw and 22 with the education point, not 20; impression concluded "points to a multi-infarct mechanism"; `stepwise_course_with_dateable_events` is history, not a test result. | FIXED: item-level findings adding letter fluency 0/1 and abstraction 1/2 (19 raw + 1 for 10 years = 20/30); impression lists the losses only; the history key removed from `criteria_met`. |
+| D | major | `initial_tool_outputs.mri.impression`, `.additional_observations` | Plan C5: "requires a proximal source", "explains the transient anomia" (cross-reference to history), "absence of microbleeds supports the safety of anticoagulation" (management). | FIXED: numbered impression with territories and sizes, hedged within-imaging "a distribution suggestive of embolism" (Kind 2), SWI negative stated as a finding; WMH grade made explicit "periventricular 2, deep 1" (caps and smooth halo). |
+| D | major | `initial_tool_outputs.echo.impression`, `.echo_type` | Echo impression prescribed anticoagulation ("an indication for anticoagulation independently of any arrhythmia"); `echo_type` missing on the answer to a TTE criterion. | FIXED: numbered cardiac findings (aneurysm 32 x 24 mm, laminated thrombus 14 x 9 mm non-mobile, EDD 58 mm, EF 38%, LA 40 mm, mild functional MR); `echo_type` TTE. |
+| D | minor | `initial_tool_outputs.ecg.interpretation` | Told the reader the next study ("an echocardiographic question rather than a rhythm question"). | FIXED: categorical ECG read only. |
+| D | minor | `initial_tool_outputs.advanced_imaging.impression` | Duplex stated a mechanism verdict ("a large-artery mechanism cannot explain infarcts in both hemispheres"). | FIXED: stenosis grades and vertebral flow only. |
+| B | minor | `initial_tool_outputs.labs` | Plan C6: Hct 41.6 against Hb 12.6; template values; female HDL range ">40" (46 unflagged); eGFR ">60"; interpretation with targets and "renal function adequate for anticoagulant dosing". | FIXED: Hct 38.1; WBC 7.1, Plt 221, MCV 86, Na 140, K 4.6, ALT 19, albumin 4.0, folate 9.6; HDL ">50" and flagged low; eGFR ">=60" (62 not flagged); summary rebuilt; interpretation "Flagged: ..." only. |
+| D | minor | `fallback_tool_outputs.advanced_imaging`, `.labs`, `.specialized_test`, `.ct` | Plan C7 "non-contributory" fallbacks; CT "already obtained". | FIXED: three deleted; CT fallback shows this patient's three chronic infarcts. Holter fallback kept (sinus, consistent). |
+| A | minor | `action_criteria[*]` | Plan C13. | FIXED: rationales and expected evidence case-specific (duplex rationale notes her contrast allergy); one bracketed key each. |
+| B | minor | `stop_rule` | `max_additional_actions` 0 (C16). | FIXED: 1; required set unchanged (screen, labs, MRI, ECG, duplex, TTE). Order screen, labs, MRI, ECG, duplex, TTE, drug check. |
+| B | minor | `avoided_actions` | Plan C18. | FIXED: CT canonical rationale; EEG and monitoring rationales name this patient's reasons. |
+| C | major | `ground_truth.assessment.required_recommendations` | Musts restated diagnostic steps (ECG, MRI, carotid) and lacked warfarin specifics, LDL, HbA1c, BP, supervision. | FIXED (C19): warfarin INR 2-3 for at least 3 months and heart failure referral for EF 38%; stop aspirin (no stent or ACS); supervised medicines and INR monitoring; LDL below 70 (106 on atorvastatin 20); BP below 130/80 from 142/78 with orthostatic checks; HbA1c individualised about below 8.0% (7.4%) [ADA_2025_older_adults]. |
+| C | minor | `ground_truth.assessment.prohibited_recommendations` | Wording "already been demonstrated", "new anticoagulant". | FIXED: reworded; contrast-allergy prohibition kept (plan). |
+| C | major | `ground_truth.differential[0]` | Plan C8: occult AF `moderate` after a structural source and sinus rhythm. | FIXED: `low`, features without the em dash. |
+| E | minor | `ground_truth.key_clinical_evidence[2]` | Em dash in a sentence rewritten anyway. | FIXED: colon. Label `accepted[0]` dash FLAGGED only (ruling 3). |
+| - | check | plan 3.6 | perfect_agent ok; probe: all seven criteria and all five drug alternatives answered by case data; CT and Holter answered by the case fallbacks; `case_io.py check` and test_case_guards list no failure naming M03. | - |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+
+The case stays multi-infarct vascular dementia in a 77-year-old woman with three chronic embolic-pattern infarcts (left MCA, right MCA, right PICA), sinus rhythm with an old anterior infarct, and an apical LV aneurysm with laminated thrombus (EF 38%). Reports now describe their own modality only: the echo no longer prescribes anticoagulation, the ECG no longer points to the echo, the MRI no longer argues the source or anticoagulation safety, the duplex gives grades only, and the MoCA items now add up to 20/30 with the education point. The drug check is now recommended and case-specific (warfarin or any DOAC against her aspirin, statin and alendronate). The musts are management: warfarin INR 2-3 for at least 3 months with a heart failure referral, stop aspirin, supervised medicines and INR monitoring, LDL below 70, BP below 130/80, individualised HbA1c. Occult AF is low on the differential. Labs corrected (Hct, HDL range and flag).
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+
+- New citation key `[ADA_2025_older_adults]` used in the HbA1c must (plan 5.4).
+- Synonyms (plan 5.1): `F06.7` appended to this dementia case's codes.
+
+## Open questions for Andrea (judgment calls you could not settle)
+
+- None.
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. Read the log, the diff and the whole final case. Checked: MoCA arithmetic (11 lost, 19 raw + 1 = 20/30); group R drug check (warfarin first, four DOACs, each keyed output names aspirin and the real medicines; apixaban no-reduction statement correct at 77 years and creatinine 0.96); musts (warfarin INR 2-3 for at least 3 months, heart failure referral, stop aspirin: stable CAD more than 12 months after the MI, LDL below 70 justified by coronary and carotid atherosclerosis, HbA1c individualised); contrast allergy vs duplex choice and the contrast prohibition; `echo_type: TTE` in the TTE criterion (schema default TTE, so a bare call matches); female ranges, HDL flag; monitoring waste vs prohibition consistent; differential low for occult AF.
+
+Found and changed:
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| B | minor | `initial_tool_outputs.mri.findings[0].location` | A 22 x 16 mm infarct "including Wernicke's area" with naming 3/3, repetition 2/2 and no aphasia on examination: a deficit the lesion should produce is absent. | FIXED: "Left posterior middle temporal gyrus (left middle cerebral artery territory)", compatible with a transient anomia that recovered. |
+| A | minor | `action_criteria[action-5-analyze-ecg].label` | Label asked for LVH of chronic hypertension; the criterion's evidence and rationale are AF and the old anterior infarction. | FIXED: label "look for atrial fibrillation and characterise the old anterior infarction found three years ago". |
+
+perfect_agent ok (all five drug alternatives served by case data); `case_io.py check` and test_case_guards list no failure naming M03.
+
+## Condition audit
+Condition auditor, 24 Oct 2026. Scripted checks over all 30 VASC-DEM cases (plan classes C1-C21, PATTERNS.md, lab arithmetic) found the stragglers below in this case; changed through `case_io`.
+
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| B | minor | `initial_tool_outputs.labs.panels.Vascular_risk[Total cholesterol]` | Total cholesterol 188 mg/dL did not equal LDL + HDL + TG/5 (181.6); the same lab-arithmetic class was fixed in M07-M10, P01, P02 and S06-S11 but not here. | FIXED: total cholesterol 182 mg/dL (flag unchanged; LDL, HDL and TG, which the musts and evidence quote, unchanged). |
+| C | minor | `ground_truth.avoided_actions[avoid-waste-3-order-advanced-imaging].rationale`, `[avoid-waste-4-interpret-labs].rationale` | Plan C18: the MIBG and paraneoplastic/autoimmune rationales were still the August template text shared by M01-M06; the autoimmune one described "a chronic stepwise decline with a hypertensive imaging burden", which is wrong for this case. | FIXED: case-specific one-liners (no Lewy features; stepwise decline dated to two focal events). |
+| D | major | `initial_tool_outputs.clinical_assessment.criteria_met` | Plan 1.2 and C5 (no report states the severity): the screen's structured fields still carried independence_in_iadl_lost, i.e. the mild-versus-major threshold, the profile verdict or history items. Workers removed these keys in the other 19 cases; here they survived (the P03 worker flagged the question for a condition-wide decision). | FIXED: keys removed; `criteria_met` keeps domain impairment and cue-responsive recall. The informant FAQ score stays in the report as an instrument score. |
+
+perfect_agent.py, case_io.py check and test_case_guards re-run on all 30 VASC-DEM ids: clean.
+
+## Close-out (24 Oct 2026)
+
+Condition close-out per `plans/VASC-DEM-decisions.md`.
+
+- Synonyms (diagnosis_synonyms.yaml, applied with `--prune --conditions vascular_dementia`): F06.7, I67.3 and the umbrella "vascular cognitive impairment" no longer accepted (mild-VCI answers must not score in a dementia case); subtype labels scoped by mechanism, here multi-infarct labels and F01.1. Generic labels "vascular dementia", "major vascular neurocognitive disorder", "major neurocognitive disorder due to vascular disease", "VaD"; codes F01.50, F01.51, F01.5, F01.9, F01.A0-C0.
+- `ground_truth.diagnosis.accepted[0]`: em dash replaced by a colon or semicolon; wording and entity unchanged (no scoring effect: matching ignores punctuation).
+- `action-3-interpret-labs`: RPR and HIV removed from `required_arguments.panels` and the label; `[AAN_dementia_2001]` added. AAN 2001: syphilis screening "is not justified unless clinical suspicion for neurosyphilis is present"; NICE NG97 does not test routinely; this case has no risk factor. The stored labs output keeps its RPR and HIV results, so an agent that orders them still receives them (decision Q1).
+- Lipid must: "Intensify lipid lowering to LDL below 70 mg/dL (current 106 mg/dL on atorvastatin 20 mg) [AHA_ASA_2021_secondary]." -> "Intensify lipid lowering to LDL below 55 mg/dL (current 106 mg/dL on atorvastatin 20 mg): very high risk with a prior myocardial infarction and ischaemic strokes; high-intensity statin, adding ezetimibe if the goal is not reached [ACC_AHA_dyslipidemia_2026]." Reason: the 2026 ACC/AHA multisociety dyslipidemia guideline (supersedes the 2018 cholesterol guideline on which the AHA 2021 LDL-below-70 figure rests) sets LDL below 55 mg/dL for clinical ASCVD at very high risk (two major ASCVD events, or one plus two or more high-risk conditions).
+- `[ADA_2025_older_adults]` -> `[ADA_older_adults_2026]` in the HbA1c must (same target below about 8.0%; superseded edition, as in ALZ-EARLY).
+- `metadata.revision_reason`: the stale August literature/interaction audit text replaced by the round's (summary CENTRAL 9; not read by the harness).
+- `metadata.fallback_tool_kinds`: ct normal->case (the fallback describes this patient, not a library normal; summary CENTRAL 9).
+
+Checks after the close-out: `perfect_agent.py` and `case_io.py check` clean for this case; `test_case_guards -k VASC-DEM-` clean; `apply_diagnosis_synonyms.py --check --conditions vascular_dementia` clean.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, named in the report's own text.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+A fresh order of each study below was answered by the benchmark-level normal library, which contradicted this patient (age, rhythm, devices, surgery, stored findings). Each now has a case-specific report:
+
+- FDG_PET: Three focal metabolic defects in separate arterial territories (left posterior temporal, right postcentral-supramarginal, right cerebellar) with mild patchy frontal hypometabolism, a pattern consistent with multiple infarcts. No diffuse temporoparietal-predominant pattern. (fallback_tool_outputs.advanced_imaging)
+- perfusion_SPECT: Three focal perfusion defects in separate arterial territories (left posterior temporal, right postcentral-supramarginal, right cerebellar) with mild patchy frontal hypoperfusion, a pattern consistent with multiple infarcts. No diffuse temporoparietal-predominant pattern. (followup request_perfusion_spect)
+- performance_status: Karnofsky 60 (requires occasional assistance but able to care for most needs), ECOG 2 (ambulatory and capable of all self-care, unable to carry out any work activities). (fallback_tool_outputs.clinical_assessment)
+- exercise_stress_test: Reduced exercise capacity (3.8 METs) with a blunted blood pressure rise; submaximal heart rate on beta-blockade, non-diagnostic for inducible ischaemia. (fallback_tool_outputs.specialized_test)
+- neuropsych_battery: Multi-domain impairment led by executive dysfunction and slowed processing, with a retrieval-type memory deficit, mild anomia, impaired visuoconstruction and mild left-sided inattention. With the reported loss of independence, the profile is consistent with a major neurocognitive disorder of moderate severity. (followup request_neuropsych_battery)
+- gait_and_balance_timed: Mildly slowed timed gait (Timed Up and Go 12.6 s) with reduced left arm swing and imperfect tandem gait. (followup request_gait_and_balance_timed)
+- levodopa_challenge: MDS-UPDRS III 8/132 OFF and 8/132 ON (0% change), below the 30% threshold for a clinically meaningful levodopa response. (followup request_levodopa_challenge)
+- TEE: Apical aneurysm with laminated mural thrombus; LVEF about 38%; mildly dilated left atrium; aortic valve sclerosis without stenosis. No patent foramen ovale. (fallback_tool_outputs.echo)
+- cardiac_MRI: Chronic transmural anterior-apical infarct with an apical aneurysm containing laminated thrombus; dilated left ventricle with LVEF 36%. (followup request_cardiac_mri)
+- coronary_angiography: Chronic total occlusion of the mid left anterior descending artery with collateral filling; non-obstructive disease elsewhere. (followup request_coronary_angiography)
+- coronary_CTA: Occlusion of the mid left anterior descending artery (CAD-RADS 5) with an apical left ventricular aneurysm containing laminated thrombus; non-obstructive disease elsewhere. (followup request_coronary_cta)
+- DTI_tractography: Truncated posterior terminations of the left arcuate fasciculus in the posterior temporal lobe and reduced fractional anisotropy beneath the right postcentral cortex; optic radiations intact. (followup request_dti_tractography)
+- CT_perfusion: Matched perfusion defects confined to chronic tissue loss (left posterior temporal lobe; right postcentral and supramarginal cortex; right cerebellar hemisphere); no acute core or penumbral mismatch. (followup request_ct_perfusion)
+- perfusion_MRI: Matched perfusion defects confined to chronic tissue loss (left posterior temporal lobe; right postcentral and supramarginal cortex; right cerebellar hemisphere); no acute core or penumbral mismatch. (followup request_perfusion_mri)
+- MR_angiography: Mild left internal carotid bulb stenosis (about 30%) and minimal right bulb irregularity; no intracranial stenosis or occlusion. (followup request_mr_angiography)
+- cerebral_angiography: Mild left internal carotid bulb stenosis (about 30%); no intracranial stenosis, occlusion or aneurysm. (followup request_cerebral_angiography)
+- functional_MRI: Absent left posterior superior temporal activation within the infarct, with preserved left inferior frontal activation and normal motor somatotopy. (followup request_functional_mri)
+- BNP: 412 pg/mL, raised (fallback_tool_outputs.labs[BNP])
+
+Checks: `perfect_agent.py` pass; `test_case_guards.py -k VASC-DEM-M03` pass; criterion outputs unchanged against the pre-pass snapshot; no 60-character window of any expected_evidence in the new reports; synonym guard 0 changes.

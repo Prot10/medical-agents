@@ -19,7 +19,7 @@
 set -euo pipefail
 
 export CUDA_MODULE_LOADING=LAZY
-export HF_HOME="${HF_HOME:-/eos/project-d/diagbox/dvc/NeuroAgent/models/base/huggingface}"
+export HF_HOME="${HF_HOME:-/eos/project-d/diagbox/dvc/aprotani/models/hf}"
 # Tool-call syntax is sampled freely, not grammar-constrained (the default flipped to strict in
 # vLLM 0.26). GRPO rollouts pin the same value so training and serving sample the same way.
 export VLLM_ENFORCE_STRICT_TOOL_CALLING=0
@@ -56,16 +56,14 @@ fi
 
 case "$MODEL" in
   qwen3.5-9b)
-    # The model card's MTP speculative decoding is lossless and measured 60 -> 80 output tok/s
-    # single-stream (TPOT 14.2 -> 8.5 ms, 76% draft acceptance on tool-call output); it needs
-    # `ninja` in the vLLM venv for the JIT kernels.
+    # No MTP: with the prefix cache it adds no throughput, and on vLLM 0.23 the pair moved
+    # logprobs well past the batching noise floor (2 Nov 2026; vllm#53912 is still open).
     "${VLLM[@]}" \
       --model Qwen/Qwen3.5-9B \
       "${COMMON_FLAGS[@]}" \
       --language-model-only \
       --enable-auto-tool-choice \
-      --tool-call-parser qwen3_coder \
-      --speculative-config '{"method":"qwen3_next_mtp","num_speculative_tokens":2}'
+      --tool-call-parser qwen3_coder
     ;;
   gemma-4-e4b)
     "${VLLM[@]}" \

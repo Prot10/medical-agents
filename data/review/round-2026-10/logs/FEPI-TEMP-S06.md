@@ -1,0 +1,76 @@
+# FEPI-TEMP-S06
+Reviewer status: R1 not reviewed, R2 not reviewed (no notes file for FEPI-TEMP) | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| (none) | n/a | No reviewer notes for this case. The physician input is the July 2026 tool guidance (plan 1.3), applied through the plan classes below. |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| B | minor | `patient.history_present_illness` (name) | "Kapoor" is shared with M03 and S03 (class R). | No change here: the plan keeps the name in S06, where it fits her recorded South Asian ethnicity; M03 and S03 are renamed. |
+| C | major | `ground_truth.key_clinical_evidence[2]`, `ground_truth.assessment.required_recommendations[0]` | Right-hand automatisms and right tongue bite said to be "contralateral" and to "confirm left temporal onset" (class N, fact 12: manual automatisms usually ipsilateral; tongue-bite side does not lateralize). | FIXED: KCE states that these signs do not localize and that localization rests on the concordant EEG and MRI `[Lateralization_2005]`; the must is deleted. HPI unchanged (plan: fix the claims, not the HPI). |
+| B | minor | `initial_tool_outputs.ecg` | Template carry-over: intervals, rate and teaching text identical to S05 ("ECG evaluates a seizure mimic and does not diagnose epilepsy"; "no cardiac substrate ... to explain transient loss of consciousness"). | FIXED: own values (74/min, PR 142, QRS 84, QTc 411 ms, axis 45 degrees), correlation empty, report-voice interpretation. |
+| B | minor | `initial_tool_outputs.eeg.findings[0]`, `.impression` | "Frequent" at 10-12 per hour (ACNS 2021: occasional); TIRDA "semi-rhythmic". | FIXED: "Occasional, approximately 10-12 per hour"; "Sinusoidal, monomorphic rhythmic delta activity ... without ... evolution"; impression without "Frequent". |
+| D | minor | `initial_tool_outputs.eeg.limitations` | "Prolonged video-EEG monitoring may be considered" (class K). | FIXED: "Routine 45-minute recording with drowsiness and stage II sleep; no habitual event captured." |
+| C | major | `initial_tool_outputs.labs.panels.Additional` (Prolactin 47.6) | Prolactin about 10 h after the seizure has no value (class M, fact 11). | FIXED: row deleted; abnormal summary empty; interpretation "All values within reference ranges. Urine drug screen and serum beta-hCG negative." (beta-hCG is appropriate in a woman of childbearing potential and kept). |
+| D | minor | `initial_tool_outputs.mri.additional_observations`, `.impression` | No reason given for contrast in a lesional case (class E); unnumbered impression ending without a period. | FIXED: canonical post-contrast line added first; numbered impression (lesion, DNET most consistent, ganglioglioma not excluded; normal hippocampi). Size 14 x 11 x 10 mm kept (unique in the dataset; red herring path `initial_tool_outputs.mri.findings[0].size` still holds it; 0.8 cm3 matches an ellipsoid of these axes). |
+| D | major | `followup_outputs` literature (now [1]) | Blumcke Brain Pathol 2021 (outside the allow-list, unverifiable title), fabricated Glauser 2017 with wrong evidence levels, Englot Epilepsia 2012;53:1588 (class O); summary echoed the old criterion ("80-90%"). | FIXED: Blumcke NEJM 2017, SANAD II, Tomson 2018 EURAP; general summary; query and trigger renamed; last in the pathway. |
+| D | minor | `followup_outputs` drug check (now [0]) | Warning cited the creatinine (cross-modality); duplicate loratadine line; no HLA warning in a South Asian patient. | FIXED: generic renal dosing; one loratadine line naming levetiracetam and lamotrigine; HLA-B*15:02 warning before carbamazepine or oxcarbazepine; lamotrigine note on a future estrogen contraceptive. |
+| A | major | `ground_truth.action_criteria` | Literature, drug check and ECG required with template text and doubled citations; MRI `{contrast: true, protocol: epilepsy}`; em dash in the MRI evidence (classes A, B, E, H, T). | FIXED: order labs, ECG, MRI, routine EEG, drug check, literature; MRI `{protocol: epilepsy}` and routine EEG required, the rest optional; one bracketed key each; evidence names the stored results. |
+| A | major | `ground_truth.sequence_constraints`, `.stop_rule` | MRI -> drug check soft constraint with the drug check optional; stop rule with literature, drug check, ECG, max 0 (classes C, D). | FIXED: constraint deleted; stop rule MRI and EEG, max 1. |
+| C | major | `ground_truth.assessment` | Process and insight musts (recognize the aura, obtain MRI, do not dismiss the lesion, which duplicated a prohibition); first-line list with lacosamide; "80-90%" surgical claim; no HLA, contraception, SUDEP or valproate lines (class L). | FIXED: musts first-line lamotrigine or levetiracetam (non-inducing, low malformation risk), contraception and folic acid, HLA-B*15:02, surgical evaluation of the lesion, laboratory and swimming safety, driving, SUDEP; prohibitions: lesion not incidental, enzyme inducers (reworded, "surgical pharmacotherapy" removed), valproate (canonical MHRA 2024), LP. |
+| C | minor | `ground_truth.differential` | Ganglioglioma `high` (class P); hypoglycemia, which she offered as the explanation, missing (ruling 7). | FIXED: ganglioglioma moderate with the features favoring DNET; HS "Excluded" with the volumes; hypoglycemic episodes added very_low; other key features tightened. |
+| E | minor | `ground_truth.key_clinical_evidence` | Engineering lines (class G); em dash; generic text. | FIXED: two-seizure criterion from the prior auras, EEG and MRI concordance, lateralization, tumor surgery outcomes, non-inducing ASM. |
+| C | minor | `ground_truth.avoided_actions` | Template rationales. | FIXED: case-specific; CT waste kept (back to baseline, no head injury) with `[ILAE_MRI_2019]`; FDG_PET waste added (`[Willmann_2007]`). |
+| B | minor | `ground_truth.red_herrings[0].data_point` | Named the lesion "DNET" while the report gives a probable diagnosis. | FIXED: "Left inferior temporal cortical lesion measuring only 14 x 11 x 10 mm ...". |
+| A | minor | `fallback_tool_outputs.echo` | No `echo_type`. | FIXED: "TTE". |
+| B | minor | `metadata.difficulty_rationale` | "Five required tool calls" no longer true. | FIXED. |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+Ms. Kapoor, 24, a South Asian biochemistry graduate student without hormonal contraception, has ten months of metallic taste and rising epigastric auras, two witnessed with impaired awareness, and a first focal to bilateral tonic-clonic seizure. The epilepsy-protocol MRI (contrast added because a lesion was seen) shows a 14 x 11 x 10 mm non-enhancing multicystic cortical lesion in the left inferior temporal gyrus with inner table scalloping, most consistent with DNET, and normal hippocampi; the routine EEG shows occasional left anterior temporal spike-and-wave at F7 with TIRDA. The late prolactin is gone and the ECG has its own values. The right-hand automatisms and right tongue bite are no longer called lateralizing: localization rests on EEG and MRI. Only MRI and EEG are required; labs, ECG, interaction check and literature (now Blumcke 2017, SANAD II, EURAP 2018) are optional and FDG-PET is waste. Musts: lamotrigine or levetiracetam, contraception and folic acid, HLA-B*15:02 before carbamazepine or oxcarbazepine, surgical evaluation of the lesion, laboratory and swimming safety, driving, SUDEP; valproate and enzyme inducers are prohibited. Ganglioglioma is moderate and hypoglycemia, her own explanation, is listed as excluded.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+- Pack allow-list: `[ILAE_def_2014]`, `[ILAE_MRI_2019]`, `[IFCN_ILAE_EEG_2023]`, `[Lateralization_2005]`, `[Blumcke_2017]`, `[NICE_NG217_2025]` (plan 5, request 2).
+- Synonyms: neocortical DNET case inherits "mesial temporal lobe epilepsy" and "mesial temporal sclerosis epilepsy", both wrong here (plan 5, request 6).
+
+## Open questions for Andrea (judgment calls you could not settle)
+- None.
+
+## Verification
+Adversarial check (24 Oct 2026) of the final case against this log, `git diff` and plan section 4 (S06).
+- Confirmed: name kept per plan; HPI unchanged per class N; ECG now distinct; "occasional" at 10-12/h; prolactin gone; canonical post-contrast line; lesion volume 0.8 cm3 matches 14 x 11 x 10 mm; red herring path still holds the size; literature (Blumcke 2017, SANAD II, EURAP 2018) real; drug check optional with correct content (no hormonal contraception), HLA warning and must for a South Asian patient; tiers, stop rule (MRI, EEG, max 1), no constraint; FDG_PET waste; differential matches the results; case guards pass.
+- Found: `ground_truth.key_clinical_evidence[2]` said manual automatisms are usually ipsilateral and then concluded that the right-hand picking "does not localize", which contradicts itself and fact 12 (a usually-ipsilateral sign points right). Changed it to: right-hand picking is a weak, discordant sign that does not outweigh the concordant left temporal EEG focus and lesion; tongue-bite side does not lateralize [Lateralization_2005].
+- `perfect_agent.py -v` and `case_io.py check` clean for the case.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026. Checked uniformity of the plan's decisions across the 30 cases and the FND and MS-RR audit classes (engineering text, any-query outputs, second-tier labs, copied numbers, sharp-wave durations, differential codes). After the changes below, `perfect_agent.py` and `case_io.py check` are clean for all 30 cases and `test_case_guards.py -k FEPI-TEMP` passes.
+
+- `initial_tool_outputs.literature_search.general`: neutral focal-epilepsy block added (definition, classification, MRI protocol, first-line ASM, drug resistance), so a literature query that names no case-specific topic no longer receives a stored follow-up.
+- Literature follow-up trigger `search_literature_epilepsy_associated_tumors_and_asm_choice` renamed `search_literature_dysembryoplastic_glioneuronal_dnet`: it names the case's lesion or concurrent finding, so it is served only to a query that names it.
+- `action-7-interpret-labs.rationale`: engineering prefix or tier wording removed (was "A first convulsion warrants a check for ...").
+- `action-5-check-drug-interactions.rationale`: engineering prefix or tier wording removed (was "Her only medicine is as-needed loratadin...").
+- `red_herrings[0].intended_effect`: "A naive agent" reworded.
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (`plans/FEPI-TEMP-decisions.md`). What changed and why:
+
+- Diagnosis synonyms (`diagnosis_synonyms.yaml` G40 entries, re-applied with `--prune --conditions focal_epilepsy_temporal`): labels now focal epilepsy, temporal lobe epilepsy, TLE, epilepsy temporal lobe; removed mesial temporal sclerosis epilepsy (no hippocampal sclerosis on MRI); mesial temporal lobe epilepsy (the onset zone is not mesial); focal seizures; focal onset seizures; focal impaired awareness seizures (seizure-type labels, retired: their tokens occur in an acute symptomatic or functional-seizure answer). Codes: G40.2, G40.1, G40.9 plus G40.209, G40.109, G40.909 (not intractable); the idiopathic G40.009 and G40.019 removed and the intractable codes removed.
+- Checks: `perfect_agent.py -v` and `case_io.py check` clean; `test_case_guards.py -k FEPI-TEMP-` passes, now with the discriminator guard and the FEPI-TEMP banned strings.
+
+## Library contradictions (25 Oct 2026)
+
+Orders the benchmark library answered with a normal report that contradicts this case now get a case-specific report (term: gist, where stored):
+
+- analyze_eeg ambulatory: This is an ABNORMAL 48-hour ambulatory EEG due to: 1. Left anterior temporal spike-and-wave complexes (phase reversal at F7), maximal in NREM sleep. 2 (fallback_tool_outputs.eeg)
+- analyze_eeg video: This is an ABNORMAL 72-hour video-EEG due to: 1. Left anterior temporal spike-and-wave complexes (phase reversal at F7), maximal in NREM sleep. 2. Lef (followup request_video_eeg)
+- order_advanced_imaging FDG_PET: 1. Small photopenic focus in the left anterior inferior temporal gyrus with mild surrounding anterior temporal hypometabolism. 2. Normal mesial tempor (fallback_tool_outputs.advanced_imaging)
+- obtain_tissue_diagnosis resection: Dysembryoplastic neuroepithelial tumour, CNS WHO grade 1 (fallback_tool_outputs.tissue_diagnosis)
+- obtain_tissue_diagnosis stereotactic_biopsy: Dysembryoplastic neuroepithelial tumour, CNS WHO grade 1 (followup request_stereotactic_biopsy)
+- obtain_tissue_diagnosis open_biopsy: Dysembryoplastic neuroepithelial tumour, CNS WHO grade 1 (followup request_open_biopsy)
+- interpret_labs AED_levels: No levetiracetam, valproate, carbamazepine, phenytoin, lamotrigine or lacosamide detected. (fallback_tool_outputs.labs[AED_levels], also answers valproate_level)
+
+Checks: `perfect_agent.py` passes; the criterion snapshot of the case is unchanged; `pytest agent-platform/tests -k FEPI-TEMP` (case guards included), `test_reports_do_not_fabricate.py` and `apply_diagnosis_synonyms.py --check` pass; no new report repeats a 60-character window of any criterion's expected evidence.

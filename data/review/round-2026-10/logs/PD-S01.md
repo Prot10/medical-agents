@@ -1,0 +1,69 @@
+# PD-S01
+Reviewer status: R1 none, R2 none (PD has no notes file; only the July 2026 tool review, `condition_tool_guidance.yaml` key `parkinsons`) | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| (none) | - | No physician note exists for PD. The case was corrected against plans/PD.md (classes C1 to C23, per-case entry PD-S01) and the July 2026 tool review (MRI required; ECG, EEG, autonomic and tilt testing removed; labs, neuropsychology and genetics optional and targeted). |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| A | major | `ground_truth.action_criteria[action-3-search-medical-literature]`, `followup_outputs[0]` | Required literature criterion with an exact `query` string that no agent matches; literature as a clinical step (C1, ruling 5). | FIXED: criterion and follow-up deleted, removed from the stop rule; initial and fallback literature null. |
+| A | major | `action-2-check-drug-interactions`, `followup_outputs[1]` | Required drug check with exact `drug` and `current_medications` strings; the output said "no significant interaction with tamsulosin" in one line and warned about tamsulosin orthostasis in another (C2). | FIXED: `check_drug_interactions {}`, tier `optional` (no dopamine blocker on the list); one stored output `initial_tool_outputs.drug_interactions.general` (proposed carbidopa-levodopa; tamsulosin C2 sentence; lisinopril; non-selective MAOI contraindication; atorvastatin and acetaminophen no relevant interaction; absorption, nausea, ICD/EDS, hallucination warnings); follow-up deleted, fallback null; distinct label, rationale and expected_evidence. |
+| A | major | `action-1-analyze-brain-mri.alternatives` | Required `{"contrast": false, "protocol": "standard"}`, which a plain MRI order does not match (C5). | FIXED: `analyze_brain_mri {}`; canonical label and rationale; `[Postuma_2015]` only (no SWI finding). |
+| B | major | `action-1-analyze-brain-mri.expected_evidence` | Claimed a loss of the swallow-tail sign that the MRI report does not contain (C12). | FIXED: expected_evidence restates the report (normal for age, minimal punctate small-vessel change, Evans 0.28, normal basal ganglia, midbrain and pons). |
+| B | minor | `initial_tool_outputs.mri.findings[0].signal_characteristics.FLAIR`, `.additional_observations[5]`, `.impression` | First finding said no white matter hyperintensity "beyond minimal age-appropriate changes" while the second listed scattered punctate foci; the hot cross bun sign was placed in the midbrain (it is pontine); impression without a final period. | FIXED: FLAIR "No confluent periventricular or deep white matter hyperintensity"; "Normal midbrain morphology without hummingbird sign; no hot cross bun sign in the pons"; impression "Normal midbrain and pons" with period. |
+| C | major | `ground_truth.assessment.required_recommendations`, `key_clinical_evidence[0]` | "Clinically established PD" at a first visit before any levodopa (only one supportive criterion: rest tremor) (C6); generic template musts; em dash (C16). | FIXED: five musts: C6 probable-PD diagnostic must, canonical levodopa start, agonist caution (age 65), lying and standing BP during titration (tamsulosin, lisinopril), physiotherapy, OT and SLT referrals tied to his near-falls, fine-motor loss and hypophonia. |
+| C | minor | `ground_truth.assessment.prohibited_recommendations` | Three generic prohibitions with an em dash; pimavanserin listed among antipsychotic options. | FIXED: canonical D2-blocker prohibition; anticholinergic prohibition made case-specific (age, urinary retention with BPH). |
+| D | major | `ground_truth.key_clinical_evidence` | Two "July 2026" engineering sentences (C4); "baseline labs" and "baseline neuropsych" for steps that are not criteria (C15). | FIXED: six case-specific lines (parkinsonism, probable PD, no exclusion, no early-falls red flag, MRI, orthostatic drugs). |
+| C | major | `ground_truth.differential[Essential tremor]` | ET `moderate` (and "Sister with ET" as a feature of his own tremor) although rest tremor with re-emergence, decrement and rigidity exclude it (C13). | FIXED: `low` with the excluding features; vascular, MSA and PSP `key_features` restated against the MRI and exam. |
+| B | minor | `ground_truth.red_herrings[0]` | Data point bundled the sister's ET with a 10 pack-year smoking history that does not anchor toward ET; path pointed at the whole list. | FIXED: sister's ET only, `field_path` `patient.clinical_history.family_history[3]`. |
+| C | minor | `ground_truth.avoided_actions` | Generic rationales; no DaTscan, autonomic or tilt guard (C8, 3.3). | FIXED: case-specific rationales for EEG, CSF, echo, monitoring, ECG; added `avoid-waste-datscan` (NICE NG71 rationale), `avoid-waste-autonomic-testing`, `avoid-waste-tilt-table`. |
+| B | major | `followup_outputs` (missing DaTscan) | No stored DaTscan, so an ordered scan returned the library "Normal DaTscan", an MDS absolute exclusion of the label (C8). | FIXED: stored C8 report (`request_datscan`, 123I-ioflupane SPECT): left posterior putamen 1.16, right 1.44 (normal >1.50), caudates 2.39 and 2.55, contralateral to the worse right side. |
+| A | minor | `fallback_tool_outputs.echo`, `.ecg` | Echo fallback without `echo_type`; ECG fallback rate 70 against vitals HR 71 and vague text (C17). | FIXED: echo `TTE`, EF 61% with concrete text; ECG "Sinus rhythm 71/min, normal axis and intervals, no ST change." |
+| B | minor | `ground_truth.sequence_constraints`, `.stop_rule` | `max_additional_actions` 0; stop rule listed the drug and literature ids (C20). | FIXED: no constraint (DaTscan is waste); stop rule MRI only; `max_additional_actions` 2. |
+| E | minor | criterion `rationale`, `citations`; `metadata.difficulty_rationale`, `.revision_reason`, `.last_revised` | Rationale copied from label; bare duplicate keys (C3); shared engineering metadata (C19). | FIXED: distinct rationales, bracketed keys only; case-specific difficulty (1 required criterion), revision reason, 2026-10-24. |
+| - | check | plan 3.6 | perfect_agent ok (MRI from the initial output); case_io check: no failure names PD-S01; test_case_guards pass; discriminator_defects empty. Routing: DaTscan returns the case report; MIBG, amyloid, FDG, PSG, battery, orthostatic BP return the library (normal, consistent with the case: no dream enactment, MMSE 28/30, no orthostatic symptoms); `drug: levodopa` and `drug: rasagiline` return the case output. | - |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+
+This 65-year-old man has a 2-year right-predominant tremor-onset parkinsonism (pill-rolling rest tremor with re-emergence, decrement, cogwheel rigidity, micrographia, hypophonia), no levodopa trial yet, and no red flag (two near-falls only, pull test one step). He is now diagnosed as clinically probable PD, not "established": rest tremor is his only supportive criterion until a levodopa response is seen. The policy is a brain MRI (required, any protocol) and an optional medication review; the literature step is gone, and a DaTscan is marked waste because the clinical diagnosis is clear (a stored abnormal scan, left putamen worse, answers an agent who orders it). The MRI report no longer contradicts itself on white matter and places the hot cross bun sign in the pons; its expected evidence no longer claims a swallow-tail loss. The musts are the probable-PD diagnosis, levodopa 25/100 half a tablet three times daily titrated to 300 mg/day, the agonist ICD/EDS warning, lying and standing BP during titration (tamsulosin, lisinopril), and physiotherapy, OT and SLT. ET is now low.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+
+- Plan R1: `[NICE_NG71]` (levodopa and agonist musts, therapy referral must, DaTscan avoided action) is not yet in the PD criteria pack.
+
+## Open questions for Andrea (judgment calls you could not settle)
+
+- None specific to this case (plan Q1 to Q6 apply).
+
+## Verification
+- Checked against the committed rewrite (diff from b8be2153^, field by field), plans/PD.md section 4 entry and classes C1 to C23. No notes file exists for PD, so there is no note id to account for. Tools re-run 24 Oct 2026: perfect_agent ok, case_io check (no failure names the case), test_case_guards pass (leak, followup, banned strings), and a MockServer routing script (MRI or CT, DaTscan, MIBG, amyloid, FDG, PSG, battery, orthostatic BP, labs, ECG, drug check for levodopa and for rasagiline).
+- Every row of the Own findings table was confirmed in the file: literature criterion, follow-ups and outputs gone; drug criterion `{}` optional with one stored output naming tamsulosin and lisinopril; MRI `{}` with evidence restating the report (Evans 0.28, no swallow-tail claim); FLAIR contradiction and hot cross bun placement fixed; ET `low`; red herring path `family_history[3]` correct; stored DaTscan left putamen worse (contralateral to the right-sided signs); DaTscan, autonomic and tilt waste; ECG fallback 71/min matches vitals; stop rule MRI only, 2 extra actions.
+- Hunted for introduced errors: no claim of established PD, levodopa response, constipation or hyposmia (the HPI denies constipation and none is claimed); no red flag in the data; musts consistent with allergy (latex only) and medicines; library defaults that the agent can reach (PSG normal, battery MoCA 28, orthostatic BP normal, MIBG normal) agree with the patient block (no dream enactment, MMSE 28/30, no orthostatic symptoms). Patient block unchanged.
+- Found nothing to correct. No change made.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/PD-decisions.md`.
+
+- Accepted codes are now G20.A1 (PD without dyskinesia, without mention of fluctuations; also PD NOS) and G20; G20.A2, G20.B1, G20.B2 (motor complications the case does not have) and G20.C ("Parkinsonism, unspecified", not PD) are no longer accepted. Labels unchanged.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: MDS-UPDRS III 24/132 OFF, 12/132 ON (50%) (fallback_tool_outputs.clinical_assessment). Why: rule 3: the stored exam documents parkinsonism; the library reports MDS-UPDRS III 3/132 with no parkinsonian signs.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: TUG 10.8 s, 10 m 1.16 m/s, Berg 53/56 (followup request_gait_and_balance_timed). Why: rule 3: the stored gait exam (arm swing, stride, turns, pull test) is abnormal; the library reports a normal gait, turns in 3 steps and Berg 56/56.
+- `order_specialized_test {test_type: speech_language_evaluation}`: hypophonia, articulation precise (63 dB SPL), no aphasia (fallback_tool_outputs.specialized_test). Why: rule 3: the stored exam records hypophonia; the library reports no motor speech disorder.
+- `order_specialized_test {test_type: olfactory_test}`: UPSIT 26/40 (moderate microsmia) (followup request_olfactory_test). Why: rule 1: olfactory loss is a supportive feature of PD; the library reports normosmia (UPSIT 35/40).
+- `order_advanced_imaging {modality: MIBG_scan}`: early H/M 1.53, delayed 1.40, washout 33% (fallback_tool_outputs.advanced_imaging). Why: rule 1: cardiac sympathetic denervation is a supportive criterion of PD; the library reports normal uptake (H/M 2.4/2.6).
+
+Checks: `perfect_agent.py` 30/30 PD pass; `test_case_guards.py -k PD-` and `pytest agent-platform/tests -k PD-` 300 passed (`test_grpo_rollout.py` not collected: training extra not installed); every criterion's served output unchanged (snapshot before/after); synonym guard 0 changes; no new report repeats a 60-character window of any `expected_evidence`; every listed term is answered without the library.

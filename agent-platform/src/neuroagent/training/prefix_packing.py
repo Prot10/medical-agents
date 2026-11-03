@@ -101,7 +101,10 @@ def packing_config(config) -> dict | None:
     layer_types = getattr(config, "layer_types", None)
     if layer_types and any(t not in ("full_attention", "sliding_attention") for t in layer_types):
         return None  # e.g. Qwen3.5's linear_attention layers
-    head_dim = max(getattr(config, "head_dim", 0) or 0, getattr(config, "global_head_dim", 0) or 0)
+    if "head_dim" in (getattr(config, "per_layer_attributes", None) or ()):  # transformers >= 5.16
+        head_dim = max(config.per_layer_config[i].head_dim for i in range(config.num_hidden_layers))
+    else:
+        head_dim = max(getattr(config, "head_dim", 0) or 0, getattr(config, "global_head_dim", 0) or 0)
     return {
         "layer_types": layer_types,
         "sliding_window": getattr(config, "sliding_window", None),

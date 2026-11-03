@@ -1,0 +1,116 @@
+# GBS-RS15
+Reviewer status: R1 not reviewed, R2 needs_changes | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| 98e9377c-e0d0-4bf6-8007-28afb8fdb3b0 | FIXED | Option chosen: give her limb involvement (plan RS15, open question 1, decided under Andrea's 24 Oct rule). The case is now the pharyngeal-cervical-brachial (PCB) variant [Wakerley_2014]. `neurological_exam.motor` records neck flexion 3/5, neck extension 4/5, shoulder abduction and elbow flexion 4/5, grip 4+/5 and legs 5/5. `reflexes`: arm reflexes absent, knee 2+, ankle 1+. The HPI and chief complaint add a week of neck and arm weakness. The NCS no longer says "no generalized polyneuropathy" or reports paraspinal positive sharp waves (a motor neuron disease pattern). It now shows reduced median and ulnar CMAPs with normal conduction velocities, absent upper-limb F-waves, normal leg and sensory studies, and proximal arm denervation. Label "Guillain-Barré syndrome, pharyngeal-cervical-brachial variant (anti-GT1a positive)". Pearl 2 (loss of limb reflexes supports GBS over MG) was false against the old exam. It is rewritten: bulbar reflexes do not separate GBS from MG, while arm areflexia, CSF, F-waves and RNS do. |
+| 7fcdfb5c-5437-4e9a-bdf6-5ca43ce03ea9 | FIXED | AChR and MuSK moved from the baseline labs to their own follow-up, with LRP4 added (all negative). They are scored by a new recommended criterion `action-11-interpret-labs-myasthenia` (`anti_AChR`, `anti_MuSK`). The NCS now reports 3 Hz RNS of facial (nasalis), spinal accessory (trapezius) and ulnar nerves without decrement. Optional `action-12-order-specialized-test-sfemg` returns a normal frontalis jitter study. Exam negatives added: no ptosis, no ophthalmoparesis, no fatigability, no fluctuation in the history. MG lowered from high to low, with those reasons. Ice pack test not added: there is no ptosis to test (deviation from plan RS15). |
+| b578810b-e5f5-41d9-a0f8-cf6df20c6bbf | FIXED | Weight loss reduced from 9 kg to 4 kg over 2 weeks (plan), with weight 70.7 kg (74.7 kg two weeks ago) and height 160 cm in `physical_exam.general` (BMI 27.6 agrees). Haemoglobin 12.3 (normal); albumin 3.2 (low, from intake and pneumonia). The prior CT chest now states no mass or lymphadenopathy. "Malignancy (paraneoplastic or infiltrative bulbar syndrome)" is added to the differential at low, with reasons (dysphagia explains the weight; CT chest, CSF cytology, CEA and CA-125 negative). The weight loss is `red_herrings[1]`. Prior episode: "Recurrent GBS or autoimmune nodopathy" low in the differential, KCE 4 [EAN_PNS_2023], and optional `action-13-interpret-labs-nodal` (anti-NF155, anti-CNTN1, negative follow-up). No body CT criterion: the reason-based route of the plan was chosen. |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| D | major | `patient.history_present_illness`, `neurological_exam.additional` | The HPI gave the brain MRI result ("no new lesions"), which is now a scored study. `additional` gave the ganglioside panel results (GD1b, GM1, GQ1b negative) and "Anti-GT1a not tested initially", plus editorial sentences (C2/C7). | FIXED: brain MRI removed from the HPI. Ganglioside text deleted. `additional` keeps the NG tube and prior stroke. Pre-referral laryngoscopy, swallow study, neck CT and chest CT stay as dated history (none is orderable or scored). Pertinent negatives added (botulism exposures, diphtheria vaccination, fatigability). |
+| A/D | major | `initial_tool_outputs.specialized_test` | A videofluoroscopic swallow study was reported inside the NCS/EMG report (wrong modality; not in the vocabulary, C9). Median entrapment was labelled "incidental". Pattern "Isolated bulbar neuronopathy". `test_type` was prose. | FIXED: swallow study moved to pre-referral history (the swallow reassessment is a must). Report rewritten for the PCB pattern with limits. Hedged impression; `test_type` "emg_ncs". Carpal tunnel pattern dropped (it confounded the median CMAP). |
+| A | major | `followup_outputs` brain MRI | Served under `order_advanced_imaging` (`request_brain_mri_gadolinium`), with em dashes (C9). | FIXED: `analyze_brain_mri` (trigger `order_brain_mri_brainstem_skull_base`), with IX-X nerve enhancement (Kind 2), the chronic PCA infarct and a normal brainstem. New recommended `action-10-analyze-brain-mri`; `avoid-waste-4-analyze-brain-mri` removed. |
+| C | major | ganglioside follow-up | Trigger `request_anti_ganglioside_panel_extended` was unreachable by the a1 order. The GT1a positive result was uninterpreted (C2). | FIXED: trigger `request_anti_gq1b_gt1a_ganglioside_panel` (reachable when the call names GT1a, GQ1b or ganglioside; probe verified). GT1a IgG 1:160 positive and GQ1b negative, with a hedged templated comment. Interpreted in KCE 3. No criterion: BLOCKED (CENTRAL 1). The must asks to send the antibodies without delaying treatment. |
+| C | major | respiratory follow-up | "All values within normal limits"; NIF "well above threshold"; no MEP, weight or cough (C1). | FIXED: canonical format: FVC 2.4 L (86% predicted; 34 mL/kg at 70.7 kg), MIP -42 L, MEP 52 L, cough weak. Bulbar weakness with weak cough is an ICU-level trigger (must 1). |
+| C | major | `ground_truth.assessment` | "Initiate IVIG / plasma exchange" had no indication. There was no airway or aspiration plan and no pneumonia treatment, although she has aspiration pneumonia. "Speech-and-swallow consult" was combined with nil by mouth. Non-canonical steroid prohibition (C8). | FIXED: must 1 high-dependency monitoring with an airway protection plan. Must 2 IVIg 2 g/kg (about 28 g/day) now, at day 14, for progressive bulbar weakness in an ambulant patient (EAN/PNS "consider"); PE within 4 weeks equivalent. Must 3 treat the aspiration pneumonia. Must 4 send GT1a/GQ1b. Must 5 telemetry. Must 6 SLT reassessment. Prohibitions: canonical steroid text, renal function before IVIg. |
+| C | major | `initial_tool_outputs.labs` | Interpretation inside the summary ("aspiration pneumonia", "malnutrition"). HIV leak sentence (C10). Ganglioside and MG antibodies in the baseline labs. No potassium, glucose, liver tests or CK. | FIXED: summary factual. HIV removed (no risk). Antibodies moved to follow-ups. CMP (glucose 89, consistent with CSF ratio 0.70) and CK 64 added. TSH and tumour markers kept. |
+| C | major | `ground_truth.differential` | Botulism moderate; brainstem stroke "MRI excludes" before any MRI. Bulbar motor neuron disease missing although the old NCS described an MND pattern (C5). | FIXED: botulism, brainstem stroke, bulbar-onset MND and diphtheria very_low; MG, malignancy and recurrent GBS/nodopathy low; all with case findings. |
+| C | minor | DDI | Medication list echoed; taper boilerplate. | FIXED: category-level output (aspirin and line placement or LP, amlodipine and PE volume shifts). a6 optional: no interaction changes management (plan 3.1 item 7). |
+| C | minor | telemetry, CSF | 72 h telemetry (C12); CSF "(N/A PMN/N/A lymph)". | FIXED: 24 h with blood pressure; CSF report voice, values unchanged. |
+| A | major | literature and DDI placeholders, literature output | Empty follow-ups (C9). The initial literature output echoed a5's expected_evidence (C11). | FIXED: placeholders deleted. Population-keyed PCB output [Wakerley_2014, EAN_PNS_2023]; a5 optional and last. |
+| C | major | criteria, stop rule, citations | Template criteria and constraints, stop rule including literature and DDI with max 0, free-text citations. | FIXED: plan 3.1 order (NCS, CSF, brain MRI, MG antibodies, labs, respiratory, telemetry, ECG, then optional SFEMG, nodal antibodies, DDI, literature). Stop rule: the five required criteria, max 3. |
+| C | minor | `key_clinical_evidence`, `red_herrings`, `metadata` | Two pearls, one false; no red herrings; metadata "dysphagia without limb weakness". | FIXED: five pearls; red herrings for the prior stroke and the weight loss; metadata rewritten. |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+GBS-RS15 is now a pharyngeal-cervical-brachial variant in a 74-year-old woman. She has 2 weeks of bulbar palsy with silent aspiration and aspiration pneumonia, then neck flexion and proximal arm weakness with absent arm reflexes, with normal legs and sensation. The NCS shows an upper-limb motor pattern with absent F-waves and normal RNS of facial, accessory and ulnar nerves. The CSF shows albuminocytological dissociation. Brain MRI shows IX-X enhancement and only the old PCA infarct. Myasthenia antibodies (AChR, MuSK, LRP4) are negative, and anti-GT1a is positive (send-out, not scored). MG is lowered to low, and botulism, brainstem stroke and bulbar MND to very_low, each with reasons. The weight loss is now 4 kg and explained by dysphagia, and malignancy and recurrent GBS/nodopathy are listed at low. Management is high-dependency monitoring with an airway plan, IVIg 2 g/kg now (PE equivalent), treatment of the aspiration pneumonia, telemetry and swallow reassessment, with corticosteroids prohibited.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+- `ground_truth.diagnosis.accepted[0]` changed (reviewer ruling 98e9377c; plan RS15): "isolated bulbar variant with anti-GT1a IgG positivity" became "pharyngeal-cervical-brachial variant (anti-GT1a positive)". Synonyms untouched.
+- Plan CENTRAL 1 and 11: an `interpret_labs` term for anti-GT1a IgG is needed before a criterion can score the GT1a order. BLOCKED until then. The follow-up `request_anti_gq1b_gt1a_ganglioside_panel` is reachable by a call that names GT1a, GQ1b or ganglioside.
+- Plan CENTRAL 3: `botulinum_toxin_assay`. Botulism is lowered here on clinical reasons.
+- Plan CENTRAL 6: this PCB case accepts "AIDP", "AMAN" and "miller fisher syndrome" through the code-level synonyms. "miller fisher syndrome" is wrong here.
+- Plan CENTRAL 5 (weight field).
+
+## Open questions for Andrea (judgment calls you could not settle)
+- Decided, not open (plan open question 1): I took the edit route and kept G61.0, making the case a full PCB variant rather than relabelling it as MG or MND. The source case's isolated pharyngeal weakness is a recognised incomplete PCB form (Wakerley 2014). It was not kept because without limb signs the diagnosis would rest on an anti-GT1a result the agent cannot order (CENTRAL 1).
+
+## Verification
+Adversarial verifier, 24 Oct 2026. Read the log, the diff and the whole final case.
+- Note 98e9377c: FIXED holds. Neck flexion 3/5 and proximal arm 4/5 with absent arm reflexes, legs 5/5 with preserved reflexes, normal sensation; NCS upper-limb motor pattern with absent upper-limb F-waves and no paraspinal MND pattern; label, KCE 1 and literature all PCB [Wakerley_2014]; pearl 2 rewritten correctly.
+- Note 7fcdfb5c: FIXED holds. AChR/MuSK/LRP4 negative in their own follow-up scored by a recommended criterion; RNS of facial, accessory and ulnar without decrement; optional SFEMG normal; MG low with those reasons. Declining the plan's ice pack test is sound: there is no ptosis to test.
+- Note b578810b: FIXED holds. Weight 74.7 to 70.7 kg (4 kg, explained by dysphagia), BMI 27.6 agrees; malignancy low with named negatives; prior episode addressed (differential, KCE 4, optional nodal antibodies).
+- GT1a follow-up reachable (probe: a call naming GT1a or ganglioside is served it); BLOCKED criterion correctly logged under CENTRAL 1. Arithmetic: FVC 2.4 L = 34 mL/kg; IVIg 28 g/day; 20 mL/kg = 1.4 L; glucose ratio 62/89 = 0.70.
+- No errors found; no change made.
+- perfect_agent.py GBS-RS15 -v passes; case_io.py check clean for the case.
+
+
+## Condition audit (24 Oct 2026)
+Condition auditor, after the worker and the verifier. Changes made through case_io; `perfect_agent.py` and `case_io.py check` re-run clean for all 30 GBS cases afterwards, and `test_case_guards.py -k GBS` passes.
+- E, minor: `fallback_tool_outputs.drug_interactions.general.proposed` read "(agent not specified on this case's pathway)", an engineering note served to any off-pathway interaction check (PATTERNS 5). Now "Medication list review", as in S01-S03 and RS18.
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/GBS-decisions.md` (Andrea, 24 Oct 2026: resolve open points for dataset quality).
+
+- Synonyms (`diagnosis_synonyms.yaml` G61.0 split into scoped entries, expanded with `--prune`): now accepts the generic GBS labels plus "pharyngeal cervical brachial"; AIDP, AMAN and Miller Fisher labels removed.
+- Checks: `perfect_agent.py` pass; `case_io.py check` clean for this case; GBS guards pass; synonym `--check` clean.
+
+## Central vocabulary wired (24 Oct 2026)
+Terms added in commit e19131d6 (`interpret_labs` `anti_GQ1b_IgG`, `anti_GT1a_IgG`, `botulinum_toxin_assay`; `analyze_csf` `CMV_PCR`), wired per plan C2/C3/C9 and GBS-decisions CENTRAL 1-3. Checks after the change: `perfect_agent.py -v` pass, `case_io.py check` clean for this case, `test_case_guards -k GBS-` 60 passed; optional criteria probed against the MockServer (served the case's own report, not a fallback).
+
+- New `action-14-interpret-labs-anti-gt1a` (recommended; `{panels: [anti_GT1a_IgG]}`), after the myasthenia antibodies, answered by `request_anti_gq1b_gt1a_ganglioside_panel` (GT1a 1:160, GQ1b negative, both on one request; GQ1b checks the MFS overlap). The criterion credits the GT1a order, the variant's antibody.
+- New `action-15-interpret-labs-botulinum-toxin` (optional; `{panels: [botulinum_toxin_assay]}`) with a new follow-up `request_botulinum_toxin_assay` (not detected) after the ganglioside follow-up. Optional for the same clinical reasons as the differential (very_low). Differential 'Botulism' key_features add "the serum botulinum toxin assay, if sent, is negative".
+- Must 4 "Send serum anti-GT1a and anti-GQ1b IgG (send-out) without delaying treatment for the result." deleted (now scored); new prohibition "Do not delay IVIg while waiting for the send-out anti-GT1a and anti-GQ1b result."
+- Resolves the BLOCKED criterion of the ganglioside finding (CENTRAL 1) and CENTRAL 3.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+- follow-up `request_cardiac_monitoring`: `monitor_type` "Continuous telemetry" -> `telemetry`.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Engineering text (25 Oct 2026)
+
+Review-process wording (references to the round's rulings, the round policy file, the criteria packs, and tier markers such as "(optional)" in criterion labels and rationales) is shown to physicians in the review app, so it was rewritten in clinical language. The tier stays in the criterion's `importance` field; scoring is unchanged. `test_case_guards.py::test_no_review_process_text` now fails on any of it.
+
+- criterion `action-6-check-drug-interactions` rationale: "Amlodipine and aspirin do not interact with IVIg and aspirin does not preclude lumbar puncture, so the check cannot change management (ROUND_POLICY ruling 6)." -> "Amlodipine and aspirin do not interact with IVIg and aspirin does not preclude lumbar puncture, so the check cannot change management."
+
+## Weight and height (25 Oct 2026)
+
+- `patient.demographics`: weight 69.8 -> 70.7 kg, height 159 -> 160 cm, BMI 27.6 -> 27.6 (the prompt shows height, weight and BMI).
+- Why: rule 1: patient.physical_exam.general states weight 70.7 kg, height 160 cm.
+- The FVC mL/kg figures and the weight-based IVIg amounts in the text were checked against this weight: all within rounding, no text change.
+
+Checks: `perfect_agent.py` ok; BMI = weight / height^2 to one decimal.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 50, ECOG 2 (fallback_tool_outputs.clinical_assessment). Why: rule 1: the library reports Karnofsky 100 / ECOG 0 and a working patient; she has severe dysphagia with nasogastric feeding, aspiration pneumonia and arm and neck weakness.
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: no tremor or rigidity; upper-limb items limited by weakness, response not assessable (followup_outputs[9] request_levodopa_challenge). Why: rule 1: the library describes a normal motor examination, gait and postural reflexes; arm weakness 4/5 and neck flexion 3/5.
+- `order_body_imaging {study: spine_MRI}`: smooth enhancement of the ventral cervical roots C5-C7; cauda equina and cord normal (fallback_tool_outputs.body_imaging). Why: rule 1: smooth enhancement of the cauda equina and ventral roots is seen in most patients with this polyradiculoneuropathy (Gorson 1996; Byun 1998), while the library reads the roots as normal (here the cervical roots, which supply the weak arms).
+- `order_body_imaging {study: peripheral_nerve_MRI}`: C5-C7 root enhancement and mild brachial plexus T2 hyperintensity; lumbosacral normal (followup_outputs[10] request_peripheral_nerve_mri). Why: rule 1 and 3: the library reads the nerve roots as normal; root enhancement as on the spine MRI of this case (cervical roots).
+- `order_specialized_test {test_type: speech_language_evaluation}`: moderate flaccid dysarthria with hypernasality and dysphonia; language normal (fallback_tool_outputs.specialized_test). Why: rule 1 and 3: a hoarse weak voice, nasal regurgitation and bilateral palatal weakness are in the examination; the library reports no dysarthria.
+- `order_body_imaging {study: chest_xray}`: Right lower lobe consolidation. Nasogastric tube tip below the diaphragm (followup_outputs[11] request_chest_xray). Why: rule 2: the CT chest before referral showed right lower lobe consolidation, with crackles at the right base; the library reports clear lungs.
+- `order_body_imaging {study: chest_CT}`: Right lower lobe consolidation. No mass or lymphadenopathy (followup_outputs[12] request_chest_ct). Why: rule 2: the CT chest before referral showed right lower lobe consolidation, with crackles at the right base; the library reports clear lungs.
+- `order_body_imaging {study: chest_CTA}`: no pulmonary embolism. Right lower lobe consolidation. No mass or lymphadenopathy (followup_outputs[13] request_chest_cta). Why: rule 2: the CT chest before referral showed right lower lobe consolidation, with crackles at the right base; the library reports clear lungs.
+- `order_body_imaging {study: chest_abdomen_pelvis_CT}`: Right lower lobe consolidation. No mass or lymphadenopathy. Abdomen and pelvis unremarkable (followup_outputs[14] request_chest_abdomen_pelvis_ct). Why: rule 2: the CT chest before referral showed right lower lobe consolidation, with crackles at the right base; the library reports clear lungs.
+- Case fallback replaced, `order_ct_scan` (fallback_tool_outputs.ct): chronic left posterior cerebral artery territory infarct; no acute abnormality. Why: rule 2 and 3: a left posterior cerebral artery infarct 9 years ago is in the history and on the stored brain MRI; the old fallback read no infarct.
+- Case fallback replaced, `analyze_brain_mri` (fallback_tool_outputs.mri): chronic left posterior cerebral artery territory infarct; no acute abnormality. Why: rule 2 and 3: the stored brain MRI shows the chronic left posterior cerebral artery infarct; the old fallback read only sinus mucosal thickening.
+- `order_body_imaging {study: pelvis_abdomen_CT}`: unremarkable abdomen and pelvis; right basal consolidation (followup_outputs[15] request_pelvis_abdomen_ct). Why: rule 3: aspiration pneumonia of the right lower lobe is in the history; without its own report this order received the chest-abdomen-pelvis report, which describes the whole chest.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

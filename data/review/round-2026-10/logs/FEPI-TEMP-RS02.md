@@ -1,0 +1,95 @@
+# FEPI-TEMP-RS02
+Reviewer status: no reviewer notes for FEPI-TEMP (R1 and R2 never reviewed this condition in a notes round) | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| (none) | n/a | No reviewer notes for this case. Physician input applied: the July 2026 tool guidance for focal_epilepsy_temporal via plans/FEPI-TEMP.md. |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| B | major | `initial_tool_outputs.mri` (classes F, E) | Standard study that "recommends epilepsy protocol MRI", with "subtle" right hippocampal signal "raising concern for early" MTS and a teaching threshold in the asymmetry index, while the label rests on definite right MTS; calcifications placed in deep white matter and basal ganglia (atypical for neurocysticercosis); no right temporal calcification although the label calls the HS secondary to the calcified cysts. | FIXED: non-contrast 1.5T epilepsy-protocol MRI (technique line, no gadolinium for pregnancy); finding 1 definite right HS (atrophy, T2/FLAIR hyperintensity, loss of internal architecture, temporal horn enlargement), volumes kept (2.6 vs 3.3 cm3, 21% smaller, index 0.12 as (L - R)/(L + R)); finding 2 about 12 calcified nodules at cortical-subcortical junctions including the right inferior temporal gyrus and right thalamus, SWI phase consistent with calcification, no cyst or scolex on 3D T2; numbered impression naming calcified neurocysticercosis (Kind 2) with a one-line imaging differential. |
+| B | major | `fallback_tool_outputs.ct` | Fallback head CT "No ... mass" with no calcifications in a patient with about 12 parenchymal calcifications. | FIXED: CT shows the punctate calcifications without edema, no acute abnormality, abdominal shielding, MRI recommended. |
+| C | major | `initial_tool_outputs.labs` (class M, plan RS02) | Prolactin 185 ng/mL in the third trimester (no diagnostic value, fact 11); no urine protein, liver enzymes or LDH although eclampsia is the first question. | FIXED: prolactin deleted; BMP became CMP with total protein, albumin, AST 19, ALT 14, ALP 168 (pregnancy range), bilirubin 0.4; Urinalysis panel (dipstick protein negative, protein/creatinine 0.11 mg/mg); LDH and uric acid normal; levetiracetam moved to an `AED_levels` panel; interpretation in panel voice. |
+| A | major | `ground_truth.action_criteria` (classes A, B, D, E, H, T) | MRI `{contrast: true, protocol: epilepsy}` in pregnancy; literature and drug check required with template evidence; ECG required with the pre-excitation template; labs optional with the template; doubled citations; rationales equal labels. | FIXED: order labs, ECG, MRI, EEG, drug check, literature. Labs required `{panels: [BMP, LFTs, CBC, urinalysis, AED_levels]}` (a CMP satisfies BMP plus LFTs) [ACOG_HTN_2020]; ECG optional [NICE_NG217_2025]; MRI required `{protocol: epilepsy}` [ILAE_MRI_2019]; routine EEG required [IFCN_ILAE_EEG_2023]; drug check optional [AAN_WWE_2009]; literature optional [IDSA_NCC_2018]; case-specific labels, rationales and evidence. |
+| C | major | `ground_truth.avoided_actions` (classes I, J) | CT as waste in pregnancy (head CT is acceptable and shows the calcifications); no protection against gadolinium or FDG-PET; template rationales. | FIXED: CT waste deleted; new `avoid-harm-5-gadolinium-mri-pregnancy` (`analyze_brain_mri {contrast: true}`, harm, [ACOG_imaging_2017]) and `avoid-harm-6-fdg-pet-pregnancy` (`order_advanced_imaging {modality: FDG_PET}`, harm); CSF, echo, Holter waste kept with case-specific rationales. |
+| D | minor | `followup_outputs` FDG-PET (class J) | FDG-PET follow-up with no criterion, in a pregnant patient. | FIXED: deleted; not moved to the fallback (PET is not done in pregnancy). |
+| D | major | `followup_outputs` literature (classes A, O) | Tomson Lancet Neurol 2019 and Wilson CID 2009 do not exist as cited; Garcia 2014 with a wrong title; invented percentages. | FIXED: White 2018 (IDSA/ASTMH), Garcia, Nash, Del Brutto 2014 with its real title, Harden 2009 (Neurology 73:142-149, levels Level C for levetiracetam), Tomson 2018 (EURAP); general summary, no case findings; trigger `search_literature_calcified_neurocysticercosis_pregnancy_asm`; last in the pathway. |
+| C | minor | `followup_outputs` drug check | Oxcarbazepine offered as an alternative at 33 weeks; "absolutely contraindicated" wording; interactions line only. | FIXED: interactions listed per medicine; warnings on third-trimester clearance, post-delivery reduction, behavioral effects, breastfeeding; alternatives lamotrigine (with cross-titration caveat) and avoid valproate. |
+| B | minor | `initial_tool_outputs.ecg.interpretation` (class T) | "Slight sinus tachycardia" at rate 94. | FIXED: "Normal sinus rhythm, 94/min, upper normal for the third trimester." |
+| B | minor | `initial_tool_outputs.eeg` (class K) | Limitations recommended prolonged video-EEG; sharp waves "every 3-4 minutes" called "frequent" (ACNS: occasional). | FIXED: limitations state the recording's own limits (hyperventilation omitted in pregnancy kept); frequency 1-3 per minute (frequent); impression in numbered ABNORMAL style. |
+| C | major | `ground_truth.assessment` (class L) | Musts were work-up steps (eclampsia labs, dedicated MRI); valproate prohibition said "new-onset epilepsy"; no dose plan after delivery, newborn safety, SUDEP or driving. | FIXED: musts: obstetric and fetal assessment with magnesium sulfate if hypertension or proteinuria appears; restart and raise levetiracetam by trough levels; reduce after delivery; social work and medication supply; newborn safety and breastfeeding; SUDEP; driving. Prohibitions: valproate, delay of obstetric review, gadolinium, albendazole or praziquantel. |
+| C | major | `ground_truth.differential` (class P) | Eclampsia `high`, active neurocysticercosis and metabolic `moderate` after normal BP, labs and MRI. | FIXED: eclampsia, active NCC, convulsive syncope, PNES `low`; metabolic `very_low`; added calcified tuberculomas or toxoplasmosis `low` (raised by the MRI differential); each entry names the excluding finding. |
+| D | minor | `ground_truth.key_clinical_evidence` (class G) | Engineering lines; generic statements. | FIXED: six case-specific statements. |
+| A | minor | `ground_truth.sequence_constraints`, `.stop_rule` (classes C, D) | Template MRI -> drug check constraint with a drug check now optional; stop rule with literature, drug check and ECG, max 0. | FIXED: constraint deleted; stop rule labs, MRI, EEG, max 2. |
+| C | minor | `ground_truth.red_herrings` | Negative cysticercosis IgG (a classic pitfall in calcified NCC) not marked. | FIXED: added red herring at `initial_tool_outputs.labs.panels.Infectious_Workup[0]`; existing HPI "syncopal episode" red herring verified. |
+| E | minor | `patient.history_present_illness`, `.clinical_history.past_medical_history` (class R) | Duplicate surname Ramirez (RM04, RS03); PMH said the episodes were "attributed to vasovagal etiology" without the later epilepsy diagnosis, and repeated the diagnosis in two lines. | FIXED: renamed Ms. Coyoy (Guatemalan surname used nowhere else); PMH merged into "initially attributed to vasovagal syncope, then diagnosed as epilepsy at age 21"; HPI last sentence aligned. |
+| A | minor | `fallback_tool_outputs.echo` (class I) | No `echo_type`. | FIXED: `TTE`. |
+| B | minor | `metadata.difficulty_description` | "Straightforward case ... imaging pattern is unmistakable". | FIXED: describes the real challenges (eclampsia first, pregnancy imaging, negative serology, dosing and social cause). |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+
+Ms. Coyoy (renamed), 31, from rural Guatemala, living in a shelter, at 33 weeks, has had deja vu and epigastric auras for years and epilepsy diagnosed after her first delivery (first called vasovagal); after missed levetiracetam doses she had a focal to bilateral convulsion. The required labs now answer the eclampsia question (normal platelets, creatinine, AST/ALT, LDH, urine protein/creatinine 0.11; BP 112/68) and show a low levetiracetam level (5.8); prolactin is gone. The required non-contrast 1.5T epilepsy-protocol MRI shows definite right hippocampal sclerosis and about 12 calcified nodules without cyst, scolex or edema, consistent with calcified neurocysticercosis; the required routine EEG shows right anterior temporal sharp waves and TIRDA. ECG, drug review and literature are optional; gadolinium MRI and FDG-PET are harm-level avoided actions, CT is no longer waste. Management: urgent obstetric and fetal assessment with magnesium sulfate if eclampsia features appear, restart and raise levetiracetam by trough levels and reduce after delivery, social work and medication supply, breastfeeding and newborn safety, SUDEP and driving advice; no valproate, gadolinium or antiparasitic drugs.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+
+- Citation keys not yet in the pack allow-list: `[ILAE_MRI_2019]`, `[IFCN_ILAE_EEG_2023]`, `[NICE_NG217_2025]`, `[ACOG_HTN_2020]`, `[ACOG_imaging_2017]`, `[AAN_WWE_2009]`, `[IDSA_NCC_2018]` (plan request 2).
+- Synonyms (plan request 6): the inherited idiopathic codes G40.009/G40.019 do not fit structural epilepsy.
+- `perfect_agent.py` prints `<- ?` for the labs criterion because `_source` compares against `model_dump(exclude_none=True)` while the served output keeps `clinical_significance: null`; the whole stored labs output is served (checked by executing the call). Cosmetic, affects every labs criterion.
+
+## Open questions for Andrea (judgment calls you could not settle)
+
+- Decided, deviating from the plan: the MRI criterion requires `{protocol: epilepsy}` instead of `{protocol: epilepsy, contrast: false}`. The tool has no default for `contrast`, so the plan's version would fail an agent that orders a correct epilepsy-protocol MRI and simply does not ask for gadolinium. The safety intent is kept by the harm-level avoided action on `{contrast: true}`, which caps any run that does request gadolinium.
+- Decided: a red herring on the negative cysticercosis IgG and a differential entry for calcified tuberculomas or toxoplasmosis were added (not in the plan), because the MRI impression raises them and negative serology in calcified neurocysticercosis is a recognized pitfall [IDSA_NCC_2018].
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. Checked the log against the case file and `git diff master`. Tiers (labs, MRI, routine EEG required; ECG, drug check, literature optional), the emergency order (labs, ECG, MRI, EEG, drug check, literature), no constraints and the stop rule (labs, MRI, EEG; `max_additional_actions: 2`, as plan 3.4 sets) match the plan. The labs criterion `{panels: [BMP, LFTs, CBC, urinalysis, AED_levels]}` is met by a CMP order (the reward expands CMP to BMP plus LFTs). The worker's choice of `{protocol: epilepsy}` with a harm-level `{contrast: true}` avoided action, instead of the plan's `contrast: false`, is sound and keeps the safety intent. Timeline (first delivery and diagnosis at 21, son of 10, 31 now), asymmetry index 0.12 and 21%, eclampsia exclusion values, the red-herring path `labs.panels.Infectious_Workup[0]` (cysticercosis IgG), QuantiFERON and HIV cited by the differential, the albendazole and gadolinium prohibitions and the literature sources (White 2018, Garcia 2014, Harden 2009 levels, Tomson 2018) all check out. Guards pass.
+
+Found and fixed:
+- `initial_tool_outputs.eeg.findings[0].morphology`: discharges typed "Sharp waves" had "duration 40-60 ms", a spike duration (sharp waves last 70-200 ms); now 80-120 ms.
+- `metadata.fallback_tool_kinds.ct` still said `normal` after the CT fallback was rewritten with the calcifications: set to `case_specific`.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026. Checked uniformity of the plan's decisions across the 30 cases and the FND and MS-RR audit classes (engineering text, any-query outputs, second-tier labs, copied numbers, sharp-wave durations, differential codes). After the changes below, `perfect_agent.py` and `case_io.py check` are clean for all 30 cases and `test_case_guards.py -k FEPI-TEMP` passes.
+
+- `initial_tool_outputs.literature_search.general`: neutral focal-epilepsy block added (definition, classification, MRI protocol, first-line ASM, drug resistance), so a literature query that names no case-specific topic no longer receives a stored follow-up.
+- Literature follow-up trigger `search_literature_calcified_neurocysticercosis_pregnancy_asm` renamed `search_literature_neurocysticercosis_cysticerci_calcified`: it names the case's lesion or concurrent finding, so it is served only to a query that names it.
+- `action-4-search-medical-literature.label`: "Optional" prefix removed.
+- Differential "Calcified tuberculomas or toxoplasmosis": ICD-10-CM A17.8 -> A17.81.
+- Differential "Hyponatremia or another metabolic provoked seizure": ICD-10-CM G93.49 -> E87.1.
+- Infectious serology panel (cysticercosis IgG, HIV, RPR, HBsAg, HCV, QuantiFERON) moved from the initial labs, where the first-line order received it unasked, to an `interpret_labs` follow-up (`request_cysticercosis_hiv_syphilis_hepatitis_quantiferon_serology`, first in the pathway, before the drug check and literature); red herring [1] path now `followup_outputs[0].output.panels.Infectious_Workup[0]`.
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (`plans/FEPI-TEMP-decisions.md`). What changed and why:
+
+- Diagnosis synonyms (`diagnosis_synonyms.yaml` G40 entries, re-applied with `--prune --conditions focal_epilepsy_temporal`): labels now focal epilepsy, temporal lobe epilepsy, TLE, epilepsy temporal lobe, mesial temporal lobe epilepsy, MTLE (added), mesial temporal sclerosis epilepsy; removed focal seizures; focal onset seizures; focal impaired awareness seizures (seizure-type labels, retired: their tokens occur in an acute symptomatic or functional-seizure answer). Codes: G40.2, G40.1, G40.9 plus G40.209, G40.109, G40.909 (not intractable); the idiopathic G40.009 and G40.019 removed and the intractable codes removed.
+- Checks: `perfect_agent.py -v` and `case_io.py check` clean; `test_case_guards.py -k FEPI-TEMP-` passes, now with the discriminator guard and the FEPI-TEMP banned strings.
+
+## Batch-5 vocabulary (25 Oct 2026)
+
+Commit c02f3050 added `cysticercosis_serology`, `IGRA` (interpret_labs), `olfactory_test` (order_specialized_test) and `levodopa_challenge` (perform_clinical_assessment); `HBV_DNA` (interpret_labs) was added the same day for this round. The requests are now wired into the case.
+
+- `followup_outputs[0]` (one `Infectious_Workup` panel of cysticercosis IgG, HIV, RPR, HBsAg, HCV and QuantiFERON, trigger `request_cysticercosis_hiv_syphilis_hepatitis_quantiferon_serology`) split into three follow-ups in the same place: `request_cysticercosis_serology_eitb` (panel `Cysticercosis_serology`, Taenia solium IgG by EITB, negative), `request_igra_quantiferon` (panel `IGRA`, QuantiFERON-TB Gold Plus TB1 0.02, TB2 0.04 IU/mL, mitogen > 10, negative) and `request_hiv_syphilis_hepatitis_serology` (panel `Infectious_serology`, the four other rows unchanged). Each order now receives its own assay, not the whole serology block.
+- Two new recommended criteria after the EEG: `action-9-interpret-labs-cysticercosis-serology` (`{panels: [cysticercosis_serology]}`, [IDSA_NCC_2018]) and `action-10-interpret-labs-igra` (`{panels: [IGRA]}`, [ATS_IDSA_CDC_TB_2017], added to the FEPI-TEMP pack). Two criteria rather than one naming both, so that each assay is credited on its own: the serology answers the neurocysticercosis question, the IGRA the calcified-tuberculoma differential and the screening a pregnant woman from a high-incidence country in a shelter needs. Scoring change: recommended coverage now counts them; the stop rule is unchanged.
+- `ground_truth.red_herrings[1]`: `field_path` now `followup_outputs[0].output.panels.Cysticercosis_serology[0]`, data point names the EITB.
+
+## Library contradictions (25 Oct 2026)
+
+Orders the benchmark library answered with a normal report that contradicts this case now get a case-specific report (term: gist, where stored):
+
+- analyze_eeg ambulatory: This is an ABNORMAL 48-hour ambulatory EEG due to: 1. Right anterior temporal sharp waves (phase reversal at F8), maximal in NREM sleep. 2. Right temp (fallback_tool_outputs.eeg)
+- analyze_eeg video: This is an ABNORMAL 72-hour video-EEG due to: 1. Right anterior temporal sharp waves (phase reversal at F8), maximal in NREM sleep. 2. Right temporal  (followup request_video_eeg)
+- order_advanced_imaging FDG_PET: 1. Right mesial temporal hypometabolism extending to the temporal pole. 2. Normal metabolism elsewhere. Clinical correlation recommended. (fallback_tool_outputs.advanced_imaging)
+- obtain_tissue_diagnosis resection: Hippocampal sclerosis, ILAE type 1 (fallback_tool_outputs.tissue_diagnosis)
+- obtain_tissue_diagnosis stereotactic_biopsy: Hippocampal neuronal loss with fibrillary gliosis (followup request_stereotactic_biopsy)
+- obtain_tissue_diagnosis open_biopsy: Hippocampal neuronal loss with fibrillary gliosis (followup request_open_biopsy)
+- order_specialized_test neuropsych_battery: Weakness in visual learning and delayed visual recall (T-scores 37 and 35) with verbal memory and naming within the average range and intellectual fun (fallback_tool_outputs.specialized_test)
+- interpret_labs valproate_level: valproate not detected (fallback_tool_outputs.labs[valproate_level])
+- interpret_labs beta-hCG: Beta-hCG 24,500 mIU/mL, positive, within the range seen in the third trimester. (fallback_tool_outputs.labs[beta-hCG])
+- interpret_labs D_dimer: D-dimer 1.6 mg/L FEU, above the non-pregnant reference range. (fallback_tool_outputs.labs[D_dimer])
+
+Checks: `perfect_agent.py` passes; the criterion snapshot of the case is unchanged; `pytest agent-platform/tests -k FEPI-TEMP` (case guards included), `test_reports_do_not_fabricate.py` and `apply_diagnosis_synonyms.py --check` pass; no new report repeats a 60-character window of any criterion's expected evidence.

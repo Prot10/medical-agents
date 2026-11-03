@@ -1,0 +1,77 @@
+# FEPI-TEMP-S05
+Reviewer status: R1 not reviewed, R2 not reviewed (no notes file for FEPI-TEMP) | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| (none) | n/a | No reviewer notes for this case. The physician input is the July 2026 tool guidance (plan 1.3), applied through the plan classes below. |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| B | minor | `patient.history_present_illness` | "A second episode ... three years ago" while the episodes had recurred three to four times a month for nine months; the red herring rests on this sentence. | FIXED: "an earlier, identical episode while walking to a coffee shop three years ago, the first he remembers, had been attributed ... to low blood sugar"; red herring `data_point` and `correct_interpretation` updated to match. |
+| B | minor | `patient.history_present_illness` | Right-hand manual automatisms in the witnessed episodes alongside right-hand dystonic posturing: unilateral manual automatisms are usually ipsilateral (fact 12), so right-hand automatisms argue for a right focus in a case built to be fully concordant on the left. | FIXED: "reach at his shirt with his left hand"; dystonic posturing (right) and postictal dysphasia unchanged. |
+| E | minor | `patient.history_present_illness`, `patient.neurological_exam.additional` | Em dashes; a "healing" tongue bite four hours after the seizure. | FIXED: commas; "A fresh 4 mm bite laceration on the lateral aspect of the left tongue". |
+| D | minor | `initial_tool_outputs.ecg.clinical_correlation`, `.interpretation` | Teaching sentence ("ECG evaluates a seizure mimic and does not diagnose epilepsy") and a clinical conclusion about loss of consciousness in the report. | FIXED: correlation empty; "Normal sinus rhythm, 76/min. Normal PR, QRS and QTc intervals; no pre-excitation, Brugada pattern or conduction block." |
+| B | minor | `initial_tool_outputs.eeg.findings` | "Frequent, occurring every 1-2 minutes"; "dipole field"; TIRDA described as "notched, semi-rhythmic". | FIXED: "Frequent, approximately 1-2 per minute"; "field extending to T3 and F3"; "Sinusoidal, monomorphic rhythmic delta activity ... without evolution". |
+| D | minor | `initial_tool_outputs.eeg.limitations` | Recommended prolonged video-EEG (class K). | FIXED: "Routine 45-minute recording with drowsiness and stage II sleep; no habitual event captured."; impression names the slowing as polymorphic and ends with a period. |
+| C | major | `initial_tool_outputs.labs.panels.Additional` (Prolactin 42.1) | Prolactin drawn about four hours after the convulsion has no diagnostic value (class M, fact 11). | FIXED: row deleted; abnormal summary now bicarbonate only; interpretation rewritten without the cause attribution. |
+| D | minor | `initial_tool_outputs.mri.findings[0].signal_characteristics.post_gadolinium`, `.impression` | Gadolinium line and "no enhancement" in an HS case (class E); impression omitted the loss of internal architecture and the temporal horn dilation it reports. | FIXED: post-gadolinium field deleted; impression lists volume loss, loss of internal architecture, T2/FLAIR signal and temporal horn dilation. Volumes and index (2.0 vs 3.4 cm3, 0.26) verified and kept. |
+| D | major | `followup_outputs` literature (now [1]) | Fabricated Glauser 2017 (class O) with wrong evidence levels (fact 6); Krumholz 2007 cited for recurrence figures from the 2015 guideline; summary reasoned about this patient ("supports diagnosing epilepsy after a single unprovoked seizure when ...") and echoed the old criterion. | FIXED: Fisher 2014 (definition), Fisher 2017 (classification), Krumholz 2015 (recurrence after a first seizure), SANAD II; general summary; query and trigger renamed; last in the pathway. |
+| E | minor | `followup_outputs` drug check (now [0]) | Em dashes; "calculate eGFR at baseline" instruction. | FIXED: parenthesized alternatives; loratadine line names levetiracetam and lamotrigine; generic renal dosing line. |
+| A | major | `ground_truth.action_criteria` | Literature, drug check and ECG required with template text and doubled citations; MRI `{contrast: true, protocol: epilepsy}` (classes A, B, E, H, T). | FIXED: order labs, ECG, MRI, routine EEG, drug check, literature; MRI `{protocol: epilepsy}` and routine EEG required, the rest optional; one bracketed key each; evidence names the stored results. |
+| A | major | `ground_truth.sequence_constraints`, `.stop_rule` | MRI -> drug check soft constraint while the drug check is optional; stop rule with literature, drug check, ECG, max 0 (classes C, D). | FIXED: constraint deleted; stop rule MRI and EEG, max 1. |
+| C | major | `ground_truth.assessment` | Diagnostic-insight and process musts (recognize the aura, recognize dysphasia, obtain MRI, "ILAE diagnosis after a single seizure"); first-line list with oxcarbazepine and lacosamide; prohibition on "a single normal routine EEG" in a case whose EEG is abnormal; valproate wording (class L). | FIXED: musts first-line lamotrigine or levetiracetam, driving, SUDEP, seizure safety; prohibitions LP without indication, valproate (canonical MHRA 2024 text), and not managing the postictal dysphasia as a stroke (reworded from the "15-30 minutes ... DWI" text). |
+| C | minor | `ground_truth.differential` | Syncope and PNES `low`; the two mimics the case itself raises (panic attack, low blood sugar) missing (ruling 7). | FIXED: syncope, PNES very_low with the excluding findings; panic attacks and hypoglycemic episodes added as very_low; structural alternatives "Excluded" by MRI; em dash removed from the first entry. |
+| C | major | `ground_truth.key_clinical_evidence` | "ILAE 2017 ... after a single unprovoked seizure" (fact 1: the prior auras are seizures); routine EEG sensitivity and "highly specific" dysphasia claims; engineering lines (class G). | FIXED: two-seizure criterion, lateralization with the ipsilateral automatisms (Lateralization_2005), febrile seizure antecedent, first-line ASM per fact 6. |
+| C | minor | `ground_truth.avoided_actions` (CT) | CT listed as waste, but the exam four hours after the seizure still shows word-finding hesitation; fact 3 lists a persistent deficit as an indication for emergency CT. | FIXED: CT avoided action deleted (see Open questions); CSF, echo, Holter rationales case-specific; FDG_PET waste added (`[Willmann_2007]`). |
+| A | minor | `fallback_tool_outputs.echo` | No `echo_type`. | FIXED: "TTE". |
+| B | minor | `metadata.difficulty_rationale` | "Five required tools" no longer true. | FIXED: two required tools and the red herring. |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+Mr. Novak, 33, has nine months of rising epigastric and deja vu auras (three to four a month), two partner-witnessed episodes with impaired awareness, an identical episode three years ago he blamed on low blood sugar, and now a focal to bilateral tonic-clonic seizure with right-hand dystonic posturing and five minutes of postictal dysphasia; the manual automatisms are now left-sided (ipsilateral), so the semiology, the left hippocampal sclerosis on the epilepsy-protocol MRI (2.0 vs 3.4 cm3, no gadolinium lines) and the left anterior temporal discharges on the routine EEG are fully concordant. The late prolactin is gone and the ECG reads as a report. Only the MRI and routine EEG are required; labs, ECG, interaction check (loratadine) and literature (now Fisher 2014, Fisher 2017, Krumholz 2015, SANAD II) are optional and FDG-PET is waste. CT is no longer penalized because a mild word-finding hesitation persists at four hours. Musts: lamotrigine or levetiracetam, driving, SUDEP, seizure safety; valproate, LP and a stroke pathway are prohibited. Panic attacks and hypoglycemia, the two explanations offered in the history, are in the differential as excluded.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+- Pack allow-list: `[ILAE_def_2014]`, `[ILAE_MRI_2019]`, `[IFCN_ILAE_EEG_2023]`, `[Lateralization_2005]`, `[SANAD2_2021]`, `[NICE_NG217_2025]`, `[AAN_2015]` (plan 5, request 2).
+- `perfect_agent.py -v` prints `<- ?` for the MRI because `_source` compares against `initial_tool_outputs` dumped with `exclude_none`, and this MRI has null fields in `findings[1]`; the call is answered by `initial_tool_outputs.mri` (no other MRI source exists and the check passes). Cosmetic tool issue.
+
+## Open questions for Andrea (judgment calls you could not settle)
+- None. Decision recorded: the plan keeps the template CT waste for S05, but the exam at four hours documents residual word-finding hesitation; with the plan's own fact 3 (persistent deficit is an emergency CT indication) CT is defensible, so it is neither credited nor penalized.
+
+## Verification
+Adversarial check (24 Oct 2026) of the final case against this log, `git diff` and plan section 4 (S05).
+- Confirmed: the HPI change to left-hand automatisms is correct and needed (the same right hand cannot show both automatisms and dystonic posturing; manual automatisms are usually ipsilateral, dystonia contralateral, fact 12); red herring path and data point match the rewritten HPI sentence; prolactin gone; index 0.26 from 2.0 vs 3.4 cm3; no gadolinium; EEG wording; ECG report voice; literature (Fisher 2014, Fisher 2017, Krumholz 2015, SANAD II) correctly summarized; tiers, stop rule (MRI, EEG, max 1), no constraint; CT avoided action deletion defensible under fact 3 (residual word-finding hesitation at four hours) and logged; differential includes both mimics the history raises; case guards pass. The stored `fallback_tool_outputs.ecg` (84/min) is pre-existing and only answers a repeat ECG.
+- Found: nothing to change.
+- `perfect_agent.py -v` and `case_io.py check` clean for the case.
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026. Checked uniformity of the plan's decisions across the 30 cases and the FND and MS-RR audit classes (engineering text, any-query outputs, second-tier labs, copied numbers, sharp-wave durations, differential codes). After the changes below, `perfect_agent.py` and `case_io.py check` are clean for all 30 cases and `test_case_guards.py -k FEPI-TEMP` passes.
+
+- `initial_tool_outputs.literature_search.general`: neutral focal-epilepsy block added (definition, classification, MRI protocol, first-line ASM, drug resistance), so a literature query that names no case-specific topic no longer receives a stored follow-up.
+- `action-7-interpret-labs.rationale`: engineering prefix or tier wording removed (was "A first convulsion warrants a check for ...").
+- `action-5-check-drug-interactions.rationale`: engineering prefix or tier wording removed (was "His only medicine is as-needed loratadin...").
+- `initial_tool_outputs.ecg`: rate and intervals identical to M02 and RM04 and below the triage HR of 88; now 86/min, PR 140, QRS 90, QTc 414; ECG criterion evidence updated.
+- `initial_tool_outputs.eeg.findings[0].morphology`: sharp-and-slow-wave discharge with a 35-60 ms sharp component (spike range); now 80-120 ms.
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (`plans/FEPI-TEMP-decisions.md`). What changed and why:
+
+- Diagnosis synonyms (`diagnosis_synonyms.yaml` G40 entries, re-applied with `--prune --conditions focal_epilepsy_temporal`): labels now focal epilepsy, temporal lobe epilepsy, TLE, epilepsy temporal lobe, mesial temporal lobe epilepsy, MTLE (added), mesial temporal sclerosis epilepsy; removed focal seizures; focal onset seizures; focal impaired awareness seizures (seizure-type labels, retired: their tokens occur in an acute symptomatic or functional-seizure answer). Codes: G40.2, G40.1, G40.9 plus G40.209, G40.109, G40.909 (not intractable); the idiopathic G40.009 and G40.019 removed and the intractable codes removed.
+- Checks: `perfect_agent.py -v` and `case_io.py check` clean; `test_case_guards.py -k FEPI-TEMP-` passes, now with the discriminator guard and the FEPI-TEMP banned strings.
+
+## Library contradictions (25 Oct 2026)
+
+Orders the benchmark library answered with a normal report that contradicts this case now get a case-specific report (term: gist, where stored):
+
+- analyze_eeg ambulatory: This is an ABNORMAL 48-hour ambulatory EEG due to: 1. Left anterior temporal sharp waves (phase reversal at F7), maximal in NREM sleep. 2. Left tempor (fallback_tool_outputs.eeg)
+- analyze_eeg video: This is an ABNORMAL 72-hour video-EEG due to: 1. Left anterior temporal sharp waves (phase reversal at F7), maximal in NREM sleep. 2. Left temporal in (followup request_video_eeg)
+- order_advanced_imaging FDG_PET: 1. Left mesial temporal hypometabolism. 2. Normal metabolism elsewhere. Clinical correlation recommended. (fallback_tool_outputs.advanced_imaging)
+- obtain_tissue_diagnosis resection: Hippocampal sclerosis, ILAE type 1 (fallback_tool_outputs.tissue_diagnosis)
+- obtain_tissue_diagnosis stereotactic_biopsy: Hippocampal neuronal loss with fibrillary gliosis (followup request_stereotactic_biopsy)
+- obtain_tissue_diagnosis open_biopsy: Hippocampal neuronal loss with fibrillary gliosis (followup request_open_biopsy)
+- order_specialized_test neuropsych_battery: Weakness in verbal learning and delayed verbal recall (T-scores 34 and 32) and mild confrontation naming weakness (BNT T-score 38), with visual memory (fallback_tool_outputs.specialized_test)
+- interpret_labs AED_levels: No levetiracetam, valproate, carbamazepine, phenytoin, lamotrigine or lacosamide detected. (fallback_tool_outputs.labs[AED_levels], also answers valproate_level)
+
+Checks: `perfect_agent.py` passes; the criterion snapshot of the case is unchanged; `pytest agent-platform/tests -k FEPI-TEMP` (case guards included), `test_reports_do_not_fabricate.py` and `apply_diagnosis_synonyms.py --check` pass; no new report repeats a 60-character window of any criterion's expected evidence.

@@ -1,0 +1,92 @@
+# BACT-MEN-RS01
+Reviewer status: R1 none, R2 needs_changes | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| 00b8d7a0-db3d-4b7d-8f3c-5e3cc009d410 | FIXED | (1) Blood culture follow-up: `organism` "Streptococcus agalactiae", `gram_stain` filled, identification row added, impression "Streptococcus agalactiae isolated from two aerobic bottles at 18 and 20 hours; anaerobic bottle no growth at 5 days; susceptibilities as listed." (2) Repeat LP (`request_repeat_lp`) deleted; index LP moved from `initial_tool_outputs.csf` (now null) to follow-up `request_lumbar_puncture`; perfect agent confirms action-3 receives it. (3) New required `action-7-order-body-imaging-spine-mri` (`order_body_imaging {study: spine_MRI, contrast: true}`) with follow-up `request_spine_mri_contrast` (no epidural collection, discitis, osteomyelitis or facet septic arthritis; leptomeningeal enhancement; degenerative C4-C6), in `stop_rule`; must 8; cervical epidural abscess, vertebral osteomyelitis and septic facet arthritis added to the differential. (4) Template musts replaced: targeted must "high-dose penicillin G (4 million units IV every 4 hours) or ampicillin 2 g IV every 4 hours ... for 14 days (NICE NG240), longer if a deep focus is found; gentamicin may be added for synergy in the first 5 to 7 days" (the plan's 14 days per NICE rather than the reviewer's 14 to 21, with extension for a deep focus); dexamethasone must stops it on S. agalactiae; the "do NOT discontinue dexamethasone" prohibition and the droplet-precaution must deleted (15-day indolent course, no rash). (5) CT criterion, HARD constraint and CT follow-up deleted (no WHO 2025 Annex A.4 criterion: GCS 15, no focal signs, no papilloedema, not immunocompromised); C must, C prohibition and waste avoided action `avoid-waste-5-order-ct-scan` added. (6) Portal of entry: must 9 (ulcer inspection, deep swab or tissue culture, wound care and debridement); ulcer named in `key_clinical_evidence[8]`; and, as the reviewer asked, in `diagnosis.accepted[0]` (see CENTRAL). |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| B | major | patient.history_present_illness | Timeline sums to 17 days (PCP day 5, ED day 7, ED day 11, "six days after his second ED visit") against 15 days in the chief complaint | FIXED: "four days after his second ED visit" |
+| B | minor | patient.clinical_history.medications | HPI says he was discharged with ibuprofen; not in the medication list (and the NSAID with acetaminophen bears on his being afebrile) | FIXED: ibuprofen 400 mg every 8 hours as needed added |
+| B | major | patient.neurological_exam.cranial_nerves | No fundoscopy documented, yet the imaging decision depends on absent papilloedema | FIXED: "Fundoscopy: optic discs sharp bilaterally, no papilloedema." |
+| B | major | initial_tool_outputs.labs.panels.CBC | Differential 102% (neutrophils 92, bands 6, lymphocytes 4) | FIXED: neutrophils 88, monocytes 2 added; summary and interpretation updated |
+| B | major | initial_tool_outputs.labs | HIV and CMP liver tests ordered by action-1 but absent (C12) | FIXED: LFTs (normal) and HIV-1/2 Ag/Ab non-reactive added; confirmed served |
+| B/D | major | index CSF | "likely traumatic tap artifact" interpretation, "normal >0.6" ratio, GBS antigen used as confirmation, diagnostic interpretation (C7) | FIXED: RBC value only, canonical ratio and lactate strings, antigen removed, culture "Pending", interpretation values and pattern only |
+| A/C | major | followup `request_pcr_panel` (interpret_labs) | CSF PCR filed as a blood lab (C8) | FIXED: deleted; the panel result is in the index CSF |
+| A/C | minor | followup `request_audiometry` | audiometry filed as `baep`, a post-treatment result (C8) | FIXED: deleted; hearing must added |
+| C | major | action-6 literature | literature criterion expecting IDSA 2004 and ESCMID 2016 (C9) | FIXED: criterion and follow-up deleted |
+| C | major | followup check_drug_interactions | template vancomycin regimen, "age >50" Listeria warning, 15-20 mcg/mL trough; ignored ibuprofen and tamsulosin (C9) | FIXED: checks ceftriaxone, ampicillin, dexamethasone against his sedating drugs, tamsulosin, ibuprofen, lisinopril and metformin (eGFR about 70, CKD-EPI 2021); criterion recommended (no allergy or regimen-changing interaction) with concrete expected evidence |
+| C | major | ground_truth.assessment.required_recommendations | vancomycin plus ceftriaxone template, no Listeria line (C4) | FIXED: canonical base and Listeria (diabetes) musts; medication-withholding must added |
+| C | major | ground_truth.differential | viral meningitis, HSV and TB "moderate" after a neutrophilic CSF with S. agalactiae; SAH and cryptococcal boilerplate (ruling 7, C10) | FIXED: six entries, all low with excluding data, including the spinal infections and the musculoskeletal mimic |
+| C | minor | red_herrings[1] | "treat with fluid restriction" for Na 134 (not standard in bacterial meningitis) | FIXED: monitoring, no separate work-up |
+| D | minor | red_herrings | undeclared distractors: near-syncope attributed to cyclobenzaprine and pinpoint pupils (opioid) | FIXED: declared as `red_herrings[3]` |
+| B | minor | citations | `[IDSA_2004]` and free-text duplicates | FIXED: `[WHO_Meningitis_2025]`; `[Brouwer_2012]` on the spine MRI |
+| C | minor | ground_truth.avoided_actions[avoid-waste-1-order-echocardiogram] | echocardiography labelled waste in streptococcal bacteraemia; many clinicians obtain a TTE in adult GBS bacteraemia | FLAGGED: kept (portal identified, no murmur or embolic sign documented); see Open questions |
+| B | minor | metadata.difficulty_rationale | counts | FIXED: "4 required tools; 4 red herrings" |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+The pathway is now blood cultures, lumbar puncture without prior CT (GCS 15, no focal signs, no papilloedema now documented on fundoscopy, not immunocompromised: no WHO 2025 imaging criterion; CT is a waste action), contrast MRI of the cervical spine (required, excludes epidural abscess, vertebral osteomyelitis and septic facet arthritis after 15 days of torticollis with bacteraemia), and a drug check that flags his sedating drugs, tamsulosin, NSAID and metformin. The post-treatment repeat LP, the PCR filed as a blood test, audiometry and the literature step are gone. The blood culture report now names Streptococcus agalactiae. Management: ceftriaxone within 60 minutes with ampicillin (diabetes), dexamethasone stopped once S. agalactiae is identified, then penicillin G or ampicillin for 14 days, wound assessment and culture of the venous stasis ulcer as the presumed portal, withholding the sedating drugs, ibuprofen and metformin, and audiology. The diagnosis label names the ulcer as the portal of entry. Record fixes: timeline 15 days, ibuprofen in the medication list, CBC differential 100%, liver tests and HIV added.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+- Label change (ruling 3, on the reviewer's request): `diagnosis.accepted[0]` from "Acute bacterial meningitis due to Streptococcus agalactiae (Group B Streptococcus)" to "... with bacteraemia, portal of entry a right lower-extremity venous stasis ulcer"; `icd_codes[0]` G00.2 unchanged, synonyms unaffected.
+- Vocabulary: `order_microbiology` `wound_swab` (plan section 5 item 4), so that ulcer culture can be an action rather than a must only.
+- Citation key `[Brouwer_2012]` is used for the spine MRI criterion (allow-list review with `[WHO_Meningitis_2025]`).
+
+## Open questions for Andrea (judgment calls you could not settle)
+- Ampicillin is a must on the plan's diabetes ruling (Q7): he is 59 with HbA1c 6.4%; without that ruling NICE NG240 would not add it.
+- The plan and the reviewer differ on where to name the ulcer: the plan said key evidence only, the reviewer said the primary diagnosis. I did both. Revert `accepted[0]` if the label should stay organism-only across the condition.
+- Echocardiography is a waste action here; transthoracic echo is commonly obtained in adult Group B streptococcal bacteraemia. Consider removing that avoided action.
+- Q2 of the plan (CT as waste in no-criterion cases) applies.
+
+## Verification
+Adversarial check (23 October 2026) of the log against the case file, the plan (4.0 row RS01: imaging C, Listeria yes on diabetes) and note 00b8d7a0. Read the whole final case. Confirmed: organism field, Gram stain, identification row and impression of the blood culture agree; repeat LP gone and index CSF served to action-3 by `request_lumbar_puncture` (initial `csf` null); required contrast spine MRI with follow-up, must and stop-rule entry, and the three spinal infections in the differential, each low with the excluding MRI finding; targeted GBS must (penicillin G or ampicillin, 14 days, gentamicin optional) and dexamethasone stopped on S. agalactiae; CT criterion, HARD constraint and CT follow-up deleted, C must, prohibition and waste action present; ulcer named in a must, key evidence and the label (label change logged under CENTRAL). Cross-field: HPI timeline sums to 15 days (5 + 2 + 4 + 4); `collected_before_antimicrobials` true is correct (ketorolac and analgesics only); CBC differential 100%; anion gap 15; eGFR about 70 (creatinine 1.2, man, 59) as stated; the drug check lists exactly the medication list; fundoscopy documented.
+Found and changed: `ground_truth.avoided_actions` penalised echocardiography as waste (`avoid-waste-1-order-echocardiogram`, "no evidence of endocarditis") in a patient with 15 days of indolent illness and streptococcal (S. agalactiae) bacteraemia. A subacute streptococcal bacteraemia is a recognised setting for infective endocarditis, and echocardiography there is a defensible action that must not cost the agent score; the item is removed (the worker's open question; ids of the other avoided actions unchanged). Echocardiography is not added as a criterion; the fallback TTE is normal. `perfect_agent.py -v` passes; `case_io.py check` clean for the case.
+
+## Open questions resolved (24 Oct 2026)
+
+Andrea's ruling of 24 Oct 2026 (resolve open points for dataset quality); decisions and sources in `plans/BACT-MEN-decisions.md`.
+
+- 'WHO 2025 Annex A.4' renamed 'WHO 2025 section A.4' (4 strings): the cranial imaging recommendations are section A.4 of chapter 3 of the guideline, not an annex
+- Hearing must cites WHO 2025 (strong recommendation: formal audiological screening before discharge, or within four weeks of discharge), which covers every adult with acute meningitis, instead of NICE NG240, which excludes immunocompromised and neurosurgical patients
+- Synonyms: the G00.2 category entry now carries only 'streptococcal meningitis'; the group B labels moved to a case-scoped entry (G00.2+gbs) so they are no longer offered to the S. suis case RM04; RS01 gains 'group b streptococcal meningitis' and 'streptococcus agalactiae meningitis' (synonym script, --prune)
+
+Re-run: `perfect_agent.py` ok; `case_io.py check` clean for the case; BACT-MEN case guards pass; synonym `--check` clean.
+
+## Central vocabulary wired (24 Oct 2026)
+- Core term `order_microbiology` `wound_swab`: new recommended criterion `action-8-order-microbiology-ulcer-swab` (`specimen: wound_swab, tests: [culture]`) after the spine MRI; follow-up `request_ulcer_swab_culture` (`followup_outputs[3]`): deep swab of the cleaned right leg ulcer bed, heavy growth of Streptococcus agalactiae at 24 hours with the blood isolate's susceptibilities (penicillin 0.03, ampicillin 0.06, ceftriaxone <=0.5 mcg/mL), scanty coagulase-negative staphylococci; collected before antimicrobials.
+- Ulcer must (`required_recommendations[8]`) now "Treat the right lower-extremity venous stasis ulcer as the portal of entry: inspect it, culture the cleaned ulcer bed, and arrange wound care and debridement as needed for source control."
+- Re-run: `perfect_agent.py -v` ok; `case_io.py check`: schema OK, synonym guard OK, no test failure names the case.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+- `fallback_tool_outputs.advanced_imaging` set to null: a generic report (modality 'MRI', impression 'No abnormality identified.') that names no one study and so answered every variant; the benchmark library now answers each study with its own normal report.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 50, ECOG 2 (fallback_tool_outputs.clinical_assessment). Why: rule 3: two weeks of persistent neck pain and stiffness, fatigue, a near-syncopal episode and HR 120; the library's Karnofsky 100 describes a person without disease.
+- `perform_clinical_assessment {assessment_type: gait_and_balance_timed}`: mildly slowed antalgic gait; lightheaded on rising (followup_outputs[5] request_gait_and_balance_timed). Why: rule 3: the stored exam records a mildly antalgic gait, tandem gait not tested and near-syncope on standing; the library reports normal timed values.
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: no parkinsonian signs; fixed left torticollis; challenge not administered (followup_outputs[6] request_levodopa_challenge). Why: rule 3: the library reports a normal neck and gait in a patient with fixed left torticollis and an antalgic gait; no challenge would be given without parkinsonism.
+- `perform_clinical_assessment {assessment_type: structured_headache_history_ichd3}`: no headache; persistent neck pain and stiffness with systemic red flags (followup_outputs[7] request_structured_headache_history_ichd3). Why: rule 1 and 3: the patient denies headache but has 15 days of neck stiffness with systemic features; the library describes a headache history without red flags.
+- `analyze_brain_mri`: basal and posterior fossa leptomeningeal enhancement; no complication (fallback_tool_outputs.mri). Why: rule 1 and 3: no brain MRI is stored; the stored spine MRI shows leptomeningeal enhancement along the cervical cord, so an MRI with gadolinium of the brain would not be normal.
+- `analyze_ecg`: sinus tachycardia at 120 bpm, otherwise normal (fallback_tool_outputs.ecg). Why: rule 3: presenting heart rate 120 bpm; the library reports a rate of 72.
+- `perform_clinical_assessment {assessment_type: orthostatic_blood_pressure}`: orthostatic hypotension with symptoms; resting HR 120 (followup_outputs[8] request_orthostatic_blood_pressure). Why: rule 3: a near-syncopal episode on standing today and HR 120 at rest, on tamsulosin and cyclobenzaprine; the library reports a normal response with HR 68.
+- `order_body_imaging {study: spine_CT}`: C4-C6 degenerative disc disease; no fracture or bone destruction (fallback_tool_outputs.body_imaging). Why: rule 3: the stored spine MRI shows disc space narrowing and osteophytes at C4-C5 and C5-C6; the library reports a normal spine.
+- `interpret_labs {panels: [tox_screen]}`: urine opiates positive (prescribed hydrocodone) (fallback_tool_outputs.labs['tox_screen']). Why: rule 2: acetaminophen/hydrocodone prescribed at the last ED visit, with pinpoint pupils on the stored exam; the library reports opiates negative.
+
+Checks: perfect agent ok; case guards pass; criteria answers unchanged.

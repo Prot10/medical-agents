@@ -1,0 +1,111 @@
+# SE-M04
+Reviewer status: R1 none, R2 approved (1 note) | Approved before this round: yes
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| 0afbb493-4142-40fd-8184-68d92edcaae5 | FIXED | "Treat UTI empirically pending cultures" removed from `ground_truth.assessment.required_recommendations`; `differential[1]` (UTI-precipitated seizure) now `low`, key features cite the normal urinalysis, negative urine culture and procalcitonin 0.18; `red_herrings[1]` rewritten: "Temperature 37.6 C is not a fever; cultures and procalcitonin are negative." (data point temperature and WBC 12.4, path `patient.vitals.temp`). The urine culture criterion (action-9) is `recommended`, without the `before_antimicrobials` argument, and its report is negative. The stored microbiology report no longer carries blood cultures ("no growth at 48 hours" was impossible at assessment time and had no criterion), urinalysis or procalcitonin, which now sit once each in the labs. |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| C | blocker | `ground_truth.diagnosis.accepted[0]`, `initial_tool_outputs.labs` sodium | Sodium 132 cannot cause NCSE, so the labelled entity was not real (plan C15). | FIXED: sodium 123, chloride 88 (anion gap 15 unchanged); `accepted[0]` "(Na 132)" changed to "(Na 123)" (CENTRAL 3a). Synonym labels untouched. |
+| C | major | `initial_tool_outputs.labs.panels.Urine`; criterion action-6 | SIADH was asserted from urine studies inside the first-line labs, with interpretive reference ranges ("inappropriately elevated >100 suggests SIADH") and "= SIADH" in the lab interpretation; no serum osmolality, thyroid or adrenal test. Action-6 was a post-treatment "AED optimization" recheck (ruling 4). | FIXED: urine block removed from the first-line labs; action-6 (id kept) is now a required hyponatremia work-up (serum and urine osmolality) answered by a new follow-up: serum osmolality 262 (L), urine osmolality 480, urine sodium 62, uric acid 3.0 (L), TSH 1.8, cortisol 21, plain reference ranges. |
+| B | major | `initial_tool_outputs.eeg` | "GPDs ... right > left" and "on the right hemisphere" (generalized discharges cannot be hemispheric); background said the right hemisphere was slowed "from chronic stroke" (the infarct is left) (C6). | FIXED: GPDs with triphasic morphology, generalized and frontally predominant; left hemisphere attenuation and polymorphic delta; rightward eye deviation on video; ACNS impression. |
+| B | minor | `patient.neurological_exam.cranial_nerves` | Intermittent left gaze deviation with a left temporal-parietal ictal focus (C6). | FIXED: intermittent rightward gaze deviation. |
+| D | minor | `patient.neurological_exam.additional` | "hyponatremia present" leaked a lab result (C7). | FIXED: removed ("carbamazepine recently increased" also removed as a duplicate of the HPI). |
+| C | major | `patient.clinical_history.medications[apixaban]` | 2.5 mg twice daily "reduced for age/weight/creatinine", but at 71 years with BMI 29.7 he meets only the creatinine criterion (two of three are needed). | FIXED: apixaban 5 mg twice daily; the drug check states the dose-reduction criteria; a must keeps him on 5 mg. |
+| C | major | drug-check follow-up | The criterion expected the carbamazepine-apixaban induction, but the output never mentioned apixaban; it proposed lacosamide without metoprolol conduction risk. | FIXED: T-DDI content: carbamazepine and fosphenytoin with apixaban (avoid), carbamazepine with sertraline (additive SIADH) and atorvastatin, fosphenytoin and lacosamide with metoprolol, valproate with aspirin and apixaban, levetiracetam renal dosing, oxcarbazepine/eslicarbazepine hyponatremia, apixaban dose criteria. Required (C9). |
+| C | major | `initial_tool_outputs.literature_search`, `fallback_tool_outputs.literature_search` | Initial "general" literature repeated the criterion's expected text (leak guard failure) and cited "Brophy_2012" for sodium limits it does not give. | FIXED: both deleted; T-LIT follow-up last with [Spasovski_2014] and [Verbalis_2013] facts; criterion optional. |
+| C | major | `prohibited_recommendations[0]`, pearl 3, must 2 | "Do not correct faster than 8 mEq/L per 24h" in a patient without osmotic-demyelination risk factors; 3% saline with fluid restriction as one step. | FIXED: limits per plan 1.2 (10 mmol/L first 24 h, 8 mmol/L each further 24 h); 3% saline bolus protocol, then fluid restriction. |
+| C | major | `required_recommendations` | Lorazepam without maximum; no second-line ASM although carbamazepine is being withdrawn; no cEEG; no anticoagulation plan. | FIXED: T-MUST-BZD; T-MUST-2L (levetiracetam 60 mg/kg max 4500 mg, renal maintenance; avoid fosphenytoin: inducer of apixaban, bradycardia with metoprolol); stop carbamazepine after loading and review sertraline; T-MUST-cEEG; continue apixaban 5 mg twice daily. New prohibition: no oxcarbazepine or eslicarbazepine. |
+| C | major | `followup_outputs` `request_continuous_eeg_monitoring`, `request_aed_optimization` | EEG "after sodium correction and lacosamide" and post-switch levels with corrected sodium 137 reported treatment effects (ruling 4, C4); the EEG trigger hijacked the cEEG order. | FIXED: both deleted. |
+| C | minor | `followup_outputs` `request_autoimmune_encephalitis_panel` | Orphan serum antibody panel (C5). | FIXED: deleted. |
+| B | minor | MRI follow-up | Report with no findings and the impression repeated as an observation; the fallback MRI described only a pineal cyst (no infarct) (C10). | FIXED: full MRI report of the chronic left MCA infarct, no acute lesion; fallback MRI deleted. Criterion recommended. |
+| C | minor | criterion action-7 CSF | "Likely deferred unless cultures negative ..." as expected evidence; no mention that he is on apixaban. | FIXED: optional; label and rationale require holding the DOAC before any LP; evidence states the bland CSF result. |
+| C | major | `ground_truth.differential` | Recurrent stroke and UTI "moderate" after CT, MRI and cultures exclude them; "mild AKI (Cr 1.6)" though creatinine is his CKD 3 baseline (eGFR 48). | FIXED: stroke low, UTI low, carbamazepine toxicity moderate (contributing), sertraline SIADH low (new: a mimic the drug list raises), SDH very_low, uremic very_low. |
+| B | minor | `initial_tool_outputs.labs.panels["Exclusion studies"]` | Template ammonia, ABG, tox screen "Within reference range" (C1). | FIXED: deleted; not indicated (no liver disease or valproate; history explains the drugs); removed from the criterion. Hepatic panel, coagulation (INR 1.2 on apixaban), procalcitonin 0.18 and a normal urinalysis added with values. |
+| A | minor | `red_herrings[0].field_path` | Pointed at the whole labs block. | FIXED: carbamazepine level row. |
+| C | minor | avoided actions | Polysomnography with the DaTscan rationale (C11); echo and Holter rationales said "no cardiac comorbidity" in a patient with atrial fibrillation. | FIXED: T-PSG; echo and Holter rationales state known, anticoagulated, rate-controlled AF. |
+| E | minor | fallbacks ECG and Holter | "consistent with known AF on apixaban and metoprolol" (clinical correlation in a cardiac report). | FIXED: rhythm reads only; AF kept (C10). Advanced-imaging (prose "FDG-PET brain") and specialized-test fallbacks deleted. |
+| E | minor | criteria labels/rationales | Rationales copied from labels; EEG without `eeg_type`; ammonia, ABG, lactate, tox in labs arguments. | FIXED: T-LABS (AED_levels and coagulation extras), T-CT, T-EEG, case-specific evidence. |
+| B | minor | order; `sequence_constraints`; `stop_rule` | Not the diagnostic order; allowance 0. | FIXED: labs, CT, EEG, hyponatremia work-up, MRI, urine culture, CSF, drug check, literature; CT before CSF hard and labs before drug check soft kept (C13); stop rule = 5 required, allowance 1. |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+A 71-year-old nursing-home resident with a large old left MCA infarct and post-stroke epilepsy, whose carbamazepine was doubled 3 weeks ago, stays unresponsive after a convulsion. Sodium is now 123 (label updated), carbamazepine 14.2, creatinine at his CKD baseline, and urinalysis, procalcitonin and urine culture are negative. A new required hyponatremia work-up returns serum osmolality 262 with urine osmolality 480, urine sodium 62, low uric acid and normal TSH and cortisol (SIADH). The EEG shows left temporal-parietal electrographic SE with rightward eye deviation and generalized triphasic GPDs, and the exam gaze matches. Apixaban is at the correct 5 mg dose, and the drug check now names the carbamazepine-apixaban induction and the sertraline SIADH overlap. The UTI must, post-treatment EEG and levels, the orphan antibody panel and the leaking literature are gone. Musts: lorazepam, 3% saline with plan 1.2 limits, levetiracetam with renal maintenance, stop carbamazepine, cEEG, continue apixaban.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+- CENTRAL 3a: `accepted[0]` changed from "(Na 132)" to "(Na 123)"; refresh the synonym expansion if it keys on the label.
+- Plan CENTRAL 1: allow-list `[ACNS_2021]`, `[Spasovski_2014]`, `[Verbalis_2013]` for SE; this case cites them.
+- Vocabulary: there is no `urine_sodium` lab term; the hyponatremia criterion uses `serum_osmolality` and `urine_osmolality`, and urine sodium is reported in the same follow-up.
+
+## Open questions for Andrea (judgment calls you could not settle)
+None. Decided: (1) the plan lists the CSF as optional; it stays optional, with the label requiring apixaban to be held first, because LP is not indicated once the cause is found and a DOAC raises spinal hematoma risk. (2) Apixaban was corrected to 5 mg twice daily because the stored 2.5 mg dose did not meet the label's reduction criteria.
+
+## Verification
+`perfect_agent.py SE-M04 -v`: pass; labs initial, EEG initial for `continuous_icu`, hyponatremia work-up, MRI, urine culture and drug check from their follow-ups (served-output probe: `serum_osmolality` alone also returns the work-up; a plain `CBC/CMP/sodium` order returns the first-line labs). `test_case_guards -k SE-M04` and the red-herring path test: pass. `case_io.py check SE-M04`: schema and synonym guard OK; no failure names SE-M04.
+
+## Verification (adversarial verifier, 24 Oct 2026)
+Checked: note 0afbb493: "Treat UTI empirically" is gone from the musts; the UTI differential is low citing urinalysis, urine culture and procalcitonin; the red herring reads exactly as the plan's text and points at `patient.vitals.temp`; urine culture recommended without `before_antimicrobials`, negative. Sodium 123 is used everywhere (labs, label, evidence, differential, key evidence, musts); chloride 88 and CO2 20 keep a plausible anion gap, and measured osmolality 262 agrees with the calculated value (about 264 from Na 123, glucose 142, BUN 28). SIADH work-up follow-up is coherent (urine osm 480, urine Na 62, low uric acid, normal TSH and cortisol). Apixaban change 2.5 to 5 mg BID verified: at 71 years with Cr 1.6 he meets one of the three label criteria, so the reduced dose was an error. EEG has no hemispheric GPDs; left temporal-parietal ictal pattern with rightward deviation matches the exam and the left MCA lesion. Sodium limits in the musts, prohibition, key evidence and literature agree with plan 1.2. Stop rule equals the 5 required criteria; CT before CSF hard and labs before drug check soft as the plan says.
+Found and fixed:
+- B minor `patient.neurological_exam.mental_status`: "Awake with eyes open; GCS 8 (E3V2M3)": eyes open spontaneously is E4. FIXED: "GCS 9 (E4V2M3)".
+Noted, not changed: the urine culture reports "no growth at 24 hours" although he arrived 2 hours after the event; the benchmark returns results at order time, and the worker removed the blood cultures mainly because no criterion asked for them, so this is left as is.
+Checks re-run after my edits: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, `test_case_guards -k` pass.
+
+## Close-out (24 Oct 2026)
+Decisions in `plans/SE-decisions.md`.
+- synonyms: the G41 category no longer grants the type codes G41.0, G41.2 and G41.8 (a type code is granted only by the case's own code, so an answer coded with the wrong SE type no longer scores by code); `apply_diagnosis_synonyms.py --prune --conditions status_epilepticus` removed G41.0 and G41.8 from `ground_truth.diagnosis.icd_codes`. Labels unchanged.
+- Checks: `perfect_agent.py -v` pass, `case_io.py check` schema and synonym guard OK with no failure naming the case, SE case guards pass, `apply_diagnosis_synonyms.py --check --conditions status_epilepticus` clean.
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Wiring (`urine_sodium`, CENTRAL 3 of this log): `action-6-interpret-labs` alternatives are now serum osmolality + urine osmolality + urine sodium, or urine osmolality + urine sodium (the SIADH criteria need urine osmolality and urine sodium [Spasovski_2014]; the serum-osmolality-only alternative is gone). Follow-up trigger renamed `request_hyponatremia_osmolality_urine_sodium_workup` so a urine-sodium order reaches it.
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `initial_tool_outputs.eeg`: `eeg_type` set to `continuous_icu`, decided by reading the report.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## EEG and labs after routing (25 Oct 2026)
+
+Commit 317e46db routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG) and serves an `interpret_labs` order only the stored panels it names. Decisions for the condition in `plans/SE-routing-decisions.md`.
+
+- EEG: a routine order received the library's normal routine EEG, which contradicts the case. Added `fallback_tool_outputs.eeg` with `eeg_type` `routine` (the stored continuous_icu recording cut to a 30-minute portable recording without video, technologist notes for the clinical events, activation not performed): continuous left temporal-parietal evolving discharge (electrographic SE), intermittent triphasic GPDs, left hemisphere attenuation. No criterion, tiers and the reward-relevant policy unchanged; the clinically correct test stays the continuous EEG of `action-1-analyze-eeg`. A `continuous_icu` or `video` order still receives `initial_tool_outputs.eeg`.
+- Labs `action-2-interpret-labs`: unserved result cited in `expected_evidence`: lactate 3.6, CK 580 (Other), procalcitonin 0.18 (Inflammatory Markers). TRIM: incidental post-convulsive markers and a negative infection marker; the served urinalysis stays. Scoring change: no.
+- Labs `action-6-interpret-labs`: unserved result cited in `expected_evidence`: none (the probe's sodium 123 is a core-labs value the evidence does not cite). NO CHANGE. Scoring change: no.
+  - action-2-interpret-labs expected_evidence: 'Sodium 123 and chloride 88; carbamazepine 14.2 (high); creatinine 1.6 with BUN 28 (CKD 3); lactate 3.6 and CK 580; WBC 12.4; INR 1.2; procalcitonin and urinalysis normal' -> 'Sodium 123 and chloride 88; carbamazepine 14.2 (high); creatinine 1.6 with BUN 28 (CKD 3); WBC 12.4; INR 1.2; urinalysis normal'
+- Checks: `perfect_agent.py -v` pass; `case_io.py check` schema and synonym guard OK, no test failure names the case; probe: routine (omitted and explicit) order -> the new case fallback, `continuous_icu` and `video` -> the stored index recording; every number in each lab criterion's evidence is in what its order returns.
+
+## Matcher fix (25 Oct 2026)
+
+The lab matcher now keeps a urine or CSF row out of a blood order: a urinalysis, urine sodium or urine osmolality row answers only an order that names the urine assay, so a CBC or CMP order no longer returns the urine results. The lab criterion therefore names the urine assays its expected evidence cites.
+
+- `ground_truth.action_criteria[action-2-interpret-labs]`: new first alternative `{panels: ['CBC', 'CMP', 'magnesium', 'AED_levels', 'coagulation', 'urinalysis']}` (adds `urinalysis`); the previous orders stay as alternatives, so every call that matched before still matches. The expected evidence reads the normal urinalysis, which the first order received only through two matcher defects fixed on 25 Oct 2026: a urine row answered a blood-count or metabolic order (`Urine WBC` as WBC, `Urine sodium` as sodium, a urine creatinine ratio as creatinine), and the unit `mg/dL` read as magnesium. Scoring: cost reference only (the policy's reference order is fuller); coverage unchanged.
+
+## Library contradictions (25 Oct 2026)
+
+Orders that reached the benchmark library's normal report although this case contradicts it (diagnosis, history, medications or a stored finding) now get a case-specific report; every other off-pathway order still gets the library normal. No tier, criterion, diagnosis or existing output changed.
+
+- `analyze_eeg eeg_type=ambulatory` -> `followup_outputs[order_ambulatory]`: ambulatory EEG mirroring the stored continuous EEG (no video).
+- `perform_clinical_assessment assessment_type=performance_status` -> `followup_outputs[order_performance_status]`: performance status KPS 20, ECOG 4 during the admission.
+- `perform_clinical_assessment assessment_type=gait_and_balance_timed` -> `followup_outputs[order_gait_and_balance_timed]`: timed gait not testable, as on the examination.
+- `perform_clinical_assessment assessment_type=cognitive_screen` -> `followup_outputs[order_cognitive_screen]`: baseline cognitive screen not testable in the documented mental state.
+- `order_specialized_test test_type=neuropsych_battery` -> `followup_outputs[order_neuropsych_battery]`: neuropsychological battery not testable in the documented mental state.
+- `order_specialized_test test_type=speech_language_evaluation` -> `followup_outputs[order_speech_language_evaluation]`: speech and language evaluation not testable in the documented mental state.
+- `perform_clinical_assessment assessment_type=cognitive_screen timing=post_intervention` -> `followup_outputs[order_cognitive_screen_post_intervention]`: repeat cognitive screen impaired or not testable, in keeping with the documented dementia or brain injury.
+- `labs:lithium_level` -> fallback labs panel `Lithium`: lithium not detected (not prescribed).
+- `labs:valproate_level` -> fallback labs panel `Valproate`: valproate not detected (not prescribed).
+- `labs:HbA1c` -> fallback labs panel `Glycated haemoglobin`: HbA1c of a patient with treated type 2 diabetes.
+- `order_advanced_imaging modality=FDG_PET` -> `followup_outputs[order_fdg_pet]`: brain FDG-PET abnormal where the stored MRI shows the lesion.
+- `order_advanced_imaging modality=perfusion_MRI` -> `followup_outputs[order_perfusion_mri]`: perfusion MRI as the stored lesion.
+
+Checks: `perfect_agent.py` ok; `test_case_guards.py -k SE` pass; every order listed in `plans/LIBRARY-group2-map.yaml` for this case is answered without the library; served answers of every other order unchanged against HEAD. Reasons and doubts: `plans/LIBRARY-group2-decisions.md`.

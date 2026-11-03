@@ -325,6 +325,11 @@ export function PatientViewer() {
                   {demographics.ethnicity}
                 </span>
               )}
+              {demographics.height_cm != null && demographics.weight_kg != null && (
+                <span className="inline-flex items-center gap-1.5 text-base px-3 py-1 rounded-lg bg-secondary border border-border font-medium">
+                  {demographics.height_cm} cm · {demographics.weight_kg} kg
+                </span>
+              )}
               {demographics.bmi && (
                 <span className="inline-flex items-center gap-1.5 text-base px-3 py-1 rounded-lg bg-secondary border border-border font-medium">
                   BMI {demographics.bmi}

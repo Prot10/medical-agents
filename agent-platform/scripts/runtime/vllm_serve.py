@@ -38,23 +38,9 @@ def _patch_platform_detection():
 
 _patch_platform_detection()
 
-# Now run the normal vLLM OpenAI server __main__ block
-import uvloop  # noqa: E402
-
-from vllm.entrypoints.openai.api_server import (  # noqa: E402
-    FlexibleArgumentParser,
-    cli_env_setup,
-    make_arg_parser,
-    run_server,
-    validate_parsed_serve_args,
-)
+# Now run the normal `vllm serve` command in this patched process
+from vllm.entrypoints.cli.main import main  # noqa: E402
 
 if __name__ == "__main__":
-    cli_env_setup()
-    parser = FlexibleArgumentParser(
-        description="vLLM OpenAI-Compatible RESTful API server."
-    )
-    parser = make_arg_parser(parser)
-    args = parser.parse_args()
-    validate_parsed_serve_args(args)
-    uvloop.run(run_server(args))
+    sys.argv = ["vllm", "serve", *sys.argv[1:]]
+    main()

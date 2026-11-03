@@ -1,0 +1,96 @@
+# NPH-M01
+Reviewer status: R1 none, R2 none (NPH has no notes file; only the July 2026 tool review, `condition_tool_guidance.yaml` key `nph`) | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| (none) | - | No physician note exists for NPH. The case was corrected against plan NPH (classes C1 to C20) and the July 2026 tool review (MRI and tap test required, gait before and after the tap, labs optional, no advanced imaging or neuropsychology). |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| D | major | `initial_tool_outputs.literature_search`, criterion `action-1-search-medical-literature` | Literature criterion (recommended) whose stored output repeated its expected_evidence (leak-test failure, C1). | FIXED: criterion deleted; initial and fallback literature outputs null. |
+| C | major | `followup_outputs[0]` (check_drug_interactions `request_drug_interactions_shunt_medications`) | Perioperative shunt antibiotic and "hold metformin" advice served as a tool result (C2). No interaction changes the work-up. | FIXED: follow-up deleted; drug-interaction initial and fallback null. |
+| D | major | `patient.chief_complaint`, `patient.history_present_illness` | "Admitted for tap trial", "suspected normal pressure hydrocephalus", "Evans index of 0.31" given to the agent (C3). | FIXED: complaint now names the symptoms; HPI says an outside MRI was reported as showing enlarged ventricles, images not available, and he was referred and admitted for assessment of the symptoms. "On cognitive assessment" reworded to "On questioning". |
+| D | major | `patient.neurological_exam.gait`, `.mental_status` | TUG 22 s, MoCA 23/30 with item profile and MMSE 26/30 in the exam: results of the required gait assessment and of the cognitive screen (C4). | FIXED: exam keeps qualitative gait (magnetic, start hesitation, turning) and "formal cognitive screening reported separately"; the numbers moved to the baseline gait report and the new cognitive-screen follow-up. |
+| D | blocker | `initial_tool_outputs.clinical_assessment` | The pre-tap gait call returned the post-tap result (`pre_post_comparison`), a verdict ("positive tap test"), engineering `criteria_met` keys and the sentence "this is what the case's own tap-trial report states" (C5, C6). | FIXED: baseline only (TUG 22 s, 10-metre walk 18 s in 26 steps, 180-degree turn 7 steps, MoCA 23/30), qualitative findings, descriptive impression, `criteria_met` and `pre_post_comparison` null. |
+| A | major | `followup_outputs` | No post-tap reassessment although Reviewer 1 (July 2026) asked for gait before and after the tap; no case cognitive screen (the library would return a normal MoCA). | FIXED: `followup_outputs[0]` cognitive screen (`request_moca_cognitive_screen`, MoCA 23/30 itemised to sum to 23, MMSE 26/30, recall 2/5 free and 4/5 cued); `followup_outputs[1]` post-tap reassessment (`request_post_reassessment`; TUG 18 s at 2 h, 16.5 s at 24 h, 10-metre walk 14.2 s, MoCA 24/30, identical to the CSF report). |
+| C | major | `initial_tool_outputs.mri` | No technique, no callosal angle, temporal horns, hippocampal score or fourth ventricle; no DESH but the differential argued from DESH (C7). | FIXED: technique line; Evans 0.31; callosal angle 82 degrees; temporal horns enlarged out of proportion to the hippocampi (MTA 1); tight convexity sulci with Sylvian fissures not enlarged, stated as incomplete DESH; Fazekas 2; patent aqueduct with flow void, fourth ventricle mildly enlarged; "No obstructing lesion, mass or aqueductal stenosis"; descriptive impression without a disease name; volumetrics block with the three measures. |
+| D | major | `initial_tool_outputs.csf.interpretation`, `.special_tests` | Interpretation restated the values in prose with "improved"; special_tests mixed verdict wording. | FIXED: C5 canonical interpretation with the case's own figures (40 mL; TUG 22 to 18 s at 2 h and 16.5 s at 24 h, 25%; 10-metre walk 18 to 14.2 s; MoCA 23 to 24); special_tests hold the same figures with percentages, no verdict. |
+| B | minor | `initial_tool_outputs.csf.protein` | Protein 48 mg/dL lies above the usual 15-45 mg/dL range while the policy rests on normal CSF content (F3). | FIXED: 44 mg/dL (nothing else in the case quoted the value). |
+| C | minor | `initial_tool_outputs.labs` | HIV row in a "Baseline workup" panel with a templated clinical_significance; HbA1c reference written as prose; interpretive summary ("mild diabetes") (C9). | FIXED: RPR and HIV moved to a `Serology` panel; every `clinical_significance` null; HbA1c reference "<5.7", flagged high; B12 named "Vitamin B12"; interpretation states the pattern only. |
+| B | minor | `patient.clinical_history.past_medical_history[1]` | "Diet-controlled" diabetes while metformin is listed (C9). | FIXED: "Type 2 diabetes mellitus on metformin (HbA1c 7.2%)". |
+| C | major | `ground_truth.action_criteria` | Labs criterion required four named panels; criteria rationales repeated their labels; generic expected_evidence; no post-tap or cognitive criterion (C6, C9, C19). | FIXED: order MRI (required), labs `interpret_labs {}` (optional), baseline gait (required), cognitive screen (optional, new `action-cognitive-screen`), CSF tap (required), post-tap reassessment (recommended, new `action-post-tap-gait-reassessment`); each with a case-specific rationale and expected_evidence that matches its report. Existing ids kept. |
+| B | minor | `ground_truth.sequence_constraints`, `.stop_rule` | Baseline-gait constraint cited Relkin for the tap protocol; `max_additional_actions` 0. | FIXED: hard MRI before CSF [Relkin_2005], soft baseline gait before CSF [Nakajima_2021], canonical reasons; stop rule lists the three required ids, `max_additional_actions` 1. |
+| B | minor | `ground_truth.avoided_actions` | No guard against advanced imaging, the neuropsych battery or generic CSF assays, which the library would answer with normal reports (C10, 3.3). | FIXED: added `avoid-waste-advanced-imaging`, `avoid-waste-neuropsych-battery`, `avoid-waste-generic-csf-assays` (14-3-3, RT-QuIC, oligoclonal bands, meningitis panel, HSV PCR); existing five rationales rewritten for this patient (mechanical falls, no syncope). |
+| C | major | `ground_truth.assessment.required_recommendations` | Four process musts (MRI before LP, document gait, remove 30-50 mL, reassess at 1-4 and 24 h) already scored by criteria (C11). | FIXED: three musts: neurosurgical referral for a programmable-valve shunt citing the 25% TUG response, the supportive MRI and normal-pressure CSF; falls prevention (three falls); counselling that gait benefits most and memory and urinary benefit is less predictable (BPH). |
+| C | major | `ground_truth.assessment.prohibited_recommendations[1]`, `[2]` | "DESH, callosal angle <90 and the clinical triad are required" is wrong (F1, F2); AD prohibition copied although AD is not in question (C12). | FIXED: canonical ventriculomegaly-alone prohibition; AD prohibition removed; LP-before-MRI and normal-ageing prohibitions kept (reworded without dashes); new prohibition against restarting oxybutynin or another anticholinergic bladder drug, which the HPI says worsened his cognition. |
+| C | major | `ground_truth.differential` | VCI `high`, PD, AD and atrophy `moderate` after the work-up; PD and atrophy entries argued from DESH the MRI does not show (C13). | FIXED: VCI `moderate` (Fazekas 2); PD, AD, atrophy ex vacuo and secondary hydrocephalus `low`, each with one sentence citing the case's data (leg tone without tremor, cued recall and MTA 1 despite the paternal AD history, acute callosal angle and tap response, no antecedent). |
+| C | major | `ground_truth.key_clinical_evidence` | "Evans >0.3 and DESH" stated as required, tap sensitivity "50-80%", July 2026 tier sentence (C19, F4). | FIXED: seven case-specific items (Relkin clinical criteria without the full triad, the MRI supportive features with incomplete DESH, the tap figures, Marmarou sensitivity 26-61% and PPV 73-100%, Fazekas 2 per Tisell, mixed urinary symptoms, neuropathy). |
+| B | minor | `ground_truth.red_herrings[0]` | Interpretation cited DESH; data_point not visible as written. | FIXED: kept (exam has reduced toe vibration and ankle reflexes 1+, C20); data_point names the PMH entry and the exam signs; interpretation one sentence without DESH. |
+| B | minor | `fallback_tool_outputs.ct` | "No acute intracranial abnormality" against ventriculomegaly (C18). | FIXED: enlarged lateral and third ventricles (Evans about 0.31), periventricular hypodensity, no mass, haemorrhage or shift. |
+| A | minor | `fallback_tool_outputs.echo.echo_type` | Missing discriminator value (PATTERNS 5). | FIXED: "TTE". |
+| E | minor | `metadata.vocab_gap`, `.fallback_tool_kinds`, `.difficulty_rationale`, `.difficulty_variant_description`, `.revision_reason`, `.last_revised` | Stale phase-contrast vocab gap; counts of removed tools (C19). | FIXED: vocab gap and literature kind removed; counts and variant description updated; last_revised 2026-10-24. |
+| E | minor | `patient.history_present_illness` | Em dash in an edited sentence. | FIXED: comma. |
+| - | check | plan 3.6 | perfect_agent ok (MRI, baseline gait and CSF from case outputs, post-tap from `followup[1]`); test_case_guards pass for M01; hijack probe: cognitive screen first then "baseline before tap test" returns the baseline; after the CSF call "post-tap reassessment at 24 hours" returns the follow-up; "repeat TUG after CSF removal" returns the baseline again (a miss, no leak, as the plan's simulation predicts). Patient-block grep: no Evans, callosal, DESH, NPH, hydrocephalus, tap, shunt, TUG or MoCA. | - |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+
+The patient block no longer gives the diagnosis, the outside Evans index or the bedside scores: the HPI says an outside MRI was reported as showing enlarged ventricles, and the exam describes the magnetic gait qualitatively. The brain MRI now reports a technique line, Evans index 0.31, an acute callosal angle of 82 degrees, temporal horns out of proportion to the hippocampi (MTA 1), tight convexity sulci without Sylvian enlargement (incomplete DESH), Fazekas 2 white matter change, a patent aqueduct and no obstruction, with a descriptive impression. The pre-tap gait report holds only the baseline (TUG 22 s, 10-metre walk 18 s, turn in 7 steps, MoCA 23/30); a separate post-tap reassessment returns TUG 18 s at 2 hours and 16.5 s at 24 hours (25%), 10-metre walk 14.2 s (21%), MoCA 24/30, the same figures as the CSF report, which now states normal opening pressure (16 cmH2O) and normal content (protein corrected to 44 mg/dL) without a verdict. A cognitive screen itemises the MoCA (executive, fluency and free-recall deficits with cueing benefit). Literature and drug-check steps are gone. The policy is MRI, baseline gait and tap required, post-tap reassessment recommended, labs and cognitive screen optional; advanced imaging, neuropsychology and generic CSF assays are waste. The musts are shunt referral with a programmable valve on the tap response, falls prevention and counselling that gait benefits most (urinary symptoms possibly mixed with BPH); a new prohibition forbids restarting oxybutynin. Vascular cognitive impairment is moderate (Fazekas 2); parkinsonism, AD and atrophy are low.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+
+- Plan R2: citation keys `[Nakajima_2021]` (used in criteria, musts, constraints and key evidence) are not yet in the NPH criteria pack; the case uses the plan's canonical texts and waits for R2.
+- Plan R4: the post-tap criterion has the same pattern as the baseline criterion; coverage credits it from the baseline call until a timing discriminator exists.
+- Plan R5/R8: the post-tap follow-up is reached by "post-tap reassessment" phrasings; "repeat TUG after CSF removal" receives the baseline again (no leak).
+
+## Open questions for Andrea (judgment calls you could not settle)
+
+- None specific to this case (plan Q1 and Q2 apply to all NPH cases).
+
+## Verification
+Adversarial verifier, 24 Oct 2026. Read the log, the whole final case and its diff against fa1d22e6 (the pre-round version; the worker's edit is in checkpoint 1fd43d22).
+- Checked: every own-finding row against the file (literature and drug outputs null, no drug or literature follow-ups, patient block free of Evans, callosal, DESH, NPH, tap, shunt, TUG and MoCA; baseline gait report has no post-tap data; post-tap follow-up, CSF report and criteria carry identical figures). Arithmetic: TUG 22 to 18 s = 18%, to 16.5 s = 25%; 10-metre walk 18 to 14.2 s = 21%; MoCA items sum to 23 (2+3+6+2+2+2+6) and fit the old exam's losses; CSF glucose 68 with ratio 0.61 matches serum glucose 112; opening pressure 16 cmH2O within F3. Tiers, order, constraints and stop rule match plan 3.1 to 3.5; vocabulary terms (holter_24h, TTE, 14_3_3_protein, RT_QuIC, oligoclonal_bands, meningitis_panel, HSV_PCR) exist in costs.yaml. MockServer probe (cognitive screen first, then "baseline TUG before tap test", MRI, CSF, "post-tap reassessment at 24 hours"): baseline served before the tap, follow-up after; a second post-tap phrasing returns the baseline again (miss, no leak).
+- Found and fixed (B, minor): the exam calls the reduced toe vibration "age-appropriate", while `ground_truth.red_herrings[0].correct_interpretation` and `key_clinical_evidence[6]` asserted a diabetic neuropathy. Both now say the signs "may reflect age or a mild diabetic neuropathy"; the red herring stays (ankle reflexes 1+, plan C20).
+- Not changed: one pre-existing em dash in an unedited HPI sentence (not new text); a unilateral left heel-shin finding in the original exam (pre-existing, does not affect the diagnosis).
+- perfect_agent -v ok, case_io check clean for the case, test_case_guards pass.
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (`plans/NPH-decisions.md`); no clinical data the agent receives changed.
+- Synonyms (`diagnosis_synonyms.yaml`, applied with `--prune --conditions nph`): code G91.0 removed (ICD-10-CM communicating hydrocephalus, which covers secondary NPH, a different entity from iNPH); labels unchanged, G91.2 and G91.9 accepted.
+- `key_clinical_evidence`: the 10% TUG threshold is no longer attributed to `[Nakajima_2021]`, which sets no numeric tap-test cut-off; it is stated as a commonly used threshold that no guideline fixes (the tap protocol keeps its Nakajima citation where the sentence states it).
+- Checks: `perfect_agent.py -v` pass, `case_io.py check` clean, `test_case_guards -k NPH-` pass. Not yet in `DISCRIMINATOR_CONDITIONS`: the post-tap follow-up's prose `assessment_type` is deliberate until the timing discriminator lands (CENTRAL C2 in the decisions file).
+
+## Vocabulary wiring (24 Oct 2026)
+
+Central vocabulary (timing discriminator, NPH R4; decisions Q2 and CENTRAL C2). No clinical text changed.
+
+| field path | change |
+| --- | --- |
+| `initial_tool_outputs.clinical_assessment.timing` | added `baseline` |
+| `followup_outputs[1]` (`request_post_reassessment`) | `assessment_type` "gait_and_balance_timed (post-tap reassessment)" -> `gait_and_balance_timed`; `timing: post_intervention` added |
+| `ground_truth.action_criteria[action-6-perform-clinical-assessment]` | `required_arguments.timing: baseline` (the schema default, so a call that omits it still matches; a post-tap call no longer does) |
+| `ground_truth.action_criteria[action-post-tap-gait-reassessment]` | `required_arguments.timing: post_intervention`; importance recommended -> required (Reviewer 1: gait before and after the tap) |
+| `ground_truth.sequence_constraints` | soft: `action-4-analyze-csf` before `action-post-tap-gait-reassessment` [Nakajima_2021] |
+| `ground_truth.stop_rule.required_before_assessment` | `action-post-tap-gait-reassessment` added |
+
+Scoring change for re-review: the post-tap reassessment is now required and is credited only by a call with `timing: post_intervention`; the baseline order is answered by the baseline report and the reassessment order by the post-tap report (MockServer secondary discriminator).
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+- `perform_clinical_assessment {assessment_type: performance_status}`: Karnofsky 70, ECOG 2; cares for himself; unable to carry on normal activity; ambulatory with support for turning (fallback_tool_outputs.clinical_assessment). Why: the library gives Karnofsky 100 / ECOG 0 (no evidence of disease, working) in a symptomatic patient.
+- `perform_clinical_assessment {assessment_type: levodopa_challenge}`: MDS-UPDRS III 16 to 15 (6%); gait, gait initiation, turning and postural stability unchanged; no clinically meaningful levodopa response (below 30%) (followup_outputs[2] request_levodopa_challenge). Why: the library describes a normal motor examination and gait; this patient has a gait disorder, and the challenge shows little or no levodopa response.
+- `order_specialized_test {test_type: neuropsych_battery}`: frontal-subcortical profile of mild severity (slowed processing, executive and attention deficits, recognition relatively preserved) (fallback_tool_outputs.specialized_test). Why: the library reports normal cognition in every domain; this patient has documented cognitive impairment on the stored bedside screen.
+- `order_specialized_test {test_type: exercise_stress_test}`: submaximal non-diagnostic test, stopped at 2.3 METs for gait unsteadiness with freezing on the moving belt (followup_outputs[3] request_exercise_stress_test). Why: the library describes a 9.5-minute Bruce protocol at 10.4 METs; this patient's gait disorder (magnetic gait with falls) does not allow it.
+- `order_echocardiogram {echo_type: exercise_echo}`: submaximal non-diagnostic study stopped at 2.3 METs; resting findings as on the stored TTE (followup_outputs[4] request_exercise_echo). Why: the library describes 9.5 METs on a treadmill with a normal echo; this patient's gait disorder does not allow it.
+- `order_body_imaging {study: pelvis_abdomen_ultrasound}`: enlarged prostate (52 mL); abdomen normal (fallback_tool_outputs.body_imaging). Why: the library reads the prostate as normal in size in a man treated for prostatic enlargement.
+- Checks: perfect agent ok; case guards pass; criteria answers unchanged.

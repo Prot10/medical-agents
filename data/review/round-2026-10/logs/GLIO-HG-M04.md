@@ -1,0 +1,97 @@
+# GLIO-HG-M04
+Reviewer status: R1 not reviewed, R2 needs_changes (2 notes) | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| 457ccd8f-c786-43fa-8ec1-fa45af285fa4 | FIXED | One procedure policy, group A: the tissue criterion `action-9-obtain-tissue-diagnosis` accepts `resection` first and `stereotactic_biopsy` only if resection is not safely feasible (AIOM Q1), with one follow-up per procedure; the surgery must `required_recommendations[0]` is the C3 text with preoperative functional MRI, DTI tractography and intraoperative mapping. New recommended `action-fmri-functional-mapping` (hand motor area 9 mm, right SMA 6 mm from the enhancing margin) and `action-dti-tractography` (CST 7 mm, genu, frontal aslant tract) with authored outputs and soft constraints before tissue. |
+| af437c8f-f3fc-48e0-a463-4c73ba1a77ba | FIXED | `CDKN2A_B_deletion` added to the required assays (with IDH1_IHC, IDH1_IDH2_sequencing, ATRX_IHC, 1p_19q_codeletion, MGMT_methylation) and to both tissue reports: "No homozygous deletion"; grade 4 rests on the microvascular proliferation and necrosis already in the histology. The literature fact (CDKN2A/B deletion confers grade 4) moved into the tissue criterion rationale; the literature step is deleted (C1). |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| D | major | `patient.history_present_illness` | Outpatient MRI result in the HPI (C8). | FIXED: referring ED non-contrast CT with a right frontal hypodensity, oedema and slight leftward shift. |
+| B | minor | `patient.clinical_history.medications` | HPI says he takes over-the-counter ibuprofen; not in the medication list. | FIXED: ibuprofen 400 mg as needed added; must to stop it before surgery and dexamethasone; drug check covers it. |
+| E | minor | `patient.neurological_exam.additional` | Author aside "The subtle left pronator drift is the most localizing finding". | FIXED: deleted. |
+| C | major | `assessment.required_recommendations` | "Continue levetiracetam for post-operative seizure prophylaxis" although he had two focal seizures, the second on levetiracetam 500 mg twice daily. | FIXED: treat class, continue form with dose increase (for example 1000 mg twice daily), no enzyme inducers. |
+| C | major | `avoided_actions` EEG waste | Penalised EEG in a patient with seizures (C5). | FIXED: removed. The case fallback EEG was a normal study, which contradicts a right frontal tumour with focal seizures; replaced by right frontal polymorphic slowing without epileptiform discharges (`fallback_tool_outputs.eeg`, kind "case-specific"). |
+| C | major | musts | Template Stupp must for an IDH-mutant tumour; molecular must listing EGFR and TERT; MRI and labs musts. | FIXED: C11 IDH-mutant grade 4 "managed like glioblastoma" with 60 Gy/30 and temozolomide (EANO 2021); assays folded into the surgery must (IDH, ATRX, 1p/19q, CDKN2A/B, MGMT); MRI/labs musts removed (scored criteria). Dexamethasone must per C11. |
+| A/D | major | `initial_tool_outputs.tissue_diagnosis` | Tissue in initial work-up; meta-text impression; "Integrated Diagnosis" and histology items listed as molecular findings; "WHO grade 4". | FIXED (C2): two follow-ups, Histology row, `molecular_findings` holds the seven assays only, integrated diagnosis "Astrocytoma, IDH-mutant, CNS WHO grade 4". |
+| A | major | literature criterion, follow-up and fallback | Literature as a required step. | FIXED (C1). |
+| D | minor | `followup_outputs[0]`, `[1]` | Threshold teaching text in perfusion and MRS; MRS impression concluded the tumour type. | FIXED: numbered metric impressions. |
+| C | major | criteria, constraints, stop rule | No performance status; MRI expected evidence fine but perfusion and MRS labels "confirm high-grade features". | FIXED: plan 3.1 order, KPS 80/ECOG 1 follow-up, hard MRI and labs constraints, canonical perfusion and MRS wording (support, not confirm). |
+| C | major | `ground_truth.differential` | IDH-wildtype GBM "high", lower-grade and oligodendroglioma "moderate" after tissue excludes them; "WHO grade" names. | FIXED: assessment-time view, all very_low, CNS WHO names. |
+| C | minor | `key_clinical_evidence` | Literature-derived survival figures, "features all present in this case", em dashes. | FIXED: rewritten from the case. |
+| C | minor | `red_herrings[0].correct_interpretation` | Said perfusion and spectroscopy "confirm grade 4". | FIXED: histology assigns grade; imaging does not grade. |
+| C | minor | `avoided_actions` CSF, cardiac | Generic rationales. | FIXED: C17 (4 mm shift, frontal horn effacement); cardiac canonical. |
+| C | minor | drug check | Output fine in substance; expected evidence echoed the template. | FIXED: adds ibuprofen, dose-increase review, NKDA; expected evidence rewritten (leak guard passes). |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+
+The HPI now cites a non-contrast CT, and the ibuprofen he takes is in the medication list. The pathway is MRI, perfusion, spectroscopy, labs, performance status (KPS 80), fMRI (hand motor 9 mm, SMA 6 mm), DTI (corticospinal tract 7 mm), then resection or, if not feasible, stereotactic biopsy, and an optional drug check. Both tissue reports give Astrocytoma, IDH-mutant, CNS WHO grade 4: IDH1 R132H mutant by IHC and sequencing, ATRX lost, 1p/19q intact, CDKN2A/B without homozygous deletion (grade 4 from MVP and necrosis), MGMT methylated, TERT wildtype. Musts: resection with fMRI, DTI and mapping and the full IDH-mutant panel; dexamethasone at the lowest effective dose; continue and uptitrate levetiracetam for the two seizures (treatment, not prophylaxis), no enzyme inducers; stop ibuprofen; MDT, 60 Gy/30 with temozolomide as for glioblastoma. The EEG is no longer penalised. The differential is at the assessment-time view.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+
+- Synonyms "glioblastoma", "GBM" and "astrocytoma grade 4" are appended to this IDH-mutant astrocytoma; "glioblastoma" and "GBM" are wrong for the entity (plan section 5.2). Not hand-edited.
+- accepted[0] "Astrocytoma, IDH-mutant, WHO grade 4 (right frontal lobe)": "CNS WHO grade" normalisation (plan section 5.3).
+- `[AIOM_brain]` key (plan section 5.1).
+
+## Open questions for Andrea (judgment calls you could not settle)
+
+None.
+
+## Verification
+
+Adversarial check (24 Oct 2026). Both notes fixed: one scored procedure policy (resection first, biopsy only if not feasible) consistent across criterion, must 1 and the two follow-ups, with fMRI (hand motor 9 mm) and DTI (CST 7 mm) justified by the MRI's extension toward the precentral gyrus; CDKN2A_B_deletion is in both alternatives and both reports ("No homozygous deletion"), and grade 4 rests on the MVP and palisading necrosis printed in the histology. Checked the treat-class must (two focal seizures, recurrence on 500 mg twice daily, uptitration), the removed EEG waste entry with a fallback EEG that now fits a right frontal tumour, ibuprofen added to the medication list as the HPI describes, the IDH-mutant grade 4 treatment must (no Stupp citation, managed like glioblastoma per EANO 2021), ATRX loss and TERT wildtype consistent with the entity, differential all at the assessment-time view, leftward shift for a right mass, labs arithmetic (MCHC 34.2). The MRI impression's hedged "lower-grade glioma with anaplastic transformation cannot be excluded" is a single imaging hedge, allowed by the style guide, not a retired entity name. No change made; perfect_agent and case_io check clean.
+
+## Condition audit (24 Oct 2026)
+
+Condition auditor, cross-case uniformity pass. Changed:
+- `initial_tool_outputs.mri.impression`: trailing sentence "Tissue diagnosis is recommended for definitive characterization." removed, for uniformity with the other 25 GLIO-HG MRI impressions (imaging-only, plan C9); the style guide allows it, so this is consistency, not an error fix.
+Re-ran perfect-agent (30/30 pass), `case_io.py check` (no failure names the case) and the case guards (60 passed).
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/GLIO-HG-decisions.md` (Andrea, 24 Oct 2026: open points resolved for dataset quality).
+
+- accepted[0]: 'Astrocytoma, IDH-mutant, WHO grade 4 (right frontal lobe)' -> 'Astrocytoma, IDH-mutant, CNS WHO grade 4 (right frontal lobe)' (summary CENTRAL 3: WHO CNS5 writes "CNS WHO grade"; ruling 3 label correction)
+- action-performance-status: recommended -> required (Q3: KPS selects the treatment branch in every case, EANO 2021; Reviewer 2 RP04 0289beef applied as a class)
+- stop rule: + action-performance-status (Q3: KPS selects the treatment branch in every case, EANO 2021; Reviewer 2 RP04 0289beef applied as a class)
+- AIOM question numbers removed from the text (edition 2026 numbering unverified) (Q1: AIOM cited as the 2026 update; Quesito numbering not verifiable)
+- fallback specialized_test (generic 'Study within normal limits.', test_type '') -> null; the library answers by test_type (auditor flag, S01 class: a case fallback is served for any order of the tool, whatever the test type)
+- Synonyms re-expanded from `diagnosis_synonyms.yaml` (`--prune --conditions brain_tumor_glioma`): removed ['glioblastoma', 'GBM', 'astrocytoma grade 4']; added ['astrocytoma idh mutant grade 4'] (entity, grade and H3 scoping; summary CENTRAL 2).
+
+## Discriminators and vocabulary (24 Oct 2026)
+
+Discriminator fixes. The MockServer now routes stored reports by their discriminating field: a vocabulary value answers only its own study, an empty or prose value answers every variant of the tool (PATTERNS.md section 5).
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (was missing): the report is a resting transthoracic study, and untyped it also answered TEE, bubble-study and exercise-echo orders.
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, named in the report's own text.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Library contradictions (25 Oct 2026)
+
+Case-specific reports stored where the benchmark library's normal report contradicted the case. Why: the stored MRI shows a mass in the right frontal lobe (superior and middle frontal gyri) (3.4 x 2.8 x 3.0 cm) with an abnormal routine EEG and a focal history and exam; the library reports a normal head CT, a non-diagnostic biopsy, normal brain metabolism, perfusion and vessels, a normal prolonged EEG, no headache and normal bedside and neurophysiological tests where the exam is abnormal.
+
+- order_ct_scan: CT showing the stored lesion(s) instead of a normal head CT (fallback_tool_outputs.ct)
+- obtain_tissue_diagnosis open_biopsy: the stored integrated diagnosis on this procedure's specimen (fallback_tool_outputs.tissue_diagnosis)
+- FDG_PET: hypermetabolic lesion(s) (fallback_tool_outputs.advanced_imaging)
+- amino_acid_PET: FET-avid lesion(s) (followup request_amino_acid_pet)
+- CT_perfusion: lesion perfusion matching the stored perfusion MRI (followup request_ct_perfusion)
+- perfusion_SPECT: regional hypoperfusion over the lesion (followup request_perfusion_spect)
+- cerebral_angiography: mass effect and lesion vascularity (followup request_cerebral_angiography)
+- video EEG: the stored routine EEG's abnormalities over 24 h (followup request_video_eeg)
+- ambulatory EEG: the stored routine EEG's abnormalities over 48 h (followup request_ambulatory_eeg)
+- structured_headache_history_ichd3: the case's headache, prior primary headache and red flags (fallback_tool_outputs.clinical_assessment)
+- gait_and_balance_timed: matching the exam (followup request_timed_gait_balance)
+- labs AED_levels: Levetiracetam 14.2 mg/L (therapeutic range); no other antiseizure drug detected. (fallback_tool_outputs.labs[AED_levels])
+
+Checks: `perfect_agent.py` pass; `test_case_guards.py -k GLIO-HG-M04` pass; no fixed order still answered by the library (`lib4.source`); no 60-character window of any criterion's expected_evidence in the added text, except tissue copies that repeat the stored tissue report verbatim; every criterion's served output unchanged (snapshot diff against the baseline).

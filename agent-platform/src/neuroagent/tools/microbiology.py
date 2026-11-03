@@ -28,8 +28,9 @@ from .vocabulary import microbiology_specimens
 class MicrobiologyTool(BaseTool):
     name = "order_microbiology"
     description = (
-        "Culture, stain or PCR a specimen other than CSF: blood, urine, throat swab, or "
-        "ascitic fluid via diagnostic paracentesis. Use this to identify a pathogen or an "
+        "Culture, stain or PCR a specimen other than CSF: blood, urine, throat swab, "
+        "ascitic fluid via diagnostic paracentesis, sputum, stool, a wound swab or a brain "
+        "aspirate. Use this to identify a pathogen or an "
         "infectious precipitant outside the cerebrospinal compartment. Sampling should not "
         "delay empirical antimicrobial therapy — draw, then treat."
     )
@@ -46,11 +47,21 @@ class MicrobiologyTool(BaseTool):
                 "enum": microbiology_specimens(),
                 "description": (
                     "What to sample. 'blood_culture': two sets, with susceptibility "
-                    "testing. 'whole_blood_pcr': meningococcus / pneumococcus and other "
-                    "principal meningeal pathogens. 'throat_swab': meningococcal culture. "
+                    "testing. 'whole_blood_pcr': EDTA whole-blood PCR for Neisseria "
+                    "meningitidis (with pneumococcus and the other principal meningeal "
+                    "pathogens), the organism test of suspected meningococcal disease when "
+                    "lumbar puncture is delayed or contraindicated. 'throat_swab': "
+                    "meningococcal culture. "
                     "'urine': urinalysis and culture. 'ascitic_fluid': diagnostic "
                     "paracentesis with PMN count, protein and culture — indicated in every "
-                    "patient with ascites and altered mental status."
+                    "patient with ascites and altered mental status. 'sputum': Gram stain and "
+                    "culture (acid-fast smear and mycobacterial culture on request). 'stool': "
+                    "C. difficile toxin PCR. 'wound_swab': culture of a wound or ulcer, a "
+                    "possible portal of entry. 'brain_aspirate': Gram stain and aerobic and "
+                    "anaerobic culture of material aspirated from a brain lesion; the aspiration "
+                    "itself is ordered through obtain_tissue_diagnosis. "
+                    "'tracheal_aspirate': Gram stain and culture of a lower-airway sample "
+                    "aspirated through the endotracheal tube of a ventilated patient."
                 ),
             },
             "tests": {
@@ -72,4 +83,15 @@ class MicrobiologyTool(BaseTool):
             },
         },
         "required": ["clinical_context", "specimen"],
+    }
+    vocabulary = {"specimen": microbiology_specimens}
+    pack_notes = {
+        "general_medicine": {
+            "specimen": (
+                "'synovial_fluid': arthrocentesis with cell count, crystals and culture. "
+                "'pleural_fluid': thoracentesis with cell count, protein, LDH, pH and culture. "
+                "'nasopharyngeal_swab': respiratory pathogen PCR (influenza, SARS-CoV-2, RSV). "
+                "'bronchoalveolar_lavage': bronchoscopy with lavage for culture, cytology and PCR."
+            ),
+        },
     }

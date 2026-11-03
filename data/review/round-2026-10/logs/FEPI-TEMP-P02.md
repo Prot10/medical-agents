@@ -1,0 +1,92 @@
+# FEPI-TEMP-P02
+Reviewer status: R1 not reviewed, R2 not reviewed (no notes file for FEPI-TEMP) | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| (none) | n/a | No reviewer notes for this case. The physician input is the July 2026 tool guidance for focal_epilepsy_temporal (condition_tool_guidance.yaml), applied through plans/FEPI-TEMP.md. |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| D | blocker | `initial_tool_outputs.literature_search['general']`, `initial_tool_outputs.drug_interactions['general']` | Plan class A: both any-query blocks were only the literature and drug-check criteria's `expected_evidence` (leak). | FIXED: both deleted. Because the drug check stays `recommended` (plan B) it needs a real stored answer, so a new `drug_interactions['methylprednisolone']` answers the planned immunotherapy against his actual list (carbamazepine CYP3A4 induction of corticosteroids, carbamazepine hyponatremia, carbamazepine plus lacosamide PR and neurotoxicity, levetiracetam and IVIG without PK interaction, steroid and IVIG warnings). A new literature entry gives general cited evidence (Graus 2016 criteria, Irani 2011 FBDS cohort). Leak guard passes. |
+| B | major | `followup_outputs` (`request_csf`), `ground_truth.action_criteria` (CSF) | CSF interpretation called WBC 5 a pleocytosis, reported "LGI1 detected in CSF" (1:16) while the CSF criterion's evidence said serum (fact 19). | FIXED: CSF WBC 3, protein 52 mg/dL (mildly raised), normal glucose; CSF autoimmune panel (LGI1, CASPR2, NMDAR, GABA-B, AMPAR) negative, OCB negative, HSV-1/2 PCR not detected, cytology negative; pattern-level interpretation. CSF evidence rewritten to match. |
+| C | major | `initial_tool_outputs.labs`, `ground_truth.action_criteria` (labs) | Plan P02: serum is the sample where LGI1 antibodies are found, but no serum antibody was stored and labs were `optional` with template evidence. | FIXED: new panel `Autoimmune_encephalitis_serum` (LGI1 IgG positive 1:320 by cell-based assay; CASPR2, NMDAR, GABA-B, AMPAR, GAD65 negative); sodium 126 and carbamazepine 8.2 kept; interpretation is a recital with the templated hedged antibody comment. Criterion `required`, panels `autoimmune_encephalitis` with `sodium` (or BMP or CMP). The plan asked the lab interpretation to name carbamazepine as a contributor to the hyponatremia; the style guide forbids causal claims in lab interpretations, so that statement went into the KCE, the drug check and a must instead. |
+| D | major | `patient.neurological_exam.motor`, `.additional` | The exam named the sign "faciobrachial dystonic seizures (FBDS)" (class V), which is what the case scores. | FIXED: episodes described (2-3 s right arm extension and posturing with right facial contraction, awareness preserved), not named; duplicate chorea sentence removed from `additional`. |
+| B | minor | `patient.neurological_exam.mental_status` | MMSE 22/30 listed losses summing to 10 ("missing 2 points"). | FIXED: date -1, day -1, delayed recall -3, serial sevens -3 = 8. |
+| D | minor | `initial_tool_outputs.mri` | Teaching capitals ("SWELLING, NOT atrophy", "not ATROPHY") and an essay line about MTS in `additional_observations`. | FIXED: report voice; pertinent negatives (no cortical or deep gray DWI change, no susceptibility); numbered impression "most consistent with limbic encephalitis; non-enhancing infiltrative neoplasm less likely". Gadolinium line kept: contrast is appropriate when inflammation is suspected (fact 3). |
+| D | minor | `followup_outputs` (`request_video_eeg`) | EEG artifact location named "FBDS"; PDR line carried a teaching parenthesis; impression not in ACNS numbered form. | FIXED: artifact "during the habitual right arm and face events"; PDR "7-8 Hz, mildly slow for age"; numbered ABNORMAL impression; limitations name the 2-hour duration. Substance unchanged. |
+| C | major | `ground_truth.action_criteria` | Template criteria: MRI `{contrast, epilepsy}` (plan E: no arguments), duplicate citations, rationale = label, ECG `required` with pre-excitation template, literature recommended, FDG-PET recommended. | FIXED: order MRI (no arguments, required), video-EEG (required), labs (required), ECG (optional, baseline before PR-prolonging ASMs), CSF (required), FDG-PET (optional), new chest CT (recommended), drug check (recommended), literature (optional, last). One bracketed key each, case-specific evidence and rationale. Criterion ids kept. |
+| C | major | `ground_truth.action_criteria` (`action-chest-ct-tumor-screen`), `followup_outputs` (`request_chest_ct_tumor_screen`) | Tumor screening was a must ("chest/abdomen/pelvis CT, testicular ultrasound") that no criterion scored. | FIXED: recommended `order_body_imaging` chest_CT (or mediastinum_CT, chest_abdomen_pelvis_CT) with a stored contrast chest CT: no thymoma, mass, nodes or lung lesion. The must is deleted. |
+| C | major | `ground_truth.sequence_constraints` | MRI -> CSF was `soft`; MRI -> drug check carried a template reason. | FIXED: MRI -> CSF `hard` ("Exclude mass effect on imaging before lumbar puncture."); MRI -> drug check soft with a reason that fits immunotherapy planning (the class C canonical reason is about tumors and is not apt here). |
+| C | major | `ground_truth.stop_rule` | Max 0; included ECG. | FIXED: MRI, video-EEG, labs, CSF; max 2. |
+| C | major | `ground_truth.assessment.required_recommendations` | Musts were diagnostic steps (recognize FBDS, send paired antibodies, malignancy screen) and lacked the carbamazepine/hyponatremia problem and driving. | FIXED: five musts: immunotherapy with doses (IVMP 1 g x 3-5 days, prednisolone taper, IVIG 2 g/kg or PLEX if incomplete response); review carbamazepine for sodium 126 with daily sodium and SIADH management; continue a focal ASM without escalation; driving; follow-up cognition and relapse plan. |
+| E | minor | `ground_truth.assessment.prohibited_recommendations` | Em dashes. | FIXED: same three prohibitions reworded without dashes. |
+| C | major | `ground_truth.differential` | Not the assessment-time view (class P): presumed drug-resistant TLE and NMDAR `moderate`; paraneoplastic entry phrased as "CASPR2 / GAD65" with ICD G13.1; HSV ICD G05.1. | FIXED: TLE, NMDAR, other antibody-mediated LE `low`; CJD and HSV `very_low`; HSV ICD B00.4; each entry names the excluding finding. |
+| C | minor | `ground_truth.key_clinical_evidence` | Two engineering lines ("Tier per the July 2026...", "July 2026 review applied...") (class G); "pathognomonic"-style overstatement. | FIXED: six case lines (semiology, serum vs CSF antibody, Graus 2016 criteria, sodium with carbamazepine, three failed ASMs, chest CT). |
+| A | minor | `fallback_tool_outputs.echo` | No `echo_type` (class I). | FIXED: `"echo_type": "TTE"`. |
+| C | minor | `ground_truth.avoided_actions[*].rationale` | Generic rationales. | FIXED: case-specific (preserved awareness, no syncope or palpitations). |
+| E | minor | `metadata.difficulty_rationale` | Named "CSF antibody" synthesis. | FIXED: serum and CSF antibody testing. |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+
+A 31-year-old man with six months of brief right arm and face episodes (20-50 a day) despite levetiracetam, carbamazepine and lacosamide, with two months of memory decline, personality change and dream enactment. The exam now describes the episodes without naming them. The work-up the case scores is MRI (bilateral mesial temporal FLAIR hyperintensity with left hippocampal swelling, no enhancement), video-EEG (six habitual events with brief bitemporal fast activity, diffuse slowing, left temporal sharp waves), serum antibodies and sodium (LGI1 IgG positive 1:320 by cell-based assay, sodium 126, carbamazepine 8.2), CSF after MRI (hard constraint; WBC 3, protein 52, CSF LGI1 and panel negative, HSV PCR negative) and, recommended, chest CT for thymoma (normal) and a drug check of the planned steroids against the current ASMs. ECG, FDG-PET and literature are optional. Musts: start IV methylprednisolone with IVIG or PLEX if the response is incomplete, review carbamazepine because of the hyponatremia, keep one focal ASM without escalation, no driving, follow-up of cognition and relapse.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+
+- Criteria pack allow-list: `[Graus_2016]` (MRI, labs, CSF, chest CT, drug check, literature, constraints) and `[IFCN_ILAE_EEG_2023]` (video-EEG) are plan 1.1 starred keys not yet in the pack (plan CENTRAL 2); `case_io check` accepted them.
+- An `analyze_eeg` order with `eeg_type: routine` receives the stored video-EEG (EEG is not a routed tool). Here that gives a routine order a richer report than it would record; harness-level, not changed here.
+
+## Open questions for Andrea (judgment calls you could not settle)
+
+None. Two deliberate departures from the plan, both for quality: the plan said to delete the initial literature and drug blocks; they were deleted, and new non-leaking outputs were authored because a recommended drug check needs its own stored answer and the generic fallback ("no high-quality evidence") would misstate the LGI1 literature. The plan's wording for the lab interpretation (carbamazepine named as a contributor) was moved out of the lab report to respect the style guide.
+
+## Verification
+
+Adversarial check, 24 Oct 2026. Read the log, the diff against master (the edit was committed in the batch-5 checkpoint) and the whole final case. Checked: exam no longer names FBDS; MMSE losses sum to 8 (22/30); serum LGI1 positive and CSF LGI1 negative agree across labs, CSF, criteria evidence, KCE, differential and literature (fact 19); CSF WBC 3 is called normal everywhere and the HSV entry says "without pleocytosis"; MRI volumes (4.1 and 3.6 cm3) match the criterion evidence; MRI -> CSF is hard and the MRI criterion has no arguments (plan E); chest CT criterion is answered by its own follow-up (`study: chest_CT`); immunotherapy doses (IVMP 1 g for 3-5 days, IVIG 2 g/kg) and the carbamazepine-hyponatremia must are correct and consistent with the prohibitions; tiers, stop rule (max 2) and the literature output (Graus 2016 criteria wording, Irani 2011) are correct; no engineering lines, duplicate citations or new dashes; leak, followup and discriminator guards pass. Nothing wrong found; no change made. The HPI keeps one pre-existing em dash (original text, not churned). `perfect_agent.py -v` prints `<- ?` for the labs criterion only because the stored panels carry null fields (no labs fallback exists, so the served report is `initial_tool_outputs.labs`).
+
+## Condition audit
+
+Condition auditor, 24 Oct 2026. Checked uniformity of the plan's decisions across the 30 cases and the FND and MS-RR audit classes (engineering text, any-query outputs, second-tier labs, copied numbers, sharp-wave durations, differential codes). After the changes below, `perfect_agent.py` and `case_io.py check` are clean for all 30 cases and `test_case_guards.py -k FEPI-TEMP` passes.
+
+- `initial_tool_outputs.literature_search.general`: neutral focal-epilepsy block added (definition, classification, MRI protocol, first-line ASM, drug resistance), so a literature query that names no case-specific topic no longer receives a stored follow-up.
+- Initial literature output ("LGI1 antibody encephalitis faciobrachial dystonic seizures diagnosis and treatment", served for any query) moved to the last follow-up `search_literature_lgi1_faciobrachial_autoimmune_encephalitis`.
+- `fallback_tool_outputs.literature_search`: placeholder block deleted (unreachable behind the initial output; it held "(agent not specified...)" or "No directly applicable evidence").
+- `fallback_tool_outputs.drug_interactions`: placeholder block deleted (unreachable behind the initial output; it held "(agent not specified...)" or "No directly applicable evidence").
+- `action-10-analyze-ecg.rationale`: engineering prefix or tier wording removed (was "Optional baseline: he takes lacosamide a...").
+- `action-7-order-advanced-imaging.rationale`: engineering prefix or tier wording removed (was "Optional: mesial temporal hypermetabolis...").
+- `action-5-search-medical-literature.rationale`: engineering prefix or tier wording removed (was "Optional background; the diagnosis rests...").
+- Serum autoimmune encephalitis panel (LGI1 positive 1:320) moved from the initial labs, where any first labs order received it, to an `interpret_labs` follow-up (`request_autoimmune_encephalitis_lgi1_caspr2_antibodies`, after the video-EEG); LGI1 removed from the initial interpretation and abnormal summary. The required order `[autoimmune_encephalitis, sodium]` (and the BMP and CMP alternatives) still receives both panels.
+- Initial drug output (methylprednisolone and IVIG, served for any drug, so any first check revealed immunotherapy) moved to a follow-up `check_methylprednisolone_prednisolone_ivig_corticosteroid` before the literature; the initial block is now a review of his three current ASMs.
+
+## Close-out (24 Oct 2026)
+
+Condition close-out (`plans/FEPI-TEMP-decisions.md`). What changed and why:
+
+- Synonyms: the generic G04.81 labels (autoimmune encephalitis, antibody mediated encephalitis, autoimmune limbic encephalitis) and codes G04.8, G04.90 removed (P02 added to the entry's `except_cases`): their tokens occur in "anti-NMDA receptor autoimmune encephalitis" and "GAD65 autoimmune limbic encephalitis", alternatives this case excludes. New `G04.81+lgi1` entry: LGI1 encephalitis, anti-LGI1 encephalitis, LGI1 antibody encephalitis, LGI1 limbic encephalitis, leucine rich glioma inactivated 1 encephalitis.
+- Checks: `perfect_agent.py -v` and `case_io.py check` clean; `test_case_guards.py -k FEPI-TEMP-` passes, now with the discriminator guard and the FEPI-TEMP banned strings.
+
+## Lab evidence, normal results (25 Oct 2026)
+
+Since 24 Oct 2026 an `interpret_labs` order returns only the stored panels it names (`tools/lab_matching.py`). This criterion's `expected_evidence` cited normal results its own order (the first alternative) did not return; a perfect agent following it would not see them.
+
+- `ground_truth.action_criteria[action-9-interpret-labs]`.expected_evidence: was "Serum LGI1 IgG positive by cell-based assay (titer 1:320) with other neuronal antibodies negative; sodium 126 mEq/L; carbamazepine 8.2 mcg/mL."; now "Serum LGI1 IgG positive by cell-based assay (titer 1:320) with other neuronal antibodies negative; sodium 126 mEq/L.".
+- Decision: trim evidence. The carbamazepine level is not part of the antibody and sodium order and no other field relies on it; the AED-level panel stays servable to an agent that orders it.
+- Scoring: none (evidence only; the reward does not read it).
+
+Checks: `perfect_agent.py` ok; `case_io.py check` clean for this case; the normal-row probe reports nothing for this criterion.
+
+## Library contradictions (25 Oct 2026)
+
+Orders the benchmark library answered with a normal report that contradicts this case now get a case-specific report (term: gist, where stored):
+
+- analyze_eeg routine: This is an ABNORMAL EEG due to: 1. Moderate diffuse background slowing. 2. Rare left anterior temporal sharp waves (F7/T3). 3. Intermittent bitemporal (fallback_tool_outputs.eeg)
+- analyze_eeg ambulatory: This is an ABNORMAL 48-hour ambulatory EEG due to: 1. Moderate diffuse background slowing. 2. Occasional left anterior temporal sharp waves (F7/T3). 3 (followup request_ambulatory_eeg)
+- obtain_tissue_diagnosis resection: Chronic T-lymphocytic inflammation with neuronal loss in limbic grey matter (fallback_tool_outputs.tissue_diagnosis)
+- obtain_tissue_diagnosis stereotactic_biopsy: Chronic T-lymphocytic inflammation with neuronal loss in limbic grey matter (followup request_stereotactic_biopsy)
+- obtain_tissue_diagnosis open_biopsy: Chronic T-lymphocytic inflammation with neuronal loss in limbic grey matter (followup request_open_biopsy)
+- order_specialized_test neuropsych_battery: Severe anterograde amnesia for verbal and visual material (delayed recall T-scores 22 and 30) with slowed processing speed, impaired calculation and e (fallback_tool_outputs.specialized_test)
+- perform_clinical_assessment cognitive_screen (baseline): MoCA 17/30 with impaired delayed recall, attention and calculation, and disorientation to date. Cognitive impairment on  (fallback_tool_outputs.clinical_assessment)
+- interpret_labs valproate_level: valproate not detected (fallback_tool_outputs.labs[valproate_level])
+
+Checks: `perfect_agent.py` passes; the criterion snapshot of the case is unchanged; `pytest agent-platform/tests -k FEPI-TEMP` (case guards included), `test_reports_do_not_fabricate.py` and `apply_diagnosis_synonyms.py --check` pass; no new report repeats a 60-character window of any criterion's expected evidence.

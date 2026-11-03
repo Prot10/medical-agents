@@ -1,0 +1,85 @@
+# FTD-M06
+Reviewer status: R1 none, R2 none (no FTD notes file; FTD was never reviewed case by case) | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| none | - | No reviewer note exists for this case. Reviewer 1's July 2026 tool rulings (`condition_tool_guidance.yaml` `ftd:`) are kept: neuropsychology, clinical assessment and labs required; FDG-PET optional; genetics not needed (carrier status known). |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| C | blocker | `followup_outputs` (neuropsych) | Laterality contradiction: left-hand ideomotor apraxia, left-hand graphesthesia loss and a left alien hand against left frontoparietal atrophy and hypometabolism with the right hemisphere preserved; the impression then claimed "right hemisphere praxis and parietal involvement". | FIXED: the cortical signs are now right-sided (right hand 3/5 postures, right graphesthesia 4/5; left hand intact), concordant with the MRI, FDG-PET and the right palmomental reflex. The son's alien-hand report, which existed only inside the test report, was removed; "no alien limb phenomenon observed". |
+| B | major | `followup_outputs` (neuropsych) | Not a battery: only praxis and cortical sensory items; impression covered apraxia only (plan C13). | FIXED: executive (TMT-B, Stroop, card sorting), fluency, social cognition (Ekman, faux pas, FBI 22/72), memory (RAVLT retrieval pattern, recognition 13/15), language, visuospatial, praxis, cortical sensory and mood screen; numbered impression with the canonical ending and one clause on the right-sided cortical signs. |
+| B | major | `initial_tool_outputs.clinical_assessment` | Only perseveration and the executive feature marked; perseveration evidenced by medication errors; emotional blunting, impulsive disposal of photographs and withdrawal from friends ignored (plan C3). | FIXED: 5 of 6 features (disinhibition, apathy, loss of empathy, compulsive routines, executive); dietary change absent; informant, screen, functional decline; canonical impression. |
+| B | major | `initial_tool_outputs.labs` | CSF NfL reported in a blood panel; plasma progranulin "(H)" inside the core panel ("haploinsufficiency confirmed"); RPR/HIV in the core panel; folate, calcium, glucose, LFTs, Hb, platelets missing; "Reviewed_FTD_panel_additions" (plan C5). | FIXED: five panels with stored values kept (TSH 1.8, B12 482, WBC 5.8, Na 141, creatinine 0.8, ESR 11, CRP 1.6) and normal values added (eGFR 85 by CKD-EPI 2021, folate 12.2, others); CSF NfL deleted; progranulin 42 ng/mL (L) moved to keyed follow-up `request_plasma_progranulin` (`plasma_progranulin`); RPR/HIV to `request_rpr_syphilis_hiv_serology`. |
+| D | major | `followup_outputs` (two literature outputs), `action-8-search-medical-literature` | Literature criterion required, in the stop rule, echo `expected_evidence`, required query string; two follow-ups with empty summaries, one listing a latozinemab "NEJM 2023" trial report that cannot be verified (plan C1). | FIXED: both follow-ups deleted; canonical familial variant (`[Pottier_2016]`) in `initial_tool_outputs.literature_search`; criterion optional, last, `required_arguments` {}, out of the stop rule. |
+| C | major | `ground_truth.assessment.required_recommendations` | "Confirm GRN pathogenic variant and reduced plasma progranulin" (carrier status is already known; plan C9); two overlapping genetic musts; trial must tied to a named agent. | FIXED: six musts: Rascovsky with the definite category for a known pathogenic variant; why grief or adjustment does not explain the picture; the right-sided corticobasal signs and their follow-up; safety (no longer managing her daughter's medicines alone, finances, driving, power of attorney, advance care planning); family genetic counselling (son at 50%) and GRN cohorts and trials; caregiver support for a son caring for two relatives, without ChEI or memantine. |
+| D | minor | `patient.history_present_illness` | Closing author sentence framing the question ("It remains uncertain whether these changes represent early emerging symptoms or ... grief"). | FIXED: deleted; the son's own attribution to grief and stress stays as the red herring. |
+| B | minor | `patient.neurological_exam` | "No primitive reflexes on cranial nerve exam" against a right palmomental reflex (plan C14); "8 F-words, low normal" although 8 words lose the MoCA fluency point; interpretive sentence on the MoCA; sensory "Normal" against impaired graphesthesia. | FIXED: cranial nerves "Normal."; fluency 0/1 with 8 words (items sum to 24/30); interpretive sentence deleted; sensory "Primary sensation normal." |
+| D | minor | `initial_tool_outputs.mri` | "contributes to left frontoparietal atrophy pattern" (interpretation); unterminated impression. | FIXED: descriptive; numbered impression with pertinent negatives. |
+| C | minor | `action-7-order-advanced-imaging`, `followup_outputs` (FDG, SPECT) | No SPECT alternative; tautological FDG impression (plan C6, C7). | FIXED: SPECT alternative and authored asymmetric left SPECT; FDG impression hedged, values unchanged. |
+| C | major | `fallback_tool_outputs.advanced_imaging`, `.drug_interactions`, `.ct` | Generic advanced fallback; "agent not specified" drug fallback; normal CT against MRI atrophy (plan C6). | FIXED: first two deleted; CT shows asymmetric left frontal volume loss; `fallback_tool_kinds` updated. |
+| A | minor | `ground_truth.action_criteria[*]` | Rationale equal to label, duplicate unbracketed citations, `[AAN_dementia_2018]`, labs label naming RPR/HIV, MRI evidence "bilateral" against a left-predominant scan (plan C4). | FIXED: canonical labels and citations; case-specific evidence. Ids kept. |
+| C | minor | `ground_truth.assessment.prohibited_recommendations[0..1]` | Overstated memantine harm (plan C10). | FIXED: canonical wording. |
+| C | major | `ground_truth.differential` | CBS listed as a "high" competitor although it is the phenotype of the same GRN disease; AD-CBS "moderate" despite a pathogenic GRN variant; "Sporadic bvFTD" listed (plan C11). | FIXED: grief or adjustment reaction low, AD (including AD-CBS) low, PSP very low, each with for/against from the case. |
+| D | minor | `ground_truth.key_clinical_evidence`, `.red_herrings`, `metadata.notes` | Generic lines ("cascade testing and clinical-trial discussion are central"); notes claimed "amyloid PET mandatory" and progranulin as teaching. | FIXED: four lines from the pedigree, history, neuropsychology and MRI; red herrings for the grief framing and the MoCA 24/30; notes rewritten. |
+| C | minor | `ground_truth.avoided_actions` (CT, perfusion MRI) | `[AAN_dementia_2018]`; perfusion MRI rationale. | FIXED: `[NICE_NG97]`; reworded. |
+
+## Changes, in one paragraph a physician can read before re-reviewing
+
+Required work-up unchanged (informant assessment, neuropsychological battery, reversible-cause blood tests, MRI brain without contrast); FDG-PET or SPECT and a literature search are optional. The main correction is laterality: the apraxia and cortical sensory signs were on the left hand while the MRI and FDG-PET show left hemisphere disease; they are now right-sided and the neuropsychology report is a full battery (executive and social-cognition deficits, retrieval-pattern memory with preserved recognition). The clinical assessment counts 5 Rascovsky features from the son's account. CSF NfL is gone from the blood tests; plasma progranulin (42 ng/mL, low) is served only when ordered, and the must to "confirm reduced progranulin" was removed because the carrier status is known. Musts: Rascovsky with the definite category for a known pathogenic variant; why grief does not explain the picture; the early corticobasal signs and their follow-up; safety, including no longer managing her daughter's medicines alone; family genetic counselling and GRN trials; caregiver support for her son.
+
+## CENTRAL (requests outside this file: vocabulary, synonyms, library, tests, UI)
+
+- Citation keys used per plan 1.1: `[SNLG_ISS_2024]`, `[Pottier_2016]`.
+
+## Open questions for Andrea (judgment calls you could not settle)
+
+- Plan question 1: `accepted[0]` still says "probable"; the Rascovsky must now states that a known pathogenic GRN variant with the syndrome is the definite category. If the reviewers rule that the case should stay silent on certainty, reword that must.
+- No AD biomarker criterion was added: with a known pathogenic GRN variant and a concordant asymmetric frontal syndrome, AD-related CBS is low. Add an optional amyloid step if the reviewers want it.
+
+## Verification
+
+Adversarial verifier, 24 Oct 2026. Read the log, the diff and the whole final case. No reviewer notes apply. Checked the laterality fix against HEAD: the original MRI, FDG-PET and palmomental reflex were all left-hemisphere / right-sided and only the neuropsychology praxis items were left-handed, so flipping those to the right hand is the correct direction; no left-hand or alien-limb text remains. MoCA items sum to 24/30; eGFR 85 recomputed (CKD-EPI 2021, woman of 59, creatinine 0.8); CSF NfL gone from the blood panel; progranulin keyed and no must depends on it; the "definite" must is correct per Rascovsky 2011 (known pathogenic mutation) and the label conflict is already an open question; guards pass. Found and fixed one cross-field inconsistency: the exam's additional line said she gave away her daughter's "childhood belongings" while the HPI, the clinical assessment and the expected evidence say photographs; now "childhood photographs". `perfect_agent.py -v` and `case_io.py check` clean.
+
+## Condition audit (FTD auditor, 24 Oct 2026)
+
+- D, major, `patient.neurological_exam.mental_status`: the examination gave the bedside screen results (MoCA 24/30 with item losses and letter fluency), which the required `perform_clinical_assessment` returns (ROUND_POLICY timeline-leak rule). The other 12 FTD cases, and VASC-DEM and ALZ-EARLY, had already moved them out. Removed the scores and test results; the behavioural observations, insight and frontal signs stay. The clinical assessment output already carries every removed value, so no information is lost. FIXED.
+- B, major, `followup_outputs`: she is a known carrier of GRN c.709-1G>A (HPI), but an FTD gene panel order fell to the library's normal panel. Added follow-up `request_ftd_gene_panel_known_grn` (`test_type: genetic_panel:FTD`) reporting the known heterozygous GRN variant, with C9orf72 and MAPT normal. Not scored: there is no genetics criterion because her status is already known. FIXED.
+- B, minor, `fallback_tool_outputs.csf`: a case CSF fallback with empty `special_tests` answered any CSF order without a stored result (for example Abeta42, p-tau and t-tau), so the ordered assays were missing from the report. Deleted, together with `metadata.fallback_tool_kinds.csf`, as in M07, M09, M10, P01 and P02. The library now answers per assay; a probe returned normal AD markers. FIXED.
+- E, minor, `initial_tool_outputs.literature_search[*].results[*].source`: the sources were citation keys (`[Rascovsky_2011]` or `Rascovsky_2011`), which a literature tool does not return, and the condition used three styles. They now give the full reference, as in M07-P02 (for example "Rascovsky K et al. Brain 2011;134:2456-2477 (FTDC criteria for bvFTD)"). Findings and summary are unchanged. FIXED.
+- `perfect_agent.py` and `case_io.py check` were re-run on all 30 FTD cases after the changes and are clean; `test_case_guards.py -k FTD` passes (60 tests).
+
+## Close-out (24 Oct 2026)
+
+Decisions in `plans/FTD-decisions.md`. Changes:
+
+- `fallback_tool_outputs.echo.echo_type` set to `TTE` (the report is a transthoracic study). The MockServer routes echo reports by this field; without it the normal TTE fallback answered a TEE order too (PATTERNS section 5; FTD added to `DISCRIMINATOR_CONDITIONS`).
+- `ground_truth.diagnosis.accepted[0]` relabelled from "probable" to "definite": 'Behavioral variant frontotemporal dementia (bvFTD), definite (known pathogenic GRN variant), with early corticobasal syndrome features' (Rascovsky 2011 definite: clinical syndrome plus known pathogenic mutation). She meets the clinical bvFTD criteria and carries a known pathogenic GRN variant, which is the Rascovsky 2011 definition of definite bvFTD; the diagnosis must already said so (summary Q1). Code G31.09 unchanged; scoring unchanged.
+- Synonyms (`G31.09` entry, applied with `--prune --conditions ftd`): "pick disease" and "pick's disease" (retired) and the code G31.01 are no longer accepted. Pick disease is one FTLD-tau pathology that no case establishes, and G31.01 is where ICD-10-CM codes primary progressive aphasia, so a PPA answer coded G31.01 scored as correct here.
+
+Checks: `perfect_agent.py` and `case_io.py check` clean; `test_case_guards.py -k FTD-` passes, including `test_routed_outputs_name_their_study`.
+
+## MockServer routing (24 Oct 2026)
+
+The MockServer now routes `analyze_eeg` by `eeg_type` (an order without it is a routine EEG; video-EEG and ICU continuous EEG are one study), serves an `interpret_labs` order only the stored panels that answer the assays it names, and treats `analyze_brain_mri.contrast` as false when omitted.
+
+- `fallback_tool_outputs.eeg`: `eeg_type` set to `routine`, read from the report's structure: hyperventilation or photic stimulation in a waking or drowsy record, with no sign of prolonged monitoring.
+
+Checks: `perfect_agent.py --all` 600/600; full test suite 3503 passed; synonym guard 0 changes.
+
+## Engineering text (25 Oct 2026)
+
+Review-process wording (references to the round's rulings, the round policy file, the criteria packs, and tier markers such as "(optional)" in criterion labels and rationales) is shown to physicians in the review app, so it was rewritten in clinical language. The tier stays in the criterion's `importance` field; scoring is unchanged. `test_case_guards.py::test_no_review_process_text` now fails on any of it.
+
+- criterion `action-8-search-medical-literature` label: "Literature search on GRN-associated FTD phenotypes (optional)" -> "Literature search on GRN-associated FTD phenotypes"
+
+## Library contradictions (25 Oct 2026)
+
+Orders that reached the benchmark library's normal report although this case contradicts it (diagnosis, history, medications or a stored finding) now get a case-specific report; every other off-pathway order still gets the library normal. No tier, criterion, diagnosis or existing output changed.
+
+- `order_specialized_test test_type=speech_language_evaluation` -> `followup_outputs[order_speech_language_evaluation]`: speech-language findings matching the stored neuropsychology (reduced verbal fluency; naming as tested).
+- `perform_clinical_assessment assessment_type=performance_status` -> `followup_outputs[order_performance_status]`: performance status of the case's functional decline instead of Karnofsky 100.
+
+Checks: `perfect_agent.py` ok; `test_case_guards.py -k FTD` pass; every order listed in `plans/LIBRARY-group2-map.yaml` for this case is answered without the library; served answers of every other order unchanged against HEAD. Reasons and doubts: `plans/LIBRARY-group2-decisions.md`.
