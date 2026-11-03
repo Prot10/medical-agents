@@ -1,7 +1,7 @@
 # Handoff: October 2026 review round (25 Oct 2026)
 
-Branch `fix/review-round-2026-10`, everything committed and pushed to origin (no PR); deployed
-to the review VPS on 25 Oct 2026. The case-by-case round is finished: all 20 conditions (600 cases) are fixed,
+Branch `fix/review-round-2026-10`, merged into `master` on 3 Nov 2026 (PR #1, merge 481dff25);
+the review VPS serves that state (deployed 3 Nov 2026), and rockhopper's checkout is on it. The case-by-case round is finished: all 20 conditions (600 cases) are fixed,
 verified, audited and closed out, and the cross-condition MockServer work is landed. Read, for
 any follow-up: this file, `ROUND_POLICY.md`, `PATTERNS.md`, `CENTRAL_PENDING.md` (the open items),
 `plans/<COND>-decisions.md` (per-condition decisions and the physicians' items). The skills
@@ -57,4 +57,10 @@ which needs torch); `bin/perfect_agent.py --all` 600/600; `apply_diagnosis_synon
   NMDAR-ENC, MIG-AURA, SYNC-CARD, NPH, FTD, MG, FND, MS-RR, FEPI-TEMP, PD.
 - Optional: patient-surname repetition across conditions (Reyes in 8 cases, Tanaka in 2); SE-P02
   off the global F44.5 synonym entry.
-- The review VPS serves this branch (deployed 25 Oct 2026); redeploy with `deployment/hostinger/deploy.sh` only on Andrea's request.
+- The review VPS serves master at 481dff25 (deployed 3 Nov 2026: library reports, patient text without the
+  diagnosis); redeploy with `deployment/hostinger/deploy.sh` only on Andrea's request.
+- Patient text that named the case's own diagnosis (b5da9971, 3 Nov 2026): 113 cases fixed, the kept
+  classes and one doubt (MG-M02) in `plans/DX-NAMED-decisions.md`.
+- VMs (3 Nov 2026): rockhopper `~/projects/medical-agents` on master, `.venv` synced, `.venv-vllm` on vLLM
+  0.32.0 (the 7aa9ae29 pin). chinstrap `~/medical-agents` is on `new-idea` with uncommitted work: only
+  fetched, its working tree untouched.

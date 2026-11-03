@@ -188,19 +188,19 @@ ssh "$VPS_HOST" "set -eo pipefail
 echo -e "${GREEN}  Service restarted.${NC}"
 
 # ── Step 5: Smoke test ──────────────────────────────────
-# uvicorn needs ~2s after systemctl restart returns to finish loading the
+# uvicorn needs ~10s after systemctl restart returns to finish loading the
 # case fleet. Retry a few times. We accept any non-5xx code: a 401 with
 # our probe header is evidence the backend processed the request and ran
 # its auth check, which is exactly what we want to verify here.
 echo -e "${YELLOW}[5/5] Smoke-testing...${NC}"
-for attempt in 1 2 3 4 5; do
+for attempt in $(seq 1 15); do
   code=$(curl -s -o /dev/null -m 10 -w "%{http_code}" "$HEALTH_URL" -H "X-Reviewer-Code: probe")
   if [ -n "$code" ] && [ "$code" -lt 500 ]; then
     echo -e "${GREEN}  ${HEALTH_URL} responding HTTP $code (attempt $attempt).${NC}"
     break
   fi
-  if [ "$attempt" -eq 5 ]; then
-    echo -e "${RED}  ${HEALTH_URL} returned HTTP $code after 5 tries.${NC}"
+  if [ "$attempt" -eq 15 ]; then
+    echo -e "${RED}  ${HEALTH_URL} returned HTTP $code after 15 tries.${NC}"
     echo -e "${RED}  Check: ssh $VPS_HOST 'journalctl -u $SERVICE -n 50 --no-pager'${NC}"
     exit 1
   fi
