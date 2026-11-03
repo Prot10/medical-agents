@@ -79,7 +79,9 @@ class ClinicalPolicyReward:
         required = [c for c in policy.action_criteria if c.importance is ActionImportance.REQUIRED]
         recommended = [c for c in policy.action_criteria if c.importance is ActionImportance.RECOMMENDED]
         required_coverage = _coverage(required, matched)
-        recommended_coverage = _coverage(recommended, matched)
+        # With nothing recommended there is nothing extra to credit: follow the required work-up
+        # rather than paying 1.0 to an agent that ordered nothing.
+        recommended_coverage = _coverage(recommended, matched) if recommended else required_coverage
 
         # An action is justified when it satisfies a criterion no earlier action already
         # satisfied; re-ordering a study that was already resulted is unjustified even though it
@@ -149,16 +151,21 @@ class ClinicalPolicyReward:
         token_efficiency = efficiency_gate / (1.0 + completion_tokens / _TOKEN_SCALE)
         invalid = sum(isinstance(event, ActionRejected) for event in episode.events)
 
+        # Tool accuracy, safety, waste and sequence are rates over the actions taken, so they are 1.0
+        # when nothing is done. Weighting them by required coverage makes process quality count in
+        # proportion to the work-up actually done: a correct diagnosis without any test earns the
+        # diagnosis weight only. Before this (3 Nov 2026) answering with no tool scored at least as
+        # much as the full run in 225 of 600 Qwen3.5-9B episodes. The caps still apply in full.
+        process = required_coverage * (
+            0.11 * tool_accuracy + 0.13 * safety + 0.07 * waste_avoidance + 0.06 * sequence
+        )
         # The assessment component (prose recommendations) is reported for physician review but
         # carries no weight: substring matching of 16-word sentences measures phrasing, not care.
         scalar = (
             0.26 * diagnosis
             + 0.19 * required_coverage
             + 0.05 * recommended_coverage
-            + 0.11 * tool_accuracy
-            + 0.13 * safety
-            + 0.07 * waste_avoidance
-            + 0.06 * sequence
+            + process
             + 0.06 * stopping
             + 0.04 * cost_efficiency
             + 0.03 * token_efficiency

@@ -52,7 +52,7 @@ Components, each in [0, 1]:
 
 - diagnosis (scorer v2, 25 Oct 2026): every token of an accepted label occurs in the asserted part of the submitted primary diagnosis (denied clauses dropped: "non-X", "not X", "rather than X", "X excluded", "X unlikely", "criteria not met"), no `rejected` label occurs there (a competing diagnosis or wrong subtype named alongside, so "ALS or MS" earns nothing), and each of the case's `required_components` (mixed diagnoses) is named. The ICD code never decides the diagnosis;
 - icd_code, weight 0: the submitted `icd10_code` equals an accepted code at the WHO subcategory level (G43.1 agrees with G43.109). Accepted labels and codes are seeded per ICD-10 code from `config/policies/diagnosis_synonyms.yaml` (`scripts/validation/apply_diagnosis_synonyms.py`, idempotent) and refined per case by physician review;
-- required and recommended action coverage: fraction of criteria satisfied by any alternative pattern;
+- required and recommended action coverage: fraction of criteria satisfied by any alternative pattern; a policy with no recommended criteria takes the required coverage as its recommended coverage;
 - tool accuracy: fraction of actions that were the first to satisfy some criterion (re-ordering a resulted study is unjustified);
 - safety and waste avoidance: harmful / wasteful actions as a fraction of all actions;
 - sequence: fraction of constraints respected among pairs of actions the agent actually took;
@@ -61,7 +61,7 @@ Components, each in [0, 1]:
 - cost efficiency: the policy's own required work-up cost divided by the episode cost, capped at 1;
 - token efficiency: completion tokens only, halving at 2048 per episode.
 
-Cost and token efficiency are gated by diagnosis × required coverage so an agent cannot score well by stopping early. Contraindicated actions cap the scalar at 0.10, harmful actions at 0.35 and hard sequence violations at 0.50. A perfect agent that follows each case's own policy scores every component at 1.0 across all 600 cases except recommended coverage; this check is the policy self-consistency gate.
+Cost and token efficiency are gated by diagnosis × required coverage so an agent cannot score well by stopping early. Tool accuracy, safety, waste avoidance and sequence are rates over the actions taken and equal 1.0 when nothing is done, so in the scalar they are weighted by required coverage (3 Nov 2026): a correct diagnosis with no test earns the diagnosis weight, 0.26, and process quality counts in proportion to the work-up done. The breakdown still reports them unweighted. Before this change answering without any tool scored at least as much as the full run in 225 of 600 Qwen3.5-9B episodes (draft policies), which is the incentive behind the September GRPO runs that learned to stop calling tools. Contraindicated actions cap the scalar at 0.10, harmful actions at 0.35 and hard sequence violations at 0.50. A perfect agent that follows each case's own policy scores every component at 1.0 across all 600 cases except recommended coverage; this check is the policy self-consistency gate.
 
 Approved policies are required by default for reportable evaluation. Draft policies remain usable for engineering checks when explicitly allowed (`--allow-draft-policies`), and the summary records that the numbers are not reportable.
 

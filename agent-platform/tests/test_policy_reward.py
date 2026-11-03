@@ -107,6 +107,41 @@ def test_missing_required_evidence_disables_efficiency_and_stopping():
     assert score.cost_efficiency == 0 and score.token_efficiency == 0
 
 
+def test_answering_without_any_action_earns_the_diagnosis_weight_only():
+    case = approved_case()
+    score = ClinicalPolicyReward().score(make_episode(case, []), case)
+    # The rates over actions are vacuous with no action; they are reported but earn nothing.
+    assert score.tool_accuracy == score.safety == score.waste_avoidance == score.sequence == 1
+    assert score.diagnosis == 1
+    assert score.scalar == pytest.approx(0.26)
+
+
+def test_partial_workup_outscores_a_correct_guess_without_tests():
+    case = approved_case()
+    required = [criterion_action(c) for c in by_importance(case, "required")]
+    scorer = ClinicalPolicyReward()
+    guess = scorer.score(make_episode(case, []), case)
+    partial = scorer.score(make_episode(case, required[: len(required) // 2 or 1]), case)
+    complete = scorer.score(make_episode(case, required), case)
+    assert guess.scalar < partial.scalar < complete.scalar
+
+
+def test_recommended_coverage_follows_required_when_nothing_is_recommended():
+    case = approved_case()
+    policy = case.ground_truth
+    case = case.model_copy(
+        update={
+            "ground_truth": policy.model_copy(
+                update={"action_criteria": [c for c in policy.action_criteria if c.importance.value != "recommended"]}
+            )
+        }
+    )
+    required = [criterion_action(c) for c in by_importance(case, "required")]
+    scorer = ClinicalPolicyReward()
+    assert scorer.score(make_episode(case, []), case).recommended_action_coverage == 0
+    assert scorer.score(make_episode(case, required), case).recommended_action_coverage == 1
+
+
 def test_recommended_action_after_required_set_is_not_penalized_as_over_testing():
     case = approved_case()
     required = [criterion_action(c) for c in by_importance(case, "required")]

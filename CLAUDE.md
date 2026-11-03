@@ -154,7 +154,9 @@ HF_HOME=/dev/shm/hf uv run python -m neuroagent.training.train_grpo --model qwen
   criterion only; re-ordering a resulted study is unjustified), safety, waste avoidance, sequence
   (orders two actions the agent actually took), stopping (unjustified actions after the required
   set), assessment, cost efficiency (relative to the policy's own required work-up) and completion
-  token efficiency, both gated by diagnosis × required coverage. Contraindicated 0.10, harmful 0.35,
+  token efficiency, both gated by diagnosis × required coverage. In the scalar, tool accuracy, safety,
+  waste and sequence are weighted by required coverage (they are 1.0 when nothing is done), so a
+  correct answer with no test earns 0.26. Contraindicated 0.10, harmful 0.35,
   hard-sequence 0.50 caps
 - API `POST /api/v1/runs` executes one case synchronously through a checked profile and persists
   the episode under `data/episodes/`; the models route can spawn `serve_model.sh`
