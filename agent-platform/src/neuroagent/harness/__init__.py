@@ -1,7 +1,7 @@
 """Composable clinical-agent harness."""
 
 from .adapters import SUBMIT_TOOL, ActionDecodeError, NativeToolModelAdapter
-from .context import POLICY_SYSTEM_PROMPT, format_patient_info, transcript
+from .context import NARRATIVE_SYSTEM_PROMPT, POLICY_SYSTEM_PROMPT, format_patient_info, transcript
 from .environment import NeuroBenchEnvironment
 from .interfaces import (
     AgentLoop,
@@ -13,13 +13,14 @@ from .interfaces import (
     RunContext,
 )
 from .kernel import HarnessConfigError, HarnessKernel, PluginConfig, ServiceRegistry
-from .loops import ClinicalPolicyLoop, DirectAnswerLoop, ReactAblationLoop
+from .loops import ClinicalPolicyLoop, DirectAnswerLoop, NarrativeOnlyLoop, ReactAblationLoop
 from .plugins import builtin_plugins
 from .profile import HarnessProfile, load_profile, load_profiles
 from .runtime import boot_profile, context_from_profile
 from .store import MemoryEpisodeStore
 
 __all__ = [
+    "NARRATIVE_SYSTEM_PROMPT",
     "POLICY_SYSTEM_PROMPT",
     "SUBMIT_TOOL",
     "ActionDecodeError",
@@ -33,6 +34,7 @@ __all__ = [
     "MemoryEpisodeStore",
     "ModelAdapter",
     "ModelTurn",
+    "NarrativeOnlyLoop",
     "NativeToolModelAdapter",
     "NeuroBenchEnvironment",
     "Plugin",

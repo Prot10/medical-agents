@@ -15,7 +15,7 @@ from ..llm.client import LLMClient
 from ..model_registry import AVAILABLE_MODELS
 from .adapters import NativeToolModelAdapter
 from .interfaces import Plugin
-from .loops import ClinicalPolicyLoop, DirectAnswerLoop, ReactAblationLoop
+from .loops import ClinicalPolicyLoop, DirectAnswerLoop, NarrativeOnlyLoop, ReactAblationLoop
 
 
 def _model_plugin(entry: Mapping[str, Any]) -> Plugin:
@@ -56,6 +56,7 @@ def builtin_plugins() -> dict[str, Plugin]:
         _simple("loop.policy", "loop", lambda _: ClinicalPolicyLoop()),
         _simple("loop.direct", "loop", lambda _: DirectAnswerLoop()),
         _simple("loop.react", "loop", lambda _: ReactAblationLoop()),
+        _simple("loop.narrative", "loop", lambda _: NarrativeOnlyLoop()),
         _simple(
             "reward.policy",
             "reward",

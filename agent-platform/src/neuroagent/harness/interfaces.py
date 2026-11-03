@@ -31,6 +31,7 @@ class ModelAdapter(Protocol):
         allowed_tools: list[dict[str, Any]],
         require_assessment: bool = False,
         react: bool = False,
+        narrative: bool = False,
         correction: str | None = None,
     ) -> ModelTurn: ...
 

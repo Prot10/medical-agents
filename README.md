@@ -5,7 +5,7 @@ NeuroBench is a physician-validated, 360-degree simulated-patient dataset and an
 ## What is implemented
 
 - 600 schema-v2 neurology cases across 20 conditions.
-- A typed policy harness with standard, direct and ReAct-prompt conditions, and one transcript codec shared by inference and SFT.
+- A typed policy harness with standard, direct, narrative-only (no tools) and ReAct-prompt conditions, and one transcript codec shared by inference and SFT.
 - A fixed under-10B panel: Qwen3.5-9B, IBM Granite 4.1 8B and Gemma 4 E4B.
 - Nine checked experiment profiles and a batch runner that persists every episode.
 - A clinical-policy reward with safety caps and adequacy-gated efficiency.

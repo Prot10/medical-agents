@@ -132,9 +132,9 @@ Run the profiles that match the loaded server with the batch runner. Every episo
 
 | Loaded server | Required smoke profiles |
 |---|---|
-| `qwen3.5-9b` | `direct-qwen3.5-9b`, `policy-qwen3.5-9b`, `react-qwen3.5-9b` |
-| `granite-4.1-8b` | `direct-granite-4.1-8b`, `policy-granite-4.1-8b`, `react-granite-4.1-8b` |
-| `gemma-4-e4b` | `direct-gemma-4-e4b`, `policy-gemma-4-e4b`, `react-gemma-4-e4b` |
+| `qwen3.5-9b` | `direct-qwen3.5-9b`, `narrative-qwen3.5-9b`, `policy-qwen3.5-9b`, `react-qwen3.5-9b` |
+| `granite-4.1-8b` | `direct-granite-4.1-8b`, `narrative-granite-4.1-8b`, `policy-granite-4.1-8b`, `react-granite-4.1-8b` |
+| `gemma-4-e4b` | `direct-gemma-4-e4b`, `narrative-gemma-4-e4b`, `policy-gemma-4-e4b`, `react-gemma-4-e4b` |
 
 ```bash
 for p in direct-qwen3.5-9b policy-qwen3.5-9b react-qwen3.5-9b; do

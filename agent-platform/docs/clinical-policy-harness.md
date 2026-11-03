@@ -27,9 +27,10 @@ Observations recorded at turn 0 (the direct baseline) are presented as results a
 
 The primary condition is the standard policy loop. It gets the patient presentation and discovers evidence through typed tools.
 
-Two preregistered ablations share the same environment and scorer:
+Three ablations share the same environment and scorer:
 
 - direct: receives every stored initial result and submits an assessment;
+- narrative (3 Nov 2026): the presentation alone, in one turn, with no tool catalogue. The request advertises only `submit_assessment` and its own system prompt (`NARRATIVE_SYSTEM_PROMPT`) says no tests are available, so it measures what the model concludes without the option of investigating; a policy run cut to `max_turns: 1` instead still sees the 16 tools it cannot use and a prompt about ordering them;
 - ReAct prompt: uses the same typed execution loop and asks for a brief rationale in the assistant content, recorded as the `react.rationale` plugin event and replayed only within the ablation.
 
 ReAct is an ablation, not a distinct data format.
@@ -38,13 +39,13 @@ Qwen3.5 and Gemma 4 run with thinking disabled on every request; Granite 4.1 has
 
 ## Fixed model panel and profiles
 
-| Model | Policy | Direct | ReAct |
-|---|---:|---:|---:|
-| Qwen/Qwen3.5-9B | yes | yes | yes |
-| ibm-granite/granite-4.1-8b | yes | yes | yes |
-| google/gemma-4-E4B-it | yes | yes | yes |
+| Model | Policy | Direct | Narrative | ReAct |
+|---|---:|---:|---:|---:|
+| Qwen/Qwen3.5-9B | yes | yes | yes | yes |
+| ibm-granite/granite-4.1-8b | yes | yes | yes | yes |
+| google/gemma-4-E4B-it | yes | yes | yes | yes |
 
-The nine checked YAML profiles live in `agent-platform/config/profiles`. Model serving and API loading accept only this panel. A LoRA adapter is evaluated by serving it under an alias (`LORA_ADAPTER`, `LORA_NAME`) and pointing a profile's model plugin at it with `served_model`; the alias is recorded as the episode's `model_id`.
+The twelve checked YAML profiles live in `agent-platform/config/profiles`. Model serving and API loading accept only this panel. A LoRA adapter is evaluated by serving it under an alias (`LORA_ADAPTER`, `LORA_NAME`) and pointing a profile's model plugin at it with `served_model`; the alias is recorded as the episode's `model_id`.
 
 ## Policy reward
 

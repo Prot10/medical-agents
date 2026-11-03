@@ -3,15 +3,21 @@ from __future__ import annotations
 from pathlib import Path
 
 from neuroagent.harness import (
+    NARRATIVE_SYSTEM_PROMPT,
     SUBMIT_TOOL,
     ActionDecodeError,
     ClinicalPolicyLoop,
     DirectAnswerLoop,
+    MemoryEpisodeStore,
     ModelTurn,
+    NarrativeOnlyLoop,
+    NativeToolModelAdapter,
     ReactAblationLoop,
     RunContext,
     transcript,
 )
+from neuroagent.harness.context import SUBMIT_NAME
+from neuroagent.llm.client import LLMResponse, LLMToolCall
 from neuroagent.tools.base import ToolResult
 from neuroagent_schemas import (
     AssessmentSubmitted,
@@ -169,6 +175,44 @@ def test_direct_answer_presents_evidence_as_preloaded_results():
     assert messages[2]["role"] == "user"
     assert messages[2]["content"].startswith("Results already available")
     assert not any(message["role"] == "tool" for message in messages)
+
+
+def test_narrative_baseline_has_no_tool_catalogue_and_its_own_prompt():
+    loop = NarrativeOnlyLoop()
+    model = FakeModel([ModelTurn(action=assessment())])
+    episode = loop.run(context(loop, model, max_turns=1))
+    call = model.calls[0]
+    assert call["allowed_tools"] == [] and call["narrative"] is True
+    assert call["require_assessment"] is True
+    assert episode.tool_actions == [] and episode.assessment is not None
+    assert not any(isinstance(event, ObservationReceived) for event in episode.events)
+    messages = transcript(load_case(), episode, narrative=True)
+    assert messages[0]["content"] == NARRATIVE_SYSTEM_PROMPT
+    assert "order one available tool" not in messages[0]["content"]
+    assert [message["role"] for message in messages[:2]] == ["system", "user"]
+
+
+def test_narrative_request_advertises_only_submit_assessment():
+    class Client:
+        model = "fake/model"
+
+        def chat(self, messages, *, tools, tool_choice):
+            self.messages, self.tools = messages, tools
+            arguments = assessment().model_dump(exclude={"type"})
+            return LLMResponse(content="", tool_calls=[LLMToolCall(id="call_1", name=SUBMIT_NAME, arguments=arguments)])
+
+    client = Client()
+    adapter = NativeToolModelAdapter(client)
+    turn = adapter.next_action(
+        case=load_case(),
+        episode=MemoryEpisodeStore().load(),
+        allowed_tools=[],
+        require_assessment=True,
+        narrative=True,
+    )
+    assert isinstance(turn.action, SubmitAssessment)
+    assert [tool["function"]["name"] for tool in client.tools] == [SUBMIT_NAME]
+    assert client.messages[0]["content"] == NARRATIVE_SYSTEM_PROMPT
 
 
 def test_transcript_uses_tool_calls_and_tool_messages():

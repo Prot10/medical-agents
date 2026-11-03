@@ -29,6 +29,7 @@ class ClinicalPolicyLoop:
 
     loop_id = "clinical-policy"
     react = False
+    narrative = False
 
     def run(self, context: RunContext):
         self._start(context)
@@ -81,9 +82,10 @@ class ClinicalPolicyLoop:
                 return context.model.next_action(
                     case=context.environment.case,
                     episode=context.episode_store.load(),
-                    allowed_tools=context.environment.tool_definitions(),
+                    allowed_tools=self._catalogue(context),
                     require_assessment=require_assessment,
                     react=self.react,
+                    narrative=self.narrative,
                     correction=correction,
                 )
             except ActionDecodeError as exc:
@@ -102,6 +104,10 @@ class ClinicalPolicyLoop:
             except Exception as exc:
                 self._fail(context, turn, "model_error", f"{type(exc).__name__}: {exc}")
                 return None
+
+    @staticmethod
+    def _catalogue(context: RunContext) -> list[dict]:
+        return context.environment.tool_definitions()
 
     @staticmethod
     def _fail(context: RunContext, turn: int, reason: str, message: str):
@@ -162,6 +168,31 @@ class DirectAnswerLoop(ClinicalPolicyLoop):
                     error_message=result.error_message,
                 )
             )
+        model_turn = self._request_valid_action(context, 1, require_assessment=True)
+        if model_turn is None:
+            return context.episode_store.load()
+        self._record_model_turn(context, 1, model_turn)
+        context.episode_store.append(AssessmentSubmitted(turn=1, assessment=model_turn.action))
+        context.episode_store.append(RunCompleted(turn=1))
+        return context.episode_store.load()
+
+
+class NarrativeOnlyLoop(ClinicalPolicyLoop):
+    """Single-turn no-tool baseline: the presentation alone, with no tool catalogue at all.
+
+    The request advertises only ``submit_assessment`` and the system prompt says no tests are
+    available, unlike a policy run cut to one turn, which still sees the 16 tools it cannot use.
+    """
+
+    loop_id = "narrative-only"
+    narrative = True
+
+    @staticmethod
+    def _catalogue(context: RunContext) -> list[dict]:
+        return []
+
+    def run(self, context: RunContext):
+        self._start(context)
         model_turn = self._request_valid_action(context, 1, require_assessment=True)
         if model_turn is None:
             return context.episode_store.load()

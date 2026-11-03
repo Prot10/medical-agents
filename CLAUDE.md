@@ -51,7 +51,7 @@ command wraps both (`cern help`). In short, to choose:
 
 - `agent-platform/src/neuroagent/harness/` — the harness: `context.py` (prompts and the single
   transcript codec shared by inference and SFT), `adapters.py` (native tool calling → one typed
-  action), `loops.py` (policy / direct / ReAct), `environment.py`, `plugins.py`, `profile.py`
+  action), `loops.py` (policy / direct / narrative / ReAct), `environment.py`, `plugins.py`, `profile.py`
 - `agent-platform/src/neuroagent/evaluation/policy_reward.py` — the reward; `evaluation/benchmark.py`
   is the batch runner CLI
 - `agent-platform/src/neuroagent/api/` — run API (port 8888): profiles, runs (+ SSE stream), episodes, models, cases
@@ -60,7 +60,7 @@ command wraps both (`cern help`). In short, to choose:
   sparse-logits loss), `train_grpo.py` (RLVR: benchmark loop as rollout on a colocated vLLM engine,
   DAPO loss, token-level IS correction, rollouts persisted; weights only on EOS via `--weights-dir`),
   `data/episodes.py` (episode records)
-- `agent-platform/config/profiles/*.yaml` — the eight checked experiment profiles (model × loop);
+- `agent-platform/config/profiles/*.yaml` — the twelve checked experiment profiles (model × loop);
   arbitrary model ids are rejected. Models live in `model_registry.py` with their per-request defaults
 - `agent-platform/config/tools/costs.yaml` — per-tool cost registry (Medicare reference rates); the
   vocabulary in `tools/vocabulary.py` derives every enum from it
