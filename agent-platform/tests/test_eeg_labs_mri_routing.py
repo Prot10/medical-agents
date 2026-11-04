@@ -335,3 +335,75 @@ def test_served_interpretation_names_no_unserved_value(case_id, panels, absent):
     result = _labs(_env(case_id), *panels)
     prose = " ".join([result.output["interpretation"], *result.output["abnormal_values_summary"]]).lower()
     assert not [term for term in absent if term in prose], prose
+
+
+# --------------------------------------------------------------------------- 6. serving audit (4 Nov 2026)
+#
+# Every vocabulary lab term alone and every policy lab order, in all 600 cases, served before and
+# after: 1518 of 104593 orders changed, two policy orders among them (a serum osmolality no longer
+# answers `urine_osmolality`), and the perfect-agent check is unchanged.
+
+
+def test_single_assay_reaches_the_follow_up_that_stores_it():
+    # SE-S12 stores serum LGI1 in `request_autoimmune_encephalitis_panel`; the trigger does not name
+    # the assay, so `LGI1_IgG` alone received the library negative.
+    served = json.dumps(_labs(_env("SE-S12"), "LGI1_IgG").output)
+    assert "1:64" in served
+
+
+@pytest.mark.parametrize("case_id, assay, absent", [
+    ("NMDAR-ENC-M01", "quantitative_Ig", "lgi1"),       # an antibody's IgG is not an IgG level
+    ("NMDAR-ENC-M01", "IgG_subclasses", "lgi1"),
+    ("NMDAR-ENC-M01", "antiphospholipid", "lgi1"),      # "anticardiolipin" shares "anti" with every antibody
+    ("MS-RR-M01", "clustered_AChR_cell_based", "aqp4"),  # follow-up picked by its trigger's words
+    ("FTD-M07", "Lyme_serology", "hiv"),                # `Serology` is not `Lyme_serology`
+    ("HEP-ENC-S05", "hepatitis_C_antibody", "hepatitis b"),
+    ("ALS-M01", "free_T3", "free t4"),
+    ("SYNC-CARD-M01", "CK", "ck-mb"),
+])
+def test_assay_is_not_answered_by_another_analyte(case_id, assay, absent):
+    served = _labs(_env(case_id), assay).output
+    assert absent not in json.dumps(served["panels"]).lower(), served["panels"]
+
+
+@pytest.mark.parametrize("row, component, answers", [
+    ("IgG (serum)", "IgG", True),
+    ("AQP4-IgG (cell-based assay)", "IgG", False),
+    ("IgG", "IgG1", False),
+    ("Tissue transglutaminase IgA (tTG-IgA)", "IgA", False),
+    ("CK-MB", "Creatine kinase", False),
+    ("TSH receptor antibody (TRAb)", "TSH", False),
+    ("Protein C Activity", "Total protein", False),
+    ("Protein C Activity", "Protein C activity", True),
+    ("Carbohydrate-deficient transferrin (%CDT, HPLC)", "transferrin", False),
+    ("Calcium (albumin-adjusted)", "Albumin", False),
+    ("Calcium (albumin-adjusted)", "Calcium", True),
+    ("m.3243A>G (MT-TL1), blood leukocytes", "WBC", False),
+    ("Leukocytes", "WBC", True),
+    ("Botulinum neurotoxin, serum (types A, B, E, F)", "type_and_screen", False),
+    ("ABO/Rh Blood Type", "ABO group", True),
+    ("Anti-VGCC P/Q-type antibody", "P/Q-type voltage-gated calcium channel antibody", True),
+    ("Anti-VGCC P/Q-type antibody", "N-type voltage-gated calcium channel antibody", False),
+])
+def test_row_is_another_analyte_inside_its_name(row, component, answers):
+    from neuroagent.tools.lab_matching import row_is
+
+    assert row_is(row, component) is answers
+
+
+@pytest.mark.parametrize("name, assay, answers", [
+    ("Serology", "Lyme_serology", False),
+    ("serum_osmolality", "urine_osmolality", False),
+    ("HIV", "HIV_viral_load", False),
+    ("Thyroid function", "thyroid", True),
+    ("Lyme_serology", "Lyme_serology", True),
+])
+def test_panel_name_is_the_assay_only_both_ways(name, assay, answers):
+    assert MockServer(NeuroBenchCase.model_validate(_raw("MS-RR-M01")))._labs.name_is(name, assay) is answers
+
+
+def test_myasthenia_panel_is_not_magnesium():
+    from neuroagent.tools.lab_matching import tokens
+
+    assert "magnesium" not in tokens("Extended_Seronegative_MG_Panel")
+    assert "magnesium" in tokens("Mg 1.9")

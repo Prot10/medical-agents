@@ -115,7 +115,9 @@ class TestToolDefinitions:
         assert "protocol" in params
         assert "sequences" not in params  # removed
         assert "mri_file_path" not in params  # removed
-        assert set(params["protocol"]["enum"]) == {"standard", "epilepsy", "stroke", "tumor", "ms", "dementia"}
+        assert set(params["protocol"]["enum"]) == {
+            "standard", "epilepsy", "stroke", "tumor", "ms", "dementia", "orbits", "pituitary",
+        }
 
     def test_mri_has_contrast_param(self, registry):
         defn = registry.get_tool("analyze_brain_mri").get_tool_definition()

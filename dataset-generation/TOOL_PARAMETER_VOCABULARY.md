@@ -33,6 +33,12 @@ Two rules the whole laboratory vocabulary rests on:
   `paraneoplastic_panel`). `normalize_analyte()` folds both, so the score and the bill read them as
   one; `_ANALYTE_SYNONYMS` holds the second kind. Ground truth should use the canonical name — the
   one `lab_panels()` advertises.
+* **A named term has its differentials beside it** (4 Nov 2026, `docs/paper/catalogue-cue.md`).
+  NMDAR was the only neuronal-surface antibody with a term of its own, so the menu pointed at
+  anti-NMDAR encephalitis; `LGI1_IgG`, `CASPR2_IgG`, `GABA_B_receptor_IgG`, `AMPA_receptor_IgG`
+  and `GAD65_IgG` (serum) and their `*_antibodies` CSF pairs were added, with `anti_cN1A`
+  (inclusion body myositis), `treponemal_antibodies` (neurosyphilis) and the CSF
+  `Lyme_antibody_index`. `analyze_brain_mri.protocol` gained `orbits` and `pituitary`.
 * **One study, one tool.** Blood, urine and ascitic-fluid microbiology is
   `order_microbiology`, never an `interpret_labs` panel. Pricing the same study under two tools let
   either satisfy the ground truth.
@@ -103,6 +109,7 @@ call. A missing optional runtime argument is expected; an unknown key is not.
 | `electrophysiology_study` | Invasive EP study: HV interval, sinus node recovery, programmed stimulation, accessory-pathway refractory period | Syncope with bifascicular block or prior infarction (ESC 2018), WPW risk stratification (ESC 2019 SVT) |
 | `sodium_channel_blocker_challenge` | Ajmaline, flecainide or procainamide under 12-lead ECG with high precordial leads | Suspected Brugada syndrome with a non-diagnostic ECG (ESC 2022 VA/SCD) |
 | `olfactory_test` | UPSIT or Sniffin' Sticks against age and sex norms | Hyposmia, a supportive MDS criterion of Parkinson's disease (Postuma 2015) |
+| `fluorescein_angiography` | Fundus fluorescein angiography (CPT 92235) | Branch retinal artery occlusions and arteriolar wall hyperfluorescence of Susac syndrome, a differential of relapsing MS (added 4 Nov 2026) |
 | `genetic_panel:<panel>` | Targeted gene panel | See panel list below |
 
 **Allowed genetic panels** (only these `<panel>` suffix values are valid):

@@ -19,6 +19,13 @@ tools:
       tumor: 0
       ms: 0
       dementia: 0
+      # Differential completeness (4 Nov 2026): the protocol list was the benchmark's own condition
+      # families. Orbits (fat-suppressed coronal STIR and post-contrast T1: thyroid eye disease in 8
+      # MG cases, optic neuritis) and pituitary (thin sellar sections: pituitary apoplexy in 25 SAH
+      # cases) are the protocols of frequent differentials. The MockServer does not route the MRI
+      # by protocol, so a case's stored MRI answers them as it answers the others.
+      orbits: 0
+      pituitary: 0
 
   analyze_eeg:
     # CPT 95816 (routine), 95819 (awake and asleep, i.e. sleep-deprived), 95711/95717
@@ -200,6 +207,23 @@ tools:
       anti_VGCC_PQ: 200
       anti_VGCC_N: 200
       anti_SOX1: 200
+      # Differential completeness (4 Nov 2026, scripts/paper/catalogue_cue.py): the catalogue named
+      # one neuronal-surface antibody on its own, NMDAR, so the menu itself pointed at anti-NMDAR
+      # encephalitis, while "other antibody-mediated encephalitis" is the first differential of 27
+      # of its 30 cases and could only be ordered as the 1840 panel. The antibodies of that
+      # differential each get a term, as NMDAR has: live cell-based assays priced as
+      # NMDAR_IgG_cell_based (CPT 86255 per antibody, reference estimate), GAD65 by
+      # radioimmunoassay priced as the VGCC antibodies. The library rows are named so that a
+      # stored result answers the order (FEPI-TEMP-P02 stores LGI1 positive at 1:320).
+      LGI1_IgG: 276
+      CASPR2_IgG: 276
+      GABA_B_receptor_IgG: 276
+      AMPA_receptor_IgG: 276
+      GAD65_IgG: 200
+      # Cytosolic 5'-nucleotidase 1A antibody, the serological marker of inclusion body myositis,
+      # the second differential of the ALS cases (18 of 30). Immunoassay (CPT 83516), reference
+      # estimate priced as the other neuromuscular send-outs (anti_LRP4).
+      anti_cN1A: 150
       VEGF: 60
       paraneoplastic_panel: 2300
       paraneoplastic_antibodies: 2300
@@ -226,6 +250,10 @@ tools:
       # cases were ordering them through the laboratory tool and have been moved.
       VZV_IgG: 23
       Lyme_serology: 28
+      # Treponema pallidum-specific antibody (TP-PA, FTA-ABS or treponemal EIA/CLIA), the test that
+      # confirms a reactive RPR or screens first in reverse-sequence algorithms; neurosyphilis is a
+      # differential in 6 cases and RPR was the only syphilis term. CPT 86780, priced as RPR.
+      treponemal_antibodies: 14
       hepatitis_B_surface_antigen: 18
       anti_HBc_IgG: 18
       # HBV viral load (quantitative PCR), 25 Oct 2026 (labs-evidence CENTRAL): HEP-ENC-S05 stores HBV
@@ -368,6 +396,21 @@ tools:
       # each (single-target amplified probe), priced as HSV_PCR.
       toxoplasma_PCR: 184
       EBV_PCR: 184
+      # Differential completeness (4 Nov 2026): the CSF assays of the antibody-mediated
+      # encephalitides that are not anti-NMDAR, paired with the serum terms as NMDAR_antibodies is
+      # with NMDAR_IgG_cell_based. Cell-based assays priced as NMDAR_antibodies, GAD65 as the
+      # serum radioimmunoassay. CSF LGI1 and CASPR2 are often negative when serum is positive,
+      # which is the clinical reason to keep both specimens orderable.
+      LGI1_antibodies: 276
+      CASPR2_antibodies: 276
+      GABA_B_receptor_antibodies: 276
+      AMPA_receptor_antibodies: 276
+      GAD65_antibodies: 200
+      # Borrelia burgdorferi antibody index: paired CSF and serum IgG/IgM corrected for the albumin
+      # quotient, the test of intrathecal synthesis in Lyme neuroborreliosis (EFNS 2010), a
+      # differential of the GBS cases (lyme polyradiculitis). CPT 86618 on both specimens;
+      # reference estimate in the band of the kappa free light chain index.
+      Lyme_antibody_index: 46
     # Where the CSF comes from. Billing does not change (`base` prices the sampling with the
     # basic studies), as for the MRI `protocols` block; the block is the source of the
     # `source` enum. Requested by the October 2026 review (BACT-MEN RS02: a shunt tap could not
@@ -554,6 +597,10 @@ tools:
       # examination. No specific CPT code (billed as unlisted 92700); reference estimate for the
       # test kit and technician time, to verify.
       olfactory_test: 46
+      # Differential completeness (4 Nov 2026): fundus fluorescein angiography, the test that shows
+      # the branch retinal artery occlusions and arteriolar wall hyperfluorescence of Susac
+      # syndrome, a differential in 9 MS-RR cases that had no orderable test. CPT 92235.
+      fluorescein_angiography: 120
     genetic_panels:
       ALS: 1840
       FTD: 1840

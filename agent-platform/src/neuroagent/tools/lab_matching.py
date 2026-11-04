@@ -35,10 +35,26 @@ from .vocabulary import analyte_class_members, normalize_analyte
 _PHRASES: tuple[tuple[str, str], ...] = (
     (r"haem", "hem"), (r"\burinary\b", "urine"), (r"\b24[- ]?(?:hours?|hr|h)\b", "24h"), (r"oestr", "estr"), (r"leucocyt", "leukocyt"),
     (r"lactate dehydrogenase", "ldh"), (r"creatine (?:phospho)?kinase", "ck"), (r"\bcpk\b", "ck"),
+    # 4 Nov 2026, the names inside another analyte's name (lab-serving audit of the follow-up
+    # route): CK-MB is not CK, the TSH receptor antibody is not TSH, protein C and S and the
+    # M-protein are not the total protein, CDT and beta-2 transferrin are not the iron studies'
+    # transferrin, and an albumin-adjusted calcium is not an albumin.
+    (r"\bck[- ]?mb\b", "ckmb"),
+    (r"\btsh[- ]receptor(?: antibod(?:y|ies))?|\btrab\b|thyroid[- ]stimulating immunoglobulins?|\btsi\b", "trab"),
+    (r"\bprotein ([cs])\b", r"p\1protein"), (r"\bm[- ]protein\b|monoclonal protein|paraprotein", "mprotein"),
+    (r"carbohydrate[- ]deficient transferrin|%?\bcdt\b|disialotransferrin", "cdt"),
+    (r"beta[- ]?2[- ]?transferrin", "b2tf"),  # not "beta...": a four-letter stem matches
+    (r"\(?albumin[- ](?:adjusted|corrected)\)?|corrected for albumin", "adjusted"),
+    # `type_and_screen` is the ABO/Rh group; its word "type" named botulinum toxin "types A, B, E".
+    (r"type (?:and|&) screen|\babo\b(?:/rh)?(?: blood)? (?:group|type)|\bblood (?:group|type)\b|\babo\b", "abo"),
+    (r"immunoglobulin ([gamed])\b", r"ig\1"),
+    (r"voltage[- ]gated calcium channels?|\bvgcc\b", "vgcc"), (r"\bp ?/ ?q\b(?:[- ]type)?", "pq"),
+    (r"\bn[- ]type\b", "n"),
     (r"c[- ]reactive protein", "crp"), (r"(?:erythrocyte )?sedimentation rate|\bsed rate", "esr"),
     # The urine dipstick's leukocyte esterase is not the white cell count (25 Oct 2026).
     (r"\bleukocyte esterase\b", "leukesterase"),
-    (r"white (?:blood )?cells?(?: count)?|\bwbc count|\bleukocytes?\b", "wbc"),
+    # "blood leukocytes" is the specimen of a genetic test (m.3243A>G), not a count (4 Nov 2026).
+    (r"white (?:blood )?cells?(?: count)?|\bwbc count|(?<!blood )\bleukocytes?\b", "wbc"),
     (r"red (?:blood )?cells?(?: count)?", "rbc"),
     (r"alkaline phosphatase", "alp"), (r"thyroid[- ]stimulating hormone|thyrotropin", "tsh"),
     (r"thyroid peroxidase|\btpo\b", "tpo"), (r"\bft4\b|free thyroxine|thyroxine,? free|t4,? free", "free t4"),
@@ -47,14 +63,15 @@ _PHRASES: tuple[tuple[str, str], ...] = (
     (r"international normali[sz]ed ratio", "inr"),
     (r"blood urea nitrogen|\burea\b", "bun"),
     (r"hemoglobin a1c|glycated hemoglobin|glycosylated hemoglobin|\bhba1c\b|\ba1c\b", "hba1c"),
-    (r"vitamin b[- ]?12|cobalamin|\bb[- ]12\b", "b12"), (r"vitamin b[- ]?1\b|thiamine?", "thiamine"),
+    (r"vitamin b[- ]?12|cobalamin|\bb[- ]12\b", "b12"), (r"vitamin b[- ]?1\b|thiamine?|\bb1\b", "thiamine"),
     (r"folic acid", "folate"), (r"\bhgb\b|\bhb\b", "hemoglobin"), (r"\bhct\b", "hematocrit"),
     (r"\bplts?\b|platelet count", "platelets"),
     (r"\bbicarb\b|\btotal co2\b|\bco2\b|\bhco3\b", "bicarbonate"),
     (r"\bna\b", "sodium"), (r"\bk\b", "potassium"), (r"\bcl\b", "chloride"),
     # `Mg` is magnesium, but `mg` after a number or before a slash is the unit (25 Oct 2026: every
     # "112 mg/dL" read as citing magnesium, LABS-EVIDENCE CENTRAL).
-    (r"(?<![\d.])(?<![\d.] )\bmg\b(?!\s*(?:/|per\b))", "magnesium"),
+    # Nor is the `MG` of a myasthenia antibody panel ("Seronegative_MG_Panel", 4 Nov 2026).
+    (r"(?<![\d.])(?<![\d.] )\bmg\b(?!\s*(?:/|per\b|panel\b|antibod|ab\b))", "magnesium"),
     (r"\bphos\b|phosphorus", "phosphate"), (r"\bcr\b|\bcreat\b", "creatinine"),
     (r"\bglu\b", "glucose"), (r"\balb\b", "albumin"), (r"\bt\.? ?bili\b", "bilirubin"),
     (r"\bsgot\b", "ast"), (r"\bsgpt\b", "alt"), (r"gamma[- ]?glutamyl ?transferase|\bggt\b", "ggt"),
@@ -141,9 +158,18 @@ def _covers(container: frozenset[str], needed: frozenset[str]) -> bool:
     return bool(needed) and all(any(_like(n, c) for c in container) for n in needed)
 
 
+# Immunoglobulin classes. As a component (the rows of `quantitative_Ig`, `IgG_subclasses`) one
+# is a level of that class; inside a row it is the class of an antibody (`AQP4-IgG`, `Anti-GQ1b
+# IgG`), so every serum antibody answered an order for immunoglobulin levels, and IgG answered
+# IgG1 by the numbered-form rule (4 Nov 2026).
+_ISOTYPES = frozenset({"igg", "igm", "iga", "ige", "igd", "igg1", "igg2", "igg3", "igg4"})
+
+
 def row_is(test: str, component: str) -> bool:
     """Is the stored row `test` the component `component` (or the other way round)?"""
     row, comp = tokens(test), tokens(component)
+    if comp and comp <= _ISOTYPES:
+        return row == comp  # an immunoglobulin level is answered only by that level
     return _covers(row, comp) or (len(row) >= 2 and _covers(comp, row))
 
 
@@ -158,12 +184,17 @@ class LabMatcher:
         return [str(assay), *self._components(str(assay)), *sorted(analyte_class_members(str(assay)))]
 
     def name_is(self, name: str, assay: str) -> bool:
-        """The stored panel's name is the assay itself (or a recorded alias of it)."""
+        """The stored panel's name is the assay itself (or a recorded alias of it).
+
+        Both ways: a name that is only part of the assay's is another study or a family of them
+        (4 Nov 2026: `Serology` was `Lyme_serology`, `HIV` was `HIV_viral_load`, `serum_osmolality`
+        was `urine_osmolality`, `Urine studies` was `urine_arsenic`).
+        """
         name_tokens = tokens(name)
         if not name_tokens:
             return False
         own = tokens(assay)
-        if own and _covers(own, name_tokens):
+        if own and _covers(own, name_tokens) and _covers(name_tokens, own):
             return True
         return any(_covers(name_tokens, alias) for alias in _NAME_ALIASES.get(normalize_analyte(assay), ()))
 
