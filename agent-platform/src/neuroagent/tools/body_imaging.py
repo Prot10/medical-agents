@@ -26,13 +26,11 @@ from .vocabulary import body_imaging_studies
 class BodyImagingTool(BaseTool):
     name = "order_body_imaging"
     description = (
-        "Image a region OUTSIDE the brain and skull: pelvis/abdomen (occult tumour search, "
-        "portosystemic shunts), chest (pulmonary embolism, aortic dissection, an intrathoracic "
-        "mass, a chest radiograph), mediastinum (thymoma), temporal arteries (giant cell "
-        "arteritis), spine (cord compression, myelitis), or peripheral nerve "
-        "(nerve root enlargement). Use this when the question is about an organ the brain "
-        "imaging tools cannot see — order_ct_scan images the head and neck only. `study` fuses "
-        "region and modality because a CT and an MRI of the same region are different studies."
+        "Image a region OUTSIDE the brain and skull: pelvis and abdomen, testes, chest, "
+        "mediastinum, spine, peripheral nerves, leg veins and temporal arteries, by CT, MRI, "
+        "ultrasound or radiograph. Use this when the question is about an organ the brain imaging "
+        "tools cannot see — order_ct_scan images the head and neck only. `study` fuses region and "
+        "modality because a CT and an MRI of the same region are different studies."
     )
     parameter_schema = {
         "type": "object",
@@ -46,27 +44,18 @@ class BodyImagingTool(BaseTool):
                 "type": "string",
                 "enum": body_imaging_studies(),
                 "description": (
-                    "Region and modality. 'pelvis_abdomen_CT'/'_MRI'/'_ultrasound': occult "
-                    "neoplasm search (ovarian teratoma in anti-NMDAR encephalitis), "
-                    "'testicular_ultrasound': age- and sex-adapted germ-cell tumour screening "
-                    "in selected male anti-NMDAR cases, "
-                    "portosystemic shunts in refractory hepatic encephalopathy. "
-                    "'chest_CT': lung parenchyma, mediastinum, an intrathoracic mass. "
-                    "'chest_CTA': CT angiography of the thorax — pulmonary embolism, aortic "
-                    "dissection, when either has to be confirmed or excluded rapidly. "
-                    "'chest_abdomen_pelvis_CT': the staging / occult-primary study in one "
-                    "acquisition — a paraneoplastic tumour search, or excluding an extracranial "
-                    "primary before calling a lesion a primary brain tumour. "
-                    "'mediastinum_CT'/'_MRI': thymic hyperplasia or thymoma in myasthenia "
-                    "gravis. 'spine_MRI'/'_CT': cord compression, transverse myelitis, "
-                    "spinal tumour — the mimics of an ascending flaccid weakness. "
-                    "'peripheral_nerve_MRI'/'_ultrasound': nerve root enhancement, nerve "
-                    "enlargement. "
-                    "'lower_extremity_venous_duplex': compression and Doppler ultrasound of the leg "
-                    "veins for deep vein thrombosis, the venous source of a paradoxical embolism. "
-                    "'chest_xray': two-view chest radiograph, the first-line chest image "
-                    "(pneumonia in an infection screen). 'temporal_artery_ultrasound': halo "
-                    "sign and stenosis of the temporal arteries in suspected giant cell arteritis."
+                    "Region and modality. 'pelvis_abdomen_CT'/'_MRI'/'_ultrasound': the abdominal "
+                    "and pelvic organs and vessels. 'testicular_ultrasound': scrotal ultrasound of "
+                    "both testes. 'chest_CT': lung parenchyma, pleura and mediastinum. "
+                    "'chest_CTA': CT angiography of the pulmonary arteries and the thoracic aorta. "
+                    "'chest_abdomen_pelvis_CT': chest, abdomen and pelvis in one acquisition. "
+                    "'mediastinum_CT'/'_MRI': dedicated mediastinal imaging. 'spine_MRI'/'_CT': "
+                    "spinal cord, nerve roots, vertebrae and epidural space. "
+                    "'peripheral_nerve_MRI'/'_ultrasound': calibre, signal and enhancement of "
+                    "nerve roots, plexus and peripheral nerves. 'lower_extremity_venous_duplex': "
+                    "compression and Doppler ultrasound of the leg veins. 'chest_xray': two-view "
+                    "chest radiograph. 'temporal_artery_ultrasound': wall thickness and lumen of "
+                    "the superficial temporal arteries."
                 ),
             },
             "contrast": {

@@ -32,8 +32,7 @@ class CSFAnalyzerTool(BaseTool):
                 "description": (
                     "Additional CSF assays to run, billed separately from the EUR 230 "
                     "lumbar puncture: from EUR 18 (IgG index) to EUR 1840 (autoimmune "
-                    "panel). Order the assay the differential calls for — 14-3-3 and "
-                    "RT_QuIC answer a prion question, HSV_PCR an encephalitis question."
+                    "panel). Each entry is one assay; order the ones the question calls for."
                 ),
             },
             # Optional, so every existing call and criterion means a lumbar puncture as before.
@@ -45,11 +44,11 @@ class CSFAnalyzerTool(BaseTool):
                 "enum": csf_sources(),
                 "description": (
                     "Where the CSF is drawn. 'lumbar_puncture' (default). 'shunt_tap': "
-                    "aspiration from the reservoir of a ventricular shunt, for suspected "
-                    "shunt infection or malfunction. 'external_ventricular_drain': a sample "
+                    "aspiration from the reservoir of an implanted ventricular shunt. "
+                    "'external_ventricular_drain': a sample "
                     "from the drain's sampling port in a patient with an EVD in place. "
                     "'lumbar_drain': extended lumbar drainage through an indwelling catheter "
-                    "(about 10 mL/h over 72 hours), the drainage trial after a negative tap test."
+                    "(about 10 mL/h over 72 hours)."
                 ),
                 "default": "lumbar_puncture",
             },

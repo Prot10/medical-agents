@@ -34,7 +34,7 @@ list, which reported legal values as illegal:
 | Tool | Parameter | Values |
 | --- | --- | --- |
 | `order_advanced_imaging` | `modality` | 22 (`amyloid_PET`, `tau_PET`, `FDG_PET`, `perfusion_SPECT`, `amino_acid_PET`, `cardiac_FDG_PET`, `DaTscan`, `MIBG_scan`, `perfusion_MRI`, `CT_perfusion`, `cardiac_MRI`, `coronary_CTA`, `coronary_angiography`, `cerebral_angiography`, `MR_spectroscopy`, `MR_angiography`, `MR_venography`, `carotid_duplex`, `transcranial_doppler`, `functional_MRI`, `DTI_tractography`, `whole_body_FDG_PET`) |
-| `order_specialized_test` | `test_type` | 24, plus `genetic_panel:<panel>` for 19 panels |
+| `order_specialized_test` | `test_type` | 25, plus `genetic_panel:<panel>` for 19 panels |
 | `order_body_imaging` | `study` | 16 (`<region>_<modality>` over pelvis/abdomen, testis, chest, chest-abdomen-pelvis, mediastinum, spine, peripheral nerve, leg veins, temporal arteries) |
 | `order_microbiology` | `specimen` | 10 |
 | `obtain_tissue_diagnosis` | `procedure` | 5 (`resection`, `stereotactic_biopsy`, `open_biopsy`, `lymph_node_biopsy`, `temporal_artery_biopsy`), plus 21 molecular assays |
@@ -213,25 +213,51 @@ Matching on the name alone charged a *perfect* agent with a useless call in 103 
 
 ## The invariants, and how they are checked
 
+`validate_cases.py`, `check_perfect_agent.py` and `test_case_tool_contract.py` were removed with
+the clinical-policy harness (`d1246ff3`, 1 Sep 2026). Their checks live on in (4 Nov 2026):
+
 ```bash
-# 1. every case satisfies the contract          -> 600/600 clean, 0 issues
-uv run python agent-platform/scripts/validation/validate_cases.py
+# 1. the ground truth is attainable             -> 600/600 cases pass
+uv run python data/review/round-2026-10/bin/perfect_agent.py --all
 
-# 2. the ground truth is attainable             -> 0 cases where a perfect agent is imperfect
-uv run python agent-platform/scripts/validation/check_perfect_agent.py
-
-# 3. the gate that keeps it that way            -> 1205 tests
-uv run pytest agent-platform/tests/test_case_tool_contract.py
+# 2. the gates that keep it that way (schemas, vocabulary, mirror, serving, catalogue prose)
+uv run pytest agent-platform/tests packages/neuroagent-schemas/tests -q
 ```
 
-`check_perfect_agent.py` is the one that matters. For each case it builds the trace of an
-agent that does exactly what the ground truth says — every callable optimal action, with the
-ground truth's own parameters, nothing else — and asserts it scores `action_recall == 1.0`,
-`required_coverage == 1.0`, `useless_calls == 0`, `harmful_calls == 0`.
+The perfect-agent check is the one that matters. For each case it performs every required and
+recommended criterion with the criterion's own arguments, in an order that satisfies the
+sequence constraints, submits the accepted diagnosis, and fails when a call is rejected by the
+schema, is answered by a fallback instead of the case's own data, or the score falls short of
+1.0 on any process component.
 
 If that fails, the case is **unreachable**: no model can attain its ceiling, and every score
 reported against it is measured against an impossible target. Before the migration this held
 for only 355 of 600 cases.
+
+## Catalogue prose: what a study measures, never what it is for
+
+The policy loop advertises the same catalogue in every case, so a description is read in all 600
+episodes before the first call. A description says what a study measures — method, specimen,
+what the report contains — and the operational differences between neighbouring studies (the
+cerebral and the whole-body FDG PET are different acquisitions; `order_ct_scan` images the head
+and neck only). It never says which disease a study is for, and it gives no clinical advice on
+when to order it: that knowledge is what the benchmark measures.
+
+Until 4 Nov 2026 the prose had been written against the 20 conditions (the tap test of NPH, the
+teratoma of anti-NMDAR encephalitis, the glioma molecular algorithm, the functional disorder,
+syncope). With the model forced to answer on its first turn, removing the prose changed the
+diagnosis rate of the NPH, glioma and FND cases (`scripts/paper/catalogue_cue.py`,
+`docs/paper/catalogue-cue.md`). The descriptions were rewritten to the rule above, in the tool
+classes and identically in the review-app mirror (`review_api/services/tool_io.py`).
+`tests/test_catalogue_prose.py` fails if a description names a benchmark condition or one of its
+defining associations; enum members quoted in the prose are not prose and are skipped.
+`dataset-generation/TOOL_PARAMETER_VOCABULARY.md` is for policy authors, not the agent, and keeps
+its "typical use" column.
+
+The vocabulary is a separate question. A term is a member of the differential, not a hint, only
+if the differentials around it are orderable as well: the antibody-mediated encephalitides other
+than anti-NMDAR, inclusion body myositis, neurosyphilis, Lyme neuroborreliosis, Susac syndrome, thyroid eye disease and
+pituitary apoplexy got their terms on 4 Nov 2026 (`costs.yaml`, with the fallback library).
 
 ## Repairing cases
 

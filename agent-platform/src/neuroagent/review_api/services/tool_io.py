@@ -176,6 +176,8 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
                     "MRI protocol to use. 'epilepsy': thin coronal hippocampal cuts (ILAE HARNESS-MRI). "
                     "'stroke': DWI emphasis + MRA. 'tumor': includes perfusion-weighted sequences. "
                     "'ms': sagittal FLAIR + post-contrast T1. 'dementia': volumetric with hippocampal assessment. "
+                    "'orbits': fat-suppressed thin coronal and axial sections of the orbits and optic nerves. "
+                    "'pituitary': thin sagittal and coronal sections of the sella. "
                     "'standard': general brain screen."
                 ),
             },
@@ -185,7 +187,7 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
                 # Media): an order that does not ask for it is a non-contrast study, as the
                 # scorer and the cost model already read it (24 Oct 2026).
                 "default": False,
-                "description": "Whether gadolinium contrast is needed (e.g., for tumor, MS, infection).",
+                "description": "Whether gadolinium contrast is given.",
             },
         },
         "required": ["clinical_context"],
@@ -202,8 +204,8 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
                 "description": (
                     "Type of EEG study. 'routine': 20-40 min outpatient. "
                     "'ambulatory': 24-72 hr home monitoring. "
-                    "'video': inpatient video-EEG monitoring (epilepsy surgery workup). "
-                    "'continuous_icu': ICU continuous EEG for status monitoring."
+                    "'video': inpatient video-EEG monitoring with time-locked video of the events. "
+                    "'continuous_icu': continuous EEG in the intensive care unit."
                 ),
                 "default": "routine",
             },
@@ -241,7 +243,7 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
                 "description": (
                     "Individual assays or named panels to interpret. Each entry is billed "
                     "separately, from EUR 5 (glucose, sodium) to EUR 2300 "
-                    "(paraneoplastic). Prefer the specific assay the question needs."
+                    "(`paraneoplastic_panel`). Prefer the specific assay the question needs."
                 ),
             },
             "patient_age": {
@@ -267,19 +269,18 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
                 "description": (
                     "Additional CSF assays to run, billed separately from the EUR 230 "
                     "lumbar puncture: from EUR 18 (IgG index) to EUR 1840 (autoimmune "
-                    "panel). Order the assay the differential calls for — 14-3-3 and "
-                    "RT_QuIC answer a prion question, HSV_PCR an encephalitis question."
+                    "panel). Each entry is one assay; order the ones the question calls for."
                 ),
             },
             "source": {
                 "type": "string",
                 "description": (
                     "Where the CSF is drawn. 'lumbar_puncture' (default). 'shunt_tap': "
-                    "aspiration from the reservoir of a ventricular shunt, for suspected "
-                    "shunt infection or malfunction. 'external_ventricular_drain': a sample "
+                    "aspiration from the reservoir of an implanted ventricular shunt. "
+                    "'external_ventricular_drain': a sample "
                     "from the drain's sampling port in a patient with an EVD in place. "
                     "'lumbar_drain': extended lumbar drainage through an indwelling catheter "
-                    "(about 10 mL/h over 72 hours), the drainage trial after a negative tap test."
+                    "(about 10 mL/h over 72 hours)."
                 ),
                 "default": "lumbar_puncture",
             },
@@ -300,7 +301,7 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
             },
             "angiography": {
                 "type": "boolean",
-                "description": "Whether CT angiography (CTA) is needed for vascular assessment.",
+                "description": "Whether CT angiography (CTA) of the cervical and intracranial arteries is added.",
                 "default": False,
             },
         },
@@ -317,9 +318,9 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
                 "type": "string",
                 "description": (
                     "Type of echocardiogram. 'TTE': transthoracic — the standard study, "
-                    "non-invasive. 'TEE': transesophageal — when the transthoracic window is "
-                    "non-diagnostic, or for a prosthetic valve, an intracardiac mass, "
-                    "endocarditis or aortic dissection. 'bubble_study': agitated-saline "
+                    "non-invasive. 'TEE': transesophageal — close views of the atria, the "
+                    "left atrial appendage, the valves and the thoracic aorta that the "
+                    "transthoracic window cannot give. 'bubble_study': agitated-saline "
                     "contrast for a right-to-left shunt. 'exercise_echo': imaging during or "
                     "immediately after graded exercise, standing, sitting or semi-supine — "
                     "the answer is a provoked outflow-tract gradient or an exercise-induced "
@@ -343,7 +344,7 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
                     "Type of monitoring. 'holter_24h'/'holter_48h': continuous recording. "
                     "'event_monitor_14d'/'event_monitor_30d': patient-activated, captures "
                     "infrequent events. 'implantable_loop_recorder': months to years of "
-                    "monitoring (cryptogenic stroke, unexplained syncope). "
+                    "monitoring. "
                     "'telemetry': inpatient continuous monitoring. 'device_interrogation': "
                     "the stored rhythm diagnostics of a pacemaker, ICD or loop recorder already "
                     "implanted (atrial high-rate episodes, AF burden)."
@@ -363,33 +364,29 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
             "modality": {
                 "type": "string",
                 "description": (
-                    "Imaging modality. 'amyloid_PET'/'tau_PET': Alzheimer biomarkers. "
-                    "'FDG_PET': cerebral glucose metabolism (dementia pattern); NOT an "
-                    "adequate tracer for a primary brain tumour. 'amino_acid_PET': "
-                    "11C-methionine or 18F-FET — separates active tumour from necrosis or "
-                    "treatment effect and targets biopsy at the most aggressive area. "
-                    "'cardiac_FDG_PET': myocardial inflammation after dietary suppression of "
-                    "myocardial glucose uptake — a different study from the brain scan, not "
-                    "the same scan read differently. 'DaTscan': dopamine transporter "
-                    "(parkinsonian syndromes). 'MIBG_scan': cardiac sympathetic denervation "
-                    "(PD vs MSA, Lewy body disease). 'perfusion_MRI': cerebral blood flow and "
-                    "rCBV. 'CT_perfusion': core-to-penumbra quantification for tissue-based "
-                    "stroke selection outside the standard time window. 'MR_spectroscopy': "
-                    "metabolites, including 2-hydroxyglutarate. 'MR_angiography'/"
-                    "'MR_venography': arterial / venous sinus imaging. 'cardiac_MRI': "
-                    "myocardial tissue characterisation with late gadolinium enhancement — "
-                    "infiltrative or arrhythmogenic substrate, myocarditis, fibrosis. "
+                    "Imaging modality. 'amyloid_PET'/'tau_PET': cerebral amyloid / tau deposition. "
+                    "'FDG_PET': cerebral glucose metabolism; normal grey matter takes up FDG "
+                    "avidly. 'amino_acid_PET': 11C-methionine or 18F-FET — amino-acid transport, "
+                    "low in normal cortex. 'cardiac_FDG_PET': myocardial FDG uptake after dietary "
+                    "suppression of myocardial glucose uptake — a different study from the brain "
+                    "scan, not the same scan read differently. 'DaTscan': striatal dopamine "
+                    "transporter binding. 'MIBG_scan': cardiac sympathetic (postganglionic) "
+                    "innervation, as the heart-to-mediastinum ratio. 'perfusion_MRI': cerebral "
+                    "blood flow and rCBV. 'CT_perfusion': cerebral blood flow, blood volume and "
+                    "transit-time maps, with automated volumes of reduced flow. 'MR_spectroscopy': "
+                    "the brain metabolite spectrum (NAA, choline, creatine, lactate, lipids, "
+                    "myo-inositol). 'MR_angiography'/'MR_venography': arterial / venous sinus "
+                    "imaging. 'cardiac_MRI': cardiac function and myocardial tissue "
+                    "characterisation, with T1/T2 mapping and late gadolinium enhancement. "
                     "'coronary_CTA': non-invasive coronary anatomy. 'coronary_angiography': "
-                    "invasive catheter study, indicated by suspected myocardial ischaemia; "
-                    "an angiographic finding alone does not establish the cause of a symptom. "
-                    "'carotid_duplex': carotid stenosis. 'transcranial_doppler': vasospasm. "
-                    "'functional_MRI': BOLD motor and language mapping and hemispheric language "
-                    "lateralisation, before surgery near eloquent cortex. 'DTI_tractography': "
-                    "diffusion tractography of the corticospinal tract, arcuate fasciculus and optic "
-                    "radiations, for resection planning. "
-                    "'whole_body_FDG_PET': whole-body 18F-FDG PET/CT, skull base to mid-thigh — the "
-                    "occult-malignancy search of a paraneoplastic syndrome when CT is negative (a "
-                    "different acquisition from the cerebral 'FDG_PET')."
+                    "invasive catheter coronary angiography; an angiographic finding alone does "
+                    "not establish the cause of a symptom. 'carotid_duplex': extracranial carotid "
+                    "and vertebral flow velocities and plaque. 'transcranial_doppler': "
+                    "intracranial arterial flow velocities. 'functional_MRI': BOLD motor and "
+                    "language mapping and hemispheric language lateralisation. 'DTI_tractography': "
+                    "diffusion tractography of the corticospinal tract, arcuate fasciculus and "
+                    "optic radiations. 'whole_body_FDG_PET': whole-body 18F-FDG PET/CT, skull base "
+                    "to mid-thigh (a different acquisition from the cerebral 'FDG_PET')."
                 ),
             },
         },
@@ -408,27 +405,28 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
                 "type": "string",
                 "description": (
                     "Type of specialized test; targeted gene panels are 'genetic_panel:<panel>'. "
-                    "'emg_ncs': nerve conduction + needle EMG. 'emg_single_fiber' and "
-                    "'repetitive_nerve_stimulation': neuromuscular junction (myasthenia). "
-                    "'respiratory_function': FVC, MIP/MEP, NIF (ALS monitoring, MG crisis "
-                    "risk). 'neuropsych_battery': comprehensive cognitive testing. "
-                    "'vep'/'ssep'/'baep': evoked potentials. 'tilt_table': syncope. "
-                    "'optical_coherence_tomography': retinal RNFL (MS, optic neuritis). "
-                    "'audiometry': pure-tone and speech audiometry with tympanometry "
-                    "(hearing loss after bacterial meningitis). 'speech_language_evaluation': "
-                    "speech-language pathology assessment of motor speech, grammar, naming, "
-                    "repetition and comprehension, which classifies a primary progressive aphasia "
-                    "(a full cognitive battery is 'neuropsych_battery'). "
-                    "'electrophysiology_study': invasive EP study — HV interval, sinus node recovery, "
-                    "programmed stimulation for inducible arrhythmia, accessory-pathway refractory period. "
-                    "'sodium_channel_blocker_challenge': ajmaline, flecainide or procainamide under "
-                    "12-lead ECG with high precordial leads, to unmask a type 1 Brugada pattern. "
+                    "'emg_ncs': nerve conduction + needle EMG. 'emg_single_fiber': jitter and "
+                    "blocking of single muscle fibre pairs. 'repetitive_nerve_stimulation': "
+                    "decrement or increment of the compound muscle action potential on repeated "
+                    "stimulation. 'respiratory_function': FVC, MIP/MEP, NIF. 'neuropsych_battery': "
+                    "comprehensive cognitive testing. 'vep'/'ssep'/'baep': evoked potentials. "
+                    "'tilt_table': head-up tilt with continuous beat-to-beat blood pressure and "
+                    "heart rate. 'optical_coherence_tomography': retinal nerve fibre and ganglion "
+                    "cell layer thickness. 'fluorescein_angiography': fundus fluorescein "
+                    "angiography — retinal arterial and venous filling, occlusions and vessel-wall "
+                    "leakage. 'audiometry': pure-tone and speech audiometry with tympanometry. "
+                    "'speech_language_evaluation': speech-language pathology assessment of motor "
+                    "speech, grammar, naming, repetition and comprehension, with the profile of "
+                    "the deficit (a full cognitive battery is 'neuropsych_battery'). "
+                    "'electrophysiology_study': invasive EP study — HV interval, sinus node "
+                    "recovery, programmed stimulation for inducible arrhythmia, accessory-pathway "
+                    "refractory period. 'sodium_channel_blocker_challenge': ajmaline, flecainide "
+                    "or procainamide under 12-lead ECG with high precordial leads, reporting "
+                    "whether a type 1 Brugada pattern appears. "
                     "'genetic_panel:inherited_arrhythmia': long QT, Brugada and CPVT genes; "
                     "'genetic_panel:cardiomyopathy': arrhythmogenic, hypertrophic, dilated and "
-                    "laminopathy genes. "
-                    "'olfactory_test': quantitative smell test (UPSIT or Sniffin' Sticks) scored "
-                    "against age and sex norms; hyposmia is a supportive criterion of Parkinson's "
-                    "disease."
+                    "laminopathy genes. 'olfactory_test': quantitative smell test (UPSIT or "
+                    "Sniffin' Sticks) scored against age and sex norms."
                 ),
             },
         },
@@ -447,29 +445,18 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
             "study": {
                 "type": "string",
                 "description": (
-                    "Region and modality. 'pelvis_abdomen_CT'/'_MRI'/'_ultrasound': "
-                    "occult neoplasm search (ovarian teratoma in anti-NMDAR "
-                    "encephalitis), 'testicular_ultrasound': age- and sex-adapted "
-                    "germ-cell tumour screening in selected male anti-NMDAR cases, "
-                    "portosystemic shunts in refractory hepatic "
-                    "encephalopathy. 'chest_CT': lung parenchyma, mediastinum, an "
-                    "intrathoracic mass. 'chest_CTA': CT angiography of the thorax — "
-                    "pulmonary embolism, aortic dissection, when either has to be "
-                    "confirmed or excluded rapidly. "
-                    "'chest_abdomen_pelvis_CT': the staging / occult-primary study in "
-                    "one acquisition — a paraneoplastic tumour search, or excluding an "
-                    "extracranial primary before calling a lesion a primary brain "
-                    "tumour. "
-                    "'mediastinum_CT'/'_MRI': thymic hyperplasia or "
-                    "thymoma in myasthenia gravis. 'spine_MRI'/'_CT': cord compression, "
-                    "transverse myelitis, spinal tumour — the mimics of an ascending "
-                    "flaccid weakness. 'peripheral_nerve_MRI'/'_ultrasound': nerve root "
-                    "enhancement, nerve enlargement. "
-                    "'lower_extremity_venous_duplex': compression and Doppler ultrasound of the leg "
-                    "veins for deep vein thrombosis, the venous source of a paradoxical embolism. "
-                    "'chest_xray': two-view chest radiograph, the first-line chest image "
-                    "(pneumonia in an infection screen). 'temporal_artery_ultrasound': halo "
-                    "sign and stenosis of the temporal arteries in suspected giant cell arteritis."
+                    "Region and modality. 'pelvis_abdomen_CT'/'_MRI'/'_ultrasound': the abdominal "
+                    "and pelvic organs and vessels. 'testicular_ultrasound': scrotal ultrasound of "
+                    "both testes. 'chest_CT': lung parenchyma, pleura and mediastinum. "
+                    "'chest_CTA': CT angiography of the pulmonary arteries and the thoracic aorta. "
+                    "'chest_abdomen_pelvis_CT': chest, abdomen and pelvis in one acquisition. "
+                    "'mediastinum_CT'/'_MRI': dedicated mediastinal imaging. 'spine_MRI'/'_CT': "
+                    "spinal cord, nerve roots, vertebrae and epidural space. "
+                    "'peripheral_nerve_MRI'/'_ultrasound': calibre, signal and enhancement of "
+                    "nerve roots, plexus and peripheral nerves. 'lower_extremity_venous_duplex': "
+                    "compression and Doppler ultrasound of the leg veins. 'chest_xray': two-view "
+                    "chest radiograph. 'temporal_artery_ultrasound': wall thickness and lumen of "
+                    "the superficial temporal arteries."
                 ),
             },
             "contrast": {
@@ -490,22 +477,18 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
             "specimen": {
                 "type": "string",
                 "description": (
-                    "What to sample. 'blood_culture': two sets, with susceptibility "
-                    "testing. 'whole_blood_pcr': EDTA whole-blood PCR for Neisseria "
-                    "meningitidis (with pneumococcus and the other principal meningeal "
-                    "pathogens), the organism test of suspected meningococcal disease when "
-                    "lumbar puncture is delayed or contraindicated. 'throat_swab': "
-                    "meningococcal culture. "
-                    "'urine': urinalysis and culture. 'ascitic_fluid': diagnostic "
-                    "paracentesis with PMN count, protein and culture — indicated in every "
-                    "patient with ascites and altered mental status. 'sputum': Gram stain and "
-                    "culture (acid-fast smear and mycobacterial culture on request). 'stool': "
-                    "C. difficile toxin PCR. 'wound_swab': culture of a wound or ulcer, a "
-                    "possible portal of entry. 'brain_aspirate': Gram stain and aerobic and "
-                    "anaerobic culture of material aspirated from a brain lesion; the aspiration "
-                    "itself is ordered through obtain_tissue_diagnosis. "
-                    "'tracheal_aspirate': Gram stain and culture of a lower-airway sample "
-                    "aspirated through the endotracheal tube of a ventilated patient."
+                    "What to sample. 'blood_culture': two sets, with susceptibility testing. "
+                    "'whole_blood_pcr': EDTA whole-blood multiplex PCR for bacterial and viral "
+                    "pathogens. 'throat_swab': pharyngeal swab for culture, antigen testing and "
+                    "PCR. 'urine': urinalysis and culture. 'ascitic_fluid': diagnostic "
+                    "paracentesis with PMN count, protein and culture. 'sputum': Gram stain and "
+                    "culture (acid-fast smear and mycobacterial culture on request). 'stool': C. "
+                    "difficile toxin PCR. 'wound_swab': culture of a wound or ulcer. "
+                    "'brain_aspirate': Gram stain and aerobic and anaerobic culture of material "
+                    "aspirated from a brain lesion; the aspiration itself is ordered through "
+                    "obtain_tissue_diagnosis. 'tracheal_aspirate': Gram stain and culture of a "
+                    "lower-airway sample aspirated through the endotracheal tube of a ventilated "
+                    "patient."
                 ),
             },
             "tests": {
@@ -538,18 +521,12 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
             "procedure": {
                 "type": "string",
                 "description": (
-                    "How tissue is obtained. 'resection': maximal safe resection where "
-                    "feasible given site and clinical condition; also therapeutic. "
-                    "'stereotactic_biopsy': where microsurgical resection is not safely "
-                    "feasible; serial samples along the trajectory avoid sampling bias. "
-                    "'lymph_node_biopsy': endobronchial needle aspiration or surgical nodal "
-                    "sampling — the low-risk route to histological confirmation of a systemic "
-                    "disease when the accessible node is not the symptomatic organ. "
-                    "'temporal_artery_biopsy': a segment of the superficial temporal artery, "
-                    "the histological test for giant cell arteritis. 'open_biopsy': open "
-                    "surgical biopsy through a laminectomy or craniotomy, for a lesion a "
-                    "stereotactic needle cannot reach safely and that is not to be resected "
-                    "(an intramedullary spinal cord tumour)."
+                    "How tissue is obtained. 'resection': surgical resection, which is also "
+                    "therapeutic. 'stereotactic_biopsy': needle biopsy with serial samples along a "
+                    "stereotactic trajectory. 'lymph_node_biopsy': endobronchial needle aspiration "
+                    "or surgical nodal sampling. 'temporal_artery_biopsy': a segment of the "
+                    "superficial temporal artery. 'open_biopsy': open surgical biopsy through a "
+                    "laminectomy or craniotomy, without resection."
                 ),
             },
             "site": {
@@ -559,25 +536,21 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
             "molecular_assays": {
                 "type": "array",
                 "description": (
-                    "Assays to run on the specimen. 'IDH1_IHC' and 'ATRX_IHC' routinely; "
-                    "'IDH1_IDH2_sequencing' where IHC is negative, in grade 2-3 diffuse "
-                    "gliomas and in glioblastoma under 55 years; '1p_19q_codeletion' in "
-                    "IDH-mutant gliomas with retained ATRX; 'CDKN2A_B_deletion' in "
-                    "IDH-mutant astrocytomas; 'TERT_promoter', 'EGFR_amplification', "
-                    "'chr7_gain_chr10_loss' in IDH-wildtype astrocytic gliomas lacking "
-                    "microvascular proliferation and necrosis; 'H3K27_status' for midline "
-                    "tumours; 'MGMT_methylation' in glioblastoma (by PCR, pyrosequencing "
-                    "or array — NOT immunocytochemistry); 'BRAF_V600' in IDH-wildtype "
-                    "tumours. "
-                    "'CD20_IHC' and 'EBER_ISH': B-cell lineage and Epstein-Barr virus in a suspected "
-                    "primary CNS or EBV-associated lymphoma. 'SOX10_IHC' and 'Melan_A_HMB45_IHC': "
-                    "melanocytic markers, to exclude a metastatic melanoma. "
-                    "'chromogranin_A_synaptophysin_IHC': neuroendocrine markers (paraganglioma). "
-                    "'PAX8_IHC', 'TTF1_IHC', 'thyroglobulin_IHC': the primary site of a metastatic "
-                    "carcinoma (renal or Mullerian, lung, thyroid). 'H3G34_status': diffuse "
-                    "hemispheric glioma, H3 G34-mutant. 'DNA_methylation_profiling': genome-wide "
-                    "methylation classification when histology and targeted assays leave the "
-                    "tumour class open."
+                    "Assays to run on the specimen. 'IDH1_IHC': IDH1 R132H immunohistochemistry. "
+                    "'ATRX_IHC': ATRX nuclear expression. 'IDH1_IDH2_sequencing': IDH1 and IDH2 "
+                    "hotspot sequencing. '1p_19q_codeletion': whole-arm 1p/19q codeletion. "
+                    "'CDKN2A_B_deletion': homozygous CDKN2A/B deletion. 'TERT_promoter': TERT "
+                    "promoter mutation. 'EGFR_amplification': EGFR gene amplification. "
+                    "'chr7_gain_chr10_loss': combined gain of chromosome 7 and loss of chromosome "
+                    "10. 'H3K27_status': H3 K27M mutation and H3K27me3 loss. 'MGMT_methylation': "
+                    "MGMT promoter methylation by PCR, pyrosequencing or array (not "
+                    "immunohistochemistry). 'BRAF_V600': BRAF V600E mutation. 'CD20_IHC': B-cell "
+                    "lineage. 'EBER_ISH': Epstein-Barr virus-encoded RNA. 'SOX10_IHC' and "
+                    "'Melan_A_HMB45_IHC': melanocytic markers. 'chromogranin_A_synaptophysin_IHC': "
+                    "neuroendocrine markers. 'PAX8_IHC', 'TTF1_IHC', 'thyroglobulin_IHC': "
+                    "epithelial lineage markers (renal or Mullerian, lung, thyroid). "
+                    "'H3G34_status': H3 G34 mutation. 'DNA_methylation_profiling': genome-wide DNA "
+                    "methylation classification."
                 ),
             },
         },
@@ -593,24 +566,18 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
             "assessment_type": {
                 "type": "string",
                 "description": (
-                    "'cognitive_screen': MoCA / MMSE at the bedside, with informant "
-                    "history — the first step in suspected cognitive decline, before "
-                    "imaging (a full battery is "
-                    "order_specialized_test{neuropsych_battery}). "
-                    "'structured_headache_history_ichd3': headache and aura features "
-                    "against ICHD-3 criteria — reversibility, gradual spread, succession, "
-                    "duration, red flags. 'gait_and_balance_timed': Timed Up and Go and "
-                    "timed walk; run before and after a CSF tap test in suspected NPH. "
-                    "'functional_neuro_signs': Hoover's sign, entrainment and the other "
-                    "positive signs of a functional disorder. "
-                    "'performance_status': Karnofsky and ECOG scored at the visit, on which treatment "
-                    "planning in a brain tumour depends. "
-                    "'orthostatic_blood_pressure': blood pressure and heart rate supine and at 1 and "
-                    "3 minutes of active standing — orthostatic hypotension in the initial evaluation "
-                    "of syncope. "
+                    "'cognitive_screen': MoCA / MMSE at the bedside, with informant history (a "
+                    "full battery is order_specialized_test{neuropsych_battery}). "
+                    "'structured_headache_history_ichd3': the headache history and its "
+                    "accompanying neurological symptoms, taken against ICHD-3 criteria — onset, "
+                    "evolution, duration, red flags. 'gait_and_balance_timed': Timed Up and Go and "
+                    "timed walk test. 'functional_neuro_signs': Hoover's sign, entrainment and the "
+                    "other positive functional neurological signs. 'performance_status': Karnofsky "
+                    "and ECOG scored at the visit. 'orthostatic_blood_pressure': blood pressure "
+                    "and heart rate supine and at 1 and 3 minutes of active standing. "
                     "'levodopa_challenge': MDS-UPDRS part III in the OFF state and again at peak "
-                    "effect of a supra-threshold levodopa dose, with the percent improvement (30% or "
-                    "more supports DBS candidacy); one assessment that reports both states."
+                    "effect of a supra-threshold levodopa dose, with the percent improvement; one "
+                    "assessment that reports both states."
                 ),
             },
             "timing": {
@@ -618,8 +585,7 @@ _TOOL_PARAMETERS: dict[str, dict[str, Any]] = {
                 "description": (
                     "When the assessment is made relative to an intervention whose effect it "
                     "measures. 'baseline' (default): before it. 'post_intervention': the same "
-                    "assessment repeated after it, e.g. the timed gait 2 to 24 hours after a "
-                    "CSF tap test, to be compared with the baseline."
+                    "assessment repeated after it, to be compared with the baseline."
                 ),
                 "default": "baseline",
             },

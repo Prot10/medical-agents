@@ -29,7 +29,7 @@ class CardiacMonitoringTool(BaseTool):
                     "Type of monitoring. 'holter_24h'/'holter_48h': continuous recording. "
                     "'event_monitor_14d'/'event_monitor_30d': patient-activated, captures "
                     "infrequent events. 'implantable_loop_recorder': months to years of "
-                    "monitoring (cryptogenic stroke, unexplained syncope). "
+                    "monitoring. "
                     "'telemetry': inpatient continuous monitoring. 'device_interrogation': "
                     "the stored rhythm diagnostics of a pacemaker, ICD or loop recorder already "
                     "implanted (atrial high-rate episodes, AF burden)."

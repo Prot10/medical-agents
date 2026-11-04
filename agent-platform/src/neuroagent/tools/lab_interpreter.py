@@ -32,7 +32,7 @@ class LabInterpreterTool(BaseTool):
                 "description": (
                     "Individual assays or named panels to interpret. Each entry is billed "
                     "separately, from EUR 5 (glucose, sodium) to EUR 2300 "
-                    "(paraneoplastic). Prefer the specific assay the question needs."
+                    "(`paraneoplastic_panel`). Prefer the specific assay the question needs."
                 ),
             },
             "patient_age": {

@@ -28,9 +28,9 @@ class EchocardiogramTool(BaseTool):
                 "enum": echocardiogram_types(),
                 "description": (
                     "Type of echocardiogram. 'TTE': transthoracic — the standard study, "
-                    "non-invasive. 'TEE': transesophageal — when the transthoracic window is "
-                    "non-diagnostic, or for a prosthetic valve, an intracardiac mass, "
-                    "endocarditis or aortic dissection. 'bubble_study': agitated-saline "
+                    "non-invasive. 'TEE': transesophageal — close views of the atria, the "
+                    "left atrial appendage, the valves and the thoracic aorta that the "
+                    "transthoracic window cannot give. 'bubble_study': agitated-saline "
                     "contrast for a right-to-left shunt. 'exercise_echo': imaging during or "
                     "immediately after graded exercise, standing, sitting or semi-supine — "
                     "the answer is a provoked outflow-tract gradient or an exercise-induced "

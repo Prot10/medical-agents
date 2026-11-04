@@ -30,8 +30,8 @@ class EEGAnalyzerTool(BaseTool):
                 "description": (
                     "Type of EEG study. 'routine': 20-40 min outpatient. "
                     "'ambulatory': 24-72 hr home monitoring. "
-                    "'video': inpatient video-EEG monitoring (epilepsy surgery workup). "
-                    "'continuous_icu': ICU continuous EEG for status monitoring."
+                    "'video': inpatient video-EEG monitoring with time-locked video of the events. "
+                    "'continuous_icu': continuous EEG in the intensive care unit."
                 ),
                 "default": "routine",
             },

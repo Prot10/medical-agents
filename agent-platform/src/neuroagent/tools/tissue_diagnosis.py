@@ -33,13 +33,9 @@ from .vocabulary import (
 class TissueDiagnosisTool(BaseTool):
     name = "obtain_tissue_diagnosis"
     description = (
-        "Obtain tissue and issue an integrated histopathological diagnosis. For a brain "
-        "tumour this is the only route to a definitive diagnosis, grade and treatment branch — "
-        "imaging alone yields a suspicion, reported as NOS. It also covers nodal sampling when "
-        "a systemic disease has to be confirmed histologically outside the organ that is "
-        "symptomatic. Request the molecular assays that change management; each is billed "
-        "separately, and a purely histological pattern needs none. Molecular work-up must not "
-        "delay radiotherapy or tumour-specific pharmacotherapy."
+        "Obtain tissue and issue an integrated histopathological diagnosis, with a grade where one "
+        "applies. Name the molecular assays you want in `molecular_assays`; each is billed "
+        "separately."
     )
     parameter_schema = {
         "type": "object",
@@ -53,18 +49,12 @@ class TissueDiagnosisTool(BaseTool):
                 "type": "string",
                 "enum": tissue_procedures(),
                 "description": (
-                    "How tissue is obtained. 'resection': maximal safe resection where "
-                    "feasible given site and clinical condition; also therapeutic. "
-                    "'stereotactic_biopsy': where microsurgical resection is not safely "
-                    "feasible; serial samples along the trajectory avoid sampling bias. "
-                    "'lymph_node_biopsy': endobronchial needle aspiration or surgical nodal "
-                    "sampling — the low-risk route to histological confirmation of a systemic "
-                    "disease when the accessible node is not the symptomatic organ. "
-                    "'temporal_artery_biopsy': a segment of the superficial temporal artery, "
-                    "the histological test for giant cell arteritis. 'open_biopsy': open "
-                    "surgical biopsy through a laminectomy or craniotomy, for a lesion a "
-                    "stereotactic needle cannot reach safely and that is not to be resected "
-                    "(an intramedullary spinal cord tumour)."
+                    "How tissue is obtained. 'resection': surgical resection, which is also "
+                    "therapeutic. 'stereotactic_biopsy': needle biopsy with serial samples along a "
+                    "stereotactic trajectory. 'lymph_node_biopsy': endobronchial needle aspiration "
+                    "or surgical nodal sampling. 'temporal_artery_biopsy': a segment of the "
+                    "superficial temporal artery. 'open_biopsy': open surgical biopsy through a "
+                    "laminectomy or craniotomy, without resection."
                 ),
             },
             "site": {
@@ -75,24 +65,21 @@ class TissueDiagnosisTool(BaseTool):
                 "type": "array",
                 "items": {"type": "string", "enum": molecular_assays()},
                 "description": (
-                    "Assays to run on the specimen. 'IDH1_IHC' and 'ATRX_IHC' routinely; "
-                    "'IDH1_IDH2_sequencing' where IHC is negative, in grade 2-3 diffuse "
-                    "gliomas and in glioblastoma under 55 years; '1p_19q_codeletion' in "
-                    "IDH-mutant gliomas with retained ATRX; 'CDKN2A_B_deletion' in "
-                    "IDH-mutant astrocytomas; 'TERT_promoter', 'EGFR_amplification', "
-                    "'chr7_gain_chr10_loss' in IDH-wildtype astrocytic gliomas lacking "
-                    "microvascular proliferation and necrosis; 'H3K27_status' for midline "
-                    "tumours; 'MGMT_methylation' in glioblastoma (by PCR, pyrosequencing or "
-                    "array — NOT immunocytochemistry); 'BRAF_V600' in IDH-wildtype tumours. "
-                    "'CD20_IHC' and 'EBER_ISH': B-cell lineage and Epstein-Barr virus in a suspected "
-                    "primary CNS or EBV-associated lymphoma. 'SOX10_IHC' and 'Melan_A_HMB45_IHC': "
-                    "melanocytic markers, to exclude a metastatic melanoma. "
-                    "'chromogranin_A_synaptophysin_IHC': neuroendocrine markers (paraganglioma). "
-                    "'PAX8_IHC', 'TTF1_IHC', 'thyroglobulin_IHC': the primary site of a metastatic "
-                    "carcinoma (renal or Mullerian, lung, thyroid). 'H3G34_status': diffuse "
-                    "hemispheric glioma, H3 G34-mutant. 'DNA_methylation_profiling': genome-wide "
-                    "methylation classification when histology and targeted assays leave the "
-                    "tumour class open."
+                    "Assays to run on the specimen. 'IDH1_IHC': IDH1 R132H immunohistochemistry. "
+                    "'ATRX_IHC': ATRX nuclear expression. 'IDH1_IDH2_sequencing': IDH1 and IDH2 "
+                    "hotspot sequencing. '1p_19q_codeletion': whole-arm 1p/19q codeletion. "
+                    "'CDKN2A_B_deletion': homozygous CDKN2A/B deletion. 'TERT_promoter': TERT "
+                    "promoter mutation. 'EGFR_amplification': EGFR gene amplification. "
+                    "'chr7_gain_chr10_loss': combined gain of chromosome 7 and loss of chromosome "
+                    "10. 'H3K27_status': H3 K27M mutation and H3K27me3 loss. 'MGMT_methylation': "
+                    "MGMT promoter methylation by PCR, pyrosequencing or array (not "
+                    "immunohistochemistry). 'BRAF_V600': BRAF V600E mutation. 'CD20_IHC': B-cell "
+                    "lineage. 'EBER_ISH': Epstein-Barr virus-encoded RNA. 'SOX10_IHC' and "
+                    "'Melan_A_HMB45_IHC': melanocytic markers. 'chromogranin_A_synaptophysin_IHC': "
+                    "neuroendocrine markers. 'PAX8_IHC', 'TTF1_IHC', 'thyroglobulin_IHC': "
+                    "epithelial lineage markers (renal or Mullerian, lung, thyroid). "
+                    "'H3G34_status': H3 G34 mutation. 'DNA_methylation_profiling': genome-wide DNA "
+                    "methylation classification."
                 ),
             },
         },
