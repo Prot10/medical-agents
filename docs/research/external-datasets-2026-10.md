@@ -200,6 +200,22 @@ Nothing changes without the neurology filter:
 5. Download onto CERN storage, with `wget -r -N -c -np --user <user> --ask-password
    https://physionet.org/files/mimiciv/3.1/`, and the same for the other projects.
 
+**Status, 28 Oct 2026.** Andrea's account (`aprotani`) was credentialed on 27 Oct 2026 without
+any training on file: today credentialing and training are separate reviews, and the files stay
+locked until the CITI report is accepted. The four DUAs (all Credentialed Health DUA 1.5.0) are
+signed; the "Sign DUA" page keeps showing the form until training is approved, which looks like
+an unsaved signature but is not (Settings → Agreements lists them). CITI: enrolled under MIT
+Affiliates (the UPF affiliation on the same CITI account has no "Data or Specimens Only
+Research" course); both courses passed on 28 Oct 2026 and the completion report was submitted
+the same day (PhysioNet: "Under review"), with the CITI login e-mail (UPF) added and verified
+on the PhysioNet account. The data go to `/eos/user/a/aprotani/physionet` (mode 700; only the CERN backup
+service `cback` has read access), not to `/eos/project-d/diagbox`, which the diagbox group can
+read. Download with `agent-platform/scripts/external_datasets/physionet_download.sh aprotani` on
+lxplus. **Update, 5 Nov 2026:** training approved; downloaded as HTCondor jobs
+(`physionet_download.sub`, one per folder) because tmux on lxplus dies with the SSH login. Note,
+ED and CDM are complete with checksums OK; MIMIC-IV hosp and icu were still downloading that
+night (≈0.37 MB/s each). See Part 3.
+
 Timing: the course takes a few hours (my estimate, not stated by CITI). The review time is not
 published, and PhysioNet's notice of 18 June 2026 warns of significant delays from staffing
 changes, handled in order of arrival. Users at institutions in the countries covered by the US
@@ -591,6 +607,533 @@ Audit: `agent-platform/scripts/external_datasets/medmemorybench_audit.py` →
 5. Pilot 20 cases per frequent condition (ISCH, SAH, SE, SYNC, HEP, BACT) through the harness
    with the panel models, and compare scores with the synthetic split.
 
+# Part 3: first look at the full data (5 Nov 2026)
+
+What was on EOS that evening: MIMIC-IV-Note 2.2, MIMIC-IV-ED 2.2 and MIMIC-IV-Ext-CDM 1.1,
+complete and checksum-verified; MIMIC-IV 3.1 hosp up to `hcpcsevents` (plus `admissions`,
+`diagnoses_icd`, the dictionaries) and icu up to `caregiver`. `labevents`, `poe`,
+`microbiologyevents`, `patients`, `prescriptions` and `chartevents` were still downloading, so the
+CSF, EEG-order, lab and trajectory numbers below are still to come.
+
+Every number here comes from scripts run on lxplus that print counts, shares and medians only;
+no row or note text left EOS (PhysioNet DUA, see "Access and governance").
+
+## What the tables hold
+
+| Table | Rows | Unit | What it gives a case |
+|---|---|---|---|
+| `hosp/admissions` | 546,028 | admission (223,452 patients) | arrival (`admission_location`, `edregtime`), type, outcome |
+| `hosp/diagnoses_icd` | 6.36 M | coded diagnosis, `seq_num` 1 = principal | the final diagnosis and comorbidities |
+| `note/discharge` | 331,793 | one per admission (61 % of admissions) | HPI, exam, results, course, discharge diagnosis; median 9,847 characters |
+| `note/radiology` | 2.32 M (49 % with an `hadm_id`) | report | imaging tools; `radiology_detail` gives `exam_name` |
+| `ed/edstays`, `ed/triage` | 425,087 | ED stay (48 % lead to an admission) | chief complaint, triage vitals and acuity |
+| `ed/vitalsign`, `ed/medrecon`, `ed/pyxis` | 1.6 M, 3.0 M, 1.6 M | timed rows | repeat vitals, home medications, ED drugs given |
+| CDM, 10 tables | 2,400 admissions | admission | see below |
+
+## MIMIC-IV-Ext-CDM: mapping only
+
+CDM is 2,400 abdominal admissions: appendicitis 957, cholecystitis 648, pancreatitis 538,
+diverticulitis 257 (`pathology_ids.json`). Each has one HPI (median 832 characters), one
+physical exam (median 347), a discharge diagnosis, ICD codes (median 5), labs (median 56 items),
+microbiology (median 2 rows) and radiology reports (median 2; 5,960 in all).
+
+| CDM table | NeuroBench field or tool | Note |
+|---|---|---|
+| `history_of_present_illness` | `patient.history_present_illness` | CDM already removed cases whose HPI names the pathology |
+| `physical_examination` | `patient.physical_exam` (general, not the neuro exam) | vitals are inside this text; triage vitals can be joined from ED by `hadm_id` |
+| `laboratory_tests` + `lab_test_mapping` | `interpret_labs`: CBC, BMP/CMP, LFT, `lipase` (pack), urinalysis | blood in 2,400, urine in 1,982 admissions; other fluids in < 35 |
+| `microbiology` | `order_microbiology`: blood culture, urine | ids only; names come from hosp `microbiologyevents` |
+| `radiology_reports`: CT abdomen/pelvis (1,622 admissions) | `order_body_imaging` `pelvis_abdomen_CT` | |
+| RUQ / gallbladder ultrasound (≈950) | pack `hepatobiliary_ultrasound` | |
+| chest X-ray (855), abdominal X-ray (258) | `chest_xray`, pack `abdomen_xray` | |
+| MRCP (220) | `pelvis_abdomen_MRI` | MRCP as a protocol is missing |
+| ERCP (93) | **missing** | a procedure; add to `order_specialized_test` in the pack |
+| CT head (59), MRI head (11) | `order_ct_scan`, `analyze_brain_mri` | |
+| `discharge_diagnosis`, `icd_diagnosis` | `ground_truth.diagnosis` | four labels; synonyms per pathology |
+| — | demographics | not in CDM: join `hosp/patients` by `hadm_id` (still downloading) |
+| — | trajectory | not in CDM: join `poe` by `hadm_id` |
+
+**Blocking gap:** `NeuroBenchCase.condition` is the neurological enum, so a
+`domain: general_medicine` case cannot name appendicitis. The schema needs a condition label for
+general-medicine cases (an enum of the four CDM pathologies, or a free label with an ICD code)
+before the first CDM case validates.
+
+## MIMIC-IV neurology: the real counts
+
+`mimic_cohort.py` on the full database, after fixing the seizure codes (below). Each filter
+column counts the principal-diagnosis admissions passing that filter alone; the usable cohort is
+their intersection, computed once `poe` and `labevents` are in.
+
+| Condition | Principal dx | New, not a transfer | Via ED | Discharge note | Head imaging report |
+|---|---|---|---|---|---|
+| ISCH | 6,216 | 4,120 | 3,221 | 4,588 | 4,471 |
+| SYNC (R55, any cause) | 4,327 | 3,536 | 2,191 | 2,478 | 1,529 |
+| GLIO | 1,127 | 539 | 390 | 788 | 769 |
+| SAH | 989 | 656 | 495 | 742 | 730 |
+| MIG | 971 | 664 | 490 | 711 | 581 |
+| FEPI (focal only) | 952 | 512 | 327 | 763 | 337 |
+| HEP | 568 | 208 | 283 | 537 | 219 |
+| MS | 455 | 249 | 208 | 352 | 256 |
+| SE | 411 | 223 | 215 | 279 | 221 |
+| PD | 392 | 191 | 114 | 241 | 186 |
+| ALZ | 328 | 200 | 155 | 199 | 152 |
+| GBS | 218 | 157 | 105 | 163 | 115 |
+| FND | 216 | 140 | 92 | 135 | 81 |
+| MG | 191 | 92 | 91 | 138 | 46 |
+| NPH | 153 | 97 | 22 | 119 | 114 |
+| VASC | 123 | 76 | 51 | 82 | 52 |
+| ALS | 77 | 45 | 30 | 58 | 21 |
+| BACT | 74 | 48 | 30 | 66 | 53 |
+| NMDAR | 61 | 31 | 17 | 30 | 23 |
+| FTD | 54 | 41 | 27 | 43 | 31 |
+
+Neurological but outside the 20: traumatic bleeds 4,415, other cerebrovascular 3,791, ICH 3,269,
+generalized or unspecified epilepsy 2,474, encephalopathy 2,184, TIA 1,130, convulsions that are
+not epilepsy 995, CNS infection 637, other dementia 567.
+
+The estimate of Part 2 (2,000–6,000 candidate cases) holds: the 20 conditions give 17,900
+principal admissions, 11,800 of them new and not transfers. Half of that is ISCH and SYNC; ALS,
+BACT, NMDAR and FTD have fewer than 50 each before the note and leakage filters.
+
+**Three mapping problems found and what was done:**
+
+- **Status epilepticus was undercounted.** US ICD-10-CM has no G41; it codes "epilepsy with
+  status epilepticus" as a six-character G40 code ending in 1 (259 admissions), and ICD-9 345.2
+  was missing. Fixed in `mimic_neuro.py`: SE 150 → 411.
+- **FEPI held every seizure.** All G40/345 codes and the R56/780.3 convulsions (995, mostly
+  provoked or unexplained seizures) counted as focal temporal epilepsy. Fixed: FEPI keeps
+  localization-related codes only (G40.0–G40.2, 345.4–345.5), 4,682 → 952; generalized and
+  unspecified epilepsy is a separate group, from which the converter could recover focal cases by
+  reading the EEG and MRI in the note.
+- **SYNC is not cardiac syncope.** R55 as principal is syncope of any or unknown cause. Cardiac
+  syncope is better found as a principal arrhythmia or structural cause with syncope as a
+  secondary code: ≈660 admissions (conduction/arrhythmia 472, AF/flutter 89, aortic stenosis
+  82, cardiomyopathy 21; ICD-9 AF partly falls in the first group). Not yet in `mimic_neuro.py`:
+  it changes what SYNC means and needs Andrea's decision.
+
+## What the discharge notes give
+
+`mimic_note_sections.py`, share of discharge summaries carrying each section:
+
+| | All notes | Neuro range across the 20 |
+|---|---|---|
+| Chief complaint, HPI, PMH, allergies | 96–100 % | 91–100 % |
+| Physical exam | 95.6 % | 89–99 % |
+| Pertinent results | 96.2 % | 97–100 % |
+| Discharge diagnosis | 95.9 % | 88–100 % |
+| HPI median length | 1,255 characters | 598 (SAH) – 2,378 (FND) |
+
+Structure is not the problem. Two things are:
+
+1. **The HPI often tells the result.** A study named with a finding verb ("CT showed…",
+   "LP revealed…") appears in 22 % of all HPIs and in 13–50 % of neuro ones: SAH 49 %, BACT 50 %,
+   GLIO 44 %, NMDAR 43 %, ISCH 35 %. And 13–66 % mention the ED or an outside hospital
+   (SYNC 66 %, ALZ 66 %, HEP 64 %, BACT 64 %). The conversion must cut the HPI at the
+   presentation, with a local model, and a sample must be checked by Andrea.
+2. **EEG, LP and EMG results exist as text only.** The hospital course mentions an EEG in 77 % of
+   SE, 64 % of FEPI, 62 % of FND and 37 % of NMDAR notes; an LP in 77 % of BACT, 68 % of GBS, 63 %
+   of NMDAR and 40 % of NPH; an EMG in 44 % of GBS, 36 % of ALS and 21 % of MG. So for most
+   seizure, encephalitis and neuromuscular cases the result of the tool that defines the policy
+   can be extracted from the course; without that, those cases cannot be scored on the policy.
+
+## How to process the data: the pipeline
+
+1. **Cohort (SQL, DuckDB, counts only).** Principal diagnosis in the 20 conditions with the
+   fixed map; new to the patient; not a transfer; with a discharge note; a triage chief complaint
+   that does not name the diagnosis (the regex of the demo audit).
+2. **Presentation (deterministic).** Demographics from `patients`/`admissions`; chief complaint
+   and vitals from ED triage; PMH, medications on admission, allergies, social and family history
+   from the note sections; the *admission* exam (the note's exam section holds admission and
+   discharge exams), split into `neurological_exam` fields where the headings allow.
+3. **Presentation (local model).** Cut the HPI at presentation: remove ED course, outside
+   results and anything a tool would return. Runs on vLLM at CERN; the output records what was
+   removed, for audit.
+4. **Tool outputs (`provenance: record`).**
+   - `interpret_labs`, `analyze_csf`: first value per test from `labevents`, mapped item → panel
+     with a table like CDM's `lab_test_mapping` (to be built for our panel names).
+   - `order_microbiology`: `microbiologyevents`.
+   - Imaging tools: radiology reports routed by `exam_name` to the tool and protocol; decide
+     findings only (CDM) or findings plus impression.
+   - `analyze_ecg`: MIMIC-IV-ECG machine measurements.
+   - `analyze_eeg`, LP narrative, `emg_ncs`, echo: extracted from the hospital course by the local
+     model, marked as extracted text.
+   - Everything else: "not available", never a library normal.
+5. **References.** Diagnosis from the principal ICD code plus the discharge diagnosis, labels from
+   `diagnosis_synonyms.yaml`; the real trajectory from `poe` (+ ED); the condition policy
+   transferred as `draft`.
+6. **Checks before use.** Every case validates against `NeuroBenchCase`; Andrea hand-audits 100
+   (presentation leakage, wrong tool routing); a pilot with the panel.
+
+CDM follows the same steps 2, 4 and 5 with no local model, once the condition label exists.
+
+## Decisions needed
+
+1. The condition label for general-medicine cases (blocks CDM).
+2. What SYNC means in MIMIC: R55 of any cause (≈4,300, mostly not cardiac) or cardiac syncope by
+   cause (≈660).
+3. Whether extracted text counts as a tool result (EEG, LP, EMG, echo), or those cases are left
+   out of the policy score.
+4. Findings only or findings plus impression for imaging.
+
+**Update, 6 Nov 2026: download complete** (hosp 22 files 5.9 GB, icu 9 files 4.1 GB, all
+checksums OK). CSF labs and EEG orders (`poe`) per condition, admissions with a principal
+diagnosis:
+
+| Condition | EEG ordered | CSF labs |
+|---|---|---|
+| SE | 339 of 411 (82 %) | 100 (24 %) |
+| FEPI | 696 of 952 (73 %) | 52 (5 %) |
+| FND | 129 of 216 (60 %) | 9 |
+| NMDAR | 34 of 61 (56 %) | 32 (52 %) |
+| BACT | 29 of 74 | 41 (55 %) |
+| GBS | 9 of 218 | 110 (50 %) |
+| SAH | 250 of 989 | 253 (26 %) |
+| NPH | 8 of 153 | 47 (31 %) |
+| MS | 25 of 455 | 95 (21 %) |
+| ISCH | 881 of 6,216 | 138 |
+
+The EEG is ordered in most seizure cases, so the policy step was really taken; its result is
+still text only (see above). CSF has structured values where the policy needs it (BACT, GBS,
+NMDAR, SAH).
+
+## Next
+
+- The intersection of the filters per condition.
+- Lab item → panel table for our `interpret_labs` and `analyze_csf` vocabulary.
+- `poe` trajectory coverage per condition, and GCS/strength in `chartevents`.
+
+# Part 4: how SDBench turned MIMIC into interactive cases (6 Nov 2026)
+
+The Science version of SDBench (Nori et al., *Science* 394:423, 22 Oct 2026) adds MIMIC to the
+304 NEJM cases. Sources read: the public repository `microsoft/sdbench` (commit `304ce96`, 21
+Oct 2026: `case_data.py`, the MIMIC gatekeeper prompt `gatekeeper_synthetic_tests/v13_mimic`),
+the PhysioNet page of MIMIC-IV-Ext-SDBench 1.0.0, and the arXiv v2 preprint. The Science full
+text was paywalled; its physician numbers (56 physicians, 36.1 % on NEJM, 46.8 % on ED cases)
+come from a third-party summary and are unverified.
+
+## What they built
+
+- **488 cases** from MIMIC-IV 3.1 + ED 2.2 + Note 2.2: ED-originated admissions, no direct-to-ICU
+  admissions, one note per patient. Split 163 train / 254 validation / 71 test; the 71 test cases
+  were reviewed by clinicians, who corrected 13 ground-truth diagnoses (18 %). Published results
+  use validation + test (325 cases): GPT-5 baseline 76.6 % at ≈$4,240, DxO without budget 80.3 %
+  at ≈$4,980.
+- **LLM curation**: Claude Opus 4.1 screened cases (clear presenting complaint, key findings,
+  definitive diagnosis) and extracted the ground-truth diagnosis; GPT-5 mini wrote the
+  diagnosis-free vignette and extracted test names and the number of clinician visits. Calls go
+  to zero-retention providers, citing PhysioNet's LLM guidance.
+- **Schema**: one JSON object per case: `case_id`, `mimic_note_id`, `final_diagnosis`,
+  `case_title`, `case_summary` (the vignette), `full_text` (the **whole discharge summary**),
+  `estimated_clinician_visits`, `tests` (names only), `case_sets`.
+- **No structured MIMIC tables at run time.** The agent asks free-text questions and orders tests;
+  a **gatekeeper LLM reads the discharge summary** (and knows the diagnosis) and answers each
+  request. Its MIMIC prompt sets the rules:
+  - answer as if the patient were still in hospital: nothing about the course, discharge,
+    outcome or definitive surgery;
+  - give **pre-intervention** values; when the note only has post-treatment values, reconstruct a
+    plausible baseline;
+  - imaging: **objective findings only, never the radiologist's impression**;
+  - a test not in the note gets a **synthetic result**, "boring is better": normal or mildly
+    non-specific for screening tests; confirmatory tests positive only for conditions documented
+    in the note (diagnosis, history), negative for everything else, and never more specific than
+    the documentation; a documented negative is never contradicted;
+  - re-ordering a test returns the identical report; vague or umbrella orders are refused;
+  - every answer is tagged `is_synthetic`, hidden from the agent.
+- **Why synthetic and not "not available"** (preprint, Sec. 2): they started with "not
+  available" and found that it told the agent its order was off the clinicians' path. A physician
+  panel reviewed 508 gatekeeper answers, real and synthetic, and flagged 8; none leaked the
+  diagnosis.
+- Cost: CPT lookup by an LLM against a public chargemaster (Kaiser Permanente Washington), $300
+  per visit of questions. Judge: o3 with a 5-point physician rubric, ≥4 correct.
+
+## What it means for us
+
+| | SDBench MIMIC | NeuroAgent on MIMIC (proposed) |
+|---|---|---|
+| Source of answers | the discharge summary, read live by an LLM | the structured tables (labs, micro, radiology, ECG, triage) compiled offline; the note only for what has no table (EEG, LP narrative, EMG, echo) |
+| Timing | reconstructed by the gatekeeper | real: `charttime` and `poe` give the value before treatment and the order times |
+| Actions | free text, any test name | typed tool calls over a closed vocabulary |
+| Off-path orders | synthetic, generated live | **to decide**: today "not available"; proposed: synthetic, generated **offline** for every vocabulary item with the same rules, stored in the case, tagged, spot-checked |
+| Determinism | LLM at every step | a lookup: the same order always gives the same answer, so GRPO rollouts cost nothing extra and runs replicate |
+| Reference | diagnosis only (+ cost) | diagnosis, the transferred policy, and the clinicians' timed trajectory |
+
+Our closed vocabulary is what makes the offline route possible: a case can hold an answer for
+every orderable item, written once, checked once, then served deterministically. SDBench needs a
+live gatekeeper because its agents may order anything in free text.
+
+**The design point this changes.** The harness answers an unrecorded order on a
+`provenance: record` case with "not available", and the case schema forbids authored fallbacks
+on recorded cases. SDBench measured that this tells the agent which orders the clinicians did
+not place. Options: (a) keep "not available" and report it as a known leak; (b) precompute
+tagged synthetic results under SDBench's rules, served like a fallback but flagged, excluded
+from any claim about real data, and checked by a physician on a sample.
+
+The 488 SDBench cases are also a ready comparison: signing the MIMIC-IV-Ext-SDBench DUA gives
+their `mimic_note_id`s, which map to `hadm_id`, so we can count how many fall in our conditions
+and run our agents on the same admissions.
+
+## Overlap with SDBench (6 Nov 2026)
+
+MIMIC-IV-Ext-SDBench 1.0.0 is on EOS (`/eos/user/a/aprotani/physionet/mimic-iv-ext-sdbench`,
+checksums OK). `sdbench_overlap.py`: 487 of the 488 cases link to a principal diagnosis; 36 fall
+in our 20 conditions (ISCH 23, SYNC 4, GLIO 2, one each of ALZ, GBS, HEP, MS, SAH, SE), 21 of
+them in SDBench's validation + test sets. Their chapters: circulatory 114, injury 85, digestive
+75, nervous only 11. A small head-to-head set, not a neurology benchmark.
+
+# Part 5: tool catalogue and a first precomputed MIMIC set (6 Nov 2026)
+
+## What MIMIC clinicians ordered, against our vocabulary
+
+`mimic_order_catalogue.py` counted, for the 17,903 admissions with a principal diagnosis in the
+20 conditions, every radiology exam, provider order, microbiology test and lab item seen in at
+least 10 admissions. `mimic_tool_map.py` routes them to our tools:
+
+| Source | Core term | Pack term only | Approximate | Missing | Not a diagnostic order | Unmatched |
+|---|---|---|---|---|---|---|
+| Radiology exams | 72.1 % | 4.5 % | 1.2 % | 1.4 % | 19.5 % | 1.3 % |
+| Microbiology | 78.5 % | 6.3 % | 2.5 % | 0 | 11.4 % | 1.3 % |
+| Lab items (by fluid) | 99.5 % | 0.1 % | 0.4 % | 0 | 0 | 0 |
+| Provider orders | 12.5 % | 0 | 1.5 % | 0.8 % | 85.2 % | 0 |
+
+(Shares of admission × item pairs. "Not diagnostic": billing modifiers, line placement,
+embolization steps, sedation, nursing, diet, drugs.)
+
+- **The core catalogue already serves almost every diagnostic order** of a neuro admission:
+  head CT and CTA, brain MRI and MRA, CT perfusion, carotid duplex, chest X-ray and CT, spine
+  imaging, venous duplex, echo, ECG, EEG, TCD, EMG, Holter, telemetry, cultures, CSF, labs.
+- **Pack-only items** are complications, not the neuro diagnosis: gallbladder ultrasound (477
+  admissions), abdominal X-ray (382 + 141 + 82), BAL (209), renal ultrasound (164), extremity
+  X-ray.
+- **Missing**: consults (369 neurology, 336 ID, 304 cardiology, …), which the harness leaves out
+  on purpose (`consult_medical_specialist` does not exist); upper-limb venous duplex (≈250),
+  abdominal Doppler (356), plain spine X-ray (≈180). **Approximate**: the swallow evaluation (4,009
+  speech consults, 458 videofluoroscopic swallows) only as `speech_language_evaluation`.
+- **The other direction.** All 16 tools are required somewhere in NeuroBench, but 128 of the 388
+  vocabulary terms are never named in any of the 600 policies, and some are common in MIMIC:
+  arterial blood gas (`ABG`, ≈3,000 neuro admissions), `spine_CT` (≈890 C-spine CTs), `sputum`
+  culture (≈870). A policy reward trained on NeuroBench alone never rewards them.
+
+## Recommendation
+
+1. **One catalogue per experiment, the same at training and test, written down with the run.**
+   For the MIMIC-neuro pilot it is the **core catalogue**, plus at most the few missing terms a
+   pilot case needs (spine X-ray, upper-limb duplex, abdominal Doppler, a swallow study), added to
+   the core as CLAUDE.md asks for terms NeuroBench needs. The `general_medicine` pack stays off:
+   no neuro diagnosis needs it, and a longer catalogue changes the small models' behaviour, so
+   every NeuroBench baseline would have to be re-run.
+2. **GRPO and never-rewarded tools.** GRPO only moves the probability of actions the model
+   samples. A term that is never justified in training is penalized whenever it is tried (waste,
+   unjustified actions, cost), so the model can learn to avoid it everywhere, including on MIMIC
+   cases where it is right. Countermeasures, cheapest first:
+   - a coverage table per run: for every catalogue term, the training cases where it is required
+     (from the policies) and the probe cases where it is needed;
+   - keep the KL term to the base model, and track per-term call rates during training on a fixed
+     probe set (the September collapse already showed tool-skipping);
+   - put MIMIC training cases in the GRPO mix as soon as they exist, so ABG, spine CT and sputum
+     cultures are rewarded somewhere; the outcome-vs-policy comparison stays clean if both arms
+     get the same mix.
+3. **Unrecorded orders get a precomputed normal report, never "not available".** Built from what
+   we already have:
+   - the base is `fallback_library.yaml`, the same normal report NeuroBench serves, so a MIMIC
+     case reads like a NeuroBench case;
+   - a per-case contradiction pass (the `library_contradictions.yaml` idea, case by case): where a
+     normal would contradict the record (documented diabetes and a normal HbA1c, documented CKD
+     and a normal creatinine, a documented negative), the case stores its own consistent report,
+     written by a local model under SDBench's rules and checked;
+   - every served answer carries its origin (`table`, `note`, `synthetic`) in the case metadata,
+     hidden from the agent, so results can be reported on real answers only.
+   The schema today forbids fallbacks on `provenance: record` cases and `mock_server.py:650`
+   answers "not available"; both change.
+4. **Pick pilot cases where the synthetic part cannot matter.** Keep only admissions where every
+   step the transferred policy requires has a real result (table or note): synthetic reports then
+   answer only off-path orders, where a normal result is plausible. This is the existing
+   perfect-agent check, applied to real data.
+5. **Pilot size: 50 cases, 10 in each of five conditions** that exercise different tools: ISCH
+   (CT, CTA, MRI, echo, telemetry), SAH (CT, CTA, CSF), SE (EEG from the note, CSF), BACT (CSF,
+   cultures) and GBS (CSF, EMG from the note). Andrea reads all 50. Then the panel models run on
+   them with the current harness, and the 21 SDBench cases in our conditions give a direct
+   comparison.
+
+## A free-order baseline (proposed 6 Nov 2026)
+
+SDBench gives its agents no menu: they ask for any test in free text and a gatekeeper LLM answers.
+Our agents pick from 16 tools whose enums list 388 terms, and `docs/paper/catalogue-cue.md`
+(4 Nov) showed the catalogue itself carries a cue (the NMDAR antibody tests, for one). A baseline with one tool,
+`request_test(test: str, details: str)`, measures how much the menu helps or steers the panel.
+
+Design, so that only the interface changes:
+
+1. **Translate, then serve as today.** A translator model maps each free-text order to one typed
+   action of the vocabulary (`"MRI brain with diffusion"` → `analyze_brain_mri(sequence=DWI)`),
+   or to `off_catalogue`. A mapped order goes through `NeuroBenchEnvironment.execute` unchanged:
+   same MockServer answer, same cost, and the policy reward scores the translated actions, so the
+   menu and free-order runs are directly comparable.
+2. **Generate only what has no answer.** An `off_catalogue` order gets a report from the
+   gatekeeper, written from the case under SDBench's rules: findings without impression, a normal
+   result unless the case documents otherwise, never naming the diagnosis. Its price comes from
+   the same Medicare table when a code is found, else a fixed off-catalogue price. The reward
+   counts it as not justified (it can satisfy no criterion), which is the same treatment a
+   needless order gets today.
+3. **Vague orders get a clarification, not a result.** "Blood tests" returns "which tests?", a
+   turn spent inside the step budget (SDBench does the same).
+4. **Deterministic answers.** Temperature 0, and every translation and generated report cached
+   per (case, normalized order) and stored with the run, so a re-run or a second model sees the
+   identical answer. The translator and gatekeeper (model, prompt version) are recorded in the
+   run manifest.
+5. **Checks before any number is reported.** A translation table audited by hand on a sample
+   (wrong mappings change the reward), and a leak scan of generated reports for the diagnosis,
+   its synonyms (`diagnosis_synonyms.yaml`) and their ICD codes.
+
+Where it runs: GLM-5.3 (`GLM-5.3-FP8-VERTEX`) through the CERN AI gateway. On 6 Nov 2026 Andrea
+reported that CERN confirmed by email that the gateway retains and logs nothing, Vertex models
+included, so it can also serve MIMIC later; the first run is on NeuroBench only. On MIMIC the calls
+would run from a CERN host, never through a Claude session.
+
+First run (6 Nov 2026): Qwen3.5-9B, profile `free-order-qwen3.5-9b`, 600 cases, seeds 1–3,
+concurrency 16, draft policies, on rockhopper. The settings match `outputs/paper/catalogue_full/B-s*`
+(the menu arm with the neutral catalogue prose), so the two can be compared case by case. Outputs
+in `outputs/paper/free_order/` on rockhopper, translation cache in `outputs/free_order/cache`.
+A 30-order probe before the run: after one prompt fix (a missing optional argument is never
+vague), all 30 translations were right, including vague ("basic labs", "PET scan"), multiple
+("CT head and MRI brain"), not-a-test (consult, lorazepam) and off-catalogue (upper-limb duplex,
+lumbar spine X-ray, NIHSS, swallow evaluation). A second fix after the first 57 episodes
+(prompt v3): a test offered only inside a panel (single paraneoplastic antibodies) maps to the
+panel, and a lab order with some uncovered items maps the covered ones; the run was restarted.
+
+Results (6 Nov 2026, draft policies, engineering only), free order minus menu, paired by case:
+
+| Seed | Diagnosis | Required coverage | Scalar |
+|---|---|---|---|
+| 1 | 0.850 → 0.845 (−0.005 [−0.033, +0.025]) | 0.461 → 0.249 (−0.211 [−0.236, −0.184]) | 0.478 → 0.364 (−0.114) |
+| 2 | 0.872 → 0.843 | 0.475 → 0.245 | 0.492 → 0.361 |
+| 3 | 0.882 → 0.850 | 0.467 → 0.262 | 0.494 → 0.373 |
+
+- Without the menu Qwen orders half as much (1.9 against 3.7 tests per case, seed 1) and finds
+  the diagnosis about as often (−0.005 to −0.032): the menu changes the work-up, not the answer.
+- The coverage loss is tests never ordered, not translation: required criteria whose tool was
+  never ordered rise from 44% to 64%, while "same tool, other arguments" falls (24% → 19%). The
+  largest rise is `perform_clinical_assessment` (78 → 236 missed): bedside assessments such as
+  functional signs, orthostatic blood pressure or a cognitive screen are ordered when the menu
+  lists them, not otherwise. Functional disorder falls from 0.68 to 0.03, NPH 0.81 → 0.27, FTD
+  0.57 → 0.16, migraine 0.39 → 0.07; MS, SAH and cardiac syncope do not fall.
+- Orders (seed 1): 1,087 mapped, 27 off-catalogue, 49 several tests at once (not placed), 3 vague,
+  2 not a test. 2,983 translations and 105 generated reports are cached.
+- Still owed before any of this is reported: the same run for Granite and Gemma (running, see
+  below).
+
+Hand audit of the translations (7 Nov 2026). From the 2,778 distinct orders of the three seeds
+(2,522 mapped, 169 several tests, 74 off-catalogue, 10 vague, 3 not a test) I read 169 by hand
+(100 mapped, 25 several tests, 30 off-catalogue, all the vague and not-a-test orders) and then
+all 74 off-catalogue orders against the catalogue enums.
+
+- Mapped: 97 of 100 right. One dropped items the order named (a CSF order with Gram stain,
+  culture and an autoimmune panel became NMDAR antibodies only); two set an MRI protocol the order
+  did not name (dementia, epilepsy).
+- Off-catalogue: about 12 of 74 wrong, and one class is systematic. 10 of the 21 NPH tap-test
+  orders ("large-volume lumbar puncture", "CSF tap test") were called off-catalogue, while the other
+  11 were mapped to `analyze_csf`; the policy requires `analyze_csf`, so those episodes lost a
+  required criterion through the translator. Also missed: an ictal SPECT (`perfusion_SPECT`) and a
+  JC virus antibody index (`anti_JCV_antibody`).
+- Vague and several tests: inconsistent twins. "VGCC antibody" was mapped to the P/Q assay once
+  and called vague twice; "routine EEG with prolonged monitoring" was mapped once and called vague
+  once; a conditional step ("if negative, MRI"; "CSF if a lumbar puncture is done") made an order
+  "several tests" and cost the turn.
+- Effect on the Qwen numbers above: small. The tap test touches about 10 of 1,800 episodes, and the
+  coverage loss is tests never ordered. Even so, the panel run is redone with the fixed prompt.
+
+Prompt v4 fixed these cases (a catalogue procedure with extra purpose or volume is still that
+procedure; one assay split into subtypes maps to all of them; conditional steps are ignored; look
+for synonyms before calling an order off-catalogue). In a 227-order probe it changed 33 orders. It
+fixed all 10 tap tests, VGCC, the EEG twins and the conditional steps, but the synonym rule let
+GLM substitute related tests (APOE → early-onset AD panel, serum benzodiazepine → AED levels,
+"Holter or event recorder" → Holter, "hypercoagulable panel" → a list of assays). Prompt v5 says a
+related or broader test is not the same test, and that an order leaving alternatives open is vague.
+On the same 227 orders v5 kept every v4 fix, dropped all seven substitutions, and changed none of
+the 80 correct mappings. Still open in v5: the JC virus antibody index stays off-catalogue (the
+order asked for serum and CSF), and "brain MRI including orbits" is sometimes one call, sometimes
+two. Probe outputs: rockhopper
+`outputs/paper/free_order_panel/probe_v{4,5}.txt`.
+
+Panel run (started 7 Nov 2026, 14:03): `scripts/paper/free_order_queue.sh` on rockhopper in tmux
+`panel`. Granite, Gemma, then Qwen: each gets the menu profile (`policy-*`) and the free-order
+profile, 600 cases × seeds 1–3, concurrency 16, draft policies, prompt v5, all on the same code.
+Outputs go to `outputs/paper/free_order_panel/<model>/`, with `compare.txt` per model and progress
+in `status.txt`; the staged Granite and Gemma weights are deleted from `/dev/shm` when each model
+finishes. In the first 80 Granite menu episodes, half failed on invalid actions. There were 90
+prose answers instead of a tool call and 72 calls to invented tools (`order_brain_mri`,
+`order_lumbar_puncture`, `order_csf`). Its September base evaluation failed 16%. The free-order
+arm has a single tool, so the two arms' completion rates will differ; the comparison script
+prints both.
+
+What it does not do: replace the typed catalogue for GRPO. A live LLM in every rollout step is
+slow and adds noise to the reward; the cache makes it affordable for evaluation, and only later,
+if it matters, for training. It is a third arm of the evaluation (menu, no tools, free order),
+run on the same cases and seeds.
+
+Panel result (finished 7 Nov 2026, 20:08; prompt v5, 600 cases × 3 seeds per arm; free minus menu,
+range over seeds):
+
+| Model | Diagnosis | Required coverage | Scalar | Tests per case (menu → free) |
+|---|---|---|---|---|
+| Qwen3.5-9B | −0.02 / −0.03 | −0.20 / −0.22 | −0.11 / −0.12 | 3.7 → 1.9 |
+| Gemma 4 E4B | −0.06 / −0.08 | −0.23 / −0.25 | −0.15 / −0.17 | 5.1 → 3.0 |
+| Granite 4.1 8B | see below | −0.09 | +0.002 | 3.6 → 1.0 |
+
+Granite's pooled diagnosis difference (+0.086) is an artefact: its menu arm fails 28-33% of
+episodes on invalid actions. On menu-completed cases, menu diagnosis is 0.69-0.74 against
+0.59-0.61 free. Without the menu, every model orders about half the tests and covers less of the
+work-up.
+
+# Part 6: the MIMIC pilot, built and evaluated (7-9 Nov 2026)
+
+Cases are built on rockhopper by a Claude Code session under Andrea's CERN account (zero data
+retention), which is the only agent that reads MIMIC records. Everything record-derived stays in
+`/eos/user/a/aprotani/physionet/work/mimic-neuro`. This document, like the Mac session, sees only
+aggregate reports. The formal method (cohort flow, record-to-tool mapping, decision log 1-51,
+validation, limitations) is [`docs/benchmark/mimic-neuro-methods.md`](../benchmark/mimic-neuro-methods.md),
+copied from the workspace's `report/07_methods.md`.
+
+**Final set (task 07, 9 Nov 2026): 100 cases.**
+- Allocation: ISCH 38, MS 22, SAH 12, HEP 10, SE 9, GBS 3, FND 2, FEPI 2, BACT 2.
+- Changes from the task-06 set (8 Nov):
+  - 12 cases were excluded and replaced, all of them by ISCH, because the SAH, SE, FND and FEPI pools were exhausted;
+  - the exclusions: SAH aneurysm status not established 5, transfers 3, SE evidence only in the ED course 1, frontal FEPI focus 1, exam after thrombolysis 1.
+- Coverage of the 20 conditions: 9 conditions gave cases.
+  - Seven are out of scope for an ED-admission source: MIG, ALZ, FTD, VASC, PD, NPH, ALS.
+  - SYNC is out of scope too: 0 of 40 strict admissions were cardiac syncope.
+  - GLIO, MG and NMDAR have no admission with every required step.
+- SAH labels come from the record. 6 cases have an aneurysm and keep I60.x. 6 are non-aneurysmal and coded I60.8, and they accept only non-aneurysmal labels.
+- Label errors inherited from the synonyms file are fixed by a 13-entry overlay (`apply_diagnosis_synonyms.py --overlay`). Each entry reuses labels the repository already grants. Methods 5.4 lists the repository fix each entry stands in for; these fixes are not applied yet.
+- Every case has rejected labels: half of the templates, or one third when half gives none. SE also gets its mimics (PNES, syncope).
+- Required criteria with a served result: 289/289, recommended 96/96.
+- Checks on the final build:
+  - schema, build errors, synonyms `--check`, timing, perfect agent: all clean, 100/100;
+  - independent field-by-field re-read: 1.41% of fields wrong in round 3, 0.55% in round 4 (the last full round), 0.28% in round 6 (93 cases);
+  - after round 4, each round re-read every case with an error or a content change; rounds 11 and 12 found 0 errors;
+  - blind leakage: 8 leaks, then 4, 1, 1 and 0. No presentation leak in any round.
+
+**Evaluation on the final set** (`eval_20261109`; Qwen3.5-9B, seeds 1-3, draft policies, engineering only; GRPO adapters from the 2 Nov sweep; paired against the tool-using base model, 95% bootstrap CI):
+
+| Arm | Scalar | Diagnosis | Required coverage | Tools per case | Completed |
+|---|---|---|---|---|---|
+| no tools (narrative) | 0.132 | 0.510 (−0.100 [−0.187, −0.013]) | 0 | 0 | 100% |
+| tools, base model | 0.358 | 0.610 | 0.378 | 6.2 | 95% |
+| GRPO, default config | +0.105 [+0.065, +0.141] | +0.080 [+0.020, +0.140] | +0.151 | 7.3 | 95% |
+| GRPO, best validation arm | +0.025 [−0.013, +0.057] | +0.030 [−0.033, +0.090] | +0.062 [+0.015, +0.107] | 5.8 | 95% |
+
+- The default GRPO configuration beats the base model on all three sets: 53 cases (7 Nov), the task-06 set and the final set.
+- The best-validation arm still covers more of the required work-up. Its diagnosis and scalar gains (significant on the task-06 set) are not significant on the final set.
+- Per condition (scalar, tools → GRPO default):
+  - ISCH 0.28 → 0.47 (n=38);
+  - MS 0.38 → 0.51 (n=22, a condition held out of GRPO training);
+  - SE 0.29 → 0.42 (n=9);
+  - SAH 0.34 → 0.40 (n=12);
+  - HEP 0.52 → 0.54 (n=10).
+- FND (n=2) gets worse: 0.89 → 0.23. The gain is broad, but ISCH carries the most weight.
+- On this set the narrative arm now loses diagnoses as well (−0.10), unlike on NeuroBench.
+- On NeuroBench validation no sweep arm beat the base.
+- Not yet reportable: the policies, labels and drafts are draft until two physicians approve them.
+
 ## Reproduce
 
 ```bash
@@ -605,3 +1148,16 @@ uv run --no-project --with pandas python -I agent-platform/scripts/external_data
 
 Run from the repository root. On the full database, `mimic_cohort.py` also takes `--note` and
 `--ecg`, and `mimic_to_neurobench.py` takes `--notes` and `--full`.
+
+Part 3 ran on lxplus against `/eos/user/a/aprotani/physionet` (`P` below), with
+`UV_CACHE_DIR=/tmp/<user>-uv` and `uv run -q --no-project --python 3.12 --with duckdb --with pandas python -I`:
+
+```bash
+mimic_profile.py $P/mimic-iv-ext-cdm/1.1 $P/mimic-iv-ed/2.2 $P/mimic-iv-note/2.2 $P/mimiciv/3.1/hosp
+mimic_cohort.py --hosp $P/mimiciv/3.1/hosp --ed $P/mimic-iv-ed/2.2/ed --note $P/mimic-iv-note/2.2/note
+mimic_note_sections.py --hosp $P/mimiciv/3.1/hosp --note $P/mimic-iv-note/2.2/note
+# Parts 4 and 5
+sdbench_overlap.py --sdbench $P/mimic-iv-ext-sdbench/1.0.0/dataset.json --hosp $P/mimiciv/3.1/hosp --note $P/mimic-iv-note/2.2/note
+mimic_order_catalogue.py --hosp $P/mimiciv/3.1/hosp --note $P/mimic-iv-note/2.2/note --out orders_neuro.csv
+mimic_tool_map.py orders_neuro.csv   # reads only the counts CSV (test names and admission counts)
+```
