@@ -34,6 +34,14 @@ presentation alone. Use only information in the case. Call submit_assessment onc
 structured assessment, and let the confidence reflect what the presentation alone supports. This
 system is for research and clinician support, not autonomous care."""
 
+FREE_ORDER_SYSTEM_PROMPT = """You are a clinical decision-support agent operating in a simulated hospital.
+At every turn choose exactly one structured action: request one test, investigation or examination
+with request_test, naming it as you would on an order form, or submit the final assessment. Any
+test can be requested and its result comes back as the hospital reports it. Use only information
+in the case and returned observations. Prefer the smallest safe, diagnostically useful work-up. Do
+not order tests that cannot change management. Submit as soon as the evidence is sufficient. This
+system is for research and clinician support, not autonomous care."""
+
 REACT_ADDENDUM = """This is the isolated ReAct ablation. Before the structured action, provide a
 brief rationale in the assistant content, then make exactly one function call in the same response
 (a tool, or submit_assessment). Never answer in prose alone. Do not reveal hidden chain-of-thought;
@@ -54,8 +62,12 @@ def format_patient_info(case: NeuroBenchCase) -> str:
     if history.past_medical_history:
         parts.append(f"Past medical history: {'; '.join(history.past_medical_history)}")
     if history.medications:
+        # Empty fields are left out rather than rendered as "()" or double spaces: MIMIC
+        # record cases often have no indication. Every NeuroBench medication fills all
+        # four fields, so NeuroBench prompts and SFT transcripts are unchanged.
         medications = [
-            f"{item.drug} {item.dose} {item.frequency} ({item.indication})"
+            " ".join(part for part in (item.drug, item.dose, item.frequency) if part)
+            + (f" ({item.indication})" if item.indication else "")
             for item in history.medications
         ]
         parts.append(f"Current medications: {'; '.join(medications)}")
@@ -161,6 +173,7 @@ def transcript(
     *,
     react: bool = False,
     narrative: bool = False,
+    free_order: bool = False,
     correction: str | None = None,
 ) -> list[dict[str, Any]]:
     """Chat messages for the next model request, or the full SFT example.
@@ -171,9 +184,14 @@ def transcript(
     available at the start of the encounter. Rejected outputs are not replayed; the retry
     carries a one-off ``correction`` instead. The ReAct rationale is replayed only in the
     ablation, never in SFT examples. The narrative baseline has no tool catalogue, so its system
-    prompt does not mention ordering.
+    prompt does not mention ordering. The free-order ablation has one free-text ``request_test``
+    tool and its own system prompt.
     """
-    system = NARRATIVE_SYSTEM_PROMPT if narrative else POLICY_SYSTEM_PROMPT
+    system = (
+        NARRATIVE_SYSTEM_PROMPT if narrative
+        else FREE_ORDER_SYSTEM_PROMPT if free_order
+        else POLICY_SYSTEM_PROMPT
+    )
     system += ("\n\n" + REACT_ADDENDUM) if react else ""
     messages: list[dict[str, Any]] = [
         {"role": "system", "content": system},

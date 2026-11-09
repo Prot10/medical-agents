@@ -184,3 +184,17 @@ def test_the_unavailable_flag_reaches_the_episode():
     ))
     observation = next(event for event in episode.events if isinstance(event, ObservationReceived))
     assert observation.unavailable and not observation.success and observation.cost_usd > 0
+
+
+def test_empty_medication_fields_are_left_out_of_the_prompt():
+    """Record cases often lack an indication; the prompt must not show "()" or double spaces."""
+    from neuroagent_schemas.patient import Medication
+
+    case = NeuroBenchCase.model_validate(json.loads(FIXTURE.read_text()))
+    full = Medication(drug="aspirin", dose="81 mg", frequency="daily", indication="stroke prevention")
+    bare = Medication(drug="metformin", dose="", frequency="BID", indication="")
+    case.patient.clinical_history.medications = [full, bare]
+    line = next(
+        row for row in format_patient_info(case).splitlines() if row.startswith("Current medications")
+    )
+    assert line == "Current medications: aspirin 81 mg daily (stroke prevention); metformin BID"

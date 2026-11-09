@@ -67,6 +67,11 @@ class ClinicalPolicyReward:
                 f"case {case.case_id} policy is {policy.review_status.value}; only approved policies are scoreable"
             )
 
+        # A free-order episode is scored on its translated catalogue actions (idempotent; other
+        # episodes pass through unchanged). Imported here: the harness package imports this module.
+        from ..harness.free_order import typed_episode
+
+        episode = typed_episode(episode)
         actions = episode.tool_actions
         assessment = episode.assessment
         diagnosis = float(bool(assessment and policy.diagnosis.matches(assessment.primary_diagnosis)))

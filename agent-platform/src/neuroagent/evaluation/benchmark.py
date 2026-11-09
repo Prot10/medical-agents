@@ -28,9 +28,11 @@ from neuroagent_schemas import (
     RunFailed,
 )
 
-from ..datasets import DATASETS, DEFAULT_DATASET_VERSION, load_dataset
+from ..datasets import DATASETS, DEFAULT_DATASET_VERSION, load_dataset, split_case_ids
+from ..harness.free_order import translation_counts, typed_episode
 from ..harness.profile import HarnessProfile, load_profiles
 from ..harness.runtime import boot_profile, context_from_profile
+from .manifest import run_manifest
 from .policy_reward import ClinicalPolicyReward
 
 PROFILES_DIR = Path(__file__).resolve().parents[3] / "config" / "profiles"
@@ -45,8 +47,7 @@ def select_cases(
             raise SystemExit(f"unknown cases: {missing}")
         return [cases[case_id] for case_id in case_ids]
     if split:
-        ids = (dataset_path / "splits" / f"{split}_cases.txt").read_text().split()
-        return [cases[case_id] for case_id in ids]
+        return [cases[case_id] for case_id in split_case_ids(dataset_path, split)]
     return list(cases.values())
 
 
@@ -60,6 +61,9 @@ def run_episode(
 
 
 def episode_row(case: NeuroBenchCase, episode: ClinicalEpisode, scorer: ClinicalPolicyReward) -> dict:
+    # A free-order episode stores what the agent wrote; the reward scores the translated actions.
+    orders = translation_counts(episode)
+    episode = typed_episode(episode)
     terminal = episode.events[-1]
     proposals = [event for event in episode.events if isinstance(event, ActionProposed)]
     row = {
@@ -78,7 +82,14 @@ def episode_row(case: NeuroBenchCase, episode: ClinicalEpisode, scorer: Clinical
         "model_latency_seconds": sum(event.latency_seconds for event in proposals),
         "reward": scorer.score(episode, case).model_dump(mode="json"),
     }
+    if orders:
+        row["free_orders"] = orders
     return row
+
+
+def _environment_failure(episode: ClinicalEpisode) -> bool:
+    terminal = episode.events[-1] if episode.events else None
+    return isinstance(terminal, RunFailed) and terminal.reason == "environment_error"
 
 
 def summarize(rows: list[dict]) -> dict:
@@ -101,6 +112,11 @@ def summarize(rows: list[dict]) -> dict:
         "mean_cost_usd": mean([row["total_cost_usd"] for row in rows]),
         "mean_tokens": mean([row["total_tokens"] for row in rows]),
         "mean_model_latency_seconds": mean([row["model_latency_seconds"] for row in rows]),
+        **(
+            {"free_orders": dict(sum((Counter(row["free_orders"]) for row in rows if "free_orders" in row), Counter()))}
+            if any("free_orders" in row for row in rows)
+            else {}
+        ),
         "by_condition": {
             condition: {
                 "episodes": len(group),
@@ -131,6 +147,13 @@ def main(argv: list[str] | None = None) -> None:
     )
     parser.add_argument("--allow-draft-policies", action="store_true")
     parser.add_argument("--resume", action="store_true", help="skip cases whose episode file exists")
+    parser.add_argument(
+        "--dataset-dir",
+        type=Path,
+        default=None,
+        help="dataset root holding cases/ (and splits/ for --split) instead of NeuroBench, "
+        "e.g. converted external cases that must stay in their own storage",
+    )
     args = parser.parse_args(argv)
 
     profiles = load_profiles(PROFILES_DIR)
@@ -147,8 +170,15 @@ def main(argv: list[str] | None = None) -> None:
             plugin.config.update(overrides)
 
     dataset = DATASETS[DEFAULT_DATASET_VERSION]
-    _, cases = load_dataset(dataset.path)
-    selected = select_cases(cases, case_ids=args.cases, split=args.split, dataset_path=dataset.path)
+    dataset_path, dataset_label = dataset.path, dataset.version
+    if args.dataset_dir is not None:
+        if not (args.dataset_dir / "cases").is_dir():
+            raise SystemExit(f"--dataset-dir needs a cases/ folder: {args.dataset_dir}")
+        dataset_path, dataset_label = args.dataset_dir, f"external:{args.dataset_dir}"
+    _, cases = load_dataset(dataset_path)
+    if not cases:
+        raise SystemExit(f"no cases loaded from {dataset_path / 'cases'}")
+    selected = select_cases(cases, case_ids=args.cases, split=args.split, dataset_path=dataset_path)
 
     services = boot_profile(profile)
     scorer = (
@@ -158,12 +188,18 @@ def main(argv: list[str] | None = None) -> None:
     )
     episodes_dir = args.output / "episodes"
     episodes_dir.mkdir(parents=True, exist_ok=True)
+    manifest = run_manifest(selected, scorer)
+    gatekeeper = getattr(services.require("loop"), "gatekeeper", None)
+    if gatekeeper is not None:
+        manifest["free_order"] = gatekeeper.config()
+    (args.output / "manifest.json").write_text(json.dumps(manifest, indent=2))
 
     def one(case: NeuroBenchCase) -> dict:
         path = episodes_dir / f"{case.case_id}.json"
-        if args.resume and path.exists():
-            episode = ClinicalEpisode.model_validate_json(path.read_text())
-        else:
+        episode = ClinicalEpisode.model_validate_json(path.read_text()) if args.resume and path.exists() else None
+        # A resumed run retries episodes that failed on the environment (a gateway outage),
+        # never those the model failed.
+        if episode is None or _environment_failure(episode):
             episode = run_episode(profile, services, case, path)
         row = episode_row(case, episode, scorer)
         print(
@@ -184,7 +220,7 @@ def main(argv: list[str] | None = None) -> None:
     summary = {
         "profile": profile.model_dump(mode="json"),
         "model_id": services.require("model").model_id,
-        "dataset": dataset.version,
+        "dataset": dataset_label,
         "policy_review": "draft (not reportable)" if args.allow_draft_policies else "approved",
         "seed": args.seed,
         "wall_seconds": round(wall, 1),

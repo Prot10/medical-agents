@@ -16,6 +16,7 @@ from neuroagent_schemas import (
 )
 
 from .adapters import ActionDecodeError
+from .free_order import FreeOrderEnvironment, FreeOrderGatekeeper, translation_event
 from .interfaces import ModelTurn, RunContext
 
 
@@ -30,6 +31,7 @@ class ClinicalPolicyLoop:
     loop_id = "clinical-policy"
     react = False
     narrative = False
+    free_order = False
 
     def run(self, context: RunContext):
         self._start(context)
@@ -66,6 +68,7 @@ class ClinicalPolicyLoop:
                     unavailable=result.unavailable,
                 )
             )
+            self._after_observation(context, turn)
             total_cost = context.episode_store.load().total_cost_usd
             if context.max_cost_usd is not None and total_cost > context.max_cost_usd:
                 return self._fail(
@@ -86,6 +89,7 @@ class ClinicalPolicyLoop:
                     require_assessment=require_assessment,
                     react=self.react,
                     narrative=self.narrative,
+                    free_order=self.free_order,
                     correction=correction,
                 )
             except ActionDecodeError as exc:
@@ -108,6 +112,9 @@ class ClinicalPolicyLoop:
     @staticmethod
     def _catalogue(context: RunContext) -> list[dict]:
         return context.environment.tool_definitions()
+
+    def _after_observation(self, context: RunContext, turn: int) -> None:
+        """Hook for loops that record more than the observation (the free-order translation)."""
 
     @staticmethod
     def _fail(context: RunContext, turn: int, reason: str, message: str):
@@ -200,3 +207,26 @@ class NarrativeOnlyLoop(ClinicalPolicyLoop):
         context.episode_store.append(AssessmentSubmitted(turn=1, assessment=model_turn.action))
         context.episode_store.append(RunCompleted(turn=1))
         return context.episode_store.load()
+
+
+class FreeOrderLoop(ClinicalPolicyLoop):
+    """Free-text ordering ablation over the canonical loop: one ``request_test`` tool, no menu.
+
+    The loop wraps the case's typed environment so each order is translated onto the catalogue
+    and served as in a policy run; the translation is recorded as a namespaced plugin event, and
+    the reward scores the translated actions (``free_order.typed_episode``).
+    """
+
+    loop_id = "free-order"
+    free_order = True
+
+    def __init__(self, gatekeeper: FreeOrderGatekeeper) -> None:
+        self.gatekeeper = gatekeeper
+
+    def run(self, context: RunContext):
+        if not isinstance(context.environment, FreeOrderEnvironment):
+            context.environment = FreeOrderEnvironment(context.environment, self.gatekeeper)
+        return super().run(context)
+
+    def _after_observation(self, context: RunContext, turn: int) -> None:
+        context.episode_store.append(translation_event(turn, context.environment.translations[-1]))

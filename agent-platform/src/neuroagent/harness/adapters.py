@@ -86,6 +86,7 @@ class NativeToolModelAdapter:
         require_assessment: bool = False,
         react: bool = False,
         narrative: bool = False,
+        free_order: bool = False,
         correction: str | None = None,
     ) -> ModelTurn:
         # The catalogue is identical on every turn so the rendered transcript chains as prefixes
@@ -99,7 +100,9 @@ class NativeToolModelAdapter:
         # retried with a correction like any other decode failure.
         try:
             response = self.client.chat(
-                transcript(case, episode, react=react, narrative=narrative, correction=correction),
+                transcript(
+                    case, episode, react=react, narrative=narrative, free_order=free_order, correction=correction
+                ),
                 tools=tools,
                 tool_choice="auto",
             )

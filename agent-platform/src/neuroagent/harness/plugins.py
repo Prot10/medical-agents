@@ -8,6 +8,7 @@ alias as the model identifier, which is the evidence that the adapter, not the b
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any, Mapping
 
 from ..evaluation.policy_reward import ClinicalPolicyReward
@@ -15,7 +16,17 @@ from ..llm.client import LLMClient
 from ..model_registry import AVAILABLE_MODELS
 from .adapters import NativeToolModelAdapter
 from .interfaces import Plugin
-from .loops import ClinicalPolicyLoop, DirectAnswerLoop, NarrativeOnlyLoop, ReactAblationLoop
+from .free_order import FreeOrderGatekeeper, GatekeeperLLM
+from .loops import (
+    ClinicalPolicyLoop,
+    DirectAnswerLoop,
+    FreeOrderLoop,
+    NarrativeOnlyLoop,
+    ReactAblationLoop,
+)
+
+# Translations and off-catalogue reports are shared by every free-order run (gitignored).
+FREE_ORDER_CACHE = Path(__file__).resolve().parents[4] / "outputs" / "free_order" / "cache"
 
 
 def _model_plugin(entry: Mapping[str, Any]) -> Plugin:
@@ -51,12 +62,28 @@ def _simple(plugin_id: str, provides: str, build) -> Plugin:
     )
 
 
+def _free_order_loop(config: Mapping[str, Any]) -> FreeOrderLoop:
+    llm = GatekeeperLLM(
+        model=str(config.get("gatekeeper_model", "GLM-5.3-FP8-VERTEX")),
+        base_url=str(config.get("base_url", "https://aigw.cern.ch/v1")),
+        key_file=str(config.get("key_file", "~/.config/cern-ml/aigw.key")),
+        max_tokens=int(config.get("max_tokens", 100_000)),
+    )
+    gatekeeper = FreeOrderGatekeeper(
+        llm,
+        cache_dir=Path(str(config.get("cache_dir", FREE_ORDER_CACHE))).expanduser(),
+        off_catalogue_cost_usd=float(config.get("off_catalogue_cost_usd", 150.0)),
+    )
+    return FreeOrderLoop(gatekeeper)
+
+
 def builtin_plugins() -> dict[str, Plugin]:
     plugins = [_model_plugin(entry) for entry in AVAILABLE_MODELS] + [
         _simple("loop.policy", "loop", lambda _: ClinicalPolicyLoop()),
         _simple("loop.direct", "loop", lambda _: DirectAnswerLoop()),
         _simple("loop.react", "loop", lambda _: ReactAblationLoop()),
         _simple("loop.narrative", "loop", lambda _: NarrativeOnlyLoop()),
+        _simple("loop.free_order", "loop", _free_order_loop),
         _simple(
             "reward.policy",
             "reward",
