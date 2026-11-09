@@ -37,7 +37,9 @@ from typing import Any
 
 from neuroagent_schemas import ClinicalEpisode, NeuroBenchCase, RunCompleted, RunStarted
 
-from ..datasets import DATASETS, DEFAULT_DATASET_VERSION, load_dataset
+from ..datasets import DATASETS, DEFAULT_DATASET_VERSION, load_dataset, refuse_test_cases, split_case_ids
+from ..evaluation.manifest import run_manifest
+from ..evaluation.outcome_reward import OutcomeReward
 from ..evaluation.policy_reward import ClinicalPolicyReward
 from ..harness.adapters import SUBMIT_TOOL, NativeToolModelAdapter
 from .storage import WEIGHTS_ROOT, require_eos
@@ -58,7 +60,7 @@ from .prefix_packing import (
     split_by_budget,
 )
 
-# Tool-call syntax is sampled freely, as in serving (serve_model.sh pins the same value).
+# Tool-call syntax is sampled freely, as in serving (serve_model.sh and vllm_serve.py pin the same value).
 os.environ.setdefault("VLLM_ENFORCE_STRICT_TOOL_CALLING", "0")
 # fla auto-selects its TileLang backend when tilelang is importable (it is, as a vLLM dependency);
 # those kernels JIT-compile with nvcc, which the training host lacks. The Triton kernels are used.
@@ -413,7 +415,7 @@ def assemble_sequence(tokenizer, records: list[TurnRecord], template_kwargs: dic
 # --------------------------------------------------------------------------------------------------
 
 
-def make_reward_funcs(cases: dict[str, NeuroBenchCase], scorer: ClinicalPolicyReward):
+def make_reward_funcs(cases: dict[str, NeuroBenchCase], scorer: ClinicalPolicyReward | OutcomeReward):
     def breakdown(episode_json: str):
         episode = ClinicalEpisode.model_validate_json(episode_json)
         started = next(event for event in episode.events if isinstance(event, RunStarted))
@@ -422,7 +424,7 @@ def make_reward_funcs(cases: dict[str, NeuroBenchCase], scorer: ClinicalPolicyRe
     def scalar(completions, episode, **kwargs):
         return [breakdown(item).scalar for item in episode]
 
-    scalar.__name__ = "policy_scalar"
+    scalar.__name__ = "outcome_scalar" if isinstance(scorer, OutcomeReward) else "policy_scalar"
     funcs = [scalar]
     for component in REWARD_COMPONENTS:
         def func(completions, episode, _component=component, **kwargs):
@@ -451,7 +453,7 @@ def build_trainer(
     train_cases: list[NeuroBenchCase],
     output_dir: str,
     weights_dir: str,
-    scorer: ClinicalPolicyReward,
+    scorer: ClinicalPolicyReward | OutcomeReward,
     max_steps: int,
     num_generations: int,
     cases_per_step: int,
@@ -820,6 +822,7 @@ def build_trainer(
                     "turns": sequence.turns,
                     "attempts": len(records),
                     "truncated_turns": sum(record.finish_reason == "length" for record in records),
+                    "scorer": scorer.scorer_id,
                     "reward": scorer.score(episode, cases[episode.events[0].case_id]).model_dump(mode="json"),
                     "tools": [action.tool_name for action in episode.tool_actions],
                     "raw_turns": [
@@ -954,7 +957,7 @@ def main() -> None:
     parser.add_argument("--output", required=True, help="local directory for logs, rollouts and diagnostics")
     parser.add_argument("--weights-dir", required=True, help=f"EOS directory for checkpoints and adapters, e.g. {WEIGHTS_ROOT}/<run>/<model>")
     selection = parser.add_mutually_exclusive_group(required=True)
-    selection.add_argument("--split", choices=["train", "test"])
+    selection.add_argument("--split", choices=["train"], help="the test split never trains (refused for --cases too)")
     selection.add_argument("--cases", nargs="+")
     selection.add_argument("--cases-file", type=Path, help="whitespace-separated case ids, e.g. a condition-held-out training set")
     parser.add_argument("--max-steps", type=int, default=50)
@@ -975,27 +978,42 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--resume", action="store_true", help="continue from the latest checkpoint-* in --weights-dir, if any")
     parser.add_argument("--allow-draft-policies", action="store_true")
+    parser.add_argument("--reward", choices=["policy", "outcome"], default="policy",
+                        help="the optimized signal; E1 trains one arm with each, everything else equal")
+    parser.add_argument("--outcome-budget-usd", type=float, help="B of the outcome reward, frozen before training")
+    parser.add_argument("--outcome-cost-weight", type=float, default=0.15, help="w of the outcome reward; 0 = diagnosis only")
     args = parser.parse_args()
     weights = require_eos(args.weights_dir)
+    if args.reward == "outcome":
+        if args.outcome_budget_usd is None:
+            parser.error("--reward outcome needs --outcome-budget-usd (B, frozen before training)")
+        scorer = OutcomeReward(
+            budget_usd=args.outcome_budget_usd,
+            cost_weight=args.outcome_cost_weight,
+            require_approved=not args.allow_draft_policies,
+        )
+    else:
+        scorer = ClinicalPolicyReward(require_approved=not args.allow_draft_policies)
 
     dataset = DATASETS[DEFAULT_DATASET_VERSION]
     _, cases = load_dataset(dataset.path)
     if args.cases or args.cases_file:
         ids = args.cases or args.cases_file.read_text().split()
-        train_cases = [cases[case_id] for case_id in ids]
     else:
-        ids = (dataset.path / "splits" / f"{args.split}_cases.txt").read_text().split()
-        train_cases = [cases[case_id] for case_id in ids]
+        ids = split_case_ids(dataset.path, args.split)
+    refuse_test_cases(ids, dataset.path)
+    train_cases = [cases[case_id] for case_id in ids]
     Path(args.output).mkdir(parents=True, exist_ok=True)
     weights.mkdir(parents=True, exist_ok=True)
     Path(args.output, "run_config.json").write_text(json.dumps(vars(args), indent=2, default=str))
+    Path(args.output, "manifest.json").write_text(json.dumps(run_manifest(train_cases, scorer), indent=2))
     trainer, _ = build_trainer(
         model_key=args.model,
         cases=cases,
         train_cases=train_cases,
         output_dir=args.output,
         weights_dir=str(weights),
-        scorer=ClinicalPolicyReward(require_approved=not args.allow_draft_policies),
+        scorer=scorer,
         max_steps=args.max_steps,
         num_generations=args.num_generations,
         cases_per_step=args.cases_per_step,

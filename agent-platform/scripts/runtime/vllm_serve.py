@@ -3,9 +3,16 @@
 On systems with NVIDIA driver/library version mismatch (e.g., CERN lxplus),
 pynvml.nvmlInit() fails even though CUDA works fine via PyTorch.
 This script patches vLLM's platform detection to force CUDA mode.
+
+It also samples tool-call syntax freely, as the GRPO rollouts do, whoever launches it: on 4 Nov 2026
+two validation scripts started this wrapper directly, without serve_model.sh, and got vLLM's strict
+(grammar-constrained) default.
 """
 
+import os
 import sys
+
+os.environ.setdefault("VLLM_ENFORCE_STRICT_TOOL_CALLING", "0")
 
 
 def _patch_platform_detection():

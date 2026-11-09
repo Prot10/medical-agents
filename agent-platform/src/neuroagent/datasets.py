@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import logging
 from dataclasses import dataclass
+from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
 
@@ -34,6 +35,29 @@ DATASETS: dict[str, DatasetInfo] = {
         description="Tool-augmented neurology benchmark across 20 conditions.",
     ),
 }
+
+
+def split_case_ids(dataset_path: Path, split: str) -> list[str]:
+    """The case ids of one split file, ``splits/{split}_cases.txt``, in file order."""
+    return (dataset_path / "splits" / f"{split}_cases.txt").read_text().split()
+
+
+def refuse_test_cases(case_ids: Iterable[str], dataset_path: Path | None = None) -> None:
+    """Raise if a training or checkpoint-selection set holds a case of the test split.
+
+    Every path that turns cases into weights (GRPO rollouts, SFT episodes, the episode export
+    that feeds SFT) or picks among them (`scripts/training/eval_checkpoints.sh`) calls this, so a
+    test case cannot get there through a hand-written case list or a run directory evaluated on
+    the test split.
+
+    Raises:
+        ValueError: Some of ``case_ids`` belong to the test split.
+    """
+    test = set(split_case_ids(dataset_path or DATASETS[DEFAULT_DATASET_VERSION].path, "test"))
+    leaked = sorted(test.intersection(case_ids))
+    if leaked:
+        shown = ", ".join(leaked[:10]) + (" ..." if len(leaked) > 10 else "")
+        raise ValueError(f"{len(leaked)} test-split case(s) where only training or validation cases belong: {shown}")
 
 
 def load_dataset(

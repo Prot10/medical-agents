@@ -15,11 +15,13 @@ from pathlib import Path
 
 from neuroagent_schemas import ClinicalEpisode, RunCompleted, RunStarted
 
+from ...datasets import refuse_test_cases
 from .episodes import EpisodeRecord
 
 
 def export(run_dirs: list[Path], output: Path) -> int:
-    lines = []
+    """Write every completed episode of ``run_dirs`` as one record; a test-split case is refused."""
+    records = []
     for run_dir in run_dirs:
         for path in sorted((run_dir / "episodes").glob("*.json")):
             episode = ClinicalEpisode.model_validate_json(path.read_text())
@@ -33,10 +35,11 @@ def export(run_dirs: list[Path], output: Path) -> int:
                 provenance={"profile_id": started.profile_id, "model_id": started.model_id, "run_dir": str(run_dir)},
                 episode=episode,
             )
-            lines.append(record.model_dump_json())
+            records.append(record)
+    refuse_test_cases(record.case_id for record in records)
     output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text("".join(line + "\n" for line in lines))
-    return len(lines)
+    output.write_text("".join(record.model_dump_json() + "\n" for record in records))
+    return len(records)
 
 
 def main() -> None:

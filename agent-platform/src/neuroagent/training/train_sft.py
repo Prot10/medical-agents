@@ -23,6 +23,7 @@ import json
 import os
 from pathlib import Path
 
+from ..datasets import refuse_test_cases
 from ..model_registry import KEY_TO_MODEL
 
 # fla's TileLang backend needs nvcc (absent on the training host); use the Triton kernels.
@@ -55,6 +56,7 @@ def episode_segments(tokenizer, rows: list[dict], template_kwargs: dict) -> list
 def build_examples(model_key: str, episodes_path: str, cases_path: str, tokenizer, *, allow_candidates: bool) -> list[dict]:
     entry = KEY_TO_MODEL[model_key]
     records = load_episode_records(episodes_path, allow_candidates=allow_candidates)
+    refuse_test_cases(record.case_id for record in records)
     cases = load_case_map(cases_path)
     missing = sorted({record.case_id for record in records} - cases.keys())
     if missing:
