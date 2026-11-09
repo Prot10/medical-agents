@@ -13,8 +13,14 @@ entry lists are case-specific and are kept, except those named under the table's
 (labels the table once granted and no longer does). An entry's `rejected: [...]` labels are added to
 `ground_truth.diagnosis.rejected` (answers naming them score no diagnosis credit) and are pruned the
 same way. `except_cases: [...]` excludes named cases from
-an otherwise applicable entry. `--cases` / `--conditions` limit the run (check, apply or prune) to
+an otherwise applicable entry, and `except_codes: [...]` cases whose primary code is one of those
+(a category entry that must not reach a sibling code, e.g. aneurysmal labels and I60.8). `--cases` / `--conditions` limit the run (check, apply or prune) to
 those cases, so a change can be applied to one condition while other conditions are being edited.
+
+`--cases-dir` runs on another case folder (converted external cases kept in their own storage), and
+`--overlay FILE` adds entries kept with those cases: a key the table already has merges its
+`cases` / `except_cases` / `except_codes` lists into the table's entry, a new key is a new entry.
+The overlay never changes what NeuroBench cases receive unless it names them.
 """
 
 from __future__ import annotations
@@ -48,8 +54,29 @@ def entries_for(code: str, condition: str, table: dict, case_id: str = "") -> li
             continue
         if case_id in entry.get("except_cases", []):
             continue
+        if code in entry.get("except_codes", []):
+            continue
         chosen.append(entry)
     return chosen
+
+
+_LIST_FIELDS = ("cases", "except_cases", "except_codes")
+
+
+def merge_overlay(table: dict, overlay: dict) -> dict:
+    """The table with an overlay's entries: list fields of a shared key are extended, new keys added."""
+    merged = {key: dict(entry) if isinstance(entry, dict) else entry for key, entry in table.items()}
+    for key, entry in overlay.items():
+        if key in merged and isinstance(merged[key], dict):
+            unknown = set(entry) - set(_LIST_FIELDS)
+            if unknown:
+                raise SystemExit(f"overlay key {key} exists in the table: only {_LIST_FIELDS} may be extended, not {sorted(unknown)}")
+            for field in _LIST_FIELDS:
+                if entry.get(field):
+                    merged[key][field] = list(merged[key].get(field, [])) + [x for x in entry[field] if x not in merged[key].get(field, [])]
+        else:
+            merged[key] = entry
+    return merged
 
 
 def main() -> None:
@@ -58,14 +85,21 @@ def main() -> None:
     parser.add_argument("--prune", action="store_true", help="also remove synonyms no entry grants any more")
     parser.add_argument("--cases", nargs="+", default=[], help="limit the run to these case ids")
     parser.add_argument("--conditions", nargs="+", default=[], help="limit the run to these conditions")
+    parser.add_argument("--cases-dir", type=Path, default=CASES,
+                        help="case folder (default NeuroBench), e.g. converted external cases kept in their own storage")
+    parser.add_argument("--overlay", type=Path, default=None,
+                        help="extra entries kept with an external case folder (merged into the table)")
     args = parser.parse_args()
+    cases_dir = args.cases_dir
     table = yaml.safe_load(SYNONYMS.read_text())
+    if args.overlay is not None:
+        table = merge_overlay(table, yaml.safe_load(args.overlay.read_text()) or {})
     granted = {label for entry in table.values() for label in entry.get("labels", [])}
     granted |= set(table.get("RETIRED", {}).get("retired_labels", []))
     granted_rejected = {label for entry in table.values() for label in entry.get("rejected", [])}
     changed = []
     reformatted = 0
-    for path in sorted(CASES.glob("*.json")):
+    for path in sorted(cases_dir.glob("*.json")):
         raw = path.read_text()
         data = json.loads(raw)
         if args.cases and data["case_id"] not in args.cases:
@@ -94,7 +128,7 @@ def main() -> None:
             if not args.check:
                 path.write_text(_dump(data))
     verb = "would change" if args.check else "updated"
-    print(f"{verb} {len(changed)} of {len(list(CASES.glob('*.json')))} cases ({reformatted} were not in canonical form)")
+    print(f"{verb} {len(changed)} of {len(list(cases_dir.glob('*.json')))} cases ({reformatted} were not in canonical form)")
     if args.check and changed:
         print("\n".join(f"  {path.stem}" for path in changed))
         sys.exit(1)

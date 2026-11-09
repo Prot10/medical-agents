@@ -1,0 +1,34 @@
+# HTCondor submit file (lxplus) for physionet_download.sh: the download runs on a batch node and
+# no longer depends on the laptop's SSH login, which lxplus kills with all its processes (tmux
+# included) when it closes. One job per folder, so they download in parallel (PhysioNet
+# throttles each connection to ~250 KB/s); each job resumes what is on EOS and checks its
+# checksums, and is re-run up to 5 times if wget or a checksum fails.
+#
+# Before submitting, create the private .netrc once on lxplus (the password is typed, never
+# echoed or put on a command line):
+#   umask 077; mkdir -p /eos/user/a/aprotani/.physionet-auth
+#   read -rsp "PhysioNet password: " pw; echo
+#   printf 'machine physionet.org login aprotani password %s\n' "$pw" \
+#     > /eos/user/a/aprotani/.physionet-auth/.netrc; unset pw
+# Then, from the folder holding this file and the script:
+#   mkdir -p logs && condor_submit physionet_download.sub
+# Follow with `condor_q` and the file sizes on EOS: CERN batch dropped stream_output/stream_error
+# (Nov 2025), so logs/<cluster>.<proc>.{out,err} arrive only when a job ends.
+
+executable    = physionet_download.sh
+arguments     = aprotani /eos/user/a/aprotani/physionet $(path)
+environment   = "PHYSIONET_NETRC_DIR=/eos/user/a/aprotani/.physionet-auth"
+output        = logs/$(ClusterId).$(ProcId).out
+error         = logs/$(ClusterId).$(ProcId).err
+log           = logs/$(ClusterId).log
+request_cpus  = 1
++JobFlavour   = "nextweek"
+max_retries   = 5
+
+queue path in (
+  mimiciv/3.1/hosp
+  mimiciv/3.1/icu
+  mimic-iv-note/2.2
+  mimic-iv-ed/2.2
+  mimic-iv-ext-cdm/1.1
+)

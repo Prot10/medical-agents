@@ -79,6 +79,24 @@ def test_routine_order_in_status_is_not_answered_with_the_icu_recording():
     assert not ceeg.from_fallback and ceeg.output["eeg_type"] == "continuous_icu"
 
 
+@pytest.mark.parametrize("arguments", [{}, {"eeg_type": "routine"}, {"eeg_type": "sleep_deprived"}])
+def test_any_eeg_order_receives_the_recorded_eeg_in_a_recorded_case(arguments):
+    # 7 Nov 2026: a recorded case holds the EEGs the patient had (MockServer._RECORD_ANY_VARIANT).
+    raw = _raw("SE-M01")
+    raw["provenance"] = "record"
+    raw.pop("fallback_tool_outputs", None)
+    result = _call(_env("SE-M01", raw), "analyze_eeg", **arguments)
+    assert not result.unavailable and not result.from_fallback
+    assert result.output["impression"] == raw["initial_tool_outputs"]["eeg"]["impression"]
+
+
+def test_a_stored_recording_of_the_exact_type_goes_first_in_a_recorded_case():
+    raw = _raw("SE-M01")  # index continuous_icu, follow-up ambulatory
+    raw["provenance"] = "record"
+    raw.pop("fallback_tool_outputs", None)
+    assert _call(_env("SE-M01", raw), "analyze_eeg", eeg_type="ambulatory").output["eeg_type"] == "ambulatory"
+
+
 def test_video_and_icu_eeg_are_one_study():
     # SE policies accept `continuous_icu` or `video` for one criterion; NMDAR-ENC stores its
     # monitoring as a follow-up behind a routine index recording.

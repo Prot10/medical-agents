@@ -304,6 +304,8 @@ class MockServer:
         spec = self._DISCRIMINATOR.get(tool_name)
         if spec is None or output is None:
             return True
+        if self.case.provenance == "record" and tool_name in self._RECORD_ANY_VARIANT:
+            return True
         call_key, vocabulary = spec
         wanted = self._wanted(tool_name, parameters)
         if wanted is None:
@@ -666,6 +668,16 @@ class MockServer:
         )
 
     _KNOWLEDGE_TOOLS = frozenset({"search_medical_literature", "check_drug_interactions"})
+
+    # Tools whose variant does not gate the answer in a recorded case (7 Nov 2026). A synthetic case
+    # writes one report per EEG type, so a routine order must not receive the ICU recording and
+    # what it would have missed. A recorded case holds the one EEG the patient had: in the MIMIC
+    # pilot, a routine order on a status epilepticus case whose first EEG was continuous answered
+    # "not available" (the EEG reached the agent in 3 of 60 SE episodes), which scored how the order
+    # was worded, not whether an EEG was asked for. Any EEG order now receives the recorded EEGs in
+    # order (the first one first, a stored recording of the exact type ahead of the others). Tool
+    # accuracy still scores the type against the policy, so the choice of study stays measured.
+    _RECORD_ANY_VARIANT = frozenset({"analyze_eeg"})
 
     @classmethod
     def _panel_names(cls, name: str, rows: list[LabValue], assay: Any) -> bool:

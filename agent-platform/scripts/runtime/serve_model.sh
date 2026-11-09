@@ -9,6 +9,7 @@
 #   MAX_NUM_SEQS             default 16 (the KV cache on an A100-40GB fits ~15 full-length requests;
 #                            output throughput on Qwen3.5-9B: 60 tok/s at 1, 365 at 8, 450 at 16)
 #   LORA_ADAPTER             PEFT adapter directory to expose next to the base model
+#   LORA_MODULES             more adapters, space-separated name=dir pairs, served side by side
 #   LORA_NAME                served name of that adapter (default: sft); a profile selects it with
 #                            `served_model: <name>` on its model plugin, and episodes record it as
 #                            the model identifier
@@ -42,14 +43,20 @@ COMMON_FLAGS=(
   --enable-prefix-caching
 )
 
-if [ -n "${LORA_ADAPTER:-}" ]; then
-  [ -f "$LORA_ADAPTER/adapter_config.json" ] || {
-    echo "LORA_ADAPTER is not a PEFT adapter directory: $LORA_ADAPTER" >&2
-    exit 1
-  }
+LORA_SPECS=()
+[ -n "${LORA_ADAPTER:-}" ] && LORA_SPECS+=("${LORA_NAME:-sft}=$LORA_ADAPTER")
+for spec in ${LORA_MODULES:-}; do LORA_SPECS+=("$spec"); done
+if [ "${#LORA_SPECS[@]}" -gt 0 ]; then
+  for spec in "${LORA_SPECS[@]}"; do
+    [ -f "${spec#*=}/adapter_config.json" ] || {
+      echo "not a PEFT adapter directory: ${spec#*=}" >&2
+      exit 1
+    }
+  done
   COMMON_FLAGS+=(
     --enable-lora
-    --lora-modules "${LORA_NAME:-sft}=$LORA_ADAPTER"
+    --max-loras "${#LORA_SPECS[@]}"
+    --lora-modules "${LORA_SPECS[@]}"
     --max-lora-rank "${MAX_LORA_RANK:-64}"
   )
 fi

@@ -11,8 +11,15 @@ import re
 
 # (condition, ICD-10 prefixes, ICD-9 prefixes). First match wins, so specific codes go first.
 NEURO_CONDITIONS: list[tuple[str, tuple[str, ...], tuple[str, ...]]] = [
-    ("SE", ("G41",), ("3453",)),
-    ("FEPI", ("G40", "R56"), ("345", "78039", "7803")),
+    # Status epilepticus: US ICD-10-CM has no G41; it codes "epilepsy ... with status
+    # epilepticus" as a six-character G40 code ending in 1 (G40.901, G40.011, G40.A01, ...),
+    # matched in neuro_condition(). ICD-9 345.2 / 345.3 are petit and grand mal status.
+    ("SE", ("G41",), ("3452", "3453")),
+    # FEPI is focal (temporal) epilepsy: localization-related codes only (5 Nov 2026; before,
+    # every G40 / 345 and the R56 / 780.3 convulsions were counted here).
+    ("FEPI", ("G400", "G401", "G402"), ("3454", "3455")),
+    ("other:epilepsy_generalized_or_unspecified", ("G40",), ("345",)),
+    ("other:seizure_not_epilepsy", ("R56",), ("7803",)),
     ("ISCH", ("I63",), ("43301", "43311", "43321", "43331", "43381", "43391", "43401", "43411", "43491", "436")),
     ("SAH", ("I60",), ("430",)),
     ("MS", ("G35",), ("340",)),
@@ -52,6 +59,8 @@ def neuro_condition(code: str, version: int) -> str | None:
     code = code.strip().replace(".", "")
     if code.startswith(NOT_NEURO[int(version)]):
         return None
+    if int(version) == 10 and code.startswith("G40") and len(code) == 6 and code.endswith("1"):
+        return "SE"
     for name, icd10, icd9 in NEURO_CONDITIONS:
         prefixes = icd10 if int(version) == 10 else icd9
         if code.startswith(prefixes):

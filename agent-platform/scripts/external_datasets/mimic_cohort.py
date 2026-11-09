@@ -63,13 +63,21 @@ def main() -> None:
         where {same}
     """)
     con.execute(f"create table edh as select distinct hadm_id from {csv(a.ed, 'edstays.csv.gz')} where hadm_id is not null")
-    con.execute(f"""
-        create table csf as select distinct l.hadm_id from {csv(a.hosp, 'labevents.csv.gz')} l
+    def optional(table: str, sql: str) -> None:
+        """A table still downloading (absent, or a truncated gzip) gives an empty column, not a crash."""
+        try:
+            con.execute(f"create table {table} as {sql}")
+        except duckdb.Error as e:
+            print(f"{table}: source not readable yet ({type(e).__name__}); its column counts 0", file=sys.stderr)
+            con.execute(f"create table {table} (hadm_id bigint)")
+
+    optional("csf", f"""
+        select distinct l.hadm_id from {csv(a.hosp, 'labevents.csv.gz')} l
         join {csv(a.hosp, 'd_labitems.csv.gz')} i using (itemid)
         where i.fluid = 'Cerebrospinal Fluid' and l.hadm_id is not null
     """)
-    con.execute(f"""
-        create table eeg as select distinct hadm_id from {csv(a.hosp, 'poe.csv.gz')}
+    optional("eeg", f"""
+        select distinct hadm_id from {csv(a.hosp, 'poe.csv.gz')}
         where order_type = 'Neurology' and order_subtype = 'EEG'
     """)
     extra = ""
