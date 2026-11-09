@@ -58,11 +58,18 @@ def load():
     split = {}
     for cid in manifest["train_case_ids"]:
         split[cid] = "train"
-    for cid in manifest["test_heldout_condition_case_ids"]:
+    # Both manifest formats: the Oct 2026 stratified split and the Nov 2026 condition split.
+    for cid in manifest.get("validation_case_ids", []):
+        split[cid] = "validation"
+    for cid in _heldout(manifest):
         split[cid] = "test_heldout"
-    for cid in manifest["test_stratified_case_ids"]:
+    for cid in manifest.get("test_stratified_case_ids", []):
         split[cid] = "test_stratified"
     return manifest, cases, split
+
+
+def _heldout(manifest) -> list[str]:
+    return manifest.get("test_heldout_condition_case_ids", manifest.get("test_case_ids", []))
 
 
 def flatten(value) -> list[str]:
@@ -195,7 +202,7 @@ def permutation_mean_greater(x: list[float], y: list[float], n: int, rng: random
 
 def split_integrity(manifest, cases, split) -> dict:
     train = set(manifest["train_case_ids"])
-    test = set(manifest["test_heldout_condition_case_ids"]) | set(manifest["test_stratified_case_ids"])
+    test = set(_heldout(manifest)) | set(manifest.get("test_stratified_case_ids", []))
     files_test = set((DATA / "splits" / "test_cases.txt").read_text().split())
     files_train = set((DATA / "splits" / "train_cases.txt").read_text().split())
     result = {
@@ -239,7 +246,7 @@ def split_integrity(manifest, cases, split) -> dict:
 
 def similarity(cases, split, permutations: int, rng: random.Random):
     texts = {cid: field_texts(c) for cid, c in cases.items()}
-    train_ids = [cid for cid in cases if split[cid] == "train"]
+    train_ids = [cid for cid in cases if split.get(cid) == "train"]
     by_cond = defaultdict(list)
     for cid in train_ids:
         by_cond[cases[cid]["condition"]].append(cid)
@@ -263,7 +270,9 @@ def similarity(cases, split, permutations: int, rng: random.Random):
 
         groups = defaultdict(list)
         for cid in cases:
-            kind = split[cid]
+            kind = split.get(cid)
+            if kind in (None, "validation"):  # excluded cases and the validation split are not test cases
+                continue
             if kind == "train":
                 pool = by_cond[cases[cid]["condition"]]
                 group = "null_train_loo_same_condition"

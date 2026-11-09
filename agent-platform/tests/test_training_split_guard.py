@@ -19,8 +19,10 @@ def completed_episode(case_id: str) -> ClinicalEpisode:
 
 
 def test_the_splits_are_disjoint_and_cover_the_benchmark():
-    assert not set(TEST) & set(TRAIN)
-    assert len(TEST) == 100 and len(TRAIN) == 500
+    """Condition split (9 Nov 2026): whole conditions held out, two cross-condition mimics excluded."""
+    validation = split_case_ids(DATASETS[DEFAULT_DATASET_VERSION].path, "validation")
+    assert not set(TEST) & set(TRAIN) and not set(validation) & set(TRAIN) and not set(validation) & set(TEST)
+    assert (len(TRAIN), len(validation), len(TEST)) == (419, 60, 119)
 
 
 def test_a_training_list_with_one_test_case_is_refused():
