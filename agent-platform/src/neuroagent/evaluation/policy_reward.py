@@ -27,6 +27,8 @@ from ..tools.vocabulary import analyte_class_members, normalize_analyte
 # Completion tokens per episode at which token efficiency halves. Prompt tokens are dictated
 # by the harness (case, tools, observations), not by the policy, so they are not scored.
 _TOKEN_SCALE = 2048.0
+# Deducted from the scalar for each action that claims no policy criterion (clinical-policy-v3).
+UNJUSTIFIED_PENALTY = 0.03
 
 
 class RewardBreakdown(BaseModel):
@@ -47,6 +49,8 @@ class RewardBreakdown(BaseModel):
     # The submitted ICD-10 code, reported with weight 0: coding is not clinical reasoning.
     icd_code: float = Field(ge=0, le=1)
     invalid_actions: int = Field(ge=0)
+    # Actions that claim no policy criterion (v3): each one is deducted from the scalar.
+    unjustified_actions: int = Field(default=0, ge=0)
     scalar: float = Field(ge=0, le=1)
     caps_applied: list[str] = Field(default_factory=list)
 
@@ -54,7 +58,8 @@ class RewardBreakdown(BaseModel):
 class ClinicalPolicyReward:
     # v2 (25 Oct 2026): the diagnosis is matched on its label alone, with negation, rejected
     # labels and mixed-diagnosis components; the ICD code is a separate weight-0 component.
-    scorer_id = "clinical-policy-v2"
+    # v3 (13 Nov 2026): every unjustified action costs UNJUSTIFIED_PENALTY (see score()).
+    scorer_id = "clinical-policy-v3"
 
     def __init__(self, *, require_approved: bool = True) -> None:
         self.require_approved = require_approved
@@ -186,6 +191,13 @@ class ClinicalPolicyReward:
             + 0.04 * cost_efficiency
             + 0.03 * token_efficiency
         )
+        # v3 (13 Nov 2026): the rates above barely move when useless tests are added, so ordering
+        # everything paid. E1 seed 1 (policy arm, checkpoint 500, 60 validation cases x 3 seeds)
+        # went from 3.7 tests per case (1.7 justified) to 9.7 (3.9 justified, 5.8 not) and doubled
+        # the cost. Each action that claims no criterion now costs a flat amount, so a test is worth
+        # ordering only when the policy asks for it.
+        unjustified = sum(not hit for hit in positive)
+        scalar -= UNJUSTIFIED_PENALTY * unjustified
         scalar *= 1.0 / (1.0 + 0.1 * invalid)
         caps = []
         if any(item.severity is AvoidanceSeverity.CONTRAINDICATED for item in avoided_hits):
@@ -212,6 +224,7 @@ class ClinicalPolicyReward:
             token_efficiency=token_efficiency,
             icd_code=icd_code,
             invalid_actions=invalid,
+            unjustified_actions=unjustified,
             scalar=max(0.0, min(1.0, scalar)),
             caps_applied=caps,
         )

@@ -8,40 +8,45 @@
 #   cases per step in both arms. Nothing here touches validation or test cases.
 #
 # Usage (inside the pod): SNAP=/eos/.../e1_<commit>.tar.gz SEED=1 bash e1_rtx.sh
+# One arm only, in its own folders (13 Nov 2026, policy reward v3):
+#   ARMS=policy L=/tmp/e1-v3/seed-1 OUT=<runs>/e1_qwen3.5-9b-policy-v3/seed-1 WEIGHTS=<ckpts>/qwen3.5-9b-policy-v3 ...
+# L and WEIGHTS must be new for a new reward: --resume would otherwise continue the old run's checkpoints.
 # Writes /tmp/e1 (logs, rollouts), synced to $OUT every 15 min; adapters and checkpoints go to $WEIGHTS on EOS.
 # A crashed arm resumes from its last checkpoint (3 attempts). Ends with E1_EXIT=done in $OUT/status.txt.
 set -uo pipefail
 SEED=${SEED:-1}
 SNAP=${SNAP:?SNAP=<code snapshot tar.gz on EOS>}
-STEPS=${STEPS:-500} LR=${LR:-2e-5} SAVE=${SAVE:-50} B=${B:-5913}
+STEPS=${STEPS:-500} LR=${LR:-2e-5} SAVE=${SAVE:-50} B=${B:-5913} ARMS=${ARMS:-policy outcome}
 OUT=${OUT:-/eos/project-d/diagbox/dvc/aprotani/medical-agents/runs/e1_qwen3.5-9b/seed-$SEED}
 WEIGHTS=${WEIGHTS:-/eos/project-d/diagbox/dvc/NeuroAgent/checkpoints/paper-e1/qwen3.5-9b}
 export HF_HOME=/tmp/hf TOKENIZERS_PARALLELISM=false
 export UV_NO_MODIFY_PATH=1 UV_INSTALL_DIR=/tmp/uvbin UV_CACHE_DIR=/tmp/uvcache
 export UV_PYTHON_INSTALL_DIR=/tmp/uvpython XDG_DATA_HOME=/tmp/xdg XDG_CACHE_HOME=/tmp/xdgcache
-export UV_PROJECT_ENVIRONMENT=/tmp/venv-e1 TRITON_CACHE_DIR=/tmp/triton TRITON_CACHE_AUTOTUNING=1
+# Each snapshot gets its own source tree and venv (the venv installs the source editable).
+NAME=$(basename "$SNAP" .tar.gz) R=/tmp/ma-$(basename "$SNAP" .tar.gz) V=/tmp/venv-$(basename "$SNAP" .tar.gz)
+export UV_PROJECT_ENVIRONMENT=$V TRITON_CACHE_DIR=/tmp/triton TRITON_CACHE_AUTOTUNING=1
 export VLLM_CACHE_ROOT=/tmp/vllm-cache TORCHINDUCTOR_CACHE_DIR=/tmp/inductor
-L=/tmp/e1/seed-$SEED; mkdir -p "$L" "$OUT" "$WEIGHTS"
+L=${L:-/tmp/e1/seed-$SEED}; mkdir -p "$L" "$OUT" "$WEIGHTS"
 mark() { echo "$(date -Is) $*" | tee -a "$L/status.txt"; cp "$L/status.txt" "$OUT/" 2>/dev/null; }
 touch "$WEIGHTS/.write_test" "$OUT/.write_test" || { echo "E1_EXIT=eos-write"; exit 1; }
 
 # Environment: the locked stack of the snapshot (vLLM 0.32, TRL 1.17), as in the November sweep.
 [ -x /tmp/uvbin/uv ] || curl -LsSf https://astral.sh/uv/install.sh | sh
 export PATH=/tmp/uvbin:$PATH
-if [ ! -d /tmp/ma-e1 ]; then mkdir -p /tmp/ma-e1 && tar -xzf "$SNAP" -C /tmp/ma-e1; fi
-cd /tmp/ma-e1 && find . -name '._*' -not -path './.git/*' -delete
+if [ ! -d "$R" ]; then mkdir -p "$R" && tar -xzf "$SNAP" -C "$R"; fi
+cd "$R" && find . -name '._*' -not -path './.git/*' -delete
 uv sync --all-packages --extra training > "$L/sync.log" 2>&1 || { mark "E1_EXIT=sync"; cp "$L/sync.log" "$OUT/"; exit 1; }
-export PATH=/tmp/venv-e1/bin:$PATH
+export PATH=$V/bin:$PATH
 # vLLM takes the first mapped library named libcudart, and tilelang ships libcudart_stub.so without cudaDeviceReset
-export VLLM_CUDART_SO_PATH=/tmp/venv-e1/lib/python3.12/site-packages/nvidia/cu13/lib/libcudart.so.13
-grep -rl 'def find_loaded_library' /tmp/venv-e1/lib/python3.12/site-packages --include='*.py' \
+export VLLM_CUDART_SO_PATH=$V/lib/python3.12/site-packages/nvidia/cu13/lib/libcudart.so.13
+grep -rl 'def find_loaded_library' $V/lib/python3.12/site-packages --include='*.py' \
   | xargs sed -i 's/if lib_name in line:/if lib_name in line and "_stub" not in line:/'
 python -c "import torch,vllm,trl;print(torch.__version__,torch.version.cuda,torch.cuda.get_device_name(0),vllm.__version__,trl.__version__);torch.ones(1).cuda()" > "$L/env.txt" 2>&1
 python -c "from huggingface_hub import snapshot_download as s; print(s('Qwen/Qwen3.5-9B'))" >> "$L/env.txt" 2>&1 \
   || { mark "E1_EXIT=model-download"; cp "$L/env.txt" "$OUT/"; exit 1; }
 cat "$L/env.txt" > "$OUT/env.txt"
-cp /tmp/ma-e1/COMMIT "$OUT/" 2>/dev/null
-mark "env ready: commit $(cat /tmp/ma-e1/COMMIT 2>/dev/null) $(head -1 "$L/env.txt")"
+cp "$R/COMMIT" "$OUT/" 2>/dev/null
+mark "env ready: $NAME arms=[$ARMS] commit $(cat "$R/COMMIT" 2>/dev/null) $(head -1 "$L/env.txt")"
 
 # Logs to EOS every 15 min, from /tmp so an EOS outage cannot break the runs.
 ( while sleep 900; do rsync -a --exclude 'rollouts*' "$L/" "$OUT/" 2>/dev/null; done ) & SYNC=$!
@@ -60,9 +65,13 @@ arm() {  # arm REWARD [extra args]
   done
   mark "$r exit=$rc"
 }
-arm policy & P=$!; sleep 180
-arm outcome --outcome-budget-usd "$B" --outcome-cost-weight 0.15 & O=$!
-wait $P $O
+pids=()
+for r in $ARMS; do
+  [ ${#pids[@]} -gt 0 ] && sleep 180
+  if [ "$r" = outcome ]; then arm outcome --outcome-budget-usd "$B" --outcome-cost-weight 0.15 & else arm "$r" & fi
+  pids+=($!)
+done
+wait "${pids[@]}"
 kill $SYNC $SMI 2>/dev/null
 rsync -a "$L/" "$OUT/"
 mark "E1_EXIT=done"

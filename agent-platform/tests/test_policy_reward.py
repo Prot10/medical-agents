@@ -288,3 +288,21 @@ def test_icd_code_is_reported_without_weight():
     assert coded.scalar == uncoded.scalar
     wrong_label = scorer.score(make_episode(case, required, diagnosis="Seizure disorder"), case)
     assert wrong_label.diagnosis == 0
+
+
+def test_each_unjustified_action_costs_a_flat_penalty():
+    # clinical-policy-v3 (13 Nov 2026): GRPO learned to order everything because extra tests barely moved
+    # the rates; now the same work-up plus useless tests must score below the work-up alone.
+    from neuroagent.evaluation.policy_reward import UNJUSTIFIED_PENALTY
+
+    case = approved_case()
+    required = [criterion_action(c) for c in by_importance(case, "required")]
+    # Re-ordering a study that was already resulted claims no criterion (first match only).
+    repeats = [required[0]] * 3
+    scorer = ClinicalPolicyReward()
+    clean = scorer.score(make_episode(case, required), case)
+    padded = scorer.score(make_episode(case, required + repeats), case)
+    guess = scorer.score(make_episode(case, []), case)
+    assert clean.unjustified_actions == 0 and padded.unjustified_actions == 3
+    assert padded.scalar <= clean.scalar - 3 * UNJUSTIFIED_PENALTY
+    assert guess.scalar < padded.scalar < clean.scalar

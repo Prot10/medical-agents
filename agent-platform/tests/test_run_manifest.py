@@ -32,7 +32,7 @@ def test_manifest_records_the_scorer_and_its_configuration():
     case = approved_case()
     policy = run_manifest([case], ClinicalPolicyReward(require_approved=False))["scorer"]
     outcome = run_manifest([case], OutcomeReward(budget_usd=6992.0, require_approved=False))["scorer"]
-    assert policy["id"] == "clinical-policy-v2" and policy["config"] == {"require_approved": False}
+    assert policy["id"] == "clinical-policy-v3" and policy["config"] == {"require_approved": False}
     assert outcome["id"] == "outcome-v1"
     assert outcome["config"] == {"budget_usd": 6992.0, "cost_weight": 0.15}
     assert set(policy["source_sha256"]) == set(outcome["source_sha256"])
