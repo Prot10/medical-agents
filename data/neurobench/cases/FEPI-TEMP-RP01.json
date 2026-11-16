@@ -104,7 +104,7 @@
           "type": "parenchymal hypodensity"
         }
       ],
-      "impression": "1. Ill-defined low attenuation in the right anterior and mesial temporal lobe without hemorrhage or mass effect; MRI recommended for further characterization. 2. Postsurgical changes of the anterior skull base. 3. No hemorrhage, midline shift or hydrocephalus.",
+      "impression": "1. Ill-defined low attenuation with mild effacement of the adjacent sulci in the right anterior and mesial temporal lobe, without hemorrhage; MRI recommended for further characterization. 2. Postsurgical changes of the anterior skull base. 3. No midline shift, effacement of the basal cisterns or hydrocephalus.",
       "recommended_actions": [
         "MRI of the brain with and without contrast"
       ]
@@ -612,6 +612,26 @@
       {
         "alternatives": [
           {
+            "required_arguments": {},
+            "tool_name": "order_ct_scan"
+          },
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_brain_mri"
+          }
+        ],
+        "citations": [
+          "[ABN_enc_2012]"
+        ],
+        "criterion_id": "action-imaging-before-lp",
+        "expected_evidence": "No midline shift, hydrocephalus or effacement of the basal cisterns; right anterior and mesial temporal abnormality.",
+        "importance": "optional",
+        "label": "Brain imaging (CT or MRI) to exclude mass effect before lumbar puncture",
+        "rationale": "With reduced consciousness and ongoing seizures, brain imaging must exclude mass effect before the lumbar puncture; CT is sufficient for that question, and CSF and acyclovir are not delayed to obtain MRI first."
+      },
+      {
+        "alternatives": [
+          {
             "required_arguments": {
               "contrast": true
             },
@@ -625,7 +645,7 @@
         "expected_evidence": "Asymmetric right mesial temporal, temporal pole and insular T2/FLAIR hyperintensity with swelling, restricted diffusion and petechial susceptibility, milder left temporal pole involvement; no recurrent tumor at the resection bed and no midline shift.",
         "importance": "required",
         "label": "Obtain brain MRI with gadolinium",
-        "rationale": "A subacute encephalopathy with focal seizures after skull-base cancer treatment needs contrast MRI to look for encephalitis, recurrence and radiation injury, and to exclude mass effect before lumbar puncture."
+        "rationale": "A subacute encephalopathy with focal seizures after skull-base cancer treatment needs contrast MRI to look for encephalitis, recurrence and radiation injury; done before the lumbar puncture, it also excludes mass effect."
       },
       {
         "alternatives": [
@@ -717,7 +737,7 @@
       ],
       "required_recommendations": [
         "Start IV acyclovir 10 mg/kg every 8 hours on suspicion, without waiting for MRI, LP or PCR, with IV hydration and the dose adjusted to creatinine clearance; continue for 14 to 21 days, favoring 21 days and a repeat CSF HSV PCR before stopping because he is immunosuppressed (dexamethasone, recent radiochemotherapy).",
-        "Treat the nonconvulsive status epilepticus under continuous EEG: IV benzodiazepine, then a non-inducing second-line IV ASM (levetiracetam 60 mg/kg, maximum 4500 mg, or lacosamide), with ICU care and escalation to an anesthetic infusion only if seizures persist.",
+        "Treat the recurrent seizures without return to baseline as status epilepticus promptly, without waiting for MRI, lumbar puncture, PCR or the continuous EEG: IV benzodiazepine, then a non-inducing second-line IV ASM (levetiracetam 60 mg/kg, maximum 4500 mg, or lacosamide), with ICU care, continuous EEG to confirm and guide treatment of the nonconvulsive status epilepticus, and escalation to an anesthetic infusion only if seizures persist.",
         "Monitor creatinine daily during IV acyclovir, adjusting acyclovir and levetiracetam doses to renal function, and replace metformin with insulin while he is acutely ill and hyperglycemic on dexamethasone.",
         "Continue dexamethasone at the current dose without abrupt withdrawal (adrenal suppression), and review it with oncology; corticosteroids are not an established treatment for HSV encephalitis.",
         "Involve oncology in the plan and in surveillance of the treated sinonasal adenocarcinoma.",
@@ -773,6 +793,54 @@
         "criterion_id": "avoid-waste-fdg-pet",
         "rationale": "FDG-PET adds nothing to an acute encephalitis already characterized by MRI, CSF PCR and continuous EEG; it belongs to presurgical evaluation of drug-resistant epilepsy.",
         "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "procedure": "stereotactic_biopsy"
+            },
+            "tool_name": "obtain_tissue_diagnosis"
+          }
+        ],
+        "citations": [
+          "[IDSA_enc_2008]"
+        ],
+        "criterion_id": "avoid-harm-stereotactic-biopsy",
+        "rationale": "A standalone stereotactic biopsy of the right temporal lobe adds procedural risk (hemorrhage, infection, deficit) without diagnostic gain: the positive CSF HSV-1 PCR establishes the diagnosis, and any histology comes from a therapeutically indicated resection.",
+        "severity": "harm"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "procedure": "open_biopsy"
+            },
+            "tool_name": "obtain_tissue_diagnosis"
+          }
+        ],
+        "citations": [
+          "[IDSA_enc_2008]"
+        ],
+        "criterion_id": "avoid-harm-open-biopsy",
+        "rationale": "A standalone open biopsy of the right temporal lobe adds procedural risk (hemorrhage, infection, deficit) without diagnostic gain: the positive CSF HSV-1 PCR establishes the diagnosis, and any histology comes from a therapeutically indicated resection.",
+        "severity": "harm"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "procedure": "resection"
+            },
+            "tool_name": "obtain_tissue_diagnosis"
+          }
+        ],
+        "citations": [
+          "[Kwan_2010]"
+        ],
+        "criterion_id": "avoid-harm-resection",
+        "rationale": "No surgical indication at this encounter: the seizures are acute symptomatic; resection is considered only after presurgical evaluation of drug-resistant epilepsy.",
+        "severity": "harm"
       }
     ],
     "diagnosis": {
@@ -861,21 +929,12 @@
     "sequence_constraints": [
       {
         "after_criterion_id": "action-4-analyze-csf",
-        "before_criterion_id": "action-3-analyze-brain-mri",
+        "before_criterion_id": "action-imaging-before-lp",
         "citations": [
           "[ABN_enc_2012]"
         ],
-        "reason": "Exclude mass effect on imaging before lumbar puncture.",
+        "reason": "Exclude mass effect on brain imaging (CT or MRI) before lumbar puncture.",
         "severity": "hard"
-      },
-      {
-        "after_criterion_id": "action-6-check-drug-interactions",
-        "before_criterion_id": "action-3-analyze-brain-mri",
-        "citations": [
-          "[IDSA_enc_2008]"
-        ],
-        "reason": "Know the structural cause before finalizing the ASM and its interactions (a tumor or planned oncologic therapy favors non-inducing ASMs).",
-        "severity": "soft"
       }
     ],
     "stop_rule": {
@@ -928,7 +987,7 @@
       "panels": {
         "Additional Labs": [
           {
-            "clinical_significance": null,
+            "clinical_significance": "Mild nonspecific inflammatory response",
             "is_abnormal": true,
             "reference_range": "<5.0",
             "test": "CRP",
@@ -936,7 +995,7 @@
             "value": 18.4
           },
           {
-            "clinical_significance": null,
+            "clinical_significance": "Consistent with known type 2 diabetes; glucose is further raised by dexamethasone",
             "is_abnormal": true,
             "reference_range": "<5.7",
             "test": "HbA1c",
@@ -1018,7 +1077,7 @@
             "value": 1.0
           },
           {
-            "clinical_significance": null,
+            "clinical_significance": "Hyperglycemia on dexamethasone in a patient with type 2 diabetes",
             "is_abnormal": true,
             "reference_range": "70-100",
             "test": "Glucose",
@@ -1036,7 +1095,7 @@
         ],
         "Complete Blood Count": [
           {
-            "clinical_significance": null,
+            "clinical_significance": "Mild nonspecific inflammatory response",
             "is_abnormal": true,
             "reference_range": "4.0-11.0",
             "test": "WBC",
@@ -1068,7 +1127,7 @@
             "value": 198
           },
           {
-            "clinical_significance": null,
+            "clinical_significance": "Mild nonspecific inflammatory response",
             "is_abnormal": true,
             "reference_range": "40-70",
             "test": "Neutrophils",
@@ -1192,14 +1251,12 @@
   },
   "metadata": {
     "authoring_agent": "condition-expert:FEPI-TEMP",
-    "case_body_concerns": [
-      "useless_tools entry for `analyze_ecg` dropped: tool output is provided up-front in initial_tool_outputs, so declaring it useless to call would be incoherent (agent never had to call it)."
-    ],
+    "case_body_concerns": [],
     "citation_gap": [],
     "condition_name": "Focal epilepsy - temporal lobe",
     "criteria_pack_version": "1.0",
     "difficulty_description": "Complex presentation in a post-neurosurgical oncology patient where the recent cancer history, skull-base surgery, radiochemotherapy and dexamethasone create strong red herrings toward recurrence or radiation injury. The diagnosis (HSV-1 encephalitis with nonconvulsive status epilepticus of right temporal onset) requires recognizing the asymmetric mesial temporal MRI pattern, obtaining CSF for HSV PCR after imaging, and continuous EEG to confirm and quantify the seizures.",
-    "difficulty_rationale": "Encephalopathic patient with competing etiologies (recurrence, radiation, HSV, autoimmune, metabolic) requiring MRI before LP, CSF HSV PCR, continuous EEG and time-critical empiric acyclovir with renal and interaction-aware ASM choices.",
+    "difficulty_rationale": "Encephalopathic patient with competing etiologies (recurrence, radiation, HSV, autoimmune, metabolic) requiring brain imaging (CT or MRI) before LP, CSF HSV PCR, continuous EEG and time-critical empiric acyclovir with renal and interaction-aware ASM choices.",
     "expected_agent_confidence": 0.4,
     "fallback_tool_kinds": {
       "advanced_imaging": "case",

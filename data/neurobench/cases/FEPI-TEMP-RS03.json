@@ -218,27 +218,29 @@
   "followup_outputs": [
     {
       "output": {
-        "alternatives": [
-          "Lamotrigine: slow titration over about 6 weeks (rash risk); ethinylestradiol-containing contraceptives lower lamotrigine levels; compatible with breastfeeding with infant monitoring",
-          "Higher topiramate dose: above 200 mg/day topiramate lowers combined hormonal contraceptive efficacy; topiramate requires a pregnancy prevention programme (MHRA 2024)",
-          "Lacosamide: limited breastfeeding data"
+        "findings": [
+          {
+            "interpretation": "Patent dural venous sinuses",
+            "region": "Superior sagittal, straight, transverse and sigmoid sinuses, internal jugular veins",
+            "signal": "Normal flow-related signal and enhancement; no filling defect or empty delta sign"
+          },
+          {
+            "interpretation": "No cortical or deep vein thrombosis",
+            "region": "Cortical veins, vein of Labbe, internal cerebral veins and vein of Galen",
+            "signal": "Normal flow-related signal and enhancement; no filling defect"
+          }
         ],
-        "contraindications": [],
-        "formulary_status": "On formulary, no prior authorization required",
-        "interactions": [
-          "Levetiracetam with topiramate during cross-titration: no pharmacokinetic interaction; additive somnolence and fatigue possible",
-          "Levetiracetam with prenatal multivitamin with iron: no clinically relevant interaction",
-          "Levetiracetam with hormonal contraception: no interaction in either direction"
-        ],
-        "proposed": "Levetiracetam 500 mg twice daily, titrated to 1000 mg twice daily",
-        "warnings": [
-          "Behavioral adverse effects (irritability, low mood) occur in a minority of patients; postpartum mood should be monitored",
-          "Levetiracetam passes into breast milk; breastfeeding is generally considered compatible, with observation of the infant for sedation and poor feeding",
-          "Dose adjustment is needed in renal impairment"
-        ]
+        "impression": "No cerebral venous sinus, cortical or deep vein thrombosis.",
+        "modality": "MR_venography",
+        "quantitative_data": null,
+        "recommended_actions": [],
+        "tracer_or_protocol": "2D time-of-flight and contrast-enhanced 3D MR venography"
       },
-      "tool_name": "check_drug_interactions",
-      "trigger_action": "check_drug_interactions_levetiracetam"
+      "tool_name": "order_advanced_imaging",
+      "tool_parameters": {
+        "modality": "MR_venography"
+      },
+      "trigger_action": "request_mr_venography"
     },
     {
       "output": {
@@ -276,6 +278,30 @@
       },
       "tool_name": "analyze_eeg",
       "trigger_action": "request_video_eeg"
+    },
+    {
+      "output": {
+        "alternatives": [
+          "Lamotrigine: slow titration over about 6 weeks (rash risk); ethinylestradiol-containing contraceptives lower lamotrigine levels; compatible with breastfeeding with infant monitoring",
+          "Higher topiramate dose: above 200 mg/day topiramate lowers combined hormonal contraceptive efficacy; topiramate requires a pregnancy prevention programme (MHRA 2024)",
+          "Lacosamide: limited breastfeeding data"
+        ],
+        "contraindications": [],
+        "formulary_status": "On formulary, no prior authorization required",
+        "interactions": [
+          "Levetiracetam with topiramate during cross-titration: no pharmacokinetic interaction; additive somnolence and fatigue possible",
+          "Levetiracetam with prenatal multivitamin with iron: no clinically relevant interaction",
+          "Levetiracetam with hormonal contraception: no interaction in either direction"
+        ],
+        "proposed": "Levetiracetam 500 mg twice daily, titrated to 1000 mg twice daily",
+        "warnings": [
+          "Behavioral adverse effects (irritability, low mood) occur in a minority of patients; postpartum mood should be monitored",
+          "Levetiracetam passes into breast milk; breastfeeding is generally considered compatible, with observation of the infant for sedation and poor feeding",
+          "Dose adjustment is needed in renal impairment"
+        ]
+      },
+      "tool_name": "check_drug_interactions",
+      "trigger_action": "check_drug_interactions_levetiracetam"
     },
     {
       "output": {
@@ -353,10 +379,10 @@
           "[ILAE_MRI_2019]"
         ],
         "criterion_id": "action-3-analyze-brain-mri",
-        "expected_evidence": "Right hippocampal sclerosis (2.0 versus 3.3 cm3, T2/FLAIR hyperintensity, loss of internal architecture) with no second lesion and normal venous sinuses.",
+        "expected_evidence": "Right hippocampal sclerosis (2.0 versus 3.3 cm3, T2/FLAIR hyperintensity, loss of internal architecture) with no second lesion and normal dural sinus flow voids.",
         "importance": "required",
         "label": "Obtain a brain MRI with a dedicated epilepsy protocol",
-        "rationale": "Rising seizure frequency and a first convulsion in years, six weeks postpartum with headaches, need dedicated imaging to confirm the substrate and exclude a new lesion or venous thrombosis."
+        "rationale": "Rising seizure frequency and a first convulsion in years, six weeks postpartum with headaches, need dedicated imaging to confirm the substrate and exclude a new lesion; venous thrombosis needs venography."
       },
       {
         "alternatives": [
@@ -380,22 +406,64 @@
         "alternatives": [
           {
             "required_arguments": {
+              "modality": "MR_venography"
+            },
+            "tool_name": "order_advanced_imaging"
+          }
+        ],
+        "citations": [
+          "[AHA_CVT_2024]"
+        ],
+        "criterion_id": "action-mrv-venous-sinuses",
+        "expected_evidence": "Patent dural venous sinuses; no cerebral venous sinus, cortical or deep vein thrombosis.",
+        "importance": "recommended",
+        "label": "MR venography for postpartum cerebral venous thrombosis",
+        "rationale": "A convulsion with headaches six weeks postpartum raises cerebral venous thrombosis; normal flow voids on routine MRI do not exclude it, so dedicated venous imaging is needed."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
               "panels": [
                 "BMP",
-                "AED_levels"
+                "AED_levels",
+                "CBC",
+                "LFTs",
+                "urinalysis"
               ]
             },
             "tool_name": "interpret_labs"
           }
         ],
         "citations": [
-          "[AAN_WWE_2009]"
+          "[AAN_WWE_2009]",
+          "[ACOG_HTN_2020]"
         ],
         "criterion_id": "action-7-interpret-labs",
-        "expected_evidence": "Topiramate 3.2 mcg/mL, low but in keeping with 100 mg daily; mild normal anion gap low bicarbonate (21 mEq/L); sodium, glucose and calcium normal.",
+        "expected_evidence": "Topiramate 3.2 mcg/mL, low but in keeping with 100 mg daily; mild normal anion gap low bicarbonate (21 mEq/L); sodium, glucose and calcium normal; platelets, creatinine, AST/ALT and urine protein/creatinine normal.",
         "importance": "recommended",
-        "label": "Check electrolytes and the topiramate level after the breakthrough convulsion",
-        "rationale": "Sets the baseline for dose change or switching and excludes a metabolic provocation; topiramate lowers bicarbonate."
+        "label": "Check electrolytes, the topiramate level and postpartum preeclampsia tests after the breakthrough convulsion",
+        "rationale": "Sets the baseline for dose change or switching and excludes a metabolic provocation (topiramate lowers bicarbonate); a convulsion six weeks postpartum also needs platelets, renal and liver tests and urine protein/creatinine for late postpartum preeclampsia."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "panels": [
+                "beta-hCG"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          }
+        ],
+        "citations": [
+          "[MHRA_TPM_2024]"
+        ],
+        "criterion_id": "action-labs-hcg",
+        "expected_evidence": "Serum beta-hCG negative.",
+        "importance": "recommended",
+        "label": "Pregnancy test (beta-hCG)",
+        "rationale": "Six weeks postpartum and breastfeeding with no documented contraception, she needs pregnancy status before a topiramate dose change or a switch, given the teratogenic risk of topiramate."
       },
       {
         "alternatives": [
@@ -417,11 +485,13 @@
     "assessment": {
       "prohibited_recommendations": [
         "Do not pursue ENT evaluation for the olfactory hallucinations: they are her habitual seizure aura.",
-        "Do not start valproate: it is not first-line for focal epilepsy and, under the 2024 MHRA rules, is not started under 55 unless two specialists document that no alternative works.",
+        "Do not start valproate: it is not first-line for focal epilepsy, and in a woman who could become pregnant its teratogenic and neurodevelopmental risks restrict it to cases where nothing else works, within a pregnancy prevention programme.",
         "Do not advise stopping breastfeeding because of the antiseizure medication."
       ],
       "required_recommendations": [
-        "Offer a switch from topiramate to lamotrigine or levetiracetam by cross-titration (lower malformation risk in a future pregnancy, compatible with breastfeeding); if she stays on topiramate, increase the dose within the topiramate pregnancy prevention programme.",
+        "Offer a switch from topiramate to lamotrigine or levetiracetam by cross-titration (lower malformation risk in a future pregnancy, compatible with breastfeeding); if she stays on topiramate, raise the dose cautiously (200 mg/day previously caused word-finding difficulty and paresthesia) with highly effective contraception and counselling on its pregnancy risks.",
+        "Recheck serum bicarbonate before any topiramate dose increase and monitor for persistent metabolic acidosis (topiramate inhibits carbonic anhydrase).",
+        "Arrange postpartum obstetric review with serial blood pressure measurement.",
         "Discuss contraception and pregnancy plans before choosing the ASM; continue folic acid.",
         "Continue breastfeeding and monitor the infant for sedation, poor feeding, diarrhea and weight gain.",
         "Advise on infant safety: feed and change the baby seated low or on the floor, never bathe the baby alone, and avoid carrying the baby on stairs.",
@@ -488,7 +558,7 @@
           "[ILAE_MRI_2019]"
         ],
         "criterion_id": "avoid-waste-4-order-ct-scan",
-        "rationale": "She is back to baseline with a normal examination and MRI is available; MRI answers both the epileptogenic substrate and the venous question without radiation.",
+        "rationale": "She is back to baseline with a normal examination and MRI is available; MRI with MR venography answers both the epileptogenic substrate and the venous question without radiation.",
         "severity": "waste"
       },
       {
@@ -506,6 +576,54 @@
         "criterion_id": "avoid-waste-5-fdg-pet",
         "rationale": "FDG-PET adds nothing to a first diagnosis with concordant MRI and EEG; it belongs to presurgical evaluation of drug-resistant epilepsy.",
         "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "procedure": "stereotactic_biopsy"
+            },
+            "tool_name": "obtain_tissue_diagnosis"
+          }
+        ],
+        "citations": [
+          "[ILAE_MRI_2019]"
+        ],
+        "criterion_id": "avoid-harm-stereotactic-biopsy",
+        "rationale": "A standalone stereotactic biopsy of the right hippocampus adds procedural risk (hemorrhage, infection, deficit) without diagnostic gain: the concordant clinical, MRI and EEG findings establish the diagnosis, and any histology comes from a therapeutically indicated resection.",
+        "severity": "harm"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "procedure": "open_biopsy"
+            },
+            "tool_name": "obtain_tissue_diagnosis"
+          }
+        ],
+        "citations": [
+          "[ILAE_MRI_2019]"
+        ],
+        "criterion_id": "avoid-harm-open-biopsy",
+        "rationale": "A standalone open biopsy of the right hippocampus adds procedural risk (hemorrhage, infection, deficit) without diagnostic gain: the concordant clinical, MRI and EEG findings establish the diagnosis, and any histology comes from a therapeutically indicated resection.",
+        "severity": "harm"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "procedure": "resection"
+            },
+            "tool_name": "obtain_tissue_diagnosis"
+          }
+        ],
+        "citations": [
+          "[Kwan_2010]"
+        ],
+        "criterion_id": "avoid-harm-resection",
+        "rationale": "No surgical indication at this encounter: the epilepsy has been treated with a single antiseizure medication at a dose limited by tolerability and is not drug-resistant; resection is considered only after presurgical evaluation of drug-resistant epilepsy.",
+        "severity": "harm"
       }
     ],
     "diagnosis": {
@@ -553,7 +671,7 @@
       {
         "diagnosis": "Postpartum cerebral venous thrombosis",
         "icd_code": "O87.3",
-        "key_features": "Seizure and headaches six weeks postpartum raise it; the headaches are mild and longstanding, the exam is normal and MRI shows normal venous flow voids without venous infarct or hemorrhage.",
+        "key_features": "Postpartum seizure with headaches raises it; normal flow voids on routine MRI are not enough, and MR venography shows patent dural venous sinuses without cortical or deep vein thrombosis.",
         "likelihood": "low"
       },
       {
@@ -565,7 +683,7 @@
       {
         "diagnosis": "Late postpartum eclampsia",
         "icd_code": "O15.2",
-        "key_features": "Six weeks after delivery with blood pressure 118/72 and a habitual aura before the convulsion.",
+        "key_features": "Possible up to six weeks postpartum; normal blood pressure, platelets, renal and liver tests and urine protein/creatinine and her habitual aura make it unlikely; serial blood pressure at the postpartum review.",
         "likelihood": "very_low"
       },
       {
@@ -585,8 +703,8 @@
       "Burnt-rubber olfactory hallucinations with an epigastric rising sensation, oral automatisms and right-hand picking are a mesial temporal seizure, here evolving to a bilateral tonic-clonic seizure.",
       "Right anterior temporal sharp waves and right hippocampal sclerosis on the epilepsy-protocol MRI are concordant.",
       "Seizures increased from the third trimester and now with newborn care: sleep deprivation is the likely precipitant; by six weeks postpartum pregnancy-related clearance has normalized, and the topiramate level of 3.2 mcg/mL is in keeping with her low 100 mg daily dose.",
-      "One ASM at a low dose has never been optimized, so the epilepsy is not drug-resistant; the choice between a higher topiramate dose and a switch depends on breastfeeding, contraception and future pregnancy.",
-      "Topiramate requires a pregnancy prevention programme under the 2024 MHRA rules; lamotrigine and levetiracetam carry the lowest malformation risks in registry data."
+      "Only one ASM has been used and a higher topiramate dose was not tolerated, so the epilepsy is not drug-resistant; the choice between a cautious topiramate increase and a switch depends on her earlier intolerance, breastfeeding, contraception and future pregnancy.",
+      "Topiramate in pregnancy raises the risk of major malformations and may affect neurodevelopment, so while she takes it she needs highly effective contraception and counselling on these risks (the MHRA made this a pregnancy prevention programme in 2024); lamotrigine and levetiracetam carry the lowest malformation risks in registry data."
     ],
     "red_herrings": [
       {
@@ -667,7 +785,7 @@
         "Bicarbonate: 21 mEq/L (reference 22-29) (L)",
         "Topiramate: 3.2 mcg/mL (reference 5-20) (L)"
       ],
-      "interpretation": "Bicarbonate mildly low (21 mEq/L) with a normal anion gap. Topiramate level 3.2 mcg/mL, below the reference range. Remaining values within reference ranges.",
+      "interpretation": "Bicarbonate mildly low (21 mEq/L) with a normal anion gap. Topiramate level 3.2 mcg/mL, below the reference range. AST and ALT normal. Urine protein/creatinine ratio 0.08 with negative dipstick protein. Serum beta-hCG negative. Remaining values within reference ranges.",
       "panels": {
         "Additional": [
           {
@@ -695,7 +813,7 @@
             "value": 2.4
           },
           {
-            "clinical_significance": null,
+            "clinical_significance": "Below the laboratory range; consistent with 100 mg/day and no missed doses; not a measure of adequacy alone: interpret with formulation, timing of the last dose, seizure control and tolerability",
             "is_abnormal": true,
             "reference_range": "5-20",
             "test": "Topiramate level",
@@ -737,7 +855,7 @@
             "value": 106
           },
           {
-            "clinical_significance": null,
+            "clinical_significance": "Mildly low; topiramate causes a normal-anion-gap acidosis: recheck before any dose increase",
             "is_abnormal": true,
             "reference_range": "22-29",
             "test": "Bicarbonate",
@@ -818,6 +936,52 @@
             "unit": "fL",
             "value": 88.5
           }
+        ],
+        "LFTs": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "10-35",
+            "test": "AST",
+            "unit": "U/L",
+            "value": 22
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "7-35",
+            "test": "ALT",
+            "unit": "U/L",
+            "value": 17
+          }
+        ],
+        "Urinalysis": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "Negative",
+            "test": "Urine protein (dipstick)",
+            "unit": "",
+            "value": "Negative"
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "<0.30",
+            "test": "Urine protein/creatinine ratio",
+            "unit": "mg/mg",
+            "value": 0.08
+          }
+        ],
+        "beta-hCG": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "<5",
+            "test": "Beta-hCG (serum)",
+            "unit": "mIU/mL",
+            "value": "<5"
+          }
         ]
       }
     },
@@ -845,7 +1009,7 @@
           "type": "Hippocampal sclerosis"
         }
       ],
-      "impression": "1. Right hippocampal sclerosis: atrophy (right 2.0 cm3, left 3.3 cm3), T2/FLAIR hyperintensity most pronounced in the body, loss of internal architecture. 2. No second lesion. No mass, hemorrhage or venous sinus abnormality.",
+      "impression": "1. Right hippocampal sclerosis: atrophy (right 2.0 cm3, left 3.3 cm3), T2/FLAIR hyperintensity most pronounced in the body, loss of internal architecture. 2. No second lesion. No mass or hemorrhage. Normal dural sinus flow voids.",
       "recommended_actions": [],
       "volumetrics": {
         "asymmetry_index": "0.25 ((L - R)/(L + R))",
@@ -856,14 +1020,12 @@
   },
   "metadata": {
     "authoring_agent": "condition-expert:FEPI-TEMP",
-    "case_body_concerns": [
-      "useless_tools entry for `analyze_ecg` dropped: tool output is provided up-front in initial_tool_outputs, so declaring it useless to call would be incoherent (agent never had to call it)."
-    ],
+    "case_body_concerns": [],
     "citation_gap": [],
     "condition_name": "Focal epilepsy - temporal lobe",
     "criteria_pack_version": "1.0",
-    "difficulty_description": "Classic right mesial temporal lobe epilepsy with a breakthrough convulsion six weeks postpartum. The challenge is management: interpreting a low topiramate level on a low dose after pregnancy, excluding postpartum mimics, and choosing between a higher topiramate dose and a switch in a breastfeeding woman who needs contraception.",
-    "difficulty_rationale": "Diagnosis is straightforward; breastfeeding, contraception, the topiramate pregnancy prevention programme and infant safety shape the plan.",
+    "difficulty_description": "Classic right mesial temporal lobe epilepsy with a breakthrough convulsion six weeks postpartum. The challenge is management: interpreting a low topiramate level on a low, tolerability-limited dose after pregnancy, excluding postpartum mimics, and choosing between a higher topiramate dose and a switch in a breastfeeding woman who needs contraception.",
+    "difficulty_rationale": "Diagnosis is straightforward; breastfeeding, contraception, the pregnancy risks of topiramate and infant safety shape the plan.",
     "expected_agent_confidence": 0.85,
     "fallback_tool_kinds": {
       "cardiac_monitoring": "normal",
@@ -896,9 +1058,9 @@
       ],
       "medications": [
         {
-          "dose": "100 mg",
-          "drug": "Topiramate",
-          "frequency": "Once daily at bedtime",
+          "dose": "50 mg",
+          "drug": "Topiramate (immediate release)",
+          "frequency": "Twice daily",
           "indication": "Focal epilepsy"
         },
         {
@@ -909,7 +1071,7 @@
         }
       ],
       "past_medical_history": [
-        "Epilepsy diagnosed at age 14 after a witnessed focal to bilateral tonic-clonic seizure; treated with topiramate 100 mg/day for the past 17 years with partial seizure control",
+        "Epilepsy diagnosed at age 14 after a witnessed focal to bilateral tonic-clonic seizure; treated with immediate-release topiramate 100 mg/day (50 mg twice daily) for the past 17 years with partial seizure control; a trial of 200 mg/day at age 20 caused word-finding difficulty and paresthesia",
         "History of febrile seizure at age 2",
         "Uncomplicated vaginal delivery 6 weeks ago",
         "Mild iron deficiency anemia during pregnancy, resolved with supplementation"
@@ -933,7 +1095,7 @@
       "sex": "female",
       "weight_kg": 59.4
     },
-    "history_present_illness": "Ms. Arredondo is a 31-year-old right-handed woman with a long-standing history of epilepsy diagnosed at age 14 who presents to the emergency department after a witnessed focal to bilateral tonic-clonic seizure at home. She has been maintained on topiramate 100 mg daily for approximately 17 years with partial seizure control, experiencing on average two to three focal seizures per year characterized by brief olfactory hallucinations described as a strong smell of burnt rubber followed by an epigastric rising sensation. These aura episodes typically last 20 to 40 seconds and resolve spontaneously without loss of awareness. She delivered her first child six weeks ago via uncomplicated vaginal delivery and has been breastfeeding with partial formula supplementation. Her husband reports that today, approximately four hours prior to arrival, the patient was seated on the couch while holding the infant when she suddenly called out that she was smelling burnt rubber. He immediately took the infant from her arms. She then stared blankly ahead and began making repetitive lip-smacking and swallowing movements for approximately 15 seconds. Her right hand began rhythmically picking at her clothing. She then developed bilateral arm stiffening followed by generalized rhythmic jerking of all four extremities lasting approximately 70 seconds. She was incontinent of urine during the event. Post-ictally, she was confused and drowsy for approximately 25 minutes before gradually becoming oriented again. The patient reports that her seizure frequency had been slowly increasing over the past several months, particularly since the third trimester of pregnancy, and she has had approximately five aura episodes in the past month alone compared to her baseline of two to three per year. She attributes this increase to sleep deprivation associated with caring for a newborn, though she continued her topiramate unchanged throughout pregnancy and postpartum. She denies any recent medication changes, missed doses, illness, fever, or head trauma. No other family members have been ill. She reports persistent fatigue and occasional headaches attributed to sleep deprivation but denies any new neurological symptoms.",
+    "history_present_illness": "Ms. Arredondo is a 31-year-old right-handed woman with a long-standing history of epilepsy diagnosed at age 14 who presents to the emergency department after a witnessed focal to bilateral tonic-clonic seizure at home. She has been maintained on immediate-release topiramate 50 mg twice daily for approximately 17 years with partial seizure control. At age 20 the dose was raised to 200 mg/day, which caused word-finding difficulty and paresthesia, so it was returned to 100 mg/day and she chose to accept rare auras rather than further changes. She has been experiencing on average two to three focal seizures per year characterized by brief olfactory hallucinations described as a strong smell of burnt rubber followed by an epigastric rising sensation. These aura episodes typically last 20 to 40 seconds and resolve spontaneously without loss of awareness. She delivered her first child six weeks ago via uncomplicated vaginal delivery and has been breastfeeding with partial formula supplementation. Her husband reports that today, approximately four hours prior to arrival, the patient was seated on the couch while holding the infant when she suddenly called out that she was smelling burnt rubber. He immediately took the infant from her arms. She then stared blankly ahead and began making repetitive lip-smacking and swallowing movements for approximately 15 seconds. Her right hand began rhythmically picking at her clothing. She then developed bilateral arm stiffening followed by generalized rhythmic jerking of all four extremities lasting approximately 70 seconds. She was incontinent of urine during the event. Post-ictally, she was confused and drowsy for approximately 25 minutes before gradually becoming oriented again. The patient reports that her seizure frequency had been slowly increasing over the past several months, particularly since the third trimester of pregnancy, and she has had approximately five aura episodes in the past month alone compared to her baseline of two to three per year. She attributes this increase to sleep deprivation associated with caring for a newborn, though she continued her topiramate unchanged throughout pregnancy and postpartum. She denies any recent medication changes, missed doses, illness, fever, or head trauma. No other family members have been ill. She reports persistent fatigue and occasional headaches attributed to sleep deprivation but denies any new neurological symptoms.",
     "neurological_exam": {
       "additional": "Fresh lateral tongue bite on the right side. No other focal neurological deficits.",
       "coordination": "Finger-to-nose and heel-to-shin testing without dysmetria bilaterally. Rapid alternating movements intact.",
