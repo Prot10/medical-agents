@@ -226,6 +226,58 @@
     },
     {
       "output": {
+        "findings": [
+          {
+            "finding": "Normal calibre, no stenosis, intimal flap or intramural haematoma",
+            "interpretation": "No cervical artery stenosis or dissection",
+            "region": "Cervical carotid and vertebral arteries"
+          },
+          {
+            "finding": "Patent basilar artery and both intracranial vertebral arteries with normal calibre; no stenosis or occlusion; posterior inferior cerebellar, anterior inferior cerebellar and superior cerebellar arteries visualised",
+            "interpretation": "Normal vertebrobasilar circulation",
+            "region": "Vertebrobasilar circulation"
+          },
+          {
+            "finding": "No stenosis, occlusion or aneurysm of the anterior circulation",
+            "interpretation": "Normal anterior circulation",
+            "region": "Intracranial carotid, anterior and middle cerebral arteries"
+          }
+        ],
+        "impression": "Normal intracranial and cervical MR angiography. Patent basilar and both vertebral arteries; no stenosis, occlusion or dissection.",
+        "modality": "MR_angiography",
+        "quantitative_data": null,
+        "recommended_actions": [],
+        "tracer_or_protocol": "3D time-of-flight MR angiography of the circle of Willis and contrast-enhanced MR angiography of the cervical arteries"
+      },
+      "tool_name": "order_advanced_imaging",
+      "trigger_action": "request_mr_angiography"
+    },
+    {
+      "output": {
+        "additional_observations": [
+          "No acute intracranial haemorrhage or mass on the non-contrast images",
+          "Patent basilar artery and both vertebral arteries with normal calibre",
+          "No evidence of dissection in the cervical arteries"
+        ],
+        "angiography_findings": {
+          "anterior_circulation": "Intracranial carotid, anterior and middle cerebral arteries patent; no stenosis, occlusion or aneurysm",
+          "cervical_carotid_and_vertebral": "Patent, normal calibre; no stenosis, intimal flap or dissection",
+          "vertebrobasilar": "Basilar artery and both intracranial vertebral arteries patent, normal calibre, no stenosis or occlusion"
+        },
+        "contrast_used": true,
+        "findings": [],
+        "impression": "Normal CT angiography of the head and neck. Patent basilar and both vertebral arteries; no stenosis, occlusion or dissection.",
+        "recommended_actions": []
+      },
+      "tool_name": "order_ct_scan",
+      "tool_parameters": {
+        "angiography": true,
+        "contrast": true
+      },
+      "trigger_action": "request_ct_angiography"
+    },
+    {
+      "output": {
         "abnormal_values_summary": [],
         "interpretation": "AQP4-IgG and MOG-IgG not detected by cell-based assay; a negative result does not entirely exclude NMOSD or MOGAD.",
         "panels": {
@@ -356,6 +408,30 @@
         "alternatives": [
           {
             "required_arguments": {
+              "modality": "MR_angiography"
+            },
+            "tool_name": "order_advanced_imaging"
+          },
+          {
+            "required_arguments": {
+              "angiography": true
+            },
+            "tool_name": "order_ct_scan"
+          }
+        ],
+        "citations": [
+          "[AHA_2021_SecPrev]"
+        ],
+        "criterion_id": "action-vascular-imaging",
+        "expected_evidence": "Patent basilar artery and both vertebral arteries; normal intracranial and cervical arteries without stenosis, occlusion or dissection",
+        "importance": "required",
+        "label": "MR or CT angiography of the head and neck",
+        "rationale": "Sudden onset on waking at 61 with hypertension and dyslipidaemia: the vertebrobasilar circulation must be imaged before the pontine deficit is attributed to demyelination."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
               "panels": [
                 "CBC",
                 "vitamin_B12",
@@ -471,7 +547,7 @@
         "Treat the brainstem relapse (gaze palsy and facial weakness) with high-dose methylprednisolone, IV 1 g daily for 3-5 days as an inpatient or oral 500 mg daily for 5 days, after excluding infection, with gastric protection while he takes aspirin and blood pressure and glucose monitoring; plasma exchange if a disabling relapse does not respond",
         "Protect the left cornea while eyelid closure is incomplete (lubricating drops by day, ointment and taping at night) and arrange ophthalmic review if the eye becomes painful or red",
         "Offer disease-modifying therapy after the relapse, choosing efficacy by disease activity (three enhancing lesions and a cord lesion at presentation) against the higher infection risk of B-cell depletion at 61",
-        "Before an anti-CD20 or S1P modulator, check HBsAg, anti-HBc, HCV antibody and VZV IgG (HIV already non-reactive), check anti-JCV antibodies if natalizumab is considered, and give any live vaccine at least 4-6 weeks before starting",
+        "Before starting disease-modifying therapy, complete the baseline checks the chosen drug requires: for ocrelizumab, HBV screening (HBsAg and anti-HBc) and quantitative serum immunoglobulins; for another drug, its own label checks (for example anti-JCV antibody status and index before natalizumab, or a blood count with lymphocytes and liver tests before dimethyl fumarate). Review vaccination history and give any live vaccine at least 4 weeks before a drug that precludes it.",
         "Replace vitamin D (25-hydroxyvitamin D 21 ng/mL)"
       ]
     },
@@ -491,7 +567,9 @@
       {
         "alternatives": [
           {
-            "required_arguments": {},
+            "required_arguments": {
+              "angiography": false
+            },
             "tool_name": "order_ct_scan"
           }
         ],
@@ -499,31 +577,7 @@
           "[Wattjes_2021]"
         ],
         "criterion_id": "avoid-waste-2-order-ct-scan",
-        "rationale": "A week-old brainstem deficit is assessed with MRI, which he needs anyway; CT does not show pontine demyelinating lesions.",
-        "severity": "waste"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "order_echocardiogram"
-          }
-        ],
-        "citations": [],
-        "criterion_id": "avoid-waste-3-order-echocardiogram",
-        "rationale": "MRI shows enhancing demyelinating lesions without restricted diffusion, not an infarct, so there is no cardioembolic question to answer.",
-        "severity": "waste"
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "order_cardiac_monitoring"
-          }
-        ],
-        "citations": [],
-        "criterion_id": "avoid-waste-4-order-cardiac-monitoring",
-        "rationale": "No palpitations, syncope or infarct on MRI; rhythm monitoring has no diagnostic role here.",
+        "rationale": "A week-old brainstem deficit is assessed with MRI, which he needs anyway; a non-angiographic head CT does not show pontine demyelinating lesions.",
         "severity": "waste"
       },
       {
@@ -604,7 +658,7 @@
       {
         "diagnosis": "Pontine lacunar infarct",
         "icd_code": "I63.81",
-        "key_features": "For: age 61, hypertension, dyslipidaemia, sudden onset on waking. Against: no restricted diffusion (normal ADC), gadolinium enhancement of the pontine lesion, and multiple lesions of different ages elsewhere in the brain and cord.",
+        "key_features": "For: age 61, hypertension, dyslipidaemia, sudden onset on waking. Against: multiple lesions of different ages in periventricular, juxtacortical and cerebellar sites, a C5-C6 cord lesion and CSF-restricted oligoclonal bands, which an infarct does not explain; MR angiography shows patent vertebrobasilar arteries, so there is no basilar stenosis, occlusion or dissection, although a normal angiogram does not exclude a small-vessel lacune. Normal ADC at one week and enhancement do not by themselves exclude a subacute infarct.",
         "likelihood": "low"
       },
       {
@@ -648,7 +702,7 @@
       "Sudden left horizontal gaze palsy with a left lower motor neuron facial palsy, explained by the enhancing left dorsal pontine lesion at the facial colliculus",
       "DIS: 4 of 5 regions: periventricular (bilateral ovoid lesions perpendicular to the ventricles), juxtacortical (right frontal), infratentorial (left dorsal pons, both cerebellar hemispheres), spinal cord (left dorsolateral C5-C6)",
       "Age 61 with hypertension: the 2024 criteria recommend additional supporting evidence, here the C5-C6 cord lesion and positive CSF (5 CSF-restricted oligoclonal bands, kFLC index 31.4); simultaneous enhancing and non-enhancing lesions also show DIT",
-      "No restricted diffusion in the pontine lesion (T2 shine-through with normal ADC), against a lacunar infarct",
+      "The multifocal pattern (lesions of different ages in periventricular, juxtacortical and cerebellar sites and the C5-C6 cord) with CSF-restricted oligoclonal bands argues against a pontine infarct, and MR angiography shows patent vertebrobasilar arteries without stenosis, occlusion or dissection; the normal ADC at one week is not used alone to exclude an infarct",
       "AQP4-IgG and MOG-IgG negative by cell-based assay, with a short peripheral cord lesion and no optic neuritis or area postrema syndrome",
       "Mild age-appropriate deep white matter small-vessel change and dyslipidaemia are vascular markers that do not explain the enhancing, juxtacortical and cord lesions"
     ],
@@ -661,10 +715,10 @@
         "location": "labs"
       },
       {
-        "correct_interpretation": "Vascular risk and mild deep white matter small-vessel change do not explain ovoid periventricular, juxtacortical and enhancing infratentorial lesions, the absent diffusion restriction, the C5-C6 cord lesion or the CSF-restricted oligoclonal bands",
+        "correct_interpretation": "Vascular risk and mild deep white matter small-vessel change do not explain ovoid periventricular, juxtacortical and enhancing infratentorial lesions, the C5-C6 cord lesion or the CSF-restricted oligoclonal bands; a normal MR angiography excludes large-artery vertebrobasilar disease but would not by itself exclude a lacune",
         "data_point": "Hypertension, dyslipidaemia, a referral for suspected lacunar stroke and age-appropriate small-vessel change on MRI",
         "field_path": "initial_tool_outputs.mri.additional_observations[4]",
-        "intended_effect": "May lead the agent to diagnose a pontine lacunar infarct and stop after a vascular work-up",
+        "intended_effect": "May lead the agent to diagnose a pontine lacunar infarct and stop at a lacunar-infarct diagnosis",
         "location": "brain MRI"
       }
     ],
@@ -684,7 +738,8 @@
         "action-1-analyze-brain-mri",
         "action-2-order-body-imaging",
         "action-6-interpret-labs",
-        "action-aqp4-mog-cba"
+        "action-aqp4-mog-cba",
+        "action-vascular-imaging"
       ]
     }
   },
@@ -709,6 +764,16 @@
         "VDRL": "Nonreactive",
         "kappa free light chain index": "31.4 (elevated; reference < 6.1)"
       }
+    },
+    "ct": {
+      "additional_observations": [
+        "Age-related involutional change."
+      ],
+      "angiography_findings": null,
+      "contrast_used": false,
+      "findings": [],
+      "impression": "No acute intracranial abnormality. Age-related cerebral involutional change.",
+      "recommended_actions": []
     },
     "drug_interactions": null,
     "ecg": null,
@@ -999,7 +1064,7 @@
     "citation_gap": [],
     "condition_name": "Multiple sclerosis \u2014 relapsing-remitting",
     "criteria_pack_version": "1.0",
-    "difficulty_description": "Straightforward case with typical MRI findings (Dawson fingers, juxtacortical, infratentorial and cord lesions, enhancing lesions) and positive CSF oligoclonal bands. The challenge is the atypical demographics (a 61-year-old man with vascular risk) that suggest a lacunar stroke; the absent diffusion restriction, the lesion distribution and the CSF point to MS.",
+    "difficulty_description": "Straightforward case with typical MRI findings (Dawson fingers, juxtacortical, infratentorial and cord lesions, enhancing lesions) and positive CSF oligoclonal bands. The challenge is the atypical demographics (a 61-year-old man with vascular risk) that suggest a lacunar stroke; the lesion distribution and the CSF point to MS, a normal MR angiography excludes large-artery vertebrobasilar disease, and a normal ADC alone would not exclude a subacute infarct.",
     "difficulty_rationale": "Typical RRMS imaging (ovoid periventricular, juxtacortical, infratentorial and cord lesions, enhancing and non-enhancing) with CSF-restricted oligoclonal bands and negative AQP4/MOG; the 2024 McDonald criteria are met, and because he is 61 with hypertension the cord lesion and positive CSF supply the additional evidence the criteria recommend over 50.",
     "expected_agent_confidence": 0.85,
     "fallback_tool_kinds": {
