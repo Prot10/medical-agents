@@ -611,8 +611,12 @@ SPEC += [
          response="Applied: all 30 retain the required baseline mimic-exclusion panel (CBC, B12, "
                   "thyroid, HIV). AQP4-IgG and MOG-IgG by cell-based assay are a separate order "
                   "in 25 cases, not a universal screen: required in 8 with a red flag (severe "
-                  "optic neuritis, tumefactive lesion, onset at 50 or later) and recommended in "
-                  "17 with optic neuritis or myelitis. Their results are returned only to an "
+                  "optic neuritis, tumefactive lesion, onset at 50 or later), recommended in 7 with "
+                  "a feature suggestive of NMOSD or MOGAD (optic neuritis and myelitis in one attack, "
+                  "optic disc swelling, painful tonic spasms) and optional in 10 typical "
+                  "presentations; 5 cases have no criterion. The November 2026 round made the test "
+                  "targeted: before, it was recommended whenever optic neuritis or myelitis was in "
+                  "the history (17 cases). Their results are returned only to an "
                   "order that names the assay, not to the first-line panel."),
     dict(cond="multiple_sclerosis", filed="analyze_eeg", tool="analyze_eeg",
          reviewer=1, tier="remove", status="applied",
@@ -692,7 +696,10 @@ SPEC += [
          reviewer=1, tier="required", status="applied",
          response="Applied at pathway level: structural imaging is required in all 30 cases. "
                   "Twenty-nine use MRI; ALZ-EARLY-RS05 uses the requested non-contrast CT "
-                  "alternative because severe claustrophobia makes MRI unavailable."),
+                  "alternative because severe claustrophobia makes MRI unavailable. The MRI criterion "
+                  "is a non-contrast dementia protocol; only RS06 adds an optional gadolinium study, "
+                  "since the November 2026 round, to characterize the incidental extra-axial lesion "
+                  "its non-contrast study shows."),
     dict(cond="alzheimers_early", filed="analyze_brain_mri", tool="perform_clinical_assessment",
          reviewer=1, tier="required", status="applied",
          seg=("1) structured cognitive", "2) non-contrast"),
@@ -714,11 +721,18 @@ SPEC += [
          seg=("3) FDG-PET", "Suggested diagnostic sequence"),
          src_seg=("Source:", None),
          response="Applied: all subtype studies are optional and occur only after the core "
-                  "assessment. Seven atypical cases have an optional FDG-PET step, one of which "
-                  "(RP03) also accepts the newly priced perfusion-SPECT substitute; every case "
-                  "authors its own FDG-PET report, so an unanticipated order never returns a "
-                  "library normal scan. Amyloid PET is an alternative to CSF within one optional "
-                  "amyloid-status step in 29 cases (one conclusive test is enough)."),
+                  "assessment. Since the November 2026 round FDG-PET is a conditional test for a "
+                  "subtype question that would change management: the optional FDG-PET step remains "
+                  "only in P03, a frontal-variant presentation with a paternal behavioural dementia, "
+                  "where behavioural-variant FTD is the suspected alternative, and it accepts "
+                  "perfusion SPECT as the substitute. It was removed from P01, P02, RM04, RP01, RP02 "
+                  "and RP03, where the syndrome, the MRI and the amyloid biomarkers settle the "
+                  "diagnosis, and FDG-PET is waste in the 22 amnestic cases with conclusive amyloid "
+                  "biomarkers. Perfusion SPECT is waste in the other 29 cases, because it substitutes "
+                  "for FDG-PET only where FDG-PET is unavailable. Every case still authors its own "
+                  "FDG-PET report, so an unanticipated order never returns a library normal scan. "
+                  "Amyloid PET is an alternative to CSF within one optional amyloid-status step in "
+                  "29 cases (one conclusive test is enough)."),
     dict(cond="alzheimers_early", filed="interpret_labs", tool="interpret_labs",
          reviewer=1, tier="required", status="applied",
          response="Applied in all 30 cases: CBC, CMP, TSH, B12, folate, homocysteine, "
@@ -745,15 +759,19 @@ SPEC += [
                   "alternatives (with amyloid PET) of a single amyloid-status step. RP04 is the sole "
                   "required exception because the same lumbar puncture must answer the independent, "
                   "high-stakes CJD differential with RT-QuIC and 14-3-3; there amyloid PET is not a "
-                  "criterion."),
+                  "criterion, and since the November 2026 round ordering it is waste, because the "
+                  "lumbar puncture already establishes amyloid status."),
     dict(cond="alzheimers_early", filed="analyze_csf", tool="order_advanced_imaging",
          reviewer=1, tier="optional", status="applied",
          seg=("Add amyloid PET", None),
          response="Applied, following your ruling that PET is an alternative to CSF: in 29 cases "
                   "one optional amyloid-status step accepts either CSF biomarkers or amyloid PET, "
                   "one conclusive test is enough, and both return a concordant case-authored "
-                  "result. A second amyloid test is not required. FDG-PET/perfusion SPECT remains "
-                  "a separate optional subtype question."),
+                  "result. A second amyloid test is not required, and since the November 2026 round "
+                  "it counts as an unjustified extra action once the required work-up is done, except "
+                  "in M01 and M03, where a borderline CSF result leaves room for the other test. "
+                  "FDG-PET (or perfusion SPECT in its place) remains a separate subtype question, "
+                  "credited only in P03."),
 
     # === frontotemporal dementia (reviewer 1) ===
     dict(cond="ftd", filed="interpret_labs", tool="interpret_labs",
@@ -773,9 +791,11 @@ SPEC += [
                   "you would rather keep it optional there, tell us and those cases will be "
                   "relabelled possible bvFTD. Every case authors concordant FDG-PET and SPECT "
                   "results. Amyloid PET, with CSF AD markers as the alternative, is optional in 4 "
-                  "cases with an active AD differential. P04 has one explicit optional DaTscan "
-                  "exception for co-existing Parkinson's disease; it is not presented as an FTD "
-                  "test. Tau PET and all vascular imaging modalities are absent."),
+                  "cases with an active AD differential. No FTD case credits a DaTscan: the optional "
+                  "DaTscan in P04 was removed in the November 2026 round, so ordering one is now waste "
+                  "in all 30 cases; in P04 because the parkinsonism is clinically established and levodopa-responsive "
+                  "and the scan cannot separate Parkinson's disease from FTD-associated "
+                  "parkinsonism. Tau PET and all vascular imaging modalities are absent."),
     dict(cond="ftd", filed="order_specialized_test", tool="order_specialized_test",
          reviewer=1, tier="required", status="applied",
          response="Applied: the validated neuropsychological battery is required in all 30 cases. "
@@ -786,8 +806,11 @@ SPEC += [
                   "includes motor neuron disease, EMG/NCS is required and respiratory testing is "
                   "recommended as staging; both are absent from every FTD-only case. The two "
                   "primary progressive aphasia cases (S11, S12) recommend a speech and language "
-                  "evaluation. Genetics is also optional in 7 selected young/familial Alzheimer "
-                  "cases."),
+                  "evaluation. Since the November 2026 round an ALS gene panel is waste in the 7 "
+                  "cases with no sign of motor neuron disease that store one, because the FTD panel "
+                  "already tests C9orf72. It is accepted as an alternative within the optional "
+                  "genetics step in M02, whose brother died of ALS, and in P08. Genetics is also optional in 7 "
+                  "selected young/familial Alzheimer cases."),
     dict(cond="ftd", filed="order_specialized_test", tool="perform_clinical_assessment",
          reviewer=1, tier="required", status="applied",
          seg=("Validated neuropsychological testing must be REQUIRED", "Genetic testing should"),
@@ -801,9 +824,11 @@ SPEC += [
     dict(cond="ftd", filed="order_ct_scan", tool="order_ct_scan",
          reviewer=1, tier="optional", status="applied",
          response="Applied without adding cases: S06 uses non-contrast CT because severe "
-                  "claustrophobia makes MRI unavailable. M09 separately receives acute non-contrast "
-                  "CT in the emergency department before MRI because the immediate question is "
-                  "haemorrhage or mass. CT angiography, carotid duplex and transcranial Doppler are "
+                  "claustrophobia makes MRI unavailable. In M09 an emergency-department non-contrast "
+                  "CT is optional, acceptable but not required: it was required until the November "
+                  "2026 round, but nothing in the history (no trauma, headache, focal sign, fever or "
+                  "sudden change) calls for an emergency scan, and MRI remains the required study. "
+                  "CT angiography, carotid duplex and transcranial Doppler are "
                   "absent from every FTD case and authored report."),
 
     # === Parkinson's disease (reviewer 1) ===
@@ -941,52 +966,74 @@ SPEC += [
     # === temporal lobe epilepsy (reviewer 1) ===
     dict(cond="focal_epilepsy_temporal", filed="analyze_eeg", tool="analyze_eeg",
          reviewer=1, tier="required", status="applied",
-         response="Applied end to end in the October 2026 round. The pathway is staged: 24 routine "
-                  "recordings (required in 23; optional in RP01, where continuous EEG is the required "
-                  "study), 5 sleep-deprived studies, all recommended after a non-diagnostic or "
-                  "equivocal routine EEG, and 2 ambulatory studies (recommended in M03, required in "
-                  "RP02, where they capture the events). Video-EEG appears in 10 cases and is required "
-                  "only in 8: event capture against panic or PNES (P01, P03), seizure versus syncope "
-                  "(P05), the LGI1 encephalitis (P02) and presurgical evaluation (P04, RP04, RS01, "
-                  "RS04); it is recommended in M05 and RP05. RP01 is the single continuous-ICU "
-                  "recording, required, because its presentation is nonconvulsive status epilepticus, "
-                  "the acute setting you named."),
+         response="Applied end to end in the October 2026 round and adjusted in the November 2026 "
+                  "round. The pathway is staged: 24 routine recordings (required in 22; optional in "
+                  "RP01, where continuous EEG is the required study; recommended in RP02, where the "
+                  "ambulatory recording is the decisive study, November 2026 round), 5 sleep-deprived "
+                  "studies, all recommended after a non-diagnostic or equivocal routine EEG, and 2 "
+                  "ambulatory studies (recommended in M03, required in RP02, where they capture the "
+                  "events). Video-EEG appears in 11 cases and is required only in 7: event capture "
+                  "against panic or PNES (P01, P03), the LGI1 encephalitis (P02) and presurgical "
+                  "evaluation (P04, RP04, RS01, RS04). It is recommended in M05, RP05, P05 and RP03. "
+                  "P05 moved from required to recommended in the November 2026 round: the routine EEG "
+                  "and the MRI already secure the diagnosis and the cardiac work-up was normal, so "
+                  "event capture only closes any remaining syncope doubt. RP03 gained it in the same "
+                  "round, because its stored 72-hour study captured nine seizures while the routine "
+                  "EEG showed no epileptiform discharges. RP01 is the single continuous-ICU recording, required, because its "
+                  "presentation is nonconvulsive status epilepticus, the acute setting you named."),
     dict(cond="focal_epilepsy_temporal", filed="analyze_brain_mri", tool="analyze_brain_mri",
          reviewer=1, tier="required", status="applied",
          response="Applied: brain MRI is required in 29 cases, as the dedicated epilepsy protocol in "
                   "26; RP01 (encephalitis after skull-base cancer) and RP03 (a growing metastasis) "
                   "require contrast MRI, and P02 (LGI1 encephalitis) any MRI. Gadolinium is added "
-                  "only when a lesion, infection or tumor is suspected. P04 has no MRI criterion: her "
-                  "earlier 1.5T epilepsy-protocol MRI was normal, she could not tolerate the 3T study "
-                  "and declined anesthesia, so CT is optional there and her presurgical work-up rests "
-                  "on video-EEG and FDG-PET. CT is required only after the head injury in RM03 and "
-                  "recommended in RM01 (shunt) and RP05 (skull-base defect)."),
+                  "only when a lesion, infection or tumor is suspected: since the November 2026 round "
+                  "every first MRI report is a non-contrast study, and a post-gadolinium study is "
+                  "recommended in M04 and RM04 (a possible tumor before surgical planning) and RM03 "
+                  "(possible Sturge-Weber syndrome); in the pregnant patient (RS02) gadolinium is a "
+                  "harmful action. P04 has no MRI criterion: her earlier 1.5T epilepsy-protocol MRI "
+                  "was normal, she could not tolerate the 3T study and declined anesthesia, so CT is "
+                  "optional there and her presurgical work-up rests on video-EEG and FDG-PET. CT is "
+                  "required only after the head injury in RM03 and recommended in RM01 (shunt) and "
+                  "RP05 (skull-base defect). Two optional CT steps were added in the November 2026 "
+                  "round: in RP01, CT or MRI before the lumbar puncture to exclude mass effect, so "
+                  "that CSF and acyclovir are not delayed for MRI, and in RS02, a non-contrast CT to "
+                  "confirm the calcified granulomas, which may be deferred until after delivery."),
     dict(cond="focal_epilepsy_temporal", filed="interpret_labs", tool="interpret_labs",
          reviewer=1, tier="optional", status="applied",
-         response="Applied: 25 cases have a laboratory criterion, optional in 15. It is required only "
+         response="Applied: 26 cases have a laboratory criterion, optional in 15. It is required only "
                   "where the result is the case question (P02 serum LGI1 antibodies and sodium, RM03 "
                   "the phenytoin level after a fall with head injury, RS02 the eclampsia screen at 33 "
-                  "weeks) and recommended in 7 with a named indication (an antiseizure medication "
+                  "weeks) and recommended in 17 with a named indication (an antiseizure medication "
                   "level after a breakthrough seizure, renal function before acyclovir, glucose on "
-                  "metformin). Five cases have no laboratory criterion. The earlier claim that "
-                  "prolactin had left the template was not true at the time; it is now: only P05 "
-                  "keeps a level, drawn 22 minutes after a witnessed convulsion and read as evidence "
-                  "against a psychogenic event, not against syncope."),
+                  "metformin). The November 2026 round added two of these: a pregnancy test "
+                  "(beta-hCG) in 10 women of childbearing potential whose pregnancy status is not "
+                  "established and who start or switch an antiseizure medication or present with a "
+                  "first convulsion (M01, M02, P01, RM02, RP05, RS03, RS04, S02, S04, S06), and serum "
+                  "and urine osmolality with urine sodium for the hyponatremia on carbamazepine in "
+                  "P02. Four cases have no laboratory criterion. The earlier claim that prolactin had "
+                  "left the template was not true at the time; it is now: only P05 keeps a level. It "
+                  "was drawn 22 minutes after a witnessed convulsion, outside the 10 to 20 minute "
+                  "window, so since the November 2026 round it is read as at most supportive and no "
+                  "longer as evidence against a psychogenic event."),
     dict(cond="focal_epilepsy_temporal", filed="analyze_ecg", tool="analyze_ecg",
          reviewer=1, tier="optional", status="applied",
          response="Applied as you asked. The previous answer (ECG required in 21 cases) did the "
-                  "opposite. The ECG is now optional in the 19 cases that store one at a first "
-                  "presentation, so ordering it is credited and never waste; it is required only in "
-                  "P05, where seizure versus syncope is the case question, and recommended in RP02 "
-                  "as part of the pulmonary embolism assessment. The 9 established or tertiary cases "
-                  "have no ECG criterion."),
+                  "opposite. The ECG is now optional in 20 cases, so ordering it is credited and never "
+                  "waste, and it is required in none. P05 was the last required ECG; it became "
+                  "optional in the November 2026 round, because a normal 12-lead ECG, Holter, "
+                  "echocardiogram and tilt test were done in the past three months, so a repeat is "
+                  "acceptable but not mandatory. It is recommended in RP02 as part of the pulmonary "
+                  "embolism assessment. The 9 established or tertiary cases have no ECG criterion."),
     dict(cond="focal_epilepsy_temporal", filed="order_echocardiogram", tool="order_echocardiogram",
          reviewer=1, tier="remove", status="applied",
          response="Removed from all 30 action lists: no case has an echocardiography criterion, and "
-                  "ordering one is waste in 27 cases, each with its own rationale. P05 already had a "
-                  "normal cardiac work-up in its history, and RP02's pulmonary embolism is assessed "
-                  "with the required chest CT angiogram instead. Stored fallback reports are normal "
-                  "studies, so an agent that orders an echocardiogram anyway gets a coherent result."),
+                  "ordering one is waste in 29 cases, each with its own rationale. P05 is the "
+                  "exception: it already had a normal cardiac work-up in its history, and a repeat "
+                  "study is neither scored nor penalised. In RM02 and RP02 only a transesophageal "
+                  "study is waste (added in the November 2026 round, as low yield); a transthoracic "
+                  "study is left to clinical need there, and RP02's pulmonary embolism is assessed "
+                  "with the required chest CT angiogram. Stored fallback reports are normal studies, "
+                  "so an agent that orders an echocardiogram anyway gets a coherent result."),
     dict(cond="focal_epilepsy_temporal", filed="order_cardiac_monitoring",
          tool="order_cardiac_monitoring", reviewer=1, tier="remove", status="applied",
          response="Removed from all 30 action lists: no case has a rhythm-monitoring criterion, and "
