@@ -636,13 +636,22 @@ SPEC += [
          reviewer=1, tier="optional", status="applied",
          seg=(None, "Migraine with aura is primarily a clinical diagnosis. The true required"),
          response="Applied case by case and corrected beyond the first pass: MRI is absent in 11 "
-                  "typical cases, optional in 2 and recommended in 11 red-flag presentations. It "
-                  "is required in 6 non-routine exceptions: a first aphasic aura at 52, two "
-                  "documented infarcts, MELAS with persistent deficit, familial aneurysm evaluation "
-                  "and a witnessed seizure. Those scans establish or exclude the complication or "
-                  "alternative, not migraine. Vessel imaging is now its own study and no brain MRI "
-                  "report describes vessels: MR angiography in 8 cases (required in 3, recommended "
-                  "in 5) and MR venography in 1 (the seizure case, on a combined pill)."),
+                  "typical cases, optional in 2 and recommended in 8 red-flag presentations. It "
+                  "is required in 9 non-routine exceptions: a first aphasic aura at 52 (P01), an "
+                  "aphasic aura with atrial fibrillation, where silent infarcts would change the "
+                  "anticoagulation decision (P02), two documented infarcts (P03, P07), a family "
+                  "history of CADASIL (P04), MELAS with persistent deficit (P08), familial aneurysm "
+                  "evaluation (P09), a witnessed seizure (RM11) and sporadic hemiplegic migraine "
+                  "with impaired consciousness (RS11). P02, P04 and RS11 moved from recommended to "
+                  "required in the November 2026 round. Those scans establish or exclude the "
+                  "complication or alternative, not migraine. Vessel imaging is its own study and "
+                  "no brain MRI report describes vessels. MR angiography appears in 12 cases: "
+                  "required in 5 (P01, P03, P07, P09 and RM11, where CT angiography is accepted in "
+                  "the 3-hour emergency presentation), recommended in 4, and optional in 3 (M01, "
+                  "M05 and P05, as MRA or carotid duplex), because a normal MRI excludes infarction "
+                  "but not TIA, as your November 2026 notes asked. P01's MRA and RM11's arterial "
+                  "imaging became required in that round. MR venography appears in 1 case (the "
+                  "seizure case, on a combined pill)."),
     dict(cond="migraine_with_aura", filed="analyze_brain_mri", tool="perform_clinical_assessment",
          reviewer=1, tier="required", status="applied",
          seg=("Migraine with aura is primarily a clinical diagnosis. The true required", None),
@@ -652,24 +661,31 @@ SPEC += [
                   "flags. The first implementation incorrectly encoded a 3-of-4 rule."),
     dict(cond="migraine_with_aura", filed="analyze_eeg", tool="analyze_eeg",
          reviewer=1, tier="remove", status="applied",
-         response="Applied end to end: 29 of 30 cases have neither an EEG action nor an authored "
-                  "EEG result. The exception is MIG-AURA-RM11, "
-                  "whose diagnosis is hemiplegic migraine *with migralepsy* — a seizure during "
-                  "aura, ICHD-3 1.4.4 — so the EEG (video preferred, routine accepted) establishes half of the diagnosis "
-                  "rather than being routine headache evaluation, and it stays required there. "
-                  "That case is the one place to argue with us, and the place to do it is the case "
-                  "itself."),
+         response="Applied end to end: 28 of 30 cases have no EEG action, and an EEG ordered in "
+                  "them is answered with a normal report. There are two exceptions. "
+                  "MIG-AURA-RM11's diagnosis is probable sporadic hemiplegic migraine with "
+                  "suspected migraine aura-triggered seizures (a seizure during aura, ICHD-3 "
+                  "1.4.4), so the EEG (video preferred, routine accepted) answers half of the "
+                  "diagnosis rather than being routine headache evaluation, and it stays required "
+                  "there. In MIG-AURA-P08, genetically confirmed MELAS, still slightly slow to "
+                  "respond 10 days after a stroke-like episode with confusion, an EEG (routine, "
+                  "ambulatory or video) is recommended since the November 2026 round, as an early "
+                  "investigation of a stroke-like episode, not as headache work-up. Those two cases "
+                  "are the places to argue with us, and the place to do it is the case itself."),
     dict(cond="migraine_with_aura", filed="analyze_ecg", tool="analyze_ecg",
          reviewer=1, tier="remove", status="applied",
-         response="Applied to migraine evaluation: 29 of 30 cases have no ECG action. The exception is "
-                  "MIG-AURA-P08, genetically confirmed MELAS, where an ECG is recommended (not "
-                  "required) to screen for pre-excitation and conduction disease, part of the "
-                  "Mitochondrial Medicine Society care standards rather than headache work-up."),
+         response="Applied to migraine evaluation: 28 of 30 cases have no ECG action, and neither "
+                  "exception is headache work-up. In MIG-AURA-P08, genetically confirmed MELAS, an "
+                  "ECG is recommended (not required) to screen for pre-excitation and conduction "
+                  "disease, part of the Mitochondrial Medicine Society care standards. In "
+                  "MIG-AURA-RS11 the second attack included a period of unresponsiveness, so a "
+                  "12-lead ECG is required since the November 2026 round: NICE CG109 asks for one "
+                  "in everyone with transient loss of consciousness."),
     dict(cond="migraine_with_aura", filed="order_echocardiogram", tool="order_echocardiogram",
          reviewer=1, tier="remove", status="applied",
          response="Applied to routine migraine evaluation. Three cases order an echocardiogram, "
                   "all at required, and none is a routine migraine: MIG-AURA-P03 is a migrainous infarction whose diagnosis "
-                  "rests on secondary causes having been excluded, MIG-AURA-P07 is a cardioembolic "
+                  "rests on secondary causes having been excluded, MIG-AURA-P07 is a probably cardioembolic "
                   "PCA infarct the case explicitly distinguishes from migrainous infarction, and "
                   "MIG-AURA-P08 is genetically confirmed MELAS, where cardiomyopathy screening is "
                   "standard. In each the echocardiogram is embolic-source or cardiomyopathy "
@@ -681,15 +697,22 @@ SPEC += [
                   "moved."),
     dict(cond="migraine_with_aura", filed="analyze_csf", tool="analyze_csf",
          reviewer=1, tier="remove", status="applied",
-         response="Removed end to end: no migraine case orders CSF analysis and no authored CSF result remains. "
-                  "The seizure exception retains EEG, but lacked a specific clinical indication for LP."),
+         response="Removed end to end: no migraine case has a CSF analysis action, and a CSF order "
+                  "is answered with a normal stored report. The seizure exception retains EEG, but "
+                  "lacked a specific clinical indication for LP. Since the November 2026 round a "
+                  "lumbar puncture is no longer scored as waste in MIG-AURA-RS11: ICHD-3 notes that "
+                  "an LP may be needed in sporadic hemiplegic migraine to exclude HaNDL, which is now "
+                  "in that case's differential."),
     dict(cond="migraine_with_aura", filed="interpret_labs", tool="interpret_labs",
          reviewer=1, tier="optional", status="applied",
          response="Applied: no case requires routine blood tests. Five carry a targeted panel as "
                   "recommended (ESR and CRP in a first aura after 50, antiphospholipid antibodies "
                   "in the two infarct cases, lactate in the hemiplegic migraine and MELAS cases). "
-                  "The one required laboratory order is MIG-AURA-P08's m.3243A>G test, which can "
-                  "be requested as a laboratory panel or as a genetic test and confirms MELAS."),
+                  "Two laboratory orders are required, and neither is routine: MIG-AURA-P08's "
+                  "m.3243A>G test, which can be requested as a laboratory panel or as a genetic "
+                  "test and confirms MELAS, and, since your November 2026 note, today's INR and "
+                  "blood count in MIG-AURA-P05, a patient on warfarin with an above-range INR and "
+                  "gum and nose bleeding."),
 
     # === early Alzheimer's disease (reviewer 1) ===
     dict(cond="alzheimers_early", filed="analyze_brain_mri", tool="analyze_brain_mri",
@@ -836,25 +859,33 @@ SPEC += [
          reviewer=1, tier="optional", status="applied",
          response="Applied case by case: the fixed routine panel was removed. Nine of 30 cases "
                   "keep a targeted laboratory study for a question the case raises: required only "
-                  "in P04 (Wilson screen with ceruloplasmin and serum and 24-hour urinary copper in "
-                  "young-onset parkinsonism), recommended in RM02 (valproate level and ammonia), "
-                  "RM05 (thyroid function on levothyroxine) and RS01 (lithium level), and optional "
-                  "in the other 5. The other 21 have no laboratory action or authored laboratory "
-                  "report. Counselled genetics is under specialised tests."),
+                  "in RM05 (thyroid function on levothyroxine, with new slowing and a TSH 6 months "
+                  "old; raised from recommended in the November 2026 round), recommended in RM02 "
+                  "(valproate level and ammonia) and RS01 (lithium level), and optional in the "
+                  "other 6. One of those 6 is P04's Wilson screen (ceruloplasmin and serum and "
+                  "24-hour urinary copper), which your November 2026 note moved from required to "
+                  "optional: the presentation at 42 is typical and the slit-lamp shows no "
+                  "Kayser-Fleischer rings. The other 21 have no laboratory action; where a stored "
+                  "result exists (for example HbA1c in a diabetic patient), it is there only so "
+                  "that an order is answered consistently with the case. Counselled genetics is "
+                  "under specialised tests."),
     dict(cond="parkinsons", filed="analyze_eeg", tool="analyze_eeg",
          reviewer=1, tier="remove", status="applied",
          response="Removed: no Parkinson case orders an EEG, and it is listed as waste in 28; the "
                   "DLB and PSP mimic cases (P02, P03) do not penalise it, since posterior slowing "
                   "is a supportive DLB biomarker."),
     dict(cond="parkinsons", filed="analyze_ecg", tool="analyze_ecg",
-         reviewer=1, tier="remove", status="confirm",
-         response="Applied with one departure we ask you to rule on. 29 cases have no ECG "
-                  "criterion, and 18 list the ECG as waste. In RP01, a man with recurrent syncope "
-                  "and known Wolff-Parkinson-White, the ECG and a 24-hour Holter are recommended "
-                  "(echocardiography optional): the 2018 ESC syncope guideline asks for a 12-lead "
-                  "ECG in every syncope, and the case is built on attributing the syncope to "
-                  "neurogenic orthostatic hypotension rather than to the accessory pathway. If you "
-                  "would rather remove it there too, tell us."),
+         reviewer=1, tier="remove", status="applied",
+         response="Applied, with three exceptions your November 2026 notes settled. 27 cases have "
+                  "no ECG criterion, and 17 list the ECG as waste. In RP01, a man with recurrent "
+                  "syncope and known Wolff-Parkinson-White, the 12-lead ECG is now required (the "
+                  "2018 ESC syncope guideline asks for one in every syncope), a 24-hour Holter and "
+                  "an electrophysiology study for accessory-pathway risk stratification are "
+                  "recommended (2019 ESC SVT guideline; a Holter that captured no syncope does not "
+                  "exclude an arrhythmia), and echocardiography is optional. P01 (recurrent falls "
+                  "and near-syncope with neurogenic orthostatic hypotension, midodrine or droxidopa "
+                  "planned) and P02 (two falls with loss of consciousness, before a cholinesterase "
+                  "inhibitor) now have a recommended baseline ECG with a stored tracing."),
     dict(cond="parkinsons", filed="order_specialized_test", tool="order_specialized_test",
          reviewer=1, tier="optional", status="applied",
          response="Applied end to end: EMG/NCS, repetitive stimulation, biopsies and evoked "
@@ -867,16 +898,29 @@ SPEC += [
                   "enactment not yet confirmed and recommended in one (M05, violent episodes with "
                   "obstructive sleep apnoea as the RBD mimic). Counselled PD genetics is optional "
                   "only in the 42-year-old young-onset case and one case with an affected "
-                  "first-degree relative."),
+                  "first-degree relative. The cardiac electrophysiology study recommended in RP01 "
+                  "is described under the ECG answer."),
     dict(cond="parkinsons", filed="analyze_brain_mri", tool="analyze_brain_mri",
          reviewer=1, tier="required", status="applied",
-         response="Structural imaging remains required, but is described as exclusion of a secondary or "
-                  "atypical parkinsonian syndrome rather than proof of idiopathic PD: MRI in 29 cases and "
-                  "the reviewed CT alternative in one."),
+         response="Structural imaging is described as exclusion of a secondary or atypical "
+                  "parkinsonian syndrome rather than proof of idiopathic PD. Your November 2026 "
+                  "notes made it optional in clinically typical PD (NICE NG71: structural MRI is "
+                  "not used to diagnose PD), and we applied that to all 15 typical cases: MRI is "
+                  "optional in 14 and the CT alternative in S06, so 14 cases have no required test "
+                  "and are answered by a clinical diagnosis. MRI stays required in the other 15, "
+                  "each for a written reason: near-symmetric gait-onset parkinsonism in older "
+                  "diabetic patients (M01, M02, M03), MSA or PSP features (P01, P03, RP03), early "
+                  "orthostatic hypotension (RP01, RP02), a dementia work-up (P02), onset at 42 "
+                  "(P04), new episodic oculomotor and speech symptoms (RM01), encephalitis 18 "
+                  "months earlier (RM02), pre-DBS planning (RP04), a prior TIA with white-matter "
+                  "disease (RP05) and a ventriculoperitoneal shunt (RS02)."),
     dict(cond="parkinsons", filed="analyze_brain_mri", tool="order_ct_scan",
          reviewer=1, tier="optional", status="applied",
          response="Applied without adding a case: PD-S06 uses non-contrast CT because severe "
-                  "claustrophobia makes MRI unavailable; the report explicitly states CT's lower sensitivity."),
+                  "claustrophobia makes MRI unavailable; the report explicitly states CT's lower "
+                  "sensitivity. Since the November 2026 round the CT is optional there, as MRI is "
+                  "in the other clinically typical cases, to be considered only if structural "
+                  "imaging becomes indicated."),
 
     # === amyotrophic lateral sclerosis (reviewer 1) ===
     dict(cond="als", filed="order_specialized_test", tool="order_specialized_test",
@@ -1046,22 +1090,42 @@ SPEC += [
          response="Applied as your second option, as agreed in August 2026 and confirmed on 24 "
                   "October 2026: FND stays in the frozen 20-condition dataset, and dementia with "
                   "Lewy bodies remains a deferred same-size replacement. The examination of positive "
-                  "functional signs is the only required diagnostic act, in all 30 cases, and no "
-                  "instrumental test is required in any case. Video-EEG appears in 22 paroxysmal "
-                  "cases and is optional in every one of them. A test that answers a named red flag "
-                  "is recommended, not required: brain MRI in 12 cases (with gadolinium only for a "
-                  "new deficit on natalizumab; emergency MRI or CT for an acute hemiparesis three "
-                  "hours after an insulin bolus), spine MRI in 1 case of acute paraplegia, and named "
-                  "assays in 8 cases (glucose after insulin, sodium in polydipsia, electrolytes and "
-                  "thiamine in malnutrition, lupus and vasculitis markers). Optional elsewhere: brain "
-                  "MRI in 9 cases, labs in 4 cases, a 12-lead ECG in 10 cases whose events are "
-                  "apparent loss of consciousness or whose medicines affect the QT, and a "
-                  "neuropsychological battery in all 30 cases. The medicine review is required in 7 "
-                  "cases as a management act, not a diagnostic one: a drug started for the events "
-                  "(levetiracetam, carbamazepine, phenytoin, diazepam) is to be tapered, or a drug on "
-                  "the list worsens the picture (desmopressin with polydipsia, metoclopramide); "
-                  "please confirm this at re-review. EMG/NCS and evoked potentials are scored as "
-                  "waste in all 30 cases. Efficient traces stop after the examination."),
+                  "functional signs is required in all 30 cases. Your November 2026 notes changed "
+                  "the rest: a test that a guideline makes necessary is now required rather than "
+                  "optional, while the waste labels still measure over-testing. Video-EEG appears "
+                  "in 18 paroxysmal cases and is optional in none. It is required in 7 where no "
+                  "clinician has seen a habitual event or the bedside semiology cannot separate "
+                  "the events from an epileptic seizure type (M04, M06, P01, RP01, S05, S06, S11), "
+                  "because without the recording the diagnosis stays at the ILAE possible level, "
+                  "and recommended in the 11 where a clinician witnessed a typical event (AAN "
+                  "2025). A 12-lead ECG is required in 12 cases whose events include apparent loss "
+                  "of responsiveness with no ECG on record (NICE CG109), recommended in 3 (RP01 "
+                  "and RS03, where an earlier ECG is likely but not documented, and RP02, on "
+                  "ondansetron with low potassium and magnesium), optional in P08 and scored as "
+                  "waste in 10 cases without loss of responsiveness. Brain MRI is required in 8 "
+                  "cases: a new focal deficit within 7 days (M05, P08, S05, S06, S10, RS04; in P08, "
+                  "three hours after an insulin bolus, MRI or non-contrast CT), new symptoms on "
+                  "natalizumab with a JC virus index of 2.8 (M09, with gadolinium) and complete "
+                  "bilateral visual loss (RS02, MRI or CT). It is recommended for 4 subacute "
+                  "questions (M03, P07, RM02, RP03), optional in 8 and waste in 2. Spine MRI is "
+                  "required for the acute paraplegia in S07 and optional in 2 cases. Named assays "
+                  "are required in 5 cases (glucose after insulin in P08, sodium and osmolality "
+                  "with polydipsia in RM01 and RM03, electrolytes and thiamine before refeeding in "
+                  "RP02 and RS01), recommended in 4 (lupus markers in M05, inflammatory markers in "
+                  "RP03, thyroid function for the new tremor in S02, electrolytes and thiamine with "
+                  "hazardous alcohol use in S09) and optional in 4. A neuropsychological battery is "
+                  "optional in all 30 cases. The medicine review is required in 5 cases as a "
+                  "management act, not a diagnostic one: a drug started for the events is to be "
+                  "tapered (levetiracetam in M02, carbamazepine, phenytoin and diazepam in RP01, "
+                  "levetiracetam and diazepam in RP03), or a drug on the list worsens the picture "
+                  "(desmopressin with polydipsia in RM03, metoclopramide above its weight-based "
+                  "maximum in RS01). It is recommended in 8 and optional in 15. Four cases were "
+                  "rewritten as new phenotypes after your near-duplicate notes: S02 functional "
+                  "tremor, S03 functional gait disorder, S04 functional fixed dystonia and RS02 "
+                  "record-derived functional visual loss, where visual evoked potentials and OCT "
+                  "are recommended. EMG/NCS and somatosensory evoked potentials are scored as waste "
+                  "in all 30 cases. Efficient traces stop once the examination and the required "
+                  "safety tests are done."),
 ]
 
 SPEC += [
