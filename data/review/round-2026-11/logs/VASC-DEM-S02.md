@@ -1,0 +1,30 @@
+# VASC-DEM-S02
+
+## Reviewer notes
+Reviewer status: R1 in_progress, no R2 | Approved before this round: no
+
+| note id | ruling | what changed (field paths) |
+|---|---|---|
+| d16d609a-293e-40d9-a6ff-598c9ebcd3c8 | FIXED (plan D16) | ground_truth.differential[2].key_features: OSA "is associated with white matter hyperintensity and cerebral small-vessel disease and may contribute to both the vascular injury and the cognitive impairment; with CPAP used about two nights a week and an Epworth of 13 it is a potentially important contributor to correct, but it is unlikely to be the sole explanation..." (likelihood low kept). red_herrings[1].correct_interpretation, key_clinical_evidence[4] and required_recommendations[5] (CPAP must: "poorly treated sleep apnoea may contribute to the small-vessel injury and the cognitive impairment") aligned |
+| 368be191-3ff4-4cd6-880f-4ef815c25066 | FIXED (plan D16) | ground_truth.key_clinical_evidence[2] -> "Passed performance-validity measures make the scores interpretable; they do not separate vascular impairment from depression, which rests on the clinical, functional and imaging picture". action_criteria[action-6-order-specialized-test].rationale reworded the same way; differential[0] key_features drop "passed performance-validity measures" as an argument against depression; metadata.key_educational_points[2] -> "...make a battery interpretable ..., but they do not decide between a vascular and a psychiatric cause" |
+| 338e7d25-e993-4cb1-87a9-7791e0b80cf5 | FIXED (plan C1, D1) | ground_truth.action_criteria[action-4-perform-clinical-assessment].importance required -> recommended; removed from stop_rule.required_before_assessment (now screen, labs, MRI); rationale "Timed testing quantifies the short-stepped gait with en bloc turns and the falls risk; the diagnosis does not depend on it [VASCOG_2014]." |
+
+## Own findings
+| dim | severity | field path | finding | action |
+|---|---|---|---|---|
+| C | minor | initial_tool_outputs.specialized_test | Plan class C6 (D6): RAVLT delayed free recall 18th flagged "yes" | FIXED: percentile rows reference_range "9th percentile or above (25th-75th average)"; that row "low average"; impression "with low-average free recall". Validity row (pass) unchanged |
+| C | minor | ground_truth.action_criteria[action-5-analyze-brain-mri].rationale | "The vascular attribution ... rests on the small-vessel burden" (C8 sufficiency) | FIXED: the burden "read with the apathetic dysexecutive profile and the course, informs the vascular attribution and the weight of a primary depressive explanation [STRIVE_2] [VasCog2_WSO_2025]" |
+| E | minor | ground_truth.action_criteria[action-6-order-specialized-test].label | "to settle the ... attribution" overstates a recommended test | FIXED: "to characterise the executive-versus-amnestic profile" |
+| C | minor | ground_truth.avoided_actions | Plan class C11 (D12): stored SPECT, levodopa challenge and DTI follow-ups matched no criterion or label | FIXED: added avoid-waste-perfusion-spect (order_advanced_imaging modality perfusion_SPECT, [NICE_NG97]), avoid-waste-levodopa-challenge (perform_clinical_assessment assessment_type levodopa_challenge, [VASCOG_2014]), avoid-waste-dti-tractography (modality DTI_tractography, [STRIVE_2]). TEE is already covered by the wildcard echo waste label; speech-language, polysomnography and respiratory function stay unlabelled (plan table). Follow-ups already credited-first |
+
+## Changes
+The diagnosis is unchanged. Sleep apnoea is no longer described as unable to contribute to the white matter disease: poorly treated OSA is associated with white matter hyperintensity and small-vessel disease and may contribute to both the vascular injury and the cognitive impairment. It remains a low-likelihood sole explanation and a contributor to correct, with the CPAP must saying why. Passed performance-validity measures are now described as making the scores interpretable, not as separating vascular impairment from depression, which rests on the clinical, functional and imaging picture. This is applied in the key evidence, the battery rationale, the depression differential and the teaching point. Timed gait testing is recommended, not required (stop rule: screen, labs, MRI). The RAVLT 18th percentile is labelled low average, the MRI rationale rests attribution on concordance, and ordering perfusion SPECT, a levodopa challenge or DTI is labelled waste; the stored reports are kept. Checks: perfect_agent.py passes; test_case_guards 48 passed for the batch; case_io check, no failure naming the case. No MRI edited.
+
+## Verification
+Pass 1: 0 errors found
+Checked: d16d609a (OSA as a possible contributor, in the differential, red herring, key evidence and CPAP must), 368be191 (validity measures, in the key evidence, battery rationale, depression differential and teaching point) and 338e7d25 (gait recommended, out of the stop rule) applied; C6 RAVLT 18th low average; C11 labels consistent with the exam; perfect_agent, case_io check and test_case_guards pass.
+Cosmetic (not counted): none.
+Condition audit (17 Nov 2026): 1 error found and fixed. C, minor, ground_truth.avoided_actions[avoid-waste-levodopa-challenge].citations: [VASCOG_2014] does not address levodopa challenge testing and the plan's C11 table gives this label no citation; 19 other VASC-DEM cases carry it uncited (the P05 and P06 verifiers removed the same citation and flagged S01-S05 for the lead). FIXED: citation removed, rationale and severity unchanged. Re-checked: perfect_agent.py passes; test_case_guards clean for VASC-DEM.
+Pass 5: 0 errors found
+Checked the condition-audit change only: ground_truth.avoided_actions[avoid-waste-levodopa-challenge].citations is now empty, matching the plan's C11 table (levodopa_challenge: waste, no citation) and the other VASC-DEM cases; rationale and severity unchanged and consistent with the exam (no rest tremor or rigidity, arm swing preserved); no criterion matches the same call. perfect_agent.py -v passes; test_case_guards (S02-S05) 32 passed. No changes made.
+Cosmetic (not counted): none.

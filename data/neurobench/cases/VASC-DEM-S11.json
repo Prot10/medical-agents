@@ -179,6 +179,34 @@
       "output": {
         "findings": [
           {
+            "finding": "irregular plaque with 50-60% narrowing (NASCET)",
+            "interpretation": "moderate stenosis",
+            "region": "right internal carotid artery bulb"
+          },
+          {
+            "finding": "plaque with under 30% narrowing",
+            "interpretation": "minimal disease",
+            "region": "left internal carotid artery bulb"
+          },
+          {
+            "finding": "right middle cerebral artery and its divisions patent; no intracranial stenosis",
+            "interpretation": "patent",
+            "region": "intracranial arteries"
+          }
+        ],
+        "impression": "Moderate right internal carotid stenosis (50-60%, NASCET) and minimal left bulb disease; intracranial arteries patent.",
+        "modality": "MR_angiography",
+        "quantitative_data": null,
+        "recommended_actions": [],
+        "tracer_or_protocol": "3D time-of-flight intracranial MRA with contrast-enhanced neck MRA"
+      },
+      "tool_name": "order_advanced_imaging",
+      "trigger_action": "request_mr_angiography"
+    },
+    {
+      "output": {
+        "findings": [
+          {
             "finding": "large defect with absent perfusion",
             "interpretation": "chronic tissue loss",
             "region": "right frontoparietal cortex and subcortical white matter"
@@ -419,34 +447,6 @@
       "output": {
         "findings": [
           {
-            "finding": "irregular plaque with 50-60% narrowing (NASCET)",
-            "interpretation": "moderate stenosis",
-            "region": "right internal carotid artery bulb"
-          },
-          {
-            "finding": "plaque with under 30% narrowing",
-            "interpretation": "minimal disease",
-            "region": "left internal carotid artery bulb"
-          },
-          {
-            "finding": "right middle cerebral artery and its divisions patent; no intracranial stenosis",
-            "interpretation": "patent",
-            "region": "intracranial arteries"
-          }
-        ],
-        "impression": "Moderate right internal carotid stenosis (50-60%, NASCET) and minimal left bulb disease; intracranial arteries patent.",
-        "modality": "MR_angiography",
-        "quantitative_data": null,
-        "recommended_actions": [],
-        "tracer_or_protocol": "3D time-of-flight intracranial MRA with contrast-enhanced neck MRA"
-      },
-      "tool_name": "order_advanced_imaging",
-      "trigger_action": "request_mr_angiography"
-    },
-    {
-      "output": {
-        "findings": [
-          {
             "finding": "irregular bulb stenosis of 55% (NASCET)",
             "interpretation": "moderate stenosis",
             "region": "right internal carotid artery"
@@ -532,7 +532,7 @@
         "criterion_id": "action-7-order-specialized-test",
         "expected_evidence": "Attentional, executive and visuoconstructional impairment with preserved recognition and naming; informant FAQ 17/30",
         "importance": "recommended",
-        "label": "Order formal multi-domain neuropsychological testing to settle the executive-versus-amnestic attribution and to document a baseline for follow-up",
+        "label": "Order formal multi-domain neuropsychological testing to characterise the executive-versus-amnestic profile and to document a baseline for follow-up",
         "rationale": "Formal testing and an informant-rated functional scale document the profile and the loss of instrumental independence, and give a baseline for reassessment."
       },
       {
@@ -602,6 +602,12 @@
               "modality": "carotid_duplex"
             },
             "tool_name": "order_advanced_imaging"
+          },
+          {
+            "required_arguments": {
+              "modality": "MR_angiography"
+            },
+            "tool_name": "order_advanced_imaging"
           }
         ],
         "citations": [
@@ -610,8 +616,24 @@
         "criterion_id": "action-6-order-advanced-imaging",
         "expected_evidence": "Right ICA 50-60% (NASCET) irregular plaque ipsilateral to the infarct; left ICA under 30%",
         "importance": "required",
-        "label": "Image the extracranial carotid arteries: the result of the acute carotid study is not available",
+        "label": "Image the cervical carotid arteries (duplex or MR angiography): the result of the acute carotid study is not available",
         "rationale": "A right MCA cortical infarct ten weeks ago with no carotid result in the record: the grade of an ipsilateral stenosis decides a revascularisation referral within the 6-month window."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "order_cardiac_monitoring"
+          }
+        ],
+        "citations": [
+          "[AHA_ASA_2021_secondary]"
+        ],
+        "criterion_id": "action-prolonged-monitoring",
+        "expected_evidence": "Sinus rhythm throughout a 30-day event recording; no atrial fibrillation or flutter",
+        "importance": "optional",
+        "label": "Consider prolonged ambulatory rhythm monitoring (about 30 days) if the stroke mechanism remains uncertain",
+        "rationale": "Not mandatory: the moderate ipsilateral carotid stenosis is the likely mechanism and 72-hour telemetry was in sinus rhythm, but prolonged monitoring may be considered if the mechanism remains uncertain [AHA_ASA_2021_secondary]."
       }
     ],
     "assessment": {
@@ -715,7 +737,9 @@
       {
         "alternatives": [
           {
-            "required_arguments": {},
+            "required_arguments": {
+              "echo_type": "TTE"
+            },
             "tool_name": "order_echocardiogram"
           }
         ],
@@ -729,15 +753,109 @@
       {
         "alternatives": [
           {
-            "required_arguments": {},
-            "tool_name": "order_cardiac_monitoring"
+            "required_arguments": {
+              "modality": "perfusion_SPECT"
+            },
+            "tool_name": "order_advanced_imaging"
+          }
+        ],
+        "citations": [
+          "[NICE_NG97]"
+        ],
+        "criterion_id": "avoid-waste-perfusion-spect",
+        "rationale": "Perfusion SPECT adds nothing to the MRI in vascular cognitive impairment; the MRI already shows the established right MCA infarct and the small-vessel burden [NICE_NG97].",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "assessment_type": "levodopa_challenge"
+            },
+            "tool_name": "perform_clinical_assessment"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "avoid-waste-levodopa-challenge",
+        "rationale": "No rest tremor or bradykinesia on examination; the left-sided weakness and spastic left arm tone are pyramidal signs of the right MCA infarct, so there is no parkinsonism to test.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "ssep"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "avoid-waste-ssep",
+        "rationale": "The left hemisensory deficit is clinically evident and explained by the right MCA infarct; SSEP does not inform the cognitive diagnosis.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "modality": "DTI_tractography"
+            },
+            "tool_name": "order_advanced_imaging"
+          }
+        ],
+        "citations": [
+          "[STRIVE_2]"
+        ],
+        "criterion_id": "avoid-waste-dti-tractography",
+        "rationale": "A research or problem-solving sequence that does not change diagnosis or management [STRIVE_2].",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "modality": "perfusion_MRI"
+            },
+            "tool_name": "order_advanced_imaging"
+          }
+        ],
+        "citations": [
+          "[STRIVE_2]"
+        ],
+        "criterion_id": "avoid-waste-perfusion-mri",
+        "rationale": "A research or problem-solving sequence that does not change diagnosis or management [STRIVE_2].",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "modality": "functional_MRI"
+            },
+            "tool_name": "order_advanced_imaging"
+          }
+        ],
+        "citations": [
+          "[STRIVE_2]"
+        ],
+        "criterion_id": "avoid-waste-functional-mri",
+        "rationale": "A research or problem-solving sequence that does not change diagnosis or management [STRIVE_2].",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "modality": "CT_perfusion"
+            },
+            "tool_name": "order_advanced_imaging"
           }
         ],
         "citations": [
           "[AHA_ASA_2021_secondary]"
         ],
-        "criterion_id": "avoid-waste-7-order-cardiac-monitoring",
-        "rationale": "72 hours of telemetry at the admission showed sinus rhythm and the infarct lies downstream of an ipsilateral stenosis; prolonged monitoring would not change management.",
+        "criterion_id": "avoid-waste-ct-perfusion",
+        "rationale": "Perfusion imaging is for acute stroke; this infarct is established at ten weeks [AHA_ASA_2021_secondary].",
         "severity": "waste"
       }
     ],
@@ -837,6 +955,15 @@
         ],
         "reason": "Document the cognitive deficit before attributing it: imaging read without a cognitive profile invites over-attribution of incidental white matter change.",
         "severity": "soft"
+      },
+      {
+        "after_criterion_id": "action-prolonged-monitoring",
+        "before_criterion_id": "action-5-analyze-ecg",
+        "citations": [
+          "[AHA_ASA_2021_secondary]"
+        ],
+        "reason": "Prolonged monitoring is for the patient whose surface ECG did not already show atrial fibrillation.",
+        "severity": "soft"
       }
     ],
     "stop_rule": {
@@ -878,7 +1005,24 @@
       "recommended_actions": [],
       "tracer_or_protocol": null
     },
-    "cardiac_monitoring": null,
+    "cardiac_monitoring": {
+      "duration_hours": 720,
+      "events": [],
+      "findings": [
+        "Sinus rhythm throughout 28 analysable days of a 30-day recording.",
+        "No atrial fibrillation or flutter.",
+        "Rare isolated premature atrial and ventricular complexes (under 1% of beats). No pauses over 2.0 s and no AV block."
+      ],
+      "heart_rate_range": {
+        "average": 77,
+        "max": 118,
+        "min": 54
+      },
+      "impression": "Sinus rhythm throughout the 30-day recording. No atrial fibrillation or flutter. No pauses or AV block.",
+      "monitor_type": "event_monitor_30d",
+      "recommended_actions": [],
+      "rhythm_summary": "Sinus rhythm throughout"
+    },
     "clinical_assessment": {
       "assessment_type": "cognitive_screen",
       "criteria_met": {
@@ -1218,37 +1362,37 @@
         },
         {
           "abnormal": "yes",
-          "reference_range": "25th-75th percentile",
+          "reference_range": "9th percentile or above (25th-75th average)",
           "test": "Trail Making Test Part B",
           "value": "5th percentile"
         },
         {
           "abnormal": "yes",
-          "reference_range": "25th-75th percentile",
+          "reference_range": "9th percentile or above (25th-75th average)",
           "test": "Symbol Digit Modalities Test",
           "value": "7th percentile"
         },
         {
           "abnormal": "yes",
-          "reference_range": "25th-75th percentile",
+          "reference_range": "9th percentile or above (25th-75th average)",
           "test": "Rey figure copy",
           "value": "8th percentile"
         },
         {
-          "abnormal": "yes",
-          "reference_range": "25th-75th percentile",
+          "abnormal": "low average",
+          "reference_range": "9th percentile or above (25th-75th average)",
           "test": "RAVLT delayed free recall",
           "value": "22nd percentile"
         },
         {
           "abnormal": "no",
-          "reference_range": "25th-75th percentile",
+          "reference_range": "9th percentile or above (25th-75th average)",
           "test": "RAVLT delayed recognition",
           "value": "48th percentile"
         },
         {
           "abnormal": "no",
-          "reference_range": "25th-75th percentile",
+          "reference_range": "9th percentile or above (25th-75th average)",
           "test": "Boston Naming Test",
           "value": "50th percentile"
         },
