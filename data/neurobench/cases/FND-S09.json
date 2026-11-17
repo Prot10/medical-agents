@@ -74,21 +74,7 @@
       "recommended_actions": []
     },
     "drug_interactions": null,
-    "ecg": {
-      "axis": "normal",
-      "clinical_correlation": "",
-      "findings": [
-        "Normal sinus rhythm. Normal axis and intervals. No acute ST-T changes."
-      ],
-      "interpretation": "Normal ECG",
-      "intervals": {
-        "PR": "140 ms",
-        "QRS": "100 ms",
-        "QTc": "432 ms"
-      },
-      "rate": 70,
-      "rhythm": "normal sinus rhythm"
-    },
+    "ecg": null,
     "echo": {
       "chambers": {
         "LA": "normal size",
@@ -120,6 +106,44 @@
   "followup_outputs": [
     {
       "output": {
+        "findings": [
+          {
+            "domain": "global cognition",
+            "result": "MoCA 27/30"
+          },
+          {
+            "domain": "memory, attention, executive function, language, visuospatial",
+            "result": "cognitive performance within normal limits across memory, attention, executive, language and visuospatial domains"
+          },
+          {
+            "domain": "mood and anxiety (self-report)",
+            "result": "trauma-related symptoms above the screening threshold, moderate depressive and anxiety symptoms, hazardous alcohol use on self-report and elevated dissociative experiences"
+          },
+          {
+            "domain": "effort",
+            "result": "performance validity measures passed (TOMM trial 2 48/50)"
+          }
+        ],
+        "impression": "Cognitive performance within normal limits across memory, attention, executive, language and visuospatial domains. Self-report measures show trauma-related symptoms above the screening threshold, moderate depressive and anxiety symptoms, hazardous alcohol use on self-report and elevated dissociative experiences. Performance validity measures passed.",
+        "quantitative_data": {
+          "AUDIT": "14 (hazardous use)",
+          "DES-II": "27",
+          "GAD-7": "12 (moderate)",
+          "MoCA": "27/30",
+          "PCL-5": "56",
+          "PHQ-9": "13 (moderate)",
+          "RAVLT_delayed_recall": "z = -0.6",
+          "TOMM_trial_2": "48/50",
+          "Trail_Making_B": "z = -0.8"
+        },
+        "recommended_actions": [],
+        "test_type": "neuropsych_battery"
+      },
+      "tool_name": "order_specialized_test",
+      "trigger_action": "request_neuropsych_battery"
+    },
+    {
+      "output": {
         "assessment_type": "performance_status",
         "findings": [
           {
@@ -141,44 +165,6 @@
       },
       "tool_name": "perform_clinical_assessment",
       "trigger_action": "request_performance_status"
-    },
-    {
-      "output": {
-        "findings": [
-          {
-            "domain": "global cognition",
-            "result": "MoCA 28/30"
-          },
-          {
-            "domain": "memory, attention, executive function, language, visuospatial",
-            "result": "cognitive performance within normal limits across memory, attention, executive, language and visuospatial domains"
-          },
-          {
-            "domain": "mood and anxiety (self-report)",
-            "result": "trauma-related symptoms above the screening threshold, moderate depressive and anxiety symptoms, hazardous alcohol use on self-report and elevated dissociative experiences"
-          },
-          {
-            "domain": "effort",
-            "result": "performance validity measures passed (TOMM trial 2 49/50)"
-          }
-        ],
-        "impression": "Cognitive performance within normal limits across memory, attention, executive, language and visuospatial domains. Self-report measures show trauma-related symptoms above the screening threshold, moderate depressive and anxiety symptoms, hazardous alcohol use on self-report and elevated dissociative experiences. Performance validity measures passed.",
-        "quantitative_data": {
-          "AUDIT": "14 (hazardous use)",
-          "DES-II": "27",
-          "GAD-7": "12 (moderate)",
-          "MoCA": "28/30",
-          "PCL-5": "56",
-          "PHQ-9": "13 (moderate)",
-          "RAVLT_delayed_recall": "z = -0.2",
-          "TOMM_trial_2": "49/50",
-          "Trail_Making_B": "z = -0.4"
-        },
-        "recommended_actions": [],
-        "test_type": "neuropsych_battery"
-      },
-      "tool_name": "order_specialized_test",
-      "trigger_action": "request_neuropsych_battery"
     }
   ],
   "ground_truth": {
@@ -202,6 +188,22 @@
         "importance": "required",
         "label": "Examine for positive functional signs",
         "rationale": "The right-sided weakness and tremor are diagnosed at the bedside: Hoover sign, dragging gait, variability and tremor entrainment are signs of clinical incompatibility (DSM-5 criterion B; Daum 2014)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_ecg"
+          }
+        ],
+        "citations": [
+          "[NICE_CG109]"
+        ],
+        "criterion_id": "action-ecg",
+        "expected_evidence": "Sinus rhythm at 86 per minute, normal PR, QRS and QTc",
+        "importance": "required",
+        "label": "12-lead ECG",
+        "rationale": "His events include apparent loss of responsiveness; NICE advises a 12-lead ECG for everyone with transient loss of consciousness, to look for a cardiac cause such as long QT, pre-excitation, a Brugada pattern or heart block."
       },
       {
         "alternatives": [
@@ -246,23 +248,6 @@
       {
         "alternatives": [
           {
-            "required_arguments": {},
-            "tool_name": "analyze_ecg"
-          }
-        ],
-        "citations": [
-          "[NICE_CG109]",
-          "[NICE_NG217]"
-        ],
-        "criterion_id": "action-ecg",
-        "expected_evidence": "Sinus rhythm with normal conduction and QT interval",
-        "importance": "optional",
-        "label": "12-lead ECG",
-        "rationale": "Episodes of apparent unresponsiveness: NICE advises a 12-lead ECG after transient loss of consciousness (CG109) and after a suspected seizure (NG217). The event semiology already favours functional seizures, so it does not contribute to the diagnosis."
-      },
-      {
-        "alternatives": [
-          {
             "required_arguments": {
               "eeg_type": "video"
             },
@@ -275,9 +260,9 @@
         ],
         "criterion_id": "action-4-analyze-eeg",
         "expected_evidence": "Habitual events recorded on video with no EEG change and a normal interictal record",
-        "importance": "optional",
+        "importance": "recommended",
         "label": "Video-EEG to capture a habitual event",
-        "rationale": "A blast injury and daily alcohol raise post-traumatic and withdrawal seizures, so a habitual event recorded without ictal change, which reaches the ILAE documented level, is the clearest answer, and co-occurring epilepsy is assessed before any antiseizure decision (LaFrance 2013; AAN 2025). Without the recording, the positive signs and the semiology of witnessed events support the diagnosis at a lower ILAE level of certainty (LaFrance 2013)."
+        "rationale": "A typical event was witnessed on examination, which supports the diagnosis at the clinically established level; recording a habitual event on video-EEG raises it to documented and screens for co-occurring epilepsy, as the AAN guideline advises where feasible (ILAE 2013; AAN 2025). The blast injury and daily alcohol make that screen for post-traumatic and withdrawal seizures worth having before any antiseizure decision."
       },
       {
         "alternatives": [
@@ -440,7 +425,7 @@
     ],
     "diagnosis": {
       "accepted": [
-        "Functional neurological disorder \u2014 right-sided functional hemimotor syndrome and PNES, with comorbid PTSD and alcohol use disorder",
+        "Functional neurological disorder \u2014 right-sided functional hemimotor syndrome and PNES, with comorbid PTSD and hazardous alcohol use",
         "functional neurological disorder",
         "functional neurological symptom disorder",
         "conversion disorder",
@@ -543,7 +528,8 @@
     "stop_rule": {
       "max_additional_actions": 0,
       "required_before_assessment": [
-        "action-3-perform-clinical-assessment"
+        "action-3-perform-clinical-assessment",
+        "action-ecg"
       ]
     }
   },
@@ -614,7 +600,24 @@
         ]
       }
     },
-    "ecg": null,
+    "ecg": {
+      "axis": "normal (+50 degrees)",
+      "findings": [
+        "Sinus rhythm at 86 per minute with normal P-wave morphology.",
+        "PR interval 160 ms with no delta wave; QRS 92 ms with normal morphology and no bundle branch block.",
+        "No coved or saddleback ST elevation in V1-V2; no ST-segment or T-wave abnormality.",
+        "QTc 431 ms, within normal limits for a man."
+      ],
+      "interpretation": "Normal 12-lead ECG: sinus rhythm at 86 per minute with normal PR, QRS and QTc intervals. No pre-excitation, Brugada pattern, heart block or QT prolongation.",
+      "intervals": {
+        "PR": "160 ms",
+        "QRS": "92 ms",
+        "QT": "360 ms",
+        "QTc": "431 ms (Bazett)"
+      },
+      "rate": 86,
+      "rhythm": "sinus rhythm"
+    },
     "echo": null,
     "eeg": {
       "activating_procedures": {
@@ -653,6 +656,40 @@
       ],
       "interpretation": "GGT 88 U/L (elevated). Remaining values within reference ranges.",
       "panels": {
+        "CBC": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "4.5-11.0",
+            "test": "WBC",
+            "unit": "K/uL",
+            "value": 7.4
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "13.5-17.5",
+            "test": "Hemoglobin",
+            "unit": "g/dL",
+            "value": 14.8
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "80-100",
+            "test": "MCV",
+            "unit": "fL",
+            "value": 92
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "150-400",
+            "test": "Platelets",
+            "unit": "K/uL",
+            "value": 245
+          }
+        ],
         "CMP": [
           {
             "clinical_significance": null,
@@ -767,6 +804,16 @@
             "value": 0.8
           }
         ],
+        "LFT": [
+          {
+            "clinical_significance": "Raised GGT with normal transaminases, consistent with regular alcohol intake.",
+            "is_abnormal": true,
+            "reference_range": "10-71",
+            "test": "GGT",
+            "unit": "U/L",
+            "value": 88
+          }
+        ],
         "Magnesium and thiamine": [
           {
             "clinical_significance": null,
@@ -785,39 +832,7 @@
             "value": 96
           }
         ],
-        "Other": [
-          {
-            "clinical_significance": null,
-            "is_abnormal": true,
-            "reference_range": "10-71",
-            "test": "GGT",
-            "unit": "U/L",
-            "value": 88
-          },
-          {
-            "clinical_significance": null,
-            "is_abnormal": false,
-            "reference_range": "4.5-11.0",
-            "test": "WBC",
-            "unit": "K/uL",
-            "value": 7.4
-          },
-          {
-            "clinical_significance": null,
-            "is_abnormal": false,
-            "reference_range": "13.5-17.5",
-            "test": "Hemoglobin",
-            "unit": "g/dL",
-            "value": 14.8
-          },
-          {
-            "clinical_significance": null,
-            "is_abnormal": false,
-            "reference_range": "200-900",
-            "test": "Vitamin B12",
-            "unit": "pg/mL",
-            "value": 412
-          },
+        "TSH": [
           {
             "clinical_significance": null,
             "is_abnormal": false,
@@ -825,15 +840,9 @@
             "test": "TSH",
             "unit": "mIU/L",
             "value": 2.4
-          },
-          {
-            "clinical_significance": null,
-            "is_abnormal": false,
-            "reference_range": "<10",
-            "test": "Blood alcohol",
-            "unit": "mg/dL",
-            "value": 0
-          },
+          }
+        ],
+        "prolactin": [
           {
             "clinical_significance": null,
             "is_abnormal": false,
@@ -841,6 +850,26 @@
             "test": "Prolactin (20 min after an episode)",
             "unit": "ng/mL",
             "value": 8.2
+          }
+        ],
+        "toxicology": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "<10",
+            "test": "Blood alcohol",
+            "unit": "mg/dL",
+            "value": 0
+          }
+        ],
+        "vitamin_B12": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "200-900",
+            "test": "Vitamin B12",
+            "unit": "pg/mL",
+            "value": 412
           }
         ]
       }
@@ -854,19 +883,18 @@
     "case_body_concerns": [],
     "citation_gap": [],
     "criteria_pack_version": "1.0",
-    "difficulty_rationale": "Clear positive signs and typical motionless unresponsive episodes, with three prompts to over-investigate or mislabel (blast TBI, daily alcohol, a denied disability claim); the work-up is the examination and a targeted metabolic panel, with a video-EEG capture to confirm the episodes if needed.",
+    "difficulty_rationale": "Clear positive signs and typical motionless unresponsive episodes, one witnessed on the ward, with three prompts to over-investigate or mislabel (blast TBI, daily alcohol, a denied disability claim); the required work-up is the examination and a 12-lead ECG for the episodes with apparent loss of responsiveness, with a targeted metabolic panel and a video-EEG capture recommended.",
     "fallback_tool_kinds": {
       "cardiac_monitoring": "normal",
       "clinical_assessment": "case",
       "csf": "normal",
       "ct": "normal",
-      "ecg": "normal",
       "echo": "normal"
     },
-    "last_revised": "2026-10-24",
-    "notes": "Straightforward FND in a veteran with combat PTSD, remote mild TBI and daily alcohol: functional right-sided weakness and tremor with functional unresponsive episodes. FND and PTSD co-occur and are both valid diagnoses.",
+    "last_revised": "2026-11-16",
+    "notes": "Straightforward FND in a veteran with combat PTSD, remote mild TBI and daily hazardous drinking: functional right-sided weakness and tremor with functional unresponsive episodes. FND and PTSD co-occur and are both valid diagnoses.",
     "policy_spec_status": "draft",
-    "revision_reason": "October 2026 review round: criteria rebuilt to the pack tiers (exam required, targeted labs recommended, brain MRI optional), canonical literature and medication outputs, disguised follow-ups removed, case-specific differential, evidence and assessment. Close-out 24 Oct 2026: video-EEG optional and red-flag tests recommended, per the July 2026 agreement with the physicians that the examination is the only required diagnostic act.",
+    "revision_reason": "November 2026 review round: 12-lead ECG required for the episodes with apparent loss of responsiveness (NICE CG109), with a stored case ECG; video-EEG recommended (episode witnessed on the ward; ILAE 2013, AAN 2025); diagnosis label states hazardous alcohol use (AUDIT 14, WHO AUDIT zones) instead of alcohol use disorder. Earlier (October 2026): criteria rebuilt to the pack tiers, disguised follow-ups removed, case-specific differential, evidence and assessment.",
     "version": "policy-v1",
     "vocab_gap": []
   },

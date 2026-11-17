@@ -106,6 +106,43 @@
   "followup_outputs": [
     {
       "output": {
+        "findings": [
+          {
+            "domain": "global cognition",
+            "result": "MoCA 27/30"
+          },
+          {
+            "domain": "memory, attention, executive function, language, visuospatial",
+            "result": "cognitive performance within normal limits across memory, attention, executive, language and visuospatial domains"
+          },
+          {
+            "domain": "mood and anxiety (self-report)",
+            "result": "severe anxiety, moderate depressive symptoms, a high somatic symptom burden and elevated dissociative experiences"
+          },
+          {
+            "domain": "effort",
+            "result": "performance validity measures passed (TOMM trial 2 48/50)"
+          }
+        ],
+        "impression": "Cognitive performance within normal limits across memory, attention, executive, language and visuospatial domains. Self-report measures show severe anxiety, moderate depressive symptoms, a high somatic symptom burden and elevated dissociative experiences. Performance validity measures passed.",
+        "quantitative_data": {
+          "DES-II": "25",
+          "GAD-7": "15 (severe)",
+          "MoCA": "27/30",
+          "PHQ-15": "21 (high)",
+          "PHQ-9": "14 (moderate)",
+          "RAVLT_delayed_recall": "z = -0.6",
+          "TOMM_trial_2": "48/50",
+          "Trail_Making_B": "z = -0.9"
+        },
+        "recommended_actions": [],
+        "test_type": "neuropsych_battery"
+      },
+      "tool_name": "order_specialized_test",
+      "trigger_action": "request_neuropsych_battery"
+    },
+    {
+      "output": {
         "assessment_type": "performance_status",
         "findings": [
           {
@@ -127,43 +164,6 @@
       },
       "tool_name": "perform_clinical_assessment",
       "trigger_action": "request_performance_status"
-    },
-    {
-      "output": {
-        "findings": [
-          {
-            "domain": "global cognition",
-            "result": "MoCA 28/30"
-          },
-          {
-            "domain": "memory, attention, executive function, language, visuospatial",
-            "result": "cognitive performance within normal limits across memory, attention, executive, language and visuospatial domains"
-          },
-          {
-            "domain": "mood and anxiety (self-report)",
-            "result": "severe anxiety, moderate depressive symptoms, a high somatic symptom burden and elevated dissociative experiences"
-          },
-          {
-            "domain": "effort",
-            "result": "performance validity measures passed (TOMM trial 2 49/50)"
-          }
-        ],
-        "impression": "Cognitive performance within normal limits across memory, attention, executive, language and visuospatial domains. Self-report measures show severe anxiety, moderate depressive symptoms, a high somatic symptom burden and elevated dissociative experiences. Performance validity measures passed.",
-        "quantitative_data": {
-          "DES-II": "25",
-          "GAD-7": "15 (severe)",
-          "MoCA": "28/30",
-          "PHQ-15": "21 (high)",
-          "PHQ-9": "14 (moderate)",
-          "RAVLT_delayed_recall": "z = -0.2",
-          "TOMM_trial_2": "49/50",
-          "Trail_Making_B": "z = -0.4"
-        },
-        "recommended_actions": [],
-        "test_type": "neuropsych_battery"
-      },
-      "tool_name": "order_specialized_test",
-      "trigger_action": "request_neuropsych_battery"
     }
   ],
   "ground_truth": {
@@ -203,9 +203,9 @@
         ],
         "criterion_id": "action-5-analyze-eeg",
         "expected_evidence": "Habitual events recorded on video with no EEG change and a normal interictal record",
-        "importance": "optional",
+        "importance": "required",
         "label": "Video-EEG to record the habitual events",
-        "rationale": "Recording the habitual shaking events on video-EEG without ictal change reaches the ILAE documented level of certainty; events occur 2-3 times a week, so capturing one takes prolonged inpatient monitoring, and the record also screens for co-occurring epilepsy (AAN 2025). Without the recording, the positive signs and the semiology of witnessed events support the diagnosis at a lower ILAE level of certainty (LaFrance 2013)."
+        "rationale": "No habitual event has been seen by a clinician, only described by her husband, so the history supports functional seizures only at the possible level; a habitual event recorded on video-EEG without ictal change documents the diagnosis and screens for co-occurring epilepsy. (ILAE 2013; AAN 2025)"
       },
       {
         "alternatives": [
@@ -252,9 +252,9 @@
         "Give gadolinium contrast without a specific indication."
       ],
       "required_recommendations": [
-        "Make a positive diagnosis of functional neurological disorder (mixed: functional leg weakness, functional tremor and functional seizures) based on collapsing leg weakness, tremor entrainment and distractibility, and the semiology of the habitual events, confirmed on video-EEG where recorded, and not by exclusion of other disease.",
+        "Make a positive diagnosis of functional neurological disorder (mixed: functional leg weakness, functional tremor and functional seizures) based on collapsing leg weakness, tremor entrainment and distractibility, and the habitual events recorded on video-EEG without ictal change, and not by exclusion of other disease.",
         "Explain the diagnosis to the patient, and with consent to the family, as a common and genuine disorder of nervous system functioning that can improve, show the positive signs, and give written information.",
-        "Refer for physiotherapy with expertise in functional motor disorder (motor retraining, Nielsen 2015 consensus).",
+        "Refer to a specialist multidisciplinary rehabilitation service for functional neurological disorder (physiotherapy, occupational therapy with a functional independence and equipment plan, and psychological therapy), given three months of full-time wheelchair use with help for transfers and daily activities.",
         "Refer for psychological therapy by a clinician experienced in FND (CBT-informed) and treat the comorbid depression and generalized anxiety disorder.",
         "Give the patient, family and ward a written plan for typical events: keep safe, do not restrain, wait for the event to end, and do not give emergency benzodiazepines or intubate for a typical functional seizure."
       ]
@@ -505,7 +505,8 @@
     "stop_rule": {
       "max_additional_actions": 0,
       "required_before_assessment": [
-        "action-3-perform-clinical-assessment"
+        "action-3-perform-clinical-assessment",
+        "action-5-analyze-eeg"
       ]
     }
   },
@@ -681,7 +682,7 @@
     "clinical_domain": "Functional Neurological Disorder",
     "created_by": "neurobench_generator",
     "criteria_pack_version": "1.0",
-    "difficulty_rationale": "Severe mixed FND (wheelchair-bound leg weakness, tremor, shaking events) after an extensive normal outpatient work-up and an equivocal Hoover sign: the agent must find the other positive signs, confirm the events on video-EEG if needed, and resist repeating the MRI, nerve studies or a lumbar puncture.",
+    "difficulty_rationale": "Severe mixed FND (wheelchair-bound leg weakness, tremor, shaking events) after an extensive normal outpatient work-up and an equivocal Hoover sign: the agent must find the other positive signs, record the habitual events on video-EEG, since no clinician has seen one, and resist repeating the MRI, nerve studies or a lumbar puncture.",
     "estimated_complexity": "Diagnostic puzzle: progressive bilateral weakness referred as possible MS, myelopathy or motor neuron disease, an equivocal Hoover sign with other positive signs, a normal prior work-up, and psychiatric comorbidity",
     "fallback_tool_kinds": {
       "cardiac_monitoring": "normal",
@@ -691,7 +692,7 @@
       "echo": "normal"
     },
     "generation_date": "2026-03-13",
-    "last_revised": "2026-10-24",
+    "last_revised": "2026-11-16",
     "policy_spec_status": "draft",
     "red_herrings": [
       "Maternal aunt with multiple sclerosis raising suspicion for demyelinating disease",
@@ -699,7 +700,7 @@
       "Equivocal Hoover sign making the other positive functional signs less obvious",
       "Complex pain history with multiple prior evaluations creating anchoring bias toward organic disease"
     ],
-    "revision_reason": "October 2026 review round: criteria, outputs and policy rebuilt per plans/FND.md. Close-out 24 Oct 2026: video-EEG optional and red-flag tests recommended, per the July 2026 agreement with the physicians that the examination is the only required diagnostic act.",
+    "revision_reason": "November 2026 review round: video-EEG required (no habitual event seen by a clinician; ILAE 2013, AAN 2025); physiotherapy must replaced by referral to specialist multidisciplinary FND rehabilitation for her severe disability. Earlier (October 2026): criteria, outputs and assessment rebuilt to the FND tiers.",
     "sub_domain": "Functional weakness with PNES - diagnostic puzzle",
     "version": "policy-v1",
     "vocab_gap": []

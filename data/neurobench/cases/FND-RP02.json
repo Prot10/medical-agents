@@ -94,6 +94,42 @@
   "followup_outputs": [
     {
       "output": {
+        "findings": [
+          {
+            "domain": "global cognition",
+            "result": "MoCA 27/30"
+          },
+          {
+            "domain": "memory, attention, executive function, language, visuospatial",
+            "result": "cognitive performance within normal limits across memory, attention, executive, language and visuospatial domains"
+          },
+          {
+            "domain": "mood and anxiety (self-report)",
+            "result": "moderate depressive and anxiety symptoms with a high somatic symptom burden"
+          },
+          {
+            "domain": "effort",
+            "result": "performance validity measures passed (TOMM trial 2 49/50)"
+          }
+        ],
+        "impression": "Cognitive performance within normal limits across memory, attention, executive, language and visuospatial domains. Self-report measures show moderate depressive and anxiety symptoms with a high somatic symptom burden. Performance validity measures passed.",
+        "quantitative_data": {
+          "GAD-7": "10 (moderate)",
+          "MoCA": "27/30",
+          "PHQ-15": "19 (high)",
+          "PHQ-9": "12 (moderate)",
+          "RAVLT_delayed_recall": "z = -0.5",
+          "TOMM_trial_2": "49/50",
+          "Trail_Making_B": "z = -0.7"
+        },
+        "recommended_actions": [],
+        "test_type": "neuropsych_battery"
+      },
+      "tool_name": "order_specialized_test",
+      "trigger_action": "request_neuropsych_battery"
+    },
+    {
+      "output": {
         "assessment_type": "performance_status",
         "findings": [
           {
@@ -115,42 +151,6 @@
       },
       "tool_name": "perform_clinical_assessment",
       "trigger_action": "request_performance_status"
-    },
-    {
-      "output": {
-        "findings": [
-          {
-            "domain": "global cognition",
-            "result": "MoCA 28/30"
-          },
-          {
-            "domain": "memory, attention, executive function, language, visuospatial",
-            "result": "cognitive performance within normal limits across memory, attention, executive, language and visuospatial domains"
-          },
-          {
-            "domain": "mood and anxiety (self-report)",
-            "result": "moderate depressive and anxiety symptoms with a high somatic symptom burden"
-          },
-          {
-            "domain": "effort",
-            "result": "performance validity measures passed (TOMM trial 2 49/50)"
-          }
-        ],
-        "impression": "Cognitive performance within normal limits across memory, attention, executive, language and visuospatial domains. Self-report measures show moderate depressive and anxiety symptoms with a high somatic symptom burden. Performance validity measures passed.",
-        "quantitative_data": {
-          "GAD-7": "10 (moderate)",
-          "MoCA": "28/30",
-          "PHQ-15": "19 (high)",
-          "PHQ-9": "12 (moderate)",
-          "RAVLT_delayed_recall": "z = -0.2",
-          "TOMM_trial_2": "49/50",
-          "Trail_Making_B": "z = -0.4"
-        },
-        "recommended_actions": [],
-        "test_type": "neuropsych_battery"
-      },
-      "tool_name": "order_specialized_test",
-      "trigger_action": "request_neuropsych_battery"
     }
   ],
   "ground_truth": {
@@ -170,7 +170,7 @@
           "[DSM5_FND]"
         ],
         "criterion_id": "action-3-perform-clinical-assessment",
-        "expected_evidence": "Bilateral Hoover sign, give-way arm weakness, retching and proprioceptive loss that vanish with distraction, and leg use far stronger than formal testing, beside leg wasting",
+        "expected_evidence": "Bilateral Hoover sign, give-way arm weakness, proprioceptive loss that vanishes with distraction, and leg use far stronger than formal testing, beside leg wasting",
         "importance": "required",
         "label": "Examine for positive functional signs",
         "rationale": "Her inability to walk is diagnosed at the bedside by signs incompatible with a lesion (DSM-5 criterion B); the examination also separates the functional pattern from the wasting and reflex changes of malnutrition."
@@ -194,9 +194,25 @@
         ],
         "criterion_id": "action-4-interpret-labs",
         "expected_evidence": "Potassium 3.3, magnesium 1.5 and low-normal thiamine 74 nmol/L with normal phosphate, from vomiting and starvation; none explains the weakness",
-        "importance": "recommended",
+        "importance": "required",
         "label": "Check electrolytes, magnesium, phosphate and thiamine",
-        "rationale": "Four months of vomiting, BMI 14.8 and nasogastric feeding: potassium, magnesium, phosphate and thiamine answer the refeeding and thiamine-deficiency questions that change management, and a deficiency state is the organic mimic of her weakness to check."
+        "rationale": "Safety test: BMI 14.8, four months of vomiting and nasogastric feeding put her at high risk of refeeding syndrome, so potassium, magnesium and phosphate must be measured, not assumed, before and during refeeding (NICE CG32); thiamine and the electrolytes also answer the deficiency mimic of her weakness."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_ecg"
+          }
+        ],
+        "citations": [
+          "Ondansetron prescribing information (FDA), warnings: QT prolongation, ECG monitoring with hypokalemia or hypomagnesemia"
+        ],
+        "criterion_id": "action-ecg",
+        "expected_evidence": "Sinus rhythm at 92 per minute, normal PR and QRS, QTc 452 ms at the upper limit of normal for a woman",
+        "importance": "recommended",
+        "label": "12-lead ECG",
+        "rationale": "She takes ondansetron every 8 hours while vomiting has lowered her potassium and magnesium; the ondansetron labeling advises ECG monitoring in patients with hypokalemia or hypomagnesemia, so a 12-lead ECG checks the QTc before further doses."
       },
       {
         "alternatives": [
@@ -227,7 +243,7 @@
           "[Espay_2018]"
         ],
         "criterion_id": "action-neuropsych-battery",
-        "expected_evidence": "Quantifies comorbid mood, anxiety and dissociation with performance-validity measures to plan treatment; it does not make the diagnosis",
+        "expected_evidence": "Quantifies comorbid mood, anxiety and somatic symptom burden with performance-validity measures to plan treatment; it does not make the diagnosis",
         "importance": "optional",
         "label": "Neuropsychological assessment",
         "rationale": "A battery would quantify her low mood, grief and possible eating disorder for the treatment plan, but it does not make the diagnosis, which rests on the examination, and it is the most expensive item on this pathway."
@@ -242,12 +258,12 @@
         "Give glucose-containing fluids before thiamine."
       ],
       "required_recommendations": [
-        "Make a positive diagnosis of functional neurological disorder (functional limb weakness, with functional retching and vomiting) based on the Hoover sign on both sides, collapsing weakness, distractibility and the inconsistency between examination and function, and not by exclusion of other disease.",
+        "Make a positive diagnosis of functional neurological disorder (functional limb weakness) based on the Hoover sign on both sides, collapsing weakness, distractibility and the inconsistency between examination and function, and not by exclusion of other disease.",
         "Explain the diagnosis to the patient, and with consent to the family, as a common and genuine disorder of nervous system functioning that can improve, show the positive signs, and give written information, using a professional interpreter if needed and, with her consent, involving her father.",
-        "Refer for physiotherapy with expertise in functional motor disorder (motor retraining, Nielsen 2015 consensus).",
+        "Refer to a specialist multidisciplinary rehabilitation service for functional neurological disorder (physiotherapy, occupational therapy with a functional independence and equipment plan, and psychological therapy), given her dependence for transfers and most care after weeks unable to stand or walk, starting once medically stable.",
         "Refer for psychological therapy by a clinician experienced in FND (CBT-informed) and treat the comorbid depression and prolonged grief after her mother's death.",
         "Give thiamine before glucose-containing fluids or further feeding, replace potassium and magnesium, and monitor phosphate, potassium and magnesium for refeeding syndrome.",
-        "Assess for an eating disorder, and refer for endocrine and gynecological evaluation of the primary amenorrhea with absent pubertal development."
+        "Assess for an eating disorder, and refer for endocrine and gynecological evaluation of the primary amenorrhea with absent pubertal development. Refer for gastroenterology evaluation of the intractable vomiting before attributing it to the functional disorder."
       ]
     },
     "avoided_actions": [
@@ -262,7 +278,7 @@
           "[Espay_2018]"
         ],
         "criterion_id": "avoid-waste-1-order-echocardiogram",
-        "rationale": "No cardiac question is raised: her weakness and vomiting have no cardiac cause to seek.",
+        "rationale": "No structural cardiac question is raised: her weakness and vomiting have no cardiac cause to seek, and the 12-lead ECG answers the QT question on ondansetron.",
         "severity": "waste"
       },
       {
@@ -322,7 +338,7 @@
           "[Stone_2016]"
         ],
         "criterion_id": "avoid-waste-5-order-specialized-test",
-        "rationale": "Her weakness has positive functional signs with preserved reflexes and normal CK; EMG and nerve conduction answer no question and a normal result reinforces the search for an organic cause.",
+        "rationale": "Her weakness has positive functional signs with preserved reflexes; EMG and nerve conduction answer no question and a normal result reinforces the search for an organic cause.",
         "severity": "waste"
       },
       {
@@ -360,7 +376,7 @@
     ],
     "diagnosis": {
       "accepted": [
-        "Functional neurological disorder (conversion disorder) with weakness and functional gastrointestinal symptoms (intractable vomiting/retching)",
+        "Functional neurological disorder with functional limb weakness, in severe malnutrition with intractable vomiting under evaluation",
         "functional neurological disorder",
         "functional neurological symptom disorder",
         "conversion disorder",
@@ -394,7 +410,7 @@
       {
         "diagnosis": "Hypokalemic or malnutrition-related myopathy",
         "icd_code": "G72.9",
-        "key_features": "Wasting is from starvation and immobility; CK is normal (42 U/L), potassium 3.3 mEq/L is far above the level that causes weakness, and strength in function far exceeds formal testing.",
+        "key_features": "Wasting is from starvation and immobility; potassium 3.3 mEq/L is far above the level that causes weakness, reflexes are preserved, and strength in function far exceeds formal testing.",
         "likelihood": "low"
       },
       {
@@ -414,11 +430,24 @@
         "icd_code": "F50.00",
         "key_features": "BMI 14.8, weight loss, vomiting and primary amenorrhea call for an assessment; no restriction or body-image concern is described, and an eating disorder would not produce the positive signs of functional weakness.",
         "likelihood": "moderate"
+      },
+      {
+        "diagnosis": "Hypothalamic-pituitary disorder (primary amenorrhea with absent puberty, vomiting and weight loss)",
+        "icd_code": "E23.0",
+        "key_features": "Head CT normal; needs endocrine evaluation and pituitary imaging if gonadotropins are low.",
+        "likelihood": "low"
+      },
+      {
+        "diagnosis": "Upper gastrointestinal disease (peptic ulcer, motility disorder)",
+        "icd_code": "K31.9",
+        "key_features": "Treated empirically for peptic ulcer without endoscopy; gastroenterology evaluation pending.",
+        "likelihood": "low"
       }
     ],
     "key_clinical_evidence": [
-      "Positive signs of functional weakness: Hoover sign on both sides, collapsing arm weakness, distractibility of the retching and of the sensory loss, and strong leg use when repositioned despite 1/5 on formal testing.",
+      "Positive signs of functional weakness: Hoover sign on both sides, collapsing arm weakness, distractibility of the sensory loss, and strong leg use when repositioned despite 1/5 on formal testing.",
       "Severe malnutrition (BMI 14.8) with potassium 3.3 mEq/L, magnesium 1.5 mg/dL, low-normal thiamine and iron-deficiency anemia: thiamine and electrolyte replacement with refeeding monitoring are needed, but none explains the weakness.",
+      "The intractable vomiting, weight loss and primary amenorrhea with absent puberty are not explained by the functional weakness: retching that stops during conversation is suggestive only, and gastroenterology and endocrine evaluation come before any functional attribution.",
       "The 'moving creature' sensation is acknowledged as a physical feeling and there is no psychotic feature, so the referral diagnosis of schizophrenia is not supported.",
       "Onset two months after her mother's death, with prior depressive symptoms: context and a treatment target, not the basis of the diagnosis.",
       "A head CT and a spine MRI were already normal; repeating them answers no new question."
@@ -439,7 +468,7 @@
         "location": "History of present illness"
       },
       {
-        "correct_interpretation": "Wasting and reduced ankle reflexes follow starvation and immobility; CK is normal and the weakness shows positive functional signs.",
+        "correct_interpretation": "Wasting and reduced ankle reflexes follow starvation and immobility; the weakness shows positive functional signs.",
         "data_point": "Severe leg muscle wasting with ankle reflexes 1+",
         "field_path": "patient.neurological_exam.motor",
         "intended_effect": "Pursue myopathy or neuropathy with EMG, nerve conduction or muscle biopsy",
@@ -458,7 +487,8 @@
     "stop_rule": {
       "max_additional_actions": 0,
       "required_before_assessment": [
-        "action-3-perform-clinical-assessment"
+        "action-3-perform-clinical-assessment",
+        "action-4-interpret-labs"
       ]
     }
   },
@@ -490,8 +520,12 @@
           "sign": "Inconsistency between examination and function"
         },
         {
-          "result": "Retching every 5 to 10 minutes stops while she talks about her studies; toe proprioception, reported as impaired, is intact when tested with distraction.",
+          "result": "Toe proprioception, reported as impaired, is intact when tested with distraction.",
           "sign": "Distractibility"
+        },
+        {
+          "result": "Forceful retching every 5 to 10 minutes, which stops while she talks about her studies; not a limb sign and not counted.",
+          "sign": "Observed retching"
         },
         {
           "result": "Marked wasting of the leg muscles; patellar reflexes 2+, ankle reflexes 1+, plantar responses flexor, no clonus.",
@@ -529,7 +563,22 @@
         ]
       }
     },
-    "ecg": null,
+    "ecg": {
+      "axis": "normal",
+      "findings": [
+        "Sinus rhythm at 92 bpm.",
+        "PR 150 ms with no delta wave; QRS 84 ms.",
+        "QTc 452 ms (Bazett). Low-amplitude T waves in the lateral leads; no U waves, no ST-segment change."
+      ],
+      "interpretation": "Sinus rhythm with normal PR and QRS intervals. QTc 452 ms, at the upper limit of normal for a woman. Low-amplitude lateral T waves. No atrioventricular block or pre-excitation.",
+      "intervals": {
+        "PR": "150 ms",
+        "QRS": "84 ms",
+        "QTc": "452 ms"
+      },
+      "rate": 92,
+      "rhythm": "normal sinus rhythm"
+    },
     "echo": null,
     "eeg": null,
     "labs": {
@@ -562,7 +611,7 @@
             "value": 138
           },
           {
-            "clinical_significance": null,
+            "clinical_significance": "Hypokalemia, consistent with losses from protracted vomiting.",
             "is_abnormal": true,
             "reference_range": "3.5-5.0",
             "test": "Potassium",
@@ -756,7 +805,7 @@
         ],
         "Magnesium_phosphate_thiamine": [
           {
-            "clinical_significance": null,
+            "clinical_significance": "Hypomagnesemia; with the low potassium, a risk factor for refeeding syndrome and QT prolongation.",
             "is_abnormal": true,
             "reference_range": "1.7-2.4",
             "test": "Magnesium",
@@ -823,7 +872,7 @@
     "created_by": "neurobench_generator",
     "criteria_pack_version": "1.0",
     "difficulty_description": "Diagnostic puzzle: severe malnutrition with muscle wasting and reduced ankle reflexes mimics a myopathy or neuropathy, a culturally shaped somatic complaint was read as psychosis, mildly raised inflammatory markers invite an inflammatory work-up, and bereavement and depression obscure the functional diagnosis, which needs positive signs and safe nutritional management.",
-    "difficulty_rationale": "Disabling functional weakness with functional vomiting and severe malnutrition: the examination makes the diagnosis, targeted electrolytes, magnesium, phosphate and thiamine answer the nutritional mimic, and prior normal imaging must not be repeated.",
+    "difficulty_rationale": "Disabling functional limb weakness in severe malnutrition with unexplained intractable vomiting: the examination makes the diagnosis of the weakness, electrolytes, magnesium, phosphate and thiamine are a required refeeding safety measurement, the vomiting and primary amenorrhea need gastroenterology and endocrine evaluation rather than a functional label, and prior normal imaging must not be repeated.",
     "expected_agent_confidence": 0.35,
     "fallback_tool_kinds": {
       "cardiac_monitoring": "normal",
@@ -833,13 +882,13 @@
     },
     "generation_date": "2026-03-15",
     "generation_method": "real_case_seed",
-    "last_revised": "2026-10-24",
+    "last_revised": "2026-11-16",
     "policy_spec_status": "draft",
-    "revision_reason": "October 2026 review round: policy tiers, reports and assessment rebuilt to the FND condition plan.",
+    "revision_reason": "November 2026: refeeding safety labs required, diagnosis limited to the functional limb weakness, gastroenterology and endocrine evaluation, multidisciplinary rehabilitation, 12-lead ECG recommended on ondansetron with low potassium and magnesium.",
     "source": "MedCaseReasoning",
     "source_license": "CC-BY 4.0",
     "source_pmcid": "PMC4607000",
-    "sub_domain": "Conversion disorder with weakness and functional GI symptoms - diagnostic puzzle with cultural complexity",
+    "sub_domain": "Functional limb weakness in severe malnutrition with intractable vomiting under evaluation - diagnostic puzzle with cultural complexity",
     "version": "policy-v1",
     "vocab_gap": []
   },

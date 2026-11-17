@@ -74,7 +74,7 @@
         "QRS": "90 ms",
         "QTc": "401 ms"
       },
-      "rate": 61,
+      "rate": 92,
       "rhythm": "normal sinus rhythm"
     },
     "echo": {
@@ -125,6 +125,41 @@
   "followup_outputs": [
     {
       "output": {
+        "findings": [
+          {
+            "domain": "global cognition",
+            "result": "MoCA 29/30"
+          },
+          {
+            "domain": "memory, attention, executive function, language, visuospatial",
+            "result": "cognitive performance within normal limits across memory, attention, executive, language and visuospatial domains"
+          },
+          {
+            "domain": "mood and anxiety (self-report)",
+            "result": "moderate anxiety and moderate depressive symptoms"
+          },
+          {
+            "domain": "effort",
+            "result": "performance validity measures passed (TOMM trial 2 50/50)"
+          }
+        ],
+        "impression": "Cognitive performance within normal limits across memory, attention, executive, language and visuospatial domains. Self-report measures show moderate anxiety and moderate depressive symptoms. Performance validity measures passed.",
+        "quantitative_data": {
+          "GAD-7": "12 (moderate)",
+          "MoCA": "29/30",
+          "PHQ-9": "13 (moderate)",
+          "RAVLT_delayed_recall": "z = 0.2",
+          "TOMM_trial_2": "50/50",
+          "Trail_Making_B": "z = -0.3"
+        },
+        "recommended_actions": [],
+        "test_type": "neuropsych_battery"
+      },
+      "tool_name": "order_specialized_test",
+      "trigger_action": "request_neuropsych_battery"
+    },
+    {
+      "output": {
         "assessment_type": "performance_status",
         "findings": [
           {
@@ -146,41 +181,6 @@
       },
       "tool_name": "perform_clinical_assessment",
       "trigger_action": "request_performance_status"
-    },
-    {
-      "output": {
-        "findings": [
-          {
-            "domain": "global cognition",
-            "result": "MoCA 28/30"
-          },
-          {
-            "domain": "memory, attention, executive function, language, visuospatial",
-            "result": "cognitive performance within normal limits across memory, attention, executive, language and visuospatial domains"
-          },
-          {
-            "domain": "mood and anxiety (self-report)",
-            "result": "moderate anxiety and moderate depressive symptoms"
-          },
-          {
-            "domain": "effort",
-            "result": "performance validity measures passed (TOMM trial 2 49/50)"
-          }
-        ],
-        "impression": "Cognitive performance within normal limits across memory, attention, executive, language and visuospatial domains. Self-report measures show moderate anxiety and moderate depressive symptoms. Performance validity measures passed.",
-        "quantitative_data": {
-          "GAD-7": "12 (moderate)",
-          "MoCA": "28/30",
-          "PHQ-9": "13 (moderate)",
-          "RAVLT_delayed_recall": "z = -0.2",
-          "TOMM_trial_2": "49/50",
-          "Trail_Making_B": "z = -0.4"
-        },
-        "recommended_actions": [],
-        "test_type": "neuropsych_battery"
-      },
-      "tool_name": "order_specialized_test",
-      "trigger_action": "request_neuropsych_battery"
     }
   ],
   "ground_truth": {
@@ -203,7 +203,26 @@
         "expected_evidence": "Right Hoover sign, distractible right-sided weakness and a dragging right leg gait",
         "importance": "required",
         "label": "Examine for positive signs of functional weakness",
-        "rationale": "Her sudden right-sided weakness is diagnosed by positive signs incompatible with a lesion (DSM-5 criterion B; Daum 2014); with SLE in the background, the examination decides whether imaging has a stroke-mimic question to answer."
+        "rationale": "Her sudden right-sided weakness is diagnosed by positive signs incompatible with a lesion (DSM-5 criterion B; Daum 2014); the signs do not by themselves exclude a coexisting acute lesion in a 48-hour deficit with SLE in the background, so imaging follows the examination."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "contrast": false
+            },
+            "tool_name": "analyze_brain_mri"
+          }
+        ],
+        "citations": [
+          "[Espay_2018]",
+          "[AHA_ASA_Stroke_2026]"
+        ],
+        "criterion_id": "action-4-analyze-brain-mri",
+        "expected_evidence": "No acute or chronic infarct and no white matter lesion on a non-contrast brain MRI with DWI",
+        "importance": "required",
+        "label": "Brain MRI without contrast, with DWI, for the acute focal deficit",
+        "rationale": "A new focal deficit of 48 hours is imaged whatever the examination shows: positive functional signs do not exclude a coexisting acute infarct, since functional disorder coexists with neurological disease (Espay 2018; AHA/ASA 2026)."
       },
       {
         "alternatives": [
@@ -226,24 +245,6 @@
         "importance": "recommended",
         "label": "Antiphospholipid antibodies, complement and anti-dsDNA",
         "rationale": "In SLE, a focal deficit raises antiphospholipid syndrome and active lupus; the antiphospholipid panel, complement and anti-dsDNA answer that named question."
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "contrast": false
-            },
-            "tool_name": "analyze_brain_mri"
-          }
-        ],
-        "citations": [
-          "[Espay_2018]"
-        ],
-        "criterion_id": "action-4-analyze-brain-mri",
-        "expected_evidence": "No acute or chronic infarct and no white matter lesion on a non-contrast brain MRI with DWI",
-        "importance": "recommended",
-        "label": "Brain MRI without contrast, with DWI, for the stroke-mimic question",
-        "rationale": "Sudden right hemiparesis in a woman with SLE raises an antiphospholipid-related or lupus-related stroke; a non-contrast MRI with DWI 48 hours after onset answers it once."
       },
       {
         "alternatives": [
@@ -293,7 +294,7 @@
         "Explain the diagnosis to the patient, and with consent to the family, as a common and genuine disorder of nervous system functioning that can improve, show the positive signs, and give written information.",
         "Refer for physiotherapy with expertise in functional motor disorder (motor retraining, Nielsen 2015 consensus).",
         "Refer for psychological therapy by a clinician experienced in FND (CBT-informed) and treat the comorbid depression.",
-        "Inform her rheumatologist of the admission and the diagnosis, and continue hydroxychloroquine unchanged."
+        "Inform her rheumatologist of the admission and the diagnosis, and continue hydroxychloroquine with a dose review: 400 mg daily is 5.4 mg/kg of her actual body weight (74.1 kg), above the 5 mg/kg daily maximum advised for retinal safety."
       ]
     },
     "avoided_actions": [
@@ -483,14 +484,15 @@
         "citations": [
           "[Espay_2018]"
         ],
-        "reason": "The examination comes first: its positive signs decide whether imaging has a specific question to answer (Espay 2018).",
+        "reason": "The examination comes first: it defines the deficit the imaging must explain and takes minutes, so it does not delay the MRI (Espay 2018).",
         "severity": "soft"
       }
     ],
     "stop_rule": {
       "max_additional_actions": 0,
       "required_before_assessment": [
-        "action-3-perform-clinical-assessment"
+        "action-3-perform-clinical-assessment",
+        "action-4-analyze-brain-mri"
       ]
     }
   },
@@ -547,7 +549,7 @@
         "proposed": "Hydroxychloroquine 200 mg twice daily; Sertraline 100 mg once daily",
         "summary": "Minor additive QT effect of hydroxychloroquine with sertraline; no contraindicated combination.",
         "warnings": [
-          "Hydroxychloroquine: retinal toxicity with long-term use; keep the daily dose at or below 5 mg/kg actual body weight, with annual retinal screening after 5 years of use.",
+          "Hydroxychloroquine: retinal toxicity with long-term use; keep the daily dose at or below 5 mg/kg actual body weight, with annual retinal screening after 5 years of use. The listed 400 mg daily is 5.4 mg/kg at 74.1 kg.",
           "Sertraline: hyponatremia from inappropriate antidiuretic hormone secretion; bleeding risk with antiplatelet drugs, anticoagulants or NSAIDs."
         ]
       }
@@ -741,7 +743,7 @@
         ],
         "Inflammatory markers": [
           {
-            "clinical_significance": null,
+            "clinical_significance": "Mildly raised and non-specific; CRP is normal.",
             "is_abnormal": true,
             "reference_range": "<20",
             "test": "ESR",
@@ -810,7 +812,7 @@
     "case_body_concerns": [],
     "citation_gap": [],
     "criteria_pack_version": "1.0",
-    "difficulty_rationale": "Functional right-sided weakness in a woman with SLE who fears CNS lupus. The examination gives a Hoover sign, distractibility and a dragging gait; the comorbidity earns one non-contrast MRI with DWI and a targeted antiphospholipid and lupus serology panel, both normal, and the trap is to treat presumed neuropsychiatric lupus.",
+    "difficulty_rationale": "Functional right-sided weakness in a woman with SLE who fears CNS lupus. The examination gives a Hoover sign, distractibility and a dragging gait; the 48-hour deficit requires one non-contrast MRI with DWI, and the comorbidity earns a targeted antiphospholipid and lupus serology panel, both normal, and the trap is to treat presumed neuropsychiatric lupus.",
     "fallback_tool_kinds": {
       "cardiac_monitoring": "normal",
       "clinical_assessment": "case",
@@ -819,10 +821,10 @@
       "echo": "incidental",
       "labs": "case"
     },
-    "last_revised": "2026-10-24",
+    "last_revised": "2026-11-16",
     "notes": "Moderate FND: right-sided functional weakness in a patient with quiescent SLE. The named question is neuropsychiatric lupus or antiphospholipid-related stroke, answered once by DWI MRI and the antiphospholipid and lupus serology.",
     "policy_spec_status": "draft",
-    "revision_reason": "October 2026 review round: brain MRI and targeted SLE serology recommended for the named stroke-mimic question; criteria, outputs and assessment rebuilt to the FND required, recommended and optional tiers.",
+    "revision_reason": "November 2026 review round: brain MRI with DWI required and in the stop rule for the 48-hour focal deficit (Espay 2018; AHA/ASA 2026); hydroxychloroquine dose review added to the rheumatology must. Earlier (October 2026): brain MRI and targeted SLE serology recommended; criteria, outputs and assessment rebuilt to the FND tiers.",
     "version": "policy-v1",
     "vocab_gap": []
   },

@@ -76,21 +76,7 @@
       "recommended_actions": []
     },
     "drug_interactions": null,
-    "ecg": {
-      "axis": "normal",
-      "clinical_correlation": "",
-      "findings": [
-        "Normal sinus rhythm. Normal axis and intervals. No acute ST-T changes."
-      ],
-      "interpretation": "Normal ECG",
-      "intervals": {
-        "PR": "190 ms",
-        "QRS": "92 ms",
-        "QTc": "400 ms"
-      },
-      "rate": 66,
-      "rhythm": "normal sinus rhythm"
-    },
+    "ecg": null,
     "echo": {
       "chambers": {
         "LA": "normal size",
@@ -122,6 +108,42 @@
   "followup_outputs": [
     {
       "output": {
+        "findings": [
+          {
+            "domain": "global cognition",
+            "result": "MoCA 29/30"
+          },
+          {
+            "domain": "memory, attention, executive function, language, visuospatial",
+            "result": "cognitive performance within normal limits across memory, attention, executive, language and visuospatial domains"
+          },
+          {
+            "domain": "mood and anxiety (self-report)",
+            "result": "moderate anxiety and depressive symptoms and elevated dissociative experiences"
+          },
+          {
+            "domain": "effort",
+            "result": "performance validity measures passed (TOMM trial 2 50/50)"
+          }
+        ],
+        "impression": "Cognitive performance within normal limits across memory, attention, executive, language and visuospatial domains. Self-report measures show moderate anxiety and depressive symptoms and elevated dissociative experiences. Performance validity measures passed.",
+        "quantitative_data": {
+          "DES-II": "23",
+          "GAD-7": "14 (moderate)",
+          "MoCA": "29/30",
+          "PHQ-9": "10 (moderate)",
+          "RAVLT_delayed_recall": "z = 0.1",
+          "TOMM_trial_2": "50/50",
+          "Trail_Making_B": "z = -0.3"
+        },
+        "recommended_actions": [],
+        "test_type": "neuropsych_battery"
+      },
+      "tool_name": "order_specialized_test",
+      "trigger_action": "request_neuropsych_battery"
+    },
+    {
+      "output": {
         "assessment_type": "performance_status",
         "findings": [
           {
@@ -143,42 +165,6 @@
       },
       "tool_name": "perform_clinical_assessment",
       "trigger_action": "request_performance_status"
-    },
-    {
-      "output": {
-        "findings": [
-          {
-            "domain": "global cognition",
-            "result": "MoCA 28/30"
-          },
-          {
-            "domain": "memory, attention, executive function, language, visuospatial",
-            "result": "cognitive performance within normal limits across memory, attention, executive, language and visuospatial domains"
-          },
-          {
-            "domain": "mood and anxiety (self-report)",
-            "result": "moderate anxiety and depressive symptoms and elevated dissociative experiences"
-          },
-          {
-            "domain": "effort",
-            "result": "performance validity measures passed (TOMM trial 2 49/50)"
-          }
-        ],
-        "impression": "Cognitive performance within normal limits across memory, attention, executive, language and visuospatial domains. Self-report measures show moderate anxiety and depressive symptoms and elevated dissociative experiences. Performance validity measures passed.",
-        "quantitative_data": {
-          "DES-II": "23",
-          "GAD-7": "14 (moderate)",
-          "MoCA": "28/30",
-          "PHQ-9": "10 (moderate)",
-          "RAVLT_delayed_recall": "z = -0.2",
-          "TOMM_trial_2": "49/50",
-          "Trail_Making_B": "z = -0.4"
-        },
-        "recommended_actions": [],
-        "test_type": "neuropsych_battery"
-      },
-      "tool_name": "order_specialized_test",
-      "trigger_action": "request_neuropsych_battery"
     }
   ],
   "ground_truth": {
@@ -212,33 +198,13 @@
           }
         ],
         "citations": [
-          "[NICE_CG109]",
-          "[NICE_NG217]"
+          "[NICE_CG109]"
         ],
         "criterion_id": "action-ecg",
-        "expected_evidence": "Sinus rhythm with normal conduction and QT interval",
-        "importance": "optional",
+        "expected_evidence": "Sinus rhythm at 86 per minute, normal PR, QRS and QTc",
+        "importance": "required",
         "label": "12-lead ECG",
-        "rationale": "Episodes of apparent unresponsiveness: NICE advises a 12-lead ECG after transient loss of consciousness (CG109) and after a suspected seizure (NG217). The event semiology already favours functional seizures, so it does not contribute to the diagnosis."
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "eeg_type": "video"
-            },
-            "tool_name": "analyze_eeg"
-          }
-        ],
-        "citations": [
-          "[ILAE_PNES_2013]",
-          "[AAN_Functional_Seizures_2025]"
-        ],
-        "criterion_id": "action-5-analyze-eeg",
-        "expected_evidence": "Habitual events recorded on video with no EEG change and a normal interictal record",
-        "importance": "optional",
-        "label": "Record the habitual events on video-EEG",
-        "rationale": "She was admitted with daily shaking episodes during which she sometimes cannot respond. Recording a habitual event without ictal change reaches the ILAE documented level of certainty and assesses co-occurring epilepsy, as the AAN guideline advises. Without the recording, the positive signs and the semiology of witnessed events support the diagnosis at a lower ILAE level of certainty (LaFrance 2013)."
+        "rationale": "Her events include apparent loss of responsiveness; NICE advises a 12-lead ECG for everyone with transient loss of consciousness, to look for a cardiac cause such as long QT, pre-excitation, a Brugada pattern or heart block."
       },
       {
         "alternatives": [
@@ -257,6 +223,25 @@
         "importance": "optional",
         "label": "Brain MRI without contrast, once, if a structural question remains",
         "rationale": "She fears multiple sclerosis or a tumor and the outside CT was normal; symmetric reflexes, flexor plantars, intact posterior column sensation and the positive signs already answer the structural question, so a single non-contrast scan is defensible but does not contribute to the diagnosis."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "eeg_type": "video"
+            },
+            "tool_name": "analyze_eeg"
+          }
+        ],
+        "citations": [
+          "[ILAE_PNES_2013]",
+          "[AAN_Functional_Seizures_2025]"
+        ],
+        "criterion_id": "action-5-analyze-eeg",
+        "expected_evidence": "Habitual events recorded on video with no EEG change and a normal interictal record",
+        "importance": "recommended",
+        "label": "Record the habitual events on video-EEG",
+        "rationale": "She was admitted with daily shaking episodes during which she sometimes cannot respond. A typical event was witnessed on examination, which supports the diagnosis at the clinically established level; recording a habitual event on video-EEG raises it to documented and screens for co-occurring epilepsy, as the AAN guideline advises where feasible (ILAE 2013; AAN 2025)."
       },
       {
         "alternatives": [
@@ -502,7 +487,8 @@
     "stop_rule": {
       "max_additional_actions": 0,
       "required_before_assessment": [
-        "action-3-perform-clinical-assessment"
+        "action-3-perform-clinical-assessment",
+        "action-ecg"
       ]
     }
   },
@@ -576,7 +562,24 @@
         ]
       }
     },
-    "ecg": null,
+    "ecg": {
+      "axis": "normal (+70 degrees)",
+      "findings": [
+        "Sinus rhythm at 86 per minute with normal P-wave morphology.",
+        "PR interval 164 ms with no delta wave; QRS 88 ms with normal morphology and no bundle branch block.",
+        "No coved or saddleback ST elevation in V1-V2; no ST-segment or T-wave abnormality.",
+        "QTc 432 ms, within normal limits for a woman."
+      ],
+      "interpretation": "Normal 12-lead ECG: sinus rhythm at 86 per minute with normal PR, QRS and QTc intervals. No pre-excitation, Brugada pattern, heart block or QT prolongation.",
+      "intervals": {
+        "PR": "164 ms",
+        "QRS": "88 ms",
+        "QT": "361 ms",
+        "QTc": "432 ms (Bazett)"
+      },
+      "rate": 86,
+      "rhythm": "sinus rhythm"
+    },
     "echo": null,
     "eeg": {
       "activating_procedures": {
@@ -653,14 +656,13 @@
     "condition_category": "functional_neurological_disorder",
     "created_by": "neurobench_generator",
     "criteria_pack_version": "1.0",
-    "difficulty_rationale": "The required work-up is the examination, which witnesses a habitual event; a video-EEG can record it. A normal outside CT, her fear of multiple sclerosis or a tumor and a grandmother with epilepsy invite repeat imaging and an epilepsy work-up; the main task is explaining the diagnosis.",
+    "difficulty_rationale": "The required work-up is the examination, which witnesses a habitual event, and a 12-lead ECG for the events with apparent loss of responsiveness; a video-EEG is recommended to record an event. A normal outside CT, her fear of multiple sclerosis or a tumor and a grandmother with epilepsy invite repeat imaging and an epilepsy work-up; the main task is explaining the diagnosis.",
     "expected_agent_confidence": 0.8,
     "fallback_tool_kinds": {
       "cardiac_monitoring": "normal",
       "clinical_assessment": "case",
       "csf": "normal",
       "ct": "normal",
-      "ecg": "normal",
       "echo": "normal"
     },
     "key_positive_signs": [
@@ -670,9 +672,9 @@
       "distractibility",
       "habitual event recorded on video-EEG without ictal change"
     ],
-    "last_revised": "2026-10-24",
+    "last_revised": "2026-11-16",
     "policy_spec_status": "draft",
-    "revision_reason": "October 2026 review round: policy tiers, reports and assessment rebuilt to the FND condition plan. Close-out 24 Oct 2026: video-EEG optional and red-flag tests recommended, per the July 2026 agreement with the physicians that the examination is the only required diagnostic act.",
+    "revision_reason": "November 2026 review round: 12-lead ECG required for the events with apparent loss of responsiveness (NICE CG109), with a stored case ECG; video-EEG recommended (event witnessed on examination; ILAE 2013, AAN 2025). Earlier (October 2026): policy tiers, reports and assessment rebuilt to the FND condition plan.",
     "teaching_points": [
       "FND is diagnosed by positive signs, not exclusion",
       "Video-EEG is the gold standard for diagnosing PNES",
