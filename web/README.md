@@ -7,7 +7,7 @@ Dashboard for the clinical-policy harness. Pick a case and a checked experiment 
 - **Case Browser**: the 600 NeuroBench cases across 20 conditions, with search and a difficulty filter.
 - **Patient Viewer**: demographics, vitals with abnormal values highlighted, history, neurological exam, the stored diagnostic outputs and the case policy.
 - **Live episode timeline**: every event of `POST /api/v1/runs/stream` as it happens: tool calls with their results and costs, rejected actions, ReAct rationales and the structured final assessment.
-- **Profiles**: the nine checked profiles (3 models × policy / direct / ReAct loops), with the model's serving state and Load / Stop controls.
+- **Profiles**: the fifteen checked profiles (3 models × policy / direct / narrative / ReAct / free-order loops), with the model's serving state and Load / Stop controls.
 - **Case policy**: accepted diagnoses, action criteria, avoided actions, sequence, stop rule and assessment requirements, each criterion checked against the episode on screen.
 - **Policy reward**: the reward components and any safety caps applied. On a draft policy it is shown as an engineering score that is not reportable.
 - **Episode replay**: saved episodes from `data/episodes/`, replayed step by step or at once, with no GPU needed.

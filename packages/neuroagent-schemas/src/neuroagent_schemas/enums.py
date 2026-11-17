@@ -61,20 +61,6 @@ class CaseDifficulty(str, Enum):
     DIAGNOSTIC_PUZZLE = "diagnostic_puzzle"
 
 
-class ActionCategory(str, Enum):
-    """Importance of an action criterion in the clinical policy.
-
-    Required criteria define the minimum safe workup and feed the stop rule.
-    Recommended and optional criteria capture defensible additional work without
-    prescribing one golden trajectory. Unsafe or wasteful calls belong in
-    ``GroundTruth.avoided_actions``.
-    """
-
-    REQUIRED = "required"
-    RECOMMENDED = "recommended"
-    OPTIONAL = "optional"
-
-
 class Likelihood(str, Enum):
     """Likelihood scale for entries in `GroundTruth.differential`."""
 

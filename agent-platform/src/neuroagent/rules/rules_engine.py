@@ -38,9 +38,6 @@ class ClinicalPathway:
         """Return tool names of all mandatory steps."""
         return [s.action for s in self.steps if s.mandatory]
 
-    def get_contraindicated_actions(self) -> list[str]:
-        return list(self.contraindicated)
-
 
 @dataclass
 class ComplianceResult:

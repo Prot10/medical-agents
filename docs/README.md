@@ -29,4 +29,3 @@ Start with the repository `README.md` and the executable contract in
 - Case validator: `dataset-generation/src/neurobench_gen/validate_case.py`
 - Policy authoring: `dataset-generation/POLICY_AUTHORING_GUIDE.md`
 
-Historical audits and superseded plans live under `docs/archive/` and are provenance only.

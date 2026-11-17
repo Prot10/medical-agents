@@ -1,7 +1,7 @@
 # Literature Review — Tool-Augmented LLM Agents for Clinical Decision Support
 
 **State of the art for the NeuroAgent project**
-Compiled 2026-05-22 · 20 papers · companion file: [`references.bib`](./references.bib) · PDFs: [`pdfs/`](./pdfs/)
+Compiled 2026-05-22 · 20 papers · companion file: [`references.bib`](./references.bib) · PDFs: [`pdfs/`](./pdfs/) (local only, not in git)
 
 ---
 

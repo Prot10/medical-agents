@@ -26,7 +26,7 @@ function containsRequired(actual: unknown, required: unknown): boolean {
   return a === r
 }
 
-export function patternMatches(pattern: ToolCallPattern, action: ToolAction): boolean {
+function patternMatches(pattern: ToolCallPattern, action: ToolAction): boolean {
   return action.tool_name === pattern.tool_name && containsRequired(action.arguments, pattern.required_arguments)
 }
 

@@ -1,7 +1,7 @@
 # The tool contract
 
 Every NeuroBench case describes an ideal workup as a list of tool calls. The agent executes
-tool calls. `CostTracker` prices them and `evaluation/metrics.py` scores them. Those four
+tool calls. `CostTracker` prices them and `evaluation/policy_reward.py` scores them. Those four
 things only agree if they share one definition of what a tool is and what arguments it takes.
 
 They did not, for a long time. This page is that definition, and how it is enforced.
@@ -13,23 +13,25 @@ of the two catchall tools. A term cannot exist without a price:
 
 ```
 costs.yaml  ──►  tools/vocabulary.py  ──►  tool schemas (enum)
-                                      └─►  scripts/validation/validate_cases.py
+                                      └─►  review_api/services/tool_io.py (review-app mirror)
                                       └─►  dataset-generation/TOOL_PARAMETER_VOCABULARY.md
 ```
 
-`agent-platform/tests/test_case_tool_contract.py` fails if these ever disagree again.
+`agent-platform/tests/test_tool_io_schemas.py` (each enum against the priced vocabulary, and
+the review-app mirror against the tool schemas) fails if these ever disagree again.
 
 ## The 16 tools
 
-The registry is `agent-platform/src/neuroagent/tools/tool_registry.py`. There are exactly 12.
+The registry is `agent-platform/src/neuroagent/tools/tool_registry.py`. There are exactly 16
+(`test_v4_tools.py::test_sixteen_tools_registered`).
 `consult_medical_specialist` was removed in `64d4091` — a specialist referral is a real
 clinical step, but no tool performs it, so it appears in a case as an action with
 `tool_name: null`.
 
 Six tools stand in for many studies each, selected by one discriminating parameter. Every
-value is a priced row in `costs.yaml`, and `validate_cases.py` checks each parameter against
-**its own** vocabulary — it previously checked four of the six against the specialized-test
-list, which reported legal values as illegal:
+value is a priced row in `costs.yaml`, and `BaseTool.execute` checks each parameter against
+**its own** vocabulary — the removed `validate_cases.py` once checked four of the six against
+the specialized-test list, which reported legal values as illegal:
 
 | Tool | Parameter | Values |
 | --- | --- | --- |
@@ -46,6 +48,10 @@ thoracic one. Thoracic, abdominal and spinal CT belongs to `order_body_imaging`.
 
 ## What a case may write in `tool_parameters`
 
+This section describes the v1 case shape. Schema-v2 cases state each criterion's arguments as
+`ground_truth.action_criteria[].alternatives[].required_arguments`, validated against the tool
+schemas by the perfect-agent check below.
+
 `ground_truth.optimal_actions[].tool_parameters` (and the same field on `useless_tools` /
 `harmful_tools`) is an **annotation of intent, not a complete tool call**. 87% of steps carry
 no `clinical_context`, and that is fine — the field records *which* study the clinician
@@ -55,9 +61,8 @@ What it may contain:
 
 1. **Schema parameters** of that tool. Enum-typed ones must carry a legal value.
 2. **Descriptive annotations** — clinical intent the tool does not accept as an argument
-   (`sequences`, `region`, `indication`, …). The per-tool allowlist is `ANNOTATION_KEYS` in
-   `scripts/validation/validate_cases.py`. One canonical spelling each. `CostTracker` ignores
-   them.
+   (`sequences`, `region`, `indication`, …). One canonical spelling each. `CostTracker` ignores
+   them. (The per-tool allowlist, `ANNOTATION_KEYS`, went with `validate_cases.py`; see below.)
 
 Anything else is an error.
 
@@ -261,10 +266,10 @@ pituitary apoplexy got their terms on 4 Nov 2026 (`costs.yaml`, with the fallbac
 
 ## Repairing cases
 
-`scripts/validation/migrate_cases.py` applies deterministic repairs (key renames, removed
-tools, the CSF split) and reports exactly what it changed. Whatever survives needs clinical
-judgment. `scripts/validation/check_sweep_guard.py` then verifies no case regressed and that
-`primary_diagnosis` / `icd_code` / `condition` never changed.
+The v1 repair scripts (`migrate_cases.py`, which applied deterministic repairs, and
+`check_sweep_guard.py`, which verified no case regressed) are no longer in the repository. A case
+repair is now checked by the perfect-agent check and the pytest gates above, and by the corpus
+guards in `agent-platform/tests/test_case_guards.py`.
 
 ## History
 

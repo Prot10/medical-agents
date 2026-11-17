@@ -6,7 +6,7 @@ This guide is the execution contract for validating the clinical-policy harness 
 
 ```bash
 git fetch origin
-git switch refactor/clinical-policy-harness
+git switch master
 git pull --ff-only
 git rev-parse HEAD
 git status --short
@@ -80,7 +80,7 @@ from neuroagent.harness import boot_profile, load_profiles
 index, cases = load_dataset(Path("data/neurobench"))
 assert len(index) == len(cases) == 600
 profiles = load_profiles("agent-platform/config/profiles")
-assert len(profiles) == 9
+assert len(profiles) == 15
 for profile in profiles.values():
     boot_profile(profile)
     print(f"booted={profile.profile_id}")
@@ -136,8 +136,10 @@ Run the profiles that match the loaded server with the batch runner. Every episo
 | `granite-4.1-8b` | `direct-granite-4.1-8b`, `narrative-granite-4.1-8b`, `policy-granite-4.1-8b`, `react-granite-4.1-8b` |
 | `gemma-4-e4b` | `direct-gemma-4-e4b`, `narrative-gemma-4-e4b`, `policy-gemma-4-e4b`, `react-gemma-4-e4b` |
 
+The three `free-order-*` profiles also call the CERN AI gateway (translator and gatekeeper, key in `~/.config/cern-ml/aigw.key`), so they are not part of the A100 smoke matrix.
+
 ```bash
-for p in direct-qwen3.5-9b policy-qwen3.5-9b react-qwen3.5-9b; do
+for p in direct-qwen3.5-9b narrative-qwen3.5-9b policy-qwen3.5-9b react-qwen3.5-9b; do
   uv run python -m neuroagent.evaluation.benchmark --profile $p \
     --cases FEPI-TEMP-M01 SAH-M01 FND-M01 ALS-M01 ALZ-EARLY-M01 \
     --output outputs/a100-validation/smoke/$p --concurrency 5 --seed 0 --allow-draft-policies
@@ -148,7 +150,7 @@ The five cases cover a tool-mediated work-up (`FEPI-TEMP-M01`), time-critical se
 
 ```bash
 uv run uvicorn neuroagent.api.app:app --host 127.0.0.1 --port 8888 &
-test "$(curl --fail --silent http://127.0.0.1:8888/api/v1/profiles | jq length)" -eq 9
+test "$(curl --fail --silent http://127.0.0.1:8888/api/v1/profiles | jq length)" -eq 15
 test "$(curl --fail --silent http://127.0.0.1:8888/api/v1/cases | jq length)" -eq 600
 curl --fail --silent -H 'content-type: application/json' \
   -d '{"case_id":"FEPI-TEMP-M01","profile_id":"policy-qwen3.5-9b"}' http://127.0.0.1:8888/api/v1/runs | jq '.events[-1]'
@@ -162,11 +164,11 @@ All migrated policies are drafts until physician approval. The production scorer
 
 ## 7. Staged experiment plan
 
-1. Run the smoke matrix above (five cases across eight profiles).
+1. Run the smoke matrix above (five cases across the twelve non-free-order profiles).
 2. Run a 20-case stratified set with one case per condition.
 3. Inspect failed runs, tool-parser behaviour, safety caps, latency, token use and cost.
 4. Freeze the server versions, seeds, profiles, dataset revision, sampling policy and retry policy.
-5. Only after physician policy approval, run `--split test` (and train if needed) for all eight profiles.
+5. Only after physician policy approval, run `--split test` (and train if needed) for every profile.
 6. Use at least three preregistered seeds (`--seed`) for stochastic decoding.
 7. Preserve every failed episode in the denominator (`--resume` never re-runs a persisted episode).
 
@@ -187,8 +189,11 @@ uv run python -m neuroagent.training.train_sft --model qwen3.5-9b \
 
 A valid output contains `adapter_config.json`, tokenizer files and a reloadable PEFT adapter. Monitor peak GPU memory, step time and loss for non-finite values. Then prove adapter selection end to end:
 
+Adapters live on EOS only; copy one to `/dev/shm` and serve it from there:
+
 ```bash
-LORA_ADAPTER=outputs/a100-validation/qwen-sft-smoke LORA_NAME=sft-qwen3.5-9b \
+cp -a /eos/project-d/diagbox/dvc/NeuroAgent/checkpoints/sft-smoke/qwen3.5-9b /dev/shm/sft-smoke-qwen
+LORA_ADAPTER=/dev/shm/sft-smoke-qwen LORA_NAME=sft-qwen3.5-9b \
   agent-platform/scripts/runtime/serve_model.sh qwen3.5-9b
 uv run python -m neuroagent.evaluation.benchmark --profile policy-qwen3.5-9b --served-model sft-qwen3.5-9b \
   --cases FEPI-TEMP-M01 --output outputs/a100-validation/adapter-check --allow-draft-policies
@@ -217,7 +222,8 @@ within the batch (`reward_std` > 0, `frac_reward_zero_std` < 1), gradients are f
 the engine/trainer log-prob ratio is near 1 (`sampling/importance_sampling_ratio/mean`), and with
 `--verify-packing` the packed-versus-per-row gap (`train/packing_max_abs_logp_gap`) is at bf16
 noise level. A learning claim requires the paired held-out evaluation of the saved adapter
-(`outputs/grpo/scripts/paired_eval.py`), never per-step reward alone.
+(`agent-platform/scripts/training/eval_checkpoints.sh` to score the checkpoints, then
+`scripts/paper/arm_compare.py` for the case-paired comparison), never per-step reward alone.
 
 ## 10. Required artifacts and handback
 

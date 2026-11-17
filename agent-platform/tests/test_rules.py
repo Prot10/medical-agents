@@ -5,7 +5,6 @@ import pytest
 from neuroagent.rules.rules_engine import (
     AVAILABLE_HOSPITALS,
     RulesEngine,
-    ComplianceResult,
 )
 from neuroagent.rules.pathway_checker import PathwayChecker
 

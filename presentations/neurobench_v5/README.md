@@ -21,8 +21,8 @@ roadmap (vanilla → tools → SFT → GRPO → graph-structured reasoning).
 uv run python presentations/neurobench_v5/make_figures.py
 
 # 2. compile the deck (xelatex/lualatex preferred; pdflatex falls back to helvet)
-cd presentations/neurobench
-latexmk -pdf neurobench.tex
+cd presentations/neurobench_v5
+latexmk -pdf neurobench_v5.tex
 ```
 
 If you don't have a TeX install, the easiest path is Overleaf — upload the
@@ -36,3 +36,5 @@ bundled `beamerthemeCERN.sty`.
   herring) — fully self-contained, no extra data required.
 - Regenerate stats anytime a case is added/removed: the script re-scans
   `data/neurobench/cases/`.
+- `figures/groundtruth_structure.pdf` is stale: `make_figures.py` counts the v1 fields
+  (`optimal_actions`, `critical_actions`, …), which schema-v2 cases no longer carry.

@@ -60,8 +60,9 @@ command wraps both (`cern help`). In short, to choose:
   sparse-logits loss), `train_grpo.py` (RLVR: benchmark loop as rollout on a colocated vLLM engine,
   DAPO loss, token-level IS correction, rollouts persisted; weights only on EOS via `--weights-dir`),
   `data/episodes.py` (episode records)
-- `agent-platform/config/profiles/*.yaml` — the twelve checked experiment profiles (model × loop);
-  arbitrary model ids are rejected. Models live in `model_registry.py` with their per-request defaults
+- `agent-platform/config/profiles/*.yaml` — the fifteen checked experiment profiles (model × loop:
+  policy, direct, narrative, react, free-order); arbitrary model ids are rejected. Models live in
+  `model_registry.py` with their per-request defaults
 - `agent-platform/config/tools/costs.yaml` — per-tool cost registry (Medicare reference rates); the
   vocabulary in `tools/vocabulary.py` derives every enum from it
 - `agent-platform/config/policies/diagnosis_synonyms.yaml` — accepted diagnosis labels/codes per
@@ -78,7 +79,8 @@ command wraps both (`cern help`). In short, to choose:
   July 2026 clinical review, served by the review app only (`test_condition_tool_guidance.py` fails if
   anything agent-side reads it)
 - `packages/neuroagent-schemas/` — shared Pydantic models: cases, actions, episodes, policies
-- `data/neurobench/cases/` — 600 cases across 20 conditions; `data/neurobench/splits/` 500/100
+- `data/neurobench/cases/` — 600 cases across 20 conditions; `data/neurobench/splits/` whole
+  conditions held out: train 419, validation 60, test 119 (2 excluded; `split_manifest.json`)
 - `data/review/annotations/{version}/{reviewer_code}/{case_id}.json` — annotation runtime data (gitignored)
 - `web/` — dashboard (port 5173 in dev, or `web/dist` served by the run API at `/`): profile picker,
   live runs over `POST /runs/stream`, episode replay, case policy and reward panels

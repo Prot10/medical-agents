@@ -55,16 +55,6 @@ const QK = {
 
 // ---------- Identity ----------------------------------------------------
 
-export function useReviewerProfile() {
-  const profile = useReviewStore((s) => s.profile)
-  return useQuery({
-    queryKey: QK.me(),
-    enabled: !!profile,
-    queryFn: () => fetchJSON<ReviewerProfile>("/reviewers/me"),
-    staleTime: 5 * 60 * 1000,
-  })
-}
-
 export async function validateAndLoadProfile(code: string): Promise<ReviewerProfile> {
   return fetchJSON<ReviewerProfile>("/reviewers/me", {
     headers: { "X-Reviewer-Code": code },
@@ -239,28 +229,6 @@ export function useCreateComment(version: string) {
     }) =>
       postJSON<CaseReview>(
         `/datasets/${version}/reviews/${caseId}/comments`,
-        body,
-      ),
-    onSuccess: (data, vars) => applyMutationResult(queryClient, version, vars.caseId, code, data),
-  })
-}
-
-export function useUpdateComment(version: string) {
-  const queryClient = useQueryClient()
-  const code = useReviewStore((s) => s.profile?.code ?? "")
-  return useMutation({
-    mutationFn: ({
-      caseId,
-      commentId,
-      ...body
-    }: {
-      caseId: string
-      commentId: string
-      comment?: string
-      severity?: Severity
-    }) =>
-      putJSON<CaseReview>(
-        `/datasets/${version}/reviews/${caseId}/comments/${commentId}`,
         body,
       ),
     onSuccess: (data, vars) => applyMutationResult(queryClient, version, vars.caseId, code, data),

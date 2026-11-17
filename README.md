@@ -5,12 +5,12 @@ NeuroBench is a physician-validated, 360-degree simulated-patient dataset and an
 ## What is implemented
 
 - 600 schema-v2 neurology cases across 20 conditions.
-- A typed policy harness with standard, direct, narrative-only (no tools) and ReAct-prompt conditions, and one transcript codec shared by inference and SFT.
+- A typed policy harness with standard, direct, narrative-only (no tools), ReAct-prompt and free-order (one free-text `request_test` tool) conditions, and one transcript codec shared by inference and SFT.
 - A fixed under-10B panel: Qwen3.5-9B, IBM Granite 4.1 8B and Gemma 4 E4B.
-- Nine checked experiment profiles and a batch runner that persists every episode.
+- Fifteen checked experiment profiles (3 models × 5 conditions) and a batch runner that persists every episode.
 - A clinical-policy reward with safety caps and adequacy-gated efficiency.
 - Structured independent physician review and adjudication.
-- LoRA SFT over typed episodes and a backend-neutral GRPO coordinator.
+- LoRA SFT over typed episodes and a single-GPU GRPO (RLVR) trainer: the benchmark loop as rollout on a colocated vLLM engine, DAPO loss.
 - A JSON API for profiles, runs, models, cases, hospitals and persisted episodes.
 - A dashboard in `web` for cases, policies, live and replayed episodes and the engineering reward.
 - A dedicated physician-review application in `web-review`.
@@ -74,4 +74,4 @@ uv run python -m neuroagent.training.train_sft --model qwen3.5-9b \
   --episodes training_data/candidate_episodes.jsonl --output /eos/project-d/diagbox/dvc/NeuroAgent/checkpoints/sft-qwen/qwen3.5-9b --allow-candidates
 ```
 
-Weights are written to EOS only (the trainers refuse a local path). Serve the adapter from a RAM copy, `cp -r <eos adapter dir> /dev/shm/sft-qwen && LORA_ADAPTER=/dev/shm/sft-qwen LORA_NAME=sft-qwen3.5-9b serve_model.sh qwen3.5-9b`, and evaluate it with `--served-model sft-qwen3.5-9b`. The current GRPO surface is a backend contract, not a completed distributed trainer.
+Weights are written to EOS only (the trainers refuse a local path). Serve the adapter from a RAM copy, `cp -r <eos adapter dir> /dev/shm/sft-qwen && LORA_ADAPTER=/dev/shm/sft-qwen LORA_NAME=sft-qwen3.5-9b serve_model.sh qwen3.5-9b`, and evaluate it with `--served-model sft-qwen3.5-9b`. GRPO runs with `python -m neuroagent.training.train_grpo` (see `agent-platform/scripts/training/README.md` and section 9 of the A100 handoff).

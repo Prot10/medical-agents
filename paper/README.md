@@ -4,7 +4,6 @@
 |---|---|
 | `manuscript/` | LaTeX source. `main.tex` plus one file per section in `sections/`; `references.bib` |
 | `figures/` | Figures made in HTML/CSS (`python3 build.py` → `figN.pdf`, `figN.png`; `--static` exports for Figma) |
-| `template/` | Springer Nature LaTeX template v3.1 (December 2024) as downloaded, with its user manual |
 
 ## Build
 

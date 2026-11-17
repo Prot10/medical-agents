@@ -277,7 +277,6 @@ def run_episodes(client: BatchedEngineClient, cases: list[NeuroBenchCase], *, ma
     """Run one episode per case (cases may repeat) with the benchmark loop; returns (episode, records)."""
     results: dict[int, ClinicalEpisode] = {}
     threads: list[threading.Thread] = []
-    order: list[int] = []
 
     def worker(case: NeuroBenchCase, slot: int) -> None:
         client.episode_started()
@@ -478,7 +477,6 @@ def build_trainer(
     from trl import GRPOConfig, GRPOTrainer
     from trl.generation.vllm_generation import VLLMGeneration
     from trl.trainer import grpo_trainer as grpo_module
-    from trl.trainer.utils import selective_log_softmax, entropy_from_logits
 
     concurrent_episodes = num_generations * cases_per_step
 

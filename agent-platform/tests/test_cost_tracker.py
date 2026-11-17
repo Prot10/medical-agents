@@ -9,7 +9,7 @@ currency" — currently EUR.
 
 import pytest
 
-from neuroagent.tools.cost_tracker import CostConfigError, CostTracker, ToolCostEntry
+from neuroagent.tools.cost_tracker import CostConfigError, CostTracker
 
 
 @pytest.fixture

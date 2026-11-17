@@ -1,8 +1,8 @@
 # Hospital Rules
 
-Hospital rules are clinical protocols injected into the agent's system prompt. They define mandatory investigation steps, timing constraints, and contraindicated actions for each clinical scenario.
+Hospital rules are clinical protocols per institution: mandatory investigation steps, timing constraints and contraindicated actions for each clinical scenario.
 
-Rules are **not a tool** — the agent cannot call them. Instead, they are part of the context the agent reasons over, similar to how a real clinician follows their institution's protocols.
+They are served by the run API (`api/routes/hospitals.py`: `GET /api/v1/hospitals`, `GET/POST/PUT/DELETE /api/v1/hospitals/{id}/rules`) for the dashboard. They are **not used by the harness**: they are not a tool, they are not injected into any harness prompt, and the policy reward does not read them. The policy each case is scored against lives in the case itself (`ground_truth.action_criteria`).
 
 ## Available hospital rule sets
 
@@ -16,25 +16,11 @@ Rules are **not a tool** — the agent cannot call them. Instead, they are part 
 
 ## Selecting a hospital
 
-### CLI flag
-
-All scripts accept `--hospital`:
+Through the run API:
 
 ```bash
-# Use UK NHS protocols
-uv run python scripts/runtime/run_single_case.py tests/fixtures/sample_case.json \
-    --hospital uk_nhs
-
-# Use Japanese protocols
-uv run python scripts/runtime/run_single_case.py tests/fixtures/sample_case.json \
-    --hospital jp_todai
-
-# Compare same case across hospitals
-for h in us_mayo uk_nhs de_charite jp_todai br_hcfmusp; do
-    echo "=== $h ==="
-    uv run python scripts/runtime/run_single_case.py tests/fixtures/sample_case.json \
-        --hospital "$h"
-done
+curl http://127.0.0.1:8888/api/v1/hospitals
+curl http://127.0.0.1:8888/api/v1/hospitals/uk_nhs/rules
 ```
 
 ### Programmatic
@@ -47,7 +33,7 @@ print(AVAILABLE_HOSPITALS)
 
 # Load specific hospital rules
 engine = RulesEngine("config/hospital_rules", hospital="de_charite")
-print(engine.get_context())  # Markdown for system prompt
+print(engine.get_context())  # the rules rendered as Markdown
 ```
 
 ## Condition pathways
@@ -64,17 +50,7 @@ Each hospital defines protocols for these neurological conditions:
 
 ## How rules affect the agent
 
-The rules are injected into the system prompt under a `## Hospital Protocols` section. The agent sees text like:
-
-> You are operating under the clinical protocols of **NHS England (NICE guidelines)**.
-> You MUST follow these protocols strictly. The following pathways apply:
-> - **First Seizure Pathway (NICE CG137)**: ...
->   - interpret_labs (immediate, MANDATORY)
->   - analyze_eeg (after_specialist_review, MANDATORY)
->   ...
->   - CONTRAINDICATED: Starting ASM in A&E after a single seizure without epilepsy specialist review
-
-Post-hoc, the `PathwayChecker` evaluates whether the agent's tool calls comply with the selected hospital's rules.
+They do not. `RulesEngine.get_context()` can render a hospital's pathways as Markdown, and `rules/pathway_checker.py` (`PathwayChecker`) can check a list of tool calls against them, but neither is called by the harness, the benchmark runner or the reward.
 
 ## Adding a new hospital
 

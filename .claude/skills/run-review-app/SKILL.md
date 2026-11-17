@@ -85,9 +85,9 @@ screenshot:
 
 ```bash
 R="<a reviewer-role code>"
-curl -s -X PATCH http://localhost:8889/api/v1/datasets/v5/reviews/ALS-M01/status \
+curl -s -X PATCH http://localhost:8889/api/v1/datasets/neurobench/reviews/ALS-M01/status \
   -H "X-Reviewer-Code: $R" -H "Content-Type: application/json" -d '{"status":"in_progress"}'
-curl -s -X POST http://localhost:8889/api/v1/datasets/v5/reviews/ALS-M01/heartbeat \
+curl -s -X POST http://localhost:8889/api/v1/datasets/neurobench/reviews/ALS-M01/heartbeat \
   -H "X-Reviewer-Code: $R" -H "Content-Type: application/json" -d '{"seconds":120}'
 ```
 

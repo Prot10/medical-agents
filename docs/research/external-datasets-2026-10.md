@@ -531,8 +531,9 @@ tested on the demo.
 
 ## MedLoCoMo
 
-Audit: `agent-platform/scripts/external_datasets/medlocomo_audit.py` →
-`outputs/external_datasets/medlocomo.csv`, one row per admission (2,982).
+Audit: one row per admission (2,982), written to `outputs/external_datasets/medlocomo.csv` by
+`medlocomo_audit.py`. The script was removed in the November 2026 repository clean-up because MedLoCoMo
+is not pursued (see the verdict table); the numbers below are the ones it measured.
 
 - Each admission packet holds the MIMIC-IV-Note discharge summary, the radiology reports, ICD
   diagnoses and procedures, and microbiology. **It has no lab table**: labs exist only as text
@@ -587,25 +588,6 @@ Audit: `agent-platform/scripts/external_datasets/medmemorybench_audit.py` →
   values, prescriptions, referrals without letters. There is no presentation narrative,
   neurological exam, imaging, EEG or CSF report, and no hospital work-up. It suits a different
   task, prediction over primary-care timelines.
-
-## Next steps (neurology-only pass, superseded by "Recommended order")
-
-1. Andrea applies for PhysioNet credentialed access: CITI course, reference, then the DUA for
-   MIMIC-IV, MIMIC-IV-Note and MIMIC-IV-ED.
-2. Download them to CERN storage, not to this Mac, and run `mimic_cohort.py` for the exact
-   counts per condition.
-3. Extend the converter with the Note module:
-   - section parsing of HPI and exam (code already in `mimic_neuro.py`);
-   - radiology reports mapped by `exam_name`;
-   - a local-model step that removes results from the HPI and structures the reports into our
-     Pydantic models.
-4. Decide three design points:
-   - impression versus findings-only for imaging tools;
-   - "not available" versus extracted text for EEG and telemetry;
-   - how the transferred condition policy is reviewed (a sample per condition, by the same
-     physicians).
-5. Pilot 20 cases per frequent condition (ISCH, SAH, SE, SYNC, HEP, BACT) through the harness
-   with the panel models, and compare scores with the synthetic split.
 
 # Part 3: first look at the full data (5 Nov 2026)
 
@@ -1091,7 +1073,7 @@ retention), which is the only agent that reads MIMIC records. Everything record-
 `/eos/user/a/aprotani/physionet/work/mimic-neuro`. This document, like the Mac session, sees only
 aggregate reports. The formal method (cohort flow, record-to-tool mapping, decision log 1-51,
 validation, limitations) is [`docs/benchmark/mimic-neuro-methods.md`](../benchmark/mimic-neuro-methods.md),
-copied from the workspace's `report/07_methods.md`.
+copied from `report/07_methods.md` in that EOS workspace (not in this repository).
 
 **Final set (task 07, 9 Nov 2026): 100 cases.**
 - Allocation: ISCH 38, MS 22, SAH 12, HEP 10, SE 9, GBS 3, FND 2, FEPI 2, BACT 2.
@@ -1140,7 +1122,7 @@ copied from the workspace's `report/07_methods.md`.
 # Raw downloads live in data/external/ (gitignored): hf download, git clone, wget from physionet.org/files/<project>/<version>/
 uv run --no-project --with pandas --with pyarrow python -I agent-platform/scripts/external_datasets/medmemorybench_audit.py data/external/medmemorybench/data/en outputs/external_datasets/medmemorybench.csv
 uv run --no-project --with pandas python -I agent-platform/scripts/external_datasets/general_audit.py data/external outputs/external_datasets
-python3 -I agent-platform/scripts/external_datasets/medlocomo_audit.py data/external/medlocomo/repo/MedLoCoMo outputs/external_datasets/medlocomo.csv
+# medlocomo_audit.py was removed in November 2026 (MedLoCoMo not pursued); its last output is the MedLoCoMo section above
 uv run --no-project --with pandas python -I agent-platform/scripts/external_datasets/mimic_demo_audit.py data/external outputs/external_datasets/mimic_demo.csv
 uv run --no-project --with duckdb --with pandas python -I agent-platform/scripts/external_datasets/mimic_cohort.py --hosp data/external/mimic-iv-demo/hosp --ed data/external/mimic-iv-ed-demo/ed
 uv run --no-project --with pandas python -I agent-platform/scripts/external_datasets/mimic_to_neurobench.py --root data/external --hadm 22484749 --template data/neurobench/cases/ISCH-STR-M01.json --out outputs/external_datasets/cases

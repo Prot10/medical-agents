@@ -10,7 +10,7 @@ The API serves JSON and one Server-Sent Events stream. When `web/dist` exists (a
 
 | Endpoint | Purpose |
 |---|---|
-| `GET /api/v1/profiles` | list the nine checked experiment profiles |
+| `GET /api/v1/profiles` | list the fifteen checked experiment profiles |
 | `POST /api/v1/runs` | execute one case with a checked profile |
 | `POST /api/v1/runs/stream` | the same run, streaming each episode event as SSE |
 | `GET /api/v1/models` | list the fixed three-model panel and readiness |

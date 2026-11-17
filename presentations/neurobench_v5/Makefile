@@ -13,7 +13,7 @@ all: $(TEX).pdf
 figures: $(FIGURES)
 
 $(FIGURES): make_figures.py
-	cd .. && uv run python presentations/neurobench_v5/make_figures.py
+	cd ../.. && uv run python presentations/neurobench_v5/make_figures.py
 
 $(TEX).pdf: $(TEX).tex $(FIGURES)
 	latexmk -pdf -interaction=nonstopmode -halt-on-error $(TEX).tex

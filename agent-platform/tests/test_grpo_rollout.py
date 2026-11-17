@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
-
 from neuroagent.evaluation.policy_reward import ClinicalPolicyReward
 from neuroagent.training.train_grpo import TurnRecord, assemble_sequence, make_reward_funcs
 from neuroagent_schemas import (

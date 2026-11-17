@@ -9,9 +9,9 @@ reward path. It does not depend on a prescribed reasoning transcript.
 ```mermaid
 flowchart LR
   Cases["600 schema-v2 cases"] --> Env["NeuroBenchEnvironment"]
-  Profiles["8 checked profiles"] --> Kernel["HarnessKernel"]
+  Profiles["15 checked profiles"] --> Kernel["HarnessKernel"]
   Kernel --> Adapter["ModelAdapter"]
-  Adapter --> Loop["Policy / Direct / ReAct loop"]
+  Adapter --> Loop["Policy / Direct / Narrative / ReAct / Free-order loop"]
   Loop --> Env
   Env --> Episode["ClinicalEpisode"]
   Episode --> Reward["ClinicalPolicyReward"]
@@ -29,15 +29,17 @@ hidden chain-of-thought is neither stored nor scored.
 
 ## Experimental matrix
 
-| Model | Policy | Direct | ReAct |
-|---|---:|---:|---:|
-| Qwen/Qwen3.5-9B | yes | yes | yes |
-| ibm-granite/granite-4.1-8b | yes | yes | yes |
-| google/gemma-4-E4B-it | yes | yes | yes |
+| Model | Policy | Direct | Narrative | ReAct | Free-order |
+|---|---:|---:|---:|---:|---:|
+| Qwen/Qwen3.5-9B | yes | yes | yes | yes | yes |
+| ibm-granite/granite-4.1-8b | yes | yes | yes | yes | yes |
+| google/gemma-4-E4B-it | yes | yes | yes | yes | yes |
 
-Policy is the primary condition. Direct access is a diagnostic upper-bound ablation. ReAct changes
-the prompt policy but uses the same typed action protocol, environment and scorer. All three
-models call tools natively.
+Policy is the primary condition. Direct access is a diagnostic upper-bound ablation. Narrative gives
+the presentation alone with no tools. ReAct changes the prompt policy but uses the same typed action
+protocol, environment and scorer. Free-order replaces the catalogue with one free-text
+`request_test` tool whose orders a translator maps onto the catalogue. All three models call tools
+natively.
 
 ## Data and scoring
 

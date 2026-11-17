@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
 
 from neuroagent.datasets import load_dataset
 from neuroagent.harness.environment import NeuroBenchEnvironment

@@ -33,14 +33,3 @@ export function SeverityPill({
   )
 }
 
-export function severityBorderColor(severity: Severity): string {
-  return {
-    note: "border-l-sky-500",
-    issue: "border-l-amber-500",
-    error: "border-l-rose-500",
-  }[severity]
-}
-
-export function severityRank(severity: Severity): number {
-  return { note: 0, issue: 1, error: 2 }[severity]
-}

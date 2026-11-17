@@ -8,9 +8,9 @@ The benchmark compares exactly three open models below 10B parameters, all with 
 | `granite-4.1-8b` | `ibm-granite/granite-4.1-8b` | dense; Apache-2.0; no thinking switch; vLLM `granite4` parser |
 | `gemma-4-e4b` | `google/gemma-4-E4B-it` | gated on Hugging Face; thinking disabled per request; vLLM `gemma4` parser |
 
-Every model runs the policy, direct and ReAct-prompt conditions (nine profiles). The registry in
-`model_registry.py` is the single source for ids, adapters aliases and per-request defaults;
-`serve_model.sh` and the API load only these keys.
+Every model runs the policy, direct, narrative, ReAct-prompt and free-order conditions (fifteen
+profiles). The registry in `model_registry.py` is the single source for ids, adapters aliases and
+per-request defaults; `serve_model.sh` and the API load only these keys.
 
 Serving on one A100-40GB (vLLM 0.23, bf16, 32k context, prefix caching; measured 2026-09-02 on the
 real prompt shape of ~8k input tokens, 128 output tokens):

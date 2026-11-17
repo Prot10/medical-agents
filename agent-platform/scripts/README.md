@@ -5,6 +5,9 @@
 - `review/build_condition_tool_guidance.py`: build physician-review guidance.
 - `validation/report_panel_case_tiers.py`: report drift between condition-level generation defaults and per-case policies.
 - `validation/apply_diagnosis_synonyms.py`: expand `config/policies/diagnosis_synonyms.yaml` into every case's accepted diagnosis labels and ICD codes (idempotent; `--check` for CI).
-- `diversify_cases.py`: dataset diversification utility.
+- `validation/scripted_agents.py`: E0, scripted agents of known quality scored by the policy reward.
+- `validation/lab_serving_audit.py`: snapshot what every `interpret_labs` order is served, and diff two snapshots.
+- `training/`: E1 launch, validation and checkpoint-selection scripts (see `training/README.md`).
+- `external_datasets/`: MIMIC-IV audits and the MIMIC-to-NeuroBench conversion (see `docs/research/external-datasets-2026-10.md` and `docs/benchmark/mimic-neuro-methods.md`).
 
 Benchmark execution is `python -m neuroagent.evaluation.benchmark`; SFT is `python -m neuroagent.training.train_sft`; candidate episodes are exported with `python -m neuroagent.training.data.export_episodes`.

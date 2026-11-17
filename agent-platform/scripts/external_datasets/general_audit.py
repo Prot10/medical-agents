@@ -1,9 +1,9 @@
-"""Domain-agnostic fit of MIMIC-IV (demo) and MedLoCoMo to the NeuroAgent episode format.
+"""Domain-agnostic fit of MIMIC-IV (demo) to the NeuroAgent episode format.
 
 Same question as the neuro audits, without the neurology filter: is an admission a diagnostic
 episode, i.e. an unplanned presentation whose principal diagnosis is new to the patient, with
 results an agent could request and a final diagnosis to score? One row per admission, booleans
-and counts only (MedLoCoMo note text never leaves the script).
+and counts only. (The MedLoCoMo half was removed on 13 Nov 2026: that source is not pursued.)
 
     uv run --no-project --with pandas python -I \
         agent-platform/scripts/external_datasets/general_audit.py data/external outputs/external_datasets
@@ -11,7 +11,6 @@ and counts only (MedLoCoMo note text never leaves the script).
 
 from __future__ import annotations
 
-import json
 import re
 import sys
 from collections import Counter
@@ -20,8 +19,7 @@ from pathlib import Path
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from medlocomo_audit import HPI_RESULT_LEAK
-from mimic_neuro import dx_family, icd_chapter, physical_exam, sections
+from mimic_neuro import dx_family, icd_chapter
 
 PLANNED = {"ELECTIVE", "SURGICAL SAME DAY ADMISSION"}
 DIAGNOSTIC_ORDERS = {"Radiology", "Cardiology", "Neurology"}
@@ -92,42 +90,6 @@ def mimic_demo(root: Path) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-def medlocomo(src: Path) -> pd.DataFrame:
-    packets = [json.loads(p.read_text()) for p in sorted(src.glob("*/*/formed_packet.json"))]
-    packets.sort(key=lambda d: (d["subject_id"], d["admission_start"]))
-    seen: dict[str, set[str]] = {}
-    rows = []
-    for d in packets:
-        prior = seen.setdefault(d["subject_id"], set())
-        dx = sorted(d["diagnoses"], key=lambda x: x["seq_num"])
-        note = "\n".join(n["text"] for n in d["discharge_notes"])
-        sec = sections(note)
-        hpi = sec.get("History of Present Illness", "")
-        if dx:
-            p = dx[0]
-            row = {
-                "hadm_id": d["hadm_id"],
-                "chapter": icd_chapter(p["icd_code"], p["icd_version"]),
-                "principal": f'{p["icd_version"]}:{p["icd_code"]} {p["long_title"][:55]}',
-                "new_dx": dx_family(p["icd_code"]) not in prior,
-                "cc_names_dx": names_diagnosis(sec.get("Chief Complaint", ""), p["long_title"]),
-                "hpi_chars": len(hpi),
-                "hpi_has_results": bool(HPI_RESULT_LEAK.search(hpi)),
-                "pe_chars": len(physical_exam(note)),
-                "has_results": bool(sec.get("Pertinent Results")),
-                "n_radiology": len(d["radiology_notes"]),
-                "n_microbiology": len(d["microbiology"]),
-                "elective": bool(re.search(r"elective|scheduled|planned admission", hpi[:400], re.IGNORECASE)),
-            }
-            row["episode"] = bool(
-                row["new_dx"] and not row["cc_names_dx"] and not row["elective"] and row["hpi_chars"] > 200
-                and row["pe_chars"] > 100 and row["has_results"] and (row["n_radiology"] or row["n_microbiology"])
-            )
-            rows.append(row)
-        prior.update(dx_family(x["icd_code"]) for x in dx)
-    return pd.DataFrame(rows)
-
-
 def summarise(name: str, df: pd.DataFrame) -> None:
     ep = df[df.episode]
     print(f"\n== {name}: {len(df)} admissions, {len(ep)} diagnostic episodes ({len(ep) / len(df):.1%})")
@@ -143,9 +105,6 @@ def main(root: Path, out: Path) -> None:
     demo = mimic_demo(root)
     demo.to_csv(out / "mimic_demo_general.csv", index=False)
     summarise("MIMIC-IV demo", demo)
-    loco = medlocomo(root / "medlocomo/repo/MedLoCoMo")
-    loco.to_csv(out / "medlocomo_general.csv", index=False)
-    summarise("MedLoCoMo", loco)
 
 
 if __name__ == "__main__":

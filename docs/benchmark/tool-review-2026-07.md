@@ -1,5 +1,9 @@
 # Clinical tool review — round 1 (July 2026)
 
+> Historical record. The `validate_cases.py` gates cited below were removed with the
+> clinical-policy harness on 1 Sep 2026 (`d1246ff3`); their checks now live in the perfect-agent
+> check and the pytest gates (see `tool-contract.md`).
+
 Status of the external clinical review of the NeuroBench **tool catalog** (not the cases),
 performed by Flavia and Antonio on https://review.andreaprotani.com.
 
@@ -686,10 +690,10 @@ is the migraine slice of item 4 above and should be done in the same shape as th
 
 **8. The GRPO prompt datasets were broken, not merely stale, and are now renamed.** The 2026-08-05
 build referenced 30 deleted `PERI-NEURO` cases (28 train, 2 test) and lacked the 30 new vascular
-dementia ones. They are preserved as `*.stale-2026-08-05.jsonl` so the training script fails to find
-its input rather than silently using a broken one, `data/neurobench/grpo/README.md` records why, and
-`agent-platform/tests/test_grpo_prompt_dataset.py` now fails if a present artifact disagrees with the
-split. Regeneration needs the training extra and a tokenizer.
+dementia ones. They were preserved as `*.stale-2026-08-05.jsonl` so the training script failed to find
+its input rather than silently using a broken one, with a README and a test guarding them. The stale
+files, their README and that test were deleted on 2 Sep 2026 (`1a755cdb`, `f0908dd6`): the current
+GRPO trainer builds its rollouts from the cases and the condition split, not from a prompt file.
 
 **9. One reviewer annotation is now orphaned, by design.** Reviewer 1's `SOSTITUIRE PATOLOGIA` on
 `condition_tool:peripheral_neuropathy:interpret_labs` points at a condition that no longer exists in

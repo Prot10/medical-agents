@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 
 from neuroagent_schemas import NeuroBenchCase
-from neuroagent.tools.base import ToolCall, ToolResult, BaseTool
+from neuroagent.tools.base import ToolCall, ToolResult
 from neuroagent.tools.mock_server import MockServer
 from neuroagent.tools.tool_registry import ToolRegistry
 

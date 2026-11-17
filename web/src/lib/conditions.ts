@@ -1,5 +1,5 @@
 // Display labels for the NeuroBench conditions (NeurologicalCondition in neuroagent-schemas).
-export const CONDITION_LABELS: Record<string, string> = {
+const CONDITION_LABELS: Record<string, string> = {
   als: "ALS",
   alzheimers_early: "Alzheimer's (Early)",
   autoimmune_encephalitis_nmdar: "NMDAR Encephalitis",

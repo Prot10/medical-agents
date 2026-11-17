@@ -4,14 +4,7 @@ Kept by the orchestrating session so a resumed session does not lose it. Remove 
 lands.
 
 ## Code and tests
-- Scorer: a mixed case can score both diagnoses only by recoding (it accepts a diagnosis on its
-  ICD code alone). Consider a per-case "all of" diagnosis rule. (HEP-ENC-P04, 24 Oct)
 - Test: catch fallback outputs that can never be served. (HEP-ENC, 24 Oct)
-- Scorer: per-case rejected tokens, so a dementia case does not accept an MCI answer.
-  (ALZ-EARLY, 24 Oct)
-- Scorer: C71 codes the site, not the entity, so "glioblastoma, C71.1" still scores in an
-  IDH-mutant astrocytoma through the code. Needs a per-case label requirement or ICD-O-3
-  morphology codes; same root as the ICD-code-alone item above. (GLIO-HG, 24 Oct)
 - Library: nulling generic fallbacks exposes library normals that some cases contradict, e.g. a
   normal `neuropsych_battery` in overt hepatic encephalopathy (HEP-ENC, West Haven II-III). Same root
   as the SAH library item below.
@@ -26,8 +19,6 @@ lands.
   by their text, so a non-contrast order receives post-gadolinium findings. Routing needs a
   non-contrast variant (or a "not performed" answer) per case where the criteria allow a plain
   study, then `contrast_used` on every stored MRI and a guard.
-- Scorer: negation matching, so "non-aneurysmal SAH" does not score in an aneurysmal case (and
-  in general "non-X" / "not X" answers do not match X). (SAH, 24 Oct)
 - Library: imaging variants a case does not store (e.g. CT perfusion) get normal defaults that may
   contradict the case. (SAH, 24 Oct)
 - Harness: a drug discriminator for `check_drug_interactions` stored outputs. (ALZ-EARLY, 24 Oct)
@@ -81,8 +72,8 @@ lands.
 ## Close-out recipe per batch (what batches 1 and 2 did)
 1. Workflow `bin/round-v2.js` (plan, fix, verify, audit; args `[{cond, cases}]`). 2. One close-out agent per condition
 (synonyms, pack, generator block, guidance claims via `build_condition_tool_guidance.py --write`
-and the claim table, open questions decided; brief `CLOSEOUT_BRIEF.md` with COND replaced, the batch-2 decisions
-files show the result) plus one vocabulary agent for the
+and the claim table, open questions decided; the batch-2 `plans/<COND>-decisions.md` files show the result; the
+`CLOSEOUT_BRIEF.md` brief is no longer in the repository) plus one vocabulary agent for the
 batch's CENTRAL terms. 3. One agent per condition wires the new terms into the cases.
 
 ## For the physicians at re-review

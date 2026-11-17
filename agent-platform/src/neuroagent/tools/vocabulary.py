@@ -161,19 +161,6 @@ def analyte_class_members(value: str) -> frozenset[str]:
     return _ANALYTE_CLASSES.get(normalize_analyte(value), frozenset())
 
 
-def analyte_satisfied_by(wanted: str, available: set[str] | frozenset[str]) -> bool:
-    """Is this wanted analyte covered by what was ordered?
-
-    Either the analyte itself was ordered, or it names a class and at least one member was. Never the
-    reverse: ordering `AED_levels` does not satisfy a ground truth that asks for the valproate level.
-    """
-    key = normalize_analyte(wanted)
-    if key in available:
-        return True
-    members = _ANALYTE_CLASSES.get(key)
-    return bool(members and members & set(available))
-
-
 def _fold(value: str) -> str:
     """Punctuation- and case-folded form: `Protein C`, `protein-C` and `protein_C` agree."""
     return value.strip().lower().replace(" ", "_").replace("-", "_")
