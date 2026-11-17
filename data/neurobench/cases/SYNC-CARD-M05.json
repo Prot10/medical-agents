@@ -421,6 +421,36 @@
     },
     {
       "output": {
+        "findings": [
+          {
+            "description": "Baseline: sinus rhythm, AH 82 ms, HV 44 ms; no pre-excitation"
+          },
+          {
+            "description": "Dual AV nodal physiology: AH jump of 64 ms with a 10 ms decrement of the atrial extrastimulus coupling interval"
+          },
+          {
+            "description": "Inducible sustained typical (slow-fast) AVNRT, cycle length 272 ms (about 220 bpm), septal VA interval 38 ms, reproducing the clinical tachycardia"
+          },
+          {
+            "description": "No accessory pathway during ventricular pacing (concentric, decremental retrograde conduction)"
+          }
+        ],
+        "impression": "Dual AV nodal physiology with inducible typical slow-fast AVNRT at cycle length 272 ms (about 220 bpm), reproducing the clinical tachycardia. No accessory pathway.",
+        "quantitative_data": {
+          "AH": "82 ms",
+          "AH_jump": "64 ms",
+          "HV": "44 ms",
+          "VA_interval": "38 ms",
+          "tachycardia_cycle_length": "272 ms"
+        },
+        "recommended_actions": [],
+        "test_type": "electrophysiology_study"
+      },
+      "tool_name": "order_specialized_test",
+      "trigger_action": "request_electrophysiology_study"
+    },
+    {
+      "output": {
         "alternatives": [],
         "contraindications": [
           "Second- or third-degree AV block or sick sinus syndrome without a pacemaker; severe asthma or bronchospasm.",
@@ -583,36 +613,6 @@
       },
       "tool_name": "analyze_brain_mri",
       "trigger_action": "request_brain_mri_with_contrast"
-    },
-    {
-      "output": {
-        "findings": [
-          {
-            "description": "Baseline: sinus rhythm, AH 82 ms, HV 44 ms; no pre-excitation"
-          },
-          {
-            "description": "Dual AV nodal physiology: AH jump of 64 ms with a 10 ms decrement of the atrial extrastimulus coupling interval"
-          },
-          {
-            "description": "Inducible sustained typical (slow-fast) AVNRT, cycle length 272 ms (about 220 bpm), septal VA interval 38 ms, reproducing the clinical tachycardia"
-          },
-          {
-            "description": "No accessory pathway during ventricular pacing (concentric, decremental retrograde conduction)"
-          }
-        ],
-        "impression": "Dual AV nodal physiology with inducible typical slow-fast AVNRT at cycle length 272 ms (about 220 bpm), reproducing the clinical tachycardia. No accessory pathway.",
-        "quantitative_data": {
-          "AH": "82 ms",
-          "AH_jump": "64 ms",
-          "HV": "44 ms",
-          "VA_interval": "38 ms",
-          "tachycardia_cycle_length": "272 ms"
-        },
-        "recommended_actions": [],
-        "test_type": "electrophysiology_study"
-      },
-      "tool_name": "order_specialized_test",
-      "trigger_action": "request_electrophysiology_study"
     }
   ],
   "ground_truth": {
@@ -716,9 +716,9 @@
         ],
         "criterion_id": "action-7-order-telemetry",
         "expected_evidence": "24 h of sinus rhythm without tachyarrhythmia or pre-excitation: non-diagnostic",
-        "importance": "recommended",
-        "label": "ECG monitoring in the emergency department (telemetry)",
-        "rationale": "Sudden palpitations immediately followed by syncope is a high-risk feature: immediate in-hospital ECG monitoring is Class I, even though a short recording is unlikely to capture an event weeks apart (ESC 2018)."
+        "importance": "required",
+        "label": "Immediate in-hospital ECG monitoring (telemetry): palpitation followed by syncope is a high-risk feature",
+        "rationale": "Sudden palpitation immediately followed by syncope is a major high-risk feature (ESC 2018 Table 6): immediate in-hospital ECG monitoring is Class I, even though a short recording is unlikely to capture an event weeks apart (ESC 2018)."
       },
       {
         "alternatives": [
@@ -805,7 +805,7 @@
         "Teach the modified Valsalva manoeuvre (REVERT) for recurrences, with intravenous adenosine if vagal manoeuvres fail (ESC 2019 SVT)",
         "Refer for electrophysiology study and slow-pathway catheter ablation (ESC 2019 Class I for recurrent symptomatic AVNRT), expedited because of syncope",
         "Use AV-nodal blocking drugs (verapamil, diltiazem or a beta-blocker) as a bridge to ablation only after the 12-lead ECG has excluded pre-excitation",
-        "Manage as an outpatient with expedited electrophysiology follow-up: the rhythm is documented, the ECG shows no pre-excitation and the heart is structurally normal",
+        "Discharge only after in-hospital ECG monitoring without recurrence, with ambulatory event monitoring and expedited electrophysiology follow-up for ablation once the tachycardia is documented; the ECG shows no pre-excitation and the heart is structurally normal",
         "Advise no driving until the arrhythmia is effectively treated (ESC 2018)"
       ]
     },
@@ -905,7 +905,6 @@
         "atrial flutter",
         "vasovagal",
         "reflex syncope",
-        "AVRT",
         "wolff parkinson white",
         "WPW"
       ]
@@ -938,7 +937,7 @@
       {
         "diagnosis": "AVRT / Wolff-Parkinson-White syndrome",
         "icd_code": "I45.6",
-        "key_features": "No delta wave or pre-excitation on the ECG or between episodes; orthodromic AVRT over a concealed pathway, also a short-RP tachycardia, is less likely given the pseudo-R' pattern and is settled at EP study.",
+        "key_features": "No delta wave or pre-excitation on the ECG or between episodes, so WPW is excluded; orthodromic AVRT over a concealed pathway, also a short-RP tachycardia, is less likely given the pseudo-R' pattern but cannot be excluded before EP study; management is the same.",
         "likelihood": "low"
       }
     ],
@@ -978,6 +977,15 @@
         ],
         "reason": "The 12-lead ECG sets the risk tier that selects the monitor and the urgency of imaging (ESC 2018).",
         "severity": "soft"
+      },
+      {
+        "after_criterion_id": "action-7-order-telemetry",
+        "before_criterion_id": "action-1-analyze-ecg",
+        "citations": [
+          "[ESC_2018]"
+        ],
+        "reason": "The 12-lead ECG sets the risk tier that selects the monitor and the urgency of imaging (ESC 2018).",
+        "severity": "soft"
       }
     ],
     "stop_rule": {
@@ -985,6 +993,7 @@
       "required_before_assessment": [
         "action-1-analyze-ecg",
         "action-3-order-echocardiogram",
+        "action-7-order-telemetry",
         "action-4-order-cardiac-monitoring"
       ]
     }
@@ -1229,7 +1238,7 @@
     "case_body_concerns": [],
     "citation_gap": [],
     "criteria_pack_version": "1.0",
-    "difficulty_rationale": "Three required actions (ECG, TTE, event monitor) with ED telemetry recommended; a normal resting ECG and a non-diagnostic 24 h recording; the agent must override the anxiety attribution and choose a monitor matched to events weeks apart.",
+    "difficulty_rationale": "Four required actions (ECG, TTE, in-hospital telemetry, event monitor); a normal resting ECG and a non-diagnostic 24 h recording; the agent must override the anxiety attribution and choose a monitor matched to events weeks apart.",
     "fallback_tool_kinds": {
       "cardiac_monitoring": "case_recording",
       "csf": "normal",
@@ -1238,9 +1247,9 @@
       "eeg": "normal",
       "mri": "normal"
     },
-    "last_revised": "2026-06-17",
+    "last_revised": "2026-11-17",
     "policy_spec_status": "draft",
-    "revision_reason": "v5 balance-to-30 generation",
+    "revision_reason": "November 2026 physician review: immediate in-hospital telemetry made required for palpitation immediately followed by syncope (ESC 2018 high-risk feature) and discharge only after monitoring; orthodromic AVRT over a concealed pathway no longer penalised, since it cannot be excluded before an EP study.",
     "version": "policy-v1",
     "vocab_gap": []
   },

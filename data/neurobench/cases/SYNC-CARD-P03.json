@@ -286,26 +286,6 @@
     },
     {
       "output": {
-        "alternatives": [
-          "Ibuprofen 400 mg every 6-8 h if paracetamol alone does not control fever and renal function is normal"
-        ],
-        "contraindications": [],
-        "formulary_status": "On formulary",
-        "interactions": [
-          "No current medications: no drug-drug interaction"
-        ],
-        "proposed": "Paracetamol (acetaminophen) 1 g orally every 6 h, maximum 4 g/day, reviewed against the current medication list (none)",
-        "summary": "Paracetamol: no interaction with the (empty) medication list and no cardiac ion-channel effect; standard hepatic dose limit applies.",
-        "warnings": [
-          "Hepatotoxicity above 4 g/day or with heavy alcohol use; reduce the maximum in low body weight or hepatic impairment",
-          "No sodium-channel, potassium-channel or QT effect"
-        ]
-      },
-      "tool_name": "check_drug_interactions",
-      "trigger_action": "check_paracetamol_acetaminophen_interactions"
-    },
-    {
-      "output": {
         "findings": [
           {
             "interpretation": "Pathogenic",
@@ -356,6 +336,26 @@
       },
       "tool_name": "order_specialized_test",
       "trigger_action": "request_genetic_testing"
+    },
+    {
+      "output": {
+        "alternatives": [
+          "Ibuprofen 400 mg every 6-8 h if paracetamol alone does not control fever and renal function is normal"
+        ],
+        "contraindications": [],
+        "formulary_status": "On formulary",
+        "interactions": [
+          "No current medications: no drug-drug interaction"
+        ],
+        "proposed": "Paracetamol (acetaminophen) 1 g orally every 6 h, maximum 4 g/day, reviewed against the current medication list (none)",
+        "summary": "Paracetamol: no interaction with the (empty) medication list and no cardiac ion-channel effect; standard hepatic dose limit applies.",
+        "warnings": [
+          "Hepatotoxicity above 4 g/day or with heavy alcohol use; reduce the maximum in low body weight or hepatic impairment",
+          "No sodium-channel, potassium-channel or QT effect"
+        ]
+      },
+      "tool_name": "check_drug_interactions",
+      "trigger_action": "check_paracetamol_acetaminophen_interactions"
     },
     {
       "output": {
@@ -487,13 +487,14 @@
           }
         ],
         "citations": [
-          "[ESC_2018]"
+          "[ESC_2018]",
+          "[ESC_2022_VA_SCD]"
         ],
         "criterion_id": "action-3-order-echocardiogram",
         "expected_evidence": "Structurally normal heart: normal LV and RV size and function, no valve disease or effusion",
-        "importance": "recommended",
-        "label": "Echocardiogram to exclude structural disease and myocarditis",
-        "rationale": "Echocardiography excludes structural heart disease, myocarditis and RV cardiomyopathy as the substrate of the ventricular ectopy (ESC 2018); a Brugada diagnosis requires a structurally normal heart."
+        "importance": "required",
+        "label": "Transthoracic echocardiogram to exclude structural heart disease (induced type 1 pattern)",
+        "rationale": "A fever-induced type 1 pattern supports Brugada syndrome only in the absence of other heart disease (ESC 2022, IIa C): echocardiography excludes structural heart disease, myocarditis and RV cardiomyopathy as the substrate of the ventricular ectopy (ESC 2018)."
       },
       {
         "alternatives": [
@@ -602,7 +603,7 @@
         "Quinidine (or substrate ablation) is the option for electrical storm or recurrent ICD shocks (ESC 2022)",
         "Genetic counselling and SCN5A testing, with cascade screening (ECG including high precordial leads) of first-degree relatives, including the brother with fever-related syncope and the daughter (ESC 2022)",
         "Advise prompt antipyretic treatment of any future fever",
-        "Advise no driving until treated; after ICD implantation for arrhythmic syncope, Group 1 driving is restricted for about 3 months (ESC 2018; national rules apply)"
+        "Advise no driving until treated; after ICD implantation the Group 1 restriction follows national licensing rules (ESC 2018 syncope Practical Instructions: 1 month after an ICD)"
       ]
     },
     "avoided_actions": [
@@ -707,6 +708,22 @@
         "criterion_id": "avoid-harm-sodium-channel-blocker-challenge",
         "rationale": "A sodium-channel-blocker (ajmaline or flecainide) challenge adds nothing once a type 1 pattern is documented (ESC 2022) and can provoke ventricular arrhythmia, here in a patient with fever-dependent polymorphic NSVT.",
         "severity": "harm"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "echo_type": "exercise_echo"
+            },
+            "tool_name": "order_echocardiogram"
+          }
+        ],
+        "citations": [
+          "[ESC_2018]"
+        ],
+        "criterion_id": "avoid-waste-exercise-echo",
+        "rationale": "The events are fever-related, not exertional; exercise echocardiography adds nothing to the Brugada syndrome diagnosis or ICD decision.",
+        "severity": "waste"
       }
     ],
     "diagnosis": {
@@ -828,6 +845,7 @@
       "max_additional_actions": 3,
       "required_before_assessment": [
         "action-1-analyze-ecg",
+        "action-3-order-echocardiogram",
         "action-4-order-cardiac-monitoring"
       ]
     }
@@ -1163,7 +1181,7 @@
       "Influenza infection being accepted as the 'cause' of syncope through dehydration/hypotension rather than recognizing fever as a channelopathy trigger",
       "Lack of awareness of Brugada syndrome's high prevalence in Southeast Asian (especially Filipino) populations"
     ],
-    "difficulty_rationale": "2 required actions, 3 red herrings (febrile-seizure framing, viral illness anchoring, a prior normal afebrile ECG); requires recognising the fever-associated type 1 pattern as Brugada syndrome with arrhythmic syncope and choosing fever control, drug avoidance and ICD.",
+    "difficulty_rationale": "3 required actions, 3 red herrings (febrile-seizure framing, viral illness anchoring, a prior normal afebrile ECG); requires recognising the fever-associated type 1 pattern as Brugada syndrome with arrhythmic syncope and choosing fever control, drug avoidance and ICD.",
     "expected_agent_confidence": 0.35,
     "fallback_tool_kinds": {
       "csf": "normal",
@@ -1171,9 +1189,9 @@
       "drug_interactions": "normal",
       "specialized_test": "normal"
     },
-    "last_revised": "2026-10-24",
+    "last_revised": "2026-11-17",
     "policy_spec_status": "draft",
-    "revision_reason": "per-case audit: a required literature or interaction check returned an empty payload while its expected_finding promised specific published evidence, so the judge assessed the agent against knowledge the simulation withheld",
+    "revision_reason": "November 2026 review: echocardiography required and in the stop rule (an induced type 1 pattern needs structural heart disease excluded); driving advice re-attributed; exercise echo labelled waste; gene panel moved before the drug check",
     "version": "policy-v1",
     "vocab_gap": []
   },
