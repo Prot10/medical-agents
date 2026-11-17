@@ -365,7 +365,11 @@ SPEC: list[dict[str, object]] = [
          reviewer=2, tier="unchanged", status="applied",
          seg=("Item\nBrain MRI.", None),
          response="Applied: contrast is not optional in these cases. The sweep this triggered "
-                  "also found a cervical-cord glioblastoma being imaged by a brain MRI."),
+                  "also found a cervical-cord glioblastoma being imaged by a brain MRI. Since the "
+                  "November 2026 round every case stores the plain MRI and the gadolinium study as "
+                  "separate reports, and the required MRI in all 30 orders the gadolinium tumour "
+                  "protocol, so a report describing enhancement no longer appears under a "
+                  "\"contrast used: none\" header."),
     dict(cond="brain_tumor_glioma", filed="analyze_eeg", tool="analyze_eeg",
          reviewer=2, tier="unchanged", status="applied",
          seg=(None, "Item\nAdvanced imaging"),
@@ -377,7 +381,10 @@ SPEC: list[dict[str, object]] = [
                   "MRI plus MR spectroscopy are recommended actions in 29 of the 30 cases. In the "
                   "intramedullary cervical glioblastoma (GLIO-HG-RM02) both are optional, because "
                   "spinal cord perfusion and spectroscopy are not validated for grading. FDG-PET is "
-                  "not among them, per your note."),
+                  "not among them, per your note. Since the November 2026 round functional MRI is "
+                  "also recommended in S05, where the hand motor area lies about 9 mm from the "
+                  "enhancing margin in a patient with right-sided weakness, so motor mapping plans "
+                  "the resection margin (EANO 2021)."),
     dict(cond="brain_tumor_glioma", filed="analyze_ecg", tool="analyze_ecg",
          reviewer=2, tier="unchanged", status="no_change",
          response="No change requested and none made."),
@@ -457,14 +464,26 @@ SPEC += [
     dict(cond="myasthenia_gravis", filed="order_specialized_test", tool="order_specialized_test",
          reviewer=2, tier="unchanged", status="applied",
          seg=(None, "Item\nMediastinal (thymic) imaging"),
-         response="Applied: repetitive nerve stimulation is required in 27 cases, every new "
-                  "diagnosis (the three known-myasthenia exacerbation or crisis cases list it as "
-                  "waste, since it delays treatment). Single-fibre EMG is ordered in 25: required "
-                  "in the 3 seronegative or LRP4 cases, an accepted alternative to RNS in the "
-                  "required neurophysiology action of the 2 ocular cases, recommended in 3 where "
-                  "RNS is normal or equivocal, and optional in 17 where RNS is already diagnostic. "
-                  "emg_single_fiber already existed and was one of the values the stale catalog "
-                  "hid from you."),
+         response="Applied, and revised in the November 2026 round. Repetitive nerve stimulation "
+                  "now follows ABN 2025: neurophysiology is mandatory when the antibodies are "
+                  "negative, while with unequivocal AChR or MuSK antibodies the diagnosis is "
+                  "serological and RNS is good practice that changes neither the diagnosis nor "
+                  "management. RNS is therefore recommended in the 18 seropositive new diagnoses "
+                  "(in the 2 ocular cases, RS11 and S05, as RNS or single-fibre EMG) and required "
+                  "in 9: the 3 seronegative or LRP4 cases (P01, P04, RP14), the 2 Lambert-Eaton "
+                  "cases (P02, RM13) and 4 where the nerve conduction or needle study answers a "
+                  "named alternative (a low-positive AChR titre with a possible Sjogren neuropathy "
+                  "in M02, a GBS relapse in RM12, bulbar-onset ALS in RP12, neck extensor myopathy "
+                  "or ALS behind the head drop in RS16). This reverses the October 2026 tier, which "
+                  "required it in 27 cases. The three known-myasthenia exacerbation or crisis cases "
+                  "(M04, RM14, RM15) list it as waste, since it delays treatment. Single-fibre EMG "
+                  "is ordered in 26 cases: required in the 3 seronegative or LRP4 cases, "
+                  "recommended in 5 (M02 and RM11, where RNS is equivocal or borderline, RS14, a "
+                  "MuSK-positive case where a limb study may be normal, and the 2 ocular cases as "
+                  "the RNS alternative), and optional in 18 where serology or RNS is already "
+                  "diagnostic. It is waste in the 3 crisis cases and in P02, where RNS with "
+                  "positive VGCC antibodies has already made the diagnosis. emg_single_fiber "
+                  "already existed and was one of the values the stale catalog hid from you."),
     dict(cond="myasthenia_gravis", filed="order_specialized_test", tool="order_body_imaging",
          reviewer=2, tier="required", status="applied",
          seg=("Item\nMediastinal (thymic) imaging", None),
@@ -479,10 +498,17 @@ SPEC += [
     dict(cond="myasthenia_gravis", filed="analyze_brain_mri", tool="analyze_brain_mri",
          reviewer=2, tier="unchanged", status="applied",
          response="Applied: no case orders a brain MRI as a first-line study. It is an action "
-                  "in 3 cases, each for a question the case itself raises: required in one (new "
-                  "ptosis and diplopia in multiple sclerosis on natalizumab, to exclude a relapse "
-                  "and PML), optional in a MuSK-positive bulbar case against a brainstem lesion "
-                  "and as small-cell lung cancer staging in a Lambert-Eaton case."),
+                  "in 6 cases, each for a question the case itself raises: required in one (P03, "
+                  "new ptosis and diplopia in multiple sclerosis on natalizumab, with gadolinium, "
+                  "to exclude a relapse and PML), recommended in one (RS14, a MuSK-positive bulbar "
+                  "case with PSP-like signs, raised from optional in the November 2026 round), and "
+                  "optional in 4: small-cell lung cancer staging in a Lambert-Eaton case (P02), a "
+                  "stroke question with antiphospholipid syndrome (RP14), a brainstem small-vessel "
+                  "differential (RS12) and, as brain or cervical spine MRI, a cervical myelopathy "
+                  "behind a head drop (RS16). The last three were added in the November 2026 round "
+                  "as optional criteria for scans the cases already stored, rather than as waste "
+                  "labels. A brain MRI is waste in 20 cases where "
+                  "nothing raises a central question."),
     dict(cond="myasthenia_gravis", filed="analyze_csf", tool="analyze_csf",
          reviewer=2, tier="unchanged", status="applied",
          response="Applied in the strongest form: no myasthenia case orders CSF studies."),
@@ -504,12 +530,20 @@ SPEC += [
     dict(cond="syncope_cardiac", filed="order_echocardiogram", tool="order_echocardiogram",
          reviewer=2, tier="unchanged", status="applied",
          seg=(None, "Item\nAdvanced cardiac imaging"),
-         response="Applied: required in 29 of the 30 cases, and recommended in the thirtieth "
-                  "(SYNC-CARD-P03), a Brugada syndrome where the diagnosis is electrocardiographic "
-                  "and the echocardiogram excludes structural disease rather than establishing the "
-                  "cause. Exercise echocardiography was added as its own study (exercise_echo, "
-                  "priced) because one case had been modelling a provoked outflow gradient as a "
-                  "treadmill stress test — a different study at a different price."),
+         response="Applied: a transthoracic echocardiogram is required in all 30 cases. In "
+                  "SYNC-CARD-P03, a Brugada syndrome, it was recommended until your November 2026 "
+                  "note: the type 1 pattern there is fever-induced, and an induced pattern needs "
+                  "no other heart disease before Brugada syndrome is diagnosed (ESC 2022), so the "
+                  "echocardiogram that excludes structural disease is now required. Exercise "
+                  "echocardiography was added as its own study (exercise_echo, priced) because one "
+                  "case had been modelling a provoked outflow gradient as a treadmill stress test, "
+                  "a different study at a different price. It is required in 2 cases, as the "
+                  "provoked gradient in the hypertrophic cardiomyopathy (P02) and as an accepted "
+                  "alternative to the exercise test in CPVT (RP03), and recommended in 4 as the "
+                  "same alternative: the November 2026 round added a recommended exercise test for "
+                  "syncope on exertion with intermittent AV block (M01, M02, RM03) and accepts the "
+                  "exercise echo for it there and in the exercise-induced ventricular tachycardia "
+                  "of P01."),
     dict(cond="syncope_cardiac", filed="order_echocardiogram", tool="order_advanced_imaging",
          reviewer=2, tier="optional", status="applied",
          seg=("Item\nAdvanced cardiac imaging", None),
@@ -519,7 +553,10 @@ SPEC += [
                   "cases: required in 4 (the two arrhythmogenic cardiomyopathies, the hypertrophic "
                   "cardiomyopathy and the right ventricular outflow mass), recommended in 8 (mostly "
                   "AV block before 60 without a clear cause, ESC 2021 pacing IIa) and optional in 9; "
-                  "cardiac FDG-PET is required in the one sarcoid case. Your prediction that "
+                  "cardiac FDG-PET is required in the one sarcoid case. Coronary CTA or angiography is "
+                  "recommended only where ischaemia is a real question (P01, and since the November "
+                  "2026 round RM03 and RS05), and is waste or, with an eGFR of 27, harm where "
+                  "nothing points to ischaemia. Your prediction that "
                   "offering brain MRI and no cardiac imaging is 'the arrangement most likely to "
                   "produce the wrong imaging choice' was already true in the data: one case was "
                   "requesting a CT pulmonary angiogram through the head-CT tool."),
@@ -961,13 +998,21 @@ SPEC += [
     dict(cond="nph", filed="analyze_brain_mri", tool="analyze_brain_mri",
          reviewer=1, tier="required", status="applied",
          response="Applied: required in all 30, and the reports carry the NPH-specific markers you "
-                  "list rather than a generic structural read."),
+                  "list rather than a generic structural read. NPH-P06 is the one case whose MRI "
+                  "criterion asks for gadolinium; since the November 2026 round its plain MRI and "
+                  "its gadolinium study are separate reports, so each order receives its own "
+                  "study."),
     dict(cond="nph", filed="interpret_labs", tool="interpret_labs",
          reviewer=1, tier="optional", status="applied",
-         response="Applied: blood tests are optional and targeted in 26 cases and recommended in "
-                  "the 4 with a case-specific mimic or lumbar-tap safety question (thyroid in "
-                  "NPH-M04 and S08, vitamin B12 with methylmalonic acid on metformin in M07, platelets "
-                  "and coagulation in cirrhosis in M08); none requires them."),
+         response="Applied for diagnosis: no blood test is required to diagnose NPH. Blood tests "
+                  "are optional and targeted in 23 cases and recommended in the 3 with a "
+                  "case-specific mimic (thyroid in NPH-M04 and S08, vitamin B12 with methylmalonic "
+                  "acid on metformin in M07). Your November 2026 notes made a pre-tap safety check "
+                  "required in 4 cases, as a procedural prerequisite rather than a diagnostic test: "
+                  "renal function and blood count before the lumbar tap on apixaban (M03, S10) or "
+                  "rivaroxaban (M06), and the platelet count, coagulation and bleeding-risk review "
+                  "in cirrhosis (M08, previously recommended). In each the labs must come before "
+                  "the tap."),
     dict(cond="nph", filed="analyze_csf", tool="analyze_csf",
          reviewer=1, tier="required", status="applied",
          response="Applied: required in all 30, as the large-volume tap with opening pressure."),
@@ -993,9 +1038,11 @@ SPEC += [
                   "report. The previous universal >=20% cutoff was not supported by "
                   "the cited guidelines: the cases describe a 10% TUG improvement as a commonly used "
                   "threshold, not a guideline cut-off, and interpret absolute and concordant "
-                  "changes. NPH-P08 keeps a single tap with no objective improvement and then "
-                  "proceeds to extended lumbar drainage (source lumbar_drain, required there), which "
-                  "improves gait, because one negative tap does not exclude a shunt response."),
+                  "changes. NPH-P08 keeps a single tap with no objective improvement. Extended lumbar "
+                  "drainage (source lumbar_drain) improves gait there, because one negative tap does "
+                  "not exclude a shunt response; since your November 2026 notes it is recommended "
+                  "rather than required, as a supplementary prognostic test (Marmarou 2005), and "
+                  "another specialist assessment is an acceptable next step."),
     dict(cond="nph", filed="order_advanced_imaging", tool="order_advanced_imaging",
          reviewer=1, tier="remove", status="applied",
          response="Applied: advanced imaging is absent from the NPH panel and from all 30 case "
@@ -1138,19 +1185,35 @@ SPEC += [
                   "receive pelvic/abdominal ultrasound, the 4 men under 45 receive targeted "
                   "testicular ultrasound, and the 5 patients aged 45 or older (2 women, 3 men), "
                   "whose tumours are mostly carcinomas, receive contrast CAP CT. Existing "
-                  "pelvic/testicular reports were moved out of the laboratory payload."),
+                  "pelvic/testicular reports were moved out of the laboratory payload. Since the "
+                  "November 2026 round pelvic MRI is accepted in place of the ultrasound in 20 of "
+                  "the 21 women (in M03 it is the separate recommended characterisation step), and "
+                  "9 cases with a negative first study have a recommended second-line screen, as "
+                  "Abboud 2021 describes: pelvic MRI (M02, P05), pelvic MRI and CAP CT (RM01, "
+                  "RS04), CAP CT (M05), chest CT (RS03), pelvic ultrasound (RS02) and whole-body "
+                  "FDG-PET (RM03, RP01)."),
     dict(cond="autoimmune_encephalitis_nmdar", filed="analyze_brain_mri",
          tool="analyze_brain_mri", reviewer=2, tier="unchanged", status="applied",
          seg=("Item:\nBrain MRI", None),
          response="Applied: the MRI stays required in all 30 cases and its role in the ground "
-                  "truth is exclusion of alternatives, not confirmation."),
+                  "truth is exclusion of alternatives, not confirmation. It orders the gadolinium "
+                  "study, and since the November 2026 round the plain and gadolinium studies are "
+                  "separate reports, each answering its own order. Two further imaging "
+                  "criteria answer your November 2026 notes: MR angiography is recommended in RP01 "
+                  "to exclude a stroke before steroids, and a brain FDG-PET is optional in P04, "
+                  "which stores an abnormal one, as Abboud 2021 allows when suspicion is high and "
+                  "the other studies are uninformative."),
     dict(cond="autoimmune_encephalitis_nmdar", filed="interpret_labs", tool="interpret_labs",
          reviewer=2, tier="unchanged", status="applied",
          response="Applied in all 30 cases: CBC, metabolic/coagulation, thyroid function and "
                   "antibodies, inflammatory markers, autoimmune/paraneoplastic antibodies and a "
                   "separately priced serum IgG anti-GluN1 cell-based assay are named. Serum is "
                   "explicitly read with CSF, never alone; there are no paediatric cases requiring "
-                  "selected genetic/metabolic testing."),
+                  "selected genetic/metabolic testing. Your November 2026 notes added three "
+                  "recommended case-specific tests: MOG antibodies in RM01 (an overlap question), "
+                  "serum ACE in RS04 (neurosarcoidosis in the differential) and, in RS02, urine "
+                  "and blood cultures, because that patient has fever, a CRP of 50 and a "
+                  "catheter."),
     dict(cond="autoimmune_encephalitis_nmdar", filed="analyze_csf", tool="analyze_csf",
          reviewer=2, tier="unchanged", status="applied",
          response="Applied in all 30 cases: basic CSF, OCB/IgG index, HSV PCR and the CSF "
@@ -1158,7 +1221,9 @@ SPEC += [
                   "the final CSF titre (no result is left pending). The one case first written as "
                   "seronegative sat in this condition with anti-NMDAR answers scored correct, so "
                   "it was rewritten as CSF-positive and serum-negative, the pattern in which the "
-                  "serum assay must be read with the CSF."),
+                  "serum assay must be read with the CSF. Since the November 2026 round CSF flow "
+                  "cytometry is recommended in RS04, against a haematological malignancy behind "
+                  "the meningoencephalitis pattern."),
     dict(cond="autoimmune_encephalitis_nmdar", filed="analyze_eeg", tool="analyze_eeg",
          reviewer=2, tier="unchanged", status="applied",
          response="Applied: a routine EEG is required in all 30 cases and explicitly assesses "
