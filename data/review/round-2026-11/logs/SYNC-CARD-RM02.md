@@ -2,6 +2,7 @@
 
 ## Class changes
 - LIT (literature search is not a clinical step; R1 ruling, ROUND_POLICY ruling 5 extended, Nov 2026 class 1): removed criterion action-6-search-medical-literature (optional); removed 1 literature follow-up(s); removed initial literature_search outputs: general. Any literature query is now answered by the neutral library text.
+- Synonyms (orchestrator, 17 Nov): accepted labels and codes re-derived from diagnosis_synonyms.yaml after the condition lead's CENTRAL synonym request (see the commit and plans/<COND>-summary.md); checked with DiagnosisCriterion.matches.
 
 ## Reviewer notes
 Reviewer status: R2 needs_changes (scenario_plausibility, diagnosis) | Approved before this round: no

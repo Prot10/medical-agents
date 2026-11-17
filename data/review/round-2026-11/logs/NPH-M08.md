@@ -34,3 +34,6 @@ Pass 2: 0 errors found
 Nothing changed after the clean pass 1 (no condition-audit or orchestrator entries); checks only. Re-checked: perfect_agent.py -v pass; test_case_guards -k for the six cases 48 passed.
 Pass 3: 0 errors found
 Nothing changed after the clean pass 1 (no condition-audit or orchestrator entries), so there was nothing to verify; checks only: perfect_agent.py -v pass; test_case_guards -k (8 NPH cases) 64 passed. Nothing changed.
+
+## Class changes
+- Synonyms (orchestrator, 17 Nov): accepted labels and codes re-derived from diagnosis_synonyms.yaml after the condition lead's CENTRAL synonym request (see the commit and plans/<COND>-summary.md); checked with DiagnosisCriterion.matches.

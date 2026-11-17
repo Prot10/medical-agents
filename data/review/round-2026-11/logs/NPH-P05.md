@@ -30,3 +30,6 @@ Cosmetic (not counted): added the missing "Reviewer status" header line to the l
 Pass 2: 0 errors found
 - Verified the Pass 1 timeline fix: HPI has the SAH 4 years ago, good recovery by 6 months, decline over the past 18 months, so the decline starts about 2.5 years after the SAH. prohibited_recommendations[1], differential[0].key_features and key_clinical_evidence[0] all read "about 2.5 years after the SAH, following a good recovery". This agrees with chief_complaint, metadata, the red-herring interpretation ("2 to 3 years later") and the rulings file. perfect_agent.py -v pass; test_case_guards -k for NPH-P03..P08 48 passed. No edits.
 Cosmetic (not counted): plans/NPH.md line 223 still has the old wording "2.5 years after a good recovery" (plan text only, not case data).
+
+## Class changes
+- Synonyms (orchestrator, 17 Nov): accepted labels and codes re-derived from diagnosis_synonyms.yaml after the condition lead's CENTRAL synonym request (see the commit and plans/<COND>-summary.md); checked with DiagnosisCriterion.matches.

@@ -33,3 +33,6 @@ Pass 2: 0 errors found
 Checked: 88d4951c (must 0 accepts either formulation; dd1 moderate after pass 1, consistent with the physician ruling and must 0; CENTRAL synonym request still needed, the rejected list does not veto the PCA wording), 1d95402c (amyloid PET recommended, out of the stop rule, CSF harm kept) and 9b4a12d4 (FDG optional); driving must and prohibition rest on the screen's failed copy tasks, present in the stored screen; MoCA arithmetic (9 lost, 21/30); TMT-B 20th low average; EMG and spine CT waste rationales match the L5/S1 post-fusion exam; criteria served from case data.
 Cosmetic (not counted): none
 Re-checked: perfect_agent.py -v passes; test_case_guards -k passes; case_io.py check: no failure names this case.
+
+## Class changes
+- Synonyms (orchestrator, 17 Nov): accepted labels and codes re-derived from diagnosis_synonyms.yaml after the condition lead's CENTRAL synonym request (see the commit and plans/<COND>-summary.md); checked with DiagnosisCriterion.matches.

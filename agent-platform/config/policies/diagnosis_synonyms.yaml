@@ -85,6 +85,10 @@ G31.09:
   except_cases: [FTD-P08]
   labels: [frontotemporal dementia, FTD, behavioral variant frontotemporal dementia, behavioural variant frontotemporal dementia, bvFTD, frontotemporal lobar degeneration]
   codes: [G31.0]
+# November 2026 round (plans/FTD-decisions.md): FTD-M10 is the right temporal variant.
+G31.09+rtv:
+  cases: [FTD-M10]
+  labels: [rtvFTD, right temporal variant FTD, right temporal variant frontotemporal dementia, right semantic dementia, right temporal semantic dementia]
 G31.09+mnd:
   cases: [FTD-P08]
   labels: [FTD-MND, FTD-ALS, ALS-FTD, bvFTD MND, bvFTD ALS, ALS-FTSD, frontotemporal dementia motor neuron disease, frontotemporal dementia motor neurone disease, frontotemporal dementia ALS, frontotemporal dementia amyotrophic lateral sclerosis, bvFTD motor neuron disease, bvFTD motor neurone disease]
@@ -527,9 +531,12 @@ G91.0:
 G91.0+subdural:
   cases: [NPH-M06]
   labels: [subdural NPH, subdural normal pressure hydrocephalus]
+# November 2026 round (plans/NPH-decisions.md D8, D9; physician notes on M08 and P05): the remote
+# antecedent is the preferred reading, but possible iNPH (Relkin 2005) is also accepted.
 G91.0+meningitic:
   cases: [NPH-M08]
-  labels: [post-meningitic NPH, post-meningitic normal pressure hydrocephalus, meningitis NPH, meningitis normal pressure hydrocephalus]
+  labels: [post-meningitic NPH, post-meningitic normal pressure hydrocephalus, meningitis NPH, meningitis normal pressure hydrocephalus, normal pressure hydrocephalus, NPH, idiopathic normal pressure hydrocephalus, iNPH]
+  codes: [G91.2]
 # G91.3 is post-traumatic hydrocephalus, unspecified (plan R1).
 G91.0+traumatic:
   cases: [NPH-M09]
@@ -537,7 +544,8 @@ G91.0+traumatic:
   codes: [G91.3]
 G91.0+sah:
   cases: [NPH-P05]
-  labels: [SAH NPH, SAH normal pressure hydrocephalus, haemorrhagic NPH, hemorrhagic NPH, subarachnoid NPH, subarachnoid normal pressure hydrocephalus]
+  labels: [SAH NPH, SAH normal pressure hydrocephalus, haemorrhagic NPH, hemorrhagic NPH, subarachnoid NPH, subarachnoid normal pressure hydrocephalus, normal pressure hydrocephalus, NPH, idiopathic normal pressure hydrocephalus, iNPH]
+  codes: [G91.2]
 
 # I60 (24 Oct 2026, SAH close-out): the category serves the aneurysmal cases, so it no longer
 # grants I60.8 (other nontraumatic SAH, the non-aneurysmal code). SAH-P02 (perimesencephalic
@@ -638,8 +646,16 @@ I63.4:
 # accept complete heart block unless the monitoring captures it (M03); complete heart block cases
 # do not accept Mobitz II. Bare "second degree av block" is retired (it credits Mobitz I).
 I44.1:
-  labels: [mobitz ii, mobitz type ii, mobitz 2, high grade av block, high-grade atrioventricular block, high degree av block, advanced av block]
+  labels: [high grade av block, high-grade atrioventricular block, high degree av block, advanced av block]
   codes: [I44.30]
+# November 2026 round (plans/SYNC-CARD-decisions.md): only the cases whose block is Mobitz II
+# credit a Mobitz II answer; M01 is a 2:1 and high-grade block, M03 a paroxysmal high-grade block.
+I44.1+mobitz:
+  cases: [SYNC-CARD-M02, SYNC-CARD-RM03]
+  labels: [mobitz ii, mobitz type ii, mobitz 2]
+I44.1+two_to_one:
+  cases: [SYNC-CARD-M01]
+  labels: [2:1 av block, 2:1 atrioventricular block, 2:1 second degree av block]
 I44.1+chb:
   # M03: telemetry captures transient complete heart block besides the Mobitz II block
   cases: [SYNC-CARD-M03]
@@ -652,7 +668,7 @@ I44.2:
   codes: [I44.30]
 I44.2+rheumatic:
   cases: [SYNC-CARD-RM02]
-  labels: [rheumatic carditis, rheumatic fever carditis, rheumatic carditis with heart block, rheumatic heart block, rheumatic heart disease heart block, rheumatic av block]
+  labels: [rheumatic carditis, rheumatic fever carditis, rheumatic carditis with heart block, rheumatic heart block, rheumatic heart disease heart block, rheumatic av block, acute rheumatic fever, recurrent acute rheumatic fever, recurrent rheumatic fever, acute rheumatic fever with carditis, acute rheumatic carditis]
   codes: [I01.8, I01.9]
 I45.6:
   labels: [wolff parkinson white, wolff-parkinson-white syndrome, WPW, pre-excitation syndrome]
@@ -748,6 +764,12 @@ F01+svd:
   cases: [VASC-DEM-M02, VASC-DEM-P06, VASC-DEM-P07, VASC-DEM-S01, VASC-DEM-S02, VASC-DEM-S03, VASC-DEM-S04, VASC-DEM-S05]
   labels: [subcortical vascular dementia, subcortical ischaemic vascular dementia, subcortical ischemic vascular dementia, small vessel disease dementia]
   codes: [F01.2, I67.3]
+# November 2026 round (plans/VASC-DEM-decisions.md, note 88d4951c): in P02 a posterior-predominant
+# Alzheimer (PCA) answer that names the coexisting small-vessel disease is a correct mixed answer.
+F01+mixed_pca:
+  conditions: [vascular_dementia]
+  cases: [VASC-DEM-P02]
+  labels: [posterior cortical atrophy small vessel disease, alzheimer small vessel disease, alzheimers small vessel disease]
 F01+multi_infarct:
   cases: [VASC-DEM-M03, VASC-DEM-M10, VASC-DEM-P08, VASC-DEM-S06, VASC-DEM-S07, VASC-DEM-S08]
   labels: [multi-infarct dementia, multi infarct dementia]
