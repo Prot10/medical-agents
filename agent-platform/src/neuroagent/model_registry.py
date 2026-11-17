@@ -29,6 +29,16 @@ AVAILABLE_MODELS: list[dict] = [
             "presence_penalty": 1.5,
             "chat_template_kwargs": {"enable_thinking": False},
         },
+        # Model card, thinking mode for general tasks. Used only by `benchmark --thinking-tokens`
+        # (17 Nov 2026: re-testing thinking now that longer traces are affordable); the server
+        # then needs REASONING_PARSER=qwen3 so the trace stays out of the parsed tool call.
+        "thinking_request_defaults": {
+            "temperature": 1.0,
+            "top_p": 0.95,
+            "top_k": 20,
+            "presence_penalty": 1.5,
+            "chat_template_kwargs": {"enable_thinking": True},
+        },
         # Prefix cache on, MTP off: re-prefilling the transcript every turn is what costs, and MTP
         # adds no throughput with the cache on. On vLLM 0.23 the two together moved logprobs well
         # past the batching noise floor (2 Nov 2026); 0.32 does not, vllm#53912 is still open.

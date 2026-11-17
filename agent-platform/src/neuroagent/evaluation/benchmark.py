@@ -32,6 +32,7 @@ from ..datasets import DATASETS, DEFAULT_DATASET_VERSION, load_dataset, split_ca
 from ..harness.free_order import translation_counts, typed_episode
 from ..harness.profile import HarnessProfile, load_profiles
 from ..harness.runtime import boot_profile, context_from_profile
+from ..model_registry import KEY_TO_MODEL
 from .manifest import run_manifest
 from .policy_reward import ClinicalPolicyReward
 
@@ -154,6 +155,13 @@ def main(argv: list[str] | None = None) -> None:
         help="dataset root holding cases/ (and splits/ for --split) instead of NeuroBench, "
         "e.g. converted external cases that must stay in their own storage",
     )
+    parser.add_argument(
+        "--thinking-tokens",
+        type=int,
+        default=None,
+        help="turn the model's thinking on with its model-card thinking sampling and this max_tokens "
+        "per turn (serve with REASONING_PARSER=qwen3); off by default, as in every checked profile",
+    )
     args = parser.parse_args(argv)
 
     profiles = load_profiles(PROFILES_DIR)
@@ -167,6 +175,14 @@ def main(argv: list[str] | None = None) -> None:
     }
     for plugin in profile.plugins:
         if plugin.id.startswith("model."):
+            if args.thinking_tokens is not None:
+                thinking = KEY_TO_MODEL[plugin.id.removeprefix("model.")].get("thinking_request_defaults")
+                if thinking is None:
+                    raise SystemExit(f"{plugin.id} has no thinking mode in model_registry")
+                # A long trace at batch concurrency can outlast the default 300 s request timeout.
+                plugin.config.update(
+                    {**thinking, "max_tokens": args.thinking_tokens, "timeout": max(300.0, args.thinking_tokens / 10)}
+                )
             plugin.config.update(overrides)
 
     dataset = DATASETS[DEFAULT_DATASET_VERSION]
@@ -223,6 +239,7 @@ def main(argv: list[str] | None = None) -> None:
         "dataset": dataset_label,
         "policy_review": "draft (not reportable)" if args.allow_draft_policies else "approved",
         "seed": args.seed,
+        "thinking_tokens": args.thinking_tokens,
         "wall_seconds": round(wall, 1),
         **summarize(rows),
     }

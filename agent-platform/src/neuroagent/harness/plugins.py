@@ -33,13 +33,14 @@ def _model_plugin(entry: Mapping[str, Any]) -> Plugin:
     def factory(config: Mapping[str, Any], _services: Any):
         # Any other config key (temperature, seed, top_k, chat_template_kwargs, ...) overrides
         # the model card defaults for that request.
-        transport = {"base_url", "api_key", "served_model"}
+        transport = {"base_url", "api_key", "served_model", "timeout"}
         overrides = {key: value for key, value in config.items() if key not in transport}
         client = LLMClient(
             model=str(config.get("served_model", entry["hf_model_id"])),
             request={**entry["request_defaults"], **overrides},
             base_url=str(config.get("base_url", "http://localhost:8000/v1")),
             api_key=str(config.get("api_key", "not-needed")),
+            timeout=float(config.get("timeout", 300.0)),
         )
         return NativeToolModelAdapter(client)
 
