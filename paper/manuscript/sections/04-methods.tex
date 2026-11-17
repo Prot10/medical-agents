@@ -1,4 +1,5 @@
 % Methods plan: short bold subheadings, written for replication; not counted in the 3,500 words.
+% Updated 17 Nov 2026 to match paper/decisions.md.
 
 \section{Methods ($\sim$3,400 words, thirteen subsections)}\label{sec:methods}
 
@@ -16,28 +17,35 @@ models and training $\to$ evaluation.
 Subsection & What goes in & Why & Words & Source \\ \midrule
 Cases & Generation from 20 guideline packs; case schema; difficulty and setting mix; frozen version
   and hash & Dataset provenance & 350 & schemas, cases \\
-Policies and review & Policy fields; 7 dimensions; blind double review, third on disagreement;
-  approval rule; defect-class fixes & Why the policy is trustworthy & 350 & policy\_\allowbreak{}eligibility \\
+Policies and review & Policy fields; 7 dimensions; two independent reviews, third on disagreement;
+  approval rule; defect-class fixes; inter-physician agreement on one condition reviewed twice & Why the policy is trustworthy & 350 & policy\_\allowbreak{}eligibility \\
 Environment & Typed loop; 16 tools from the cost registry; schema validation; stored and library
   results; invalid-output budget; forced final turn & Replication of episodes & 300 & harness doc,
   tool contract \\
 Policy reward & Components, weights, gating, caps; scorer v2; equation (1) & The object under test
   & 400 & policy\_\allowbreak{}reward \\
-Outcome reward & Accuracy + cost as in SDBench, same scorer and costs & The two arms differ only in
-  the signal & 150 & --- \\
-Models, inference & Panel, versions, vLLM, frozen sampling, seeds; frontier access (synthetic only)
-  & Replication & 200 & model\_\allowbreak{}registry \\
-SFT & Episode source; LoRA; same transcript codec as inference & No train/inference mismatch & 200
-  & train\_\allowbreak{}sft, context \\
-RL & GRPO, colocated vLLM, DAPO loss, token-level IS; selection on train-side validation only;
-  compute & Central experiment & 350 & train\_\allowbreak{}grpo \\
-Split, leakage & 500/100, held-out conditions; test guard; similarity test; release dates; SE-P07
-  & Pre-empts contamination & 300 & leakage audit \\
-MIMIC-IV & Cohort; records to cases (\texttt{provenance: record}); comparison with clinicians'
-  orders; local inference only & External validity, DUA compliance & 250 & --- \\
-Rating study & Sampling, blinding, scale, raters, agreement & Validity of C3 & 200 & --- \\
-Statistics & Case as unit; Wilcoxon, bootstrap, McNemar, mixed-effects; $\tau$, $\rho$, $\kappa$;
-  multiplicity & One place for all tests & 250 & --- \\
+Outcome reward & $0.85\,D + 0.15\,(1-\text{cost}/B)$, $B$ the 95th percentile of the untrained
+  model's cost on the training cases; same scorer and costs & The two models differ only in the
+  signal & 150 & --- \\
+Models, inference & Panel, versions, vLLM, frozen sampling, seeds; thinking off (Supp.\ Table~11);
+  larger models on synthetic cases only & Replication & 200 & model\_\allowbreak{}registry \\
+SFT (control only) & Episode source; LoRA; same transcript codec as inference & Separates RL from
+  imitation (Supp.\ Table~4) & 100 & train\_\allowbreak{}sft, context \\
+RL & Both models from the untrained Qwen3.5-9B; GRPO, colocated vLLM, DAPO loss, token-level IS;
+  three seeds; checkpoint chosen on the validation cases by each model's own reward; compute
+  & Central experiment & 350 & train\_\allowbreak{}grpo \\
+Split, leakage & Whole conditions: 419 training, 60 validation, 119 test (4 conditions), 2 excluded;
+  test guard; similarity test; model release dates & Pre-empts contamination & 300 & split
+  manifest, leakage audit \\
+MIMIC-IV & 100 admissions, 9 conditions, strict pool; records to cases; policies from the
+  condition's templates; clinicians' orders; inference at CERN & External validity, DUA & 300 &
+  mimic-neuro \\
+Physician studies & Blind rating of $\sim$100 work-ups: sampling, blinding, scale, agreement;
+  20--30 cases solved by neurologists through the same interface & Validity of C3, human
+  reference in Figs.~2 and~4 & 250 & --- \\
+Statistics & Primary: NeuroBench test; MIMIC-IV external, never pooled; case as unit; Wilcoxon,
+  paired bootstrap, McNemar; $\tau$, $\rho$, $\kappa$; Benjamini--Hochberg & One place for all
+  tests & 250 & --- \\
 Use of LLMs & Case drafting, code and text editing; human review and responsibility & Required by
   NMI & 100 & --- \\
 \bottomrule
@@ -47,8 +55,9 @@ Use of LLMs & Case drafting, code and text editing; human review and responsibil
 \begin{itemize}
 \item \textbf{Equation (1)}, the policy reward: the only formula in the paper, so reviewers can check
 gating and caps.
-\item \textbf{ED Table~1} (tools and costs) and \textbf{ED Table~2} (hyperparameters, compute): keep
-long lists out of the text.
+\item \textbf{Supplementary Tables~5--8} (rewards, datasets, models, training and compute) and
+\textbf{Supplementary Note~3} (tool catalogue with costs): keep long lists out of the text.
 \end{itemize}
 
-\status{Can be drafted now from the code, except MIMIC-IV and the rating study.}
+\status{Can be drafted now from the code and docs/benchmark/mimic-neuro-methods.md, except the
+physician studies.}

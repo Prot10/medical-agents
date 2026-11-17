@@ -1,6 +1,6 @@
 # Paper: decisions
 
-Updated 17 Nov 2026. One line per decision, with its date.
+Updated 17 Nov 2026. One line per decision, with its date. The manuscript plan (`manuscript/`) was brought in line with this file on 17 Nov: anything there that disagrees with it is a bug.
 
 ## Journal
 - **Nature Machine Intelligence** (17 Nov). ICML dropped: the method alone was judged too weak.
@@ -65,7 +65,7 @@ NMI: **Main** at most 6 figures/tables and ~3,500 words · **Extended Data (ED)*
 | RL with MIMIC cases: 50 in training, 50 in test (with the current 100) | Exploratory; placement decided from the results |
 | Reasons for the requests: every test ordered carries a reason written by the model; are they correct? (17 Nov) | To decide |
 
-Extended Data (17 Nov): 9 items of 10, merged by topic because we were at 12. One slot is left for the rows still to decide (non-neurological MIMIC, reasons for the requests); if both are needed, the thinking test moves to the Supplementary.
+Extended Data (17 Nov): 9 items of 10, merged by topic because we were at 12: eight figures and Extended Data Table 1 (main results). The thinking test moved to Supplementary Table 11, so one slot stays free for a row still to decide (non-neurological MIMIC, reasons for the requests).
 
 | ED | Content |
 |---|---|
@@ -77,7 +77,8 @@ Extended Data (17 Nov): 9 items of 10, merged by topic because we were at 12. On
 | 6 | Acute vs chronic |
 | 7 | Controls (no test, no menu, scripted agents) |
 | 8 | Robustness (weights, contradictory facts) |
-| 9 | Thinking off vs on (why A and B do not use thinking) |
+| Table 1 | Main results: untrained, B, A on the NeuroBench test and on MIMIC, with the A − B difference |
+| (free) | Non-neurological MIMIC or reasons for the requests, decided from the results |
 
 Main figures (17 Nov; several experiments can share a figure, in different panels):
 
@@ -128,7 +129,7 @@ Figure 2 (17 Nov), draft to settle the layout (`paper/figures/fig2_svg.py`, `fig
 - d: the same correct diagnosis, three work-ups; model name above, tests as pills (required in order, not needed, out of order), cost and score on the right.
 - No "fake values" labels: every printed number is "xx" until the real runs exist; the names of the large models are placeholders.
 - Legend in the manuscript (17 Nov, 202 words, "xx" where data are missing): a title that states the result, then per panel what is drawn, on which data, what symbols and error bars mean, and a single sentence of reading. As in NMI, AMIE and Ferber (Nature Cancer 2025): a brief comment on the results, no method detail.
-- In the PDF it prints as "Fig. 3": the old October dataset figure still takes the place of Fig. 2. To decide whether it moves to Extended Data.
+- The old October dataset figure moved to Extended Data Fig. 1 (17 Nov), as a draft to redo in the house style.
 
 Figure 3 (17 Nov), draft to settle the layout (`paper/figures/fig3_svg.py`, `fig3-new.pdf`, 180 × 131 mm, same rules as Fig. 2; every number is "xx"). Redone the same day after the research on what reviewers expect (`paper/nmi-notes.md`):
 - Three models in every panel: untrained (grey), rewarded on diagnosis + cost (orange, "Outcome reward"), rewarded on the work-up (blue, "Policy reward").
@@ -144,3 +145,27 @@ Figure 2, changes of 17 Nov after the same research: one more class in the bars 
 Notes:
 - Weights of models trained on MIMIC: not freely publishable (PhysioNet agreement).
 - Everything in the repository is written in English (Andrea, 17 Nov).
+
+## Tables (17 Nov)
+File `manuscript/sections/08-tables.tex`. Values are `xx ± xx` (mean ± s.d. across 3 seeds) and `xx (xx to xx)` (95% CI, bootstrap over cases, paired by case) until the runs exist; known facts are filled in.
+
+| Table | Content |
+|---|---|
+| ED Table 1 | Main results, two blocks (NeuroBench test 119, MIMIC 100): untrained, outcome reward, policy reward, policy − outcome difference with CI, P (Wilcoxon or McNemar, Benjamini–Hochberg per block). Rows: correct diagnosis, required, recommended, unsafe, useless tests, tests, cost, outcome score, policy score |
+| Supp 1 | MIMIC split: conditions kept out of training (HEP 10 + BACT 2) vs seen in training or validation (88) |
+| Supp 2 | Untrained models (numbers behind Fig. 2) with ranks, and the block on the cases worked up by the neurologists |
+| Supp 3 | Per test condition (numbers behind Fig. 3c) |
+| Supp 4 | Controls and ablations: scripted (perfect, order everything), untrained (no test, no menu, rules in the prompt), trained (SFT, outcome without cost, policy without penalty) |
+| Supp 5 | The two rewards, weights filled in from `policy_reward.py` |
+| Supp 6 | Datasets per split |
+| Supp 7 | Models and inference settings |
+| Supp 8 | Training and compute |
+| Supp 9 | Physician agreement (kappa per dimension, blind rating vs score) |
+| Supp 10 | Cost of running an episode |
+| Supp 11 | Thinking off vs on (values filled in; check whether invalid actions and failed episodes are totals or per seed) |
+
+## Which test set carries the main claim (17 Nov, proposed, to confirm with Andrea)
+Both, with different roles.
+- **NeuroBench test = primary endpoint of the A vs B comparison.** Four conditions never seen in training, 119 cases × 3 seeds, case-specific policies reviewed by physicians, releasable.
+- **MIMIC = external validation on real records; it must show the same direction.** Reported in the same table, never pooled with the synthetic test. Limits to state: 88 of 100 admissions come from conditions seen in training or validation (MS chose the checkpoint), only 12 from held-out conditions; policies are carried over from the templates of the same condition and are still draft; the strict pool keeps admissions with a complete recorded work-up (selection); a test never done answers "not available" (censoring); n = 100 is underpowered for diagnosis differences; the data cannot be released.
+- MIMIC becomes a stronger second primary if two physicians approve its 100 policies and the held-out-condition block grows beyond 12 cases.

@@ -1,5 +1,6 @@
 % Abstract plan: the narrative of the paper and what it must prove. The 150-word abstract is
-% written last, one sentence per narrative move below.
+% written last, one sentence per narrative move below. Plan updated 17 Nov 2026 to match
+% paper/decisions.md; claims are numbered C1--C5 and each points to the display item that carries it.
 
 \section*{Abstract (150 words, no references)}
 
@@ -18,35 +19,40 @@ is the testbed.
 \structure
 \begin{enumerate}
 \item \textbf{Constraint}: patient data cannot leave the hospital, so the agent is a 4--9\,B open model.
-\item \textbf{Gap}: sequential-diagnosis benchmarks score outcome (accuracy, cost) and cannot tell a
-safe work-up from a lucky or harmful one; as a reward, outcome invites shortcuts.
-\item \textbf{Idea}: one executable policy per case, approved by two physicians, used as metric and as
-RL reward.
-\item \textbf{Resource}: NeuroBench, 600 cases, 20 conditions, 16 tools, [N] approved policies.
-\item \textbf{Central result}: policy-reward RL vs outcome-reward RL, effect sizes, held-out conditions.
-\item \textbf{Implication}: executable process rewards as a verifiable training signal.
+\item \textbf{Gap}: sequential-diagnosis benchmarks score the outcome (accuracy, cost) and cannot tell a
+complete work-up from a lucky or unsafe one; as a reward, the outcome invites shortcuts.
+\item \textbf{Idea}: one executable policy per case, reviewed by two neurologists, used both as the
+measure and as the reinforcement-learning reward.
+\item \textbf{Resource}: NeuroBench, 600 synthetic cases of 20 neurological conditions and 16 tools,
+plus 100 recorded MIMIC-IV admissions for external testing.
+\item \textbf{Central result}: Qwen3.5-9B trained on the policy reward against the same model trained on
+diagnosis and cost, on four conditions never seen in training and on the MIMIC-IV admissions.
+\item \textbf{Implication}: executable process specifications are a verifiable training signal wherever
+experts write protocols.
 \end{enumerate}
 
 \artefacts
-What we must prove, each claim with the experiment that tests it and the result that would refute it.\par\smallskip
+What we must prove, each claim with its display item and the result that would refute it.\par\smallskip
 \noindent{\small
-\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.05\linewidth}>{\raggedright\arraybackslash}p{0.34\linewidth}>{\raggedright\arraybackslash}p{0.16\linewidth}>{\raggedright\arraybackslash}X@{}}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.05\linewidth}>{\raggedright\arraybackslash}p{0.38\linewidth}>{\raggedright\arraybackslash}p{0.16\linewidth}>{\raggedright\arraybackslash}X@{}}
 \toprule
 & Claim & Evidence & Refuted if \\ \midrule
-C1 & Outcome metrics hide unsafe and incomplete work-ups and change the ranking of models
-   & E4, Fig.~3 & correct diagnoses rarely come with violations; Kendall $\tau\approx1$ \\
-C2 & Policy-reward RL lowers safety violations and raises required coverage at equal accuracy,
-     vs outcome-reward RL & E1, Fig.~4 & no paired difference, or accuracy drops \\
-C3 & Physicians agree with the policy reward more than with accuracy+cost or an LLM judge
-   & E2, Fig.~5 & $\rho_{\text{policy}}\le\rho_{\text{outcome}}$ \\
-C4 & The gains hold on unseen conditions and on real records & E1 held-out, E3, Fig.~6
-   & gain vanishes on held-out or MIMIC-IV \\
-C5 & The agent runs on one GPU at a cost per case far below frontier APIs & E5, Fig.~6
-   & latency or cost not compatible with use \\
+C1 & Accuracy hides incomplete and unsafe work-ups: untrained models reach correct diagnoses without the
+     required tests, and ranking by accuracy differs from ranking by policy score
+   & Fig.~2, Supp.\ Table~2 & correct diagnoses rarely lack required tests; Kendall's $\tau\approx1$ \\
+C2 & Training on the policy reward raises required coverage and cuts unsafe actions without losing
+     diagnoses, while training on diagnosis and cost learns to skip tests
+   & Fig.~3, ED Table~1 & no paired difference on the test conditions, or diagnoses drop \\
+C3 & Physicians agree with the policy score, and the trained agent's work-ups approach theirs
+   & Fig.~4 & blind ratings agree with accuracy and cost as much as with the policy score \\
+C4 & The gain carries over to recorded admissions & Fig.~5, ED Table~1, Supp.\ Table~1
+   & no difference, or the opposite direction, on MIMIC-IV \\
+C5 & The trained 9B model works up cases as well as larger untrained models, on one GPU at a fraction
+     of their cost & Fig.~6 & larger models win clearly on policy score at similar cost \\
 \bottomrule
 \end{tabularx}}
 \par\smallskip
 \textbf{Not claimed:} clinical readiness, superiority over physicians or frontier models,
 generality beyond neurology. Never ``concurrent'' for SDBench.
 
-\status{Every number waits for runs on the frozen dataset after the leakage fixes.}
+\status{Every number waits for the three seeds of both trained models and for approved test policies.}
