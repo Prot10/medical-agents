@@ -69,21 +69,7 @@
       "recommended_actions": []
     },
     "drug_interactions": null,
-    "ecg": {
-      "axis": "normal",
-      "clinical_correlation": "",
-      "findings": [
-        "Normal sinus rhythm. No ST-T changes. Normal QTc."
-      ],
-      "interpretation": "Normal ECG.",
-      "intervals": {
-        "PR": "168 ms",
-        "QRS": "88 ms",
-        "QTc": "412 ms"
-      },
-      "rate": 72,
-      "rhythm": "normal sinus rhythm"
-    },
+    "ecg": null,
     "echo": {
       "chambers": {
         "LA": "borderline enlarged (3.8 cm)",
@@ -232,17 +218,29 @@
         "abnormal_values_summary": [
           "Anti-LRP4 antibody positive, titre 1:400"
         ],
-        "interpretation": "Anti-LRP4 antibody detected (cell-based assay, titre 1:400). Clustered AChR antibody not detected. Anti-LRP4 antibodies are found in a minority of patients with features of myasthenia gravis who are seronegative for AChR and MuSK antibodies; clinical correlation recommended.",
+        "interpretation": "Anti-LRP4 antibody detected by cell-based assay at a titre of 1:400.",
         "panels": {
-          "Extended_Seronegative_MG_Panel": [
+          "LRP4_Antibody": [
             {
               "clinical_significance": null,
               "is_abnormal": true,
               "reference_range": "Negative (<1:20)",
-              "test": "Anti-LRP4 antibody (cell-based assay)",
+              "test": "Anti-LRP4 antibody",
               "unit": "titre",
               "value": "Positive, titre 1:400"
-            },
+            }
+          ]
+        }
+      },
+      "tool_name": "interpret_labs",
+      "trigger_action": "request_lrp4_antibody"
+    },
+    {
+      "output": {
+        "abnormal_values_summary": [],
+        "interpretation": "Clustered AChR and clustered MuSK antibodies not detected by live cell-based assay.",
+        "panels": {
+          "Cell_Based_Assay_Clustered_AChR_MuSK": [
             {
               "clinical_significance": null,
               "is_abnormal": false,
@@ -250,12 +248,20 @@
               "test": "Anti-clustered AChR antibody (cell-based assay)",
               "unit": "qualitative",
               "value": "Negative"
+            },
+            {
+              "clinical_significance": null,
+              "is_abnormal": false,
+              "reference_range": "Negative",
+              "test": "Anti-clustered MuSK antibody (cell-based assay)",
+              "unit": "qualitative",
+              "value": "Negative"
             }
           ]
         }
       },
       "tool_name": "interpret_labs",
-      "trigger_action": "request_lrp4_and_clustered_achr_antibodies"
+      "trigger_action": "request_live_cell_based_assay"
     },
     {
       "output": {
@@ -506,13 +512,34 @@
           }
         ],
         "citations": [
-          "[Gilhus_2016]"
+          "[Jacob_2025]",
+          "[Higuchi_2011]"
         ],
         "criterion_id": "action-2-interpret-labs",
-        "expected_evidence": "Anti-LRP4 antibody positive by cell-based assay (titre 1:400); clustered AChR negative",
+        "expected_evidence": "Anti-LRP4 antibody positive by cell-based assay (titre 1:400)",
         "importance": "required",
         "label": "Order LRP4 antibody testing in this double-seronegative patient",
-        "rationale": "With fatigable ptosis, diplopia and bulbar symptoms and negative AChR and MuSK antibodies, the extended cell-based panel (LRP4, clustered AChR) is the next serological step (Jacob 2025 ABN guidance; Evoli 2019)."
+        "rationale": "With fatigable ptosis, diplopia and bulbar symptoms and negative AChR and MuSK antibodies, LRP4 antibody testing is the serological step that can identify the disease: ABN 2025 includes LRP4 in the extended panel, while the Italian recommendations say LRP4 may be tested (Fionda 2026, statement 6). It is required here because it is the only test that identifies the antibody in this double-seronegative patient (Jacob 2025 ABN guidance)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "panels": [
+                "clustered_AChR_cell_based"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          }
+        ],
+        "citations": [
+          "[Jacob_2025]"
+        ],
+        "criterion_id": "action-cell-based-panel",
+        "expected_evidence": "Clustered AChR and clustered MuSK antibodies not detected by live cell-based assay",
+        "importance": "recommended",
+        "label": "Send the high-sensitivity cell-based assay (clustered AChR and clustered MuSK)",
+        "rationale": "A live cell-based assay detects clustered AChR (and MuSK) antibodies missed by radioimmunoassay and is advised before MG is called seronegative (Fionda 2026, statement 5; Jacob 2025). Here it is negative, so it does not change the diagnosis, which rests on LRP4 and SFEMG."
       },
       {
         "alternatives": [
@@ -547,16 +574,24 @@
               "study": "chest_CT"
             },
             "tool_name": "order_body_imaging"
+          },
+          {
+            "required_arguments": {
+              "contrast": true,
+              "study": "mediastinum_MRI"
+            },
+            "tool_name": "order_body_imaging"
           }
         ],
         "citations": [
-          "[Wolfe_2016]"
+          "[Jacob_2025]",
+          "[Narayanaswami_2021]"
         ],
         "criterion_id": "action-5-order-body-imaging",
         "expected_evidence": "No thymoma; fatty-replaced involuted thymus; mild emphysema",
         "importance": "required",
-        "label": "Order mediastinal CT with contrast",
-        "rationale": "Thymic imaging is indicated in every patient with MG regardless of serostatus; a thymoma would change management (Jacob 2025 ABN guidance)."
+        "label": "Order contrast mediastinal CT (or MRI)",
+        "rationale": "Thymic imaging, by contrast CT or MRI of the mediastinum, is indicated in every patient with MG regardless of serostatus; a thymoma would change management (Jacob 2025 ABN guidance). Iodinated contrast is used with caution in MG (ICG 2020, Table 1) and does not replace the indication."
       },
       {
         "alternatives": [
@@ -567,12 +602,30 @@
             "tool_name": "order_specialized_test"
           }
         ],
-        "citations": [],
+        "citations": [
+          "[Jacob_2025]"
+        ],
         "criterion_id": "action-9-order-specialized-test",
         "expected_evidence": "FVC 3.8 L (84% predicted, 43.8 mL/kg), MIP -72 cmH2O, MEP 112 cmH2O: no respiratory muscle weakness",
-        "importance": "recommended",
+        "importance": "required",
         "label": "Measure baseline respiratory function",
-        "rationale": "Bulbar symptoms (chewing fatigue, dysarthria) with sleep apnoea: baseline FVC, MIP and MEP stage respiratory reserve before treatment (Lawn 2001 thresholds)."
+        "rationale": "He is an inpatient with bulbar weakness (chewing fatigue, fatigable dysarthria, hoarseness, reduced tongue strength) and neck flexor weakness on a background of sleep apnoea: a baseline FVC with MIP and MEP is needed to decide the level of care and to trend against the ABN criteria (inpatient care below 30 mL/kg; ICU or HDU below 20 mL/kg or a fall of more than 30%) (Jacob 2025)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_ecg"
+          }
+        ],
+        "citations": [
+          "[Jacob_2025]"
+        ],
+        "criterion_id": "action-baseline-ecg",
+        "expected_evidence": "Normal sinus rhythm at 74/min with normal PR (168 ms), QRS (88 ms) and QTc (412 ms).",
+        "importance": "recommended",
+        "label": "Baseline 12-lead ECG before starting pyridostigmine",
+        "rationale": "Pyridostigmine can cause bradycardia and atrioventricular block; ABN 2025 advises a baseline ECG before it is started (Jacob 2025)."
       },
       {
         "alternatives": [
@@ -595,14 +648,16 @@
       "prohibited_recommendations": [
         "Do not attribute fatigable ptosis, diplopia or bulbar weakness to a functional cause on the basis of negative AChR and MuSK antibodies; seronegative MG needs extended serology and single-fibre EMG.",
         "Avoid fluoroquinolones, aminoglycosides, macrolides and IV magnesium unless no alternative exists and the patient is monitored; use non-depolarising neuromuscular blockers only at reduced dose with quantitative monitoring.",
-        "Do not start high-dose prednisone (above 20 mg/day) as an outpatient; start low and titrate, or start high dose only with inpatient monitoring, because initial steroid-induced worsening can precipitate crisis.",
-        "Do not add a beta-blocker if his blood pressure treatment needs intensifying; choose another class."
+        "Do not start prednisone at full dose (for example 1 mg/kg daily) at once; escalate from a low dose, because steroid initiation can transiently worsen MG (Jacob 2025)."
       ],
       "required_recommendations": [
-        "Start pyridostigmine 30-60 mg three to five times daily, titrated to effect (maximum about 360-480 mg/day).",
-        "If bulbar and ocular symptoms persist on pyridostigmine, start prednisone at 10-20 mg/day and increase slowly; add azathioprine after TPMT testing if long-term immunosuppression is needed (Sanders 2016).",
+        "Start pyridostigmine 30 mg three to four times daily after a baseline ECG, titrating to effect (usually up to 60 mg four to five times daily); the maximum is 360 mg/day, with specialist review above 300 mg/day (Jacob 2025).",
+        "If symptoms persist on pyridostigmine, start prednisone 5-10 mg daily and increase by 5 mg every 3-5 days to 30 mg daily (up to 1 mg/kg, not above 60 mg, only after specialist discussion), warning that weakness may worsen around days 5-10 (Jacob 2025). Add azathioprine (after TPMT, and NUDT15 where available, testing) if long-term immunosuppression is needed.",
         "Replace the functional diagnosis in his record with LRP4-antibody-positive generalized myasthenia gravis and explain the diagnosis to him and his GP.",
-        "Give him a list of drugs that can worsen MG (fluoroquinolones, aminoglycosides, macrolides, IV magnesium, beta-blockers), keep atorvastatin under review if weakness worsens, and advise urgent review for dysphagia or breathlessness."
+        "Give him a list of drugs that can worsen MG (fluoroquinolones, aminoglycosides, macrolides, IV magnesium, beta-blockers, and iodinated contrast, which is used with monitoring), keep atorvastatin under review if weakness worsens, and if his blood pressure treatment needs intensifying prefer another class to a beta-blocker (beta-blockers are used with caution in MG, ICG 2020 Table 1); advise urgent review for dysphagia or breathlessness.",
+        "Before long-term immunosuppression: HbA1c, lipids, blood pressure and weight before steroids; hepatitis B (HBsAg, anti-HBc) and hepatitis C serology, TB screening (IGRA) and HIV test; vaccinations updated at least four weeks before (Jacob 2025; Fionda 2026). During steroids: periodic blood pressure, glucose, weight and eye checks, calcium and vitamin D, and bone densitometry (Fionda 2026).",
+        "Arrange a speech and language therapy swallowing assessment while he is an inpatient, because chewing fatigue, fatigable dysarthria and hoarseness are bulbar symptoms (Jacob 2025).",
+        "Record the MGFA class (here IIb) and a baseline MG-ADL, with QMG where available, to follow treatment against the goal of MG-ADL 0-1 (Fionda 2026; Jacob 2025)."
       ]
     },
     "avoided_actions": [
@@ -667,6 +722,38 @@
         "criterion_id": "avoid-waste-6-order-cardiac-monitoring",
         "rationale": "No palpitations, syncope or arrhythmia; cardiac monitoring is not part of the MG work-up.",
         "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "polysomnography"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[Jacob_2025]"
+        ],
+        "criterion_id": "avoid-waste-polysomnography",
+        "rationale": "His sleep apnoea is controlled: the CPAP download already shows good adherence with a residual AHI below 5, so polysomnography adds nothing to the evaluation of his fatigable ptosis and bulbar weakness (Jacob 2025).",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "speech_language_evaluation"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[Jacob_2025]"
+        ],
+        "criterion_id": "avoid-waste-speech-language-evaluation",
+        "rationale": "His fatigable dysarthria and hoarseness are documented on examination and language is normal; the speech and language battery tests motor speech and language and never assesses swallowing, which needs a speech and language therapy swallowing assessment (Jacob 2025).",
+        "severity": "waste"
       }
     ],
     "diagnosis": {
@@ -686,8 +773,7 @@
       ],
       "icd_codes": [
         "G70.00",
-        "G70.0",
-        "G70.01"
+        "G70.0"
       ],
       "rejected": [
         "functional neurological disorder",
@@ -742,7 +828,7 @@
       "Positive ice-pack test on the left (MRD1 0.5 to 3.5 mm).",
       "AChR and MuSK antibodies are negative on repeat testing, so the extended cell-based panel is needed: anti-LRP4 is positive at 1:400 and clustered AChR is negative.",
       "RNS is normal (maximum decrement 9%), which does not exclude MG; SFEMG shows increased jitter and blocking in extensor digitorum communis and orbicularis oculi.",
-      "Mediastinal CT shows an involuted thymus without thymoma; thymectomy is not routine in LRP4-positive MG outside trials.",
+      "Mediastinal CT shows an involuted thymus without thymoma; without a thymoma, thymectomy is not routinely indicated in AChR-negative (LRP4-positive) MG, for which there are no data (Jacob 2025), and may be considered only if immunotherapy fails (ICG 2020).",
       "Respiratory function is normal (FVC 84% predicted, 43.8 mL/kg; MIP -72 cmH2O)."
     ],
     "red_herrings": [
@@ -773,8 +859,10 @@
       {
         "after_criterion_id": "action-3-order-specialized-test",
         "before_criterion_id": "action-4-order-specialized-test",
-        "citations": [],
-        "reason": "Repetitive nerve stimulation is done first; SFEMG follows when RNS is normal (Jacob 2025).",
+        "citations": [
+          "[Jacob_2025]"
+        ],
+        "reason": "RNS is the initial neurophysiological test; SFEMG is considered when RNS is normal and suspicion persists, where expertise is available (Jacob 2025).",
         "severity": "soft"
       }
     ],
@@ -785,7 +873,8 @@
         "action-4-order-specialized-test",
         "action-2-interpret-labs",
         "action-3-order-specialized-test",
-        "action-5-order-body-imaging"
+        "action-5-order-body-imaging",
+        "action-9-order-specialized-test"
       ]
     }
   },
@@ -831,17 +920,31 @@
         "interactions": [
           "Pyridostigmine with lisinopril: no clinically significant interaction; additive bradycardia or hypotension is uncommon.",
           "Pyridostigmine or prednisone with atorvastatin: no pharmacokinetic interaction.",
-          "Atorvastatin: rare case reports of new or worsened myasthenic weakness with statins; use with caution and review if weakness worsens."
+          "Atorvastatin: rare case reports of new or worsened neuromuscular junction weakness with statins; use with caution and review if weakness worsens."
         ],
         "proposed": "Pyridostigmine, prednisone (screened against the current medication list)",
         "summary": "",
         "warnings": [
-          "Myasthenia gravis: avoid fluoroquinolones, aminoglycosides, macrolides and IV magnesium where possible; use beta-blockers with caution; non-depolarising neuromuscular blockers need reduced doses with quantitative monitoring.",
-          "Corticosteroids: initial worsening of myasthenic weakness can occur within 1-2 weeks of starting high doses; monitor blood pressure and glucose."
+          "Disorders of neuromuscular transmission: avoid fluoroquinolones, aminoglycosides, macrolides and IV magnesium where possible; use beta-blockers with caution; non-depolarising neuromuscular blockers need reduced doses with quantitative monitoring.",
+          "Corticosteroids: initial worsening of weakness from impaired neuromuscular transmission can occur within 1-2 weeks of starting high doses; monitor blood pressure and glucose."
         ]
       }
     },
-    "ecg": null,
+    "ecg": {
+      "axis": "normal",
+      "clinical_correlation": "",
+      "findings": [
+        "Normal sinus rhythm. No ST-T changes. Normal QTc."
+      ],
+      "interpretation": "Normal ECG.",
+      "intervals": {
+        "PR": "168 ms",
+        "QRS": "88 ms",
+        "QTc": "412 ms"
+      },
+      "rate": 74,
+      "rhythm": "normal sinus rhythm"
+    },
     "echo": null,
     "eeg": null,
     "labs": {
@@ -1051,15 +1154,14 @@
     "fallback_tool_kinds": {
       "cardiac_monitoring": "normal",
       "csf": "normal",
-      "ecg": "normal",
       "echo": "mild_incidental",
       "eeg": "normal",
       "mri": "normal"
     },
     "generated": "2026-06-17",
-    "last_revised": "2026-10-24",
+    "last_revised": "2026-11-17",
     "policy_spec_status": "draft",
-    "revision_reason": "October 2026 review round: criteria, reports, musts and differential rebuilt per the MG plan; RNS moved to the initial work-up and SFEMG to a follow-up",
+    "revision_reason": "Extended serology split into an LRP4 panel and a live cell-based assay panel (clustered AChR and MuSK), each answering its own order; mediastinal MRI accepted for thymic imaging; respiratory function required; baseline ECG before pyridostigmine; sourced SFEMG constraint reason; ABN pyridostigmine maximum, outpatient steroid titration, screening before immunosuppression, swallowing assessment, beta-blocker and iodinated contrast cautions and MG severity recording in the management; waste labels for polysomnography and the speech and language battery",
     "version": "policy-v1",
     "vocab_gap": [
       "emg_ncs_useless_via_param_conflation: pack lists order_specialized_test:emg_ncs as USELESS, but coherence validator treats tool_name overlap as a contradiction regardless of tool_parameters; cannot encode without removing required RNS/SFEMG entries. Suggest extending validator to compare tool_name + tool_parameters or fleet-wide pattern."

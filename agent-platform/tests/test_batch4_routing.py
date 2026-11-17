@@ -74,10 +74,11 @@ def test_repeat_call_counts_only_the_same_study():
 
 
 def test_combined_lab_order_returns_every_matching_panel():
+    # MG-P04 stores LRP4 as its own panel since the November 2026 round (plans/MG-decisions.md D17).
     env = _env("MG-P04")
     labs = _call(env, "interpret_labs", panels=["anti_AChR", "anti_MuSK", "TSH", "anti_LRP4"])
     panels = set(labs.output["panels"])
-    assert {"Neuromuscular_Junction_Antibody_Panel", "Thyroid_Function", "Extended_Seronegative_MG_Panel"} <= panels
+    assert {"Neuromuscular_Junction_Antibody_Panel", "Thyroid_Function", "LRP4_Antibody"} <= panels
 
 
 def test_combined_lab_order_adds_a_followup_panel():
@@ -89,10 +90,10 @@ def test_combined_lab_order_adds_a_followup_panel():
 def test_single_lab_orders_are_unchanged():
     env = _env("MG-P04")
     lrp4 = _call(env, "interpret_labs", panels=["anti_LRP4"])
-    assert set(lrp4.output["panels"]) == {"Extended_Seronegative_MG_Panel"}
+    assert set(lrp4.output["panels"]) == {"LRP4_Antibody"}
     env = _env("MG-P04")
     initial = _call(env, "interpret_labs", panels=["TSH"])
-    assert "Extended_Seronegative_MG_Panel" not in initial.output["panels"]
+    assert "LRP4_Antibody" not in initial.output["panels"]
 
 
 def test_lumbar_drain_is_billed_on_top_of_the_puncture():

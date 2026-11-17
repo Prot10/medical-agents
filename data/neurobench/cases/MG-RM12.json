@@ -27,26 +27,7 @@
       "recommended_actions": [],
       "tracer_or_protocol": "F-18 fluorodeoxyglucose PET with low-dose CT, skull base to mid-thigh"
     },
-    "body_imaging": {
-      "contrast": true,
-      "findings": [
-        {
-          "finding": "diffusely enlarged bilobed thymus with preserved shape and homogeneous intermediate signal; uniform signal loss on opposed-phase imaging (chemical shift ratio 0.62)",
-          "interpretation": "thymic hyperplasia",
-          "region": "anterior mediastinum"
-        },
-        {
-          "finding": "no discrete mass, lymphadenopathy or effusion",
-          "interpretation": "normal",
-          "region": "remaining mediastinum"
-        }
-      ],
-      "impression": "Diffuse thymic enlargement with uniform chemical-shift signal loss, consistent with thymic hyperplasia. No feature of thymoma.",
-      "measurements": null,
-      "modality": "MRI",
-      "recommended_actions": [],
-      "region": "mediastinum"
-    },
+    "body_imaging": null,
     "cardiac_monitoring": {
       "duration_hours": 24,
       "events": [],
@@ -100,21 +81,7 @@
     },
     "ct": null,
     "drug_interactions": null,
-    "ecg": {
-      "axis": "normal",
-      "clinical_correlation": "",
-      "findings": [
-        "Normal sinus rhythm. Normal axis and intervals. No acute ST-T changes."
-      ],
-      "interpretation": "Normal ECG",
-      "intervals": {
-        "PR": "151 ms",
-        "QRS": "88 ms",
-        "QTc": "437 ms"
-      },
-      "rate": 68,
-      "rhythm": "normal sinus rhythm"
-    },
+    "ecg": null,
     "echo": {
       "chambers": {
         "LA": "normal size",
@@ -245,31 +212,31 @@
           {
             "panel": "Pulmonary_Function_Bedside",
             "reference_range": ">=80% predicted (predicted 4.6 L)",
-            "result": "2.6 L (57% predicted; 31.3 mL/kg) L",
+            "result": "2.6 L (57% predicted; 31.3 mL/kg)",
             "test": "FVC (sitting)"
           },
           {
             "panel": "Pulmonary_Function_Bedside",
             "reference_range": "fall <10%",
-            "result": "2.3 L (12% fall from sitting) L",
+            "result": "2.3 L (12% fall from sitting)",
             "test": "FVC (supine)"
           },
           {
             "panel": "Pulmonary_Function_Bedside",
             "reference_range": "more negative than -60 cmH2O",
-            "result": "-46 cmH2O L",
+            "result": "-46 cmH2O",
             "test": "MIP (NIF)"
           },
           {
             "panel": "Pulmonary_Function_Bedside",
             "reference_range": ">=95 cmH2O",
-            "result": "62 cmH2O L",
+            "result": "62 cmH2O",
             "test": "MEP"
           },
           {
             "panel": "Pulmonary_Function_Bedside",
             "reference_range": ">=25",
-            "result": "19 L",
+            "result": "19",
             "test": "Single-breath count"
           },
           {
@@ -327,6 +294,32 @@
       },
       "tool_name": "order_specialized_test",
       "trigger_action": "request_ice_pack_test"
+    },
+    {
+      "output": {
+        "contrast": true,
+        "findings": [
+          {
+            "description": "Diffusely enlarged bilobed thymus with preserved shape and homogeneous intermediate signal; uniform signal loss on opposed-phase imaging (chemical shift ratio 0.62). No focal nodule.",
+            "location": "Anterior mediastinum",
+            "type": "Thymus"
+          },
+          {
+            "description": "No discrete mass, lymphadenopathy or effusion.",
+            "location": "Remaining mediastinum",
+            "type": "pertinent_negative"
+          }
+        ],
+        "impression": "Diffuse thymic enlargement with uniform chemical-shift signal loss, consistent with thymic hyperplasia. No feature of thymoma.",
+        "measurements": {
+          "Chemical shift ratio": "0.62"
+        },
+        "modality": "MRI",
+        "recommended_actions": [],
+        "region": "mediastinum"
+      },
+      "tool_name": "order_body_imaging",
+      "trigger_action": "request_mediastinum_mri"
     },
     {
       "output": {
@@ -489,12 +482,14 @@
             "tool_name": "order_specialized_test"
           }
         ],
-        "citations": [],
+        "citations": [
+          "[Jacob_2025]"
+        ],
         "criterion_id": "action-7-order-specialized-test",
         "expected_evidence": "FVC 2.6 L (57% predicted, 31.3 mL/kg) with a 12% supine fall, MIP -46 cmH2O, MEP 62 cmH2O",
         "importance": "required",
         "label": "Measure respiratory function now and trend it",
-        "rationale": "Nasal speech and jaw fatigue with proximal weakness after a recent neuropathy: FVC, MIP and MEP stage respiratory reserve and decide the level of care and rapid therapy (Lawn 2001 thresholds)."
+        "rationale": "Nasal speech and jaw fatigue with proximal weakness after a recent neuropathy: FVC with MIP and MEP and the single-breath count stage respiratory reserve and decide the level of care and rapid therapy, against the ABN criteria (inpatient care below 30 mL/kg or a single-breath count below 25; ICU or HDU below 20 mL/kg or a fall of more than 30%) (Jacob 2025)."
       },
       {
         "alternatives": [
@@ -545,13 +540,48 @@
           }
         ],
         "citations": [
+          "[Jacob_2025]",
           "[Gilhus_2016]"
         ],
         "criterion_id": "action-2-order-specialized-test",
         "expected_evidence": "Nasalis decrement 13% with post-activation exhaustion and no facilitation; residual demyelinating features improving since the GBS study",
         "importance": "required",
         "label": "Order repetitive nerve stimulation with repeat nerve conduction studies",
-        "rationale": "RNS of weak facial and proximal muscles tests the junction, and repeat conduction studies compared with the GBS study show whether the neuropathy is recovering or relapsing (Jacob 2025 ABN guidance)."
+        "rationale": "RNS of weak facial and proximal muscles tests the junction, and repeat conduction studies compared with the GBS study show whether the neuropathy is recovering or relapsing. It stays required despite positive AChR antibodies because the conduction studies are what exclude a GBS relapse, the main alternative here (Jacob 2025 ABN guidance)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "contrast": true,
+              "study": "mediastinum_CT"
+            },
+            "tool_name": "order_body_imaging"
+          },
+          {
+            "required_arguments": {
+              "contrast": true,
+              "study": "chest_CT"
+            },
+            "tool_name": "order_body_imaging"
+          },
+          {
+            "required_arguments": {
+              "contrast": true,
+              "study": "mediastinum_MRI"
+            },
+            "tool_name": "order_body_imaging"
+          }
+        ],
+        "citations": [
+          "[Jacob_2025]",
+          "[Narayanaswami_2021]"
+        ],
+        "criterion_id": "action-4-order-body-imaging",
+        "expected_evidence": "Diffuse thymic enlargement with preserved shape consistent with hyperplasia; no thymoma",
+        "importance": "required",
+        "label": "Order contrast mediastinal CT (or MRI)",
+        "rationale": "Thymic imaging, by contrast CT or MRI of the mediastinum, is indicated in every patient with MG; it separates thymoma from hyperplasia and informs the thymectomy decision (Jacob 2025 ABN guidance; ICG 2020)."
       },
       {
         "alternatives": [
@@ -574,43 +604,36 @@
       {
         "alternatives": [
           {
-            "required_arguments": {
-              "contrast": true,
-              "study": "mediastinum_CT"
-            },
-            "tool_name": "order_body_imaging"
-          },
-          {
-            "required_arguments": {
-              "contrast": true,
-              "study": "chest_CT"
-            },
-            "tool_name": "order_body_imaging"
+            "required_arguments": {},
+            "tool_name": "analyze_ecg"
           }
         ],
         "citations": [
-          "[Wolfe_2016]"
+          "[Jacob_2025]"
         ],
-        "criterion_id": "action-4-order-body-imaging",
-        "expected_evidence": "Diffuse thymic enlargement with preserved shape consistent with hyperplasia; no thymoma",
-        "importance": "required",
-        "label": "Order mediastinal CT with contrast",
-        "rationale": "Thymic imaging is indicated in every patient with MG; it separates thymoma from hyperplasia and informs the thymectomy decision (Jacob 2025 ABN guidance; MGTX)."
+        "criterion_id": "action-baseline-ecg",
+        "expected_evidence": "Normal sinus rhythm at 72/min with normal PR (151 ms), QRS (88 ms) and QTc (437 ms).",
+        "importance": "recommended",
+        "label": "Baseline 12-lead ECG before starting pyridostigmine",
+        "rationale": "Pyridostigmine can cause bradycardia and atrioventricular block; ABN 2025 advises a baseline ECG before it is started (Jacob 2025)."
       }
     ],
     "assessment": {
       "prohibited_recommendations": [
         "Avoid fluoroquinolones, aminoglycosides, macrolides and IV magnesium unless no alternative exists and the patient is monitored; use non-depolarising neuromuscular blockers only at reduced dose with quantitative monitoring.",
-        "Do not start high-dose prednisone (above 20 mg/day) as an outpatient; start low and titrate, or start high dose only with inpatient monitoring, because initial steroid-induced worsening can precipitate crisis.",
+        "Do not start corticosteroids as an outpatient while bulbar weakness is significant; start them in hospital with bulbar and respiratory monitoring (Evoli 2019).",
         "Do not attribute fatigable ptosis, diplopia or bulbar weakness to a GBS relapse or variant before AChR antibody testing and neurophysiology."
       ],
       "required_recommendations": [
-        "Start pyridostigmine 30-60 mg three to five times daily, titrated to effect (maximum about 360-480 mg/day).",
-        "Treat the bulbar weakness with reduced respiratory reserve (FVC 57% predicted with a supine fall, MIP -46 cmH2O) with plasma exchange (5 exchanges) or IVIG 2 g/kg over 2-5 days; a second IVIG course 4 weeks after the GBS course is acceptable.",
-        "Admit to a monitored bed and repeat FVC, MIP and MEP at least twice daily; move to intensive care if FVC falls below 20 mL/kg, MIP is weaker than -30 cmH2O, MEP is below 40 cmH2O, or swallowing or cough fail.",
-        "Start prednisone at a low dose and titrate, or at a higher dose only with inpatient monitoring; add azathioprine after TPMT testing if long-term immunosuppression is needed (Sanders 2016).",
-        "Plan thymectomy once he is stable (AChR-positive generalized MG at 42 with thymic hyperplasia, MGTX), with pre-operative IVIG or plasma exchange if bulbar or respiratory weakness persists.",
-        "Give him a list of drugs that can worsen MG (fluoroquinolones, aminoglycosides, macrolides, IV magnesium, beta-blockers)."
+        "Start pyridostigmine 30 mg three to four times daily after a baseline ECG, titrating to effect (usually up to 60 mg four to five times daily); the maximum is 360 mg/day, with specialist review above 300 mg/day (Jacob 2025).",
+        "Treat the bulbar weakness with reduced respiratory reserve (FVC 57% predicted, 31.3 mL/kg, with a 12% supine fall; single-breath count 19) with plasma exchange (5 exchanges) or IVIG 1 g/kg over 2-3 days for significant bulbar weakness without ventilatory failure, dosed by ideal body weight (about 71 g), after hepatitis B and C serology and an IgG level, read in the light of the IVIG he received 4 weeks ago (Jacob 2025); a second IVIG course 4 weeks after the GBS course is acceptable.",
+        "Keep him in a monitored bed. Repeat FVC (with MIP and MEP) at least twice daily while bulbar symptoms persist; refer to ICU or HDU if FVC falls below 20 mL/kg or by more than 30%, or if he cannot complete a sentence, uses accessory muscles or cannot clear secretions (Jacob 2025).",
+        "Start prednisone in hospital, because bulbar weakness makes steroid-induced worsening dangerous (Evoli 2019): 5-10 mg daily increased by 5 mg on alternate days (after IVIG or plasma exchange, from 10 mg by 5-10 mg every second day) to 30 mg daily, with bulbar and respiratory monitoring (Jacob 2025). Plan a steroid-sparing agent (azathioprine after TPMT, and NUDT15 where available, testing) if long-term immunosuppression is needed.",
+        "Offer thymectomy early, once MG is optimally controlled: AChR-positive generalized MG without thymoma (thymic hyperplasia) at 42 (ICG 2020 recommendation 1a, ages 18-50; Jacob 2025); IVIG or plasma exchange beforehand only on clinical indication.",
+        "Give him a list of drugs that can worsen MG (fluoroquinolones, aminoglycosides, macrolides, IV magnesium, beta-blockers).",
+        "Before long-term immunosuppression, without delaying urgent treatment: HbA1c, lipids, blood pressure and weight before steroids; hepatitis B (HBsAg, anti-HBc) and hepatitis C serology, TB screening (IGRA) and HIV test; vaccinations updated at least four weeks before (Jacob 2025; Fionda 2026). During steroids: periodic blood pressure, glucose, weight and eye checks, calcium and vitamin D, and bone densitometry (Fionda 2026).",
+        "Arrange a speech and language therapy swallowing assessment while he is an inpatient, because nasal speech and jaw fatigue are bulbar symptoms (Jacob 2025).",
+        "Record the MGFA class (here IIb) and a baseline MG-ADL, with QMG where available, to follow treatment against the goal of MG-ADL 0-1 (Fionda 2026; Jacob 2025)."
       ]
     },
     "avoided_actions": [
@@ -645,11 +668,19 @@
               "modality": "FDG_PET"
             },
             "tool_name": "order_advanced_imaging"
+          },
+          {
+            "required_arguments": {
+              "modality": "whole_body_FDG_PET"
+            },
+            "tool_name": "order_advanced_imaging"
           }
         ],
-        "citations": [],
+        "citations": [
+          "[Jacob_2025]"
+        ],
         "criterion_id": "avoid-waste-3-order-advanced-imaging",
-        "rationale": "FDG-PET is not indicated in MG; contrast CT answers the thymic question.",
+        "rationale": "FDG-PET (cerebral or whole-body) is not indicated in MG; contrast CT or MRI answers the thymic question (Jacob 2025).",
         "severity": "waste"
       },
       {
@@ -687,6 +718,54 @@
         "criterion_id": "avoid-waste-6-order-cardiac-monitoring",
         "rationale": "No palpitations, syncope or arrhythmia; cardiac monitoring is not part of the MG work-up.",
         "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "assessment_type": "gait_and_balance_timed"
+            },
+            "tool_name": "perform_clinical_assessment"
+          }
+        ],
+        "citations": [
+          "[Jacob_2025]"
+        ],
+        "criterion_id": "avoid-waste-gait-and-balance-timed",
+        "rationale": "His wide-based gait is the residual GBS deficit and is improving; a timed gait and balance battery measures nothing specific to neuromuscular transmission and is not part of the MG work-up (Jacob 2025).",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "assessment_type": "levodopa_challenge"
+            },
+            "tool_name": "perform_clinical_assessment"
+          }
+        ],
+        "citations": [
+          "[Jacob_2025]"
+        ],
+        "criterion_id": "avoid-waste-levodopa-challenge",
+        "rationale": "He has no rest tremor, rigidity or bradykinesia; a levodopa challenge answers no question in new MG after GBS and exposes him to nausea and orthostatic hypotension.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "speech_language_evaluation"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[Jacob_2025]"
+        ],
+        "criterion_id": "avoid-waste-speech-language-evaluation",
+        "rationale": "His fatigable nasal speech is documented on examination and language is normal; the speech and language battery tests motor speech and language and never assesses swallowing, which needs a speech and language therapy swallowing assessment (Jacob 2025).",
+        "severity": "waste"
       }
     ],
     "diagnosis": {
@@ -701,8 +780,7 @@
       ],
       "icd_codes": [
         "G70.00",
-        "G70.0",
-        "G70.01"
+        "G70.0"
       ],
       "rejected": [
         "recurrent GBS",
@@ -751,7 +829,7 @@
       "Anti-AChR binding 2.1 nmol/L with elevated blocking and modulating antibodies establishes AChR-positive MG; anti-GQ1b is negative.",
       "RNS shows a 13% nasalis decrement with post-activation exhaustion and no facilitation; the residual demyelinating features are improving, which argues against a GBS relapse.",
       "FVC 57% predicted (31.3 mL/kg) with a 12% supine fall and MIP -46 cmH2O: reduced reserve that calls for monitored care and rapid therapy.",
-      "Mediastinal CT shows thymic hyperplasia without thymoma; thymectomy is indicated per MGTX once he is stable."
+      "Mediastinal CT shows thymic hyperplasia without thymoma; at 42 with AChR-positive generalized MG, thymectomy should be offered early once he is stable (ICG 2020 recommendation 1a; Jacob 2025)."
     ],
     "red_herrings": [
       {
@@ -774,15 +852,19 @@
       {
         "after_criterion_id": "action-3-order-specialized-test",
         "before_criterion_id": "action-1-interpret-labs",
-        "citations": [],
-        "reason": "AChR antibody testing precedes single-fibre EMG; SFEMG is reserved for seronegative patients or a normal RNS (Jacob 2025).",
+        "citations": [
+          "[Jacob_2025]"
+        ],
+        "reason": "Serology comes first: with positive AChR antibodies SFEMG is rarely needed, while every antibody-negative patient needs neurophysiology, RNS first and SFEMG where expertise is available (Jacob 2025).",
         "severity": "soft"
       },
       {
         "after_criterion_id": "action-3-order-specialized-test",
         "before_criterion_id": "action-2-order-specialized-test",
-        "citations": [],
-        "reason": "Repetitive nerve stimulation is done first; SFEMG follows when RNS is normal (Jacob 2025).",
+        "citations": [
+          "[Jacob_2025]"
+        ],
+        "reason": "RNS is the initial neurophysiological test; SFEMG is considered when RNS is normal and suspicion persists, where expertise is available (Jacob 2025).",
         "severity": "soft"
       }
     ],
@@ -831,7 +913,21 @@
     "cardiac_monitoring": null,
     "ct": null,
     "drug_interactions": null,
-    "ecg": null,
+    "ecg": {
+      "axis": "normal",
+      "clinical_correlation": "",
+      "findings": [
+        "Normal sinus rhythm. Normal axis and intervals. No acute ST-T changes."
+      ],
+      "interpretation": "Normal ECG",
+      "intervals": {
+        "PR": "151 ms",
+        "QRS": "88 ms",
+        "QTc": "437 ms"
+      },
+      "rate": 72,
+      "rhythm": "normal sinus rhythm"
+    },
     "echo": null,
     "eeg": null,
     "labs": {
@@ -990,7 +1086,7 @@
           "test": "Technique"
         },
         {
-          "result": "Distal motor latencies mildly prolonged (median 4.6 ms, peroneal 6.1 ms); CMAP amplitudes low normal; conduction velocities normal; no conduction block; improved compared with the study of 4 weeks ago",
+          "result": "Distal motor latencies mildly prolonged (median 4.6 ms, peroneal 6.4 ms); CMAP amplitudes low normal; conduction velocities mildly slow (peroneal 38 m/s); no conduction block; improved compared with the study of 4 weeks ago",
           "significance": "Mild residual demyelinating features, improving",
           "test": "Motor NCS (median, ulnar, peroneal, tibial)"
         },
@@ -1038,16 +1134,15 @@
     "fallback_tool_kinds": {
       "cardiac_monitoring": "normal",
       "csf": "normal",
-      "ecg": "normal",
       "echo": "normal",
       "eeg": "normal",
       "mri": "incidental"
     },
     "generated": "2026-03-29",
     "generation_method": "real_case_seed",
-    "last_revised": "2026-10-24",
+    "last_revised": "2026-11-17",
     "policy_spec_status": "draft",
-    "revision_reason": "October 2026 review round: chest CT moved to body imaging, ice-pack report authored, criteria, musts and differential rebuilt per the MG plan",
+    "revision_reason": "Mediastinal MRI accepted for thymic imaging with a stored report; baseline ECG before pyridostigmine; SFEMG after the core work-up with sourced constraint reasons; respiratory report flags and the RNS conduction values aligned; ABN pyridostigmine maximum, IVIG by ideal body weight, ABN respiratory escalation criteria, inpatient steroid titration, thymectomy per ICG 2020, screening before immunosuppression, swallowing assessment and MG severity recording in the management; waste labels for off-pathway assessments",
     "source": "MedCaseReasoning",
     "source_license": "CC-BY 4.0",
     "source_pmcid": "PMC6642474",
