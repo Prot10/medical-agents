@@ -407,7 +407,7 @@ def draw_c(h, draw=True):
         yy += gap
     sx, sw_, sy = x + 12, w - 24, h - PAD - 12 - SCORE_H
     rect(sx, sy, sw_, SCORE_H, "#F6F7F9", rx=12)
-    text(sx + 16, sy + 34, "Case score", bold=True)
+    text(sx + 16, sy + 34, "Policy score", bold=True)
     text(sx + sw_ - 16, sy + 34, "0.96", bold=True, anchor="end")
     rect(sx + 16, sy + 50, sw_ - 32, 12, "#E3E6EA", rx=6)
     rect(sx + 16, sy + 50, (sw_ - 32) * 0.96, 12, MODEL_A, rx=6)

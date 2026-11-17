@@ -100,10 +100,22 @@ Figura 1 (17 nov):
 - Box arrotondati con sfondo tenue, come la figura di ottobre.
 - Pannello b: tutti i 5 esami, una riga per turno numerata su una linea verticale; a sinistra la richiesta di NeuroAgent (blu: esame + ragione), a destra, sulla stessa riga, la risposta dell'ospedale simulato (frecce andata e ritorno). Richiesta e risposta sono widget della stessa forma: intestazione colorata (esame / nome del referto) e testo sotto (ragione / risultato). Il controllo farmaci non ha ragione: lo dice in grigio. Poi la valutazione finale. Nessun riquadro thinking e nessun blocco riassuntivo.
 - Nel manoscritto dal 17 nov (`sections/02-results.tex`, file `fig1-new.pdf`), alla larghezza vera di 180 mm: ridotta alla colonna del template (~130 mm) il testo scendeva a 5 pt.
+- Un nome solo per il punteggio, "policy score", in figure e didascalie (17 nov): il box della Fig. 1 diceva "Case score". Didascalia ricontrollata con la skill di stile: titolo in positivo, b in due frasi, ✓ verdi e ✗ arancione descritti a parole come chiede NMI.
 - Didascalia (17 nov), 139 parole: dice cosa mostra ogni pannello e cosa serve per leggerlo; numeri e storia del caso stanno nella figura e non si ripetono (come le Fig. 1 di NMI, AMIE, AgentClinic).
 - Font misurati (17 nov): NMI pubblicato ha testo 8,2 pt, didascalie 7 pt, figure 5,5–6,5 pt. Noi: figura 7 pt, didascalia 8 pt, testo del template 10 pt.
 - Regole NMI/Nature applicate (17 nov; pagina NMI "AIP and formatting" e guida figure Nature): larghezza massima 180 mm, altezza massima 170 mm (siamo a 129), testo sans-serif 5–7 pt, lettere 8 pt; testo tutto nero (niente testo colorato), niente icone decorative (il colore resta in sfondi, bordi e ✓/✗); PDF con font TrueType modificabili, niente Type 3 → PDF stampato con Chrome (`paper/figures/fig1_pdf.sh`).
 - Testi: tutti a 7 pt, lettere dei pannelli 8 pt grassetto minuscolo (guida Nature: testo 5–7 pt, massimo 7); niente numeri grandi, niente corsivo (nel PDF le lettere si sovrapponevano), niente frecce tra i pannelli.
+
+Figura 2 (17 nov), bozza per decidere l'impaginazione (`paper/figures/fig2_svg.py`, `fig2-new.pdf`, 180 × 129 mm, stessa palette e stesse regole NMI della Fig. 1):
+- Forme prese da paper simili: accuratezza contro un'altra misura, un punto per modello (SDBench, npj Digit. Med. 2026); due classifiche a confronto (AgentClinic); barre al 100% per gli esiti (npj Digit. Med. 2026).
+- Due righe: a | b sopra, c | d sotto.
+- a: accuratezza contro punteggio della policy, un punto per modello con IC 95%, nome subito dopo l'intervallo; cerchio grigio = aperti fino a 9B, quadrato nero = modelli più grandi.
+- b: classifica per accuratezza contro classifica per punteggio, linee che si incrociano, tau di Kendall sotto.
+- c: cosa c'è dietro le diagnosi giuste, barre al 100%: lavoro completo / esame richiesto mancante / azione pericolosa.
+- d: stessa diagnosi giusta, tre percorsi; nome del modello sopra, esami come pillole (richiesto in ordine, non necessario, fuori ordine), costo e punteggio a destra.
+- Niente etichette "valori finti": ogni numero stampato è "xx" finché non ci sono i run veri; i nomi dei modelli grandi sono segnaposto.
+- Didascalia nel manoscritto (17 nov, 202 parole, "xx" dove mancano i dati): titolo che dice il risultato, poi per pannello cosa è disegnato, su quali dati, cosa significano simboli e barre di errore, e una sola frase di lettura. Come NMI, AMIE e Ferber (Nature Cancer 2025): commento dei risultati breve, niente dettagli di metodo.
+- Nel PDF esce come "Fig. 3": la vecchia figura del dataset di ottobre occupa ancora il posto della Fig. 2. Da decidere se va in Extended Data.
 
 Note:
 - Pesi di modelli addestrati su MIMIC: non pubblicabili liberamente (accordo PhysioNet).
