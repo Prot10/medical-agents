@@ -20,7 +20,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import svgkit as k
-from svgkit import BASE, BLACK, ERR, ERR_T, GREY_T, INK, LINE, MUTED, OK, OK_T, ROW, S, YELLOW
+from svgkit import BASE, BLACK, PHYS, ERR, ERR_T, GREY_T, INK, LINE, MUTED, OK, OK_T, ROW, S, SKY, YELLOW
 
 XX = "xx"   # printed in place of every number until the real runs exist
 
@@ -33,12 +33,19 @@ MODELS = [
     ("Gemma 4 E4B", "small", 84, (81, 87), 0.27, (0.24, 0.29)),
     ("Granite 4.1 8B", "small", 79, (75, 82), 0.34, (0.31, 0.37)),
 ]
-STYLE = {"small": ("circle", BASE), "large": ("square", BLACK)}
-LEGEND = [("small", "Open models up to 9B"), ("large", "Larger models")]
-# share of correct diagnoses (%): complete work-up, a required test missed, an unsafe action -- INVENTED
-HIDDEN = {"GLM-5.3": (44, 46, 10), "Qwen3.8-27B": (57, 36, 7), "gpt-oss-20b": (38, 50, 12),
-          "Qwen3.5-9B": (47, 42, 11), "Gemma 4 E4B": (24, 61, 15), "Granite 4.1 8B": (30, 57, 13)}
-HIDDEN_KEYS = [("Complete work-up", OK), ("Required test missed", YELLOW), ("Unsafe action", ERR)]
+STYLE = {"small": ("circle", BASE), "large": ("square", BLACK), "human": ("diamond", PHYS)}
+LEGEND = [("small", "Open models up to 9B"), ("large", "Larger models"), ("human", "Neurologists")]
+# Human reference (17 Nov, as Hager 2024, MIRA 2026 and SDBench put clinicians beside the models): the
+# neurologists who work up xx test cases through the same harness (paper/decisions.md, Fig. 4b). INVENTED.
+HUMAN = ("Neurologists", "human", 85, (79, 90), 0.64, (0.60, 0.68))
+# share of correct diagnoses (%): complete and lean, complete with useless tests, a required test missed,
+# an unsafe action -- INVENTED. Over-ordering gets its own class because reviewers of a Nature test-ordering
+# agent (MIRA, 2026) asked for precision and a penalty for unnecessary tests, not recall only.
+HIDDEN = {"GLM-5.3": (30, 14, 46, 10), "Qwen3.8-27B": (40, 17, 36, 7), "gpt-oss-20b": (22, 16, 50, 12),
+          "Qwen3.5-9B": (35, 12, 42, 11), "Gemma 4 E4B": (16, 8, 61, 15), "Granite 4.1 8B": (22, 8, 57, 13)}
+HIDDEN["Neurologists"] = (52, 10, 33, 5)
+HIDDEN_KEYS = [("Complete", OK), ("Complete, useless tests", SKY), ("Required test missed", YELLOW),
+               ("Unsafe action", ERR)]
 
 R1, R2 = 640, 620
 A_W = 940
@@ -46,7 +53,16 @@ B_X, B_W = A_W + k.GAP, k.W - A_W - k.GAP
 C_W = 640
 D_X, D_W = C_W + k.GAP, k.W - C_W - k.GAP
 Y2 = R1 + k.GAP
-NAME_W = max(k.width(m[0]) for m in MODELS)
+NAME_W = max(k.width(m[0]) for m in MODELS + [HUMAN])
+
+
+def marker(cx, cy, shape, col, r):
+    if shape == "diamond":
+        d = r * 1.25
+        k.out.append(f'<path d="M{cx:.1f},{cy - d:.1f} L{cx + d:.1f},{cy:.1f} L{cx:.1f},{cy + d:.1f} '
+                     f'L{cx - d:.1f},{cy:.1f} Z" fill="{col}" stroke="#FFFFFF" stroke-width="1.5"/>')
+    else:
+        k.marker(cx, cy, shape, col, r=r)
 
 
 def inner(x, y, w, h):
@@ -59,7 +75,7 @@ def inner(x, y, w, h):
 def legend_models(x, y):
     for cls, label in LEGEND:
         shape, col = STYLE[cls]
-        k.marker(x + 9, y - S * 0.36, shape, col, r=9)
+        marker(x + 9, y - S * 0.36, shape, col, r=9)
         k.text(x + 26, y, label)
         x += 26 + k.width(label) + 36
     return x
@@ -89,11 +105,11 @@ def draw_a():
     k.text(cx + 34, (py0 + py1) / 2, "Policy score", anchor="middle", rotate=-90)
     # 95% CIs as thin lines, the point on top, the name just past the end of its CI
     left = {"Qwen3.5-9B"}           # labels that would cross a neighbour's CI go on the left
-    for name, cls, acc, (a0, a1), sc, (s0, s1) in MODELS:
+    for name, cls, acc, (a0, a1), sc, (s0, s1) in MODELS + [HUMAN]:
         shape, col = STYLE[cls]
         k.line(X(a0), Y(sc), X(a1), Y(sc), stroke=col, sw=1.6)
         k.line(X(acc), Y(s0), X(acc), Y(s1), stroke=col, sw=1.6)
-        k.marker(X(acc), Y(sc), shape, col, r=10.5)
+        marker(X(acc), Y(sc), shape, col, r=10.5)
         if name in left:
             k.text(X(a0) - 12, Y(sc) + S * 0.36, name, anchor="end")
         else:
@@ -136,13 +152,17 @@ def draw_c():
         if lx + 26 + k.width(label) > cx + cw - 20:
             lx, ky = cx + 28, ky + ROW + 6
         lx = k.key(lx, ky, col, label)
-    bx0, bx1 = cx + 28 + NAME_W + 20, cx + cw - 32
+    n_w = k.width(f"n = {XX}")
+    bx0, bx1 = cx + 28 + NAME_W + 20, cx + cw - 32 - n_w - 20
     top, bottom = ky + 34, cy + ch - 96
-    step = (bottom - top) / len(MODELS)
+    rows = [m[0] for m in MODELS] + [HUMAN[0]]
+    step = (bottom - top) / len(rows)
     bar_h = step * 0.6
-    for i, (name, *_rest) in enumerate(MODELS):
+    k.line(cx + 28, top + len(MODELS) * step, cx + cw - 28, top + len(MODELS) * step, stroke=LINE, sw=1.2)
+    for i, name in enumerate(rows):
         y = top + i * step + (step - bar_h) / 2
         k.text(bx0 - 20, y + bar_h / 2 + S * 0.36, name, anchor="end")
+        k.text(cx + cw - 32, y + bar_h / 2 + S * 0.36, f"n = {XX}", fill=MUTED, anchor="end")
         x = bx0
         for share, (_, col) in zip(HIDDEN[name], HIDDEN_KEYS):
             w = (bx1 - bx0) * share / 100

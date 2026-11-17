@@ -1,8 +1,8 @@
-Analisi da fare
-- Testare Agent base vs Agent FT su MIMIC neuroscienze
-- Testare Agent base vs Agent FT su MIMIC con patologie generiche
-- Testare scaling law --> il nostro modello FT dove si posiziona come bravura rispetto a modelli piu grandi non FT?
-- Analizzare per patologia se ci sono differenze significative e fare una discussione piu dal punto di vista clinico tipo cercando di capire se è perché quella patologia è meno rappresentata e anche più difficile da diagnosticare per i medici
-- Analizzare gruppi di patologie come si comportano, acute vs croniche (pero sono sul sintetico, le abbiamo anche su mimic)
-- Analizzare scenario reale di deployment (?)
-- Mostrare che il training funziona per famiglie di modelli diversi, quindi non solo qwen ma anche granite e gemma, e qwen anche versioni piu piccole per vedere se l'effetto vale anche a diverse scale
+Analyses to do
+- Test the base agent vs the fine-tuned agent on MIMIC neurology cases
+- Test the base agent vs the fine-tuned agent on MIMIC cases with general conditions
+- Test scaling: where does our fine-tuned model stand in skill compared with larger models that are not fine-tuned?
+- Analyse each condition for significant differences and write a more clinical discussion, for example trying to understand whether a condition is less represented and also harder for physicians to diagnose
+- Analyse how groups of conditions behave, acute vs chronic (on the synthetic cases; we also have them in MIMIC)
+- Analyse a real deployment scenario (?)
+- Show that the training works across model families, so not only Qwen but also Granite and Gemma, and smaller Qwen versions too, to see whether the effect holds at different scales
