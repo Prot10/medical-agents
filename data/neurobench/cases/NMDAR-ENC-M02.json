@@ -456,6 +456,45 @@
       },
       "tool_name": "order_specialized_test",
       "trigger_action": "order_speech_language_evaluation"
+    },
+    {
+      "output": {
+        "contrast": true,
+        "findings": [
+          {
+            "abnormal": "false",
+            "finding": "Polycystic morphology with multiple peripheral follicles; no focal lesion.",
+            "structure": "Right ovary"
+          },
+          {
+            "abnormal": "false",
+            "finding": "Polycystic morphology; a 1.2 cm simple follicle or cyst, T2 hyperintense with a thin wall, no fat signal on fat-suppressed T1, no calcification and no enhancing solid component.",
+            "structure": "Left ovary"
+          },
+          {
+            "abnormal": "false",
+            "finding": "Normal size and zonal anatomy.",
+            "structure": "Uterus"
+          },
+          {
+            "abnormal": "false",
+            "finding": "No lymphadenopathy; no ascites.",
+            "structure": "Pelvic lymph nodes and peritoneum"
+          }
+        ],
+        "impression": "1. No adnexal mass and no fat-containing or solid ovarian lesion. 2. Polycystic morphology of both ovaries with a 1.2 cm simple left ovarian follicle or cyst; uterus normal.",
+        "measurements": {
+          "left ovarian simple follicle or cyst": "1.2 cm"
+        },
+        "modality": "MRI",
+        "recommended_actions": [],
+        "region": "pelvis_abdomen"
+      },
+      "tool_name": "order_body_imaging",
+      "tool_parameters": {
+        "study": "pelvis_abdomen_MRI"
+      },
+      "trigger_action": "order_pelvis_abdomen_mri"
     }
   ],
   "ground_truth": {
@@ -607,6 +646,12 @@
               "study": "pelvis_abdomen_ultrasound"
             },
             "tool_name": "order_body_imaging"
+          },
+          {
+            "required_arguments": {
+              "study": "pelvis_abdomen_MRI"
+            },
+            "tool_name": "order_body_imaging"
           }
         ],
         "citations": [
@@ -616,8 +661,27 @@
         "criterion_id": "action-5-order-body-imaging",
         "expected_evidence": "No adnexal mass; polycystic ovaries with a simple left follicle",
         "importance": "required",
-        "label": "Screen for an ovarian teratoma with pelvic and abdominal ultrasound",
+        "label": "Screen for an ovarian teratoma with pelvic and abdominal ultrasound or pelvic MRI",
         "rationale": "Women of reproductive age carry the highest teratoma risk; tumor removal is part of first-line treatment."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "study": "pelvis_abdomen_MRI"
+            },
+            "tool_name": "order_body_imaging"
+          }
+        ],
+        "citations": [
+          "[Abboud_2021]",
+          "[Titulaer_2013]"
+        ],
+        "criterion_id": "pelvic-mri-tumour-screen",
+        "expected_evidence": "No adnexal mass or fat-containing ovarian lesion; polycystic ovaries with a 1.2 cm simple left follicle",
+        "importance": "recommended",
+        "label": "Continue the teratoma screen with pelvic MRI after the negative ultrasound",
+        "rationale": "In an adult woman a negative pelvic ultrasound does not end the tumor screen: further imaging is added until a teratoma is found or ruled out, and pelvic MRI detects small teratomas the ultrasound can miss."
       },
       {
         "alternatives": [
@@ -663,14 +727,15 @@
         "Do not interpret a negative serum anti-NMDAR antibody as ruling out the disease; the CSF assay is the gold standard and may be positive when serum is negative."
       ],
       "required_recommendations": [
-        "Start IV acyclovir 10 mg/kg every 8 hours at presentation, and stop it once CSF HSV PCR is negative and the antibody diagnosis is established; repeat the PCR on a second CSF sample if the first LP was within 72 hours of onset and HSV encephalitis remains plausible.",
-        "Start first-line immunotherapy without waiting for the antibody result once infection is reasonably excluded: IV methylprednisolone 1 g daily for 5 days with IVIG 0.4 g/kg/day for 5 days (2 g/kg total) or plasma exchange (5 to 7 exchanges).",
-        "Pelvic ultrasound shows no tumor: repeat pelvic imaging (MRI or transvaginal ultrasound) if the response to immunotherapy is poor or the disease relapses, and continue tumor surveillance during follow-up.",
+        "Start IV acyclovir 10 mg/kg every 8 hours at presentation, with empirical bacterial meningitis cover (ceftriaxone 2 g IV every 12 hours with vancomycin; a cephalosporin is acceptable after a non-severe penicillin rash) until the CSF cell count, Gram stain and culture exclude bacterial infection (Abboud 2021, ESCMID 2016); stop acyclovir once CSF HSV PCR is negative and the antibody diagnosis is established. HSV PCR can be negative if done too early (for example within 24 hours of onset) and is repeated if clinical suspicion of HSV encephalitis remains high (Graus 2016).",
+        "Start first-line immunotherapy once infection is reasonably excluded on the CSF results, without waiting for the antibody result: IV methylprednisolone 1 g daily for 3 to 7 days, combined from the start with IVIG (2 g/kg over 2 to 5 days) or plasma exchange (5 to 10 sessions every other day), because the presentation is severe (five of the six Graus 2016 groups, with seizures and heart-rate lability) (Abboud 2021). IVIG is preferred here (her agitation, in which plasma exchange is less suitable, and no factor favoring plasma exchange: sodium 136 mEq/L and no tumor found); plasma exchange remains the alternative, with central venous access and hemodynamic monitoring.",
+        "After the acute course, bridge with a gradual oral prednisone taper, or monthly IVIG or IV methylprednisolone, while recovery or second-line therapy takes effect (Abboud 2021).",
+        "Pelvic ultrasound shows no tumor; in an adult woman a negative ultrasound does not end the screen: obtain pelvic MRI now, and continue tumor surveillance during follow-up (Abboud 2021).",
         "Treat seizures with an antiseizure medication such as levetiracetam or lacosamide; avoid valproate in a woman able to become pregnant; seizures respond mainly to immunotherapy.",
         "Monitor with continuous EEG for non-convulsive seizures while consciousness fluctuates or seizures persist.",
         "Admit to a neurology ward with seizure precautions and continuous cardiac monitoring.",
-        "If there is no meaningful clinical improvement 10 to 14 days after first-line therapy, escalate to rituximab (375 mg/m\u00b2 weekly for 4 doses or 1 g twice 2 weeks apart, after hepatitis B screening) and/or cyclophosphamide; discuss fertility preservation before cyclophosphamide.",
-        "Treat agitation and insomnia with benzodiazepines (lorazepam) first; stop olanzapine and monitor CK and temperature.",
+        "If there is no clinical or radiological improvement 2 to 4 weeks after completion of first-line therapy, escalate to rituximab (375 mg/m\u00b2 weekly for 4 doses or 1000 mg twice 2 weeks apart, after hepatitis B screening) and/or IV cyclophosphamide 600 to 1000 mg/m\u00b2 monthly; discuss fertility preservation before cyclophosphamide (Abboud 2021).",
+        "Treat agitation and insomnia with benzodiazepines (lorazepam) first; stop olanzapine and monitor CK and temperature (Lejuste 2016).",
         "Neurology-led care with psychiatry for behavioral management."
       ]
     },
@@ -809,7 +874,7 @@
       "CSF IgG anti-GluN1 positive (titer 1:32) on cell-based assay: definite anti-NMDAR encephalitis (Graus 2016); serum positive (1:160) is read with the CSF.",
       "MRI shows only subtle left medial temporal FLAIR signal without restricted diffusion or hemorrhage; MRI is normal or non-specific in about two thirds of patients and here excludes HSV encephalitis and structural causes.",
       "EEG shows diffuse slowing, delta with superimposed beta short of extreme delta brush and left temporal seizures; extreme delta brush, when present, supports but does not establish the diagnosis.",
-      "Pelvic ultrasound shows no tumor; tumor surveillance continues, and olanzapine exposure must be stopped because of neuroleptic intolerance in this disease.",
+      "Pelvic ultrasound and pelvic MRI show no tumor; in an adult woman a negative ultrasound alone does not end the screen, tumor surveillance continues, and olanzapine exposure must be stopped because of neuroleptic intolerance in this disease.",
       "Earlier immunotherapy and tumor removal are associated with better outcome (Titulaer 2013)."
     ],
     "red_herrings": [

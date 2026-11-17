@@ -173,6 +173,90 @@
     },
     {
       "output": {
+        "contrast": false,
+        "findings": [
+          {
+            "abnormal": "false",
+            "finding": "Small, postmenopausal uterus with a thin endometrium (3 mm); no focal lesion.",
+            "structure": "Uterus"
+          },
+          {
+            "abnormal": "false",
+            "finding": "Small, atrophic, without follicles; no adnexal mass or cyst.",
+            "structure": "Right ovary"
+          },
+          {
+            "abnormal": "false",
+            "finding": "Small, atrophic, without follicles; no adnexal mass or cyst.",
+            "structure": "Left ovary"
+          },
+          {
+            "abnormal": "false",
+            "finding": "Urinary catheter in a decompressed bladder; no free fluid.",
+            "structure": "Bladder and pouch of Douglas"
+          }
+        ],
+        "impression": "Postmenopausal uterus and ovaries. No adnexal mass.",
+        "measurements": null,
+        "modality": "ultrasound",
+        "recommended_actions": [],
+        "region": "pelvis_abdomen"
+      },
+      "tool_name": "order_body_imaging",
+      "trigger_action": "order_pelvis_abdomen_ultrasound"
+    },
+    {
+      "output": {
+        "cell_counts": null,
+        "collected_before_antimicrobials": true,
+        "findings": [
+          {
+            "result": "No growth at 48 hours",
+            "test": "Set 1 (aerobic and anaerobic bottles, peripheral)"
+          },
+          {
+            "result": "No growth at 48 hours",
+            "test": "Set 2 (aerobic and anaerobic bottles, peripheral)"
+          }
+        ],
+        "gram_stain": null,
+        "impression": "Two peripheral sets collected before the first antimicrobial dose: no growth at 48 hours; final report at 5 days.",
+        "organism": null,
+        "recommended_actions": [],
+        "specimen": "blood_culture",
+        "susceptibility": null,
+        "tests": [
+          "culture"
+        ]
+      },
+      "tool_name": "order_microbiology",
+      "trigger_action": "request_blood_cultures"
+    },
+    {
+      "output": {
+        "cell_counts": null,
+        "collected_before_antimicrobials": true,
+        "findings": [
+          {
+            "result": "No significant growth (<10^3 CFU/mL)",
+            "test": "culture (catheter specimen)"
+          }
+        ],
+        "gram_stain": null,
+        "impression": "Catheter urine culture: no significant growth.",
+        "organism": null,
+        "recommended_actions": [],
+        "specimen": "urine",
+        "susceptibility": null,
+        "tests": [
+          "culture"
+        ]
+      },
+      "tool_name": "order_microbiology",
+      "trigger_action": "request_urine_culture"
+    },
+    {
+      "output": {
         "alternatives": [
           "Levetiracetam or lacosamide as additional antiseizure medication with few interactions",
           "Plasma exchange as an alternative to IVIG for first-line immunotherapy"
@@ -626,6 +710,60 @@
       {
         "alternatives": [
           {
+            "required_arguments": {
+              "study": "pelvis_abdomen_ultrasound"
+            },
+            "tool_name": "order_body_imaging"
+          }
+        ],
+        "citations": [
+          "[Abboud_2021]"
+        ],
+        "criterion_id": "pelvic-ultrasound-screen",
+        "expected_evidence": "Postmenopausal uterus and ovaries; no adnexal mass",
+        "importance": "recommended",
+        "label": "Add a pelvic ultrasound to the tumor screen after the negative CT",
+        "rationale": "CT is less sensitive than targeted ultrasound for small ovarian lesions; a pelvic ultrasound is the targeted gynecological study in a woman (Abboud 2021)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "specimen": "blood_culture"
+            },
+            "tool_name": "order_microbiology"
+          }
+        ],
+        "citations": [
+          "[Abboud_2021]"
+        ],
+        "criterion_id": "blood-cultures",
+        "expected_evidence": "No growth at 48 hours in two sets",
+        "importance": "recommended",
+        "label": "Take blood cultures for the fever",
+        "rationale": "Fever of 38.6 \u00b0C with CRP 50 mg/L, an indwelling urinary catheter and recent high-dose steroids needs an infection screen before the fever is attributed to central dysautonomia (Abboud 2021)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "specimen": "urine"
+            },
+            "tool_name": "order_microbiology"
+          }
+        ],
+        "citations": [
+          "[Abboud_2021]"
+        ],
+        "criterion_id": "urine-culture",
+        "expected_evidence": "No significant growth",
+        "importance": "recommended",
+        "label": "Send a catheter urine culture for the fever",
+        "rationale": "An indwelling urinary catheter is the most likely source of an intercurrent infection in this febrile patient (Abboud 2021)."
+      },
+      {
+        "alternatives": [
+          {
             "required_arguments": {},
             "tool_name": "check_drug_interactions"
           }
@@ -649,17 +787,18 @@
         "Do not interpret a negative serum anti-NMDAR antibody as ruling out the disease; the CSF assay is the gold standard and may be positive when serum is negative."
       ],
       "required_recommendations": [
-        "Start IV acyclovir 10 mg/kg every 8 hours at presentation, and stop it once CSF HSV PCR is negative and the antibody diagnosis is established; repeat the PCR on a second CSF sample if the first LP was within 72 hours of onset and HSV encephalitis remains plausible.",
-        "Give IVIG 0.4 g/kg/day for 5 days (2 g/kg total) or plasma exchange (5 to 7 exchanges) now, without waiting for the antibody result once infection is reasonably excluded, and repeat IV methylprednisolone 1 g daily for 5 days, since three days of steroid gave only transient benefit.",
-        "Contrast CT of chest, abdomen and pelvis shows no tumor: repeat tumor screening, including pelvic imaging, during follow-up if the course is refractory or relapsing.",
+        "Start IV acyclovir 10 mg/kg every 8 hours at presentation, with empirical bacterial meningitis cover (ceftriaxone 2 g IV every 12 hours with vancomycin, and amoxicillin 2 g IV every 4 hours for Listeria at 50 after recent high-dose steroids; no carbapenem, which sharply lowers valproate levels) until the CSF cell count, Gram stain and culture exclude bacterial infection and the blood and urine cultures are negative (Abboud 2021, ESCMID 2016); stop acyclovir once CSF HSV PCR is negative and the antibody diagnosis is established. HSV PCR can be negative if done too early (for example within 24 hours of onset) and is repeated if clinical suspicion of HSV encephalitis remains high (Graus 2016).",
+        "Add plasma exchange (5 to 10 sessions every other day) or IVIG (2 g/kg over 2 to 5 days) now, without waiting for the antibody result once infection is reasonably excluded on the CSF results, because three days of IV methylprednisolone gave only transient benefit, and repeat IV methylprednisolone 1 g daily for 3 to 7 days (Abboud 2021). Plasma exchange is preferred here (tract lesions with possible demyelination, and a high thromboembolic risk from recent COVID-19, immobility and a D-dimer of 0.72 ug/mL), with central venous access and hemodynamic monitoring; give valproate doses after each exchange and recheck the level, and time enoxaparin around the catheter placement; agitation and autonomic instability, in which plasma-exchange volume shifts are poorly tolerated, favor IVIG, which remains the alternative, with sodium monitoring, as IVIG can worsen hyponatremia (sodium 131 mEq/L).",
+        "After this second course, bridge with a gradual oral prednisone taper, or monthly IVIG or IV methylprednisolone, while recovery or second-line therapy takes effect (Abboud 2021).",
+        "Contrast CT of the chest, abdomen and pelvis shows no tumor; add a pelvic ultrasound now, and repeat screening if the course is refractory (Abboud 2021).",
         "Treat the ongoing seizures by adding levetiracetam or lacosamide to valproate (level 68 mcg/mL, ammonia normal), and recheck the valproate level during acyclovir or plasma exchange; seizures respond mainly to immunotherapy.",
         "Monitor with continuous EEG for non-convulsive seizures while consciousness fluctuates or seizures persist.",
         "Admit to the ICU / neurocritical care for autonomic instability (heart rate to 125, blood pressure 100/60 to 160/100 mmHg, diaphoresis), recurrent seizures and dysphagia, with airway assessment and cardiac monitoring.",
         "Keep her nil by mouth until a swallowing assessment, with nasogastric feeding and aspiration precautions.",
         "Give empirical IV thiamine (200 mg three times daily) before glucose-containing fluids, given severe vomiting early in the illness, dysphagia with poor oral intake, encephalopathy and truncal ataxia.",
         "Perform the lumbar puncture at least 12 hours after the last prophylactic enoxaparin dose and restart enoxaparin no sooner than 4 hours after it.",
-        "If there is no meaningful clinical improvement 10 to 14 days after first-line therapy, escalate to rituximab (375 mg/m2 weekly for 4 doses or 1 g twice 2 weeks apart, after hepatitis B screening) and/or cyclophosphamide.",
-        "Treat agitation with benzodiazepines (lorazepam) first.",
+        "If there is no clinical or radiological improvement 2 to 4 weeks after completion of first-line therapy, escalate to rituximab (375 mg/m2 weekly for 4 doses or 1000 mg twice 2 weeks apart, after hepatitis B screening) and/or IV cyclophosphamide 600 to 1000 mg/m2 monthly (Abboud 2021).",
+        "Treat agitation with benzodiazepines (lorazepam) first (Lejuste 2016).",
         "Neurology-led care with psychiatry for behavioral management."
       ]
     },
@@ -814,6 +953,12 @@
         "icd_code": "F19.159",
         "key_features": "No antipsychotic exposure; urine drug screen negative; CK only 245 U/L.",
         "likelihood": "low"
+      },
+      {
+        "diagnosis": "Intercurrent catheter-associated urinary or bloodstream infection",
+        "icd_code": "T83.511A",
+        "key_features": "Fever of 38.6 \u00b0C, CRP 50 mg/L and an indwelling urinary catheter, but blood cultures show no growth at 48 hours, the catheter urine culture shows no significant growth and procalcitonin is normal; an infection would not explain the encephalitis.",
+        "likelihood": "low"
       }
     ],
     "key_clinical_evidence": [
@@ -821,7 +966,8 @@
       "CSF IgG anti-GluN1 positive (titer 1:1280) on cell-based assay: definite anti-NMDAR encephalitis (Graus 2016); serum positive 1:640 is read with the CSF.",
       "MRI shows symmetric dentate, inferior cerebellar peduncle and corticospinal tract lesions with restricted diffusion; with negative MOG and aquaporin-4 antibodies and negative CSF viral PCRs (HSV, SARS-CoV-2) it excludes HSV encephalitis and does not establish a demyelinating syndrome.",
       "EEG shows extreme delta brush and right temporal seizures with behavioral arrest; extreme delta brush, when present, supports but does not establish the diagnosis.",
-      "Contrast CT of chest, abdomen and pelvis shows no tumor; at 50 the tumor risk is lower and shifts toward carcinoma, so screening is repeated if the course is refractory.",
+      "Contrast CT of the chest, abdomen and pelvis and a pelvic ultrasound show no tumor; at 50 the tumor risk is lower and shifts toward carcinoma, so screening is repeated if the course is refractory.",
+      "Fever of 38.6 \u00b0C and CRP 50 mg/L with an indwelling urinary catheter: blood and urine cultures are negative and procalcitonin is normal, so no intercurrent infection is found.",
       "Only transient benefit after three days of steroid: IVIG or plasma exchange is due now; earlier immunotherapy is associated with better outcome (Titulaer 2013)."
     ],
     "red_herrings": [

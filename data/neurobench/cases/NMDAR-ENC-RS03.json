@@ -213,8 +213,80 @@
     },
     {
       "output": {
+        "contrast": true,
+        "findings": [
+          {
+            "abnormal": "true",
+            "finding": "Dependent consolidation of the posterior and basal segments of the right lower lobe with air bronchograms, consistent with aspiration; no cavitation, abscess or empyema.",
+            "structure": "Lungs"
+          },
+          {
+            "abnormal": "false",
+            "finding": "No pleural effusion; no pneumothorax.",
+            "structure": "Pleura"
+          },
+          {
+            "abnormal": "false",
+            "finding": "No mediastinal or hilar mass or lymphadenopathy; normal thymic remnant for age.",
+            "structure": "Mediastinum and hila"
+          },
+          {
+            "abnormal": "false",
+            "finding": "Liver, spleen, pancreas, kidneys and adrenals unremarkable.",
+            "structure": "Upper abdomen"
+          },
+          {
+            "abnormal": "false",
+            "finding": "No retroperitoneal mass or lymphadenopathy.",
+            "structure": "Retroperitoneum"
+          },
+          {
+            "abnormal": "false",
+            "finding": "Bladder and prostate unremarkable; no pelvic or inguinal lymphadenopathy; no ascites.",
+            "structure": "Pelvis"
+          }
+        ],
+        "impression": "1. Dependent right lower lobe consolidation consistent with aspiration. 2. No mediastinal, retroperitoneal or pelvic mass or lymphadenopathy.",
+        "measurements": null,
+        "modality": "CT",
+        "recommended_actions": [],
+        "region": "chest_abdomen_pelvis"
+      },
+      "tool_name": "order_body_imaging",
+      "trigger_action": "order_chest_abdomen_pelvis_ct"
+    },
+    {
+      "output": {
+        "contrast": false,
+        "findings": [
+          {
+            "abnormal": "true",
+            "finding": "Patchy airspace opacity in the right lower zone.",
+            "structure": "Lungs"
+          },
+          {
+            "abnormal": "false",
+            "finding": "No pleural effusion; no pneumothorax.",
+            "structure": "Pleura"
+          },
+          {
+            "abnormal": "false",
+            "finding": "Normal cardiac size and mediastinal contour.",
+            "structure": "Heart and mediastinum"
+          }
+        ],
+        "impression": "Right lower zone airspace opacity, consistent with aspiration in this clinical setting.",
+        "modality": "xray",
+        "recommended_actions": [],
+        "region": "chest"
+      },
+      "tool_name": "order_body_imaging",
+      "trigger_action": "order_chest_xray"
+    },
+    {
+      "output": {
         "alternatives": [
-          "Plasma exchange (5 to 7 exchanges) as an alternative to IVIG",
+          "Plasma exchange (5 to 10 sessions every other day) as an alternative to IVIG",
           "Second-line agents: rituximab 375 mg/m2 weekly for 4 doses, or cyclophosphamide"
         ],
         "contraindications": [
@@ -545,7 +617,7 @@
         "expected_evidence": "No pleocytosis (3 cells/uL), normal protein, no oligoclonal bands; HSV PCR negative, HHV-7 PCR positive; CSF anti-GluN1 IgG positive 1:128",
         "importance": "required",
         "label": "Analyze CSF for cells, protein and glucose, OCB/IgG index, HSV PCR and a cell-based IgG anti-GluN1 assay interpreted in parallel with serum",
-        "rationale": "The CSF cell-based anti-GluN1 assay is decisive even when cells, protein and oligoclonal bands are normal, and the HSV PCR excludes HSV encephalitis."
+        "rationale": "The CSF cell-based anti-GluN1 assay is decisive even when cells, protein and oligoclonal bands are normal, and a negative HSV PCR without pleocytosis makes HSV encephalitis unlikely, though after an LP within 1 to 2 days of onset it is repeated before acyclovir is stopped (Graus 2016)."
       },
       {
         "alternatives": [
@@ -617,6 +689,31 @@
       {
         "alternatives": [
           {
+            "required_arguments": {
+              "study": "chest_CT"
+            },
+            "tool_name": "order_body_imaging"
+          },
+          {
+            "required_arguments": {
+              "contrast": true,
+              "study": "chest_abdomen_pelvis_CT"
+            },
+            "tool_name": "order_body_imaging"
+          }
+        ],
+        "citations": [
+          "[Abboud_2021]"
+        ],
+        "criterion_id": "chest-ct-aspiration-gct",
+        "expected_evidence": "Dependent right lower lobe consolidation consistent with aspiration; no mediastinal or retroperitoneal mass or lymphadenopathy",
+        "importance": "recommended",
+        "label": "Obtain CT of the chest, or contrast CT of the chest, abdomen and pelvis, for suspected aspiration and an extragonadal germ-cell tumor",
+        "rationale": "Post-ictal desaturation to 71% after vomiting, neutrophilia and a wide A-a gradient suggest aspiration, and after a negative scrotal ultrasound CT-based screening looks for an extragonadal germ-cell tumor (Abboud 2021)."
+      },
+      {
+        "alternatives": [
+          {
             "required_arguments": {},
             "tool_name": "check_drug_interactions"
           }
@@ -641,14 +738,15 @@
         "Do not attribute the encephalitis to HHV-7 or treat it with antivirals alone: HHV-7 DNA in a CSF without pleocytosis is of uncertain significance, and the CSF anti-GluN1 antibody explains the illness."
       ],
       "required_recommendations": [
-        "Start IV acyclovir 10 mg/kg every 8 hours at presentation, with hydration and without NSAIDs, and stop it once CSF HSV PCR is negative and the antibody diagnosis is established; repeat the PCR on a second CSF sample if the first LP was within 72 hours of onset and HSV encephalitis remains plausible.",
-        "Start first-line immunotherapy without waiting for the antibody result once infection is reasonably excluded: IV methylprednisolone 1 g daily for 5 days with IVIG 0.4 g/kg/day for 5 days (2 g/kg total) or plasma exchange (5 to 7 exchanges).",
-        "Scrotal ultrasound shows no tumor; no further tumor imaging is needed unless the course is atypical or refractory.",
+        "Start IV acyclovir 10 mg/kg every 8 hours at presentation, with hydration and without NSAIDs (hold ibuprofen), with empirical bacterial meningitis cover (ceftriaxone 2 g IV every 12 hours with vancomycin) until the CSF cell count, Gram stain and culture exclude bacterial infection (Abboud 2021, ESCMID 2016); ceftriaxone then continues as treatment of the right lower lobe aspiration pneumonia. The LP was within about 1 to 2 days of neurological onset, when HSV PCR can be falsely negative (Graus 2016): continue acyclovir and repeat the HSV PCR on a second CSF sample before stopping it, once the antibody diagnosis is established.",
+        "Start first-line immunotherapy once infection is reasonably excluded on the CSF results, without waiting for the antibody result: IV methylprednisolone 1 g daily for 3 to 7 days, combined from the start with IVIG (2 g/kg over 2 to 5 days) or plasma exchange (5 to 10 sessions every other day), because the presentation is severe (GCS 9, post-ictal hypoventilation and recurrent seizures) (Abboud 2021). IVIG is preferred here (agitation, and autonomic instability, in which plasma-exchange volume shifts are poorly tolerated; no thrombotic, demyelinating or severe hyponatremic factor favors plasma exchange), with sodium monitoring, as IVIG can worsen hyponatremia (sodium 134 mEq/L); plasma exchange remains the alternative, with central venous access and hemodynamic monitoring.",
+        "After the acute course, bridge with a gradual oral prednisone taper, or monthly IVIG or IV methylprednisolone, while recovery or second-line therapy takes effect (Abboud 2021).",
+        "Scrotal ultrasound shows no testicular tumor; a negative scrotal ultrasound does not exclude an extragonadal germ-cell tumor, so obtain contrast CT of the chest, abdomen and pelvis (Abboud 2021); it also assesses the aspiration.",
         "Treat seizures with an antiseizure medication such as levetiracetam or lacosamide, with a benzodiazepine for any seizure lasting over 5 minutes; seizures respond mainly to immunotherapy.",
         "Monitor with continuous EEG for non-convulsive seizures while consciousness fluctuates or seizures persist.",
         "Admit to the ICU / neurocritical care for GCS 9, post-ictal hypoventilation with desaturation to 71% and recurrent seizures, with airway assessment (intubation if consciousness or ventilation worsens) and cardiac monitoring.",
-        "If there is no meaningful clinical improvement 10 to 14 days after first-line therapy, escalate to rituximab (375 mg/m2 weekly for 4 doses or 1 g twice 2 weeks apart, after hepatitis B screening) and/or cyclophosphamide.",
-        "Treat agitation with benzodiazepines (lorazepam) first.",
+        "If there is no clinical or radiological improvement 2 to 4 weeks after completion of first-line therapy, escalate to rituximab (375 mg/m2 weekly for 4 doses or 1000 mg twice 2 weeks apart, after hepatitis B screening) and/or IV cyclophosphamide 600 to 1000 mg/m2 monthly; discuss fertility preservation (sperm cryopreservation) before cyclophosphamide (Abboud 2021).",
+        "Treat agitation with benzodiazepines (lorazepam) first (Lejuste 2016).",
         "Neurology-led care with psychiatry for behavioral management."
       ]
     },
@@ -755,6 +853,12 @@
         "likelihood": "low"
       },
       {
+        "diagnosis": "Bacterial meningitis or meningoencephalitis",
+        "icd_code": "G04.2",
+        "key_features": "Neutrophilia and a temperature of 37.6 C, but no meningeal signs, CSF without pleocytosis (3 cells/uL) with a normal glucose ratio, and Gram stain and culture negative at 48 hours; the neutrophilia is explained by the aspiration and seizures.",
+        "likelihood": "low"
+      },
+      {
         "diagnosis": "HHV-7 encephalitis",
         "icd_code": "B10.09",
         "key_features": "HHV-7 DNA in CSF without pleocytosis, protein rise or oligoclonal bands is of uncertain significance in an immunocompetent adult; the CSF anti-GluN1 antibody explains the syndrome.",
@@ -788,10 +892,11 @@
     "key_clinical_evidence": [
       "Days after a gastrointestinal prodrome, new generalized and focal seizures, cognitive slowing, orofacial dyskinesias and chorea, reduced consciousness (GCS 9) and autonomic instability: five of the six Graus 2016 groups.",
       "CSF IgG anti-GluN1 positive (titer 1:128) on cell-based assay: definite anti-NMDAR encephalitis (Graus 2016) despite a CSF without pleocytosis or oligoclonal bands; serum positive 1:64 is read with the CSF.",
-      "MRI shows bilateral hippocampal FLAIR signal (left greater than right) without restricted diffusion or hemorrhage; MRI is normal or non-specific in about two thirds, and the negative CSF HSV PCR excludes HSV encephalitis.",
+      "MRI shows bilateral hippocampal FLAIR signal (left greater than right) without restricted diffusion or hemorrhage; MRI is normal or non-specific in about two thirds. The negative CSF HSV PCR without pleocytosis makes HSV encephalitis unlikely, but the LP was within 1 to 2 days of onset, so the PCR is repeated before acyclovir is stopped (Graus 2016).",
       "EEG shows extreme delta brush and a left frontotemporal seizure; extreme delta brush, when present, supports but does not establish the diagnosis.",
       "HHV-7 DNA in a non-inflammatory CSF is of uncertain significance and does not displace the antibody diagnosis.",
-      "Scrotal ultrasound shows no tumor; earlier immunotherapy is associated with better outcome (Titulaer 2013)."
+      "Post-ictal desaturation to 71% after vomiting, neutrophilia (13.2 x10^9/L) and a pO2 of 72 mmHg on FiO2 about 0.36 (A-a gradient about 120 mmHg), with dependent right lower lobe consolidation on CT, indicate aspiration pneumonia; the mixed respiratory and lactic acidosis (pH 7.16) follows the seizures and hypoventilation.",
+      "Scrotal ultrasound and contrast CT of the chest, abdomen and pelvis show no germ-cell tumor; earlier immunotherapy is associated with better outcome (Titulaer 2013)."
     ],
     "red_herrings": [
       {
@@ -988,24 +1093,24 @@
         "Sodium 134 mEq/L (L)",
         "Bicarbonate 18 mEq/L (L)",
         "Glucose 124 mg/dL (H)",
-        "pH 7.25 (L)",
+        "pH 7.16 (L)",
         "pCO2 52 mmHg (H)",
-        "pO2 72 mmHg (L)",
+        "pO2 72 mmHg (L) on 4 L/min nasal oxygen (FiO2 about 0.36)",
         "Lactate 8.1 mmol/L (H)",
         "CK 412 U/L (H)",
         "SARS-CoV-2 IgG positive",
         "Serum anti-NMDA receptor (GluN1) IgG positive, titer 1:64"
       ],
-      "interpretation": "Abnormal values: WBC 16.9 x10^9/L (H), Neutrophils 13.2 x10^9/L (H), Sodium 134 mEq/L (L), Bicarbonate 18 mEq/L (L), Glucose 124 mg/dL (H), pH 7.25 (L), pCO2 52 mmHg (H), pO2 72 mmHg (L), Lactate 8.1 mmol/L (H), CK 412 U/L (H). SARS-CoV-2 IgG positive; nasopharyngeal PCR negative. Serum anti-NMDA receptor (GluN1) IgG positive, titer 1:64, on cell-based assay. Other neuronal-surface and onconeural antibodies negative.",
+      "interpretation": "Abnormal values: WBC 16.9 x10^9/L (H), Neutrophils 13.2 x10^9/L (H), Sodium 134 mEq/L (L), Bicarbonate 18 mEq/L (L), Glucose 124 mg/dL (H), pH 7.16 (L), pCO2 52 mmHg (H), pO2 72 mmHg (L) on 4 L/min nasal oxygen (FiO2 about 0.36), Lactate 8.1 mmol/L (H), CK 412 U/L (H). SARS-CoV-2 IgG positive; nasopharyngeal PCR negative. Serum anti-NMDA receptor (GluN1) IgG positive, titer 1:64, on cell-based assay. Other neuronal-surface and onconeural antibodies negative.",
       "panels": {
         "ABG": [
           {
-            "clinical_significance": null,
+            "clinical_significance": "Mixed respiratory (pCO2 52 mmHg) and metabolic acidosis (bicarbonate 18 mEq/L, lactate 8.1 mmol/L, anion gap 18) in the same post-ictal sample",
             "is_abnormal": true,
             "reference_range": "7.35-7.45",
             "test": "pH",
             "unit": "",
-            "value": 7.25
+            "value": 7.16
           },
           {
             "clinical_significance": null,
@@ -1016,7 +1121,7 @@
             "value": 52
           },
           {
-            "clinical_significance": null,
+            "clinical_significance": "Low for the inspired oxygen (4 L/min nasal cannula, FiO2 about 0.36): the A-a gradient is about 120 mmHg, wider than hypoventilation alone explains",
             "is_abnormal": true,
             "reference_range": "80-100",
             "test": "pO2",

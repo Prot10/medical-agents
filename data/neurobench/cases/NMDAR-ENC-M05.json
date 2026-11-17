@@ -407,6 +407,80 @@
       },
       "tool_name": "order_specialized_test",
       "trigger_action": "order_speech_language_evaluation"
+    },
+    {
+      "output": {
+        "contrast": true,
+        "findings": [
+          {
+            "abnormal": "false",
+            "finding": "Clear lungs; no pulmonary nodule.",
+            "structure": "Lungs"
+          },
+          {
+            "abnormal": "false",
+            "finding": "No anterior mediastinal or other mediastinal mass; no hilar or mediastinal lymphadenopathy.",
+            "structure": "Mediastinum and hila"
+          },
+          {
+            "abnormal": "false",
+            "finding": "Liver, spleen, pancreas, adrenals and kidneys unremarkable.",
+            "structure": "Upper abdomen"
+          },
+          {
+            "abnormal": "false",
+            "finding": "No retroperitoneal mass or lymphadenopathy.",
+            "structure": "Retroperitoneum"
+          },
+          {
+            "abnormal": "false",
+            "finding": "No pelvic mass or lymphadenopathy; no ascites.",
+            "structure": "Pelvis"
+          }
+        ],
+        "impression": "No thoracic, abdominal or pelvic mass or lymphadenopathy; in particular no mediastinal or retroperitoneal mass.",
+        "measurements": null,
+        "modality": "CT",
+        "recommended_actions": [],
+        "region": "chest_abdomen_pelvis"
+      },
+      "tool_name": "order_body_imaging",
+      "tool_parameters": {
+        "study": "chest_abdomen_pelvis_CT"
+      },
+      "trigger_action": "order_chest_abdomen_pelvis_ct"
+    },
+    {
+      "output": {
+        "contrast": true,
+        "findings": [
+          {
+            "abnormal": "false",
+            "finding": "Liver, spleen, pancreas, adrenals and kidneys unremarkable.",
+            "structure": "Upper abdomen"
+          },
+          {
+            "abnormal": "false",
+            "finding": "No retroperitoneal mass or lymphadenopathy.",
+            "structure": "Retroperitoneum"
+          },
+          {
+            "abnormal": "false",
+            "finding": "No pelvic mass or lymphadenopathy; no ascites.",
+            "structure": "Pelvis"
+          }
+        ],
+        "impression": "No abdominal or pelvic mass or lymphadenopathy; in particular no retroperitoneal mass.",
+        "measurements": null,
+        "modality": "CT",
+        "recommended_actions": [],
+        "region": "pelvis_abdomen"
+      },
+      "tool_name": "order_body_imaging",
+      "tool_parameters": {
+        "study": "pelvis_abdomen_CT"
+      },
+      "trigger_action": "order_pelvis_abdomen_ct"
     }
   ],
   "ground_truth": {
@@ -557,6 +631,25 @@
         "alternatives": [
           {
             "required_arguments": {
+              "contrast": true,
+              "study": "chest_abdomen_pelvis_CT"
+            },
+            "tool_name": "order_body_imaging"
+          }
+        ],
+        "citations": [
+          "[Abboud_2021]"
+        ],
+        "criterion_id": "cap-ct-tumour-screen",
+        "expected_evidence": "No thoracic, abdominal or pelvic mass or lymphadenopathy; no mediastinal or retroperitoneal mass",
+        "importance": "recommended",
+        "label": "Screen for an extragonadal germ cell tumour with contrast CT of the chest, abdomen and pelvis",
+        "rationale": "A negative scrotal ultrasound does not exclude an extragonadal germ cell tumour, which CT-based general cancer screening detects; cancer screening is considered in most adults with autoimmune encephalitis."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
               "eeg_type": "continuous_icu"
             },
             "tool_name": "analyze_eeg"
@@ -618,15 +711,16 @@
         "Do not interpret a negative serum anti-NMDAR antibody as ruling out the disease; the CSF assay is the gold standard and may be positive when serum is negative."
       ],
       "required_recommendations": [
-        "Start IV aciclovir 10 mg/kg every 8 hours at presentation, and stop it once CSF HSV PCR is negative and the antibody diagnosis is established; repeat the PCR on a second CSF sample if the first LP was within 72 hours of onset and HSV encephalitis remains plausible.",
-        "Start first-line immunotherapy without waiting for the antibody result once infection is reasonably excluded: IV methylprednisolone 1 g daily for 5 days with IVIG 0.4 g/kg/day for 5 days (2 g/kg total) or plasma exchange (5 to 7 exchanges).",
-        "Scrotal ultrasound shows no tumour; no further tumour imaging is needed unless the course is atypical or refractory.",
+        "Start IV aciclovir 10 mg/kg every 8 hours at presentation, with empirical bacterial meningitis cover (ceftriaxone 2 g IV every 12 hours with vancomycin) until the CSF cell count, Gram stain and culture exclude bacterial infection (Abboud 2021, ESCMID 2016); stop aciclovir once CSF HSV PCR is negative and the antibody diagnosis is established. HSV PCR can be negative if done too early (for example within 24 hours of onset) and is repeated if clinical suspicion of HSV encephalitis remains high (Graus 2016).",
+        "Start first-line immunotherapy once infection is reasonably excluded on the CSF results, without waiting for the antibody result: IV methylprednisolone 1 g daily for 3 to 7 days, combined from the start with IVIG (2 g/kg over 2 to 5 days) or plasma exchange (5 to 10 sessions every other day), because the presentation is severe (GCS 12 with recurrent seizures) (Abboud 2021). Plasma exchange is preferred here (sodium 128 mEq/L, which IVIG can worsen, with no agitation or dysautonomia that would favour IVIG); IVIG remains the alternative, with close sodium monitoring. Give plasma exchange with central venous access and haemodynamic monitoring, and give levetiracetam doses after each exchange.",
+        "After the acute course, bridge with a gradual oral prednisone taper, or monthly IVIG or IV methylprednisolone, while recovery or second-line therapy takes effect (Abboud 2021).",
+        "Scrotal ultrasound shows no testicular tumour; a negative scrotal ultrasound does not exclude an extragonadal germ cell tumour, so obtain contrast CT of the chest, abdomen and pelvis (Abboud 2021).",
         "Treat seizures with an antiseizure medication such as levetiracetam (continue maintenance after the loading dose) or lacosamide; seizures respond mainly to immunotherapy.",
         "Monitor with continuous EEG for non-convulsive seizures while consciousness fluctuates or seizures persist.",
-        "Admit to the ICU / neurocritical care for a GCS of 12 after recurrent seizures, with airway assessment and cardiac monitoring.",
-        "If there is no meaningful clinical improvement 10 to 14 days after first-line therapy, escalate to rituximab (375 mg/m\u00b2 weekly for 4 doses or 1 g twice 2 weeks apart, after hepatitis B screening) and/or cyclophosphamide; discuss fertility preservation before cyclophosphamide.",
-        "Treat agitation and insomnia with benzodiazepines (lorazepam) first rather than antipsychotics, and stop zopiclone to avoid combined sedation.",
-        "Treat the moderate hyponatraemia (128 mEq/L) as SIADH (no thiazide or SSRI on his medication list): fluid restriction, correcting by no more than 10 mEq/L in 24 hours.",
+        "Admit to a high-dependency unit or the ICU according to airway status and seizure control (GCS 12 after recurrent seizures), with airway assessment and cardiac monitoring.",
+        "If there is no clinical or radiological improvement 2 to 4 weeks after completion of first-line therapy, escalate to rituximab (375 mg/m\u00b2 weekly for 4 doses or 1000 mg twice 2 weeks apart, after hepatitis B screening) and/or IV cyclophosphamide 600 to 1000 mg/m\u00b2 monthly; discuss fertility preservation before cyclophosphamide (Abboud 2021).",
+        "Treat agitation and insomnia with benzodiazepines (lorazepam) first rather than antipsychotics (Lejuste 2016), and stop zopiclone to avoid combined sedation.",
+        "Treat the moderate hyponatraemia (128 mEq/L) as SIADH (no thiazide or SSRI on his medication list): fluid restriction, which is usually sufficient (Abboud 2021), correcting slowly, by no more than 10 mEq/L in the first 24 hours (Spasovski 2014), to avoid osmotic demyelination.",
         "Neurology-led care with psychiatry for behavioural management."
       ]
     },
@@ -757,7 +851,7 @@
       "CSF IgG anti-GluN1 positive (titre 1:80) on cell-based assay: definite anti-NMDAR encephalitis (Graus 2016); serum positive (1:40) is read with the CSF.",
       "MRI shows bilateral left-predominant medial temporal FLAIR signal without restricted diffusion or haemorrhage; MRI is normal or non-specific in about two thirds of patients and here excludes HSV encephalitis and structural causes.",
       "Routine EEG shows diffuse slowing with bitemporal rhythmic delta, and continuous EEG captures bitemporal seizures; extreme delta brush is absent, which excludes nothing.",
-      "Scrotal ultrasound shows no tumour: tumours are rare in men, and no further tumour imaging is needed unless the course is atypical. Moderate hyponatraemia (128 mEq/L, SIADH pattern) needs its own correction.",
+      "Scrotal ultrasound and contrast CT of the chest, abdomen and pelvis show no tumour: tumours are rare in men, and a negative scrotal ultrasound alone does not exclude an extragonadal germ cell tumour. Moderate hyponatraemia (128 mEq/L, SIADH pattern) needs its own correction.",
       "Earlier immunotherapy and tumour removal are associated with better outcome (Titulaer 2013)."
     ],
     "red_herrings": [

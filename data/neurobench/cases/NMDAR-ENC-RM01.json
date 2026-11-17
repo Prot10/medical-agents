@@ -210,6 +210,79 @@
     },
     {
       "output": {
+        "contrast": true,
+        "findings": [
+          {
+            "abnormal": "false",
+            "finding": "Normal size and signal; no focal lesion, no fat-containing or solid component.",
+            "structure": "Right ovary"
+          },
+          {
+            "abnormal": "false",
+            "finding": "Normal size and signal; no focal lesion, no fat-containing or solid component.",
+            "structure": "Left ovary"
+          },
+          {
+            "abnormal": "false",
+            "finding": "Normal size and appearance.",
+            "structure": "Uterus"
+          },
+          {
+            "abnormal": "false",
+            "finding": "No lymphadenopathy; no ascites.",
+            "structure": "Pelvic lymph nodes and peritoneum"
+          },
+          {
+            "abnormal": "false",
+            "finding": "Liver, spleen, pancreas, kidneys and adrenals unremarkable.",
+            "structure": "Upper abdomen"
+          }
+        ],
+        "impression": "1. Normal ovaries and uterus; no adnexal lesion and no fat-containing lesion. 2. No lymphadenopathy, ascites or other abdominal or pelvic abnormality.",
+        "measurements": null,
+        "modality": "MRI",
+        "recommended_actions": [],
+        "region": "pelvis_abdomen"
+      },
+      "tool_name": "order_body_imaging",
+      "trigger_action": "order_pelvis_abdomen_mri"
+    },
+    {
+      "output": {
+        "contrast": true,
+        "findings": [
+          {
+            "abnormal": "false",
+            "finding": "Clear lungs; no nodule, mediastinal or hilar mass or lymphadenopathy.",
+            "structure": "Chest"
+          },
+          {
+            "abnormal": "false",
+            "finding": "Normal; no adnexal mass.",
+            "structure": "Ovaries and uterus"
+          },
+          {
+            "abnormal": "false",
+            "finding": "No mass or lymphadenopathy; no ascites.",
+            "structure": "Retroperitoneum and pelvic lymph nodes"
+          },
+          {
+            "abnormal": "false",
+            "finding": "Liver, spleen, pancreas, kidneys and adrenals unremarkable.",
+            "structure": "Upper abdomen"
+          }
+        ],
+        "impression": "No thoracic, abdominal or pelvic mass or lymphadenopathy.",
+        "measurements": null,
+        "modality": "CT",
+        "recommended_actions": [],
+        "region": "chest_abdomen_pelvis"
+      },
+      "tool_name": "order_body_imaging",
+      "trigger_action": "order_chest_abdomen_pelvis_ct"
+    },
+    {
+      "output": {
         "alternatives": [
           "Lacosamide 100 mg IV twice daily, if levetiracetam behavioural effects complicate assessment.",
           "Valproate: avoid in women able to become pregnant unless other options fail."
@@ -586,6 +659,12 @@
               "study": "pelvis_abdomen_ultrasound"
             },
             "tool_name": "order_body_imaging"
+          },
+          {
+            "required_arguments": {
+              "study": "pelvis_abdomen_MRI"
+            },
+            "tool_name": "order_body_imaging"
           }
         ],
         "citations": [
@@ -595,7 +674,7 @@
         "criterion_id": "action-5-order-body-imaging",
         "expected_evidence": "No ovarian or adnexal mass",
         "importance": "required",
-        "label": "Screen for an ovarian teratoma with pelvic and abdominal ultrasound",
+        "label": "Screen for an ovarian teratoma with pelvic and abdominal ultrasound or pelvic MRI",
         "rationale": "Women of reproductive age carry the highest teratoma risk; tumour removal is part of first-line treatment."
       },
       {
@@ -615,6 +694,65 @@
         "importance": "recommended",
         "label": "Escalate to continuous EEG monitoring after a subclinical seizure on the routine EEG",
         "rationale": "A subclinical left temporal seizure on a short, artefact-limited recording means the seizure burden is unknown until she is monitored."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "panels": [
+                "MOG_IgG_cell_based"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          }
+        ],
+        "citations": [
+          "[Graus_2016]",
+          "[Abboud_2021]"
+        ],
+        "criterion_id": "mog-aqp4-antibodies",
+        "expected_evidence": "Serum MOG-IgG and AQP4-IgG negative on cell-based assay",
+        "importance": "recommended",
+        "label": "Test serum MOG-IgG and AQP4-IgG on cell-based assays for the cortical and leptomeningeal MRI pattern",
+        "rationale": "Sulcal FLAIR signal with leptomeningeal enhancement is an atypical MRI pattern for anti-NMDAR encephalitis; MOG antibodies cause cortical encephalitis and a minority of patients have an anti-NMDAR and demyelinating overlap, so serum MOG and AQP4 antibodies are tested."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "study": "pelvis_abdomen_MRI"
+            },
+            "tool_name": "order_body_imaging"
+          }
+        ],
+        "citations": [
+          "[Abboud_2021]",
+          "[Graus_2016]"
+        ],
+        "criterion_id": "pelvic-mri-tumour-screen",
+        "expected_evidence": "Normal ovaries and uterus; no adnexal or fat-containing lesion",
+        "importance": "recommended",
+        "label": "Obtain pelvic MRI after the negative pelvic ultrasound to complete the ovarian teratoma screen",
+        "rationale": "In an adult woman a negative ultrasound does not end the tumour screen; pelvic MRI characterises the ovaries when the ultrasound is negative or equivocal."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "contrast": true,
+              "study": "chest_abdomen_pelvis_CT"
+            },
+            "tool_name": "order_body_imaging"
+          }
+        ],
+        "citations": [
+          "[Abboud_2021]"
+        ],
+        "criterion_id": "cap-ct-tumour-screen",
+        "expected_evidence": "No thoracic, abdominal or pelvic mass or lymphadenopathy",
+        "importance": "recommended",
+        "label": "Obtain contrast CT of the chest, abdomen and pelvis to screen for an extra-ovarian tumour",
+        "rationale": "Extra-ovarian germ cell tumours and other neoplasms are found on CT- or MRI-based general screening after a negative pelvic study."
       },
       {
         "alternatives": [
@@ -642,14 +780,15 @@
         "Do not interpret a negative serum anti-NMDAR antibody as ruling out the disease; the CSF assay is the gold standard and may be positive when serum is negative."
       ],
       "required_recommendations": [
-        "Start IV aciclovir 10 mg/kg every 8 hours at presentation, and stop it once CSF HSV PCR is negative and the antibody diagnosis is established; repeat the PCR on a second CSF sample if the first LP was within 72 hours of onset and HSV encephalitis remains plausible.",
-        "Start first-line immunotherapy without waiting for the antibody result once infection is reasonably excluded: IV methylprednisolone 1 g daily for 5 days with IVIG 0.4 g/kg/day for 5 days (2 g/kg total) or plasma exchange (5 to 7 exchanges).",
-        "Pelvic ultrasound shows no tumour: repeat pelvic imaging (MRI or transvaginal ultrasound) if the response to immunotherapy is poor or the disease relapses, and continue tumour surveillance during follow-up.",
+        "Start IV aciclovir 10 mg/kg every 8 hours at presentation, with hydration and without NSAIDs (hold ibuprofen while IV aciclovir and high-dose steroids are given), with empirical bacterial meningitis cover (ceftriaxone 2 g IV every 12 hours with vancomycin) until the CSF cell count, Gram stain and culture exclude bacterial infection (Abboud 2021, ESCMID 2016); stop aciclovir once CSF HSV PCR is negative and the antibody diagnosis is established. HSV PCR can be negative if done too early (for example within 24 hours of onset) and is repeated if clinical suspicion of HSV encephalitis remains high (Graus 2016).",
+        "Start first-line immunotherapy once infection is reasonably excluded on the CSF results, without waiting for the antibody result: IV methylprednisolone 1 g daily for 3 to 7 days, combined from the start with IVIG (2 g/kg over 2 to 5 days) or plasma exchange (5 to 10 sessions every other day), because the presentation is severe (combative agitation, autonomic instability and seizures) (Abboud 2021). IVIG is preferred here (combative agitation, and autonomic instability in which plasma-exchange volume shifts are poorly tolerated), with sodium monitoring, as IVIG can worsen hyponatraemia (sodium 131 mEq/L); no factor in this patient favours plasma exchange, which remains the alternative, with central venous access and haemodynamic monitoring.",
+        "After the acute course, bridge with a gradual oral prednisone taper, or monthly IVIG or IV methylprednisolone, while recovery or second-line therapy takes effect (Abboud 2021).",
+        "Pelvic ultrasound shows no tumour; in an adult woman a negative ultrasound does not end the screen: obtain pelvic MRI now, and contrast CT of the chest, abdomen and pelvis, and continue tumour surveillance during follow-up (Abboud 2021).",
         "Treat seizures with an antiseizure medication such as levetiracetam or lacosamide; avoid valproate in a woman able to become pregnant; seizures respond mainly to immunotherapy.",
         "Monitor with continuous EEG for non-convulsive seizures while consciousness fluctuates or seizures persist.",
         "Admit to a neurology ward with seizure precautions and continuous cardiac monitoring; transfer to the ICU if heart rate exceeds 130 bpm, consciousness falls or seizures recur.",
-        "If there is no meaningful clinical improvement 10 to 14 days after first-line therapy, escalate to rituximab (375 mg/m\u00b2 weekly for 4 doses or 1 g twice 2 weeks apart, after hepatitis B screening) and/or cyclophosphamide; discuss fertility preservation.",
-        "Treat agitation, insomnia and hallucinations with benzodiazepines (lorazepam) first.",
+        "If there is no clinical or radiological improvement 2 to 4 weeks after completion of first-line therapy, escalate to rituximab (375 mg/m\u00b2 weekly for 4 doses or 1000 mg twice 2 weeks apart, after hepatitis B screening) and/or IV cyclophosphamide 600 to 1000 mg/m\u00b2 monthly; discuss fertility preservation before cyclophosphamide (Abboud 2021).",
+        "Treat agitation, insomnia and hallucinations with benzodiazepines (lorazepam) first (Lejuste 2016).",
         "Neurology-led care with psychiatry for behavioural management."
       ]
     },
@@ -779,15 +918,27 @@
         "icd_code": "F19.159",
         "key_features": "No antipsychotic, serotonergic or recreational drug exposure; urine drug screen negative; temperature 37.8 \u00b0C and CK 145 U/L.",
         "likelihood": "low"
+      },
+      {
+        "diagnosis": "MOG antibody-associated disease or an anti-NMDAR and MOG antibody overlap syndrome",
+        "icd_code": "G37.81",
+        "key_features": "Raised by the cortical sulcal FLAIR signal with leptomeningeal enhancement, a pattern described with MOG antibodies; serum MOG-IgG and AQP4-IgG are negative on cell-based assay, and CSF anti-GluN1 explains the syndrome.",
+        "likelihood": "low"
+      },
+      {
+        "diagnosis": "Neuropsychiatric systemic lupus erythematosus",
+        "icd_code": "M32.19",
+        "key_features": "ANA 1:80 is a low titre that is frequent in healthy adults; anti-dsDNA and ENA are negative, there are no systemic features of lupus (rash, arthritis, cytopenia, renal involvement), and CSF anti-GluN1 is positive.",
+        "likelihood": "low"
       }
     ],
     "key_clinical_evidence": [
       "Three weeks of a viral-like prodrome, then behavioural change with psychosis, staring spells with a left temporal electrographic seizure, orofacial dyskinesias and rigidity, and autonomic lability: at least 4 of the six Graus 2016 groups (her disorganised, incoherent speech may also count as speech dysfunction).",
       "CSF IgG anti-GluN1 positive (titre 1:32) on cell-based assay: definite anti-NMDAR encephalitis (Graus 2016); serum positive at a low titre (1:10) is read with the CSF.",
-      "MRI subtle sulcal FLAIR signal with mild leptomeningeal enhancement and an equivocal left hippocampal signal; MRI is normal or non-specific in about two thirds and excludes HSV encephalitis and structural causes.",
+      "MRI subtle sulcal FLAIR signal with mild leptomeningeal enhancement and an equivocal left hippocampal signal, with negative serum MOG-IgG and AQP4-IgG; MRI is normal or non-specific in about two thirds and excludes HSV encephalitis and structural causes.",
       "EEG diffuse slowing, frontotemporal rhythmic delta and a subclinical left temporal seizure; extreme delta brush, when present, supports but does not establish the diagnosis.",
       "Raised anti-TPO and anti-thyroglobulin antibodies in treated hypothyroidism do not support Hashimoto encephalopathy once a well-characterised neuronal antibody is found.",
-      "Pelvic ultrasound shows no teratoma: imaging is repeated if the response is poor or the disease relapses; earlier immunotherapy is associated with better outcome (Titulaer 2013)."
+      "Pelvic ultrasound, pelvic MRI and contrast CT of the chest, abdomen and pelvis show no tumour; screening continues during follow-up (Abboud 2021); earlier immunotherapy is associated with better outcome (Titulaer 2013)."
     ],
     "red_herrings": [
       {
@@ -899,7 +1050,7 @@
       "general": {
         "alternatives": [],
         "contraindications": [
-          "Class warning: haloperidol and other high-potency D2 antagonists are associated with severe neuroleptic intolerance (rigidity, hyperthermia, rhabdomyolysis) in anti-NMDAR encephalitis."
+          "Class warning: haloperidol and other high-potency D2 antagonists are associated with severe neuroleptic intolerance (rigidity, hyperthermia, rhabdomyolysis) in autoimmune encephalitis."
         ],
         "formulary_status": "on formulary",
         "interactions": [
@@ -999,7 +1150,7 @@
         "ANA 1:80, speckled (H)",
         "Serum anti-GluN1 IgG positive, titre 1:10"
       ],
-      "interpretation": "Abnormal: WBC 13.2 x10^9/L (H), neutrophils 78% (H), lymphocytes 15% (L), sodium 131 mEq/L (L), glucose 102 mg/dL (H), TSH 6.8 mIU/L (H) with free T4 1.0 ng/dL, anti-TPO 312 IU/mL (H), anti-thyroglobulin 185 IU/mL (H), CRP 1.8 mg/dL (H), ESR 28 mm/hr (H), ANA 1:80 speckled (H), serum anti-GluN1 IgG positive (titre 1:10). All other results are within reference ranges.",
+      "interpretation": "Abnormal: WBC 13.2 x10^9/L (H), neutrophils 78% (H), lymphocytes 15% (L), sodium 131 mEq/L (L), glucose 102 mg/dL (H), TSH 6.8 mIU/L (H) with free T4 1.0 ng/dL, anti-TPO 312 IU/mL (H), anti-thyroglobulin 185 IU/mL (H), CRP 1.8 mg/dL (H), ESR 28 mm/hr (H), ANA 1:80 speckled (H), serum anti-GluN1 IgG positive (titre 1:10). Anti-dsDNA and ENA negative. MOG-IgG and AQP4-IgG negative. All other results are within reference ranges.",
       "panels": {
         "Autoimmune encephalitis antibodies (serum)": [
           {
@@ -1223,6 +1374,24 @@
             "value": 28
           }
         ],
+        "MOG and AQP4 antibodies (serum, cell-based assay)": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "Negative",
+            "test": "MOG-IgG",
+            "unit": "",
+            "value": "Negative"
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "Negative",
+            "test": "AQP4-IgG",
+            "unit": "",
+            "value": "Negative"
+          }
+        ],
         "Onconeural antibodies (serum)": [
           {
             "clinical_significance": null,
@@ -1309,12 +1478,28 @@
         ],
         "Other autoantibodies": [
           {
-            "clinical_significance": null,
+            "clinical_significance": "Low-titre ANA, frequent in healthy adults; interpret with anti-dsDNA and ENA",
             "is_abnormal": true,
             "reference_range": "<1:40",
             "test": "ANA",
             "unit": "",
             "value": "1:80 (speckled pattern)"
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "Negative",
+            "test": "Anti-dsDNA",
+            "unit": "",
+            "value": "Negative"
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "Negative",
+            "test": "ENA panel (Ro, La, Sm, RNP)",
+            "unit": "",
+            "value": "Negative"
           }
         ],
         "Serum anti-GluN1 IgG (cell-based assay)": [
