@@ -31,49 +31,7 @@
     "ecg": null,
     "echo": null,
     "eeg": null,
-    "labs": {
-      "abnormal_values_summary": [
-        "Prothrombin time 37.5 s (H)",
-        "INR 3.8 (H)"
-      ],
-      "interpretation": "Coagulation: prothrombin time 37.5 s and INR 3.8, prolonged and above the usual warfarin target range of 2.0-3.0; aPTT and fibrinogen within their reference ranges.",
-      "panels": {
-        "coagulation": [
-          {
-            "clinical_significance": null,
-            "is_abnormal": true,
-            "reference_range": "11.0-13.5",
-            "test": "Prothrombin time",
-            "unit": "s",
-            "value": 37.5
-          },
-          {
-            "clinical_significance": null,
-            "is_abnormal": true,
-            "reference_range": "0.9-1.1",
-            "test": "INR",
-            "unit": "ratio",
-            "value": 3.8
-          },
-          {
-            "clinical_significance": null,
-            "is_abnormal": false,
-            "reference_range": "25-35",
-            "test": "aPTT",
-            "unit": "s",
-            "value": 34.0
-          },
-          {
-            "clinical_significance": null,
-            "is_abnormal": false,
-            "reference_range": "200-400",
-            "test": "Fibrinogen",
-            "unit": "mg/dL",
-            "value": 310.0
-          }
-        ]
-      }
-    },
+    "labs": null,
     "literature_search": null,
     "mri": null,
     "specialized_test": null
@@ -102,6 +60,33 @@
       {
         "alternatives": [
           {
+            "required_arguments": {
+              "panels": [
+                "coagulation",
+                "CBC"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          },
+          {
+            "required_arguments": {
+              "panels": [
+                "coagulation"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "action-labs-inr-fbc",
+        "expected_evidence": "INR 3.6 today, still above range but under 4.5; haemoglobin 124 g/L and platelets 238 x10^9/L, so there is no anaemia and the bleeding is minor",
+        "importance": "required",
+        "label": "Repeat INR and full blood count today: the INR of 3.8 is an earlier value and she has gum bleeding and a recent prolonged nosebleed",
+        "rationale": "Required: today's INR and haemoglobin decide whether withholding warfarin is enough or vitamin K and escalation are needed (Tran HA et al., Med J Aust 2013;198:198-199)."
+      },
+      {
+        "alternatives": [
+          {
             "required_arguments": {},
             "tool_name": "analyze_brain_mri"
           }
@@ -114,6 +99,28 @@
         "importance": "recommended",
         "label": "Brain MRI with DWI and susceptibility imaging: a new isolated language aura pattern and headache while over-anticoagulated",
         "rationale": "Recommended for red flags: a new isolated aphasic aura (infarct must be excluded) and headache on warfarin with an INR of 3.8 (haemorrhage must be excluded). The outside MRI is re-read against the new study. MRI does not establish migraine."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "modality": "MR_angiography"
+            },
+            "tool_name": "order_advanced_imaging"
+          },
+          {
+            "required_arguments": {
+              "modality": "carotid_duplex"
+            },
+            "tool_name": "order_advanced_imaging"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "action-vessel-imaging-optional",
+        "expected_evidence": "Normal vessel imaging; it does not change the diagnosis of migraine aura",
+        "importance": "optional",
+        "label": "Vessel imaging (MR angiography or carotid duplex) as part of the cerebrovascular review, if the clinician wants it before the anticoagulation decision is final",
+        "rationale": "The clinical features favour aura and the MRI shows no infarct, but a normal MRI does not exclude TIA, so vessel imaging is acceptable within the cerebrovascular review (NICE NG128); it is not required."
       },
       {
         "alternatives": [
@@ -135,7 +142,7 @@
         "expected_evidence": "Sinus rhythm with atrial ectopy at the palpitation triggers; no atrial fibrillation or flutter over 14 days",
         "importance": "recommended",
         "label": "Prolonged ambulatory ECG monitoring (14-30 days) for the palpitations recorded elsewhere as AF",
-        "rationale": "The AF label rests on a single rhythm strip during palpitations and a 24-hour Holter is too short to exclude paroxysmal AF. A 14-30 day monitor characterises the palpitations. It does not decide anticoagulation: with the attacks recognised as aura her CHA2DS2-VA score is 0 whatever it shows (Van Gelder IC et al., Eur Heart J 2024)."
+        "rationale": "The AF label rests on a single rhythm strip during palpitations and a 24-hour Holter is too short to exclude paroxysmal AF. A 14-30 day monitor characterises the palpitations. It does not by itself decide anticoagulation: if the attacks are accepted as aura her CHA2DS2-VA score is 0 even if paroxysmal AF is found, and a negative monitor does not invalidate the original strip, which is reviewed (Van Gelder IC et al., Eur Heart J 2024)."
       },
       {
         "alternatives": [
@@ -186,14 +193,15 @@
     ],
     "assessment": {
       "prohibited_recommendations": [
-        "Do not continue warfarin or start an antiplatelet for presumed TIA: the attacks have the features of migraine aura (language disturbance building over minutes, previous identical attacks, headache after each) and imaging shows no infarct",
+        "Do not continue warfarin at the current dose with an above-range INR and mucosal bleeding, and do not replace it with an antiplatelet for presumed TIA without new evidence of ischaemia",
         "Do not give NSAIDs or aspirin for headache while she is still anticoagulated with an above-range INR"
       ],
       "required_recommendations": [
-        "Revise the diagnosis to migraine with typical (language) aura and explain it to the patient and, in writing, to her GP and the referring team, so that the TIA label is removed from her record",
-        "Stop warfarin now, without bridging and without a replacement antiplatelet: the attacks are migraine aura, not TIA, and even if paroxysmal AF were later confirmed her CHA2DS2-VA score would be 0 (ESC 2024)",
-        "Manage the over-anticoagulation by severity: at INR 3.8 with minor gum and nose bleeding, withholding warfarin is enough; vitamin K is for an INR of 4.5 or more with high bleeding risk, and IV vitamin K 5-10 mg with prothrombin complex concentrate for clinically significant bleeding (Tran HA et al., Med J Aust 2013)",
-        "Acute treatment: a triptan (for example sumatriptan 50-100 mg) taken at headache onset rather than during the aura, with an antiemetic if needed; an NSAID such as naproxen 500 mg only after warfarin has stopped and the INR is normal; limit acute medication days to avoid medication overuse",
+        "Revise the diagnosis to migraine with typical (language) aura and explain it to the patient and, in writing, to her GP and the referring team, asking them to review the TIA label on her record",
+        "Withhold warfarin now, without bridging: the INR is above range (3.6 today) with gum and nose bleeding",
+        "Make the decision not to restart anticoagulation with the referring team after reviewing the original rhythm strip: with the attacks attributed to migraine aura and no AF on the outside Holter or the 14-day monitor there is no indication (CHA2DS2-VA 0, ESC 2024), and no antiplatelet replacement is needed unless that review finds a real suspicion of ischaemia; if the strip shows AF and a TIA cannot be confidently excluded, the score is 2 and anticoagulation is reconsidered",
+        "Manage the over-anticoagulation by severity: with today's INR of 3.6 (3.8 at the last check) and minor gum and nose bleeding, withholding warfarin is enough, with a repeat INR in 2-3 days until it is back in range and review if the bleeding worsens or the haemoglobin falls; vitamin K is for an INR of 4.5 or more with high bleeding risk, and IV vitamin K 5-10 mg with prothrombin complex concentrate for clinically significant bleeding (Tran HA et al., Med J Aust 2013)",
+        "Acute treatment: a triptan (for example sumatriptan 50-100 mg) once the review keeps the attacks as migraine aura (triptans are contraindicated after TIA), taken at headache onset rather than during the aura, with an antiemetic if needed; an NSAID such as naproxen 500 mg only after warfarin has stopped and the INR is normal; limit acute medication days to avoid medication overuse",
         "No preventive treatment at about four attacks a year (below the AHS 2021 thresholds); keep a headache diary and reassess if attacks become more frequent or prolonged",
         "If HRT is wanted for menopausal symptoms, migraine with aura is not a contraindication: prefer transdermal oestradiol at the lowest effective dose, with micronised progesterone or a levonorgestrel IUS for endometrial protection, and review if the aura changes (NICE NG23)"
       ]
@@ -230,22 +238,6 @@
       {
         "alternatives": [
           {
-            "required_arguments": {
-              "modality": "MR_angiography"
-            },
-            "tool_name": "order_advanced_imaging"
-          }
-        ],
-        "citations": [
-          "[AHS_neuroimaging_2020]"
-        ],
-        "criterion_id": "avoid-waste-3-order-advanced-imaging",
-        "rationale": "MR angiography is not indicated: there is no infarct, no thunderclap headache and no suspicion of dissection or vasculopathy.",
-        "severity": "waste"
-      },
-      {
-        "alternatives": [
-          {
             "required_arguments": {},
             "tool_name": "order_echocardiogram"
           }
@@ -254,13 +246,13 @@
           "[ICHD_3]"
         ],
         "criterion_id": "avoid-harm-1-order-echocardiogram",
-        "rationale": "Echocardiography (transthoracic or transoesophageal) is not indicated: there is no infarct or embolic event to explain, and the attacks are migraine aura; a TOE also adds procedural risk without diagnostic gain.",
+        "rationale": "Echocardiography (transthoracic or transoesophageal) is not indicated at this visit: the attacks have the features of migraine aura, the MRI shows no infarct and AF is unconfirmed, so it does not change today's management; it is reconsidered only if review of the original strip confirms AF. A TOE also adds procedural risk without diagnostic gain.",
         "severity": "waste"
       }
     ],
     "diagnosis": {
       "accepted": [
-        "Migraine with aphasic aura (ICHD-3 1.2.1) \u2014 misdiagnosed as TIA; warfarin overtreatment causing supratherapeutic INR and bleeding; warfarin should be stopped",
+        "Migraine with aphasic aura (ICHD-3 1.2.1), previously labelled TIA; supratherapeutic INR with minor bleeding on warfarin",
         "migraine with aura",
         "migraine with typical aura",
         "classic migraine"
@@ -284,7 +276,7 @@
       {
         "diagnosis": "Recurrent TIA (original diagnosis)",
         "icd_code": "G45.9",
-        "key_features": "Against: four stereotyped attacks of language disturbance building over about 5 minutes, each followed by migrainous headache; years of brief positive visual phenomena; maternal migraine with aura; no vascular risk factors; MRI shows no infarct. The 'AF' was a single strip during palpitations, and the 24-hour Holter and 14-day monitor show no AF.",
+        "key_features": "Against: four stereotyped attacks of language disturbance building over about 5 minutes, each followed by migrainous headache; years of brief positive visual phenomena; maternal migraine with aura; no vascular risk factors. The MRI excludes infarction but not TIA, so the judgement rests on these clinical features. The 'AF' was a single strip during palpitations; the 24-hour Holter and 14-day monitor show no AF, which does not invalidate that strip, so it is reviewed before anticoagulation is finally stopped.",
         "likelihood": "low"
       },
       {
@@ -303,13 +295,13 @@
     "key_clinical_evidence": [
       "The four language attacks meet ICHD-3 1.2.1: speech disturbance building over about 5 minutes, 15-25 minutes long, fully reversible and followed by migrainous headache (4 of 6 characteristics)",
       "The TIA label rested on a single rhythm strip during palpitations reported as AF and on non-specific white matter foci; neither indicates cerebral ischaemia, and the MRI shows no infarct",
-      "With the attacks recognised as aura her CHA2DS2-VA score is 0, so warfarin has no indication even if paroxysmal AF were found; the 14-day monitor shows none",
-      "Warfarin is causing harm: INR 3.8 with gum bleeding and a prolonged nosebleed",
+      "If the attacks are accepted as aura her CHA2DS2-VA score is 0, so anticoagulation is not indicated even if paroxysmal AF were confirmed; the 14-day monitor shows none, and the original strip is reviewed before the decision is final",
+      "Warfarin is causing harm: INR above range (3.8 at the last check, 3.6 today) with gum bleeding and a prolonged nosebleed; haemoglobin is normal",
       "Regular paracetamol and any NSAID or aspirin interact with warfarin; triptans do not"
     ],
     "red_herrings": [
       {
-        "correct_interpretation": "It was a single rhythm strip during palpitations; the 24-hour Holter was normal and the 14-day monitor shows no AF. With the attacks recognised as aura her CHA2DS2-VA score is 0, so no anticoagulant is indicated.",
+        "correct_interpretation": "It was a single rhythm strip during palpitations; the 24-hour Holter was normal and the 14-day monitor shows no AF, although a negative monitor does not invalidate the strip, which is reviewed. With the attacks attributed to aura her CHA2DS2-VA score is 0, so anticoagulation is not indicated.",
         "data_point": "Outside ECG reported as showing 'intermittent AF', and warfarin started for presumed TIA",
         "field_path": "patient.history_present_illness",
         "intended_effect": "May anchor on continuing anticoagulation",
@@ -337,6 +329,7 @@
       "max_additional_actions": 1,
       "required_before_assessment": [
         "action-3-perform-clinical-assessment",
+        "action-labs-inr-fbc",
         "action-2-check-drug-interactions"
       ]
     }
@@ -473,7 +466,83 @@
     "ecg": null,
     "echo": null,
     "eeg": null,
-    "labs": null,
+    "labs": {
+      "abnormal_values_summary": [
+        "Prothrombin time 35.6 s (H)",
+        "INR 3.6 (H)"
+      ],
+      "interpretation": "Coagulation: prothrombin time 35.6 s and INR 3.6, above the usual warfarin target range of 2.0-3.0 but under 4.5, with aPTT and fibrinogen within their reference ranges. Full blood count: haemoglobin 124 g/L, platelets 238 x10^9/L, white cell count 6.4 x10^9/L and MCV 88 fL, all within their reference ranges.",
+      "panels": {
+        "CBC": [
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "115-155",
+            "test": "Haemoglobin",
+            "unit": "g/L",
+            "value": 124
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "150-400",
+            "test": "Platelets",
+            "unit": "x10^9/L",
+            "value": 238
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "4.0-11.0",
+            "test": "White cell count",
+            "unit": "x10^9/L",
+            "value": 6.4
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "80-100",
+            "test": "MCV",
+            "unit": "fL",
+            "value": 88
+          }
+        ],
+        "coagulation": [
+          {
+            "clinical_significance": "Prolonged, in keeping with the raised INR on warfarin.",
+            "is_abnormal": true,
+            "reference_range": "11.0-13.5",
+            "test": "Prothrombin time",
+            "unit": "s",
+            "value": 35.6
+          },
+          {
+            "clinical_significance": "Above the warfarin target range of 2.0-3.0 and below 4.5.",
+            "is_abnormal": true,
+            "reference_range": "0.9-1.1",
+            "test": "INR",
+            "unit": "ratio",
+            "value": 3.6
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "25-35",
+            "test": "aPTT",
+            "unit": "s",
+            "value": 33.0
+          },
+          {
+            "clinical_significance": null,
+            "is_abnormal": false,
+            "reference_range": "200-400",
+            "test": "Fibrinogen",
+            "unit": "mg/dL",
+            "value": 305.0
+          }
+        ]
+      }
+    },
     "mri": {
       "additional_observations": [
         "Technique: non-contrast 3 T brain MRI with T1, T2, FLAIR, DWI/ADC and susceptibility-weighted imaging.",
@@ -505,14 +574,12 @@
   },
   "metadata": {
     "authoring_agent": "condition-expert:MIG-AURA",
-    "case_body_concerns": [
-      "Useless-tool entries dropped because the case has neither output nor fallback (silent irrelevance, per authoring guide \u00a71): ['analyze_eeg', 'interpret_labs']"
-    ],
+    "case_body_concerns": [],
     "citation_gap": [],
-    "condition_name": "Migraine with aphasic aura \u2014 misdiagnosed as TIA; warfarin overtreatment causing active bleeding",
+    "condition_name": "Migraine with aphasic aura previously labelled TIA: supratherapeutic INR with minor bleeding on warfarin",
     "criteria_pack_version": "1.0",
-    "difficulty_description": "Diagnostic puzzle: prior TIA misdiagnosis with warfarin treatment causing bleeding complications; recognising TIA misdiagnosis and appropriately stopping anticoagulation; supratherapeutic INR is urgent management priority",
-    "difficulty_rationale": "Diagnostic puzzle: deconstructing a prior misdiagnosis, stopping inappropriate anticoagulation, and reframing migraine with aphasic aura",
+    "difficulty_description": "Diagnostic puzzle: a prior TIA label with warfarin causing bleeding; recognising migraine aura on the clinical features, withholding warfarin now, rechecking the INR and blood count, and reviewing the anticoagulation decision with the referring team",
+    "difficulty_rationale": "Diagnostic puzzle: re-examining a prior TIA label, managing the supratherapeutic INR and reframing the attacks as migraine with aphasic aura",
     "expected_agent_confidence": 0.38,
     "fallback_tool_kinds": {
       "csf": "normal",
