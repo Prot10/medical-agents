@@ -4,7 +4,8 @@
 
 RULINGS_DIR holds <CASE>.json (a list of {note_id, status, field_path_now, what, reason});
 NOTES_JSONL is the round's new_notes.jsonl. Every note must have exactly one ruling with a valid
-status. Each row records the cases changed (the note's case, when its file differs from the base
+status. A fixed field note whose target no longer exists (e.g. a removed literature step) gets
+field_path_now "(removed)". Each row records the cases changed (the note's case, when its file differs from the base
 commit 06b74446) and a sha256 of the ruled text, so new_notes_since.py can spot edited notes.
 """
 from __future__ import annotations
@@ -36,7 +37,7 @@ def main() -> None:
         rows.append({"note_id": n["note_id"], "case_id": n["case_id"], "condition": n["condition"], "reviewer": REV.get(n["reviewer"], n["reviewer"]),
                      "kind": n["kind"], "status": r["status"],
                      "cases_changed": [n["case_id"]] if f"data/neurobench/cases/{n['case_id']}.json" in changed else [],
-                     "field_path_seen": n.get("field_path") or "", "field_path_now": r.get("field_path_now") or "",
+                     "field_path_seen": n.get("field_path") or "", "field_path_now": r.get("field_path_now") or ("(removed)" if n["kind"] == "field" and r["status"] in {"FIXED", "ALREADY-FIXED"} else ""),
                      "what": r.get("what") or "", "reason": r.get("reason") or "", "text_sha256": digest(n), "round": "2026-11"})
     extra = set(rulings) - {n["note_id"] for n in notes}
     errors += [f"ruling for unknown note {x}" for x in sorted(extra)]

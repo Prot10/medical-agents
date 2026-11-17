@@ -46,7 +46,7 @@ def main() -> None:
                 r = json.loads(line); ruled[r["note_id"]] = r.get("text_sha256")
     for f in glob.glob(str(HERE.parent / "round-2026-10/notes/*.json")):
         for n in json.loads(Path(f).read_text()):
-            ruled.setdefault(n["id"], None)
+            ruled.setdefault(n["id"], digest(n))
     new = []
     for item in flatten(a.annotations):
         nid = item["note_id"]
