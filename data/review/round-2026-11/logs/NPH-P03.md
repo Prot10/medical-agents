@@ -1,0 +1,34 @@
+# NPH-P03
+Reviewer status: R1 (NB-KSC3-TWUA-QDTM) in_progress; no R2 notes | Approved before this round: no
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+|---|---|---|
+| 3e7e8482-29f2-4ef9-9006-979fd6f8f6cb | FIXED | `ground_truth.action_criteria[4]` (action-spine-mri): importance recommended -> required; rationale rewritten with the upper motor neuron red flag (plan C5, D10) |
+| 3cc428d0-0e34-4f5c-8f4f-6353cab137c1 | FIXED | `ground_truth.stop_rule.required_before_assessment`: action-spine-mri added (before action-4-analyze-csf); no sequence constraint (order does not matter for safety, D10) |
+
+## Own findings
+| dim | severity | field path | finding | action |
+|---|---|---|---|---|
+| C | major | `ground_truth.assessment.required_recommendations[0]` | Referral "for CSF shunting with a programmable valve" presumed surgery (class C1, D1) | FIXED: "Refer to neurosurgery for shunt eligibility assessment ...; the tap response supports considering a shunt, with a programmable valve if one is placed, but does not by itself decide surgery [Nakajima_2021]" |
+| C | major | `ground_truth.assessment.required_recommendations[1]` | Counselling said shunting "is expected to improve" and named no risk (class C2, D2, D3) | FIXED: canonical counselling must; gait most likely to improve, iNPH features more likely to improve than the spastic myelopathic features (which persist and keep their own rehabilitation and spinal follow-up), degree uncertain; complications listed [Nakajima_2021] |
+| C | minor | `ground_truth.assessment.required_recommendations[3]` | Falls must "while awaiting surgery" presumed surgery (class C3, D4) | FIXED: "while the neurosurgical assessment is pending" |
+| C | minor | `ground_truth.avoided_actions` | Stored exercise stress test (spastic gait, no cardiac indication) carried no waste label (class C4, D5) | FIXED: new `avoid-waste-exercise-stress-test` after the echo entry; echo waste rationale gains the exercise-echo clause; both cite [AHA_ACC_perioperative_2024] |
+| B | minor | `metadata.difficulty_rationale` | Tier counts stale (post-tap reassessment counted recommended; now also the spine MRI changed tier) (class C12, D16) | FIXED: 5 required, 0 recommended, 2 optional |
+| D | minor | `initial_tool_outputs.csf.interpretation`, `.special_tests` | The CSF report carries the post-tap TUG, 10-m walk and MoCA results, i.e. the evidence of the separate post-tap reassessment criterion (condition-wide October design of the tap test as a CSF tool) | FLAGGED (condition-wide; not changed in one case) |
+| D | minor | `initial_tool_outputs.clinical_assessment.scores` | Baseline gait report lists "MoCA (same session) 21/30", the result of the optional cognitive screen | FLAGGED (minor; the post-tap reassessment compares MoCA against it) |
+| B | minor | `initial_tool_outputs.mri.contrast_used` | null although the technique says "no contrast" (prints "none") | FLAGGED (outside the MRI-CONTRAST class, which covers gadolinium studies only; display reads correctly) |
+
+## Changes
+The cervical spine MRI is now a required step and part of the stop rule: with bilateral Babinski and Hoffmann signs, 3+ lower-limb reflexes and spasticity after the C3-C6 fusion, recurrent or adjacent-segment cord compression must be excluded before the second decline is attributed to iNPH (the stored MRI shows a solid fusion with no new compression). The neurosurgical referral must now asks for a shunt eligibility assessment, saying that the 22% tap response supports considering a shunt but does not by itself decide surgery, with a programmable valve if one is placed. The counselling must no longer promises improvement: gait is the symptom most likely to improve, the iNPH features more than the spastic myelopathy (which persists and needs its own rehabilitation and spinal follow-up), the degree is uncertain, and it lists the complications (shunt obstruction needing revision, infection, headache, subdural haematoma from over-drainage) [Nakajima_2021]. The falls must reads "while the neurosurgical assessment is pending". Exercise stress testing is labelled waste (no cardiac indication, treadmill unsafe with this spastic, wide-based gait) [AHA_ACC_perioperative_2024], and the echocardiogram waste rationale names exercise stress echocardiography. The difficulty rationale now counts 5 required and 2 optional actions. Nothing else changed; the chief complaint is untouched.
+
+## Verification
+17 Nov 2026: perfect_agent.py -v passes (every required and recommended criterion served by the case's own report carrying its evidence); test_case_guards for NPH-P03..P08 48 passed; case_io.py check: schema and synonym guard OK, no failure naming the case apart from the central test_guidance_claims. mri_probe.py: the MRI criterion receives the stored brain MRI.
+Pass 1: 0 errors found
+- Checked every note ruling against the plan and the note, the diff against 06b74446, the final policy (criteria, tiers, stop rule, sequence ids, musts vs prohibitions vs avoided actions, differential vs evidence), the stored exercise-test reports against the medications and gait, and the tier counts in metadata; perfect_agent.py -v and test_case_guards -k pass; no material error found.
+Cosmetic (not counted): added the missing "Reviewer status" header line to the log.
+Pass 2: 0 errors found
+- Nothing changed after Pass 1 (0 errors), so no unverified change to re-check. Re-ran perfect_agent.py -v (pass) and test_case_guards -k for NPH-P03..P08 (48 passed). No edits.
+Condition audit, 17 Nov 2026 (B consistency, minor, FIXED): the rationale of avoid-waste-exercise-stress-test (ground_truth.avoided_actions[3]) said treadmill exercise "stops submaximal and non-diagnostic", while the stored exercise stress test and exercise echo of this case report that the exercise was not performed because the patient could not walk safely on a treadmill. The clause now reads "cannot be completed, so the test is non-diagnostic" (the wording NPH-M05 already used). Severity, alternative and citation unchanged. perfect_agent.py: pass; case_io.py check: schema and synonym guard OK, the only failures naming NPH are the test_guidance_claims rows (central).
+Pass 3: 0 errors found
+Checked the condition-audit edit of ground_truth.avoided_actions[3] (avoid-waste-exercise-stress-test, order_specialized_test test_type exercise_stress_test, severity waste): the rationale now says the treadmill test "cannot be completed, so the test is non-diagnostic", which matches the stored exercise stress test and exercise echo follow-ups (exercise not performed, unable to walk safely on a treadmill; resting data only; non-diagnostic for inducible ischaemia). The gait description in the rationale matches the one in those reports. Severity, alternative and citation are unchanged. perfect_agent.py -v pass; test_case_guards -k (8 NPH cases) 64 passed. Nothing changed.
