@@ -1,5 +1,5 @@
 import * as Popover from "@radix-ui/react-popover"
-import { LogOut, Shield, UserRound } from "lucide-react"
+import { ArrowLeftRight, LogOut, Shield, UserRound } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import type { ReviewerProfile } from "@/api/types"
@@ -25,6 +25,7 @@ function colorFromName(name: string): string {
 
 export function ReviewerChip({ profile }: { profile: ReviewerProfile }) {
   const signOut = useReviewStore((s) => s.signOut)
+  const chooseWorkspace = useReviewStore((s) => s.chooseWorkspace)
   const accent = colorFromName(profile.name)
 
   return (
@@ -79,6 +80,16 @@ export function ReviewerChip({ profile }: { profile: ReviewerProfile }) {
             <Shield className="w-3.5 h-3.5" />
             {profile.role === "admin" ? "Researcher (admin)" : "Reviewer"}
           </div>
+          <Popover.Close asChild>
+            <button
+              type="button"
+              onClick={() => chooseWorkspace(null)}
+              className="mt-1 w-full flex items-center gap-2 px-2 py-2 text-sm rounded-md text-foreground hover:bg-secondary/70 transition-colors"
+            >
+              <ArrowLeftRight className="w-4 h-4" />
+              Change view
+            </button>
+          </Popover.Close>
           <button
             type="button"
             onClick={signOut}

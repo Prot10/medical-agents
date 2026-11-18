@@ -22,6 +22,7 @@ from .config import (
     CONDITIONS_YAML_PATH,
     DEFAULT_DATASET_VERSION,
     REVIEWER_CODES_PATH,
+    REVIEW_SETS_PATH,
     TOOL_COSTS_PATH,
     TOOL_REVIEWS_DIR,
     WEB_DIST,
@@ -29,6 +30,7 @@ from .config import (
 from .services.annotation_store import AnnotationStore
 from .services.dataset_loader import load_dataset
 from .services.rate_limit import AuthRateLimiter
+from .services.review_sets import load_review_sets, subset_dataset
 from .services.reviewer_codes import ReviewerCodeRegistry
 from .services.tool_catalog import build_catalog
 from .services.tool_review_store import ToolReviewStore
@@ -127,6 +129,14 @@ def create_app() -> FastAPI:
         )
         for version, (_idx, objs) in all_datasets.items()
     }
+    # Review sets: each is served as a dataset version of its own holding only its cases, with
+    # the base dataset's tool catalog. Added after the catalogs so a set never gets its own.
+    review_sets = load_review_sets(REVIEW_SETS_PATH)
+    for set_id, review_set in review_sets.items():
+        all_datasets[set_id] = subset_dataset(review_set, all_datasets[review_set.base])
+        tool_catalogs[set_id] = tool_catalogs[review_set.base]
+        logger.info("Review set %s: %d cases of %s", set_id, len(review_set.case_ids), review_set.base)
+    app.state.review_sets = review_sets
     app.state.tool_catalogs = tool_catalogs
 
     # Ensure on-disk locations exist.
@@ -141,7 +151,7 @@ def create_app() -> FastAPI:
     app.state.auth_limiter = AuthRateLimiter()
 
     # Annotation store — filesystem-backed.
-    app.state.annotation_store = AnnotationStore(ANNOTATIONS_DIR)
+    app.state.annotation_store = AnnotationStore(ANNOTATIONS_DIR, extra_versions=review_sets)
     app.state.tool_review_store = ToolReviewStore(TOOL_REVIEWS_DIR)
 
     from .routes import admin as admin_routes

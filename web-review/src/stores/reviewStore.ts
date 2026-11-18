@@ -5,8 +5,17 @@ import type { ReviewStatus, ReviewerProfile, Severity } from "@/api/types"
 const PROFILE_STORAGE_KEY = "neurobench.reviewer"
 const ONBOARDED_STORAGE_KEY = "neurobench.review_onboarded"
 const DARK_MODE_STORAGE_KEY = "neurobench.review_dark_mode"
+const WORKSPACE_STORAGE_KEY = "neurobench.review_workspace"
+const DEFAULT_DATASET_VERSION = "neurobench"
 
 export type ReviewTab = "overview" | "cases" | "tools" | "methodology" | "admin"
+
+/**
+ * Which view the reviewer chose after entering the code: the full review of the dataset, or a
+ * review set (a fixed list of cases re-reviewed in a space of its own, addressed by its id).
+ * `null` shows the choice screen.
+ */
+export type Workspace = { kind: "full" } | { kind: "set"; setId: string }
 
 export interface AnnotationDraft {
   fieldPath: string
@@ -18,6 +27,7 @@ export interface AnnotationDraft {
 
 export interface ReviewStore {
   profile: ReviewerProfile | null
+  workspace: Workspace | null
   darkMode: boolean
   activeTab: ReviewTab
   datasetVersion: string
@@ -33,6 +43,7 @@ export interface ReviewStore {
 
   handleAuthExpired: () => void
   setProfile: (profile: ReviewerProfile | null) => void
+  chooseWorkspace: (workspace: Workspace | null) => void
   setDarkMode: (dark: boolean) => void
   setActiveTab: (tab: ReviewTab) => void
   setDatasetVersion: (version: string) => void
@@ -57,6 +68,33 @@ function loadProfile(): ReviewerProfile | null {
   }
 }
 
+// Kept for the browser tab only: a reload returns to the chosen view, a new visit asks again.
+function loadWorkspace(): Workspace | null {
+  if (typeof sessionStorage === "undefined") return null
+  try {
+    const raw = sessionStorage.getItem(WORKSPACE_STORAGE_KEY)
+    return raw ? (JSON.parse(raw) as Workspace) : null
+  } catch {
+    return null
+  }
+}
+
+function storeWorkspace(workspace: Workspace | null) {
+  if (typeof sessionStorage === "undefined") return
+  try {
+    if (workspace) sessionStorage.setItem(WORKSPACE_STORAGE_KEY, JSON.stringify(workspace))
+    else sessionStorage.removeItem(WORKSPACE_STORAGE_KEY)
+  } catch {
+    // storage blocked: the choice simply is not remembered
+  }
+}
+
+function versionOf(workspace: Workspace | null): string {
+  return workspace?.kind === "set" ? workspace.setId : DEFAULT_DATASET_VERSION
+}
+
+const initialWorkspace = loadProfile() ? loadWorkspace() : null
+
 function loadDarkMode(): boolean {
   if (typeof localStorage === "undefined") return false
   const stored = localStorage.getItem(DARK_MODE_STORAGE_KEY)
@@ -71,9 +109,10 @@ function loadOnboarded(): boolean {
 
 export const useReviewStore = create<ReviewStore>((set) => ({
   profile: loadProfile(),
+  workspace: initialWorkspace,
   darkMode: loadDarkMode(),
   activeTab: "overview",
-  datasetVersion: "neurobench",
+  datasetVersion: versionOf(initialWorkspace),
   selectedCaseId: null,
   filterStatus: "all",
   filterConditions: [],
@@ -87,8 +126,11 @@ export const useReviewStore = create<ReviewStore>((set) => ({
     if (typeof localStorage !== "undefined") {
       localStorage.removeItem(PROFILE_STORAGE_KEY)
     }
+    storeWorkspace(null)
     set({
       profile: null,
+      workspace: null,
+      datasetVersion: DEFAULT_DATASET_VERSION,
       activeTab: "overview",
       selectedCaseId: null,
       annotationDraft: null,
@@ -104,7 +146,21 @@ export const useReviewStore = create<ReviewStore>((set) => ({
         localStorage.removeItem(PROFILE_STORAGE_KEY)
       }
     }
-    set({ profile, sessionMessage: null })
+    // A new code always lands on the choice screen.
+    storeWorkspace(null)
+    set({ profile, workspace: null, sessionMessage: null })
+  },
+  chooseWorkspace: (workspace) => {
+    storeWorkspace(workspace)
+    set({
+      workspace,
+      datasetVersion: versionOf(workspace),
+      activeTab: "overview",
+      selectedCaseId: null,
+      annotationDraft: null,
+      filterStatus: "all",
+      filterConditions: [],
+    })
   },
   setDarkMode: (dark) => {
     if (typeof localStorage !== "undefined") {
@@ -136,8 +192,11 @@ export const useReviewStore = create<ReviewStore>((set) => ({
     if (typeof localStorage !== "undefined") {
       localStorage.removeItem(PROFILE_STORAGE_KEY)
     }
+    storeWorkspace(null)
     set({
       profile: null,
+      workspace: null,
+      datasetVersion: DEFAULT_DATASET_VERSION,
       activeTab: "overview",
       selectedCaseId: null,
       annotationDraft: null,

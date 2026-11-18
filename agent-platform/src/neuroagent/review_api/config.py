@@ -22,6 +22,8 @@ TOOL_REVIEWS_DIR = REVIEW_DATA_DIR / "tool_reviews"
 
 REVIEW_CONFIG_DIR = _REPO_ROOT / "agent-platform" / "config" / "review"
 REVIEWER_CODES_PATH = REVIEW_CONFIG_DIR / "reviewer_codes.yaml"
+# Fixed case subsets re-reviewed in their own space (services/review_sets.py).
+REVIEW_SETS_PATH = REVIEW_CONFIG_DIR / "review_sets.yaml"
 
 # Sources for the tool catalog (existing 12-tool list + per-condition mapping).
 TOOL_COSTS_PATH = _REPO_ROOT / "agent-platform" / "config" / "tools" / "costs.yaml"

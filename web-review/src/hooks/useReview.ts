@@ -25,6 +25,7 @@ import type {
   MyProgress,
   NeuroBenchCase,
   PolicyReviewVerdict,
+  ReviewSet,
   ReviewStatus,
   ReviewerProfile,
   Severity,
@@ -36,6 +37,7 @@ import { useReviewStore } from "@/stores/reviewStore"
 const QK = {
   me: () => ["me"] as const,
   datasets: () => ["datasets"] as const,
+  reviewSets: () => ["review-sets"] as const,
   cases: (version: string) => ["datasets", version, "cases"] as const,
   caseDetail: (version: string, caseId: string) =>
     ["datasets", version, "cases", caseId] as const,
@@ -69,6 +71,14 @@ export function useDatasets() {
     queryKey: QK.datasets(),
     queryFn: () => fetchJSON<DatasetSummary[]>("/datasets"),
     staleTime: 60 * 1000,
+  })
+}
+
+export function useReviewSets() {
+  return useQuery({
+    queryKey: QK.reviewSets(),
+    queryFn: () => fetchJSON<ReviewSet[]>("/review-sets"),
+    staleTime: 5 * 60 * 1000,
   })
 }
 

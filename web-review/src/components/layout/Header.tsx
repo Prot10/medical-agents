@@ -141,7 +141,7 @@ export function Header({ profile }: { profile: ReviewerProfile }) {
   )
 }
 
-function SaveIndicator({ saving }: { saving: boolean }) {
+export function SaveIndicator({ saving }: { saving: boolean }) {
   return (
     <span
       className="hidden sm:inline-flex items-center gap-1 text-[11px] text-muted-foreground min-w-[4.5rem] justify-end"

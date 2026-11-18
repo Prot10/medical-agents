@@ -38,7 +38,7 @@ export function CodeEntryGate() {
 
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background">
-      <BackgroundOrbs />
+      <GateBackground />
 
       <motion.div
         initial={{ opacity: 0, y: 12 }}
@@ -139,7 +139,7 @@ export function CodeEntryGate() {
   )
 }
 
-function BackgroundOrbs() {
+export function GateBackground() {
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0">
       <div className="absolute top-[-10%] left-[-10%] w-[40rem] h-[40rem] rounded-full bg-primary/10 blur-3xl" />

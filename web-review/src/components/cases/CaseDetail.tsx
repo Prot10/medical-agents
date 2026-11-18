@@ -43,7 +43,14 @@ import { ReviewerAnnotationsPanel } from "@/components/annotation/ReviewerAnnota
 import { DifficultyStars } from "@/components/ui/DifficultyStars"
 import { StatusPill } from "@/components/ui/StatusPill"
 
-export function CaseDetail({ caseId }: { caseId: string }) {
+export function CaseDetail({
+  caseId,
+  backLabel = "Back to all cases",
+}: {
+  caseId: string
+  /** The back link's text: the list it returns to differs between the full review and a re-check. */
+  backLabel?: string
+}) {
   const version = useReviewStore((s) => s.datasetVersion)
   const setSelectedCaseId = useReviewStore((s) => s.setSelectedCaseId)
   const cases = useCases(version)
@@ -155,7 +162,7 @@ export function CaseDetail({ caseId }: { caseId: string }) {
           className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back to all cases
+          {backLabel}
         </button>
         {(review.data?.time_spent_seconds ?? 0) > 0 && (
           <span className="text-[11px] text-muted-foreground tabular-nums">

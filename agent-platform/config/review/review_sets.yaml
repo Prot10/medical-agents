@@ -1,0 +1,44 @@
+# Review sets: a fixed subset of a dataset that reviewers re-review in its own space.
+#
+# Each set is served by the review app as a dataset version of its own (its id in the URL),
+# holding only the listed cases, in this order. Its annotations are stored apart, under
+# data/review/annotations/<set id>/<reviewer code>/<case id>.json, so a re-review never
+# overwrites the first review of the same case. By default a set serves the base dataset's
+# files; with `cases_dir` (relative to the repo root, holding cases/<case id>.json) it serves
+# its own frozen copies, so the review app can show corrected cases in the set while the full
+# review still serves the version the physicians annotated.
+
+recheck-2026-11:
+  base: neurobench
+  # The 20 cases as corrected in the November 2026 round (master 1a3114f2, cases hash 58c1d905).
+  cases_dir: data/review/sets/recheck-2026-11
+  name: Re-check after the corrections
+  description: >-
+    One corrected case per condition. Each one changed after the physicians' notes and in the
+    November 2026 corrections. Review it as before and say whether it is now correct.
+  # Drawn on 18 Nov 2026: per condition, one case at random (Python random.Random(20261118),
+  # conditions in alphabetical order), only among cases the November 2026 round changed
+  # (diff 06b74446..1a3114f2), so every case differs from what the physicians last saw.
+  # The 13 conditions with November notes: a case where a November note was FIXED (ledger).
+  # The 7 without (ALS, BACT-MEN, GBS, HEP-ENC, ISCH-STR, SAH, SE): a case with an October note.
+  cases:
+    - ALS-P05
+    - ALZ-EARLY-RP04
+    - BACT-MEN-M03
+    - FEPI-TEMP-M02
+    - FND-S05
+    - FTD-M01
+    - GBS-RM12
+    - GLIO-HG-S05
+    - HEP-ENC-P05
+    - ISCH-STR-RP02
+    - MG-S03
+    - MIG-AURA-P06
+    - MS-RR-RS05
+    - NMDAR-ENC-P01
+    - NPH-M04
+    - PD-RS04
+    - SAH-M01
+    - SE-M07
+    - SYNC-CARD-M02
+    - VASC-DEM-P02

@@ -23,7 +23,8 @@ set -euo pipefail
 #   - dataset-generation/{pyproject.toml,src/} ........... workspace member shell (uv sync requires it)
 #   - dataset-generation/config/conditions.yaml .......... tool-catalog per-condition rules
 #   - pyproject.toml, uv.lock ............................ root workspace + lockfile
-#   - data/neurobench/ .................................. 600 benchmark cases
+#   - data/neurobench/ .................................. 600 benchmark cases (not with --keep-cases)
+#   - data/review/sets/ .................................. frozen case copies of the review sets
 #   - web-review/dist/ ................................... built static frontend
 #
 # What this script never touches on the VPS:
@@ -38,6 +39,9 @@ set -euo pipefail
 #   ./deployment/hostinger/deploy.sh --skip-build   # reuse existing web-review/dist
 #   ./deployment/hostinger/deploy.sh --code-only    # skip data + dist (faster code push)
 #   ./deployment/hostinger/deploy.sh --force-codes  # also sync reviewer_codes.yaml
+#   ./deployment/hostinger/deploy.sh --keep-cases   # leave the VPS's data/neurobench as it is
+#       (the full review keeps serving the version the physicians annotated; review sets
+#        with their own cases_dir still get their frozen copies)
 # ─────────────────────────────────────────────────────────
 
 VPS_HOST="hostinger"
@@ -54,11 +58,13 @@ REPO_ROOT=$(pwd)
 SKIP_BUILD=0
 CODE_ONLY=0
 FORCE_CODES=0
+KEEP_CASES=0
 for arg in "$@"; do
   case "$arg" in
     --skip-build)   SKIP_BUILD=1 ;;
     --code-only)    CODE_ONLY=1 ;;
     --force-codes)  FORCE_CODES=1 ;;
+    --keep-cases)   KEEP_CASES=1 ;;
     *) echo "Unknown flag: $arg"; exit 2 ;;
   esac
 done
@@ -164,9 +170,20 @@ if [ "$CODE_ONLY" -eq 1 ]; then
   echo -e "${YELLOW}[3/5] Skipping data + dist (--code-only)${NC}"
 else
   echo -e "${YELLOW}[3/5] Rsyncing data + dist...${NC}"
-  rsync -az --delete \
-    data/neurobench/ \
-    "$VPS_HOST:$VPS_PATH/data/neurobench/"
+  if [ "$KEEP_CASES" -eq 1 ]; then
+    echo -e "${YELLOW}  Keeping the VPS's data/neurobench (--keep-cases)${NC}"
+  else
+    rsync -az --delete \
+      data/neurobench/ \
+      "$VPS_HOST:$VPS_PATH/data/neurobench/"
+  fi
+
+  # Review sets' own frozen case copies (config/review/review_sets.yaml `cases_dir`).
+  if [ -d data/review/sets ]; then
+    rsync -az --delete \
+      data/review/sets/ \
+      "$VPS_HOST:$VPS_PATH/data/review/sets/"
+  fi
 
   rsync -az --delete \
     web-review/dist/ \

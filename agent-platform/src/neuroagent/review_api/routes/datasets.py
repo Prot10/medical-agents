@@ -83,3 +83,25 @@ def get_case(
             detail=f"Case '{case_id}' not found in {version}",
         )
     return case.model_dump(mode="json")
+
+
+@router.get("/review-sets")
+def list_review_sets(
+    request: Request,
+    _reviewer: ReviewerCode = Depends(current_reviewer),
+) -> list[dict[str, Any]]:
+    """Every review set (a fixed case subset re-reviewed in its own space), in file order.
+
+    A set's id is a dataset version: its cases, reviews and progress use the same routes.
+    """
+    return [
+        {
+            "id": s.id,
+            "base_version": s.base,
+            "name": s.name,
+            "description": s.description,
+            "case_ids": list(s.case_ids),
+            "case_count": len(s.case_ids),
+        }
+        for s in getattr(request.app.state, "review_sets", {}).values()
+    ]

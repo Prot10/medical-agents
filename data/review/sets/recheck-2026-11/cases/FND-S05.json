@@ -1,0 +1,724 @@
+{
+  "case_id": "FND-S05",
+  "condition": "functional_neurological_disorder",
+  "difficulty": "straightforward",
+  "encounter_type": "inpatient",
+  "fallback_tool_outputs": {
+    "advanced_imaging": null,
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "events": [],
+      "findings": [
+        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
+      ],
+      "heart_rate_range": {
+        "average": 73,
+        "max": 115,
+        "min": 55
+      },
+      "impression": "Normal 24-hour Holter monitor.",
+      "monitor_type": "holter_24h",
+      "recommended_actions": [],
+      "rhythm_summary": "Sinus rhythm throughout the recording"
+    },
+    "clinical_assessment": {
+      "assessment_type": "gait_and_balance_timed",
+      "findings": [
+        {
+          "domain": "gait",
+          "result": "did not take a step on the right leg during the test"
+        },
+        {
+          "domain": "balance",
+          "result": "Berg 20/56; Romberg not tested"
+        },
+        {
+          "domain": "variability",
+          "result": "standing on the left leg with support"
+        },
+        {
+          "domain": "safety",
+          "result": "assistive device or support: declined to bear weight on the right leg; no fall during testing"
+        }
+      ],
+      "impression": "Abnormal timed gait and balance assessment: timed walking tests could not be completed (declined to bear weight on the right leg); did not take a step on the right leg during the test.",
+      "recommended_actions": [],
+      "scores": {
+        "Berg_balance": "20/56",
+        "Romberg": "not tested",
+        "tandem_gait": "not attempted",
+        "ten_metre_walk_time": "not completed",
+        "timed_up_and_go": "not completed"
+      },
+      "timing": "baseline"
+    },
+    "csf": {
+      "appearance": "clear and colourless",
+      "cell_count": {
+        "rbc": "0 /uL",
+        "wbc": "2 /uL"
+      },
+      "glucose": "62 mg/dL",
+      "glucose_ratio": "0.6",
+      "interpretation": "Unremarkable CSF. Normal cell count, protein, and glucose.",
+      "opening_pressure": "16 cm H2O",
+      "protein": "38 mg/dL",
+      "special_tests": {}
+    },
+    "ct": {
+      "additional_observations": [],
+      "angiography_findings": null,
+      "contrast_used": false,
+      "findings": [],
+      "impression": "No acute intracranial abnormality. No haemorrhage, mass, hydrocephalus, or large-territory infarct.",
+      "recommended_actions": []
+    },
+    "drug_interactions": null,
+    "ecg": null,
+    "echo": {
+      "chambers": {
+        "LA": "normal size",
+        "LV": "normal size and systolic function",
+        "RA": "normal size",
+        "RV": "normal size and function"
+      },
+      "echo_type": "TTE",
+      "ejection_fraction": 64.0,
+      "findings": [
+        "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
+      ],
+      "impression": "Normal transthoracic echocardiogram.",
+      "recommended_actions": [],
+      "valves": {
+        "aortic": "structurally normal",
+        "mitral": "structurally normal",
+        "pulmonic": "normal",
+        "tricuspid": "normal"
+      },
+      "wall_motion": "no regional wall-motion abnormality"
+    },
+    "eeg": null,
+    "labs": null,
+    "literature_search": null,
+    "mri": null,
+    "specialized_test": null
+  },
+  "followup_outputs": [
+    {
+      "output": {
+        "findings": [
+          {
+            "domain": "global cognition",
+            "result": "MoCA 28/30"
+          },
+          {
+            "domain": "memory, attention, executive function, language, visuospatial",
+            "result": "cognitive performance within normal limits across memory, attention, executive, language and visuospatial domains"
+          },
+          {
+            "domain": "mood and anxiety (self-report)",
+            "result": "moderate anxiety, mild depressive symptoms and mildly elevated dissociative experiences"
+          },
+          {
+            "domain": "effort",
+            "result": "performance validity measures passed (TOMM trial 2 49/50)"
+          }
+        ],
+        "impression": "Cognitive performance within normal limits across memory, attention, executive, language and visuospatial domains. Self-report measures show moderate anxiety, mild depressive symptoms and mildly elevated dissociative experiences. Performance validity measures passed.",
+        "quantitative_data": {
+          "DES-II": "22",
+          "GAD-7": "13 (moderate)",
+          "MoCA": "28/30",
+          "PHQ-9": "8 (mild)",
+          "RAVLT_delayed_recall": "z = 0.2",
+          "TOMM_trial_2": "49/50",
+          "Trail_Making_B": "z = 0.0"
+        },
+        "recommended_actions": [],
+        "test_type": "neuropsych_battery"
+      },
+      "tool_name": "order_specialized_test",
+      "trigger_action": "request_neuropsych_battery"
+    },
+    {
+      "output": {
+        "assessment_type": "performance_status",
+        "findings": [
+          {
+            "domain": "activity",
+            "result": "unable to walk for 3 days"
+          },
+          {
+            "domain": "self-care and work",
+            "result": "needs assistance with transfers and mobility; not working"
+          }
+        ],
+        "impression": "Karnofsky 50 (requires considerable assistance and frequent care), ECOG 3 (capable of only limited self-care, confined to bed or chair more than 50% of waking hours).",
+        "recommended_actions": [],
+        "scores": {
+          "ECOG": "3",
+          "Karnofsky": "50/100"
+        },
+        "timing": "baseline"
+      },
+      "tool_name": "perform_clinical_assessment",
+      "trigger_action": "request_performance_status"
+    }
+  ],
+  "ground_truth": {
+    "action_criteria": [
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "assessment_type": "functional_neuro_signs"
+            },
+            "tool_name": "perform_clinical_assessment"
+          }
+        ],
+        "citations": [
+          "[DSM5_FND]",
+          "[Daum_2014]",
+          "[Espay_2018]"
+        ],
+        "criterion_id": "action-3-perform-clinical-assessment",
+        "expected_evidence": "Hoover sign, collapsing weakness and distractible tremor on the right; sensory splitting supportive only",
+        "importance": "required",
+        "label": "Examine for positive functional signs",
+        "rationale": "The diagnosis is made at the bedside: a positive Hoover sign, collapsing weakness and a distractible tremor are signs of clinical incompatibility (DSM-5 criterion B; Daum 2014)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_ecg"
+          }
+        ],
+        "citations": [
+          "[NICE_CG109]"
+        ],
+        "criterion_id": "action-ecg",
+        "expected_evidence": "Sinus rhythm at 96 per minute, normal PR, QRS and QTc",
+        "importance": "required",
+        "label": "12-lead ECG",
+        "rationale": "Her events include apparent loss of responsiveness; NICE advises a 12-lead ECG for everyone with transient loss of consciousness, to look for a cardiac cause such as long QT, pre-excitation, a Brugada pattern or heart block."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "contrast": false
+            },
+            "tool_name": "analyze_brain_mri"
+          }
+        ],
+        "citations": [
+          "[Espay_2018]",
+          "[AHA_ASA_Stroke_2026]"
+        ],
+        "criterion_id": "action-4-analyze-brain-mri",
+        "expected_evidence": "No T2/FLAIR lesion or restricted diffusion to account for the right leg weakness",
+        "importance": "required",
+        "label": "Non-contrast brain MRI with DWI",
+        "rationale": "A new focal deficit of 3 days is imaged whatever the examination shows: positive functional signs do not exclude a coexisting acute infarct or demyelinating lesion, since functional disorder coexists with neurological disease (Espay 2018; AHA/ASA 2026). The remitting episode in the same leg two years ago adds the demyelination question; gadolinium adds nothing without a known demyelinating disease."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "eeg_type": "video"
+            },
+            "tool_name": "analyze_eeg"
+          }
+        ],
+        "citations": [
+          "[ILAE_PNES_2013]",
+          "[AAN_Functional_Seizures_2025]"
+        ],
+        "criterion_id": "action-5-analyze-eeg",
+        "expected_evidence": "Habitual events recorded on video with no EEG change and a normal interictal record",
+        "importance": "required",
+        "label": "Video-EEG to capture a habitual event",
+        "rationale": "No habitual event has been seen by a clinician, only described by her roommate, so the history supports functional seizures only at the possible level; a habitual event recorded on video-EEG without ictal change documents the diagnosis and screens for co-occurring epilepsy, which matters more here because the events have one feature that favours epileptic seizures (eyes open with upward gaze) (ILAE 2013; AAN 2025)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "check_drug_interactions"
+          }
+        ],
+        "citations": [
+          "[AAN_Functional_Seizures_2025]"
+        ],
+        "criterion_id": "action-2-check-drug-interactions",
+        "expected_evidence": "No interaction between sertraline and dicyclomine that alters the plan",
+        "importance": "optional",
+        "label": "Review the medication list",
+        "rationale": "Sertraline and PRN dicyclomine carry no interaction that changes management and no benzodiazepine or antiseizure drug is prescribed; the review is defensible but not needed for the diagnosis."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "neuropsych_battery"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[Espay_2018]"
+        ],
+        "criterion_id": "action-neuropsych-battery",
+        "expected_evidence": "Quantifies mood, anxiety and symptom burden to guide therapy; does not make the diagnosis",
+        "importance": "optional",
+        "label": "Neuropsychological assessment of the comorbidity",
+        "rationale": "Generalized anxiety disorder is a treatment target; a battery can quantify it but does not make the diagnosis and is not needed before treatment (Espay 2018)."
+      }
+    ],
+    "assessment": {
+      "prohibited_recommendations": [
+        "Order further investigations once the positive diagnosis is established, without a new specific clinical question (repeat MRI, CT, lumbar puncture, EMG or nerve conduction studies, evoked potentials, PET).",
+        "Tell the patient the symptoms are imagined, feigned, 'all in your head', or that nothing is wrong.",
+        "Perform invasive testing without a specific indication (lumbar puncture, nerve or muscle biopsy, catheter angiography).",
+        "Start or escalate antiseizure medication for the functional seizures.",
+        "Give benzodiazepines or intubate for a typical functional seizure.",
+        "Give gadolinium contrast without a specific indication."
+      ],
+      "required_recommendations": [
+        "Make a positive diagnosis of functional neurological disorder (mixed: functional seizures and functional right leg weakness) based on the Hoover sign, collapsing weakness and distractible tremor and the habitual event recorded on video-EEG without ictal change, and not by exclusion of other disease.",
+        "Explain the diagnosis to the patient, and with consent to the family, as a common and genuine disorder of nervous system functioning that can improve, show the positive signs, and give written information.",
+        "Refer for physiotherapy with expertise in functional motor disorder (motor retraining, Nielsen 2015 consensus).",
+        "Refer for psychological therapy by a clinician experienced in FND (CBT-informed) and treat the comorbid anxiety.",
+        "Give the patient, family and ward a written plan for typical events: keep safe, do not restrain, wait for the event to end, and do not give emergency benzodiazepines or intubate for a typical functional seizure."
+      ]
+    },
+    "avoided_actions": [
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "order_echocardiogram"
+          }
+        ],
+        "citations": [
+          "[Stone_2016]"
+        ],
+        "criterion_id": "avoid-waste-2-order-echocardiogram",
+        "rationale": "No murmur, embolic or structural cardiac question in a 28-year-old with functional weakness and events.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "order_cardiac_monitoring"
+          }
+        ],
+        "citations": [
+          "[Stone_2016]"
+        ],
+        "criterion_id": "avoid-waste-3-order-cardiac-monitoring",
+        "rationale": "The events are not syncopal: 2-3 minutes of bilateral shaking without pallor, not a brief collapse; rhythm monitoring answers no question here.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "order_ct_scan"
+          }
+        ],
+        "citations": [
+          "[Espay_2018]"
+        ],
+        "criterion_id": "avoid-waste-4-order-ct-scan",
+        "rationale": "Three days into the weakness, with no thrombolysis question, a head CT adds radiation and answers nothing the single MRI does not.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_csf"
+          }
+        ],
+        "citations": [
+          "[Stone_2016]"
+        ],
+        "criterion_id": "avoid-waste-5-analyze-csf",
+        "rationale": "No fever, meningism or encephalopathy; a lumbar puncture is invasive and answers no question once positive signs are documented.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "modality": "FDG_PET"
+            },
+            "tool_name": "order_advanced_imaging"
+          }
+        ],
+        "citations": [
+          "[Espay_2018]"
+        ],
+        "criterion_id": "avoid-waste-6-order-advanced-imaging",
+        "rationale": "PET has no role in functional weakness or functional seizures.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "emg_ncs"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[Stone_2016]"
+        ],
+        "criterion_id": "avoid-waste-7-order-specialized-test",
+        "rationale": "Reflexes are normal and the weakness has positive functional signs; nerve conduction studies and EMG answer no question and a normal study reinforces the search for an organic cause.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "ssep"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[Stone_2016]"
+        ],
+        "criterion_id": "avoid-waste-8-order-specialized-test",
+        "rationale": "Sensory loss splitting the midline at the groin is not a somatosensory pathway question; evoked potentials add nothing.",
+        "severity": "waste"
+      }
+    ],
+    "diagnosis": {
+      "accepted": [
+        "Functional neurological disorder \u2014 functional limb weakness (right leg) and PNES (psychogenic non-epileptic seizures)",
+        "functional neurological disorder",
+        "functional neurological symptom disorder",
+        "conversion disorder",
+        "FND",
+        "psychogenic non-epileptic seizures",
+        "psychogenic nonepileptic seizures",
+        "PNES",
+        "functional seizures",
+        "dissociative seizures",
+        "nonepileptic seizures",
+        "functional weakness",
+        "functional limb weakness",
+        "functional motor disorder",
+        "functional movement disorder",
+        "functional tremor"
+      ],
+      "icd_codes": [
+        "F44.7",
+        "F44.9",
+        "F44.5",
+        "F44.4",
+        "F44.6"
+      ],
+      "rejected": [
+        "epileptic seizures",
+        "epilepsy",
+        "multiple sclerosis",
+        "MS",
+        "ischemic stroke",
+        "ischaemic stroke",
+        "cerebral infarction"
+      ],
+      "required_components": []
+    },
+    "differential": [
+      {
+        "diagnosis": "Epileptic seizures",
+        "icd_code": "G40.909",
+        "key_features": "Eyes open during the events favour epileptic seizures, but she followed a command during bilateral shaking and recovered at once. A habitual event recorded on video-EEG without ictal change; co-occurring epilepsy remains possible in about one in five patients with functional seizures.",
+        "likelihood": "low"
+      },
+      {
+        "diagnosis": "Multiple sclerosis",
+        "icd_code": "G35",
+        "key_features": "A remitting episode of right leg weakness two years ago raises demyelination; the Hoover sign and collapsing weakness with normal reflexes and flexor plantars show that the current weakness is functional but do not exclude a coexisting lesion, and the non-contrast MRI shows no white matter lesion.",
+        "likelihood": "low"
+      },
+      {
+        "diagnosis": "Ischemic stroke or other structural brain lesion",
+        "icd_code": "I63.9",
+        "key_features": "Weakness developed over 3 days rather than abruptly; positive functional signs, normal reflexes and a normal MRI without restricted diffusion or mass argue against it.",
+        "likelihood": "low"
+      }
+    ],
+    "key_clinical_evidence": [
+      "Positive signs of functional weakness and tremor: right Hoover sign, collapsing weakness of the right leg and a right hand tremor that stops with serial 7s; midline-splitting sensory loss and normal walking when unobserved are supportive only.",
+      "Event semiology: bilateral arm shaking for 2-3 minutes with no incontinence, no postictal confusion and immediate recovery; the open eyes are an atypical feature, so the semiology alone does not settle the events.",
+      "Video-EEG recorded one habitual event, confirmed as typical by the roommate, with no EEG change and responsiveness to command during the shaking; the interictal record is normal.",
+      "A non-contrast brain MRI with DWI, indicated by the 3-day focal deficit and the prior remitting right leg episode, shows no restricted diffusion, white matter lesion or other structural cause.",
+      "The recent divorce and custody dispute and her generalized anxiety are supportive context and a treatment target; a stressor is neither required nor sufficient for the diagnosis."
+    ],
+    "red_herrings": [
+      {
+        "correct_interpretation": "Psychiatric comorbidity neither establishes nor refutes FND; the diagnosis rests on the positive signs and the event semiology, and the anxiety is a treatment target.",
+        "data_point": "Generalized anxiety disorder treated with sertraline",
+        "field_path": "patient.clinical_history.past_medical_history",
+        "intended_effect": "Anchoring on a 'psychosomatic' label without eliciting positive signs, or dismissing the symptoms as anxiety",
+        "location": "Past medical history"
+      },
+      {
+        "correct_interpretation": "A stressor is supportive context only; it is neither required nor sufficient for the diagnosis.",
+        "data_point": "Divorce finalized 3 weeks ago with a custody dispute",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Concluding that stress 'caused' the symptoms and skipping the examination and the event recording",
+        "location": "History of present illness"
+      },
+      {
+        "correct_interpretation": "Open eyes are more frequent in epileptic seizures, but no single semiological feature is diagnostic; the habitual event recorded without ictal EEG change decides.",
+        "data_point": "Eyes open and rolled back during the episodes",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Treating the events as epileptic and starting antiseizure medication",
+        "location": "History of present illness"
+      }
+    ],
+    "review_status": "draft",
+    "sequence_constraints": [
+      {
+        "after_criterion_id": "action-4-analyze-brain-mri",
+        "before_criterion_id": "action-3-perform-clinical-assessment",
+        "citations": [
+          "[Espay_2018]"
+        ],
+        "reason": "The examination comes first: it defines the deficit the imaging must explain and takes minutes, so it does not delay the MRI (Espay 2018).",
+        "severity": "soft"
+      }
+    ],
+    "stop_rule": {
+      "max_additional_actions": 0,
+      "required_before_assessment": [
+        "action-3-perform-clinical-assessment",
+        "action-ecg",
+        "action-4-analyze-brain-mri",
+        "action-5-analyze-eeg"
+      ]
+    }
+  },
+  "initial_tool_outputs": {
+    "advanced_imaging": null,
+    "cardiac_monitoring": null,
+    "clinical_assessment": {
+      "assessment_type": "functional_neuro_signs",
+      "criteria_met": {
+        "distractibility_of_deficit": true,
+        "drift_without_pronation": false,
+        "functional_seizure_semiology_observed": false,
+        "give_way_weakness": true,
+        "hip_abductor_sign_positive": false,
+        "hoover_sign_positive": true,
+        "inconsistency_between_examination_and_function": true,
+        "tremor_entrainment_positive": false
+      },
+      "findings": [
+        {
+          "result": "Right hip extension absent on direct testing, full strength during contralateral left hip flexion against resistance.",
+          "sign": "Hoover sign"
+        },
+        {
+          "result": "Right leg strength collapses suddenly after a brief normal effort on each tested movement.",
+          "sign": "Collapsing (give-way) weakness"
+        },
+        {
+          "result": "Right hand tremor stops while she performs serial 7s and returns when the task ends.",
+          "sign": "Distractibility"
+        },
+        {
+          "result": "Right leg sensory loss splitting the midline at the groin; normal walking in the hallway when unaware of being observed; not counted as rule-in signs.",
+          "sign": "Supportive features (low specificity)"
+        },
+        {
+          "result": "Reflexes 2+ and symmetric; plantar responses flexor.",
+          "sign": "Reflexes and plantar responses"
+        }
+      ],
+      "impression": "Positive signs of functional weakness and tremor: Hoover sign, collapsing weakness of the right leg and distractible right hand tremor. The pattern is inconsistent with a structural lesion. No event was observed during the examination.",
+      "pre_post_comparison": null,
+      "recommended_actions": [],
+      "scores": {
+        "distribution_consistent_with_a_single_lesion": "no",
+        "internal_inconsistency": "present",
+        "positive_rule_in_signs_documented": "3"
+      }
+    },
+    "csf": null,
+    "drug_interactions": {
+      "general": {
+        "alternatives": [],
+        "contraindications": [],
+        "formulary_status": "",
+        "interactions": [],
+        "proposed": "Sertraline 50 mg once daily; Dicyclomine 10 mg as needed up to 3 times daily",
+        "summary": "No clinically significant interactions among the current medicines.",
+        "warnings": [
+          "Dicyclomine: anticholinergic effects (dizziness, blurred vision, drowsiness) at higher or repeated doses."
+        ]
+      }
+    },
+    "ecg": {
+      "axis": "normal (+60 degrees)",
+      "findings": [
+        "Sinus rhythm at 96 per minute with normal P-wave morphology.",
+        "PR interval 152 ms with no delta wave; QRS 86 ms with normal morphology and no bundle branch block.",
+        "No coved or saddleback ST elevation in V1-V2; no ST-segment or T-wave abnormality.",
+        "QTc 430 ms, within normal limits for a woman."
+      ],
+      "interpretation": "Normal 12-lead ECG: sinus rhythm at 96 per minute with normal PR, QRS and QTc intervals. No pre-excitation, Brugada pattern, heart block or QT prolongation.",
+      "intervals": {
+        "PR": "152 ms",
+        "QRS": "86 ms",
+        "QT": "340 ms",
+        "QTc": "430 ms (Bazett)"
+      },
+      "rate": 96,
+      "rhythm": "sinus rhythm"
+    },
+    "echo": null,
+    "eeg": {
+      "activating_procedures": {
+        "hyperventilation": "No abnormality",
+        "photic_stimulation": "No photoparoxysmal response"
+      },
+      "artifacts": [
+        {
+          "description": "Myogenic artifact during the event, without underlying rhythmic evolution",
+          "type": "muscle"
+        }
+      ],
+      "background": {
+        "description": "Well-organized 10 Hz posterior dominant rhythm, reactive to eye opening. Normal sleep architecture with vertex waves and spindles.",
+        "recording": "48-hour inpatient video-EEG, wake and sleep, 10-20 electrode placement"
+      },
+      "classification": "normal",
+      "eeg_type": "video",
+      "findings": [
+        {
+          "clinical_correlation": "",
+          "frequency": "",
+          "location": "generalized",
+          "morphology": "Day 1, 15:42, duration 2 min 35 s: bilateral asynchronous arm shaking of waxing and waning amplitude, eyes open with upward gaze, no speech; she squeezed the technologist's hand on command midway through the event and returned to baseline immediately afterwards. The roommate confirmed on video review that the event was typical. Posterior dominant rhythm visible between bursts of muscle artifact throughout; no evolving rhythmic activity, no postictal slowing or attenuation.",
+          "state": "awake",
+          "type": "Habitual clinical event"
+        }
+      ],
+      "impression": "This is a NORMAL video-EEG. One habitual event was recorded (bilateral asynchronous arm shaking with eyes open, lasting 2 min 35 s) without ictal EEG change before, during or after the event; the posterior dominant rhythm persisted during the event. No interictal epileptiform discharges. No electrographic seizures.",
+      "limitations": "",
+      "recommended_actions": []
+    },
+    "labs": null,
+    "literature_search": null,
+    "mri": {
+      "additional_observations": [
+        "Technique: sagittal T1, axial T2, axial and sagittal FLAIR, DWI with ADC, SWI; no contrast administered",
+        "No T2/FLAIR white matter lesion; no periventricular, juxtacortical, infratentorial or callosal lesion",
+        "No restricted diffusion",
+        "No hemorrhage or susceptibility artifact",
+        "Normal ventricles and posterior fossa"
+      ],
+      "findings": [],
+      "impression": "Normal non-contrast brain MRI. No white matter lesion, restricted diffusion, mass or hemorrhage.",
+      "recommended_actions": [],
+      "volumetrics": null
+    },
+    "specialized_test": null
+  },
+  "metadata": {
+    "authoring_agent": "condition-expert:FND",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "criteria_pack_version": "1.0",
+    "difficulty_rationale": "Clear positive signs of functional right leg weakness and tremor, but no event has been seen by a clinician and the events include an atypical feature (eyes open), so a habitual event must be recorded on video-EEG; the 3-day focal deficit needs a non-contrast MRI with DWI, and the events with apparent loss of responsiveness a 12-lead ECG.",
+    "fallback_tool_kinds": {
+      "cardiac_monitoring": "normal",
+      "clinical_assessment": "case",
+      "csf": "normal",
+      "ct": "normal",
+      "echo": "normal"
+    },
+    "last_revised": "2026-11-16",
+    "notes": "Straightforward FND with PNES and functional right leg weakness. The Hoover sign is diagnostic of the weakness; a video-EEG capture confirms the events.",
+    "policy_spec_status": "draft",
+    "revision_reason": "November 2026 review round: video-EEG required (no event seen by a clinician; ILAE 2013, AAN 2025), non-contrast brain MRI with DWI required for the 3-day focal deficit (Espay 2018; AHA/ASA 2026), 12-lead ECG required for the events with apparent loss of responsiveness (NICE CG109), with a stored case ECG. Earlier (October 2026): criteria rebuilt to the pack tiers, non-contrast MRI, case-specific differential, evidence and assessment.",
+    "version": "policy-v1",
+    "vocab_gap": []
+  },
+  "patient": {
+    "chief_complaint": "Right leg weakness over 3 days and two episodes of unresponsiveness",
+    "clinical_history": {
+      "allergies": [
+        "NKDA"
+      ],
+      "family_history": [
+        "Mother: depression and anxiety",
+        "No neurological family history"
+      ],
+      "medications": [
+        {
+          "dose": "50 mg",
+          "drug": "Sertraline",
+          "frequency": "once daily",
+          "indication": "Generalized anxiety disorder"
+        },
+        {
+          "dose": "10 mg",
+          "drug": "Dicyclomine",
+          "frequency": "as needed up to 3 times daily",
+          "indication": "IBS cramping"
+        }
+      ],
+      "past_medical_history": [
+        "Anxiety disorder (generalized)",
+        "Irritable bowel syndrome"
+      ],
+      "social_history": {
+        "alcohol": "Rarely",
+        "occupation": "Elementary school teacher",
+        "recent_stressor": "Divorce finalized 3 weeks ago after contentious 18-month separation; custody dispute for 4-year-old daughter",
+        "tobacco": "Never"
+      }
+    },
+    "demographics": {
+      "age": 28,
+      "bmi": 23.4,
+      "ethnicity": "White",
+      "handedness": "right",
+      "height_cm": 158,
+      "sex": "female",
+      "weight_kg": 58.4
+    },
+    "history_present_illness": "Ms. L is a 28-year-old elementary school teacher who was brought to the emergency department by ambulance after two witnessed episodes of unresponsiveness at home this morning. The episodes were described by her roommate as lasting 2-3 minutes with bilateral arm shaking, eyes open and rolled back, no post-ictal confusion, and immediate return to baseline after each episode. She also reports complete right leg weakness developing over the past 3 days, making it impossible for her to walk. She has no prior history of seizures or epilepsy. She is being admitted for monitoring and workup. On further history, she reports that her divorce was finalized 3 weeks ago following a contentious 18-month separation, with ongoing custody dispute for her 4-year-old daughter. She denies any head trauma, fever, or recent illness. She notes a similar episode of weakness affecting the right leg approximately 2 years ago, which her previous doctor attributed to stress and which resolved over several weeks without treatment. She denies headache, vision changes, or speech difficulty. She is currently prescribed sertraline for anxiety, which was started 6 months ago. She is not on any anticonvulsants. She denies illicit drug use. Collateral from roommate confirms no incontinence during episodes and rapid complete recovery.",
+    "neurological_exam": {
+      "additional": "Collapsing (give-way) weakness of the right leg on testing. Mild right hand tremor that stops while she performs serial 7s.",
+      "coordination": "Normal bilateral upper extremities. Unable to assess right leg due to apparent weakness.",
+      "cranial_nerves": "Normal. No facial asymmetry. EOMI intact.",
+      "gait": "Unable to weight-bear on right leg in room; observed walking normally in hallway when unaware of being observed.",
+      "mental_status": "Alert and oriented x4. Distressed and tearful. Cooperative but anxious.",
+      "motor": "Right leg 0/5 on formal testing. Hoover sign positive: right hip extension is absent on direct testing but returns to full strength, felt under the right heel, during contralateral left hip flexion against resistance. Left leg 5/5.",
+      "reflexes": "Normal 2+ symmetric throughout. No Babinski. No Hoffman.",
+      "sensory": "Right leg sensory loss splitting the midline exactly at the groin crease."
+    },
+    "patient_id": "NB-FND-S05",
+    "vitals": {
+      "bp_diastolic": 74,
+      "bp_systolic": 122,
+      "hr": 96,
+      "rr": 15,
+      "spo2": 99,
+      "temp": 37.0
+    }
+  },
+  "schema_version": "2.0"
+}

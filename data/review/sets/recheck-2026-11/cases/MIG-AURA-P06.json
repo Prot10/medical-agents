@@ -1,0 +1,684 @@
+{
+  "case_id": "MIG-AURA-P06",
+  "condition": "migraine_with_aura",
+  "difficulty": "diagnostic_puzzle",
+  "encounter_type": "outpatient",
+  "fallback_tool_outputs": {
+    "advanced_imaging": null,
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "events": [],
+      "findings": [
+        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
+      ],
+      "heart_rate_range": {
+        "average": 79,
+        "max": 115,
+        "min": 49
+      },
+      "impression": "Normal 24-hour Holter monitor.",
+      "monitor_type": "holter_24h",
+      "recommended_actions": [],
+      "rhythm_summary": "Sinus rhythm throughout the recording"
+    },
+    "csf": {
+      "appearance": "clear and colourless",
+      "cell_count": {
+        "rbc": "0 /uL",
+        "wbc": "2 /uL"
+      },
+      "glucose": "62 mg/dL",
+      "glucose_ratio": "0.6",
+      "interpretation": "Unremarkable CSF. Normal cell count, protein, and glucose.",
+      "opening_pressure": "16 cm H2O",
+      "protein": "38 mg/dL",
+      "special_tests": {}
+    },
+    "ct": {
+      "additional_observations": [],
+      "angiography_findings": null,
+      "contrast_used": false,
+      "findings": [],
+      "impression": "No acute intracranial abnormality. No haemorrhage, mass, hydrocephalus, or large-territory infarct.",
+      "recommended_actions": []
+    },
+    "drug_interactions": null,
+    "ecg": null,
+    "echo": {
+      "chambers": {
+        "LA": "normal size",
+        "LV": "normal size and systolic function",
+        "RA": "normal size",
+        "RV": "normal size and function"
+      },
+      "echo_type": "TTE",
+      "ejection_fraction": 64.0,
+      "findings": [
+        "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
+      ],
+      "impression": "Normal transthoracic echocardiogram.",
+      "recommended_actions": [],
+      "valves": {
+        "aortic": "structurally normal",
+        "mitral": "structurally normal",
+        "pulmonic": "normal",
+        "tricuspid": "normal"
+      },
+      "wall_motion": "no regional wall-motion abnormality"
+    },
+    "eeg": null,
+    "labs": null,
+    "literature_search": null,
+    "mri": null,
+    "specialized_test": null
+  },
+  "followup_outputs": [
+    {
+      "output": {
+        "findings": [
+          {
+            "description": "Indication: first language aura at 55 with white matter disease; familial NOTCH3 c.544C>T p.(Arg182Cys) reported in a maternal cousin."
+          },
+          {
+            "description": "Technique: targeted Sanger sequencing of NOTCH3 exon 4 for the familial variant c.544C>T p.(Arg182Cys), after pre-test counselling and written consent."
+          },
+          {
+            "description": "Result: heterozygous NOTCH3 c.544C>T p.(Arg182Cys), exon 4, the familial variant: a cysteine-altering variant in an EGF-like repeat, classified pathogenic (ACMG/AMP)."
+          }
+        ],
+        "impression": "Heterozygous pathogenic NOTCH3 c.544C>T p.(Arg182Cys), the familial cysteine-altering variant, detected. This genotype confirms a diagnosis of CADASIL.",
+        "quantitative_data": null,
+        "recommended_actions": [],
+        "test_type": "genetic_panel:CADASIL"
+      },
+      "tool_name": "order_specialized_test",
+      "trigger_action": "request_notch3_gene_test_cadasil_diagnosis"
+    },
+    {
+      "output": {
+        "findings": [
+          {
+            "domain": "Verbal memory",
+            "result": "7th percentile (below average); learning reduced, recognition better than free recall."
+          },
+          {
+            "domain": "Processing speed",
+            "result": "10th percentile (low)."
+          },
+          {
+            "domain": "Executive function",
+            "result": "15th percentile (low average); slowed set-shifting."
+          },
+          {
+            "domain": "Language",
+            "result": "Normal naming, fluency and repetition."
+          },
+          {
+            "domain": "Visuospatial function",
+            "result": "Normal."
+          },
+          {
+            "domain": "Daily function",
+            "result": "Independent in all instrumental activities; working part-time."
+          }
+        ],
+        "impression": "Reduced verbal memory and processing speed with low-average executive function and normal language and visuospatial function; a subcortical-pattern mild cognitive impairment. Criteria for dementia are not met.",
+        "quantitative_data": {
+          "executive function": "15th percentile",
+          "processing speed": "10th percentile",
+          "verbal memory": "7th percentile"
+        },
+        "recommended_actions": [
+          "Repeat neuropsychological assessment in 12 months."
+        ],
+        "test_type": "neuropsych_battery"
+      },
+      "tool_name": "order_specialized_test",
+      "trigger_action": "request_neuropsychology_cognitive_baseline"
+    }
+  ],
+  "ground_truth": {
+    "action_criteria": [
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "assessment_type": "structured_headache_history_ichd3"
+            },
+            "tool_name": "perform_clinical_assessment"
+          }
+        ],
+        "citations": [
+          "[ICHD_3]"
+        ],
+        "criterion_id": "action-3-perform-clinical-assessment",
+        "expected_evidence": "Three language-aura attacks with headache meet ICHD-3 1.2 A-C (4 of 6), but first aura at 55, isolated language aura and maternal early strokes, dementia and confirmed CADASIL leave criterion D open",
+        "importance": "required",
+        "label": "Take a structured headache and aura history with neurological examination and red-flag review, applying each ICHD-3 1.2 criterion",
+        "rationale": "The history establishes migraine-type aura and identifies the red flags (onset after 50, isolated language aura, a maternal history of hereditary arteriopathy) that make a secondary cause the question."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_brain_mri"
+          }
+        ],
+        "citations": [
+          "[AHS_neuroimaging_2020]"
+        ],
+        "criterion_id": "action-4-analyze-brain-mri",
+        "expected_evidence": "Anterior temporal pole and external capsule white matter hyperintensities with an old putaminal lacune, unchanged from 18 months earlier; no acute infarct or microbleeds",
+        "importance": "recommended",
+        "label": "Brain MRI with DWI and susceptibility imaging, compared with the outside study: first aura after 50 with a family history of hereditary small-vessel disease",
+        "rationale": "Recommended for red flags: a first aura at 55 and a maternal family history of early strokes and confirmed CADASIL. The white matter pattern (anterior temporal poles, external capsules) supports the genetic test; MRI does not establish migraine."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "genetic_panel:CADASIL"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "action-5-order-specialized-test",
+        "expected_evidence": "Familial pathogenic cysteine-altering NOTCH3 c.544C>T p.(Arg182Cys) detected: CADASIL confirmed",
+        "importance": "required",
+        "label": "Targeted NOTCH3 testing for the familial variant, after pre-test counselling and consent",
+        "rationale": "Required: he is symptomatic, a maternal cousin carries a pathogenic NOTCH3 variant and the MRI pattern suggests CADASIL. Targeted testing for the known familial variant is the first step; sequencing of NOTCH3 exons 2-24 is reserved for a negative result despite strong clinical and radiological suspicion. A cysteine-altering NOTCH3 variant is the diagnostic standard (Mancuso M et al., Eur J Neurol 2020)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "neuropsych_battery"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "action-6-order-specialized-test",
+        "expected_evidence": "Reduced verbal memory and processing speed with preserved language and visuospatial function: subcortical-pattern mild cognitive impairment, not dementia",
+        "importance": "recommended",
+        "label": "Formal neuropsychological assessment for a cognitive baseline",
+        "rationale": "Recommended: CADASIL causes subcortical cognitive decline that a screening test misses (MoCA 28/30 here); a baseline guides follow-up and work planning."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "drug": "sumatriptan"
+            },
+            "tool_name": "check_drug_interactions"
+          },
+          {
+            "required_arguments": {
+              "drug": "rizatriptan"
+            },
+            "tool_name": "check_drug_interactions"
+          },
+          {
+            "required_arguments": {
+              "drug": "zolmitriptan"
+            },
+            "tool_name": "check_drug_interactions"
+          },
+          {
+            "required_arguments": {
+              "drug": "triptan"
+            },
+            "tool_name": "check_drug_interactions"
+          },
+          {
+            "required_arguments": {
+              "drug": "ergotamine"
+            },
+            "tool_name": "check_drug_interactions"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "action-2-check-drug-interactions",
+        "expected_evidence": "Triptans and ergot derivatives are avoided in CADASIL as vasoconstrictors; no interaction with amlodipine, atorvastatin or paracetamol; acute treatment is aspirin or an NSAID with an antiemetic",
+        "importance": "recommended",
+        "label": "Check the acute migraine options (triptans, ergots) against CADASIL and his current medicines",
+        "rationale": "Recommended: the acute treatment choice changes with the diagnosis, because vasoconstrictive migraine drugs are not first-line acute treatment in CADASIL (VASCERN 2023) and triptans are contraindicated after cerebral infarction; his own medicines raise no interaction."
+      }
+    ],
+    "assessment": {
+      "prohibited_recommendations": [
+        "Do not prescribe triptans or ergot derivatives for his attacks: his MRI shows an old lacunar infarct (cerebral infarction is a label contraindication to triptans), and in CADASIL vasoconstrictive migraine drugs are not a first-line acute treatment (VASCERN CADASIL recommendations, 2023)",
+        "Do not start anticoagulation without a compelling independent indication such as atrial fibrillation: the arteriopathy of CADASIL raises the risk of intracerebral haemorrhage"
+      ],
+      "required_recommendations": [
+        "Give pre-test counselling and obtain his consent before the NOTCH3 test is sent: explain what a positive or negative result means for him and for his three adult children, each of whom would have a 50% chance of carrying the variant",
+        "Explain the diagnosis: CADASIL confirmed by the familial NOTCH3 variant, with migraine with typical (language) aura as a manifestation of the disease and mild subcortical cognitive impairment",
+        "Treat attacks with aspirin 900 mg or an NSAID such as naproxen 500 mg, with an antiemetic (for example metoclopramide 10 mg); no preventive is needed at about one attack a year",
+        "Treat vascular risk factors to secondary-prevention targets for established small-vessel disease: increase antihypertensive treatment (BP 136/82 mmHg on amlodipine 5 mg) towards a clinic target below 130/80 mmHg, continue the statin and remain a non-smoker",
+        "Refer to clinical genetics: explain autosomal dominant inheritance (each of his three adult children has a 50% chance of carrying the variant) and offer the children counselling and, if they wish, predictive testing, including the option not to test",
+        "Arrange cognitive follow-up with repeat neuropsychological assessment in 12 months"
+      ]
+    },
+    "avoided_actions": [
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "order_ct_scan"
+          }
+        ],
+        "citations": [
+          "[AHS_neuroimaging_2020]"
+        ],
+        "criterion_id": "avoid-waste-1-order-ct-scan",
+        "rationale": "Head CT adds nothing to MRI here: it is insensitive to the white matter pattern and the lacune that answer the question.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_csf"
+          }
+        ],
+        "citations": [
+          "[ICHD_3]"
+        ],
+        "criterion_id": "avoid-waste-2-analyze-csf",
+        "rationale": "Lumbar puncture is not indicated: there is no suspicion of subarachnoid haemorrhage, infection or inflammation, and CSF does not diagnose CADASIL.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "order_echocardiogram"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "avoid-waste-3-order-echocardiogram",
+        "rationale": "Echocardiography is not indicated: there has been no clinical stroke or embolic event, and PFO screening is not part of the migraine or CADASIL work-up.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "order_cardiac_monitoring"
+          }
+        ],
+        "citations": [
+          "[ICHD_3]"
+        ],
+        "criterion_id": "avoid-waste-4-order-cardiac-monitoring",
+        "rationale": "Ambulatory cardiac monitoring is not indicated: there is no cardioembolic event and the attacks are migraine aura.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "modality": "MR_angiography"
+            },
+            "tool_name": "order_advanced_imaging"
+          }
+        ],
+        "citations": [
+          "[AHS_neuroimaging_2020]"
+        ],
+        "criterion_id": "avoid-waste-5-order-advanced-imaging",
+        "rationale": "MR angiography is not indicated: CADASIL is an arteriolar disease that MRA does not show, and there is no thunderclap headache or suspected large-artery disease.",
+        "severity": "waste"
+      }
+    ],
+    "diagnosis": {
+      "accepted": [
+        "CADASIL (NOTCH3 R182C confirmed) with migraine with aphasic aura and early vascular cognitive impairment \u2014 aphasic episodes are CADASIL-associated migraine with aura",
+        "CADASIL",
+        "cerebral autosomal dominant arteriopathy with subcortical infarcts and leukoencephalopathy"
+      ],
+      "icd_codes": [
+        "I67.850",
+        "I67.85"
+      ],
+      "rejected": [
+        "alzheimer",
+        "alzheimers",
+        "multiple sclerosis",
+        "MS",
+        "sporadic small vessel disease",
+        "hypertensive small vessel disease",
+        "TIA",
+        "transient ischemic attack",
+        "transient ischaemic attack"
+      ]
+    },
+    "differential": [
+      {
+        "diagnosis": "Transient ischaemic attack",
+        "icd_code": "G45.9",
+        "key_features": "Against: stereotyped 15-25 minute language disturbance followed each time by a 10-14 hour migrainous headache, conscious throughout. MRI shows no acute infarct, which excludes infarction but not TIA, so these clinical features decide. The old right putaminal lacune is clinically silent and cannot explain aphasia.",
+        "likelihood": "low"
+      },
+      {
+        "diagnosis": "Sporadic (hypertensive) cerebral small-vessel disease",
+        "icd_code": "I67.9",
+        "key_features": "Against: pathogenic NOTCH3 variant shared with a maternal cousin; anterior temporal pole and external capsule involvement are not typical of hypertensive disease, and his hypertension is mild.",
+        "likelihood": "very_low"
+      },
+      {
+        "diagnosis": "Familial early-onset Alzheimer disease",
+        "icd_code": "G30.0",
+        "key_features": "Against: the maternal family history is of strokes with dementia; neuropsychology shows a subcortical profile (processing speed, verbal learning) with normal language and visuospatial function; no disproportionate medial temporal atrophy on MRI; NOTCH3 variant found.",
+        "likelihood": "very_low"
+      },
+      {
+        "diagnosis": "Multiple sclerosis",
+        "icd_code": "G35",
+        "key_features": "Against: no relapses of demyelinating type; the white matter pattern (anterior temporal poles, external capsules, lacune) is vascular, not demyelinating.",
+        "likelihood": "very_low"
+      }
+    ],
+    "key_clinical_evidence": [
+      "Three attacks of language aura followed by migrainous headache from age 55 meet ICHD-3 1.2 A-C, but onset after 50 and the family history leave criterion D open",
+      "Maternal line with early strokes and dementia and a cousin with NOTCH3 p.Arg182Cys indicate autosomal dominant small-vessel disease",
+      "MRI: white matter hyperintensities in both anterior temporal poles and external capsules with an old putaminal lacune",
+      "NOTCH3 c.544C>T p.(Arg182Cys), the familial cysteine-altering variant, confirms CADASIL",
+      "Neuropsychology shows subcortical-pattern mild cognitive impairment that the MoCA (28/30) did not detect",
+      "Triptans and ergots are avoided in CADASIL; aspirin or an NSAID with an antiemetic is the acute treatment"
+    ],
+    "red_herrings": [
+      {
+        "correct_interpretation": "Strokes with dementia in the maternal line and a cousin with NOTCH3 p.Arg182Cys point to CADASIL; neuropsychology shows a subcortical, not an amnestic-cortical, profile.",
+        "data_point": "Mother died at 65 with 'multiple strokes and dementia'",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "Could anchor on familial early-onset Alzheimer disease",
+        "location": "patient.history_present_illness"
+      },
+      {
+        "correct_interpretation": "The attacks are migraine aura, but a first aura at 55 with this family history is a red flag; the aura is a manifestation of CADASIL.",
+        "data_point": "Stereotyped language aura followed by migrainous headache",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "The attacks look like ordinary migraine with aura, so the underlying disease may not be sought",
+        "location": "patient.history_present_illness"
+      },
+      {
+        "correct_interpretation": "Screening tests are insensitive to subcortical slowing; formal neuropsychology shows reduced verbal memory and processing speed.",
+        "data_point": "MoCA 28/30",
+        "field_path": "patient.neurological_exam.mental_status",
+        "intended_effect": "May suggest that cognition is normal",
+        "location": "patient.neurological_exam.mental_status"
+      }
+    ],
+    "review_status": "draft",
+    "sequence_constraints": [
+      {
+        "after_criterion_id": "action-4-analyze-brain-mri",
+        "before_criterion_id": "action-3-perform-clinical-assessment",
+        "citations": [],
+        "reason": "The structured history identifies the red flags that justify imaging.",
+        "severity": "soft"
+      },
+      {
+        "after_criterion_id": "action-5-order-specialized-test",
+        "before_criterion_id": "action-4-analyze-brain-mri",
+        "citations": [],
+        "reason": "The MRI pattern is part of the indication for NOTCH3 testing.",
+        "severity": "soft"
+      }
+    ],
+    "stop_rule": {
+      "max_additional_actions": 1,
+      "required_before_assessment": [
+        "action-3-perform-clinical-assessment",
+        "action-5-order-specialized-test"
+      ]
+    }
+  },
+  "initial_tool_outputs": {
+    "advanced_imaging": null,
+    "cardiac_monitoring": null,
+    "clinical_assessment": {
+      "assessment_type": "structured_headache_history_ichd3",
+      "criteria_met": {
+        "at_least_one_positive_aura_symptom": false,
+        "at_least_one_unilateral_aura_symptom": true,
+        "at_least_three_of_six_characteristics": true,
+        "at_least_two_attacks": true,
+        "aura_accompanied_or_followed_within_sixty_minutes_by_headache": true,
+        "each_symptom_lasts_five_to_sixty_minutes_motor_up_to_seventy_two_hours": true,
+        "gradual_spread_over_at_least_five_minutes": true,
+        "not_better_accounted_for_by_another_diagnosis": false,
+        "one_or_more_fully_reversible_aura_symptoms": true,
+        "two_or_more_aura_symptoms_in_succession": false
+      },
+      "findings": [
+        {
+          "element": "Attack count",
+          "result": "Three attacks in 3 years, the first at age 55. No earlier history of migraine or other recurrent headache."
+        },
+        {
+          "element": "Aura type and evolution",
+          "result": "Expressive language disturbance only: noun-finding failure with paraphasias and circumlocution. By his own account it develops over several minutes; his family perceive the start as abrupt. No visual, sensory, motor or brainstem symptoms."
+        },
+        {
+          "element": "Aura duration and reversibility",
+          "result": "15-25 minutes per attack, with full recovery of speech each time; conscious and aware throughout."
+        },
+        {
+          "element": "Headache relation",
+          "result": "Each attack is followed within about 15 minutes by a severe (8/10) right-sided pulsating headache with nausea and photophobia lasting 10-14 hours."
+        },
+        {
+          "element": "Family history",
+          "result": "Maternal line: mother with multiple strokes and dementia, died at 65; maternal uncle with strokes in his 50s; maternal cousin with genetically confirmed CADASIL (NOTCH3 p.Arg182Cys). Paternal line unaffected."
+        },
+        {
+          "element": "Vascular risk",
+          "result": "Treated mild hypertension (amlodipine 5 mg) and hypercholesterolaemia (atorvastatin 20 mg); non-smoker; 8-10 units of alcohol a week."
+        },
+        {
+          "element": "Medication use",
+          "result": "Paracetamol 1 g as needed for the headaches. No triptan or ergot used."
+        },
+        {
+          "element": "Examination today",
+          "result": "Normal language, cranial nerves, power, reflexes, sensation, coordination and gait. MoCA 28/30 (orientation 1, delayed recall 1). BP 136/82 mmHg."
+        },
+        {
+          "element": "Red-flag review (SNNOOP10)",
+          "result": "Onset after 50 (first aura at 55): present. Isolated language aura: present. Family history of early strokes and dementia with a confirmed hereditary arteriopathy: present. Systemic symptoms, neoplasia, deficit outside the aura, thunderclap onset, positional or Valsalva trigger, papilloedema and painful eye: absent."
+        }
+      ],
+      "impression": "The attacks fulfil ICHD-3 1.2 criteria A-C for migraine with typical (language) aura: 3 attacks, 4 of 6 characteristics. Criterion D is not met at this stage: a first aura at 55, an isolated language aura and a maternal history of early strokes, dementia and confirmed CADASIL require exclusion of a secondary cause (ICHD-3 6.8.1, headache attributed to CADASIL).",
+      "pre_post_comparison": null,
+      "recommended_actions": [],
+      "scores": {
+        "ICHD-3 criterion C characteristics met": "4 of 6 (gradual development, 5-60 min duration, unilateral (aphasia counts as unilateral), headache within 60 min)",
+        "attack frequency": "about one a year",
+        "aura modality": "speech/language",
+        "reference criteria applied": "ICHD-3 1.2, 1.2.1 and 6.8.1"
+      }
+    },
+    "csf": null,
+    "ct": null,
+    "drug_interactions": {
+      "sumatriptan": {
+        "alternatives": [
+          "Aspirin 900 mg or an NSAID (for example naproxen 500 mg), with an antiemetic such as metoclopramide 10 mg",
+          "Paracetamol 1 g with an antiemetic"
+        ],
+        "contraindications": [
+          "Triptans and ergot derivatives in CADASIL: no evidence contraindicates triptans, but expert recommendations advise against vasoconstrictive drugs as first-line acute treatment and allow them only as a second or third choice (VASCERN CADASIL recommendations, 2023). Triptans remain contraindicated after cerebral infarction.",
+          "Triptans are also contraindicated after ischaemic stroke or TIA and in uncontrolled hypertension."
+        ],
+        "formulary_status": "on formulary",
+        "interactions": [
+          "Triptans + amlodipine: no pharmacokinetic interaction listed.",
+          "Triptans + atorvastatin: no interaction listed.",
+          "Triptans + paracetamol: no interaction listed."
+        ],
+        "proposed": "Sumatriptan or another triptan for acute migraine, with amlodipine 5 mg, atorvastatin 20 mg and paracetamol as needed",
+        "summary": "No pharmacokinetic interaction with his current medicines; if CADASIL is confirmed, triptans and ergots are not first-line acute treatment because they are vasoconstrictors.",
+        "warnings": [
+          "NSAIDs: occasional use for acute headache is acceptable; regular use can raise blood pressure and blunt the effect of antihypertensives."
+        ]
+      }
+    },
+    "ecg": null,
+    "echo": null,
+    "eeg": null,
+    "labs": null,
+    "mri": {
+      "additional_observations": [
+        "Technique: non-contrast 3 T brain MRI with T1, T2, FLAIR, DWI/ADC and susceptibility-weighted imaging.",
+        "Comparison: outside brain MRI 18 months earlier; white matter changes and the putaminal lacune are unchanged; no new lesion.",
+        "No restricted diffusion. No microbleeds on susceptibility-weighted imaging.",
+        "No disproportionate medial temporal atrophy. Ventricles and sulci normal for age. No mass."
+      ],
+      "findings": [
+        {
+          "borders": "ill-defined, confluent",
+          "location": "bilateral anterior temporal poles",
+          "mass_effect": "none",
+          "signal_characteristics": {
+            "DWI": "no acute restriction",
+            "FLAIR": "confluent hyperintense",
+            "T2": "hyperintense"
+          },
+          "size": "confluent bilateral lesions, largest 18 mm",
+          "type": "white_matter_hyperintensity"
+        },
+        {
+          "borders": "ill-defined",
+          "location": "bilateral external capsules and periventricular white matter",
+          "mass_effect": "none",
+          "signal_characteristics": {
+            "FLAIR": "hyperintense",
+            "T2": "hyperintense"
+          },
+          "size": "extensive, multiple foci, largest 12 mm",
+          "type": "white_matter_hyperintensity"
+        },
+        {
+          "borders": "well-defined",
+          "location": "right basal ganglia (putamen)",
+          "mass_effect": "none",
+          "signal_characteristics": {
+            "DWI": "no acute restriction",
+            "FLAIR": "hyperintense",
+            "T1": "hypointense"
+          },
+          "size": "8 mm",
+          "type": "lacunar_infarction"
+        }
+      ],
+      "impression": "1. Confluent white matter hyperintensities involving both anterior temporal poles and both external capsules, with periventricular extension; this distribution is suggestive of CADASIL. 2. Old lacunar infarct in the right putamen. 3. No acute infarct, no microbleeds; unchanged from the outside study.",
+      "recommended_actions": [],
+      "volumetrics": null
+    },
+    "specialized_test": null
+  },
+  "metadata": {
+    "authoring_agent": "condition-expert:MIG-AURA",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "condition_name": "Confirmed CADASIL with migraine with aphasic aura \u2014 triptan contraindication, genetic counselling, anticoagulation avoidance",
+    "criteria_pack_version": "1.0",
+    "difficulty_description": "Diagnostic puzzle: CADASIL presenting as migraine with aphasic aura; diagnosis changes management (triptans contraindicated, anticoagulation avoided); genetic confirmation required; family implications",
+    "difficulty_rationale": "Diagnostic puzzle: CADASIL diagnosis with MRI pattern recognition, NOTCH3 confirmation, baseline neuropsych, and triptan contraindication",
+    "expected_agent_confidence": 0.35,
+    "fallback_tool_kinds": {
+      "cardiac_monitoring": "normal",
+      "csf": "normal",
+      "ct": "normal",
+      "echo": "normal"
+    },
+    "last_revised": "2026-08-10",
+    "policy_spec_status": "draft",
+    "revision_reason": "independent migraine review: corrected 3-of-6 ICHD-3 assessment, removed authored routine tests, retained explicit red-flag exceptions",
+    "version": "policy-v1",
+    "vocab_gap": []
+  },
+  "patient": {
+    "age": 58,
+    "chief_complaint": "Episodic word-finding difficulty and headache \u2014 new episodes beginning age 55; family strongly suspects hereditary condition",
+    "clinical_history": {
+      "allergies": [
+        "No known drug allergies"
+      ],
+      "family_history": [
+        "Mother: multiple strokes and dementia, died age 65. Maternal uncle: strokes in 50s. Maternal cousin: CONFIRMED CADASIL (NOTCH3 R182C mutation). No paternal family history of stroke."
+      ],
+      "medications": [
+        {
+          "dose": "5 mg",
+          "drug": "Amlodipine",
+          "frequency": "once daily",
+          "indication": "Hypertension"
+        },
+        {
+          "dose": "20 mg",
+          "drug": "Atorvastatin",
+          "frequency": "once daily",
+          "indication": "Hypercholesterolaemia"
+        },
+        {
+          "dose": "1000 mg",
+          "drug": "Paracetamol",
+          "frequency": "as needed",
+          "indication": "Headache"
+        }
+      ],
+      "past_medical_history": [],
+      "social_history": {
+        "note": "Retired solicitor/consultant; non-smoker; 8-10 units alcohol/week; married; adult children (3); drives regularly; no cognitive complaints"
+      }
+    },
+    "demographics": {
+      "age": 58,
+      "bmi": 26.5,
+      "height_cm": 175,
+      "sex": "male",
+      "weight_kg": 81.2
+    },
+    "ethnicity": "White British",
+    "history_present_illness": "A 58-year-old British man presented to the neurology outpatient clinic following three episodes of transient expressive language difficulty with subsequent headache over the past 3 years. Episodes began at age 55 \u2014 the family describes it as sudden-onset for him (though he says 'gradual'). He becomes unable to recall specific nouns \u2014 paraphasias and circumlocutions \u2014 lasting approximately 15-25 minutes, followed by a severe right-sided pulsating headache 8/10 with nausea and photophobia lasting 10-14 hours. He remains fully conscious and aware throughout each episode.\n\nHis family history is striking: his mother died at age 65 with 'multiple strokes and dementia'; his maternal uncle also had 'strokes in his 50s and died young'; and one maternal cousin underwent genetic testing and was found to have CADASIL (NOTCH3 mutation R182C \u2014 exon 4 cysteine-altering mutation). The patient has never been tested.\n\nHe had a brain MRI at a peripheral hospital 18 months ago, organised by his GP after the first episode; the images have been sent for comparison but he does not know the result.\n\nHe has mild hypertension and borderline hypercholesterolaemia. He is a non-smoker. No prior history of stroke or noticeable cognitive decline; he retired as a solicitor and now works part-time as a legal consultant.",
+    "hpi": "A 58-year-old British man presented to the neurology outpatient clinic following three episodes of transient expressive language difficulty with subsequent headache over the past 3 years. Episodes began at age 55 \u2014 the family describes it as sudden-onset for him (though he says 'gradual'). He becomes unable to recall specific nouns \u2014 paraphasias and circumlocutions \u2014 lasting approximately 15-25 minutes, followed by a severe right-sided pulsating headache 8/10 with nausea and photophobia lasting 10-14 hours. He remains fully conscious and aware throughout each episode.\n\nHis family history is striking: his mother died at age 65 with 'multiple strokes and dementia'; his maternal uncle also had 'strokes in his 50s and died young'; and one maternal cousin underwent genetic testing and was found to have CADASIL (NOTCH3 mutation R182C \u2014 exon 4 cysteine-altering mutation). The patient has never been tested.\n\nHe had a brain MRI at a peripheral hospital 18 months ago, organised by his GP after the first episode; the images have been sent for comparison but he does not know the result.\n\nHe has mild hypertension and borderline hypercholesterolaemia. He is a non-smoker. No prior history of stroke or noticeable cognitive decline; he retired as a solicitor and now works part-time as a legal consultant.",
+    "neurological_exam": {
+      "coordination": "Coordination normal.",
+      "cranial_nerves": "Normal cranial nerves II-XII. No nystagmus. Visual fields full. PERRLA. No papilledema.",
+      "gait": "Gait normal.",
+      "mental_status": "Alert, fully oriented, working part-time. Fluent speech, normal confrontation naming, normal repetition, normal comprehension between episodes. MoCA 28/30 (1 point lost on orientation to date, 1 point on delayed recall).",
+      "motor": "Motor 5/5 throughout. Normal plantar responses. No pronator drift.",
+      "reflexes": "Deep tendon reflexes 2+ symmetric. No Babinski.",
+      "sensory": "Sensation intact to light touch and pinprick bilaterally."
+    },
+    "patient_id": "UNKNOWN",
+    "physical_exam": {
+      "abdomen": "Soft",
+      "cardiovascular": "Regular rate and rhythm; no murmurs; no carotid bruits",
+      "extremities": "No edema",
+      "general": "Well-appearing; fully oriented; working part-time; fluent and articulate; no active deficits",
+      "neurological": "Normal language: fluent, normal naming, normal repetition, normal comprehension. Normal cranial nerves. No nystagmus. Motor 5/5. DTR 2+ symmetric. Normal plantar responses. Sensation intact. Coordination normal. Gait normal. MoCA 28/30 (1 point lost on orientation, 1 point on delayed recall).",
+      "respiratory": "Clear"
+    },
+    "pmh": [
+      "Mild hypertension \u2014 on amlodipine",
+      "Borderline hypercholesterolaemia \u2014 on atorvastatin 20 mg",
+      "No prior stroke or confirmed TIA",
+      "Possible CADASIL \u2014 family history"
+    ],
+    "sex": "male",
+    "vitals": {
+      "bp_diastolic": 82,
+      "bp_systolic": 136,
+      "hr": 70,
+      "rr": 14,
+      "spo2": 99,
+      "temp": 36.8
+    }
+  },
+  "schema_version": "2.0"
+}

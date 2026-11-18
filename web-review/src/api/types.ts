@@ -454,3 +454,13 @@ export interface GroundTruth {
     correct_interpretation: string
   }>
 }
+
+/** A fixed list of cases re-reviewed in a space of its own; its id is a dataset version. */
+export interface ReviewSet {
+  id: string
+  base_version: string
+  name: string
+  description: string
+  case_ids: string[]
+  case_count: number
+}

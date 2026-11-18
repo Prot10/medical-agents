@@ -14,6 +14,7 @@ import logging
 import re
 import tempfile
 import threading
+from collections.abc import Iterable
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -52,8 +53,10 @@ def _review_lock(version: str, reviewer_code: str, case_id: str) -> threading.RL
 class AnnotationStore:
     """Read/write reviewer-scoped annotation files."""
 
-    def __init__(self, root: Path) -> None:
+    def __init__(self, root: Path, extra_versions: Iterable[str] = ()) -> None:
         self._root = root
+        # Review-set ids (services/review_sets.py): versions of their own, filed apart.
+        self._versions = set(DATASETS) | set(extra_versions)
 
     @property
     def root(self) -> Path:
@@ -63,7 +66,7 @@ class AnnotationStore:
     # Path resolution
 
     def _validate_version(self, version: str) -> str:
-        if not _VERSION_PATTERN.fullmatch(version) or version not in DATASETS:
+        if not _VERSION_PATTERN.fullmatch(version) or version not in self._versions:
             raise ValueError(f"Unknown dataset version: {version!r}")
         return version
 
