@@ -38,7 +38,7 @@ Updated 17 Nov 2026. One line per decision, with its date. The manuscript plan (
 - To ask / asked:
   - [ ] one condition redone with two separate accounts → inter-physician agreement (kappa);
   - [ ] after the corrections: a sample of cases checked again;
-  - [ ] 20–30 cases solved by the physicians → physician vs agent comparison (and the human reference in Fig. 2);
+  - [ ] 20–30 cases solved by the physicians → physician vs agent comparison (Fig. 4c);
   - [ ] ~100 model work-ups rated blind → does our score agree with the physicians?
 - In the Methods: role and experience of the physicians, not their names.
 
@@ -85,7 +85,7 @@ Main figures (17 Nov; several experiments can share a figure, in different panel
 | Fig. | Content |
 |---|---|
 | 1 | Overview: cases, tests, score, physician review (+ inter-physician agreement) |
-| 2 | Correct diagnosis with wrong or missing tests, untrained models, with the neurologists as a human reference |
+| 2 | Correct diagnosis with wrong or missing tests, untrained models (models only since 18 Nov) |
 | 3 | A vs B vs base (the reward history moved to ED2 on 17 Nov) |
 | 4 | The physicians: (a) blind rating vs score, (b) physician vs agent on the same cases |
 | 5 | Real MIMIC neuro cases |
@@ -101,6 +101,8 @@ Palette (17 Nov), the same in every figure — Okabe-Ito, colour-blind safe (Won
 | Physicians / policy | pink `#CC79A7` |
 | Correct ✓ | green `#009E73` |
 | Error ✗ | vermilion `#D55E00` |
+
+Approval (18 Nov): Andrea approved Figures 1–4 as drawn here. For Figs. 2–4 this approves the layout; the marks sit on invented data and every number stays "xx" until the runs and the physician studies exist.
 
 Figure 1 (17 Nov):
 - From scratch, simpler than the 26 Oct version; SVG file, then PDF.
@@ -140,7 +142,25 @@ Figure 3 (17 Nov), draft to settle the layout (`paper/figures/fig3_svg.py`, `fig
 - Out of the Main: the reward history goes entirely to ED2 (in the Main it suggests "they changed the reward until it worked", and it rests on one seed and on validation); the single case leaves (the widget is already in Figs 1 and 2).
 - The panel on unseen conditions from the R3 plan is not needed: the test set contains only conditions excluded from training.
 
-Figure 2, changes of 17 Nov after the same research: one more class in the bars of c, "complete but with useless tests" (MIRA's reviewers, Nature 2026, asked for precision and a penalty for useless tests), and "n = xx" correct diagnoses next to each bar (Hager, Nat Med 2024). The same day, at Andrea's decision, the neurologists enter Fig. 2 as a human reference: a pink diamond in panel a and a row in the bars of c (Hager, MIRA and SDBench put clinicians beside the models). Needs the 20–30 cases solved by the physicians; in panel a the neurologists cover a subset of the cases, and the models on the same cases go to ED.
+Figure 2, changes of 17 Nov after the same research: one more class in the bars of c, "complete but with useless tests" (MIRA's reviewers, Nature 2026, asked for precision and a penalty for useless tests), and "n = xx" correct diagnoses next to each bar (Hager, Nat Med 2024). The same day, at Andrea's decision, the neurologists enter Fig. 2 as a human reference: a pink diamond in panel a and a row in the bars of c (Hager, MIRA and SDBench put clinicians beside the models). Needs the 20–30 cases solved by the physicians; in panel a the neurologists cover a subset of the cases, and the models on the same cases go to ED. **Reversed on 18 Nov (Andrea):** the neurologists left Fig. 2 (pink diamond in a, row in c, legend key) because they solve only 20–30 cases while the models solve all 119, and Fig. 4c already compares them with the models on the same cases; Supplementary Table 2 lost its neurologist block, now Supplementary Table 12.
+
+Figure 4 (18 Nov), layout (`paper/figures/fig4_svg.py`, `fig4-new.pdf`, 180 × 100 mm, same rules as Figs. 2–3; every number is "xx"). Figures and tables are drafts until Andrea approves each one (18 Nov). Redone the same day at Andrea's request: shorter texts, better use of space, no overlap with the other figures.
+- One question per row. Top: does the policy score measure what neurologists value (blind rating)? Bottom: how close is each model to neurologists who solve the same cases?
+- a: Spearman correlation of each score with the blind ratings (policy score, outcome score, diagnosis alone, LLM judge), with the agreement between two neurologists as a band, the most a score can reach. The LLM-judge row needs a new, cheap run; it answers the most frequent reviewer request (validate automatic judges against clinicians).
+- b: ratings of correct diagnoses by the four work-up classes of Fig. 2c: uses no score, so it also answers circularity.
+- c: the three models read against the neurologist of each case (agrees on the diagnosis, the neurologist's tests ordered), plus required coverage and tests per case for everyone, which show how far the neurologists follow the policy. No P values: 20–30 cases, and the paper claims nothing about beating physicians.
+- Dropped: the text panel with the study design (it repeated the legend); measures already in Fig. 3b (unsafe actions on the full test set).
+- Every row is a horizontal dot plot with labels on the left, so no label wraps.
+- Overlap resolved (18 Nov, Andrea): the neurologists left Fig. 2; physicians appear only in Fig. 4, compared with the models on the same cases. Numbers in Supplementary Table 12.
+
+Captions (18 Nov), all four re-checked against the current drawings, at most 250 words each (Fig. 1 ~190, Fig. 2 ~245, Fig. 3 ~215, Fig. 4 ~225):
+- Fig. 1: the drug check takes no reason; the score also checks useless tests and stopping ("Also scored" in c); test cost at Medicare prices.
+- Fig. 2: no neurologists; "points are means"; n counted over all seeds; the colours of d said in words (green, grey, orange), as NMI asks.
+- Fig. 3: one opening sentence names the three models; error bars, CIs and the paired, corrected test stated once for b–d (c and d had none); the test itself is left to Methods until the choice between Wilcoxon and McNemar is made.
+- Fig. 4: written for the redesigned figure; the pink line is the agreement between two neurologists and the band its CI.
+- Style pass (18 Nov, skill scientific-paper-style, approved by Andrea): "work-up" defined in the Fig. 1 caption; reading sentences about results not yet measured removed; long sentences split.
+
+Names (18 Nov), one per measure in captions, figure labels, tables and plan text: "Correct diagnoses (%)" (never "accuracy" or "correct diagnosis"), "Required tests ordered (%)", "Cases with an unsafe action (%)", "Cost per case ($)", "Tests per case", "Useless tests per case", "policy score", "outcome score". The ingredients of the outcome reward are "diagnosis and cost". "Accuracy" stays only where another paper's figure is cited and in the reward component "tool accuracy".
 
 Notes:
 - Weights of models trained on MIMIC: not freely publishable (PhysioNet agreement).
@@ -153,7 +173,7 @@ File `manuscript/sections/08-tables.tex`. Values are `xx ± xx` (mean ± s.d. ac
 |---|---|
 | ED Table 1 | Main results, two blocks (NeuroBench test 119, MIMIC 100): untrained, outcome reward, policy reward, policy − outcome difference with CI, P (Wilcoxon or McNemar, Benjamini–Hochberg per block). Rows: correct diagnosis, required, recommended, unsafe, useless tests, tests, cost, outcome score, policy score |
 | Supp 1 | MIMIC split: conditions kept out of training (HEP 10 + BACT 2) vs seen in training or validation (88) |
-| Supp 2 | Untrained models (numbers behind Fig. 2) with ranks, and the block on the cases worked up by the neurologists |
+| Supp 2 | Untrained models (numbers behind Fig. 2) with ranks |
 | Supp 3 | Per test condition (numbers behind Fig. 3c) |
 | Supp 4 | Controls and ablations: scripted (perfect, order everything), untrained (no test, no menu, rules in the prompt), trained (SFT, outcome without cost, policy without penalty) |
 | Supp 5 | The two rewards, weights filled in from `policy_reward.py` |
@@ -163,6 +183,7 @@ File `manuscript/sections/08-tables.tex`. Values are `xx ± xx` (mean ± s.d. ac
 | Supp 9 | Physician agreement (kappa per dimension, blind rating vs score) |
 | Supp 10 | Cost of running an episode |
 | Supp 11 | Thinking off vs on (values filled in; check whether invalid actions and failed episodes are totals or per seed) |
+| Supp 12 | Models against neurologists on the same cases (numbers behind Fig. 4c; added 18 Nov) |
 
 ## Which test set carries the main claim (17 Nov, proposed, to confirm with Andrea)
 Both, with different roles.

@@ -43,7 +43,7 @@ two neurologists and inter-physician agreement; 100 MIMIC-IV admissions for test
 and the case policy it is checked against; the paper's entry point.
 \end{itemize}
 
-\status{Fig.~1 drafted. Agreement needs one condition reviewed on two separate accounts.}
+\status{Fig.~1 approved by Andrea (18 Nov). Agreement needs one condition reviewed on two separate accounts.}
 
 \begin{figure}[p]
 \centering
@@ -56,13 +56,15 @@ and the case policy it is checked against; the paper's entry point.
 \textbf{a}, The cases. Synthetic neurology cases are split by condition, so no test condition is seen
 in training. Real admissions from MIMIC-IV are used for testing only.
 \textbf{b}, A real episode on a validation case. NeuroAgent is Qwen3.5-9B trained with reinforcement
-learning to raise the policy score shown in \textbf{c}. At each turn it orders one test and gives a
-reason for it, and the simulated hospital returns the report stored for that test. Reasons are quoted
-from the agent with cuts marked by ellipses, and reports are shortened.
+learning to raise the policy score shown in \textbf{c}. The tests an agent orders on the way to its
+diagnosis form its work-up. At each turn the agent orders one test and says why, and the simulated
+hospital answers with the report stored for that test; only the drug check takes no reason. Reasons
+are quoted from the agent with cuts marked by ellipses, and reports are shortened.
 \textbf{c}, The case policy, reviewed by two neurologists, lists the tests the work-up requires, those
-it recommends, those to avoid and the expected diagnosis. The episode in \textbf{b} is checked against
-each item: green ticks mark what it satisfied and the orange cross the one recommended test it missed.
-Together they give the policy score of the episode, from 0 to 1.}
+it recommends, those to avoid and the expected diagnosis. The score also checks that no test is
+useless and that the agent stops when the work-up is complete. Green ticks mark the items the episode
+in \textbf{b} satisfied and the orange cross the one recommended test it missed. Together the items
+give the policy score, from 0 (worst) to 1 (best). Test costs use Medicare reference prices.}
 \label{fig:overview}
 \end{figure}
 
@@ -75,8 +77,9 @@ outcome alone is a problem worth solving.}
 \content
 \begin{itemize}
 \item Untrained panel: Qwen3.5-9B, Granite 4.1 8B, Gemma 4 E4B and two or three larger models, on the
-119 test cases, three seeds; neurologists on 20--30 of the same cases as a human reference.
-\item Accuracy against policy score per model; rank agreement (Kendall's $\tau$, bootstrap CI).
+119 test cases, three seeds. Models only: physicians are compared with the models in Fig.~4, on the
+same cases.
+\item Correct diagnoses against policy score per model; rank agreement (Kendall's $\tau$, bootstrap CI).
 \item What lies behind correct diagnoses: complete work-up, complete with useless tests, required test
 missed, unsafe action.
 \end{itemize}
@@ -84,45 +87,44 @@ missed, unsafe action.
 \structure
 \begin{enumerate}
 \item Claim and setup (80 words).
-\item Correct but incomplete or unsafe: rates per model and for the neurologists (150).
+\item Correct but incomplete or unsafe: rates per model (150).
 \item Rankings change (100).
 \item One concrete case, Fig.~2d (70).
 \end{enumerate}
 
 \artefacts
 \begin{itemize}
-\item \textbf{Fig.~2}: a, accuracy against policy score; b, the two rankings; c, what lies behind correct
-diagnoses; d, three work-ups of one meningitis case. \emph{Why:} a and b show the mis-ranking, c what
-accuracy hides, d makes it concrete.
-\item \textbf{Supp.\ Table~2}: every number of the figure, and the models on the neurologists' cases.
+\item \textbf{Fig.~2}: a, correct diagnoses against policy score; b, the two rankings; c, what lies behind correct
+diagnoses; d, three work-ups of one meningitis case. \emph{Why:} a and b show the mis-ranking, c what a
+correct diagnosis hides, d makes it concrete.
+\item \textbf{Supp.\ Table~2}: every number of the figure.
 \item \textbf{ED Fig.~7}: controls (no test, no menu, scripted agents) bound the scales.
 \end{itemize}
 
-\status{Layout drafted on invented data; runs and the neurologists' cases to come.}
+\status{Layout approved by Andrea (18 Nov) on invented data; runs and the neurologists' cases to come.}
 
 \begin{figure}[p]
 \centering
-% Layout draft (17 Nov 2026): the marks sit on invented data and every printed number is xx; the
+% Layout approved by Andrea (18 Nov 2026): the marks sit on invented data and every printed number is xx; the
 % caption keeps xx for what the runs will give. Source: paper/figures/fig2_svg.py.
 \makebox[\textwidth][c]{\includegraphics[width=180mm]{fig2-new.pdf}}
 \caption{\textbf{A correct diagnosis can hide an incomplete or unsafe work-up.}
-\textbf{a}, Diagnostic accuracy and mean policy score of xx untrained models on the xx test cases,
-each run with xx seeds. Grey circles are open models with up to 9 billion parameters, black squares
-are larger models and the pink diamond is xx neurologists, who worked up xx of the test cases through
-the same interface (the models on those cases alone are in Supplementary Table~2); error bars are 95\%
-confidence intervals from a bootstrap over cases. Models with similar accuracy can differ widely in
-policy score.
-\textbf{b}, The same models ranked by accuracy and by policy score, with a line joining the two places
-of each model. Crossing lines mark models that change place. Kendall's $\tau$ between the two rankings
-is xx (95\% confidence interval xx to xx).
-\textbf{c}, What lies behind the correct diagnoses of each model and of the neurologists, with $n$
-the number of correct diagnoses. A complete work-up orders every required test and takes no unsafe
-action; it is split by whether it also ordered tests that the case policy does not ask for. The other
-correct diagnoses either missed at least one required test or came with an unsafe action, and a
-work-up with both counts as unsafe.
+\textbf{a}, Correct diagnoses, as a share of the 119 test cases, against the mean policy score of xx
+untrained models, each run with xx seeds. Grey circles are open models with up to 9 billion parameters
+and black squares are larger models. Points are means and error bars 95\% confidence intervals from a
+bootstrap over cases.
+\textbf{b}, The same models ranked by correct diagnoses and by policy score. A line joins the two places
+of each model, so crossing lines mark models that change place. Kendall's $\tau$ between the two
+rankings is xx (95\% confidence interval xx to xx).
+\textbf{c}, How each model reached its correct diagnoses, with $n$ the number of correct diagnoses over
+all seeds. A complete work-up orders every required test and takes no unsafe action, and complete
+work-ups are split by whether they also ordered tests that the case policy does not ask for. The other
+correct diagnoses missed a required test or came with an unsafe action, and a work-up with both counts
+as unsafe.
 \textbf{d}, Three work-ups that reach the same correct diagnosis on one test case of bacterial
-meningitis. Tests appear in the order requested and are coloured by the case policy; costs use
-Medicare reference prices and the score is the policy score, from 0 to 1.}
+meningitis. Tests appear in the order requested: green if required and in order, grey if not asked
+for by the policy, orange if out of order. Costs use Medicare reference prices and the score is the
+policy score.}
 \label{fig:panel}
 \end{figure}
 
@@ -163,29 +165,33 @@ condition; \textbf{ED Fig.~6} acute vs chronic; \textbf{ED Fig.~8} robustness. \
 Tables~3--4} per condition, controls and ablations.
 \end{itemize}
 
-\status{Seed 1 done for both models; the policy model is retrained with the current reward, then seeds
+\status{Fig.~3 layout approved (18 Nov). Seed 1 done for both models; the policy model is retrained with the current reward, then seeds
 2--3. The test opens once, after every checkpoint is fixed.}
 
 \begin{figure}[p]
 \centering
-% Layout draft (17 Nov 2026): invented data, every printed number is xx.
+% Layout approved by Andrea (18 Nov 2026): invented data, every printed number is xx.
 % Source: paper/figures/fig3_svg.py.
 \makebox[\textwidth][c]{\includegraphics[width=180mm]{fig3-new.pdf}}
 \caption{\textbf{Rewarding the work-up teaches it; rewarding diagnosis and cost teaches the model to
 stop testing.}
-\textbf{a}, Correct diagnoses and tests ordered per case on the 60 validation cases during training,
-for Qwen3.5-9B trained on the policy score (policy reward) and on diagnosis and cost (outcome
-reward). Lines are the mean and bands the range across xx seeds; the dashed line is the untrained
-model and open circles mark the checkpoint each model keeps, chosen by its own reward.
-\textbf{b}, The three models on the 119 test cases, from four conditions never seen in training. The
-first four are plain measures of the work-up; the last two are the two rewards, and every model is
-scored on both. Points are
-means across seeds and error bars 95\% confidence intervals from a bootstrap over cases; $P$ compares
-the two trained models, paired by case.
+Qwen3.5-9B was trained with reinforcement learning on one of two rewards: the policy score (policy
+reward) or a score of diagnosis and cost (outcome reward). Both trained models are compared with the
+untrained one.
+\textbf{a}, Correct diagnoses and tests ordered per case on the 60 validation cases during training.
+Lines are means and bands the range across xx seeds. The dashed line is the untrained model, and open
+circles mark the checkpoint each model keeps, chosen by its own reward.
+\textbf{b}, The three models on the 119 test cases, which come from four conditions never seen in
+training. The first four measures describe the work-up directly; the last two are the scores used as
+rewards, computed for every model.
 \textbf{c}, Correct diagnoses and required tests ordered for each test condition, with $n$ the number
 of cases.
-\textbf{d}, Correct diagnoses on the test cases that the untrained model solves from the history alone
-without any test (xx cases) and on those that need tests (xx cases).}
+\textbf{d}, Correct diagnoses on two groups of test cases: those the untrained model diagnoses from the
+history alone, without ordering any test, and those it does not. $n$ is the number of cases in each
+group.
+In \textbf{b}--\textbf{d}, points are means across xx seeds and error bars 95\% confidence intervals
+from a bootstrap over cases. $P$ compares the two trained models with a two-sided test paired by case
+and corrected for multiple comparisons (Methods).}
 \label{fig:rl}
 \end{figure}
 
@@ -198,9 +204,13 @@ what clinicians value, and how the agent compares with them.}
 \content
 \begin{itemize}
 \item Blind rating of $\sim$100 work-ups (model and reward hidden) on a fixed scale; Spearman $\rho$ of
-the ratings with the policy score and with accuracy and cost.
-\item 20--30 test cases solved by neurologists through the same interface: their work-ups against the
-three models on the same cases.
+the ratings with the policy score, the outcome score, diagnosis alone and an LLM judge, against the
+agreement between two neurologists.
+\item Ratings of correct diagnoses by work-up class (the classes of Fig.~2c): a test that uses no
+score.
+\item 20--30 test cases solved by neurologists through the same interface: each model read against
+the neurologist of the case (same diagnosis, the neurologist's tests ordered), and the neurologists'
+own required coverage. The only place in the paper where models and physicians meet.
 \end{itemize}
 
 \structure
@@ -212,19 +222,35 @@ three models on the same cases.
 
 \artefacts
 \begin{itemize}
-\item \textbf{Fig.~4}: a, blind rating against policy score and against accuracy and cost; b,
-physicians against the three models on the same cases. \textbf{Supp.\ Table~9}: agreement.
+\item \textbf{Fig.~4} (below, layout approved 18 Nov): a, agreement of each score with the
+ratings; b, ratings by work-up class; c, the three models against neurologists on the same cases.
+The study design is in the legend and Methods. \textbf{Supp.\ Table~9}: agreement;
+\textbf{Supp.\ Table~12}: the numbers of c.
 \end{itemize}
 
-\status{To design and run; needs physician time. Fix sample size and protocol first.}
+\status{Fig.~4 layout approved (18 Nov). The two studies still need their protocol, sample size and physician time.}
 
 \begin{figure}[p]
 \centering
-\figplaceholder{Fig.~4 | The physicians}{%
-\textbf{a}, blind ratings of $\sim$100 work-ups against the policy score and against accuracy and cost
-(Spearman $\rho$, 95\% CI). \textbf{b}, neurologists against the untrained and the two trained models
-on the same 20--30 test cases.}
-\caption{To design after the physician studies.}
+% Layout approved by Andrea (18 Nov 2026): invented data, every printed number is xx.
+% Source: paper/figures/fig4_svg.py.
+\makebox[\textwidth][c]{\includegraphics[width=180mm]{fig4-new.pdf}}
+\caption{\textbf{Neurologists agree with the policy score.}
+Two studies with neurologists (Methods). In the first, xx neurologists rated xx work-ups of the three
+models on xx test cases from 1 to 5, without knowing which model or reward produced them. In the
+second, xx neurologists solved xx test cases through the same interface as the models.
+\textbf{a}, Spearman correlation between the neurologists' rating and each automatic score. The LLM
+judge is a language model asked to rate each work-up from the case and its guideline. The pink line is
+the correlation between two neurologists rating the same work-ups and the band its 95\% confidence
+interval: the most a score can be expected to reach. $P$ compares the policy and outcome scores with a
+two-sided test paired by work-up.
+\textbf{b}, Rating of the work-ups that reached the correct diagnosis, in the four classes of
+Fig.~2c, with $n$ the number of work-ups in each class.
+\textbf{c}, The three models on the cases of the second study. The first two measures compare each
+model with the neurologist who solved the same case: how often it reaches that neurologist's
+diagnosis, and what share of the neurologist's tests it also orders. The last two measures apply to
+the neurologists too and show how closely they follow the case policy.
+Points are means and error bars 95\% confidence intervals from a bootstrap over cases.}
 \label{fig:validity}
 \end{figure}
 
@@ -296,7 +322,7 @@ larger untrained models, and what it costs to run.}
 \begin{figure}[p]
 \centering
 \figplaceholder{Fig.~6 | A small trained model against larger ones}{%
-\textbf{a}, policy score and accuracy of the trained 9B model against the larger untrained models.
+\textbf{a}, policy score and correct diagnoses of the trained 9B model against the larger untrained models.
 \textbf{b}, latency, memory and cost per case on one GPU.}
 \caption{To design after the runs.}
 \label{fig:cost}

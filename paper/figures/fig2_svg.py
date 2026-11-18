@@ -1,18 +1,20 @@
-"""Figure 2 as a hand-laid SVG: layout draft with invented data (17 Nov 2026).
+"""Figure 2 as a hand-laid SVG: layout approved by Andrea on 18 Nov 2026, invented data (first drawn 17 Nov 2026).
 
 Run:  uv run --no-project --with pillow python paper/figures/fig2_svg.py  (writes fig2-new.svg/.pdf)
 
 Message (paper/decisions.md, Fig. 2): untrained models often reach the right diagnosis with wrong or
-missing tests, so accuracy alone hides the work-up and ranks models differently from the policy score.
+missing tests, so counting correct diagnoses alone hides the work-up and ranks models differently from the policy score.
 The data below are invented only to place the marks; every number printed in the figure is "xx"
 until the panel runs (scored with clinical-policy-v3) replace them.
 
 Layout, two rows read a -> b, then c -> d:
-  a  accuracy vs policy score, one point per model with 95% CIs (SDBench Fig. 7 accuracy vs cost;
+  a  correct diagnoses vs policy score, one point per model with 95% CIs (SDBench Fig. 7 accuracy vs cost;
      npj Digit. Med. 2026 Fig. 2b accuracy vs tokens);
   b  the two rankings side by side (AgentClinic Fig. 3: one benchmark does not predict the other);
   c  100% stacked bars of what lies behind correct diagnoses (npj Digit. Med. 2026 Fig. 2a);
   d  the same correct diagnosis reached by three work-ups (the hook moved from the October Fig. 1e).
+Models only (18 Nov): the neurologists left this figure for Fig. 4, where they are compared with the
+models on the same cases; here they covered only xx of the cases the models solved.
 """
 
 from __future__ import annotations
@@ -20,11 +22,11 @@ from __future__ import annotations
 from pathlib import Path
 
 import svgkit as k
-from svgkit import BASE, BLACK, PHYS, ERR, ERR_T, GREY_T, INK, LINE, MUTED, OK, OK_T, ROW, S, SKY, YELLOW
+from svgkit import BASE, BLACK, ERR, ERR_T, GREY_T, INK, LINE, MUTED, OK, OK_T, ROW, S, SKY, YELLOW
 
 XX = "xx"   # printed in place of every number until the real runs exist
 
-# (name, size class, accuracy %, 95% CI, policy score, 95% CI) -- INVENTED, only to place the marks
+# (name, size class, correct diagnoses %, 95% CI, policy score, 95% CI) -- INVENTED, only to place the marks
 MODELS = [
     ("GLM-5.3", "large", 93, (91, 95), 0.45, (0.43, 0.47)),
     ("Qwen3.8-27B", "large", 91, (89, 93), 0.58, (0.55, 0.61)),
@@ -33,17 +35,13 @@ MODELS = [
     ("Gemma 4 E4B", "small", 84, (81, 87), 0.27, (0.24, 0.29)),
     ("Granite 4.1 8B", "small", 79, (75, 82), 0.34, (0.31, 0.37)),
 ]
-STYLE = {"small": ("circle", BASE), "large": ("square", BLACK), "human": ("diamond", PHYS)}
-LEGEND = [("small", "Open models up to 9B"), ("large", "Larger models"), ("human", "Neurologists")]
-# Human reference (17 Nov, as Hager 2024, MIRA 2026 and SDBench put clinicians beside the models): the
-# neurologists who work up xx test cases through the same harness (paper/decisions.md, Fig. 4b). INVENTED.
-HUMAN = ("Neurologists", "human", 85, (79, 90), 0.64, (0.60, 0.68))
+STYLE = {"small": ("circle", BASE), "large": ("square", BLACK)}
+LEGEND = [("small", "Open models up to 9B"), ("large", "Larger models")]
 # share of correct diagnoses (%): complete and lean, complete with useless tests, a required test missed,
 # an unsafe action -- INVENTED. Over-ordering gets its own class because reviewers of a Nature test-ordering
 # agent (MIRA, 2026) asked for precision and a penalty for unnecessary tests, not recall only.
 HIDDEN = {"GLM-5.3": (30, 14, 46, 10), "Qwen3.8-27B": (40, 17, 36, 7), "gpt-oss-20b": (22, 16, 50, 12),
           "Qwen3.5-9B": (35, 12, 42, 11), "Gemma 4 E4B": (16, 8, 61, 15), "Granite 4.1 8B": (22, 8, 57, 13)}
-HIDDEN["Neurologists"] = (52, 10, 33, 5)
 HIDDEN_KEYS = [("Complete", OK), ("Complete, useless tests", SKY), ("Required test missed", YELLOW),
                ("Unsafe action", ERR)]
 
@@ -53,16 +51,7 @@ B_X, B_W = A_W + k.GAP, k.W - A_W - k.GAP
 C_W = 640
 D_X, D_W = C_W + k.GAP, k.W - C_W - k.GAP
 Y2 = R1 + k.GAP
-NAME_W = max(k.width(m[0]) for m in MODELS + [HUMAN])
-
-
-def marker(cx, cy, shape, col, r):
-    if shape == "diamond":
-        d = r * 1.25
-        k.out.append(f'<path d="M{cx:.1f},{cy - d:.1f} L{cx + d:.1f},{cy:.1f} L{cx:.1f},{cy + d:.1f} '
-                     f'L{cx - d:.1f},{cy:.1f} Z" fill="{col}" stroke="#FFFFFF" stroke-width="1.5"/>')
-    else:
-        k.marker(cx, cy, shape, col, r=r)
+NAME_W = max(k.width(m[0]) for m in MODELS)
 
 
 def inner(x, y, w, h):
@@ -75,15 +64,15 @@ def inner(x, y, w, h):
 def legend_models(x, y):
     for cls, label in LEGEND:
         shape, col = STYLE[cls]
-        marker(x + 9, y - S * 0.36, shape, col, r=9)
+        k.marker(x + 9, y - S * 0.36, shape, col, r=9)
         k.text(x + 26, y, label)
         x += 26 + k.width(label) + 36
     return x
 
 
-# ------------------------------------------------------------------ a  accuracy vs policy score
+# ------------------------------------------------------------------ a  correct diagnoses vs policy score
 def draw_a():
-    k.panel(0, 0, A_W, R1, "a", "Accuracy and policy score")
+    k.panel(0, 0, A_W, R1, "a", "Correct diagnoses and policy score")
     cx, cy, cw, ch = inner(0, 0, A_W, R1)
     legend_models(cx + 28, cy + 44)
     px0, px1 = cx + 116, cx + cw - 190      # room on the right for direct labels
@@ -105,11 +94,11 @@ def draw_a():
     k.text(cx + 34, (py0 + py1) / 2, "Policy score", anchor="middle", rotate=-90)
     # 95% CIs as thin lines, the point on top, the name just past the end of its CI
     left = {"Qwen3.5-9B"}           # labels that would cross a neighbour's CI go on the left
-    for name, cls, acc, (a0, a1), sc, (s0, s1) in MODELS + [HUMAN]:
+    for name, cls, acc, (a0, a1), sc, (s0, s1) in MODELS:
         shape, col = STYLE[cls]
         k.line(X(a0), Y(sc), X(a1), Y(sc), stroke=col, sw=1.6)
         k.line(X(acc), Y(s0), X(acc), Y(s1), stroke=col, sw=1.6)
-        marker(X(acc), Y(sc), shape, col, r=10.5)
+        k.marker(X(acc), Y(sc), shape, col, r=10.5)
         if name in left:
             k.text(X(a0) - 12, Y(sc) + S * 0.36, name, anchor="end")
         else:
@@ -128,7 +117,7 @@ def draw_b():
     rx = cx + cw - 40 - NAME_W - 20
     top, bottom = cy + 96, cy + ch - 92
     step = (bottom - top) / (len(by_acc) - 1)
-    k.text(lx + 10, cy + 44, "By accuracy", bold=True, anchor="end")
+    k.text(lx + 10, cy + 44, "By correct diagnoses", bold=True, anchor="end")
     k.text(rx - 10, cy + 44, "By policy score", bold=True)
     for i, n in enumerate(by_acc):
         j = by_pol.index(n)
@@ -155,10 +144,9 @@ def draw_c():
     n_w = k.width(f"n = {XX}")
     bx0, bx1 = cx + 28 + NAME_W + 20, cx + cw - 32 - n_w - 20
     top, bottom = ky + 34, cy + ch - 96
-    rows = [m[0] for m in MODELS] + [HUMAN[0]]
+    rows = [m[0] for m in MODELS]
     step = (bottom - top) / len(rows)
     bar_h = step * 0.6
-    k.line(cx + 28, top + len(MODELS) * step, cx + cw - 28, top + len(MODELS) * step, stroke=LINE, sw=1.2)
     for i, name in enumerate(rows):
         y = top + i * step + (step - bar_h) / 2
         k.text(bx0 - 20, y + bar_h / 2 + S * 0.36, name, anchor="end")

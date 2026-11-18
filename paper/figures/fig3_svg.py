@@ -1,9 +1,9 @@
-"""Figure 3 as a hand-laid SVG: layout draft with invented data (17 Nov 2026).
+"""Figure 3 as a hand-laid SVG: layout approved by Andrea on 18 Nov 2026, invented data (first drawn 17 Nov 2026).
 
 Run:  uv run --no-project --with pillow python paper/figures/fig3_svg.py  (writes fig3-new.svg/.pdf)
 
 Message (paper/decisions.md, Fig. 3): the same model trained on the policy reward learns the work-up
-and keeps its accuracy; trained on accuracy and cost (outcome reward) it stops ordering tests. The
+and keeps its correct diagnoses; trained on diagnosis and cost (outcome reward) it stops ordering tests. The
 data below are invented only to place the marks; every number printed in the figure is "xx" until
 the three-seed runs replace them.
 
@@ -14,7 +14,7 @@ Layout, two rows read a -> b, then c -> d:
      Nature Medicine clinical AI papers);
   c  the same measures for each of the four test conditions (only four conditions are held out,
      so a reviewer asks whether one of them carries the effect);
-  d  why the outcome reward loses diagnoses: cases the untrained model solves from the story alone
+  d  why the outcome reward loses diagnoses: cases the untrained model solves from the history alone
      vs cases that need tests (the mechanism, with a measure that does not use the policy score).
 The reward history and a single worked case moved to Extended Data (17 Nov): the history in the main
 figure invites "the reward was tuned until it worked", and the case widget already appears in Figs 1-2.
@@ -143,7 +143,7 @@ def draw_a():
 # ------------------------------------------------------------------ b  test results
 # (title, axis range, ticks, tick format, {model: (mean, ci_lo, ci_hi)}) -- INVENTED
 MEASURES = [
-    ("Correct diagnosis (%)", (0, 100), (0, 50, 100), lambda v: f"{v:.0f}",
+    ("Correct diagnoses (%)", (0, 100), (0, 50, 100), lambda v: f"{v:.0f}",
      {"base": (80, 76, 84), "outcome": (62, 57, 67), "policy": (81, 77, 85)}),
     ("Required tests ordered (%)", (0, 100), (0, 50, 100), lambda v: f"{v:.0f}",
      {"base": (45, 41, 49), "outcome": (4, 2, 6), "policy": (78, 74, 82)}),
@@ -207,7 +207,7 @@ CONDITIONS = [
     ("Myasthenia gravis", {"dx": {"base": (80, 71, 89), "outcome": (62, 51, 72), "policy": (79, 70, 88)},
                            "req": {"base": (48, 41, 55), "outcome": (4, 0, 8), "policy": (80, 73, 87)}}),
 ]
-C_AXES = [("dx", "Correct diagnosis (%)"), ("req", "Required tests ordered (%)")]
+C_AXES = [("dx", "Correct diagnoses (%)"), ("req", "Required tests ordered (%)")]
 DODGE = {"base": -13, "outcome": 0, "policy": 13}
 
 
@@ -252,8 +252,8 @@ def draw_c():
 
 
 # ------------------------------------------------------------------ d  the mechanism
-# cases the untrained model diagnoses from the story alone (no test) vs cases that need tests -- INVENTED
-GROUPS = [("Solved from the story alone", {"base": (90, 85, 94), "outcome": (86, 80, 91), "policy": (91, 86, 95)}),
+# cases the untrained model diagnoses from the history alone (no test) vs cases that need tests -- INVENTED
+GROUPS = [("Solved from the history alone", {"base": (90, 85, 94), "outcome": (86, 80, 91), "policy": (91, 86, 95)}),
           ("Need tests to solve", {"base": (66, 58, 74), "outcome": (30, 22, 38), "policy": (70, 62, 78)})]
 
 
@@ -265,7 +265,7 @@ def draw_d():
     Y = lambda v: bottom - v / 100 * (bottom - top)
     for v in (50, 100):
         k.line(px0, Y(v), px1, Y(v), stroke=GRIDC, sw=1.2)
-    y_axis(px0, top, bottom, (0, 50, 100), Y, lambda v: f"{v:.0f}", cx + 34, "Correct diagnosis (%)")
+    y_axis(px0, top, bottom, (0, 50, 100), Y, lambda v: f"{v:.0f}", cx + 34, "Correct diagnoses (%)")
     k.line(px0, bottom, px1, bottom)
     gw = (px1 - px0) / len(GROUPS)
     for g, (label, vals) in enumerate(GROUPS):

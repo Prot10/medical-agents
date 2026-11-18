@@ -248,8 +248,9 @@ reward comparison places the models on the accuracy-cost plane: in Fig. 6 that w
   100% bars, one worked case.
 - Added: a "complete but with useless tests" class in the bars (MIRA: precision besides recall) and
   "n = xx" correct diagnoses next to each bar (Hager: nested denominators).
-- Added: the neurologists as a human reference in panel a and as a row in panel c (Hager, MIRA and
-  SDBench put clinicians beside the models). They come from the 20–30 cases the physicians solve.
+- Added on 17 Nov, moved on 18 Nov: the neurologists as a human reference (Hager, MIRA and SDBench put
+  clinicians beside the models). They solve only 20–30 cases, so they are compared with the models on
+  those same cases in Fig. 4c, not in Fig. 2.
 
 **Fig. 3** (model A vs B vs base)
 - a: correct diagnoses and tests per case over training (DeepSeek-R1, Baker).
@@ -266,8 +267,8 @@ Each point comes from a request seen in the reports or in the rules above; the s
 parentheses. When a point is done or decided, tick it here and record it in `decisions.md`.
 
 **Figures**
-- [x] Fig. 2: neurologists as a human reference in panel a and a row in the bars of c (Hager, MIRA,
-  SDBench put clinicians beside the models). Needs the 20–30 cases solved by the physicians.
+- [x] Neurologists as a human reference (Hager, MIRA, SDBench put clinicians beside the models): in
+  Fig. 4c since 18 Nov, on the same 20–30 cases (they were in Fig. 2 on 17 Nov).
 - [x] Fig. 2c: a "complete but with useless tests" class and n next to each bar (MIRA; Hager).
 - [x] Fig. 3: both scores for every model, independent measures first, per condition, mechanism
   (circularity; Uesato; MIRA; PsychFound).
