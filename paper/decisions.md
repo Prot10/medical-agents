@@ -102,7 +102,7 @@ Palette (17 Nov), the same in every figure — Okabe-Ito, colour-blind safe (Won
 | Correct ✓ | green `#009E73` |
 | Error ✗ | vermilion `#D55E00` |
 
-Approval (18 Nov): Andrea approved Figures 1–4 as drawn here. For Figs. 2–4 this approves the layout; the marks sit on invented data and every number stays "xx" until the runs and the physician studies exist.
+Approval (18 Nov): Andrea approved Figures 1–5 as drawn here. For Figs. 2–5 this approves the layout; the marks sit on invented data and every number stays "xx" until the runs and the physician studies exist (Fig. 5 prints only the fixed cohort counts 12 and 88).
 
 Figure 1 (17 Nov):
 - From scratch, simpler than the 26 Oct version; SVG file, then PDF.
@@ -151,7 +151,13 @@ Figure 4 (18 Nov), layout (`paper/figures/fig4_svg.py`, `fig4-new.pdf`, 180 × 1
 - c: the three models read against the neurologist of each case (agrees on the diagnosis, the neurologist's tests ordered), plus required coverage and tests per case for everyone, which show how far the neurologists follow the policy. No P values: 20–30 cases, and the paper claims nothing about beating physicians.
 - Dropped: the text panel with the study design (it repeated the legend); measures already in Fig. 3b (unsafe actions on the full test set).
 - Every row is a horizontal dot plot with labels on the left, so no label wraps.
-- Overlap resolved (18 Nov, Andrea): the neurologists left Fig. 2; physicians appear only in Fig. 4, compared with the models on the same cases. Numbers in Supplementary Table 12.
+- Overlap resolved (18 Nov, Andrea): the neurologists left Fig. 2; physicians appear only in Fig. 4, compared with the models on the same cases. Numbers in Supplementary Table 12. The only other human reference is Fig. 5c, the tests the MIMIC-IV clinicians recorded for real patients, which is a different source (record, not a study).
+
+Figure 5 (18 Nov), layout approved by Andrea the same day (`paper/figures/fig5_svg.py`, `fig5-new.pdf`, 180 × 100 mm, same rules as Figs. 2–4; every number is "xx" except the fixed cohort counts 12 and 88). One question per panel, checked against Figs. 1–4:
+- a: policy reward minus outcome reward, paired by case, for correct diagnoses, required tests ordered and cases with an unsafe action, NeuroBench test and MIMIC-IV side by side: does the direction hold on real records? Fig. 3b shows the NeuroBench levels; the NeuroBench differences are repeated here only as the anchor of the comparison.
+- b: MIMIC-IV split as Supplementary Table 1 (12 kept out of training, 88 seen in training or validation), laid out like Fig. 3c: is the result carried by conditions the models trained on?
+- c: the three models against the tests the clinicians recorded for the same patients (tests the clinicians also did, clinicians' tests ordered, tests per case), laid out like Fig. 4c so the two human references read the same way. Numbers in Supplementary Table 13.
+- Left out: the cohort flow (an Extended Data CONSORT diagram) and the policy score (in ED Table 1; the MIMIC-IV policies are still drafts).
 
 Captions (18 Nov), all four re-checked against the current drawings, at most 250 words each (Fig. 1 ~190, Fig. 2 ~245, Fig. 3 ~215, Fig. 4 ~225):
 - Fig. 1: the drug check takes no reason; the score also checks useless tests and stopping ("Also scored" in c); test cost at Medicare prices.
@@ -184,6 +190,7 @@ File `manuscript/sections/08-tables.tex`. Values are `xx ± xx` (mean ± s.d. ac
 | Supp 10 | Cost of running an episode |
 | Supp 11 | Thinking off vs on (values filled in; check whether invalid actions and failed episodes are totals or per seed) |
 | Supp 12 | Models against neurologists on the same cases (numbers behind Fig. 4c; added 18 Nov) |
+| Supp 13 | Models against the MIMIC-IV clinicians who treated the same patients (numbers behind Fig. 5c; added 18 Nov) |
 
 ## Which test set carries the main claim (17 Nov, proposed, to confirm with Andrea)
 Both, with different roles.
