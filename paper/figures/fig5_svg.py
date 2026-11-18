@@ -1,20 +1,24 @@
-"""Figure 5 as a hand-laid SVG: layout approved by Andrea on 18 Nov 2026, invented data.
+"""Figure 5 as a hand-laid SVG: redrawn after the second critical review of 18 Nov 2026, awaiting
+approval; invented data.
 
 Run:  uv run --no-project --with pillow python paper/figures/fig5_svg.py  (writes fig5-new.svg/.pdf)
 
-Message (claim C4, R5): the gain of the policy reward carries over from synthetic cases to 100 real
-MIMIC-IV emergency admissions. Three questions, one per panel, none answered by another figure:
-  a  does the difference between the two rewards keep its direction on real records? The paired
-     difference (policy reward minus outcome reward) for three measures, NeuroBench test and MIMIC-IV
-     side by side (Fig. 3b shows levels on NeuroBench only; the levels on MIMIC-IV are in ED Table 1);
-  b  is the MIMIC-IV result carried by conditions the models trained on? Only 12 of the 100 admissions
-     come from conditions kept out of training (HEP 10, BACT 2), so the two groups are drawn apart,
-     as Fig. 3c draws the test conditions;
-  c  what do the agents order against what the clinicians who treated the same patients actually did?
+Message (claim C4, R5): on 100 real MIMIC-IV emergency admissions the policy-reward model orders more
+of the tests the admission requires than the untrained model, and its tests are close to those the
+treating clinicians did. Two questions, one per panel:
+  a  do the three models keep their order on real records? The levels of the three models on the 100
+     admissions, with four measures of Fig. 3b, and the paired test of the claim (policy reward
+     against untrained). The pink dashed line marks a cost equal to that of the required work-up, as
+     in Fig. 3b;
+  b  what do the models order against what the clinicians who treated the same patients actually did?
      Only real records allow this: a test never done answers "not available". Same layout as Fig. 4c
-     (neurologists on synthetic cases), so the two human references read the same way.
-The cohort flow is an Extended Data CONSORT diagram, not a panel. The data are invented only to place
-the marks; every printed number is "xx" except the fixed cohort counts (12 and 88).
+     (neurologists who solved the same admissions), so the two human references read the same way.
+The second review removed two panels. The paired differences on both test sets (old a) were drawn
+around a large gap between the two trained models; the outcome-reward model kept by the selection rule
+keeps its diagnoses, so the levels say more than the differences. The split by condition group (old b)
+had 12 admissions in one group and intervals too wide to read; it stays in Supplementary Table 1. The
+cohort flow is an Extended Data CONSORT diagram, not a panel. The data are invented only to place the
+marks; every printed number is "xx".
 """
 
 from __future__ import annotations
@@ -27,9 +31,7 @@ from svgkit import BASE, INK, MODEL_A, MODEL_B, MUTED, PHYS, ROW, S
 XX = "xx"
 GRIDC = "#EEF1F4"
 
-R1, R2 = 500, 470
-A_W = 760
-B_X, B_W = A_W + k.GAP, k.W - A_W - k.GAP
+R1, R2 = 470, 470
 Y2 = R1 + k.GAP
 ROW_H = 62
 
@@ -49,17 +51,11 @@ def diamond(cx, cy, col, r=10.5):
                  f'L{cx - d:.1f},{cy:.1f} Z" fill="{col}" stroke="#FFFFFF" stroke-width="1.5"/>')
 
 
-def open_circle(cx, cy, r=10):
-    k.out.append(f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="{r}" fill="#FFFFFF" stroke="{INK}" stroke-width="2.4"/>')
-
-
-def x_axis(px0, px1, y, ticks, X, label=None):
+def x_axis(px0, px1, y, ticks, X):
     k.line(px0, y, px1, y)
     for v in ticks:
         k.line(X(v), y, X(v), y + 10)
-        k.text(X(v), y + 10 + S * 1.05, f"{v:g}".replace("-", "\u2212"), anchor="middle")
-    if label:
-        k.text((px0 + px1) / 2, y + 10 + S * 2.45, label, anchor="middle")
+        k.text(X(v), y + 10 + S * 1.05, f"{v:g}", anchor="middle")
 
 
 def grid(xs, top, bottom):
@@ -67,132 +63,98 @@ def grid(xs, top, bottom):
         k.line(x, top, x, bottom, stroke=GRIDC, sw=1.2)
 
 
-# ------------------------------------------------------------------ a  the difference on both test sets
-# (measure, NeuroBench (diff, lo, hi), MIMIC-IV (diff, lo, hi)) in percentage points -- INVENTED
-DIFFS = [("Correct diagnoses", (20, 14, 26), (12, 3, 21)),
-         ("Required tests ordered", (74, 68, 80), (58, 49, 67)),
-         ("Cases with an unsafe action", (3, 0, 6), (2, -3, 7))]
-DODGE = 13
-
-
-def draw_a():
-    k.panel(0, 0, A_W, R1, "a", "Policy reward minus outcome reward, on both test sets")
-    cx, cy, cw, ch = inner(0, 0, A_W, R1)
-    label_w = max(k.width(d[0]) for d in DIFFS)
-    px0, px1 = cx + 28 + label_w + 40, cx + cw - 30
-    lo, hi = -20, 80
-    X = lambda v: px0 + (v - lo) / (hi - lo) * (px1 - px0)
-    # key, one line above the plot
-    x = cx + 28
-    k.marker(x + 10, cy + 33, "circle", INK, r=9)
-    k.text(x + 28, cy + 41, "NeuroBench test cases")
-    x += 28 + k.width("NeuroBench test cases") + 34
-    open_circle(x + 10, cy + 33, r=8)
-    k.text(x + 28, cy + 41, "MIMIC-IV admissions")
-    assert x + 28 + k.width("MIMIC-IV admissions") < cx + cw - 20
-    top = cy + 74
-    bottom = top + ROW_H * 1.25 * len(DIFFS)
-    grid([X(v) for v in (20, 40, 60, 80)], top, bottom)
-    k.line(X(0), top, X(0), bottom, stroke=INK, sw=1.4, dash="6 5")
-    for i, (name, nb, mm) in enumerate(DIFFS):
-        ym = top + (i + 0.5) * ROW_H * 1.25
-        k.text(cx + 28, ym + S * 0.36, name)
-        m, a, b = nb
-        k.line(X(a), ym - DODGE, X(b), ym - DODGE, stroke=INK, sw=2.4)
-        k.marker(X(m), ym - DODGE, "circle", INK, r=10)
-        m, a, b = mm
-        k.line(X(a), ym + DODGE, X(b), ym + DODGE, stroke=INK, sw=2.4)
-        open_circle(X(m), ym + DODGE, r=9)
-    x_axis(px0, px1, bottom, (-20, 0, 20, 40, 60, 80), X, "Difference (percentage points)")
-    assert bottom + 10 + S * 2.45 < cy + ch - 8
-
-
-# ------------------------------------------------------------------ b  MIMIC-IV by condition group
-# (label lines, n, {measure: {series: (mean, lo, hi)}}) -- INVENTED; n is the fixed allocation
-GROUPS = [(("Kept out of training",), 12,
-           {"dx": {"base": (58, 33, 80), "outcome": (42, 18, 67), "policy": (67, 42, 88)},
-            "req": {"base": (40, 28, 52), "outcome": (6, 0, 14), "policy": (70, 57, 82)}}),
-          (("Seen in training", "or validation"), 88,
-           {"dx": {"base": (70, 61, 78), "outcome": (55, 45, 65), "policy": (72, 63, 80)},
-            "req": {"base": (44, 39, 49), "outcome": (5, 3, 8), "policy": (76, 72, 80)}})]
-MEASURES = [("dx", "Correct diagnoses (%)"), ("req", "Required tests ordered (%)")]
-MDODGE = {"base": -17, "outcome": 0, "policy": 17}
-
-
-def draw_b():
-    k.panel(B_X, 0, B_W, R1, "b", "MIMIC-IV admissions, by condition group")
-    cx, cy, cw, ch = inner(B_X, 0, B_W, R1)
-    # model key
-    x = cx + 28
-    for _, label, col in SERIES:
-        k.marker(x + 10, cy + 33, "circle", col, r=9)
-        k.text(x + 26, cy + 41, label)
-        x += 26 + k.width(label) + 30
-    assert x < cx + cw
-    label_w = max(k.width(s) for g in GROUPS for s in g[0])
-    x0 = cx + 28 + label_w + 40
-    gap = 44
-    pw = (cx + cw - 30 - x0 - gap) / 2
-    top = cy + 74
-    step = (ROW_H * 1.25 * 3) / len(GROUPS)
-    bottom = top + step * len(GROUPS)
-    for i, (label, n, _) in enumerate(GROUPS):
-        ym = top + (i + 0.5) * step
-        y = ym - len(label) * ROW / 2 + S * 0.36   # name lines, then n, centred on the row
-        for line in label:
-            k.text(cx + 28, y, line)
-            y += ROW
-        k.text(cx + 28, y, f"n = {n}", fill=MUTED)
-        if i:
-            k.line(cx + 20, top + i * step, cx + cw - 20, top + i * step, stroke=GRIDC, sw=1.2)
-    for j, (key, label) in enumerate(MEASURES):
-        px0 = x0 + j * (pw + gap)
-        px1 = px0 + pw
-        assert k.width(label) < pw + gap - 10, label
-        X = lambda v, px0=px0, px1=px1: px0 + v / 100 * (px1 - px0)
-        grid([X(v) for v in (50, 100)], top, bottom)
-        for i, (_, _, vals) in enumerate(GROUPS):
-            ym = top + (i + 0.5) * step
-            for model, _, col in SERIES:
-                m, a, b = vals[key][model]
-                y = ym + MDODGE[model]
-                k.line(X(a), y, X(b), y, stroke=col, sw=2.2)
-                k.marker(X(m), y, "circle", col, r=8.5)
-        x_axis(px0, px1, bottom, (0, 50, 100), X, label)
-    assert bottom + 10 + S * 2.45 < cy + ch - 8
-
-
-# ------------------------------------------------------------------ c  models against the clinicians
-ROWS = [("clin", "Clinicians", PHYS)] + SERIES
-# (title, range, ticks, {series: (mean, lo, hi) or None}) -- INVENTED; None: the reference itself
-C_MEASURES = [
-    ("Tests the clinicians also did (%)", (0, 100), (0, 50, 100),
-     {"clin": None, "base": (71, 66, 76), "outcome": (88, 70, 97), "policy": (64, 60, 68)}),
-    ("Clinicians' tests ordered (%)", (0, 100), (0, 50, 100),
-     {"clin": None, "base": (38, 34, 42), "outcome": (3, 1, 5), "policy": (55, 51, 59)}),
-    ("Tests per case", (0, 12), (0, 6, 12),
-     {"clin": (9.4, 8.8, 10.0), "base": (3.6, 3.2, 4.0), "outcome": (.1, 0, .3), "policy": (6.2, 5.8, 6.6)}),
-]
-
-
-def draw_c():
-    k.panel(0, Y2, k.W, R2, "c", "Models against the clinicians who treated the same 100 patients")
-    cx, cy, cw, ch = inner(0, Y2, k.W, R2)
-    label_w = max(k.width(s[1]) for s in ROWS)
-    x0 = cx + 28 + 34 + label_w + 50
-    gap = 90
-    pw = (cx + cw - 36 - x0 - gap * (len(C_MEASURES) - 1)) / len(C_MEASURES)
-    title_y = cy + 41
-    top = cy + 74
-    bottom = top + ROW_H * len(ROWS)
-    for i, (key, label, col) in enumerate(ROWS):
+def row_labels(cx, top, rows):
+    for i, (key, label, col) in enumerate(rows):
         ym = top + (i + 0.5) * ROW_H
         if key == "clin":
             diamond(cx + 28 + 14, ym, col, r=9)
         else:
             k.marker(cx + 28 + 14, ym, "circle", col, r=10)
         k.text(cx + 28 + 34, ym + S * 0.36, label)
-    for j, (title, (lo, hi), ticks, vals) in enumerate(C_MEASURES):
+
+
+# ------------------------------------------------------------------ a  the three models on the admissions
+# (title, range, ticks, {series: (mean, lo, hi)}, reference value or None) -- INVENTED
+A_MEASURES = [
+    ("Correct diagnoses (%)", (0, 100), (0, 50, 100),
+     {"base": (70, 61, 78), "outcome": (71, 62, 79), "policy": (74, 65, 82)}, None),
+    ("Required tests ordered (%)", (0, 100), (0, 50, 100),
+     {"base": (43, 38, 48), "outcome": (30, 25, 35), "policy": (74, 69, 79)}, None),
+    ("Ordered tests the policy asks for (%)", (0, 100), (0, 50, 100),
+     {"base": (45, 40, 50), "outcome": (50, 43, 57), "policy": (70, 65, 75)}, None),
+    ("Cost relative to the required work-up", (0, 2), (0, 1, 2),
+     {"base": (.80, .72, .88), "outcome": (.35, .29, .41), "policy": (1.05, .97, 1.13)}, 1.0),
+]
+KEY_REF = "Cost of the required work-up"
+
+
+def draw_a():
+    k.panel(0, 0, k.W, R1, "a", "The three models on 100 MIMIC-IV admissions")
+    cx, cy, cw, ch = inner(0, 0, k.W, R1)
+    label_w = max(k.width(s[1]) for s in SERIES)
+    x0 = cx + 28 + 34 + label_w + 50
+    p_w = 26 + 12 + k.width(f"P = {XX}")              # the bracket and its P value, right of each plot
+    gap = p_w + 44
+    pw = (cx + cw - 30 - p_w - x0 - gap * (len(A_MEASURES) - 1)) / len(A_MEASURES)
+    # key for the reference line, top right
+    kx = cx + cw - 28 - k.width(KEY_REF)
+    k.text(kx, cy + 41, KEY_REF)
+    k.line(kx - 54, cy + 41 - S * 0.36, kx - 10, cy + 41 - S * 0.36, stroke=PHYS, sw=2.4, dash="6 4")
+    titles = [k.wrap(t, pw + 40) for t, *_ in A_MEASURES]
+    n_lines = max(len(t) for t in titles)
+    assert n_lines <= 2, titles
+    title_top = cy + 66
+    top = title_top + n_lines * ROW + 14
+    bottom = top + ROW_H * len(SERIES)
+    row_labels(cx, top, SERIES)
+    ys = {key: top + (i + 0.5) * ROW_H for i, (key, _, _) in enumerate(SERIES)}
+    for j, (title, (lo, hi), ticks, vals, ref) in enumerate(A_MEASURES):
+        px0 = x0 + j * (pw + gap)
+        px1 = px0 + pw
+        lines = titles[j]
+        k.lines_at((px0 + px1) / 2, title_top + (n_lines - len(lines)) * ROW, lines, anchor="middle")
+        X = lambda v, px0=px0, px1=px1, lo=lo, hi=hi: px0 + (v - lo) / (hi - lo) * (px1 - px0)
+        grid([X(v) for v in ticks[1:]], top, bottom)
+        if ref is not None:
+            k.line(X(ref), top, X(ref), bottom, stroke=PHYS, sw=2.4, dash="6 4")
+        for key, _, col in SERIES:
+            m, a, b = vals[key]
+            k.line(X(a), ys[key], X(b), ys[key], stroke=col, sw=2.4)
+            k.marker(X(m), ys[key], "circle", col, r=10)
+        # paired test of the claim: policy reward against untrained
+        bx = px1 + 26
+        k.out.append(f'<path d="M{bx - 8:.1f},{ys["base"]:.1f} H{bx:.1f} V{ys["policy"]:.1f} H{bx - 8:.1f}" '
+                     f'fill="none" stroke="{INK}" stroke-width="1.4"/>')
+        k.text(bx + 12, (ys["base"] + ys["policy"]) / 2 + S * 0.36, f"P = {XX}")
+        x_axis(px0, px1, bottom, ticks, X)
+    assert bottom + 10 + S * 1.05 < cy + ch - 8, (bottom, cy + ch)
+
+
+# ------------------------------------------------------------------ b  models against the clinicians
+ROWS = [("clin", "Clinicians", PHYS)] + SERIES
+# (title, range, ticks, {series: (mean, lo, hi) or None}) -- INVENTED; None: the reference itself
+B_MEASURES = [
+    ("Tests the clinicians also did (%)", (0, 100), (0, 50, 100),
+     {"clin": None, "base": (71, 66, 76), "outcome": (78, 71, 85), "policy": (76, 72, 80)}),
+    ("Clinicians' tests ordered (%)", (0, 100), (0, 50, 100),
+     {"clin": None, "base": (36, 32, 40), "outcome": (21, 18, 24), "policy": (58, 54, 62)}),
+    ("Tests per case", (0, 12), (0, 6, 12),
+     {"clin": (7.2, 6.6, 7.8), "base": (3.6, 3.2, 4.0), "outcome": (1.9, 1.6, 2.2), "policy": (6.1, 5.7, 6.5)}),
+]
+
+
+def draw_b():
+    k.panel(0, Y2, k.W, R2, "b", "Models against the clinicians who treated the same 100 patients")
+    cx, cy, cw, ch = inner(0, Y2, k.W, R2)
+    label_w = max(k.width(s[1]) for s in ROWS)
+    x0 = cx + 28 + 34 + label_w + 50
+    gap = 90
+    pw = (cx + cw - 36 - x0 - gap * (len(B_MEASURES) - 1)) / len(B_MEASURES)
+    title_y = cy + 41
+    top = cy + 74
+    bottom = top + ROW_H * len(ROWS)
+    row_labels(cx, top, ROWS)
+    for j, (title, (lo, hi), ticks, vals) in enumerate(B_MEASURES):
         px0 = x0 + j * (pw + gap)
         px1 = px0 + pw
         assert k.width(title) < pw + gap - 20, title
@@ -216,7 +178,6 @@ def draw_c():
 
 draw_a()
 draw_b()
-draw_c()
 H = Y2 + R2
 assert H <= 1700, H
 pdf = k.save(Path(__file__).with_name("fig5-new.svg"), H)

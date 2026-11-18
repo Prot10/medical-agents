@@ -1,22 +1,29 @@
-"""Figure 4 as a hand-laid SVG: layout approved by Andrea on 18 Nov 2026, invented data.
+"""Figure 4 as a hand-laid SVG: revised after the two critical reviews of 18 Nov 2026, awaiting approval;
+invented data.
 
 Run:  uv run --no-project --with pillow python paper/figures/fig4_svg.py  (writes fig4-new.svg/.pdf)
 
-Message (paper/decisions.md, Fig. 4): the physicians. Two questions, one per row, and nothing that
-another figure already shows:
+Message (paper/decisions.md, Fig. 4): the physicians, on MIMIC-IV admissions they have not seen (the
+neurologists reviewed the synthetic cases and their policies, so those cannot be used). Two questions,
+one per row, and nothing that another figure already shows:
   a, b  does the policy score measure what neurologists value? (blind rating study)
         a  agreement of each automatic score with the ratings, against the agreement between two
            neurologists as the ceiling (the usual way to validate an automatic grader against
-           physicians); the LLM-judge row answers the most frequent reviewer request;
-        b  the ratings of correct diagnoses by work-up class, the four classes of Fig. 2c: uses no
-           score at all, so it answers the circularity objection;
-  c     how close is each model to neurologists who solve the same cases? Measures read against the
-        neurologist of each case (same diagnosis, same tests), plus the neurologists' own required
-        coverage, which shows the policy is attainable. No P values: 20-30 cases describe, and the
-        paper claims nothing about beating physicians.
+           physicians); the LLM-judge row answers the most frequent reviewer request, and the row
+           "Number of tests ordered" (second review) answers "the neurologists just like more tests";
+        b  the blind rating of each agent's work-ups (untrained, multi-agent panel, outcome reward,
+           policy reward): the only test of the main effect that uses no score at all, so it answers
+           the circularity objection. The multi-agent panel (second review) is the untrained model run
+           as five roles, the baseline of Fig. 6. The ratings by work-up class moved to Extended Data
+           Fig. 5;
+  c     how close is each model to neurologists who solve the same admissions? Measures read against
+        the neurologist of each admission (same diagnosis, same tests), plus the neurologists' own
+        required tests and tests per case: the first shows the policy is attainable, the second is the
+        number the models are read against ("about as many tests as physicians"). No P values: 20-30
+        admissions describe, and the paper claims nothing about beating physicians.
 The study design is in the legend and Methods, not in a text panel. Every row is a horizontal dot
-plot with its labels on the left, so no label wraps. The data are invented only to place the marks;
-every printed number is "xx".
+plot with its labels on the left, so no label wraps. Grey marks are the untrained Qwen3.5-9B, however
+it is run. The data are invented only to place the marks; every printed number is "xx".
 """
 
 from __future__ import annotations
@@ -24,12 +31,12 @@ from __future__ import annotations
 from pathlib import Path
 
 import svgkit as k
-from svgkit import BASE, ERR, INK, MODEL_A, MODEL_B, MUTED, OK, PHYS, S, SKY, YELLOW
+from svgkit import BASE, INK, MODEL_A, MODEL_B, MUTED, PHYS, S
 
 XX = "xx"
 GRIDC = "#EEF1F4"
 
-R1, R2 = 500, 470
+R1, R2 = 562, 470
 A_W = 900
 B_X, B_W = A_W + k.GAP, k.W - A_W - k.GAP
 Y2 = R1 + k.GAP
@@ -64,7 +71,8 @@ def grid(xs, top, bottom):
 # ------------------------------------------------------------------ a  agreement with the ratings
 # (score, rho, lo, hi) -- INVENTED
 SCORES = [("Policy score", .62, .53, .70), ("Outcome score", .34, .22, .45),
-          ("Correct diagnoses only", .29, .17, .40), ("LLM judge", .41, .30, .51)]
+          ("Correct diagnoses only", .29, .17, .40), ("Number of tests ordered", .31, .19, .42),
+          ("LLM judge", .41, .30, .51)]
 BETWEEN = (.66, .58, .73)          # rho between two neurologists rating the same work-ups -- INVENTED
 
 
@@ -101,28 +109,36 @@ def draw_a():
     assert bottom + 10 + S * 2.45 < cy + ch - 8
 
 
-# ------------------------------------------------------------------ b  ratings by work-up class
-# correct diagnoses only; (class, colour, mean rating, lo, hi) -- INVENTED
-CLASSES = [("Complete", OK, 4.4, 4.2, 4.6), ("Complete, useless tests", SKY, 3.8, 3.5, 4.1),
-           ("Required test missed", YELLOW, 2.9, 2.6, 3.2), ("Unsafe action", ERR, 1.8, 1.5, 2.1)]
+# ------------------------------------------------------------------ b  blind rating of each model
+# (agent, colour, mean rating, lo, hi) -- INVENTED; all rated work-ups, whatever the diagnosis
+CLASSES = [("Untrained", BASE, 2.9, 2.6, 3.2), ("Multi-agent panel", BASE, 3.2, 2.9, 3.5),
+           ("Outcome reward", MODEL_B, 2.6, 2.3, 2.9), ("Policy reward", MODEL_A, 3.9, 3.6, 4.2)]
 
 
 def draw_b():
-    k.panel(B_X, 0, B_W, R1, "b", "Rating of correct diagnoses, by work-up")
+    k.panel(B_X, 0, B_W, R1, "b", "Blind rating of each agent's work-ups")
     cx, cy, cw, ch = inner(B_X, 0, B_W, R1)
-    label_w = max(k.width(c[0]) for c in CLASSES)
+    label_w = max(k.width(c[0]) for c in CLASSES) + 34
     n_w = k.width(f"n = {XX}")
-    px0, px1 = cx + 28 + label_w + 40, cx + cw - 28 - n_w - 30
+    p_w = k.width(f"P = {XX}") + 34                 # room for the bracket between the plot and n
+    px0, px1 = cx + 28 + label_w + 40, cx + cw - 28 - n_w - 30 - p_w
     X = lambda v: px0 + (v - 1) / 4 * (px1 - px0)
-    top = cy + 74
+    top = cy + 74 + ROW_H / 2                        # four rows, centred against the five of a
     bottom = top + ROW_H * len(CLASSES)
     grid([X(v) for v in (2, 3, 4, 5)], top, bottom)
     for i, (name, col, m, a, b) in enumerate(CLASSES):
         ym = top + (i + 0.5) * ROW_H
-        k.text(cx + 28, ym + S * 0.36, name)
+        k.marker(cx + 28 + 14, ym, "circle", col, r=10)
+        k.text(cx + 28 + 34, ym + S * 0.36, name)
         k.line(X(a), ym, X(b), ym, stroke=col, sw=2.6)
         k.marker(X(m), ym, "circle", col, r=11)
         k.text(cx + cw - 28, ym + S * 0.36, f"n = {XX}", fill=MUTED, anchor="end")
+    # paired test, policy against outcome reward (the last two rows)
+    y_o, y_p = top + 2.5 * ROW_H, top + 3.5 * ROW_H
+    bx = px1 + 22
+    k.out.append(f'<path d="M{bx - 8:.1f},{y_o:.1f} H{bx:.1f} V{y_p:.1f} H{bx - 8:.1f}" fill="none" '
+                 f'stroke="{INK}" stroke-width="1.4"/>')
+    k.text(bx + 12, (y_o + y_p) / 2 + S * 0.36, f"P = {XX}")
     x_axis(px0, px1, bottom, (1, 2, 3, 4, 5), X, "Neurologists' rating, 1 to 5")
 
 
@@ -132,18 +148,18 @@ SERIES = [("phys", "Neurologists", PHYS), ("base", "Untrained", BASE), ("outcome
 # (title, range, ticks, {series: (mean, lo, hi) or None}) -- INVENTED; None: not defined for that series
 MEASURES = [
     ("Agrees on the diagnosis (%)", (0, 100), (0, 50, 100),
-     {"phys": None, "base": (82, 72, 90), "outcome": (64, 53, 74), "policy": (84, 75, 91)}),
+     {"phys": None, "base": (80, 70, 88), "outcome": (81, 71, 89), "policy": (84, 75, 91)}),
     ("Neurologist's tests ordered (%)", (0, 100), (0, 50, 100),
-     {"phys": None, "base": (48, 40, 56), "outcome": (4, 1, 8), "policy": (74, 66, 81)}),
+     {"phys": None, "base": (44, 36, 52), "outcome": (30, 23, 37), "policy": (72, 64, 79)}),
     ("Required tests ordered (%)", (0, 100), (0, 50, 100),
-     {"phys": (84, 77, 90), "base": (46, 38, 54), "outcome": (5, 1, 9), "policy": (79, 71, 86)}),
+     {"phys": (84, 77, 90), "base": (42, 34, 50), "outcome": (31, 24, 38), "policy": (79, 71, 86)}),
     ("Tests per case", (0, 10), (0, 5, 10),
-     {"phys": (4.8, 4.2, 5.4), "base": (3.7, 3.2, 4.2), "outcome": (.1, 0, .3), "policy": (6.0, 5.4, 6.6)}),
+     {"phys": (5.4, 4.8, 6.0), "base": (3.7, 3.2, 4.2), "outcome": (2.0, 1.6, 2.4), "policy": (5.9, 5.3, 6.5)}),
 ]
 
 
 def draw_c():
-    k.panel(0, Y2, k.W, R2, "c", f"Models against neurologists who solved the same {XX} cases")
+    k.panel(0, Y2, k.W, R2, "c", f"Models against neurologists who solved the same {XX} MIMIC-IV admissions")
     cx, cy, cw, ch = inner(0, Y2, k.W, R2)
     label_w = max(k.width(s[1]) for s in SERIES)
     x0 = cx + 28 + 34 + label_w + 50

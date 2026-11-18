@@ -1,6 +1,7 @@
 % Abstract plan: the narrative of the paper and what it must prove. The 150-word abstract is
 % written last, one sentence per narrative move below. Plan updated 17 Nov 2026 to match
 % paper/decisions.md; claims are numbered C1--C5 and each points to the display item that carries it.
+% Thesis sentence agreed with Andrea on 18 Nov 2026 (also at the top of plan.tex).
 
 \section*{Abstract (150 words, no references)}
 
@@ -8,19 +9,27 @@
 
 \content
 \begin{itemize}
-\item \textbf{Thesis.} A diagnostic agent a hospital can run is a small open model on local hardware;
-it learns a safe work-up, not only the right answer, when it is trained on an executable,
-physician-reviewed clinical policy instead of diagnosis and cost.
-\item \textbf{General claim for NMI readers.} Process rewards beat outcome rewards for agents in
-high-stakes domains when the process is an executable specification experts can audit. Neurology
-is the testbed.
+\item \textbf{Thesis} (agreed 18 Nov 2026 and revised the same day after the first real results;
+every figure, claim and section serves it). To support physicians in hospitals, a diagnostic agent
+must reach the diagnosis through the work-up that clinical practice asks for. Rewarding a small open
+model for following physician-reviewed case policies teaches it to order the tests physicians ask for
+and few others, on conditions and real admissions it never trained on: it orders about as many tests
+as physicians do and spends where the case needs it. Rewarding the same model for a correct diagnosis
+at low cost keeps the diagnoses and saves by leaving required tests out.
+The hospital is the goal, not a result: alignment with clinical practice is what the paper measures
+(physician-reviewed policies, blind ratings by neurologists, the tests clinicians recorded).
+\item \textbf{General claim for NMI readers.} An agent learns what its reward can see. An outcome
+reward cannot tell a complete work-up from a guess that happens to be right, so it does not teach the
+work-up; an executable specification that experts can audit does. Shown in one domain, with one
+trained model: neurology is the testbed and the wider reach is an outlook.
 \end{itemize}
 
 \structure
 \begin{enumerate}
 \item \textbf{Constraint}: patient data cannot leave the hospital, so the agent is a 4--9\,B open model.
 \item \textbf{Gap}: sequential-diagnosis benchmarks score the outcome (diagnosis, cost) and cannot tell a
-complete work-up from a lucky or unsafe one; as a reward, the outcome invites shortcuts.
+complete work-up from an incomplete one that reaches the same answer; as a reward, the outcome pays
+for leaving tests out.
 \item \textbf{Idea}: one executable policy per case, reviewed by two neurologists, used both as the
 measure and as the reinforcement-learning reward.
 \item \textbf{Resource}: NeuroBench, 600 synthetic cases of 20 neurological conditions and 16 tools,
@@ -37,22 +46,38 @@ What we must prove, each claim with its display item and the result that would r
 \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.05\linewidth}>{\raggedright\arraybackslash}p{0.38\linewidth}>{\raggedright\arraybackslash}p{0.16\linewidth}>{\raggedright\arraybackslash}X@{}}
 \toprule
 & Claim & Evidence & Refuted if \\ \midrule
-C1 & A correct diagnosis can hide incomplete and unsafe work-ups: untrained models reach correct diagnoses without the
-     required tests, and ranking by correct diagnoses differs from ranking by policy score
-   & Fig.~2, Supp.\ Table~2 & correct diagnoses rarely lack required tests; Kendall's $\tau\approx1$ \\
-C2 & Training on the policy reward raises required coverage and cuts unsafe actions without losing
-     diagnoses, while training on diagnosis and cost learns to skip tests
-   & Fig.~3, ED Table~1 & no paired difference on the test conditions, or diagnoses drop \\
-C3 & Physicians agree with the policy score, and the trained agent's work-ups approach theirs
-   & Fig.~4 & blind ratings agree with correct diagnoses and cost as much as with the policy score \\
-C4 & The gain carries over to recorded admissions & Fig.~5, ED Table~1, Supp.\ Tables~1, 13
-   & no difference, or the opposite direction, on MIMIC-IV \\
-C5 & The trained 9B model works up cases as well as larger untrained models, on one GPU at a fraction
-     of their cost & Fig.~6 & larger models win clearly on policy score at similar cost \\
+C1 & A correct diagnosis can hide an incomplete work-up: untrained models, small and large, reach
+     correct diagnoses without the tests the case requires
+   & Fig.~2, Supp.\ Table~2 & correct diagnoses rarely lack required tests; or neurologists who solve
+     the same cases leave out as many required tests as the models (the policies ask too much) \\
+C2 & Trained on the policy reward, the model orders more of the required tests and a larger share of
+     its tests are ones the policy asks for, with as many correct diagnoses and a cost close to that
+     of the required work-up. Trained on diagnosis and cost, it keeps the diagnoses and orders fewer
+     required tests. The gain is specific to the case: a scripted agent that always orders the same
+     tests does not reach it
+   & Fig.~3, ED Table~1 & no paired difference in required tests on the test conditions; or diagnoses
+     drop; or the share of tests the policy asks for does not rise; or a scripted agent matches the
+     trained model at the same number of tests \\
+C3 & Neurologists, blind to the agent, rate the work-ups of the policy-reward model highest; the policy
+     score agrees with their ratings more than the outcome score or a count of the tests ordered; the
+     trained model orders about as many tests as they do
+   & Fig.~4 & the ratings do not separate the two trained models; or a count of the tests ordered
+     agrees with the ratings as well as the policy score \\
+C4 & The gain over the untrained model carries over to recorded admissions, where the trained model
+     orders more of the tests the treating clinicians did & Fig.~5, ED Table~1, Supp.\ Tables~1, 13
+   & no difference from the untrained model, or the opposite direction, on MIMIC-IV \\
+C5 & The gain comes from the reward: the same 9B model given the work-up rules in its prompt,
+     fine-tuned on reference episodes or run as a multi-agent panel orders fewer of the required
+     tests, and the panel uses several times the tokens & Fig.~6, Supp.\ Tables~4, 10
+   & one of the three matches the policy-reward model on required tests ordered and on the blind
+     ratings \\
 \bottomrule
 \end{tabularx}}
 \par\smallskip
-\textbf{Not claimed:} clinical readiness, superiority over physicians or frontier models,
+\textbf{Not claimed:} clinical readiness, safety, superiority over physicians or frontier models,
 generality beyond neurology. Never ``concurrent'' for SDBench.
 
-\status{Every number waits for the three seeds of both trained models and for approved test policies.}
+\status{Every number waits for the three seeds of both trained models and for approved test policies.
+The claims were rewritten on 18 Nov 2026 after seed 1 on the validation cases: the outcome-reward model
+kept by the selection rule orders fewer tests without losing diagnoses, and unsafe actions are too
+rare to carry a claim.}

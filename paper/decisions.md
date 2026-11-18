@@ -1,6 +1,6 @@
 # Paper: decisions
 
-Updated 17 Nov 2026. One line per decision, with its date. The manuscript plan (`manuscript/`) was brought in line with this file on 17 Nov: anything there that disagrees with it is a bug.
+Updated 18 Nov 2026. One line per decision, with its date. The block "Second critical review (18 Nov)" is the latest word on thesis, claims, measures, figures and tables: where an older line disagrees with it, that block holds. The manuscript plan (`manuscript/`) was brought in line with this file on 17 Nov: anything there that disagrees with it is a bug.
 
 ## Journal
 - **Nature Machine Intelligence** (17 Nov). ICML dropped: the method alone was judged too weak.
@@ -11,7 +11,8 @@ Updated 17 Nov 2026. One line per decision, with its date. The manuscript plan (
   - B: rewarded only for a correct diagnosis and a low cost.
 - The discarded reward versions, with reasons and numbers (17 Nov):
   - 3 Nov: answering without tests scored ≥ a complete work-up in 225/600 cases → fixed;
-  - 13 Nov: A ordered 5.8 useless tests per case → −0.03 for every useless test.
+  - 13 Nov: A ordered 5.8 useless tests per case → −0.03 for every useless test;
+  - 18 Nov: with −0.03, A still orders 2.8 useless tests per case against 2.0 for the untrained model (seed 1, validation) → a stronger penalty is to be chosen on validation before seeds 2 and 3 (not launched).
 
 ## Agent reasoning (17 Nov)
 - Qwen and Gemma currently run with thinking off (decided with vLLM 0.23 and 4,096 tokens: Qwen ran out of tokens without calling any test).
@@ -38,8 +39,9 @@ Updated 17 Nov 2026. One line per decision, with its date. The manuscript plan (
 - To ask / asked:
   - [ ] one condition redone with two separate accounts → inter-physician agreement (kappa);
   - [ ] after the corrections: a sample of cases checked again;
-  - [ ] 20–30 cases solved by the physicians → physician vs agent comparison (Fig. 4c);
-  - [ ] ~100 model work-ups rated blind → does our score agree with the physicians?
+  - [ ] 20–30 MIMIC-IV admissions solved by the physicians → physician vs agent comparison (Fig. 4c);
+  - [ ] ~100 model work-ups on MIMIC-IV admissions rated blind → does our score agree with the physicians?
+  - Both studies run on MIMIC-IV admissions (Andrea, 18 Nov): the physicians reviewed the synthetic cases and their policies, and have not seen the admissions. Needs personal PhysioNet access for each physician, a place to serve the cases that respects the data use agreement (not the public review site), and at least one neurologist who has not seen the policies.
 - In the Methods: role and experience of the physicians, not their names.
 
 ## Where things go (17 Nov)
@@ -53,12 +55,13 @@ NMI: **Main** at most 6 figures/tables and ~3,500 words · **Extended Data (ED)*
 | Physicians rate ~100 work-ups blind: does the score agree? | Main |
 | Physicians solve 20–30 cases: physician vs agent | Main |
 | Transfer to 100 MIMIC neuro cases | Main |
-| A (9B) vs larger models + cost and time on one GPU | Main (one figure) |
+| Where the gain comes from: Qwen3.5-9B with the rules in the prompt, fine-tuned by imitation, run as a multi-agent panel; a larger untrained model; tokens per case (18 Nov, replaces "A vs larger models + cost and time") | Main (one figure) |
 | Inter-physician agreement + re-checked sample | Main briefly + ED |
 | Training on other models (Gemma, small Qwen, maybe Granite), 1 seed | ED |
 | Per condition, with a clinical reading | ED + Discussion |
 | Acute vs chronic (synthetic only) | ED |
-| Controls: no-test and no-menu baselines + scripted agents (perfect, orders everything, no test) | ED (one figure) |
+| Controls: no-test and no-menu baselines | ED (one figure); the scripted agents moved to Fig. 3d and Supp Table 4 (18 Nov) |
+| Second split: other conditions held out, one seed (18 Nov) | ED (one figure) |
 | Robustness: changed score weights + cases with contradictory facts | ED (one figure) |
 | The dataset: what a case looks like, 20 conditions and splits, physician review (the old October Fig. 2) | ED |
 | Non-neurological MIMIC, subset of ~100 cases | Trial; placement decided from the results |
@@ -75,10 +78,10 @@ Extended Data (17 Nov): 9 items of 10, merged by topic because we were at 12: ei
 | 4 | Training on other models |
 | 5 | Per condition |
 | 6 | Acute vs chronic |
-| 7 | Controls (no test, no menu, scripted agents) |
+| 7 | Controls (no test, no menu) |
 | 8 | Robustness (weights, contradictory facts) |
 | Table 1 | Main results: untrained, B, A on the NeuroBench test and on MIMIC, with the A − B difference |
-| (free) | Non-neurological MIMIC or reasons for the requests, decided from the results |
+| 9 | Second split: other conditions held out, one seed (18 Nov; the slot was free) |
 
 Main figures (17 Nov; several experiments can share a figure, in different panels):
 
@@ -87,9 +90,9 @@ Main figures (17 Nov; several experiments can share a figure, in different panel
 | 1 | Overview: cases, tests, score, physician review (+ inter-physician agreement) |
 | 2 | Correct diagnosis with wrong or missing tests, untrained models (models only since 18 Nov) |
 | 3 | A vs B vs base (the reward history moved to ED2 on 17 Nov) |
-| 4 | The physicians: (a) blind rating vs score, (b) physician vs agent on the same cases |
-| 5 | Real MIMIC neuro cases |
-| 6 | A vs larger models, and cost on one GPU |
+| 4 | The physicians, on MIMIC-IV admissions: (a) blind rating vs score, (b) blind rating of each agent, (c) physician vs agent on the same admissions |
+| 5 | Real MIMIC neuro cases: the three models, and against the treating clinicians |
+| 6 | Where the gain comes from: rules in the prompt, fine-tuning, multi-agent panel, a larger model (18 Nov) |
 
 Palette (17 Nov), the same in every figure — Okabe-Ito, colour-blind safe (Wong, Nat Methods 2011):
 
@@ -102,7 +105,7 @@ Palette (17 Nov), the same in every figure — Okabe-Ito, colour-blind safe (Won
 | Correct ✓ | green `#009E73` |
 | Error ✗ | vermilion `#D55E00` |
 
-Approval (18 Nov): Andrea approved Figures 1–5 as drawn here. For Figs. 2–5 this approves the layout; the marks sit on invented data and every number stays "xx" until the runs and the physician studies exist (Fig. 5 prints only the fixed cohort counts 12 and 88).
+Approval (18 Nov): Andrea approved Figures 1–6 as drawn here; the critical review of the same day (below) revised all six, so each waits again for approval. For Figs. 2–6 this approves the layout; the marks sit on invented data and every number stays "xx" until the runs and the physician studies exist (Fig. 5 prints only the fixed cohort counts 12 and 88).
 
 Figure 1 (17 Nov):
 - From scratch, simpler than the 26 Oct version; SVG file, then PDF.
@@ -153,11 +156,16 @@ Figure 4 (18 Nov), layout (`paper/figures/fig4_svg.py`, `fig4-new.pdf`, 180 × 1
 - Every row is a horizontal dot plot with labels on the left, so no label wraps.
 - Overlap resolved (18 Nov, Andrea): the neurologists left Fig. 2; physicians appear only in Fig. 4, compared with the models on the same cases. Numbers in Supplementary Table 12. The only other human reference is Fig. 5c, the tests the MIMIC-IV clinicians recorded for real patients, which is a different source (record, not a study).
 
-Figure 5 (18 Nov), layout approved by Andrea the same day (`paper/figures/fig5_svg.py`, `fig5-new.pdf`, 180 × 100 mm, same rules as Figs. 2–4; every number is "xx" except the fixed cohort counts 12 and 88). One question per panel, checked against Figs. 1–4:
+Figure 5 (18 Nov), layout approved by Andrea the same day, then revised by the critical review (below) (`paper/figures/fig5_svg.py`, `fig5-new.pdf`, 180 × 100 mm, same rules as Figs. 2–4; every number is "xx" except the fixed cohort counts 12 and 88). One question per panel, checked against Figs. 1–4:
 - a: policy reward minus outcome reward, paired by case, for correct diagnoses, required tests ordered and cases with an unsafe action, NeuroBench test and MIMIC-IV side by side: does the direction hold on real records? Fig. 3b shows the NeuroBench levels; the NeuroBench differences are repeated here only as the anchor of the comparison.
 - b: MIMIC-IV split as Supplementary Table 1 (12 kept out of training, 88 seen in training or validation), laid out like Fig. 3c: is the result carried by conditions the models trained on?
 - c: the three models against the tests the clinicians recorded for the same patients (tests the clinicians also did, clinicians' tests ordered, tests per case), laid out like Fig. 4c so the two human references read the same way. Numbers in Supplementary Table 13.
 - Left out: the cohort flow (an Extended Data CONSORT diagram) and the policy score (in ED Table 1; the MIMIC-IV policies are still drafts).
+
+Figure 6 (18 Nov), layout approved by Andrea the same day, then redrawn by the critical review (below) (`paper/figures/fig6_svg.py`, `fig6-new.pdf`, 180 × 110 mm, same rules as Figs. 2–5; every number is "xx", model sizes are placeholders). The plan's placeholder put the trained model on the plane of Fig. 2a (correct diagnoses × policy score); redesigned to avoid repeating that figure:
+- a: policy score and correct diagnoses against model size (log scale), untrained panel of Fig. 2 plus the two trained models of Fig. 3, arrows from the untrained Qwen3.5-9B (PsychFound, NMI 2026, Fig. 3). Size is what is new: Fig. 2 has no size and no trained models, Fig. 3 no larger models. Names only in the left plot; the x position is the same in both.
+- b: what it takes to run one case (peak GPU memory, completion tokens per case, time per case) for the trained model and the larger ones, dashed line at the 40 GB of one A100; GLM-5.3 runs only through an API, so tokens only. Laid out like Figs. 4c and 5c. The cost of the tests stays in Fig. 3b; numbers in Supplementary Table 10, sizes in Supplementary Table 7.
+- Open: total or active parameters for the mixture-of-experts models (drafted as total); the GPU the runtime is measured on (A100 40 GB fits only models up to about 20B).
 
 Captions (18 Nov), all four re-checked against the current drawings, at most 250 words each (Fig. 1 ~190, Fig. 2 ~245, Fig. 3 ~215, Fig. 4 ~225):
 - Fig. 1: the drug check takes no reason; the score also checks useless tests and stopping ("Also scored" in c); test cost at Medicare prices.
@@ -168,6 +176,77 @@ Captions (18 Nov), all four re-checked against the current drawings, at most 250
 
 Names (18 Nov), one per measure in captions, figure labels, tables and plan text: "Correct diagnoses (%)" (never "accuracy" or "correct diagnosis"), "Required tests ordered (%)", "Cases with an unsafe action (%)", "Cost per case ($)", "Tests per case", "Useless tests per case", "policy score", "outcome score". The ingredients of the outcome reward are "diagnosis and cost". "Accuracy" stays only where another paper's figure is cited and in the reward component "tool accuracy".
 
+Goal of the paper (18 Nov, chosen by Andrea between two drafts), in the abstract plan and at the top of `plan.tex`:
+> To support physicians in hospitals, a diagnostic agent must reach the diagnosis through the work-up that clinical practice asks for. Rewarding a small open model for following physician-reviewed case policies, rather than for a correct diagnosis at low cost, teaches it that work-up, on conditions and real admissions it never trained on, whereas the outcome reward teaches it to skip tests.
+
+Andrea asked that the sentence say the agent must follow clinical practice, since the aim is to support physicians in hospitals. Supporting physicians is written as the goal, not as a result: there is no study in a hospital, and what the paper measures is the alignment with clinical practice (physician-reviewed policies, blind ratings, the clinicians' recorded tests).
+
+Critical review (18 Nov), asked by Andrea after approving Figures 1–6: is every figure needed for the narrative, does any repeat another, is anything missing? Applied the same day; every figure waits again for approval.
+- Narrative, one figure per step: Fig. 1 setup → Fig. 2 the problem (a correct diagnosis hides the work-up) → Fig. 3 the fix (policy reward against outcome reward) → Fig. 4 validity (neurologists) → Fig. 5 real admissions → Fig. 6 a small model is enough.
+- Colour: orange is kept for the outcome reward in every figure. Fig. 1 misses are slate grey; Fig. 1c adds the outcome score of the same episode (orange bar) beside the policy score, so the reader sees from the start that the outcome score ignores the work-up.
+- One agent name: "the agent" (Qwen3.5-9B trained on the policy reward); "NeuroAgent" no longer appears in figures or captions.
+- Fig. 2: the y axis of a is required tests ordered (was the policy score: a reviewer reads a policy score as circular before the reward is introduced); the ranking panel is gone, Kendall's tau between the two rankings is one line under a; the bars become b and the single case c. Legend says "Up to 9B parameters" and "Larger models".
+- Fig. 3: b adds the control trained on the outcome reward without the cost term (open orange circle), which separates "the cost term teaches skipping tests" from "any outcome reward does", and two measures, useless tests per case and cost per case. Fig. 3c (per condition) stays; Extended Data Fig. 5, which repeated it, now holds the ratings by work-up class.
+- Fig. 4: b is the blind rating of each model (untrained, outcome reward, policy reward), P paired by case between the two trained models: the main effect tested with no score at all. The ratings by work-up class move to Extended Data Fig. 5; numbers of both in the new Supplementary Table 14.
+- Fig. 5: in a, cases with an unsafe action sit in their own block ("lower is better"), so a point right of zero is not read as a gain. Claim C4 now includes the concordance with the treating clinicians (Fig. 5c), with its refutation.
+- Fig. 6: one measure, the policy score, against size (a) and against wall time per case (b), sharing the y axis. The trained models sit exactly at 9B with vertical arrows (the 9B offset misplaced them); the correct-diagnoses plot (in Figs. 2a and 3b) and the memory and token rows (in Supplementary Table 10, which now names every model) are gone. GLM-5.3 runs only through an API and is left out of b. Claim C5 reads "in a fraction of their time".
+- Risks to state in the paper: the physician studies of Fig. 4 are not designed yet; only 4 held-out conditions on NeuroBench and 12 held-out admissions on MIMIC-IV; one trained base model; the no-cost control needs a new training run.
+
+Second critical review (18 Nov), asked by Andrea after the first real results; applied the same day to the plan, the tables and all six figures. Every figure and table waits again for approval.
+
+First real numbers (seed 1 of each model; 60 validation cases × 3 inference seeds; draft policies; EOS `runs/e1_qwen3.5-9b/` and `runs/e1_qwen3.5-9b-policy-v3/`, `seed-1/val/`):
+
+| | Untrained | Outcome reward, kept checkpoint (step 50) | Policy reward v3, kept checkpoint (step 300) |
+|---|---|---|---|
+| Correct diagnoses | 90% | 90% | 93% |
+| Required tests ordered | 42% | 31% | 82% |
+| Tests per case | 3.7 | 2.0 | 7.3 |
+| Useless tests per case | 2.0 | not read | 2.8 |
+| Ordered tests the policy asks for | 46% | not read | 61% |
+| Cost of the tests per case | $2,361 | $947 | $2,269 |
+| Policy score | 0.42 | not read | 0.64 |
+
+- The checkpoint of each model is chosen on validation by its own reward (Andrea, 18 Nov), so what a model does later in training is not part of the story. The outcome-reward model kept by that rule orders about half the tests and keeps the diagnoses; only later checkpoints stop ordering tests and lose diagnoses (58% at step 100).
+- Three things the invented-data figures drew are not supported and were removed: an outcome-reward model that loses diagnoses; a drop in unsafe actions (about 2% of cases for the untrained model, 12 of 600 episodes, unchanged by training); fewer useless tests for the policy-reward model (it orders more).
+- Why the outcome reward has little reason to test: in most conditions the diagnosis can be read from the history (validation: MS 0.80 without tests against 0.77 with; test: only glioma needs tests, 0.07 against 0.87). Stated as a limitation.
+
+Goal of the paper, new sentence (Andrea, 18 Nov: the model spends where it is needed, and its number of tests must be close to the physicians', since what counts is ordering the right ones). In the abstract plan and at the top of `plan.tex`; it replaces the sentence quoted above:
+> To support physicians in hospitals, a diagnostic agent must reach the diagnosis through the work-up that clinical practice asks for. Rewarding a small open model for following physician-reviewed case policies teaches it to order the tests physicians ask for and few others, on conditions and real admissions it never trained on: it orders about as many tests as physicians do and spends where the case needs it. Rewarding the same model for a correct diagnosis at low cost keeps the diagnoses and saves by leaving required tests out.
+
+- Title: "Executable clinical policies teach small open models the diagnostic work-up" (was "... the safe diagnostic work-up"). "Safe" is not a result of this paper and is in the list of words to avoid.
+- Claims (abstract plan): C1 a correct diagnosis can hide an incomplete work-up; C2 the policy reward teaches the required tests without losing diagnoses, the outcome reward teaches to order fewer; C3 neurologists, blind, agree with the policy score and rate the policy-reward model highest, and the number of tests alone does not explain their rating; C4 the gain over the untrained model holds on 100 MIMIC-IV admissions, with tests close to those of the treating clinicians; C5 the gain comes from the reward, not from the prompt, imitation or a panel of agents. Each has a refutation criterion.
+- Names, one per measure (they replace the list of 18 Nov above where they differ): "Correct diagnoses (%)", "Required tests ordered (%)", "Ordered tests the policy asks for (%)" (share of a model's tests that match a required or recommended item), "Tests per case" (read against the number the policies ask for and against physicians), "Cost relative to the required work-up" (1 = the cost of the required tests of the case), "Tokens per case (thousands)". "Cases with an unsafe action (%)", "Useless tests per case" and "Cost per case ($)" stay in ED Table 1 and the Supplementary tables only. Baselines: "Rules in the prompt", "Supervised fine-tuning", "Multi-agent panel" (in the style of MAI-DxO, never called MAI-DxO: it is our rebuild on a 9B model).
+- Positioning: DiagGym (Qiu 2025) already trains with a reward on diagnosis plus the overlap with the tests recorded in the health record, and compares it with a diagnosis-only reward. Our delta is the reference (a physician-reviewed policy per case, not the recorded orders), conditions never seen in training and blind physician ratings. SDBench defines no reward: the 0.85 / 0.15 weights of the outcome reward are our choice and the text says so.
+- Introduction example: meningitis named without lumbar puncture and blood cultures (a test left out, on which guidelines agree). The order of head CT and lumbar puncture is no longer used: WHO and NICE differ on it.
+
+Figures after the second review (all "revised, awaiting approval"; invented data near the numbers above, every printed number "xx"):
+- Fig. 1 (180 × 129 mm): the outcome-score bar left panel c; the box shows the policy score and the cost of the tests.
+- Fig. 2 (180 × 127 mm): Kendall's tau line removed; b has three classes (complete / complete with useless tests / required test missed), no unsafe class; c marks tests only as required or not needed, without the head CT.
+- Fig. 3 (180 × 131 mm): a, curves with the kept checkpoints (outcome reward at step 50). b, seven measures: correct diagnoses, required tests ordered, ordered tests the policy asks for, tests per case, cost relative to the required work-up, outcome score, policy score; pink dashed lines mark what the case policies ask for; the no-cost control stays. c, per condition. d, new: required tests ordered against tests per case, with a scripted agent that orders the same k tests in every case (k = 0 to 11) and the required work-up as a pink diamond: it separates "the right tests" from "more tests". The old d (cases solved from the history against cases that need tests) is gone: with the kept outcome-reward model the diagnoses do not drop.
+- Fig. 4 (180 × 106 mm): both studies on MIMIC-IV admissions. a adds the row "Number of tests ordered" (the rival explanation "physicians just like more tests"). b rates four agents: untrained, multi-agent panel, outcome reward, policy reward. c, models against the neurologists on the same admissions; tests per case is read against theirs.
+- Fig. 5 (180 × 97 mm): two full-width panels. a, the three models on the 100 admissions (correct diagnoses, required tests ordered, ordered tests the policy asks for, cost relative to the required work-up), P for policy reward against untrained. b, models against the treating clinicians (the old c). Removed: the paired differences on both test sets and the split 12 / 88 (in Supp Table 1). The caption states the selection: admissions were kept because their record holds the core tests of the policy.
+- Fig. 6 (180 × 101 mm), redrawn: a, Qwen3.5-9B used in five ways (untrained, rules in the prompt, supervised fine-tuning, multi-agent panel, policy reward); b, a larger untrained model alone, with the rules, as a panel (Qwen3.8-27B is a placeholder). Columns: correct diagnoses, required tests ordered, ordered tests the policy asks for, tokens per case. The old figure (policy score against size and wall time) plotted the reward the model was trained on and did not answer "why not a better prompt or a panel of agents".
+- Extended Data: 10 of 10 used. ED2 adds the choice of the penalty; ED7 keeps no test and no menu; ED Fig. 9 is new, a second split that holds other conditions out (one seed), since four test conditions are few.
+- Tables: ED Table 1 has both differences (policy − outcome, policy − untrained), each with CI and P, and two new rows (ordered tests the policy asks for, cost relative to the required work-up); the no-cost control moved to Supp Table 4, which now holds controls, baselines and scripted agents with a tokens column; Supp 2 lost its rank column; Supp 10 counts model calls and tokens, panel included; Supp 12 is on MIMIC-IV admissions; Supp 14 rates four agents.
+
+Runs this plan needs and that do not exist yet (none launched on 18 Nov):
+- [ ] a stronger penalty for useless tests, chosen on validation, before seeds 2 and 3 of the policy reward;
+- [ ] seeds 2 and 3 of both models;
+- [ ] the outcome reward without its cost term (Fig. 3b);
+- [ ] the scripted agent with the same k tests in every case, k = 0 to 11 (Fig. 3d; no GPU);
+- [ ] rules in the prompt, supervised fine-tuning, multi-agent panel on Qwen3.5-9B; the larger model alone, with the rules and as a panel (Fig. 6), with token counts;
+- [ ] the second split (ED Fig. 9), one seed;
+- [ ] the share of ordered tests the policy asks for and the cost relative to the required work-up, as reported measures in the benchmark summary.
+
+Open points for Andrea:
+- PhysioNet access for each physician and where the MIMIC-IV cases are served for the two studies.
+- One neurologist who has not seen the policies, as a third rater.
+- Protocol of the two studies (sample, scale, blinding, analysis) written before any rating.
+- What exactly "rules in the prompt" contains (proposed: what the policy score checks, in words, with nothing specific to a case).
+- Which larger model goes in Fig. 6b, and whether the panel on that model is worth its cost.
+- Whether R5 (MIMIC-IV results) should come before R4 (physicians on MIMIC-IV admissions), now that both use the same admissions; the order is unchanged for now.
+- Check what the public SDBench repository contains before describing the panel in Methods.
+
 Notes:
 - Weights of models trained on MIMIC: not freely publishable (PhysioNet agreement).
 - Everything in the repository is written in English (Andrea, 17 Nov).
@@ -177,20 +256,21 @@ File `manuscript/sections/08-tables.tex`. Values are `xx ± xx` (mean ± s.d. ac
 
 | Table | Content |
 |---|---|
-| ED Table 1 | Main results, two blocks (NeuroBench test 119, MIMIC 100): untrained, outcome reward, policy reward, policy − outcome difference with CI, P (Wilcoxon or McNemar, Benjamini–Hochberg per block). Rows: correct diagnosis, required, recommended, unsafe, useless tests, tests, cost, outcome score, policy score |
+| ED Table 1 | Main results, two blocks (NeuroBench test 119, MIMIC 100): untrained, outcome reward, policy reward, then policy − outcome and policy − untrained, each with CI and P (Wilcoxon or McNemar, Benjamini–Hochberg per block). Rows: correct diagnoses, required, recommended, ordered tests the policy asks for, tests, useless tests, cost, cost relative to the required work-up, unsafe, outcome score, policy score (18 Nov, second review) |
 | Supp 1 | MIMIC split: conditions kept out of training (HEP 10 + BACT 2) vs seen in training or validation (88) |
-| Supp 2 | Untrained models (numbers behind Fig. 2) with ranks |
+| Supp 2 | Untrained models (numbers behind Fig. 2), no rank column since 18 Nov |
 | Supp 3 | Per test condition (numbers behind Fig. 3c) |
-| Supp 4 | Controls and ablations: scripted (perfect, order everything), untrained (no test, no menu, rules in the prompt), trained (SFT, outcome without cost, policy without penalty) |
+| Supp 4 | Controls, baselines and scripted agents (numbers behind Figs. 3b, 3d and 6): scripted (required work-up, every test, the same k tests); Qwen3.5-9B without RL (no test, no menu, rules in the prompt, SFT, multi-agent panel); trained (outcome without cost, policy without penalty); the larger model; with tokens per case |
 | Supp 5 | The two rewards, weights filled in from `policy_reward.py` |
 | Supp 6 | Datasets per split |
-| Supp 7 | Models and inference settings |
+| Supp 7 | Models and inference settings, with parameter counts |
 | Supp 8 | Training and compute |
 | Supp 9 | Physician agreement (kappa per dimension, blind rating vs score) |
-| Supp 10 | Cost of running an episode |
+| Supp 10 | What it takes to run an episode: model calls, tokens, wall time, peak GPU memory, panel rows included (numbers behind Fig. 6; 18 Nov) |
 | Supp 11 | Thinking off vs on (values filled in; check whether invalid actions and failed episodes are totals or per seed) |
-| Supp 12 | Models against neurologists on the same cases (numbers behind Fig. 4c; added 18 Nov) |
-| Supp 13 | Models against the MIMIC-IV clinicians who treated the same patients (numbers behind Fig. 5c; added 18 Nov) |
+| Supp 12 | Models against neurologists on the same MIMIC-IV admissions (numbers behind Fig. 4c; added 18 Nov) |
+| Supp 13 | Models against the MIMIC-IV clinicians who treated the same patients (numbers behind Fig. 5b; added 18 Nov) |
+| Supp 14 | Blind ratings: four agents (untrained, multi-agent panel, outcome reward, policy reward) and work-up classes (numbers behind Fig. 4b and ED Fig. 5) |
 
 ## Which test set carries the main claim (17 Nov, proposed, to confirm with Andrea)
 Both, with different roles.

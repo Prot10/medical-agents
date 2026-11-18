@@ -1,10 +1,11 @@
-% Tables: what every table holds, decided 17 Nov 2026. Values are "xx" until the runs exist;
+% Tables: what every table holds, decided 17 Nov 2026 and revised on 18 Nov 2026 (second critical
+% review: new measures, baselines of Fig. 6, no unsafe class). Values are "xx" until the runs exist;
 % "xx $\pm$ xx" is the mean and standard deviation across the three seeds, "xx (xx to xx)" an
 % estimate with its 95% confidence interval from a bootstrap over cases (paired by case for
 % differences). Facts that are already fixed (reward weights, dataset counts, the thinking test) are
 % filled in.
 % Placement (paper/decisions.md, 17 Nov): the main text keeps its six figures; the main results go in
-% Extended Data Table 1, which takes one of the ten Extended Data slots (one is still free); the thinking test moves to the
+% Extended Data Table 1, which takes one of the ten Extended Data slots (all ten are now used); the thinking test moves to the
 % Supplementary; every other table is a Supplementary Table in the separate PDF.
 
 \newcommand{\xx}{xx}
@@ -15,7 +16,7 @@
 
 \section*{Tables (draft, values xx)}
 
-Extended Data Table~1 holds the main results; Supplementary Tables~1--13 hold the rest. Every value
+Extended Data Table~1 holds the main results; Supplementary Tables~1--14 hold the rest. Every value
 printed as xx is still to be measured.
 
 % ================================================================================================
@@ -28,36 +29,43 @@ printed as xx is still to be measured.
 the untrained Qwen3.5-9B and the two models trained from it, with every episode scored on both rewards.
 The NeuroBench test holds the 119 synthetic cases of the four conditions kept out of training;
 MIMIC-IV holds 100 recorded admissions of nine conditions, 88 of them from conditions seen in training
-or validation (Supplementary Table~1 splits them). The difference is policy reward minus outcome
-reward, with a 95\% confidence interval from a bootstrap over cases paired by case. $P$ comes from a
-two-sided Wilcoxon signed-rank test (McNemar for proportions), adjusted by Benjamini--Hochberg across
-the rows of each test set.}
+or validation (Supplementary Table~1 splits them). Ordered tests the policy asks for is the share of a
+model's tests that match a required or recommended item of the case policy, and a useless test matches
+none. Cost relative to the required work-up divides the cost of the tests ordered by the cost of the
+required tests of the case. Each difference comes with a 95\% confidence interval from a bootstrap
+over cases paired by case, and $P$ from a two-sided Wilcoxon signed-rank test (McNemar for
+proportions), adjusted by Benjamini--Hochberg across the rows of each test set. The control trained
+without the cost term is in Supplementary Table~4.}
 \label{tab:main}
-\begin{tabularx}{\linewidth}{@{}lCCCCc@{}}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.23\linewidth}CCCCcCc@{}}
 \toprule
-Measure & Untrained & Outcome reward & Policy reward & Difference (95\% CI) & $P$ \\
+Measure & Untrained & Outcome reward & Policy reward & Policy $-$ outcome (95\% CI) & $P$ & Policy $-$ untrained (95\% CI) & $P$ \\
 \midrule
-\grouprow{6}{NeuroBench test (119 cases)}
-Correct diagnoses (\%) & \msd & \msd & \msd & \ci & \xx \\
-Required tests ordered (\%) & \msd & \msd & \msd & \ci & \xx \\
-Recommended tests ordered (\%) & \msd & \msd & \msd & \ci & \xx \\
-Cases with an unsafe action (\%) & \msd & \msd & \msd & \ci & \xx \\
-Useless tests per case & \msd & \msd & \msd & \ci & \xx \\
-Tests per case & \msd & \msd & \msd & \ci & \xx \\
-Cost per case (US\$) & \msd & \msd & \msd & \ci & \xx \\
-Outcome score & \msd & \msd & \msd & \ci & \xx \\
-Policy score & \msd & \msd & \msd & \ci & \xx \\
+\grouprow{8}{NeuroBench test (119 cases)}
+Correct diagnoses (\%) & \msd & \msd & \msd & \ci & \xx & \ci & \xx \\
+Required tests ordered (\%) & \msd & \msd & \msd & \ci & \xx & \ci & \xx \\
+Recommended tests ordered (\%) & \msd & \msd & \msd & \ci & \xx & \ci & \xx \\
+Ordered tests the policy asks for (\%) & \msd & \msd & \msd & \ci & \xx & \ci & \xx \\
+Tests per case & \msd & \msd & \msd & \ci & \xx & \ci & \xx \\
+Useless tests per case & \msd & \msd & \msd & \ci & \xx & \ci & \xx \\
+Cost per case (US\$) & \msd & \msd & \msd & \ci & \xx & \ci & \xx \\
+Cost relative to the required work-up & \msd & \msd & \msd & \ci & \xx & \ci & \xx \\
+Cases with an unsafe action (\%) & \msd & \msd & \msd & \ci & \xx & \ci & \xx \\
+Outcome score & \msd & \msd & \msd & \ci & \xx & \ci & \xx \\
+Policy score & \msd & \msd & \msd & \ci & \xx & \ci & \xx \\
 \midrule
-\grouprow{6}{MIMIC-IV neurology admissions (100 cases)}
-Correct diagnoses (\%) & \msd & \msd & \msd & \ci & \xx \\
-Required tests ordered (\%) & \msd & \msd & \msd & \ci & \xx \\
-Recommended tests ordered (\%) & \msd & \msd & \msd & \ci & \xx \\
-Cases with an unsafe action (\%) & \msd & \msd & \msd & \ci & \xx \\
-Useless tests per case & \msd & \msd & \msd & \ci & \xx \\
-Tests per case & \msd & \msd & \msd & \ci & \xx \\
-Cost per case (US\$) & \msd & \msd & \msd & \ci & \xx \\
-Outcome score & \msd & \msd & \msd & \ci & \xx \\
-Policy score & \msd & \msd & \msd & \ci & \xx \\
+\grouprow{8}{MIMIC-IV neurology admissions (100 cases)}
+Correct diagnoses (\%) & \msd & \msd & \msd & \ci & \xx & \ci & \xx \\
+Required tests ordered (\%) & \msd & \msd & \msd & \ci & \xx & \ci & \xx \\
+Recommended tests ordered (\%) & \msd & \msd & \msd & \ci & \xx & \ci & \xx \\
+Ordered tests the policy asks for (\%) & \msd & \msd & \msd & \ci & \xx & \ci & \xx \\
+Tests per case & \msd & \msd & \msd & \ci & \xx & \ci & \xx \\
+Useless tests per case & \msd & \msd & \msd & \ci & \xx & \ci & \xx \\
+Cost per case (US\$) & \msd & \msd & \msd & \ci & \xx & \ci & \xx \\
+Cost relative to the required work-up & \msd & \msd & \msd & \ci & \xx & \ci & \xx \\
+Cases with an unsafe action (\%) & \msd & \msd & \msd & \ci & \xx & \ci & \xx \\
+Outcome score & \msd & \msd & \msd & \ci & \xx & \ci & \xx \\
+Policy score & \msd & \msd & \msd & \ci & \xx & \ci & \xx \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -68,7 +76,7 @@ Policy score & \msd & \msd & \msd & \ci & \xx \\
 
 \begin{table}[p]
 \centering\footnotesize\setlength{\tabcolsep}{3pt}
-\caption{\textbf{MIMIC-IV results split by how each condition was used}, the numbers behind Fig.~5b. Twelve admissions belong to
+\caption{\textbf{MIMIC-IV results split by how each condition was used.} Twelve admissions belong to
 conditions kept out of training (hepatic encephalopathy 10, bacterial meningitis 2). The other 88
 belong to conditions seen in training (ischaemic stroke 38, subarachnoid haemorrhage 12, status
 epilepticus 9, Guillain--Barr\'e syndrome 3, functional neurological disorder 2, focal epilepsy 2) or
@@ -97,19 +105,19 @@ Policy score & \msd & \msd & \msd \\
 \begin{table}[p]
 \centering\footnotesize\setlength{\tabcolsep}{3pt}
 \caption{\textbf{Untrained models on the NeuroBench test}, the numbers behind Fig.~2. Mean $\pm$
-s.d. across three seeds. The last column gives each model's rank by correct diagnoses and by policy
-score.}
+s.d. across three seeds. Ordered tests the policy asks for is the share of a model's tests that match
+a required or recommended item of the case policy.}
 \label{tab:panel}
-\begin{tabularx}{\linewidth}{@{}lCCCCCCc@{}}
+\begin{tabularx}{\linewidth}{@{}lCCCCCCC@{}}
 \toprule
-Model & Correct diagnoses (\%) & Required tests ordered (\%) & Cases with an unsafe action (\%) & Useless tests per case & Cost per case (US\$) & Policy score & Rank \\
+Model & Correct diagnoses (\%) & Required tests ordered (\%) & Ordered tests the policy asks for (\%) & Tests per case & Cases with an unsafe action (\%) & Cost per case (US\$) & Policy score \\
 \midrule
-Qwen3.5-9B & \msd & \msd & \msd & \msd & \msd & \msd & \xx/\xx \\
-Granite 4.1 8B & \msd & \msd & \msd & \msd & \msd & \msd & \xx/\xx \\
-Gemma 4 E4B & \msd & \msd & \msd & \msd & \msd & \msd & \xx/\xx \\
-Larger model 1 & \msd & \msd & \msd & \msd & \msd & \msd & \xx/\xx \\
-Larger model 2 & \msd & \msd & \msd & \msd & \msd & \msd & \xx/\xx \\
-Larger model 3 & \msd & \msd & \msd & \msd & \msd & \msd & \xx/\xx \\
+Qwen3.5-9B & \msd & \msd & \msd & \msd & \msd & \msd & \msd \\
+Granite 4.1 8B & \msd & \msd & \msd & \msd & \msd & \msd & \msd \\
+Gemma 4 E4B & \msd & \msd & \msd & \msd & \msd & \msd & \msd \\
+Larger model 1 & \msd & \msd & \msd & \msd & \msd & \msd & \msd \\
+Larger model 2 & \msd & \msd & \msd & \msd & \msd & \msd & \msd \\
+Larger model 3 & \msd & \msd & \msd & \msd & \msd & \msd & \msd \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -143,26 +151,37 @@ Required tests ordered (\%) & \msd & \msd & \msd \\
 % ------------------------------------------------------------------------------------------------
 \begin{table}[p]
 \centering\footnotesize\setlength{\tabcolsep}{3pt}
-\caption{\textbf{Controls and ablations on the NeuroBench test.} The scripted agents mark the ends of
-each scale. The agents without reinforcement learning show how much of the gain the training itself
-brings. Mean $\pm$ s.d. across three seeds for the sampled agents; the scripted agents are
-deterministic.}
+\caption{\textbf{Controls, baselines and scripted agents on the NeuroBench test}, the numbers behind
+Figs.~3d and~6. The scripted agents mark the ends of each scale and show what ordering more tests
+alone achieves. The agents without reinforcement learning show how much of the gain the reward
+brings. The multi-agent panel runs the model as five roles that discuss each step, in the style of
+MAI-DxO, and its tokens are summed over the roles. Mean $\pm$ s.d. across three seeds for the sampled
+agents; the scripted agents are deterministic and use no tokens.}
 \label{tab:controls}
-\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}XCCCC@{}}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.30\linewidth}CCCCCC@{}}
 \toprule
-Agent & Correct diagnoses (\%) & Required tests ordered (\%) & Outcome score & Policy score \\
+Agent & Correct diagnoses (\%) & Required tests ordered (\%) & Ordered tests the policy asks for (\%) & Tests per case & Tokens per case (thousands) & Policy score \\
 \midrule
-\grouprow{5}{Scripted}
-Perfect: the required work-up, then the policy's diagnosis & \xx & \xx & \xx & \xx \\
-Orders every test, then the policy's diagnosis & \xx & \xx & \xx & \xx \\
-\grouprow{5}{Untrained Qwen3.5-9B}
-No test, diagnosis from the history alone & \msd & \msd & \msd & \msd \\
-No test menu, tests requested in free text & \msd & \msd & \msd & \msd \\
-Work-up rules written in the prompt & \msd & \msd & \msd & \msd \\
-\grouprow{5}{Trained Qwen3.5-9B}
-Supervised fine-tuning on approved episodes & \msd & \msd & \msd & \msd \\
-Outcome reward without the cost term & \msd & \msd & \msd & \msd \\
-Policy reward without the useless-test penalty & \msd & \msd & \msd & \msd \\
+\grouprow{7}{Scripted}
+The required work-up, then the policy's diagnosis & \xx & \xx & \xx & \xx & -- & \xx \\
+Every test, then the policy's diagnosis & \xx & \xx & \xx & \xx & -- & \xx \\
+The same $k$ tests in every case, $k = \xx$ (the number the policy-reward model orders) & \xx & \xx & \xx & \xx & -- & \xx \\
+\grouprow{7}{Qwen3.5-9B without reinforcement learning}
+Untrained & \msd & \msd & \msd & \msd & \msd & \msd \\
+No test, diagnosis from the history alone & \msd & \msd & \msd & \msd & \msd & \msd \\
+No test menu, tests requested in free text & \msd & \msd & \msd & \msd & \msd & \msd \\
+Rules in the prompt & \msd & \msd & \msd & \msd & \msd & \msd \\
+Supervised fine-tuning on reference episodes & \msd & \msd & \msd & \msd & \msd & \msd \\
+Multi-agent panel & \msd & \msd & \msd & \msd & \msd & \msd \\
+\grouprow{7}{Qwen3.5-9B trained with reinforcement learning}
+Outcome reward & \msd & \msd & \msd & \msd & \msd & \msd \\
+Outcome reward without the cost term & \msd & \msd & \msd & \msd & \msd & \msd \\
+Policy reward without the useless-test penalty & \msd & \msd & \msd & \msd & \msd & \msd \\
+Policy reward & \msd & \msd & \msd & \msd & \msd & \msd \\
+\grouprow{7}{Larger model (\xx)}
+Untrained & \msd & \msd & \msd & \msd & \msd & \msd \\
+Rules in the prompt & \msd & \msd & \msd & \msd & \msd & \msd \\
+Multi-agent panel & \msd & \msd & \msd & \msd & \msd & \msd \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -192,7 +211,7 @@ Stopping & no unjustified action after the required set & 0.06 \\
 Cost efficiency & reference cost of the required work-up over the actual cost; gated & 0.04 \\
 Token efficiency & $1/(1+\text{completion tokens}/2048)$; gated & 0.03 \\
 Assessment, ICD-10 code & reported, not weighted & 0 \\
-Useless-test penalty & per action that meets no criterion & $-0.03$ \\
+Useless-test penalty & per action that meets no criterion; value chosen on the validation cases & $-\xx$ \\
 Invalid actions & score divided by $1 + 0.1\,n_\text{invalid}$ & -- \\
 Caps & contraindicated action 0.10, harmful action 0.35, hard sequence violation 0.50 & -- \\
 \midrule
@@ -227,18 +246,19 @@ MIMIC-IV neurology & 9 & 100 & -- & \xx & external test \\
 \begin{table}[p]
 \centering\footnotesize\setlength{\tabcolsep}{3pt}
 \caption{\textbf{Models and inference settings.} Sampling and the thinking switch follow each model
-card and are fixed per model; runs are replicated by seed. Model weights accessed on \xx.}
+card and are fixed per model; runs are replicated by seed. Parameters count all of them, the experts
+of mixture-of-experts models included. Model weights accessed on \xx.}
 \label{tab:models}
-\begin{tabularx}{\linewidth}{@{}lCCCCCC@{}}
+\begin{tabularx}{\linewidth}{@{}lCCC>{\hsize=1.3\hsize}CC>{\hsize=0.85\hsize}C>{\hsize=0.85\hsize}C@{}}
 \toprule
-Model & Revision & Licence & Temperature & Top-$p$ & Max tokens per turn & Thinking \\
+Model & Parameters (billions) & Revision & Licence & Temperature & Top-$p$ & Max tokens per turn & Thinking \\
 \midrule
-Qwen3.5-9B & \xx & \xx & \xx & \xx & \xx & off \\
-Granite 4.1 8B & \xx & \xx & \xx & \xx & \xx & \xx \\
-Gemma 4 E4B & \xx & \xx & \xx & \xx & \xx & off \\
-Larger model 1 & \xx & \xx & \xx & \xx & \xx & \xx \\
-Larger model 2 & \xx & \xx & \xx & \xx & \xx & \xx \\
-Larger model 3 & \xx & \xx & \xx & \xx & \xx & \xx \\
+Qwen3.5-9B & \xx & \xx & \xx & \xx & \xx & \xx & off \\
+Granite 4.1 8B & \xx & \xx & \xx & \xx & \xx & \xx & \xx \\
+Gemma 4 E4B & \xx & \xx & \xx & \xx & \xx & \xx & off \\
+Larger model 1 & \xx & \xx & \xx & \xx & \xx & \xx & \xx \\
+Larger model 2 & \xx & \xx & \xx & \xx & \xx & \xx & \xx \\
+Larger model 3 & \xx & \xx & \xx & \xx & \xx & \xx & \xx \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -246,21 +266,22 @@ Larger model 3 & \xx & \xx & \xx & \xx & \xx & \xx \\
 % ------------------------------------------------------------------------------------------------
 \begin{table}[p]
 \centering\footnotesize\setlength{\tabcolsep}{4pt}
-\caption{\textbf{Training and compute.} Both models start from the same untrained Qwen3.5-9B and
-differ only in the reward. The checkpoint is chosen on the validation cases by each model's own
+\caption{\textbf{Training and compute.} All models start from the same untrained Qwen3.5-9B and
+differ only in the reward; the control drops the cost term of the outcome reward. The checkpoint is chosen on the validation cases by each model's own
 reward.}
 \label{tab:training}
-\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}XCC@{}}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}XCCC@{}}
 \toprule
-Setting & Outcome reward & Policy reward \\
+Setting & Outcome reward & Outcome reward, no cost & Policy reward \\
 \midrule
-Algorithm & GRPO, DAPO loss & GRPO, DAPO loss \\
-Training steps & 500 & \xx \\
-Learning rate & $2\times10^{-5}$ & $2\times10^{-5}$ \\
-Rollouts per case; cases per step & \xx; \xx & \xx; \xx \\
-LoRA rank; $\alpha$ & \xx; \xx & \xx; \xx \\
-Checkpoint chosen (step), seeds 1/2/3 & \xx/\xx/\xx & \xx/\xx/\xx \\
-GPU; hours per seed & \xx; \xx & \xx; \xx \\
+Algorithm & GRPO, DAPO loss & GRPO, DAPO loss & GRPO, DAPO loss \\
+Training steps & 500 & \xx & \xx \\
+Learning rate & $2\times10^{-5}$ & $2\times10^{-5}$ & $2\times10^{-5}$ \\
+Penalty for a useless test & -- & -- & \xx \\
+Rollouts per case; cases per step & \xx; \xx & \xx; \xx & \xx; \xx \\
+LoRA rank; $\alpha$ & \xx; \xx & \xx; \xx & \xx; \xx \\
+Checkpoint chosen (step), seeds 1/2/3 & \xx/\xx/\xx & \xx/\xx/\xx & \xx/\xx/\xx \\
+GPU; hours per seed & \xx; \xx & \xx; \xx & \xx; \xx \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -289,16 +310,28 @@ Blind episode rating against policy score (Spearman $\rho$) & \xx & \ci \\
 % ------------------------------------------------------------------------------------------------
 \begin{table}[p]
 \centering\footnotesize\setlength{\tabcolsep}{4pt}
-\caption{\textbf{Cost of running an episode.} Mean $\pm$ s.d. per episode on the NeuroBench test, on
-one \xx{} GPU with vLLM \xx.}
+\caption{\textbf{What it takes to run an episode}, with the tokens per case of Fig.~6. Mean $\pm$ s.d.
+per case on the NeuroBench test, on one \xx{} GPU with vLLM \xx. Tokens count prompt and completion
+tokens over the whole episode, summed over the five roles for the multi-agent panel. Time is the wall
+time from the first turn to the final assessment. Peak GPU memory is one value per model; GLM-5.3 runs
+only through an API and has no GPU measures (--).}
 \label{tab:runtime}
-\begin{tabularx}{\linewidth}{@{}lCCCC@{}}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.32\linewidth}CCCCC@{}}
 \toprule
-Model & Turns & Completion tokens & Wall time (s) & Test cost (US\$) \\
+Agent & Turns per case & Model calls per case & Tokens per case (thousands) & Time per case (s) & Peak GPU memory (GB) \\
 \midrule
-Untrained & \msd & \msd & \msd & \msd \\
-Outcome reward & \msd & \msd & \msd & \msd \\
-Policy reward & \msd & \msd & \msd & \msd \\
+Gemma 4 E4B, untrained & \msd & \msd & \msd & \msd & \xx \\
+Granite 4.1 8B, untrained & \msd & \msd & \msd & \msd & \xx \\
+Qwen3.5-9B, untrained & \msd & \msd & \msd & \msd & \xx \\
+Qwen3.5-9B, rules in the prompt & \msd & \msd & \msd & \msd & \xx \\
+Qwen3.5-9B, supervised fine-tuning & \msd & \msd & \msd & \msd & \xx \\
+Qwen3.5-9B, multi-agent panel & \msd & \msd & \msd & \msd & \xx \\
+Outcome reward & \msd & \msd & \msd & \msd & \xx \\
+Policy reward & \msd & \msd & \msd & \msd & \xx \\
+gpt-oss-20b & \msd & \msd & \msd & \msd & \xx \\
+Qwen3.8-27B & \msd & \msd & \msd & \msd & \xx \\
+Qwen3.8-27B, multi-agent panel & \msd & \msd & \msd & \msd & \xx \\
+GLM-5.3 & \msd & \msd & \msd & -- & -- \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -329,11 +362,12 @@ On, 32k tokens & 0.38 & 81 & 2.8 & 173 & 12 \\
 
 % ------------------------------------------------------------------------------------------------
 % Added 18 Nov 2026 with Fig. 4c: the comparison with the neurologists left Fig. 2 and its numbers left
-% Supplementary Table 2.
+% Supplementary Table 2. Since the second critical review of 18 Nov the study runs on MIMIC-IV admissions.
 \begin{table}[p]
 \centering\footnotesize\setlength{\tabcolsep}{3pt}
-\caption{\textbf{Models against neurologists who solved the same cases}, the numbers behind Fig.~4c.
-\xx{} neurologists solved \xx{} test cases through the same interface as the models. The first two
+\caption{\textbf{Models against neurologists who solved the same admissions}, the numbers behind Fig.~4c.
+\xx{} neurologists solved \xx{} MIMIC-IV admissions, which they had not seen before, through the same
+interface as the models. The first two
 columns read each model against the neurologist of the case; the last two apply to the neurologists
 too. Mean (95\% confidence interval from a bootstrap over cases); the models' values are averaged over
 three seeds.}
@@ -351,11 +385,11 @@ Policy reward & \ci & \ci & \ci & \ci \\
 \end{table}
 
 % ------------------------------------------------------------------------------------------------
-% Added 18 Nov 2026 with Fig. 5c.
+% Added 18 Nov 2026 with Fig. 5c, now Fig. 5b.
 \begin{table}[p]
 \centering\footnotesize\setlength{\tabcolsep}{3pt}
 \caption{\textbf{Models against the clinicians who treated the same 100 patients}, the numbers behind
-Fig.~5c. The first two columns read each model against the tests recorded in the MIMIC-IV admission;
+Fig.~5b. The first two columns read each model against the tests recorded in the MIMIC-IV admission;
 tests per case applies to the clinicians too and counts, for them, the catalogue tests recorded during
 the stay. Mean (95\% confidence interval from a bootstrap over cases); the models' values are averaged
 over three seeds.}
@@ -372,3 +406,29 @@ Policy reward & \ci & \ci & \ci \\
 \end{tabularx}
 \end{table}
 
+% ------------------------------------------------------------------------------------------------
+% Added 18 Nov 2026 after the critical review: Fig. 4b shows the rating of each model, and the
+% ratings by work-up class moved to Extended Data Fig. 5.
+\begin{table}[p]
+\centering\footnotesize\setlength{\tabcolsep}{3pt}
+\caption{\textbf{Neurologists' blind ratings}, the numbers behind Fig.~4b and Extended Data Fig.~5.
+\xx{} neurologists rated \xx{} work-ups of four agents on MIMIC-IV admissions from 1 (worst) to 5 (best)
+without knowing which agent produced them. Mean (95\% confidence interval from a bootstrap over cases).}
+\label{tab:ratings}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}XCC@{}}
+\toprule
+ & Work-ups rated & Rating, 1 to 5 \\
+\midrule
+\grouprow{3}{By agent, all rated work-ups}
+Untrained & \xx & \ci \\
+Multi-agent panel & \xx & \ci \\
+Outcome reward & \xx & \ci \\
+Policy reward & \xx & \ci \\
+\midrule
+\grouprow{3}{By work-up class, correct diagnoses only}
+Complete & \xx & \ci \\
+Complete, useless tests & \xx & \ci \\
+Required test missed & \xx & \ci \\
+\bottomrule
+\end{tabularx}
+\end{table}

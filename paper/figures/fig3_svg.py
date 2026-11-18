@@ -1,21 +1,33 @@
-"""Figure 3 as a hand-laid SVG: layout approved by Andrea on 18 Nov 2026, invented data (first drawn 17 Nov 2026).
+"""Figure 3 as a hand-laid SVG: revised after the two critical reviews of 18 Nov 2026, awaiting approval;
+invented data.
 
 Run:  uv run --no-project --with pillow python paper/figures/fig3_svg.py  (writes fig3-new.svg/.pdf)
 
-Message (paper/decisions.md, Fig. 3): the same model trained on the policy reward learns the work-up
-and keeps its correct diagnoses; trained on diagnosis and cost (outcome reward) it stops ordering tests. The
-data below are invented only to place the marks; every number printed in the figure is "xx" until
-the three-seed runs replace them.
+Message (paper/decisions.md, Fig. 3): the same model trained on the policy reward orders the tests each
+case requires and few others, with as many correct diagnoses and a cost close to that of the required
+work-up; trained on diagnosis and cost (outcome reward) it keeps the diagnoses and orders fewer tests.
+The data below are invented only to place the marks, near the first real numbers (seed 1, validation
+cases, draft policies); every number printed in the figure is "xx" until the three-seed runs replace
+them.
 
 Layout, two rows read a -> b, then c -> d:
   a  validation curves over training steps, mean and seed range (DeepSeek-R1, Nature 2025, Fig. 1:
-     accuracy and response length over RL steps);
-  b  the test results, one small dot plot per measure with 95% CIs (paired comparisons as in
-     Nature Medicine clinical AI papers);
-  c  the same measures for each of the four test conditions (only four conditions are held out,
-     so a reviewer asks whether one of them carries the effect);
-  d  why the outcome reward loses diagnoses: cases the untrained model solves from the history alone
-     vs cases that need tests (the mechanism, with a measure that does not use the policy score).
+     accuracy and response length over RL steps); the open circle is the checkpoint each model keeps,
+     chosen on validation by its own reward (for the outcome reward an early one, before it stops
+     ordering tests);
+  b  the test results, one small dot plot per measure with 95% CIs. Second critical review (18 Nov):
+     "useless tests per case" became the share of ordered tests the policy asks for, "cost per case"
+     became the cost relative to the required work-up, and tests per case is read against the number
+     the case policies ask for (pink dashed lines: the policy is the reference). Cases with an unsafe
+     action left the figure (about 2% of cases, unchanged by training; Extended Data Table 1). The
+     control trained on the outcome reward without its cost term stays (open orange circle);
+  c  correct diagnoses and required tests for each of the four test conditions (only four conditions
+     are held out, so a reviewer asks whether one of them carries the effect);
+  d  right tests, or just more tests: required tests ordered against tests per case, with a scripted
+     agent that orders the same k tests in every case for every k. It replaces the earlier mechanism
+     panel (cases solved from the history alone against cases that need tests): with the outcome-reward
+     model kept by the selection rule the diagnoses do not drop, and among the test conditions only
+     glioma needs tests for the diagnosis, so that panel repeated c.
 The reward history and a single worked case moved to Extended Data (17 Nov): the history in the main
 figure invites "the reward was tuned until it worked", and the case widget already appears in Figs 1-2.
 """
@@ -25,7 +37,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import svgkit as k
-from svgkit import BASE, INK, MODEL_A, MODEL_B, MUTED, ROW, S
+from svgkit import BASE, BLACK, INK, MODEL_A, MODEL_B, MUTED, PHYS, ROW, S
 
 XX = "xx"   # printed in place of every number until the real runs exist
 
@@ -33,9 +45,12 @@ XX = "xx"   # printed in place of every number until the real runs exist
 SERIES = [("base", "Untrained", BASE), ("outcome", "Outcome reward", MODEL_B),
           ("policy", "Policy reward", MODEL_A)]
 COL = {key: col for key, _, col in SERIES}
+# panel b adds the control that answers "the outcome reward is a straw man": the same outcome reward
+# without its cost term (critical review, 18 Nov), drawn as an open orange circle
+SERIES_B = [SERIES[0], SERIES[1], ("nocost", "Outcome reward, no cost", MODEL_B), SERIES[2]]
 
 R1, R2 = 640, 640
-A_W = 640
+A_W = 560
 B_X, B_W = A_W + k.GAP, k.W - A_W - k.GAP
 C_W = 1040
 D_X, D_W = C_W + k.GAP, k.W - C_W - k.GAP
@@ -50,10 +65,19 @@ def inner(x, y, w, h):
     return cx, cy, cw, ch
 
 
-def legend(x, y, max_x, kind):
-    """Keys for the three models: a short line (kind='line') or a dot. Wraps; returns the last row's y."""
+def dot(cx, cy, key, col, r=10.5):
+    """A filled circle, or an open one for the outcome reward without cost."""
+    if key == "nocost":
+        k.out.append(f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="{r - 1.2}" fill="#FFFFFF" stroke="{col}" '
+                     f'stroke-width="3"/>')
+    else:
+        k.marker(cx, cy, "circle", col, r=r)
+
+
+def legend(x, y, max_x, kind, series=SERIES):
+    """Keys for the models: a short line (kind='line') or a dot. Wraps; returns the last row's y."""
     x0 = x
-    for key, label, col in SERIES:
+    for key, label, col in series:
         w = 44 + 10 + k.width(label)
         if x + w > max_x:
             x, y = x0, y + ROW + 6
@@ -61,7 +85,7 @@ def legend(x, y, max_x, kind):
         if kind == "line":
             k.line(x, ym, x + 44, ym, stroke=col, sw=3, dash="7 5" if key == "base" else None)
         else:
-            k.marker(x + 22, ym, "circle", col, r=9.5)
+            dot(x + 22, ym, key, col, r=9.5)
         k.text(x + 54, y, label)
         x += w + 30
     return y
@@ -92,13 +116,13 @@ def y_axis(px, y0, y1, ticks, Y, fmt, label_x=None, label=None):
 STEPS = list(range(0, 501, 50))
 # validation mean and seed range -- INVENTED
 CURVES = {
-    "dx": {"policy": [88, 88, 89, 88, 89, 89, 89, 88, 89, 89, 89],
-           "outcome": [88, 84, 70, 62, 58, 57, 56, 55, 55, 55, 55]},
-    "tests": {"policy": [3.7, 4.5, 5.2, 5.6, 5.8, 5.9, 6.0, 6.0, 6.1, 6.1, 6.1],
-              "outcome": [3.7, 1.6, .2, 0, 0, 0, 0, 0, 0, 0, 0]},
+    "dx": {"policy": [88, 88, 89, 90, 91, 91, 91, 90, 91, 91, 91],
+           "outcome": [88, 89, 70, 62, 58, 57, 56, 55, 55, 55, 55]},
+    "tests": {"policy": [3.7, 4.2, 4.8, 5.3, 5.7, 5.9, 5.9, 6.0, 5.9, 5.9, 5.9],
+              "outcome": [3.7, 2.0, .2, 0, 0, 0, 0, 0, 0, 0, 0]},
 }
 SPREAD = {"dx": 3, "tests": .5}
-CHOSEN = {"policy": 10, "outcome": 1}          # index of the checkpoint kept on validation
+CHOSEN = {"policy": 6, "outcome": 1}          # index of the checkpoint kept on validation
 
 
 def draw_a():
@@ -141,38 +165,54 @@ def draw_a():
 
 
 # ------------------------------------------------------------------ b  test results
-# (title, axis range, ticks, tick format, {model: (mean, ci_lo, ci_hi)}) -- INVENTED
+# (title, axis range, ticks, tick format, {model: (mean, ci_lo, ci_hi)}, reference value or None)
+# -- INVENTED. The reference is what the case policies ask for, drawn as a pink dashed line.
+F0 = lambda v: f"{v:.0f}"
+F1 = lambda v: f"{v:.1f}"
 MEASURES = [
-    ("Correct diagnoses (%)", (0, 100), (0, 50, 100), lambda v: f"{v:.0f}",
-     {"base": (80, 76, 84), "outcome": (62, 57, 67), "policy": (81, 77, 85)}),
-    ("Required tests ordered (%)", (0, 100), (0, 50, 100), lambda v: f"{v:.0f}",
-     {"base": (45, 41, 49), "outcome": (4, 2, 6), "policy": (78, 74, 82)}),
-    ("Cases with an unsafe action (%)", (0, 20), (0, 10, 20), lambda v: f"{v:.0f}",
-     {"base": (12, 9, 15), "outcome": (3, 1, 5), "policy": (6, 4, 8)}),
-    ("Cost per case ($)", (0, 4000), (0, 2000, 4000), lambda v: f"{v:.0f}",
-     {"base": (2400, 2200, 2600), "outcome": (40, 0, 90), "policy": (3100, 2900, 3300)}),
-    ("Outcome score", (0, 1), (0, 0.5, 1), lambda v: f"{v:.1f}",
-     {"base": (.72, .69, .75), "outcome": (.78, .75, .81), "policy": (.70, .67, .73)}),
-    ("Policy score", (0, 1), (0, 0.5, 1), lambda v: f"{v:.1f}",
-     {"base": (.41, .38, .44), "outcome": (.30, .27, .33), "policy": (.64, .61, .67)}),
+    ("Correct diagnoses (%)", (0, 100), (0, 50, 100), F0,
+     {"base": (88, 84, 92), "outcome": (89, 85, 93), "policy": (91, 87, 95)}, None),
+    ("Required tests ordered (%)", (0, 100), (0, 50, 100), F0,
+     {"base": (42, 38, 46), "outcome": (31, 27, 35), "policy": (80, 76, 84)}, None),
+    ("Ordered tests the policy asks for (%)", (0, 100), (0, 50, 100), F0,
+     {"base": (46, 42, 50), "outcome": (52, 46, 58), "policy": (74, 70, 78)}, None),
+    ("Tests per case", (0, 8), (0, 4, 8), F0,
+     {"base": (3.7, 3.4, 4.0), "outcome": (2.0, 1.8, 2.2), "policy": (5.9, 5.6, 6.2)}, 5.5),
+    ("Cost relative to the required work-up", (0, 2), (0, 1, 2), F0,
+     {"base": (.85, .78, .92), "outcome": (.35, .30, .40), "policy": (1.05, .98, 1.12)}, 1.0),
+    ("Outcome score", (0, 1), (0, 0.5, 1), F1,
+     {"base": (.84, .81, .87), "outcome": (.89, .86, .92), "policy": (.85, .82, .88)}, None),
+    ("Policy score", (0, 1), (0, 0.5, 1), F1,
+     {"base": (.42, .39, .45), "outcome": (.40, .37, .43), "policy": (.66, .63, .69)}, None),
 ]
+# the outcome reward without cost, same measures in the same order -- INVENTED
+NOCOST = [(88, 84, 92), (37, 33, 41), (48, 43, 53), (3.0, 2.7, 3.3), (.65, .58, .72), (.85, .82, .88),
+          (.41, .38, .44)]
+for (_, _, _, _, vals, _), v in zip(MEASURES, NOCOST):
+    vals["nocost"] = v
+
+
+KEY_REF = "What the case policies ask for"
 
 
 def draw_b():
     k.panel(B_X, 0, B_W, R1, "b", "Results on the test cases")
     cx, cy, cw, ch = inner(B_X, 0, B_W, R1)
-    legend(cx + 28, cy + 44, cx + cw - 20, "dot")
+    legend(cx + 28, cy + 44, cx + cw - 20, "dot", SERIES_B)
+    ly = cy + 44 + ROW + 6                     # second key line: the reference of the case policies
+    k.line(cx + 28, ly - S * 0.36, cx + 28 + 44, ly - S * 0.36, stroke=PHYS, sw=2.4, dash="6 4")
+    k.text(cx + 28 + 54, ly, KEY_REF)
     n = len(MEASURES)
     slot = (cw - 40) / n
-    title_top = cy + 44 + 40
+    title_top = ly + 34
     title_lines = [k.wrap(t, slot - 40) for t, *_ in MEASURES]
     n_lines = max(len(t) for t in title_lines)
     y0 = title_top + (n_lines - 1) * ROW + S + 66        # room for the bracket above the dots
     y1 = cy + ch - 40
-    for i, (title, (lo, hi), ticks, fmt, vals) in enumerate(MEASURES):
+    for i, (title, (lo, hi), ticks, fmt, vals, ref) in enumerate(MEASURES):
         sx = cx + 20 + i * slot
-        px0 = sx + 4 + max(k.width(fmt(v)) for v in ticks) + 22
-        px1 = sx + slot - 18
+        px0 = sx + 4 + max(k.width(fmt(v)) for v in ticks) + 16
+        px1 = sx + slot - 6
         mid = (px0 + px1) / 2
         k.lines_at(mid, title_top, title_lines[i], anchor="middle")
         Y = lambda v, lo=lo, hi=hi: y1 - (v - lo) / (hi - lo) * (y1 - y0)
@@ -180,12 +220,15 @@ def draw_b():
             k.line(px0, Y(v), px1, Y(v), stroke=GRIDC, sw=1.2)
         y_axis(px0, y0, y1, ticks, Y, fmt)
         k.line(px0, y1, px1, y1)
-        step = (px1 - px0) / 3
-        xs = {key: px0 + step * (j + 0.5) for j, (key, _, _) in enumerate(SERIES)}
-        for key, _, col in SERIES:
+        if ref is not None:          # what the case policies ask for
+            k.line(px0, Y(ref), px1, Y(ref), stroke=PHYS, sw=2.4, dash="6 4")
+        step = (px1 - px0) / len(SERIES_B)
+        assert step > 22, (title, step)
+        xs = {key: px0 + step * (j + 0.5) for j, (key, _, _) in enumerate(SERIES_B)}
+        for key, _, col in SERIES_B:
             m, a, b = vals[key]
-            k.line(xs[key], Y(a), xs[key], Y(b), stroke=col, sw=2.4)
-            k.marker(xs[key], Y(m), "circle", col, r=10.5)
+            k.line(xs[key], Y(a), xs[key], Y(b), stroke=col, sw=2.2)
+            dot(xs[key], Y(m), key, col, r=9)
         # paired test, policy vs outcome reward: bracket above the higher of the two
         top_v = max(vals["policy"][2], vals["outcome"][2])
         yb = min(Y(top_v) - 26, y0 - 6)
@@ -198,14 +241,14 @@ def draw_b():
 # ------------------------------------------------------------------ c  by test condition
 # (condition, {measure: {model: (mean, lo, hi)}}) -- INVENTED
 CONDITIONS = [
-    ("Bacterial meningitis", {"dx": {"base": (86, 78, 93), "outcome": (70, 60, 80), "policy": (88, 80, 95)},
-                              "req": {"base": (52, 45, 59), "outcome": (5, 1, 9), "policy": (84, 78, 90)}}),
-    ("High-grade glioma", {"dx": {"base": (82, 73, 90), "outcome": (66, 55, 76), "policy": (83, 74, 91)},
-                           "req": {"base": (40, 33, 47), "outcome": (3, 0, 7), "policy": (75, 68, 82)}}),
-    ("Hepatic encephalopathy", {"dx": {"base": (70, 60, 80), "outcome": (48, 37, 59), "policy": (74, 64, 84)},
-                                "req": {"base": (38, 31, 45), "outcome": (4, 0, 8), "policy": (72, 65, 79)}}),
-    ("Myasthenia gravis", {"dx": {"base": (80, 71, 89), "outcome": (62, 51, 72), "policy": (79, 70, 88)},
-                           "req": {"base": (48, 41, 55), "outcome": (4, 0, 8), "policy": (80, 73, 87)}}),
+    ("Bacterial meningitis", {"dx": {"base": (95, 88, 99), "outcome": (93, 85, 98), "policy": (96, 90, 99)},
+                              "req": {"base": (48, 41, 55), "outcome": (32, 25, 39), "policy": (84, 78, 90)}}),
+    ("High-grade glioma", {"dx": {"base": (84, 75, 92), "outcome": (80, 70, 89), "policy": (86, 77, 93)},
+                           "req": {"base": (38, 31, 45), "outcome": (27, 20, 34), "policy": (76, 69, 83)}}),
+    ("Hepatic encephalopathy", {"dx": {"base": (78, 68, 87), "outcome": (77, 67, 86), "policy": (80, 70, 89)},
+                                "req": {"base": (40, 33, 47), "outcome": (30, 23, 37), "policy": (74, 67, 81)}}),
+    ("Myasthenia gravis", {"dx": {"base": (90, 82, 96), "outcome": (89, 81, 95), "policy": (91, 83, 97)},
+                           "req": {"base": (44, 37, 51), "outcome": (33, 26, 40), "policy": (82, 75, 88)}}),
 ]
 C_AXES = [("dx", "Correct diagnoses (%)"), ("req", "Required tests ordered (%)")]
 DODGE = {"base": -13, "outcome": 0, "policy": 13}
@@ -251,38 +294,55 @@ def draw_c():
         x_axis(px0, px1, bottom, (0, 50, 100), X, label)
 
 
-# ------------------------------------------------------------------ d  the mechanism
-# cases the untrained model diagnoses from the history alone (no test) vs cases that need tests -- INVENTED
-GROUPS = [("Solved from the history alone", {"base": (90, 85, 94), "outcome": (86, 80, 91), "policy": (91, 86, 95)}),
-          ("Need tests to solve", {"base": (66, 58, 74), "outcome": (30, 22, 38), "policy": (70, 62, 78)})]
+# ------------------------------------------------------------------ d  right tests, or just more tests
+# required tests ordered (%) by a scripted agent that orders the same k tests in every case, the k most
+# often required in the training cases, for k = 0..11 -- INVENTED (its end, every test, is near the
+# 50% the order-everything agent reaches on the 600 cases)
+FIXED = [0, 14, 25, 33, 39, 43, 46, 48, 49, 50, 50, 50]
+# {model: (tests per case (mean, lo, hi), required tests ordered (mean, lo, hi))} -- INVENTED
+POINTS_D = {"base": ((3.7, 3.4, 4.0), (42, 38, 46)), "outcome": ((2.0, 1.8, 2.2), (31, 27, 35)),
+            "policy": ((5.9, 5.6, 6.2), (80, 76, 84))}
+REQUIRED = (5.5, 100)          # the required work-up of the case policies -- INVENTED number of tests
+KEY_FIXED, KEY_REQ = "Same k tests in every case", "Required work-up"
+
+
+def diamond(cx, cy, col, r=10.5):
+    d = r * 1.25
+    k.out.append(f'<path d="M{cx:.1f},{cy - d:.1f} L{cx + d:.1f},{cy:.1f} L{cx:.1f},{cy + d:.1f} '
+                 f'L{cx - d:.1f},{cy:.1f} Z" fill="{col}" stroke="#FFFFFF" stroke-width="1.5"/>')
 
 
 def draw_d():
-    k.panel(D_X, Y2, D_W, R2, "d", "The outcome reward fails where tests are needed")
+    k.panel(D_X, Y2, D_W, R2, "d", "Right tests, or just more tests")
     cx, cy, cw, ch = inner(D_X, Y2, D_W, R2)
-    px0, px1 = cx + 118, cx + cw - 34
-    top, bottom = cy + 70, cy + ch - 120
+    ly = legend(cx + 28, cy + 44, cx + cw - 20, "dot")
+    y2 = ly + ROW + 6                         # second key line: the scripted agent and the policy
+    ym = y2 - S * 0.36
+    x = cx + 28
+    k.line(x, ym, x + 44, ym, stroke=BLACK, sw=2.4)
+    k.marker(x + 22, ym, "circle", BLACK, r=5, stroke="none", sw=0)
+    k.text(x + 54, y2, KEY_FIXED)
+    x += 54 + k.width(KEY_FIXED) + 30
+    diamond(x + 12, ym, PHYS, r=8)
+    k.text(x + 32, y2, KEY_REQ)
+    assert x + 32 + k.width(KEY_REQ) < cx + cw - 16, x
+    px0, px1 = cx + 118, cx + cw - 40
+    top, bottom = y2 + 44, cy + ch - 96
+    X = lambda v: px0 + v / 12 * (px1 - px0)
     Y = lambda v: bottom - v / 100 * (bottom - top)
     for v in (50, 100):
         k.line(px0, Y(v), px1, Y(v), stroke=GRIDC, sw=1.2)
-    y_axis(px0, top, bottom, (0, 50, 100), Y, lambda v: f"{v:.0f}", cx + 34, "Correct diagnoses (%)")
-    k.line(px0, bottom, px1, bottom)
-    gw = (px1 - px0) / len(GROUPS)
-    for g, (label, vals) in enumerate(GROUPS):
-        gx = px0 + (g + 0.5) * gw
-        for j, (model, _, col) in enumerate(SERIES):
-            x = gx + (j - 1) * 46
-            m, a, b = vals[model]
-            k.line(x, Y(a), x, Y(b), stroke=col, sw=2.4)
-            k.marker(x, Y(m), "circle", col, r=10.5)
-        lines = k.wrap(label, gw - 30)
-        k.lines_at(gx, bottom + 22, lines, anchor="middle")
-        k.text(gx, bottom + 22 + S * 0.72 + len(lines) * ROW, f"n = {XX}", fill=MUTED, anchor="middle")
-        xo, xp = gx, gx + 46
-        yb = min(Y(max(vals["policy"][2], vals["outcome"][2])) - 26, top - 4)
-        k.out.append(f'<path d="M{xo:.1f},{yb + 8:.1f} V{yb:.1f} H{xp:.1f} V{yb + 8:.1f}" fill="none" '
-                     f'stroke="{INK}" stroke-width="1.4"/>')
-        k.text((xo + xp) / 2, yb - 10, f"P = {XX}", anchor="middle")
+    y_axis(px0, top, bottom, (0, 50, 100), Y, lambda v: f"{v:.0f}", cx + 34, "Required tests ordered (%)")
+    x_axis(px0, px1, bottom, (0, 4, 8, 12), X, "Tests per case")
+    polyline([X(i) for i in range(len(FIXED))], [Y(v) for v in FIXED], BLACK, sw=2.2)
+    for i, v in enumerate(FIXED):
+        k.marker(X(i), Y(v), "circle", BLACK, r=4.5, stroke="none", sw=0)
+    diamond(X(REQUIRED[0]), Y(REQUIRED[1]) + 2, PHYS)
+    for model, _, col in SERIES:
+        (tm, t0, t1), (rm, r0, r1) = POINTS_D[model]
+        k.line(X(t0), Y(rm), X(t1), Y(rm), stroke=col, sw=2.2)
+        k.line(X(tm), Y(r0), X(tm), Y(r1), stroke=col, sw=2.2)
+        k.marker(X(tm), Y(rm), "circle", col, r=10.5)
 
 
 draw_a()

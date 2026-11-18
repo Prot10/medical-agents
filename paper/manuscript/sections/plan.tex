@@ -1,7 +1,18 @@
 % Overview: positioning, format limits, word budget, display items and risks. Thesis, narrative and
-% claims are in the abstract plan. Updated 17 Nov 2026 to match paper/decisions.md.
+% claims are in the abstract plan. Updated 17 Nov 2026 to match paper/decisions.md; thesis, claims,
+% display items and risks revised on 18 Nov 2026 after the second critical review (decisions.md).
 
 \section*{Overview: positioning, budget, display items, risks}
+
+\noindent\textbf{Goal of the paper (18 Nov 2026, revised the same day after the first real results).}
+To support physicians in hospitals, a diagnostic agent must reach the diagnosis through the work-up
+that clinical practice asks for. Rewarding a small open model for following physician-reviewed case
+policies teaches it to order the tests physicians ask for and few others, on conditions and real
+admissions it never trained on: it orders about as many tests as physicians do and spends where the
+case needs it. Rewarding the same model for a correct diagnosis at low cost keeps the diagnoses and
+saves by leaving required tests out.
+Every figure, claim and section serves these sentences; the abstract plan breaks them into claims C1--C5.
+
 
 \noindent\textbf{Positioning: what each line of prior work gives, and our delta}\par\smallskip
 \noindent{\small
@@ -9,20 +20,25 @@
 \toprule
 Prior work & What it gives & Our delta \\ \midrule
 SDBench / MAI-DxO~\cite{nori2025sequential} & The sequential-diagnosis format; frontier models
-  scored on diagnosis and cost & Process-level, physician-auditable policy, used as the reward for small
-  local models. Prior art, never ``concurrent'' \\
+  scored on diagnosis and cost; a panel of five agent roles that needs no training & Process-level,
+  physician-auditable policy, used as the reward for small local models; the panel rebuilt on the same
+  9B model is a baseline (Fig.~6). Prior art, never ``concurrent'' \\
 Hager et al.~\cite{hager2024evaluation} on MIMIC-IV~\cite{johnson2023mimiciv}; MIRA~\cite{ferber2026mira}
   & Local models fail on real records and ignore guidelines; clinicians as the reference
   & The training signal that targets that failure \\
 AgentClinic~\cite{schmidgall2026agentclinic}, MedAgentBench~\cite{jiang2025medagentbench},
 MedAgents~\cite{tang2024medagents} & Interactive benchmarks & They score the outcome or use an LLM
   judge; no executable per-case policy; not rewards \\
-Clinical RL (DiagGym~\cite{qiu2025diaggym}, Med-RLVR~\cite{zhang2025medrlvr}),
-GRPO~\cite{shao2024deepseekmath}, DAPO~\cite{yu2025dapo} & Outcome or cost-aware rewards & That reward
-  trains our comparison model \\
+DiagGym~\cite{qiu2025diaggym} & Reinforcement learning with a reward on the diagnosis, on the overlap
+  with the tests recorded in the health record and on the number of turns; diagnosis-only against
+  dual reward & The reference is a physician-reviewed policy per case (required, to avoid, order,
+  stop), not the recorded orders; conditions never seen in training; blind physician ratings \\
+Med-RLVR~\cite{zhang2025medrlvr}, GRPO~\cite{shao2024deepseekmath}, DAPO~\cite{yu2025dapo} & Outcome
+  rewards and the training method & An outcome reward (diagnosis and cost) trains our comparison
+  model \\
 Process supervision~\cite{uesato2022solving,lightman2024verify} & Process beats outcome in maths, with
-  human or learned step labels & Process as a verifiable expert specification; the stakes are
-  safety \\
+  human or learned step labels & Process as a verifiable expert specification, written and
+  reviewed per case \\
 \bottomrule
 \end{tabularx}}
 
@@ -30,7 +46,8 @@ Process supervision~\cite{uesato2022solving,lightman2024verify} & Process beats 
 \noindent\textbf{NMI Article limits (checked 17 Nov 2026, details in paper/nmi-notes.md).} Main text
 $\le$3,500 words (without abstract, Methods, references, legends); abstract $\le$150; $\le$6 display
 items; $\sim$50 references; $\le$10 Extended Data items; Supplementary Information without limit.
-Avoid: ``concurrent'', ``clinically deployable'', ``human-level'', ``solves''.
+Avoid: ``concurrent'', ``clinically deployable'', ``human-level'', ``solves'', and ``safe'' as a
+result (unsafe actions are too rare to support it).
 
 \medskip
 \noindent
@@ -44,7 +61,7 @@ R2 Hidden work-up & 400 \\
 R3 Policy vs outcome & 600 \\
 R4 Physicians & 350 \\
 R5 Real records & 350 \\
-R6 Size and cost & 300 \\
+R6 Source of the gain & 300 \\
 Discussion & 600 \\ \midrule
 Main text & 3,500 \\
 Methods (not counted) & $\sim$3,400 \\
@@ -57,27 +74,41 @@ Each legend & $\le$250 \\
 {\small\begin{tabularx}{\linewidth}{@{}l>{\raggedright\arraybackslash}Xl@{}}
 \toprule
 Fig. & Shows & Status \\ \midrule
-1 & Overview: cases, one episode, the case policy & approved \\
-2 & Untrained models: a correct diagnosis can hide the work-up (C1) & layout approved \\
-3 & Untrained vs outcome reward vs policy reward (C2) & layout approved \\
-4 & Physicians: which score agrees with them; models against them on the same cases (C3) & layout approved \\
-5 & MIMIC-IV admissions: the reward difference, held-out conditions, clinicians (C4) & layout approved \\
-6 & Trained 9B vs larger models; cost on one GPU (C5) & to design \\
+1 & Overview: cases, one episode, the case policy & revised, awaiting approval \\
+2 & Untrained models: a correct diagnosis can hide an incomplete work-up (C1) & revised, awaiting approval \\
+3 & Untrained vs outcome reward vs policy reward, with the no-cost control and scripted agents (C2) & revised, awaiting approval \\
+4 & Physicians on MIMIC-IV admissions: which score agrees with them, their rating of each agent, agents against them (C3) & revised, awaiting approval \\
+5 & MIMIC-IV admissions: the three models, and against the treating clinicians (C4) & revised, awaiting approval \\
+6 & Where the gain comes from: rules in the prompt, fine-tuning, a multi-agent panel, larger models (C5) & revised, awaiting approval \\
 \bottomrule
 \end{tabularx}}
 \end{minipage}
 
 \medskip
-\noindent\textbf{Risks (17 Nov 2026)}
+\noindent\textbf{Risks (18 Nov 2026)}
 \begin{itemize}
-\item \textbf{Training not finished}: seeds 2 and 3 of both models are still to run, and the policy model
-is retrained with the current reward (one penalty per useless test). The size of the main effect is
-unknown until then.
-\item \textbf{Approved policies}: a policy counts only once two physicians approve it independently;
-so far each case was reviewed by two physicians one after the other on the same account, so
-inter-physician agreement needs one condition redone on two accounts.
-\item \textbf{Physician time}: the blind rating of $\sim$100 work-ups and the 20--30 cases solved by the
-neurologists (Fig.~4) depend on it.
-\item \textbf{MIMIC-IV}: policies carried over from the synthetic templates and still draft; only 12 of
-100 admissions come from conditions kept out of training.
+\item \textbf{Training not finished}: one seed of each model exists, read on the validation cases with
+draft policies. The outcome-reward model kept by the selection rule orders about half the tests of the
+untrained model and keeps its diagnoses; the policy-reward model doubles the required tests ordered
+but also orders more tests the policy does not ask for than the untrained model. A stronger penalty
+for such tests is chosen on validation before seeds 2 and 3.
+\item \textbf{Unsafe actions are rare}: about 2\% of cases for the untrained model, unchanged by
+training, so the paper claims nothing about safety; the measure stays in Extended Data Table~1.
+\item \textbf{Approved policies}: each case was reviewed by two physicians one after the other on the
+same account, most were corrected from their notes, and the corrections were re-checked on a sample.
+A policy counts as approved only once two physicians approve it independently, and the test cases
+come first. Inter-physician agreement needs one condition redone on two accounts.
+\item \textbf{Physician studies on MIMIC-IV} (Fig.~4): the reviewers have not seen those admissions,
+but each needs personal PhysioNet access, the cases cannot be served from the public review site, and
+the reviewers know the policies of those conditions, so at least one neurologist who has not seen the
+policies should rate too. Protocol, sample size and rating scale are fixed before any rating.
+\item \textbf{MIMIC-IV}: policies carried over from the synthetic templates and still draft; 88 of 100
+admissions come from conditions seen in training or validation; the admissions were selected because
+the record holds the core tests of the policy, so agreement with the treating clinicians is partly
+built in.
+\item \textbf{Four test conditions}: cases of one condition resemble each other, so the pooled
+intervals describe these four conditions and not conditions in general. Every effect is also given per
+condition, and one more training run holds other conditions out (Extended Data Fig.~9).
+\item \textbf{New runs}: the control without the cost term, the multi-agent panel, the rules in the
+prompt and the supervised baseline (Fig.~6) are not built or run yet.
 \end{itemize}

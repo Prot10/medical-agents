@@ -269,20 +269,37 @@ parentheses. When a point is done or decided, tick it here and record it in `dec
 **Figures**
 - [x] Neurologists as a human reference (Hager, MIRA, SDBench put clinicians beside the models): in
   Fig. 4c since 18 Nov, on the same 20–30 cases (they were in Fig. 2 on 17 Nov).
-- [x] Fig. 2c: a "complete but with useless tests" class and n next to each bar (MIRA; Hager).
+- [x] Fig. 2b (2c before the critical review of 18 Nov): a "complete but with useless tests" class and n next to each bar (MIRA; Hager).
 - [x] Fig. 3: both scores for every model, independent measures first, per condition, mechanism
   (circularity; Uesato; MIRA; PsychFound).
 - [ ] Every panel with error bars, n, test and exact P values in the legend (NMI rules; Reporting
   Summary; PsychFound).
-- [ ] Fig. 6 or ED: score against model size (PsychFound Fig. 3) and accuracy against cost with a
-  frontier (SDBench; no reward comparison does it yet).
+- [x] Fig. 6, redrawn in the second critical review (18 Nov): Qwen3.5-9B with the rules in the prompt,
+  fine-tuned by imitation and run as a multi-agent panel in the style of MAI-DxO, against the
+  policy-reward model, with tokens per case; a larger untrained model in b. The earlier panels (policy
+  score against size and against wall time) are gone: both plotted the reward the model was trained on.
+- [x] Fig. 3b: control trained on the outcome reward without the cost term (critical review, 18 Nov;
+  needs a new training run).
+- [x] Fig. 4b: blind rating of each agent, so the main effect is tested with no score (critical review,
+  18 Nov); four agents and MIMIC-IV admissions since the second review of the same day.
+- [x] Fig. 4a: a row for the number of tests ordered, the rival explanation of the ratings (second
+  review, 18 Nov).
+- [x] Fig. 3d: required tests ordered against tests per case, with a scripted agent that orders the same
+  k tests in every case: right tests, not more tests (second review, 18 Nov).
+- [ ] Correct diagnoses against the cost of the tests with a frontier (SDBench; no reward comparison
+  does it yet): not in Fig. 6, which shows the time to run the models; a candidate for the free
+  Extended Data slot.
 - [ ] ED: CONSORT diagram of the MIMIC cases (MIRA).
 - [ ] ED: full leaderboard of all models; error analysis with a taxonomy (PsychFound, MIRA).
 
 **Experiments and analyses**
-- [ ] Non-RL baselines: prompting only and SFT on the same episodes (DeepSeek-R1; X-ray agent).
-- [ ] Model B with a different cost weight or no cost: the collapse must not depend on that weight
-  (MIRA; B must not look like a weak opponent).
+- [ ] Non-RL baselines: prompting only and SFT on the same episodes (DeepSeek-R1; X-ray agent); since
+  18 Nov in the main text (Fig. 6a), with a multi-agent panel in the style of MAI-DxO on the same 9B
+  model. Not run yet.
+- [ ] Model B with a different cost weight or no cost: its behaviour must not depend on that weight
+  (MIRA; B must not look like a weak opponent). The model kept by the selection rule does not
+  collapse: it orders fewer tests and keeps the diagnoses (seed 1, 18 Nov).
+- [ ] A second split that holds other conditions out (four test conditions are few; ED Fig. 9, 18 Nov).
 - [ ] A second base model trained (ED4 already planned; DeepSeek-R1; PsychFound).
 - [ ] Contamination: similarity between training and test cases, and the models' pre-training; the
   split by condition must be measured, not only stated (PsychFound, AMIE, Med-PaLM).
@@ -293,7 +310,9 @@ parentheses. When a point is done or decided, tick it here and record it in `dec
 - [ ] Physicians rate the realism of the cases and of the library's normal reports (MIRA).
 - [ ] Repeatability: 3 seeds for everything, and sensitivity to the prompt (NMI empathy paper; Nat
   Commun NLP benchmark).
-- [ ] Unsafe actions counted and classified (PsychFound).
+- [ ] Unsafe actions counted and classified (PsychFound). They are rare (about 2% of cases) and
+  unchanged by training, so the paper claims nothing about safety (18 Nov); the count stays in ED
+  Table 1.
 - [ ] Statistics: paired tests per case (Wilcoxon, McNemar), Wilson CIs for proportions, Holm or
   Benjamini–Hochberg correction when there are several measures (MIRA, AMIE).
 - [ ] Time, number of requests, tokens and cost per episode (X-ray agent; multi-agent editorial).
@@ -303,6 +322,10 @@ parentheses. When a point is done or decided, tick it here and record it in `dec
 - [ ] Introduction: cite the NMI Correspondence "Clinical large language models with misplaced focus"
   and the NMI Comment on agents in medicine (Qiu et al. 2024).
 - [ ] Position the work explicitly against SDBench/MAI-DxO, MIRA, AMIE, HealthBench, Hager, DiagGym.
+  DiagGym is the closest (18 Nov, read in full): reinforcement learning with a reward on the diagnosis
+  and on the overlap with the tests recorded in the health record, against a diagnosis-only reward.
+  Our delta: a physician-reviewed policy per case as the reference, conditions never seen in training,
+  blind physician ratings. SDBench defines no reward, so the weights of our outcome reward are ours.
 - [ ] Measured claims: no "outperforms physicians", no "first"; null results in the abstract too.
 - [ ] Clear limitations: synthetic cases, one diagnosis per case, library normal reports, guidelines
   from a single setting.

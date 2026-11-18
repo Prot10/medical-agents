@@ -1,4 +1,4 @@
-"""Figure 1 as a hand-laid SVG (17 Nov 2026).
+"""Figure 1 as a hand-laid SVG (17 Nov 2026); revised after the two critical reviews of 18 Nov 2026, awaiting approval.
 
 Run:  uv run --no-project --with pillow python paper/figures/fig1_svg.py
 PDF:  paper/figures/fig1_pdf.sh (builds the SVG, prints it with headless Chrome: TrueType
@@ -12,10 +12,12 @@ collide. Text is measured with Pillow on the same Arial files, so boxes fit the 
 Layout as in NMI overview figures: full width (NMI maximum 180 mm), one row read left to right,
 cases (a) -> the episode (b, wide) -> the policy (c). Nature guide: black text only (no coloured
 text) and no decorative icons; colour stays in fills, outlines and the verdict marks. Palette (Okabe-Ito) and the decisions behind each panel: paper/decisions.md.
-Roles: sky blue = cases, blue = NeuroAgent, slate = the simulated hospital, pink = physicians and
-policy, green/vermilion = verdicts.
+Roles: sky blue = cases, blue = the agent (policy reward), slate = the simulated hospital, pink =
+physicians and policy, green tick = item met, grey cross = item missed. The outcome score of the
+episode left panel c in the second critical review of 18 Nov: 0.99 beside a policy score of 0.96 read
+as the better score, and the two rewards are compared in Fig. 3.
 
-Panel b is a real episode: NeuroAgent (Qwen3.5-9B RL-trained with the policy reward v3, seed 1,
+Panel b is a real episode: the agent (Qwen3.5-9B RL-trained with the policy reward v3, seed 1,
 checkpoint 300, validation seed 1) on SYNC-CARD-RS03, a validation case it never trained on.
 Every step is shown. Each "Reason" is the `clinical_context` the model wrote in that call, quoted
 with ellipses only; the drug check has no such field, so it shows none. Answers are shortened
@@ -34,7 +36,8 @@ OUT = Path(__file__).with_name("fig1.svg")
 # Okabe-Ito roles, fixed for the whole paper (paper/decisions.md)
 MODEL_A = "#0072B2"
 OK = "#009E73"
-ERR = "#D55E00"
+MISS = "#7A828C"   # grey: a policy item the episode missed
+MODEL_B = "#E69F00"   # outcome reward
 SKY_T, SKY_LINE, SKY_D, SKY_BAR, SKY_PALE = "#EAF5FC", "#CFE6F5", "#2F8FC9", "#7DC3EC", "#BFE2F6"
 A_T, A_LINE, A_D = "#E4EFF7", "#C4DBEC", "#00588A"
 PINK_T, PINK_LINE, PINK_D = "#FBF0F6", "#F0D3E4", "#B0508C"
@@ -136,7 +139,7 @@ def disc(cx, cy, r, fill, kind, color="#FFFFFF", s=None, sw=2.1):
 
 
 def mark(cx, cy, kind, r=12.5):
-    out.append(f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="{r}" fill="{OK if kind == "ok" else ERR}"/>')
+    out.append(f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="{r}" fill="{OK if kind == "ok" else MISS}"/>')
     if kind == "ok":
         out.append(f'<path d="M{cx-6:.1f},{cy+0.5:.1f} l4,4 l8,-9" fill="none" stroke="#fff" stroke-width="3" '
                    f'stroke-linecap="round" stroke-linejoin="round"/>')
@@ -203,9 +206,9 @@ def draw_b():
     y = HEAD + 4
 
     # who talks to whom
-    text(bx0, y + 15, "NeuroAgent", bold=True)
-    pill = "Qwen3.5-9B, RL-trained"
-    px = bx0 + width("NeuroAgent", True) + 10
+    text(bx0, y + 15, "Agent", bold=True)
+    pill = "Qwen3.5-9B, trained on the policy reward"
+    px = bx0 + width("Agent", True) + 10
     rect(px, y - 10, width(pill) + 22, 32, A_T, rx=16)
     text(px + 11, y + 15, pill)
     text(bx1, y + 15, "Simulated hospital", bold=True, anchor="end")
@@ -219,7 +222,7 @@ def draw_b():
     lines_at(bx0 + 20, y + 16 + block_h(1) + 8, case_lines)
     y += ch + 22
 
-    # one row per turn, two widgets of the same shape: the request NeuroAgent sends (left, blue:
+    # one row per turn, two widgets of the same shape: the request the agent sends (left, blue:
     # test as ordered, then its reason) and the report the hospital sends back (right, slate:
     # report name, then the result); the numbered line on the left keeps the order
     node_x = bx0 + STEP_R
@@ -377,7 +380,7 @@ SECTIONS = [("Required", [("ok", "12-lead ECG, first"), ("ok", "Cardiac monitori
             # reward components of the same episode: unjustified_actions 0, stopping 1.0
             ("Also scored", [("ok", "No useless test"), ("ok", "Stops when done")])]
 ROW_C, TITLE_C = 40, ROW + 4
-SCORE_H = 138
+SCORE_H = 142
 
 
 def draw_c(h, draw=True):
@@ -412,8 +415,8 @@ def draw_c(h, draw=True):
     rect(sx + 16, sy + 50, sw_ - 32, 12, "#E3E6EA", rx=6)
     rect(sx + 16, sy + 50, (sw_ - 32) * 0.96, 12, MODEL_A, rx=6)
     text(sx + 16, sy + 88, "one test missed", fill=MUTED)
-    text(sx + 16, sy + 122, "Cost of the tests", fill=MUTED)   # total_cost_usd, Medicare rates
-    text(sx + sw_ - 16, sy + 122, "$524", anchor="end")
+    text(sx + 16, sy + 126, "Cost of the tests", fill=MUTED)   # total_cost_usd, Medicare rates
+    text(sx + sw_ - 16, sy + 126, "$524", anchor="end")
     return yy
 
 
@@ -424,7 +427,7 @@ out = _saved
 H = max(H, round(a_need), round(draw_c(0, draw=False)))
 panel(AX, 0, A_W, H, "a", "Cases", SKY_T)
 draw_a(H)
-panel(BX, 0, B_W, H, "b", "NeuroAgent works up a case, one test per turn", SLATE_T)
+panel(BX, 0, B_W, H, "b", "The agent works up a case, one test per turn", SLATE_T)
 out.extend(b_items)
 panel(CX, 0, C_W, H, "c", "The policy scores it", PINK_T)
 draw_c(H)

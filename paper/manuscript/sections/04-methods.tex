@@ -1,14 +1,14 @@
 % Methods plan: short bold subheadings, written for replication; not counted in the 3,500 words.
 % Updated 17 Nov 2026 to match paper/decisions.md.
 
-\section{Methods ($\sim$3,400 words, thirteen subsections)}\label{sec:methods}
+\section{Methods ($\sim$3,600 words, fourteen subsections)}\label{sec:methods}
 
 \role{Make every Results number reproducible from this section, the released code and the frozen
 dataset; answer the replication and leakage questions so the Results can stay short.}
 
 \content
-Thirteen subsections, in the order the pipeline runs: data $\to$ environment $\to$ rewards $\to$
-models and training $\to$ evaluation.
+Fourteen subsections, in the order the pipeline runs: data $\to$ environment $\to$ rewards $\to$
+models, training and baselines $\to$ evaluation.
 
 \structure
 \noindent{\footnotesize
@@ -17,35 +17,57 @@ models and training $\to$ evaluation.
 Subsection & What goes in & Why & Words & Source \\ \midrule
 Cases & Generation from 20 guideline packs; case schema; difficulty and setting mix; frozen version
   and hash & Dataset provenance & 350 & schemas, cases \\
-Policies and review & Policy fields; 7 dimensions; two independent reviews, third on disagreement;
-  approval rule; defect-class fixes; inter-physician agreement on one condition reviewed twice & Why the policy is trustworthy & 350 & policy\_\allowbreak{}eligibility \\
+Policies and review & Policy fields; 7 dimensions. The review as it happened: each case read by two
+  physicians one after the other, their notes (counts per round), the corrections made from the notes
+  with a model and checked by tests, the sample re-checked by the physicians, the approval rule and
+  how many test cases meet it; inter-physician agreement on one condition reviewed on two accounts;
+  role and experience of the physicians & Why the policy is trustworthy & 350 & policy\_\allowbreak{}eligibility \\
 Environment & Typed loop; 16 tools from the cost registry; schema validation; stored and library
   results; invalid-output budget; forced final turn & Replication of episodes & 300 & harness doc,
   tool contract \\
 Policy reward & Components, weights, gating, caps; scorer v2; equation (1) & The object under test
   & 400 & policy\_\allowbreak{}reward \\
 Outcome reward & $0.85\,D + 0.15\,(1-\text{cost}/B)$, $B$ the 95th percentile of the untrained
-  model's cost on the training cases; same scorer and costs & The two models differ only in the
-  signal & 150 & --- \\
+  model's cost on the training cases; the weights are our choice (no earlier work defines them);
+  same scorer and costs; control with the diagnosis alone ($D$)
+  & The two models differ only in the signal; the control rules out the cost term as the cause & 170
+  & --- \\
 Models, inference & Panel, versions, vLLM, frozen sampling, seeds; thinking off (Supp.\ Table~11);
   larger models on synthetic cases only & Replication & 200 & model\_\allowbreak{}registry \\
 SFT (control only) & Episode source; LoRA; same transcript codec as inference & Separates RL from
-  imitation (Supp.\ Table~4) & 100 & train\_\allowbreak{}sft, context \\
+  imitation (Fig.~6, Supp.\ Table~4) & 100 & train\_\allowbreak{}sft, context \\
+\bottomrule
+\end{tabularx}}
+
+\medskip
+\noindent{\footnotesize
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.17\linewidth}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{0.22\linewidth}r>{\raggedright\arraybackslash}p{0.14\linewidth}@{}}
+\toprule
+Subsection & What goes in & Why & Words & Source \\ \midrule
 RL & Both models from the untrained Qwen3.5-9B; GRPO, colocated vLLM, DAPO loss, token-level IS;
-  three seeds; checkpoint chosen on the validation cases by each model's own reward; compute
+  three seeds; checkpoint chosen on the validation cases by each model's own reward; the penalty for
+  a test the policy does not ask for, chosen on validation; compute
   & Central experiment & 350 & train\_\allowbreak{}grpo \\
+Baselines without RL & Rules in the prompt (the text, with nothing specific to a case); the
+  multi-agent panel in the style of MAI-DxO (five roles, prompts, how the discussion becomes one typed
+  action, token count over the roles); scripted agents (required work-up, every test, the same $k$
+  tests in every case) & Where the gain comes from (Figs.~3d, 6) & 200 & loops, scripted\_\allowbreak{}agents \\
 Split, leakage & Whole conditions: 419 training, 60 validation, 119 test (4 conditions), 2 excluded;
   test guard; similarity test; model release dates & Pre-empts contamination & 300 & split
   manifest, leakage audit \\
-MIMIC-IV & 100 admissions, 9 conditions, strict pool; records to cases; policies from the
-  condition's templates; clinicians' orders; inference at CERN & External validity, DUA & 300 &
+MIMIC-IV & 100 admissions, 9 conditions, strict pool (admissions whose record holds the core tests
+  of the policy, and what that selection implies); records to cases; policies from the condition's
+  templates; clinicians' orders; inference at CERN & External validity, DUA & 300 &
   mimic-neuro \\
-Physician studies & Blind rating of $\sim$100 work-ups: sampling, blinding, scale, agreement;
-  20--30 cases solved by neurologists through the same interface & Validity of C3, human
-  reference in Fig.~4 & 250 & --- \\
+Physician studies & On MIMIC-IV admissions the neurologists had not seen; who rated (the reviewers
+  of the policies and at least one neurologist who had not seen them), their PhysioNet access and
+  where the cases were served. Blind rating of $\sim$100 work-ups of four agents: sampling, blinding,
+  scale, agreement, all fixed in advance; 20--30 admissions solved by neurologists through the same
+  interface & Validity of C3, human reference in Fig.~4 & 250 & --- \\
 Statistics & Primary: NeuroBench test; MIMIC-IV external, never pooled; case as unit; Wilcoxon,
-  paired bootstrap, McNemar; $\tau$, $\rho$, $\kappa$; Benjamini--Hochberg & One place for all
-  tests & 250 & --- \\
+  paired bootstrap, McNemar; $\rho$, $\kappa$; Benjamini--Hochberg; every effect per condition, the
+  pooled intervals describe the four test conditions, a second split holds others out & One place
+  for all tests & 250 & --- \\
 Use of LLMs & Case drafting, code and text editing; human review and responsibility & Required by
   NMI & 100 & --- \\
 \bottomrule
