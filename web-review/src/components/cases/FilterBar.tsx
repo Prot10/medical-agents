@@ -75,11 +75,14 @@ export function FilterBar({
 
       {/* Filter group + action: row on all sizes, wraps if needed */}
       <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap sm:ml-auto">
-        <ConditionFilter
-          options={conditionOptions}
-          selected={filterConditions}
-          onChange={setFilterConditions}
-        />
+        {/* Scoped to one condition (full review), there is nothing to filter by. */}
+        {conditionOptions.length > 1 && (
+          <ConditionFilter
+            options={conditionOptions}
+            selected={filterConditions}
+            onChange={setFilterConditions}
+          />
+        )}
 
         <select
           value={filterStatus}

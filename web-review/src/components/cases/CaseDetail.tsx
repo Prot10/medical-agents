@@ -54,6 +54,9 @@ export function CaseDetail({
   const version = useReviewStore((s) => s.datasetVersion)
   const setSelectedCaseId = useReviewStore((s) => s.setSelectedCaseId)
   const cases = useCases(version)
+  const scopeCondition = useReviewStore((s) =>
+    s.workspace?.kind === "full" ? s.workspace.condition : undefined,
+  )
   const reviews = useMyReviews(version)
   const caseDetail = useCaseDetail(version, caseId)
   const review = useReview(version, caseId)
@@ -191,7 +194,9 @@ export function CaseDetail({
             onSetStatus={async (s, policyVerdict) => {
               await setStatus.mutateAsync({ caseId, status: s, policyVerdict })
             }}
-            cases={(cases.data ?? []) as CaseIndexEntry[]}
+            cases={((cases.data ?? []) as CaseIndexEntry[]).filter(
+              (c) => !scopeCondition || c.condition === scopeCondition,
+            )}
             reviews={(reviews.data ?? []) as CaseReviewSummary[]}
             currentCaseId={caseId}
             onNavigate={(next) => setSelectedCaseId(next)}

@@ -1,7 +1,6 @@
 import { useIsMutating } from "@tanstack/react-query"
 import { motion } from "framer-motion"
 import {
-  ArrowLeft,
   ArrowRight,
   BrainCircuit,
   CheckCircle2,
@@ -14,9 +13,9 @@ import {
 } from "lucide-react"
 import { useState } from "react"
 
-import type { CaseIndexEntry, ReviewSet, ReviewStatus, ReviewerProfile } from "@/api/types"
+import type { CaseIndexEntry, ReviewSet, ReviewerProfile } from "@/api/types"
 import { useCases } from "@/hooks/useReview"
-import { isDecided, useSetProgress, type SetProgress } from "@/hooks/useSetProgress"
+import { useSetProgress, type SetProgress } from "@/hooks/useSetProgress"
 import { conditionColor, conditionLabel } from "@/lib/conditions"
 import { cn } from "@/lib/utils"
 import { useReviewStore } from "@/stores/reviewStore"
@@ -24,6 +23,7 @@ import { CaseDetail } from "@/components/cases/CaseDetail"
 import { GuidelinesDialog } from "@/components/layout/GuidelinesDialog"
 import { SaveIndicator } from "@/components/layout/Header"
 import { ReviewerChip } from "@/components/layout/ReviewerChip"
+import { CaseProgressStrip } from "@/components/review/CaseProgressStrip"
 import { Button } from "@/components/ui/Button"
 import { StatusPill } from "@/components/ui/StatusPill"
 
@@ -55,12 +55,32 @@ export function RecheckWorkspace({
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       <div className="sticky top-0 z-30 bg-background/90 backdrop-blur border-b border-border">
         <RecheckHeader profile={profile} title={reviewSet.name} />
-        <ProgressStrip
+        <CaseProgressStrip
           caseIds={reviewSet.case_ids}
-          caseById={caseById}
-          progress={progress}
+          statusOf={progress.statusOf}
           currentCaseId={selectedCaseId}
           onOpen={open}
+          describe={(id) => {
+            const entry = caseById.get(id)
+            return `${entry ? conditionLabel(entry.condition) : id} (${id})`
+          }}
+          heading={(index) => {
+            const entry = index >= 0 ? caseById.get(reviewSet.case_ids[index]) : undefined
+            return entry ? (
+              <div className="text-sm leading-tight truncate">
+                <span className="font-semibold tabular-nums">
+                  Case {index + 1} of {reviewSet.case_count}
+                </span>
+                <span className="text-muted-foreground"> · {conditionLabel(entry.condition)}</span>
+              </div>
+            ) : (
+              <div className="text-sm font-semibold leading-tight">
+                {progress.total > 0 && progress.done === progress.total
+                  ? "All cases reviewed"
+                  : "Your progress"}
+              </div>
+            )
+          }}
         />
       </div>
 
@@ -143,135 +163,6 @@ function RecheckHeader({ profile, title }: { profile: ReviewerProfile; title: st
         <ReviewerChip profile={profile} />
       </div>
       <GuidelinesDialog open={guidelinesOpen} onOpenChange={setGuidelinesOpen} />
-    </div>
-  )
-}
-
-// ---------------------------------------------------------------------------
-// Progress bar: one segment per case, coloured by the reviewer's decision
-
-const SEGMENT_COLOR: Record<ReviewStatus, string> = {
-  approved: "bg-emerald-500",
-  needs_changes: "bg-amber-500",
-  in_progress: "bg-sky-400",
-  pending: "bg-muted-foreground/20",
-}
-
-const STATUS_WORD: Record<ReviewStatus, string> = {
-  approved: "approved",
-  needs_changes: "needs changes",
-  in_progress: "started",
-  pending: "not reviewed yet",
-}
-
-function ProgressStrip({
-  caseIds,
-  caseById,
-  progress,
-  currentCaseId,
-  onOpen,
-}: {
-  caseIds: string[]
-  caseById: Map<string, CaseIndexEntry>
-  progress: SetProgress
-  currentCaseId: string | null
-  onOpen: (caseId: string | null) => void
-}) {
-  const index = currentCaseId ? caseIds.indexOf(currentCaseId) : -1
-  const prev = index > 0 ? caseIds[index - 1] : null
-  const next = index >= 0 && index < caseIds.length - 1 ? caseIds[index + 1] : null
-  const currentDecided = currentCaseId ? isDecided(progress.statusOf(currentCaseId)) : false
-  const pct = progress.total ? Math.round((progress.done / progress.total) * 100) : 0
-  const current = currentCaseId ? caseById.get(currentCaseId) : undefined
-
-  return (
-    <div className="pb-3 pt-0.5">
-      <div className="max-w-7xl mx-auto w-full px-4 sm:px-6">
-        <div className="flex items-end justify-between gap-3 mb-2">
-          <div className="min-w-0">
-            {current ? (
-              <div className="text-sm leading-tight truncate">
-                <span className="font-semibold tabular-nums">
-                  Case {index + 1} of {caseIds.length}
-                </span>
-                <span className="text-muted-foreground">
-                  {" · "}
-                  {conditionLabel(current.condition)}
-                </span>
-              </div>
-            ) : (
-              <div className="text-sm font-semibold leading-tight">
-                {progress.done === progress.total && progress.total > 0
-                  ? "All cases reviewed"
-                  : "Your progress"}
-              </div>
-            )}
-          </div>
-          <div className="flex items-center gap-1.5 flex-shrink-0">
-            <span className="text-xs text-muted-foreground tabular-nums mr-1">
-              <span className="font-semibold text-foreground">{progress.done}</span>/
-              {progress.total} reviewed · {pct}%
-            </span>
-            {index >= 0 && (
-              <>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={!prev}
-                  onClick={() => onOpen(prev)}
-                  aria-label="Previous case"
-                  className="px-2 sm:px-3"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                  <span className="hidden sm:inline">Previous</span>
-                </Button>
-                <Button
-                  variant={currentDecided ? "primary" : "outline"}
-                  size="sm"
-                  disabled={!next && !progress.nextCaseId}
-                  onClick={() => onOpen(next ?? progress.nextCaseId)}
-                  aria-label="Next case"
-                  className={cn("px-2 sm:px-3", currentDecided && next && "animate-[pulse_2s_ease-in-out_2]")}
-                >
-                  <span className="hidden sm:inline">Next case</span>
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
-              </>
-            )}
-          </div>
-        </div>
-
-        <div className="flex items-center gap-[3px] sm:gap-1" role="list" aria-label="Cases in this re-check">
-          {caseIds.map((id, i) => {
-            const status = progress.statusOf(id)
-            const entry = caseById.get(id)
-            const isCurrent = id === currentCaseId
-            const label = `${i + 1}. ${entry ? conditionLabel(entry.condition) : id} (${id}): ${STATUS_WORD[status]}`
-            return (
-              <button
-                key={id}
-                type="button"
-                role="listitem"
-                title={label}
-                aria-label={label}
-                aria-current={isCurrent ? "step" : undefined}
-                onClick={() => onOpen(id)}
-                className="group flex-1 py-1.5 -my-1.5 focus-visible:outline-none"
-              >
-                <span
-                  className={cn(
-                    "block rounded-full transition-all duration-300",
-                    isCurrent && status === "pending" ? "bg-primary/35" : SEGMENT_COLOR[status],
-                    isCurrent
-                      ? "h-2.5 ring-2 ring-primary ring-offset-2 ring-offset-background"
-                      : "h-1.5 group-hover:h-2.5 group-focus-visible:ring-2 group-focus-visible:ring-ring",
-                  )}
-                />
-              </button>
-            )
-          })}
-        </div>
-      </div>
     </div>
   )
 }

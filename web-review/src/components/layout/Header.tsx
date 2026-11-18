@@ -1,9 +1,11 @@
 import { useIsMutating } from "@tanstack/react-query"
-import { BrainCircuit, Check, HelpCircle, Loader2, Moon, Sun } from "lucide-react"
-import { useState } from "react"
+import { ArrowLeftRight, BrainCircuit, Check, HelpCircle, Loader2, Moon, Sun } from "lucide-react"
+import { useMemo, useState } from "react"
 
-import type { ReviewerProfile } from "@/api/types"
-import { useDatasets, useMyProgress } from "@/hooks/useReview"
+import type { ReviewStatus, ReviewerProfile } from "@/api/types"
+import { useCases, useDatasets, useMyProgress, useMyReviews } from "@/hooks/useReview"
+import { conditionColor, conditionLabel } from "@/lib/conditions"
+import { CaseProgressStrip } from "@/components/review/CaseProgressStrip"
 import { useToolReview } from "@/hooks/useToolReview"
 import { useReviewStore } from "@/stores/reviewStore"
 import { GuidelinesDialog } from "./GuidelinesDialog"
@@ -18,12 +20,19 @@ export function Header({ profile }: { profile: ReviewerProfile }) {
   const datasetVersion = useReviewStore((s) => s.datasetVersion)
   const setDatasetVersion = useReviewStore((s) => s.setDatasetVersion)
   const datasets = useDatasets()
+  const condition = useReviewStore((s) =>
+    s.workspace?.kind === "full" ? s.workspace.condition : undefined,
+  )
   const toolReview = useToolReview(datasetVersion)
   const progress = useMyProgress(datasetVersion)
   const isMutating = useIsMutating() > 0
   const [guidelinesOpen, setGuidelinesOpen] = useState(false)
 
   const datasetInfo = datasets.data?.find((d) => d.version === datasetVersion)
+  const scopedCases = useCases(datasetVersion)
+  const conditionCount = condition
+    ? scopedCases.data?.filter((c) => c.condition === condition).length
+    : undefined
   const toolReviewPending =
     !!toolReview.data && toolReview.data.completed_at == null
 
@@ -32,7 +41,7 @@ export function Header({ profile }: { profile: ReviewerProfile }) {
     {
       id: "cases" as const,
       label: "Cases",
-      count: datasetInfo?.case_count,
+      count: conditionCount ?? datasetInfo?.case_count,
     },
     { id: "tools" as const, label: "Tool Review", dot: toolReviewPending },
     { id: "methodology" as const, label: "Methodology" },
@@ -72,7 +81,7 @@ export function Header({ profile }: { profile: ReviewerProfile }) {
 
         <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
           <SaveIndicator saving={isMutating} />
-          {progress.data && (
+          {progress.data && !condition && (
             <span
               className="hidden md:inline-flex items-center gap-1.5 text-[11px] text-muted-foreground tabular-nums"
               title="Cases you've touched"
@@ -137,6 +146,7 @@ export function Header({ profile }: { profile: ReviewerProfile }) {
           />
         </div>
       </div>
+      {condition && <ConditionStrip condition={condition} />}
     </header>
   )
 }
@@ -159,5 +169,62 @@ export function SaveIndicator({ saving }: { saving: boolean }) {
         </>
       )}
     </span>
+  )
+}
+
+/** The chosen condition's cases as a progress bar, with a way back to the condition picker. */
+function ConditionStrip({ condition }: { condition: string }) {
+  const cases = useCases("neurobench")
+  const reviews = useMyReviews("neurobench")
+  const selectedCaseId = useReviewStore((s) => s.selectedCaseId)
+  const setSelectedCaseId = useReviewStore((s) => s.setSelectedCaseId)
+  const setActiveTab = useReviewStore((s) => s.setActiveTab)
+  const chooseCondition = useReviewStore((s) => s.chooseCondition)
+
+  const caseIds = useMemo(
+    () => (cases.data ?? []).filter((c) => c.condition === condition).map((c) => c.case_id),
+    [cases.data, condition],
+  )
+  const statusById = useMemo(() => {
+    const map = new Map<string, ReviewStatus>()
+    for (const r of reviews.data ?? []) map.set(r.case_id, r.status)
+    return map
+  }, [reviews.data])
+
+  if (caseIds.length === 0) return null
+  const label = conditionLabel(condition)
+  return (
+    <div className="border-t border-border/60 pt-2.5">
+      <CaseProgressStrip
+        caseIds={caseIds}
+        statusOf={(id) => statusById.get(id) ?? "pending"}
+        currentCaseId={selectedCaseId}
+        onOpen={(id) => {
+          setActiveTab("cases")
+          setSelectedCaseId(id)
+          window.scrollTo({ top: 0 })
+        }}
+        describe={(id) => id}
+        heading={(index) => (
+          <div className="flex items-center gap-2 text-sm leading-tight min-w-0">
+            <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: conditionColor(condition) }} />
+            <span className="font-semibold truncate">{label}</span>
+            {index >= 0 && (
+              <span className="text-muted-foreground tabular-nums whitespace-nowrap">
+                · Case {index + 1} of {caseIds.length}
+              </span>
+            )}
+            <button
+              type="button"
+              onClick={() => chooseCondition(null)}
+              className="ml-1 inline-flex items-center gap-1 text-xs text-primary hover:underline underline-offset-2 whitespace-nowrap"
+            >
+              <ArrowLeftRight className="w-3.5 h-3.5" />
+              Change condition
+            </button>
+          </div>
+        )}
+      />
+    </div>
   )
 }

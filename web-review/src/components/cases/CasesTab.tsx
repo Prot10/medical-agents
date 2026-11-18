@@ -4,6 +4,7 @@ import { useMemo } from "react"
 import { ReviewApiError } from "@/api/client"
 import type { CaseReviewSummary } from "@/api/types"
 import { useCases, useMyReviews } from "@/hooks/useReview"
+import { conditionLabel } from "@/lib/conditions"
 import { useReviewStore } from "@/stores/reviewStore"
 import { CaseDetail } from "./CaseDetail"
 import { CaseList } from "./CaseList"
@@ -13,8 +14,19 @@ export function CasesTab() {
   const version = useReviewStore((s) => s.datasetVersion)
   const selectedCaseId = useReviewStore((s) => s.selectedCaseId)
   const setSelectedCaseId = useReviewStore((s) => s.setSelectedCaseId)
-  const cases = useCases(version)
+  const allCases = useCases(version)
   const reviews = useMyReviews(version)
+  const condition = useReviewStore((s) =>
+    s.workspace?.kind === "full" ? s.workspace.condition : undefined,
+  )
+  // In the full review the reviewer works on one condition at a time.
+  const cases = useMemo(
+    () => ({
+      ...allCases,
+      data: condition ? allCases.data?.filter((c) => c.condition === condition) : allCases.data,
+    }),
+    [allCases, condition],
+  )
 
   const reviewByCase = useMemo(() => {
     const map = new Map<string, CaseReviewSummary>()
@@ -61,7 +73,10 @@ export function CasesTab() {
   return (
     <div className="px-4 sm:px-6 py-4 sm:py-6 max-w-7xl mx-auto w-full">
       {selectedCaseId ? (
-        <CaseDetail caseId={selectedCaseId} />
+        <CaseDetail
+          caseId={selectedCaseId}
+          backLabel={condition ? `Back to ${conditionLabel(condition)} cases` : undefined}
+        />
       ) : (
         <div className="space-y-4">
           <FilterBar

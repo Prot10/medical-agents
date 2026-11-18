@@ -13,9 +13,12 @@ export type ReviewTab = "overview" | "cases" | "tools" | "methodology" | "admin"
 /**
  * Which view the reviewer chose after entering the code: the full review of the dataset, or a
  * review set (a fixed list of cases re-reviewed in a space of its own, addressed by its id).
- * `null` shows the choice screen.
+ * `null` shows the choice screen. In the full review, `condition` scopes the work to the cases of
+ * one condition; without it the condition picker is shown.
  */
-export type Workspace = { kind: "full" } | { kind: "set"; setId: string }
+export type Workspace =
+  | { kind: "full"; condition?: string }
+  | { kind: "set"; setId: string }
 
 export interface AnnotationDraft {
   fieldPath: string
@@ -44,6 +47,8 @@ export interface ReviewStore {
   handleAuthExpired: () => void
   setProfile: (profile: ReviewerProfile | null) => void
   chooseWorkspace: (workspace: Workspace | null) => void
+  /** Full review only: work on one condition (`null` goes back to the condition picker). */
+  chooseCondition: (condition: string | null) => void
   setDarkMode: (dark: boolean) => void
   setActiveTab: (tab: ReviewTab) => void
   setDatasetVersion: (version: string) => void
@@ -160,6 +165,20 @@ export const useReviewStore = create<ReviewStore>((set) => ({
       annotationDraft: null,
       filterStatus: "all",
       filterConditions: [],
+    })
+  },
+  chooseCondition: (condition) => {
+    const workspace: Workspace = condition ? { kind: "full", condition } : { kind: "full" }
+    storeWorkspace(workspace)
+    set({
+      workspace,
+      datasetVersion: DEFAULT_DATASET_VERSION,
+      activeTab: "cases",
+      selectedCaseId: null,
+      annotationDraft: null,
+      filterStatus: "all",
+      filterConditions: [],
+      searchText: "",
     })
   },
   setDarkMode: (dark) => {

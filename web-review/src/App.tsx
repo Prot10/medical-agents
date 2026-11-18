@@ -3,6 +3,7 @@ import { Loader2 } from "lucide-react"
 
 import type { ReviewerProfile } from "@/api/types"
 import { CodeEntryGate } from "@/components/gate/CodeEntryGate"
+import { ConditionPicker } from "@/components/gate/ConditionPicker"
 import { WorkspaceChooser } from "@/components/gate/WorkspaceChooser"
 import { DarkModeSync } from "@/components/layout/DarkModeSync"
 import { RecheckWorkspace } from "@/components/recheck/RecheckWorkspace"
@@ -33,7 +34,10 @@ export function App() {
 function SignedIn({ profile }: { profile: ReviewerProfile }) {
   const workspace = useReviewStore((s) => s.workspace)
   if (!workspace) return <WorkspaceChooser profile={profile} />
-  if (workspace.kind === "full") return <ReviewWorkspace profile={profile} />
+  if (workspace.kind === "full") {
+    if (!workspace.condition) return <ConditionPicker profile={profile} />
+    return <ReviewWorkspace profile={profile} />
+  }
   return <ReviewSetWorkspace profile={profile} setId={workspace.setId} />
 }
 
