@@ -96,21 +96,7 @@
       "recommended_actions": []
     },
     "drug_interactions": null,
-    "ecg": {
-      "axis": "normal",
-      "clinical_correlation": "",
-      "findings": [
-        "Sinus tachycardia, rate 102. Normal axis and intervals. No acute ST-T changes. No evidence of ischemia or arrhythmia."
-      ],
-      "interpretation": "Sinus tachycardia, rate 102. No acute ischemic changes.",
-      "intervals": {
-        "PR": "144 ms",
-        "QRS": "86 ms",
-        "QTc": "418 ms"
-      },
-      "rate": 102,
-      "rhythm": "sinus tachycardia"
-    },
+    "ecg": null,
     "echo": {
       "chambers": {
         "LA": "mildly enlarged (4.2 cm)",
@@ -366,24 +352,51 @@
     },
     {
       "output": {
+        "findings": [
+          {
+            "muscle": "frontalis",
+            "parameter": "mean consecutive difference (jitter)",
+            "result": "61 us (normal < 30 us); 14 of 20 pairs with increased jitter; blocking in 5 of 20 pairs"
+          },
+          {
+            "muscle": "extensor digitorum communis",
+            "parameter": "mean consecutive difference (jitter)",
+            "result": "38 us (normal < 34 us); 6 of 20 pairs with increased jitter; no blocking"
+          }
+        ],
+        "impression": "Abnormal single-fibre EMG: increased jitter with blocking in frontalis and mildly increased jitter in extensor digitorum communis, indicating impaired neuromuscular transmission.",
+        "quantitative_data": {
+          "EDC_mean_MCD": "38 us",
+          "blocking": "5/40 pairs",
+          "frontalis_mean_MCD": "61 us",
+          "pairs_with_increased_jitter": "20/40"
+        },
+        "recommended_actions": [],
+        "test_type": "emg_single_fiber"
+      },
+      "tool_name": "order_specialized_test",
+      "trigger_action": "request_emg_single_fiber"
+    },
+    {
+      "output": {
         "alternatives": [
-          "If rate control is still needed and MG worsens, a cardioselective beta-blocker at low dose with monitoring; beta-blockade can usually be withdrawn once euthyroid."
+          "If rate control is still needed and weakness worsens, a cardioselective beta-blocker at low dose with monitoring; beta-blockade can usually be withdrawn once euthyroid."
         ],
         "contraindications": [],
         "formulary_status": "Pyridostigmine, methimazole and propranolol: formulary.",
         "interactions": [
           "Pyridostigmine with propranolol: additive bradycardia and AV-nodal slowing; monitor heart rate and rhythm when pyridostigmine is started or increased.",
-          "Propranolol (non-selective beta-blocker) in myasthenia gravis: beta-blockers, oral or ophthalmic, have been reported to worsen neuromuscular transmission; use with caution at the lowest effective dose and monitor for worsening.",
+          "Propranolol (non-selective beta-blocker): beta-blockers, oral or ophthalmic, have been reported to worsen neuromuscular transmission; use with caution at the lowest effective dose and monitor for worsening.",
           "Pyridostigmine with methimazole: no known interaction. Methimazole has no effect on neuromuscular transmission.",
           "Pyridostigmine with selenium or artificial tears: no known interaction."
         ],
         "proposed": "pyridostigmine",
         "summary": "",
         "warnings": [
-          "High-dose corticosteroids, including IV methylprednisolone pulses, can transiently worsen myasthenia gravis in the first 1 to 2 weeks; pyridostigmine does not prevent this. Start high-dose steroids only with inpatient monitoring of bulbar and respiratory function.",
+          "High-dose corticosteroids, including IV methylprednisolone pulses, can transiently worsen weakness from impaired neuromuscular transmission in the first 1 to 2 weeks; pyridostigmine does not prevent this. Start high-dose steroids only with inpatient monitoring of bulbar and respiratory function.",
           "Methimazole: agranulocytosis is a rare serious adverse effect; fever or sore throat needs an urgent white cell count.",
-          "Iodinated contrast media can aggravate hyperthyroidism and, rarely, myasthenia gravis.",
-          "Myasthenia gravis: avoid fluoroquinolones, aminoglycosides, macrolides and IV magnesium where possible; neuromuscular blockers need reduced doses with quantitative monitoring."
+          "Iodinated contrast media can aggravate hyperthyroidism and, rarely, disorders of neuromuscular transmission.",
+          "Disorders of neuromuscular transmission: avoid fluoroquinolones, aminoglycosides, macrolides and IV magnesium where possible; neuromuscular blockers need reduced doses with quantitative monitoring."
         ]
       },
       "tool_name": "check_drug_interactions",
@@ -460,33 +473,6 @@
       },
       "tool_name": "perform_clinical_assessment",
       "trigger_action": "request_orthostatic_blood_pressure"
-    },
-    {
-      "output": {
-        "findings": [
-          {
-            "muscle": "frontalis",
-            "parameter": "mean consecutive difference (jitter)",
-            "result": "61 us (normal < 30 us); 14 of 20 pairs with increased jitter; blocking in 5 of 20 pairs"
-          },
-          {
-            "muscle": "extensor digitorum communis",
-            "parameter": "mean consecutive difference (jitter)",
-            "result": "38 us (normal < 34 us); 6 of 20 pairs with increased jitter; no blocking"
-          }
-        ],
-        "impression": "Abnormal single-fibre EMG: increased jitter with blocking in frontalis and mildly increased jitter in extensor digitorum communis, indicating impaired neuromuscular transmission.",
-        "quantitative_data": {
-          "EDC_mean_MCD": "38 us",
-          "blocking": "5/40 pairs",
-          "frontalis_mean_MCD": "61 us",
-          "pairs_with_increased_jitter": "20/40"
-        },
-        "recommended_actions": [],
-        "test_type": "emg_single_fiber"
-      },
-      "tool_name": "order_specialized_test",
-      "trigger_action": "request_emg_single_fiber"
     }
   ],
   "ground_truth": {
@@ -519,6 +505,15 @@
               ]
             },
             "tool_name": "interpret_labs"
+          },
+          {
+            "required_arguments": {
+              "panels": [
+                "anti_AChR",
+                "TRAb"
+              ]
+            },
+            "tool_name": "interpret_labs"
           }
         ],
         "citations": [
@@ -539,12 +534,14 @@
             "tool_name": "order_specialized_test"
           }
         ],
-        "citations": [],
+        "citations": [
+          "[Jacob_2025]"
+        ],
         "criterion_id": "action-2-order-specialized-test",
         "expected_evidence": "Decrement of 11% in deltoid and 14% in nasalis at 3 Hz, normal baseline CMAPs, no post-exercise facilitation.",
-        "importance": "required",
+        "importance": "recommended",
         "label": "Order repetitive nerve stimulation including a facial muscle",
-        "rationale": "Neurophysiology confirms a postsynaptic transmission defect independently of the thyroid disease and separates MG from thyrotoxic myopathy and LEMS (Jacob 2025)."
+        "rationale": "With AChR binding 1.8 nmol/L and raised blocking and modulating antibodies the diagnosis is serological, so neurophysiology is good practice rather than necessary (ABN makes it mandatory when antibodies are negative); here it also separates MG from thyrotoxic myopathy and LEMS (Jacob 2025)."
       },
       {
         "alternatives": [
@@ -584,13 +581,14 @@
           }
         ],
         "citations": [
-          "[Wolfe_2016]"
+          "[Jacob_2025]",
+          "[Narayanaswami_2021]"
         ],
         "criterion_id": "action-4-order-body-imaging",
         "expected_evidence": "Bilobed homogeneous anterior mediastinal tissue 3.2 x 1.9 cm without a discrete mass; chemical-shift MRI shows uniform signal loss consistent with thymic hyperplasia.",
         "importance": "required",
         "label": "Image the anterior mediastinum for thymoma",
-        "rationale": "Every patient with AChR-positive MG needs thymic imaging to detect thymoma, and the finding informs the thymectomy decision (Wolfe 2016). She is overtly hyperthyroid, so iodinated contrast is avoided (ESUR contrast media guidelines): non-contrast CT or MRI is accepted."
+        "rationale": "Every patient with AChR-positive MG needs thymic imaging to detect thymoma, and the finding informs the thymectomy decision (Jacob 2025; ICG 2020). She is overtly hyperthyroid, so iodinated contrast is avoided (ESUR contrast media guidelines): non-contrast CT or MRI is accepted."
       },
       {
         "alternatives": [
@@ -607,6 +605,40 @@
         "importance": "recommended",
         "label": "Measure vital capacity and mouth pressures",
         "rationale": "She has bulbar fatigue and neck flexor weakness and may receive high-dose steroids, which can transiently worsen MG; a baseline makes later deterioration measurable."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "emg_single_fiber"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[Jacob_2025]"
+        ],
+        "criterion_id": "action-sfemg",
+        "expected_evidence": "Increased jitter with blocking in frontalis (mean MCD 61 us, blocking in 5 of 20 pairs) and mildly increased jitter in extensor digitorum communis (38 us).",
+        "importance": "optional",
+        "label": "Order single-fibre EMG",
+        "rationale": "Positive AChR antibodies make SFEMG rarely needed; it is acceptable as further confirmation of a transmission defect in a patient whose eye signs were attributed to thyroid eye disease (Jacob 2025)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_ecg"
+          }
+        ],
+        "citations": [
+          "[Jacob_2025]"
+        ],
+        "criterion_id": "action-baseline-ecg",
+        "expected_evidence": "Sinus tachycardia 102/min; PR 144 ms, QRS 86 ms, QTc 418 ms; no AV block or ischemic change.",
+        "importance": "recommended",
+        "label": "Record a baseline 12-lead ECG before pyridostigmine",
+        "rationale": "ABN asks for an ECG before pyridostigmine; she is thyrotoxic and takes propranolol, so heart rate and AV conduction need a baseline before a cholinesterase inhibitor adds bradycardia (Jacob 2025)."
       },
       {
         "alternatives": [
@@ -635,38 +667,26 @@
         "importance": "required",
         "label": "Check pyridostigmine against propranolol and methimazole",
         "rationale": "She takes a non-selective beta-blocker, which can worsen neuromuscular transmission, and the admitting plan is high-dose IV glucocorticoids; both change management before pyridostigmine or steroids are given."
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [],
-        "criterion_id": "action-5-search-medical-literature",
-        "expected_evidence": "General evidence on coexisting thyroid autoimmunity and MG management.",
-        "importance": "optional",
-        "label": "Search the literature on MG with autoimmune thyroid disease",
-        "rationale": "Background reading only; not a clinical step."
       }
     ],
     "assessment": {
       "prohibited_recommendations": [
         "Avoid fluoroquinolones, aminoglycosides, macrolides and IV magnesium unless no alternative exists and the patient is monitored; use non-depolarising neuromuscular blockers only at reduced dose with quantitative monitoring.",
-        "Do not start high-dose prednisone (above 20 mg/day) as an outpatient; start low and titrate, or start high dose only with inpatient monitoring, because initial steroid-induced worsening can precipitate crisis.",
-        "Do not attribute fatigable ptosis, diplopia or bulbar weakness to a functional or thyroid eye disease cause before AChR antibody testing and neurophysiology.",
+        "Do not start prednisone at full dose (for example 1 mg/kg daily) at once; escalate from a low dose, because steroid initiation can transiently worsen MG (Jacob 2025).",
+        "Do not attribute fatigable ptosis, diplopia or bulbar weakness to a functional or thyroid eye disease cause before AChR antibody testing (and neurophysiology when serology is negative).",
         "Do not give iodinated contrast while she is overtly hyperthyroid.",
         "Do not prescribe a penicillin (documented penicillin allergy)."
       ],
       "required_recommendations": [
-        "Start pyridostigmine 30 mg three to four times daily and titrate to effect (usually up to 60 mg four to five times daily), watching heart rate because she takes propranolol.",
+        "Start pyridostigmine 30 mg three to four times daily after a baseline ECG, with heart-rate watch because she takes propranolol, titrating to effect (usually up to 60 mg four to five times daily); the maximum is 360 mg/day, with specialist review above 300 mg/day (Jacob 2025).",
         "Tell ophthalmology and endocrinology that the new ptosis and diplopia are myasthenic; reassess thyroid eye disease activity before IV glucocorticoids, and if IV methylprednisolone is still indicated, give it as an inpatient with daily bulbar and respiratory checks for the first 1 to 2 weeks because high-dose steroids can transiently worsen MG.",
         "Co-manage with endocrinology to reach euthyroidism with methimazole; hyperthyroidism can aggravate MG and must be controlled before surgery.",
         "Review propranolol: keep it only at the lowest dose that controls the tachycardia, monitor for MG worsening, and withdraw it once she is euthyroid.",
-        "Refer to thoracic surgery for elective thymectomy (MGTX: AChR-positive generalized MG aged 18-65; CT and MRI show hyperplasia, no thymoma), once MG and thyroid function are stable.",
-        "If symptoms persist on pyridostigmine, add prednisone at a low dose titrated upward, with a steroid-sparing agent (azathioprine after TPMT testing) if long-term treatment is needed.",
-        "Discuss pregnancy plans before long-term immunosuppression: azathioprine and prednisone are acceptable in pregnancy, mycophenolate and methotrexate are not, and methimazole is replaced by propylthiouracil in the first trimester."
+        "Offer thymectomy early, once MG and thyroid function are optimally controlled: AChR-positive generalized MG without thymoma at 38, with CT and chemical-shift MRI showing hyperplasia (ICG 2020 recommendation 1a, ages 18-50; Jacob 2025); refer to thoracic surgery.",
+        "If symptoms persist on pyridostigmine, start prednisone 5-10 mg daily and increase by 5 mg every 3-5 days to 30 mg daily (up to 1 mg/kg, not above 60 mg, only after specialist discussion), warning that weakness may worsen around days 5-10 (Jacob 2025); plan a steroid-sparing agent (azathioprine after TPMT testing) if long-term immunosuppression is needed.",
+        "Before long-term immunosuppression: an ophthalmological assessment before high-dose steroids, given her thyroid eye disease; HbA1c, lipids, blood pressure and weight before steroids; hepatitis B (HBsAg, anti-HBc) and hepatitis C serology, TB screening (IGRA) and HIV test; vaccinations updated at least four weeks before, including HPV (Jacob 2025; Fionda 2026). During steroids: periodic blood pressure, glucose, weight and eye checks, calcium and vitamin D, and bone densitometry (Fionda 2026).",
+        "Discuss pregnancy plans before long-term immunosuppression: azathioprine and prednisone are acceptable in pregnancy, mycophenolate and methotrexate are not, and methimazole is replaced by propylthiouracil in the first trimester.",
+        "Record the MGFA class (here IIIa: moderate neck flexor weakness with milder proximal limb weakness and mild bulbar fatigue) and a baseline MG-ADL, with QMG where available, to follow treatment against the goal of MG-ADL 0-1 (Fionda 2026; Jacob 2025)."
       ]
     },
     "avoided_actions": [
@@ -707,6 +727,38 @@
         "criterion_id": "avoid-waste-3-order-advanced-imaging",
         "rationale": "FDG-PET has no place in MG; the thymus is characterised by CT and chemical-shift MRI.",
         "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "speech_language_evaluation"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[Jacob_2025]"
+        ],
+        "criterion_id": "avoid-waste-speech-language-evaluation",
+        "rationale": "Her fatigable nasal voice is documented on examination; a motor speech and language battery adds nothing to the MG diagnosis and does not assess swallowing (Jacob 2025).",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "assessment_type": "orthostatic_blood_pressure"
+            },
+            "tool_name": "perform_clinical_assessment"
+          }
+        ],
+        "citations": [
+          "[Jacob_2025]"
+        ],
+        "criterion_id": "avoid-waste-orthostatic-blood-pressure",
+        "rationale": "There is no light-headedness, syncope or other autonomic question; her tachycardia is thyrotoxic, and orthostatic testing is not part of the MG work-up (Jacob 2025).",
+        "severity": "waste"
       }
     ],
     "diagnosis": {
@@ -721,8 +773,7 @@
       ],
       "icd_codes": [
         "G70.00",
-        "G70.0",
-        "G70.01"
+        "G70.0"
       ],
       "rejected": [
         "thyrotoxic myopathy",
@@ -774,7 +825,7 @@
       "She is still hyperthyroid on methimazole (TSH 0.08, raised free T4 and T3), which can aggravate MG and precludes iodinated contrast and elective surgery until controlled.",
       "Planned IV glucocorticoids for thyroid eye disease can transiently worsen MG; the new eye signs are myasthenic, so the indication must be reassessed and any pulse given with monitoring.",
       "Propranolol is a beta-blocker caution in MG and adds bradycardia with pyridostigmine.",
-      "Mediastinal imaging shows thymic hyperplasia without thymoma; thymectomy is indicated by MGTX criteria (AChR-positive generalized MG, age 38)."
+      "Mediastinal imaging shows thymic hyperplasia without thymoma; early thymectomy is indicated at 38 in AChR-positive generalized MG once MG and thyroid function are controlled (ICG 2020 recommendation 1a; Jacob 2025)."
     ],
     "red_herrings": [
       {
@@ -805,7 +856,6 @@
       "max_additional_actions": 2,
       "required_before_assessment": [
         "action-1-interpret-labs",
-        "action-2-order-specialized-test",
         "action-4-order-body-imaging",
         "action-6-check-drug-interactions"
       ]
@@ -850,7 +900,21 @@
     "cardiac_monitoring": null,
     "ct": null,
     "drug_interactions": null,
-    "ecg": null,
+    "ecg": {
+      "axis": "normal",
+      "clinical_correlation": "",
+      "findings": [
+        "Sinus tachycardia, rate 102. Normal axis and intervals. No acute ST-T changes. No evidence of ischemia or arrhythmia."
+      ],
+      "interpretation": "Sinus tachycardia, rate 102. No acute ischemic changes.",
+      "intervals": {
+        "PR": "144 ms",
+        "QRS": "86 ms",
+        "QTc": "418 ms"
+      },
+      "rate": 102,
+      "rhythm": "sinus tachycardia"
+    },
     "echo": null,
     "eeg": null,
     "labs": {
@@ -1002,29 +1066,7 @@
         ]
       }
     },
-    "literature_search": {
-      "myasthenia gravis autoimmune thyroid disease": {
-        "query": "myasthenia gravis autoimmune thyroid disease",
-        "results": [
-          {
-            "evidence_level": "narrative review",
-            "finding": "Review of myasthenia gravis: autoimmune thyroid disease is among the most frequent coexisting autoimmune disorders, particularly in early-onset AChR-antibody-positive disease.",
-            "source": "Gilhus NE, N Engl J Med 2016;375:2570-2581"
-          },
-          {
-            "evidence_level": "consensus guideline",
-            "finding": "International consensus guidance on management: pyridostigmine as initial symptomatic therapy, corticosteroids and steroid-sparing agents for persisting symptoms, chest imaging to detect thymoma, and IVIG or plasma exchange for severe or worsening disease.",
-            "source": "Sanders DB et al., Neurology 2016;87:419-425; Narayanaswami P et al., Neurology 2021;96:114-122"
-          },
-          {
-            "evidence_level": "randomised controlled trial",
-            "finding": "In the MGTX trial thymectomy improved outcomes over three years in non-thymomatous AChR-positive generalized MG aged 18-65.",
-            "source": "Wolfe GI et al., N Engl J Med 2016;375:511-522"
-          }
-        ],
-        "summary": "Autoimmune thyroid disease frequently coexists with AChR-positive myasthenia gravis (Gilhus 2016). Consensus guidance (Sanders 2016; update Narayanaswami 2021) recommends AChR antibody testing, electrodiagnostic confirmation and chest imaging for thymoma; MGTX (Wolfe 2016) showed benefit of thymectomy in non-thymomatous AChR-positive generalized MG aged 18-65."
-      }
-    },
+    "literature_search": null,
     "mri": null,
     "specialized_test": {
       "findings": [
@@ -1086,18 +1128,17 @@
     "fallback_tool_kinds": {
       "cardiac_monitoring": "sinus_tachycardia_only",
       "csf": "normal",
-      "ecg": "sinus_tachycardia_only",
       "echo": "mild_LA_enlargement_incidental",
       "eeg": "normal",
       "mri": "normal"
     },
     "generated": "2026-06-17",
     "generation_method": "real_case_seed",
-    "last_revised": "2026-08-07",
+    "last_revised": "2026-11-17",
     "policy_spec_status": "draft",
     "real_seed_note": "Demographics and subtype loosely seeded from Patient 2 in PMC5589050 (66-year-old Cantonese female with Graves' + ocular MG + thymoma, PMID 28882932). Case demographics, disease severity, thymic finding, and clinical complexity differ substantially: this case features a 38-year-old East Asian woman with generalized (not purely ocular) MG, no discrete thymoma (thymic hyperplasia only), active hyperthyroidism with thyrotoxic myopathy as additional red herring, and propranolol interaction as a second red herring.",
     "real_seed_pmid": "28882932",
-    "revision_reason": "per-case audit: the electrophysiology studies named themselves in prose, so the discriminator could not tell them apart and the required repetitive-stimulation call was answered with whichever study occupied the slot",
+    "revision_reason": "Neurophysiology recommended rather than required with positive AChR antibodies; baseline ECG before pyridostigmine (stored report) and optional single-fibre EMG; TRAb accepted in the serology and thyroid order; ABN pyridostigmine maximum, outpatient steroid titration, pre-immunosuppression screening with ophthalmology before high-dose steroids, ICG and ABN thymectomy basis and MG severity recording in the management; waste labels for the speech battery and orthostatic testing",
     "source": "PubMed Central",
     "source_license": "CC-BY 4.0 (BMJ Publishing Group)",
     "source_pmcid": "PMC5589050",

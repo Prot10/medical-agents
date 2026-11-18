@@ -1,0 +1,46 @@
+# MIG-AURA-P05
+
+## Class changes
+- LIT (literature search is not a clinical step; R1 ruling, ROUND_POLICY ruling 5 extended, Nov 2026 class 1): removed criterion action-1-search-medical-literature (optional); removed 1 literature follow-up(s). Any literature query is now answered by the neutral library text.
+
+## Reviewer notes
+Reviewer status: R1 in_progress (NB-KSC3-TWUA-QDTM) | Approved before this round: no
+
+| note id | ruling | what changed (field paths) |
+|---|---|---|
+| 6f780f04-b414-488c-b551-0e87d8796f37 | FIXED | Class LIT, commit 393c547e: the literature criterion and follow-up were removed; checked that the case contains no search_medical_literature criterion, follow-up or stored output. |
+| 93326a8a-a805-4201-8e98-e2294bf15200 | FIXED | New required criterion action-labs-inr-fbc (interpret_labs coagulation and/or CBC), in the stop rule, after the clinical assessment. Today's result is stored in initial_tool_outputs.labs (INR 3.6, PT 35.6 s, aPTT and fibrinogen normal, Hb 124 g/L, platelets 238, WBC 6.4, MCV 88); the old INR 3.8 fallback is removed. The severity must (required_recommendations[3]) now cites today's INR, adds a repeat INR in 2-3 days and escalation if bleeding worsens or Hb falls. Field: ground_truth.action_criteria[1]. |
+| 794bf874-45ae-4f48-90e3-1881374a3d31 | FIXED | Label changed to 'Migraine with aphasic aura (ICHD-3 1.2.1), previously labelled TIA; supratherapeutic INR with minor bleeding on warfarin' (no 'misdiagnosed', no 'warfarin should be stopped'). The stop must is split into 'withhold warfarin now' and 'decide on not restarting with the referring team after reviewing the original rhythm strip' (conditional on that review; score 2 and reconsider if AF is confirmed and TIA cannot be excluded). The prohibition, the TIA-label must, the differential, key evidence, the monitoring rationale and the red herring now say that a normal MRI excludes infarction, not TIA, and that a negative monitor does not invalidate the strip. Field: ground_truth.diagnosis.accepted[0]. |
+
+## Own findings
+| dim | severity | field path | finding | action |
+|---|---|---|---|---|
+| C | major | ground_truth.avoided_actions (was [2], avoid-waste-3-order-advanced-imaging) | MR angiography was labelled waste, although a normal MRI does not exclude TIA and note 794bf874 asks for the cerebrovascular assessment to be reviewed before the anticoagulation decision (plan D4 rule 5, R1 ruling on M01). | FIXED: avoided action deleted; new optional criterion action-vessel-imaging-optional (ground_truth.action_criteria[3], MR_angiography or carotid_duplex, library normal answers) |
+| B | minor | metadata.condition_name, metadata.difficulty_description, metadata.difficulty_rationale | Restated 'misdiagnosed as TIA' and 'appropriately stopping anticoagulation' unconditionally, against note 794bf874. | FIXED: reworded (previously labelled TIA; withhold now, review the decision) |
+| B | minor | metadata.case_body_concerns | Said interpret_labs had no output; the case now stores labs. | FIXED: now lists analyze_eeg only |
+| B | minor | ground_truth.action_criteria[4].rationale (action-prolonged-monitoring) | 'CHA2DS2-VA 0 whatever it shows' was unconditional. | FIXED: conditional on accepting the attacks as aura; a negative monitor does not invalidate the strip |
+
+## Changes
+The diagnosis is now 'Migraine with aphasic aura (ICHD-3 1.2.1), previously labelled TIA; supratherapeutic INR with minor bleeding on warfarin'. A new required step repeats the INR and full blood count today (INR 3.6, Hb 124 g/L, platelets normal), and it is part of the stop rule. Warfarin is withheld now, and the decision not to restart anticoagulation is made with the referring team after reviewing the original rhythm strip; if that strip shows AF and a TIA cannot be confidently excluded, CHA2DS2-VA is 2 and anticoagulation is reconsidered. The severity must cites today's INR and adds a repeat INR in 2-3 days. Wherever the case said that imaging or a negative monitor settles the question, it now says that a normal MRI excludes infarction, not TIA, and that a negative monitor does not invalidate the strip. MR angiography is no longer labelled waste; vessel imaging (MRA or carotid duplex) is an optional step. The literature step had already been removed (class LIT).
+Verification pass 2: the triptan in the acute-treatment advice is now used once the review keeps the attacks as migraine aura, since triptans are contraindicated after TIA.
+Verification pass 4: the echocardiogram waste rationale no longer says there is no embolic event to explain; echocardiography is not indicated at this visit and is reconsidered if the original strip confirms AF.
+
+## Verification
+Pass 1: 1 errors found
+- C/citation: ground_truth.action_criteria[3] (action-vessel-imaging-optional) carried the citation [AHS_neuroimaging_2020] over from the deleted MRA waste entry, which cited it for 'MR angiography is not indicated'; it does not support the claim that vessel imaging is acceptable in the TIA review (the rationale rests on NICE NG128). FIXED: citations emptied, as in M01 and M05 (NICE NG128 stays in the rationale text).
+Checked and correct: all three notes ruled; labs served per panel (coagulation, CBC) with today's INR 3.6 and Hb 124; label scores with the diagnosis matcher; no literature output left; perfect_agent and test_case_guards pass.
+Pass 2: 1 errors found
+- B/C: ground_truth.assessment.required_recommendations[4] recommended a triptan unconditionally, while the revised musts (required_recommendations[2], differential[0]) leave TIA open until the original strip is reviewed; triptans are contraindicated after TIA (product labels). FIXED: the triptan is used once the review keeps the attacks as migraine aura.
+Checked and correct: three notes ruled; labs served per panel (coagulation alone returns PT/INR/aPTT/fibrinogen, CBC alone the blood count); today's INR 3.6 consistent in labs, musts and key evidence; CHA2DS2-VA 0 vs 2 consistent; no literature output; perfect_agent passes; test_case_guards -k passes.
+Pass 3: 1 errors found
+- C/B: ground_truth.action_criteria[1] (action-labs-inr-fbc) accepted interpret_labs {"panels": ["CBC"]} alone as a full match, so an agent could meet the required INR criterion without measuring the INR, which is the safety question of note 93326a8a (the criterion's expected evidence, INR 3.6, comes only from the coagulation panel). FIXED: CBC-only alternative removed; the coagulation-only and coagulation plus CBC alternatives stay.
+Checked and correct: three notes ruled; INR 3.6, PT 35.6 s, Hb 124 consistent across labs, musts, key evidence; CHA2DS2-VA 0 vs 2 statements consistent; triptan must conditional; no literature output; perfect_agent passes; case_io check and test_case_guards -k pass.
+Pass 4: 1 errors found
+- C/B (class of note 794bf874, plan D4 rule 1): ground_truth.avoided_actions[2] (avoid-harm-1-order-echocardiogram) said echocardiography is not indicated because 'there is no infarct or embolic event to explain', an unconditional exclusion of an embolic event while required_recommendations[2] and differential[0] leave TIA open until the original strip is reviewed (and ESC 2024 recommends a TTE once AF is diagnosed). FIXED: not indicated at this visit (aura features, no infarct on MRI, AF unconfirmed, so it does not change today's management), reconsidered only if review of the original strip confirms AF; the TOE clause stays. Severity waste unchanged.
+Checked and correct: three notes ruled; labs criterion requires the coagulation panel, INR 3.6 and Hb 124 consistent across labs, musts and key evidence; CHA2DS2-VA 0 vs 2 statements consistent; triptan must conditional; no literature output; perfect_agent passes; case_io check (no failure names the case) and test_case_guards -k pass.
+Condition audit (MIG-AURA auditor, 17 Nov 2026): class finding
+- E/metadata (class: 25 of 30 MIG-AURA cases, no other condition; flagged by the workers for a central sweep): metadata.case_body_concerns held the generation-pipeline line "Useless-tool entries dropped because the case has neither output nor fallback (silent irre...", authoring-process text in a field the review app shows to physicians (ROUND_POLICY 'How to edit'; November addendum: no process text in metadata), and no longer accurate after this round's added criteria. FIXED: line deleted; the field is now empty. No clinical content changed; no ruling changes.
+Pass 5: 0 errors found
+- Checked the pass 4 fix (avoided_actions[2] echocardiography: not indicated at this visit, reconsidered only if the original strip confirms AF; severity waste) against REQ2 and differential[0] (TIA left open until the strip is reviewed): consistent; no criterion matches order_echocardiogram. Condition-audit change: metadata.case_body_concerns empty. perfect_agent.py -v ok; test_case_guards -k (eight ids) 64 passed.
+- Cosmetic (not counted): avoided_actions[1] rationale cites 'INR of 3.8' (the previous check; today 3.6, as REQ3 states both).
+Orchestrator (17 Nov): action-labs-inr-fbc keeps only the alternatives that return the INR (coagulation, with or without CBC). Decision D6 also listed a CBC-only alternative; it is not added, because a CBC order returns no INR and the criterion exists to measure the current INR on warfarin.

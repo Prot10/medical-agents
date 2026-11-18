@@ -1,0 +1,47 @@
+# FTD-M10
+
+## Class changes
+- LIT (literature search is not a clinical step; R1 ruling, ROUND_POLICY ruling 5 extended, Nov 2026 class 1): removed criterion action-6-search-medical-literature (optional); removed 1 literature follow-up(s); removed initial literature_search outputs: behavioural variant frontotemporal dementia diagnostic criteria and management. Any literature query is now answered by the neutral library text.
+- Synonyms (orchestrator, 17 Nov): accepted labels and codes re-derived from diagnosis_synonyms.yaml after the condition lead's CENTRAL synonym request (see the commit and plans/<COND>-summary.md); checked with DiagnosisCriterion.matches.
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+|---|---|---|
+| dd2e4516-1c6f-4364-9bee-646f83c3f0b8 | FIXED (class LIT, 393c547e) | literature follow-up gone; re-verified |
+| 95ff54e9-018c-444d-98ac-b1f1dcc92f59 | FIXED (class LIT, 393c547e) | initial_tool_outputs.literature_search null; re-verified |
+| d645ace0-75e8-4aac-bdf6-1ba07bf1233b | FIXED + CENTRAL (synonyms G31.09+rtv) | ground_truth.diagnosis.accepted[0] rtvFTD meeting probable bvFTD; diagnosis.rejected minus "semantic dementia"; required_recommendations[0] names the right temporal variant; action-1-perform-clinical-assessment and action-4-analyze-brain-mri citations + [Ulugut_2020]; metadata.notes |
+| 6fd2b279-a559-40bc-8588-0c0616bef39e | FIXED | followup_outputs[6] (order_performance_status) findings, impression, scores Karnofsky 80 / ECOG 1 |
+| 0102f4ac-2d96-4489-83f1-a06c95d9f277 | FIXED | red_herrings[1].correct_interpretation; prohibited_recommendations[1] |
+
+## Own findings
+| dim | severity | field path | finding | action |
+|---|---|---|---|---|
+| C | minor | ground_truth.avoided_actions[avoid-waste-5-order-ct-scan] | class C22 CT rationale replaced ("MRI available and preferred; CT duplicates it"), citations [NICE_NG97], [SNLG_ISS_2024] | FIXED |
+| D | - | patient, outputs | checked: no study result in the HPI that the case scores (the ophthalmology visit is legitimate prior history and not a criterion) | NO CHANGE |
+| B | minor | followup_outputs[request_reviewed_neuropsych_battery].output.findings[2], [3] | verification pass 5: behavioural scales scored outside their structure: 'NPI-Q' items given out of 12 (the NPI-Q rates severity 0 to 3; the 0 to 12 item score is the full NPI, frequency x severity), and Frontal Behavioral Inventory 'subscores' of x/12 (each FBI item is scored 0 to 3, total 72); now 'Neuropsychiatric Inventory (frequency x severity, 0 to 12 per item)' and FBI 26/72 with the apathy, perseveration and personal neglect items scored severe and the verbal disinhibition item mild (totals and the clinical meaning unchanged) | FIXED |
+| B | minor | followup_outputs[request_reviewed_neuropsych_battery].output.findings[3] | verification pass 6: the pass-5 rewrite of the Frontal Behavioral Inventory line scored the personal neglect item 'severe' and a 'verbal disinhibition item' (not an FBI item) mild, contradicting her independent self-care (performance status, HPI, exam: navigates and reads unaided), the NPI disinhibition 0/12 and the absent disinhibition feature; now 'mainly from the apathy, indifference, inflexibility, perseveration and loss-of-insight items (scored severe); inappropriateness and impulsivity items not endorsed; no personal neglect reported' (total 26/72 unchanged) | FIXED |
+
+## Changes
+The diagnosis label is now "Right temporal variant frontotemporal dementia (rtvFTD), meeting probable behavioral variant FTD (bvFTD) criteria" (ICD G31.09 unchanged), and "semantic dementia" is no longer a rejected answer, while svPPA stays rejected because language is not the leading deficit. Must 0 asks the agent to name the right temporal variant, and the clinical-assessment and MRI criteria cite Ulugut Erkoyun 2020. "Right temporal variant frontotemporal dementia" already scores; "rtvFTD" and "right-sided semantic dementia" will score once the central synonym entry is added. The sertraline red herring now says an SSRI may be continued for compulsive or repetitive behaviour if it helps, and the prohibition only forbids escalating antidepressants for presumed depression in place of the dementia work-up. The performance-status report now records only the documented limits (retired, gave up hobbies, dependent on family in social settings, independent self-care; finances and driving not assessed), graded Karnofsky 80, ECOG 1. The head CT waste rationale now says the CT duplicates an available MRI.
+Verification pass 5: the neuropsychology report now names the behavioural scales correctly (Neuropsychiatric Inventory item scores out of 12; Frontal Behavioral Inventory items described by severity, total 26/72); no finding changed.
+Verification pass 6: the Frontal Behavioral Inventory line no longer reports severe personal neglect or a disinhibition item in a woman who is independent in self-care and shows no disinhibition; the elevated total (26/72) comes from apathy, indifference, inflexibility, perseveration and loss of insight.
+
+## Verification
+Pass 1: 0 errors found
+- Checked: rtvFTD label, rejected (svPPA kept, semantic dementia removed), must 0, Ulugut 2020 citations, red herring 1 and prohibition 1 (C17 text), performance status against the HPI (Karnofsky 80), CT rationale; perfect_agent and test_case_guards pass. Synonym entry G31.09+rtv remains CENTRAL.
+Pass 2: 0 errors found
+- Checked: rtvFTD label, rejected, must 0, red herring 1 and prohibition 1, performance status against the HPI, Ulugut 2020 citations; "right temporal variant frontotemporal dementia" scores, "rtvFTD" and "right-sided semantic dementia" still need the CENTRAL synonym entry G31.09+rtv; perfect_agent and test_case_guards pass.
+Pass 3: 0 errors found
+- Checked: rtvFTD label, rejected (svPPA kept; 'right temporal variant frontotemporal dementia' scores, 'rtvFTD' and 'right-sided semantic dementia' await CENTRAL synonym G31.09+rtv), must 0, red herring 1 and prohibition 1 (C17), Ulugut 2020 citations, performance status against the HPI, onset age, stop rule and sequence ids, no literature remnant; perfect_agent and test_case_guards pass.
+Pass 4: 0 errors found
+- Checked: all five note rulings and field paths, rtvFTD label, rejected ('right temporal variant frontotemporal dementia' scores; 'rtvFTD' awaits CENTRAL synonym G31.09+rtv), must 0, red herring 1 and prohibition 1 (C17), must 4 SSRI review, Ulugut 2020 citations, MoCA arithmetic, performance status (Karnofsky 80) against the HPI, stop rule and sequence ids, no literature remnant; perfect_agent and test_case_guards -k pass.
+Pass 5: 1 errors found
+- followup_outputs[0] (neuropsych battery) findings[2] and [3]: NPI-Q items scored out of 12 and FBI subscores out of 12, neither of which the instruments produce; renamed to the NPI item score and FBI item severities. No note ruling affected (rulings file unchanged).
+- Checked without change: all five note rulings and field paths, rtvFTD label and rejected (probed with DiagnosisCriterion.matches: 'right temporal variant frontotemporal dementia' and 'probable bvFTD with right temporal presentation' score, svPPA does not, 'rtvFTD' and 'right-sided semantic dementia' await CENTRAL synonym G31.09+rtv), must 0 to 4, red herring 1 and prohibition 1 (C17 text), Ulugut 2020 citations, MoCA arithmetic, performance status (Karnofsky 80) against the HPI, abnormal flags against reference ranges, stop rule and sequence ids, no literature remnant, no em dash in new text; perfect_agent -v, mri_probe and test_case_guards -k pass.
+Pass 6: 1 errors found
+- followup_outputs[0].output.findings[3] (FBI): personal neglect 'scored severe' and a non-existent 'verbal disinhibition item' contradicted independent self-care, NPI disinhibition 0/12 and the absent disinhibition feature; rewritten to the FBI items the history supports, total unchanged. No note ruling affected (rulings file unchanged).
+- Checked without change: all five note rulings and field paths, rtvFTD label and rejected, must 0 to 4, red herring 1 and prohibition 1 (C17), Ulugut 2020 citations, MoCA arithmetic (20/30), NPI wording, performance status (Karnofsky 80) against the HPI, served lab order (probed), stop rule and sequence ids, no literature remnant, no em dash in new text; perfect_agent -v, mri_probe and test_case_guards -k pass.
+Pass 7: 0 errors found
+- Checked: all five note rulings and field paths, rtvFTD label and rejected (probed: 'right temporal variant frontotemporal dementia' scores, svPPA does not, 'rtvFTD' awaits CENTRAL synonym G31.09+rtv), must 0 to 4, red herring 1 and prohibition 1 (C17), Ulugut 2020 citations, MoCA arithmetic (20/30), NPI and FBI wording, differential evidence against the exam and reports, performance status (Karnofsky 80), stop rule and sequence ids, no literature remnant, no em dash in new text; perfect_agent -v, mri_probe and test_case_guards -k pass.
+Pass 8: 0 errors found
+- Checked: every note id against the rulings file (field paths resolve to the intended targets), the pass-7 changes where present, label, musts and prohibitions against the plan classes, rejected list, differential and key evidence against the final reports, lab rows and abnormal flags, MoCA/MMSE arithmetic, performance status against the HPI, patient text for leakage, stop rule and sequence ids, no literature remnant, no em dash in new text; perfect_agent -v, mri_probe and test_case_guards -k pass.

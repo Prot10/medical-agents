@@ -1,0 +1,32 @@
+# NPH-P06
+Reviewer status: R1 (NB-KSC3-TWUA-QDTM) in_progress; no R2 notes | Approved before this round: no
+
+## Class changes
+- MRI-CONTRAST: split initial_tool_outputs.mri into a plain study (contrast_used false, original slot) and the unchanged gadolinium study (contrast_used true, first follow-up, trigger request_contrast_mri). Plain copy: technique line lost 'with post-gadolinium 3D T1 and FLAIR (requested for the cancer history)', removed the two 'enhancement' findings (post-contrast T1 leptomeningeal/ependymal/cranial nerve and parenchymal/calvarial), impression item 2 (no enhancement) removed and items renumbered; iNPH markers and measurements kept. Criterion action-2-analyze-brain-mri required_arguments {} -> {contrast: true}: iNPH alone needs no gadolinium, but this criterion also answers the oncology team's question of leptomeningeal or parenchymal metastasis in a breast cancer survivor, for which gadolinium-enhanced MRI is the imaging standard (EANO-ESMO 2017 leptomeningeal metastasis guideline), so no plain alternative; expected_evidence unchanged, it is text of the gadolinium study its alternative now receives; the hard MRI-before-CSF constraint keeps the same id. No stored body-imaging MRI; case fallback MRI is null.
+- MRI-CONTRAST verified: checked diff vs 393c547e, mri_probe (plain, contrast, both orders in either sequence, criterion alternative) and perfect_agent -v (pass); plain copy free of gadolinium keys, findings, observations and impression clauses and internally consistent (impression vs findings, numbering); gadolinium copy identical to the base study apart from contrast_used true; no MRI order answered by the library; pathway and criterion order; no other field changed; case fallback MRI null; body-imaging MRI flags. Criterion action-2 contrast: true only fits: the HPI states the oncology question of leptomeningeal or parenchymal metastasis, which only the gadolinium study answers, and its label already asks for contrast; expected_evidence matches the gadolinium study. No error found.
+
+## Reviewer notes
+| note id | ruling | what changed (field paths) |
+|---|---|---|
+| b4648379-d962-45e4-9195-1f65792bda98 | ALREADY-FIXED | Class MRI-CONTRAST (see Class changes): `initial_tool_outputs.mri` is the plain study (`contrast_used: false`); `followup_outputs[0]` (`request_contrast_mri`) is the gadolinium study (`contrast_used: true`, no leptomeningeal, ependymal or parenchymal enhancement); `ground_truth.action_criteria[0]` asks `{"contrast": true}`. mri_probe.py and perfect_agent.py -v re-run on 17 Nov: the criterion receives the gadolinium study (D14) |
+
+## Own findings
+| dim | severity | field path | finding | action |
+|---|---|---|---|---|
+| C | major | `ground_truth.assessment.required_recommendations[0]` | Referral "for CSF shunting with a programmable valve" presumed surgery (class C1, D1) | FIXED: shunt eligibility assessment; the 30% tap response, supportive MRI and normal-pressure CSF with negative cytology support considering a shunt, programmable valve if placed, not by themselves a decision for surgery [Nakajima_2021] |
+| C | major | `ground_truth.assessment.required_recommendations[1]` (new) | No must on benefit, uncertainty or shunt complications (class C2, D2) | FIXED: canonical counselling must added after the referral (no limit clause) [Nakajima_2021] |
+| C | minor | `ground_truth.assessment.required_recommendations[4]` | Falls must "while awaiting surgery" (class C3, D4) | FIXED: "while the neurosurgical assessment is pending" |
+| C | minor | `ground_truth.avoided_actions` | Stored exercise stress test (freezing on initiation, no cardiac indication) carried no waste label (class C4, D5) | FIXED: new `avoid-waste-exercise-stress-test`; echo waste rationale gains the exercise-echo clause; [AHA_ACC_perioperative_2024] |
+| B | minor | `metadata.difficulty_rationale` | Tier counts stale (class C12, D16) | FIXED: 4 required, 0 recommended, 3 optional |
+| D | minor | `initial_tool_outputs.csf`, `followup_outputs[2]` | The CSF reports carry the post-tap gait results, the evidence of the separate post-tap reassessment criterion (condition-wide October design) | FLAGGED (condition-wide) |
+
+## Changes
+The reviewer's contrast note was already resolved by this round's MRI split: the first MRI is the plain study and the gadolinium study (post-contrast sequences, no leptomeningeal or parenchymal enhancement) is returned to a contrast order, which the required MRI criterion asks for; re-verified. The referral must now asks for a shunt eligibility assessment and says the 30% tap response, the supportive MRI and normal-pressure CSF with negative cytology support considering a shunt (with a programmable valve if one is placed) but do not by themselves decide surgery. A new counselling must covers the uncertain benefit (gait most likely to improve) and the shunt complications (obstruction needing revision, infection, headache, subdural haematoma from over-drainage) [Nakajima_2021]. The falls must reads "while the neurosurgical assessment is pending". Exercise stress testing is labelled waste and the echocardiogram waste rationale names exercise stress echocardiography [AHA_ACC_perioperative_2024]. The difficulty rationale counts 4 required and 3 optional actions. The oncology, tamoxifen-duloxetine and cytology content is unchanged.
+
+## Verification
+17 Nov 2026: perfect_agent.py -v passes (every required and recommended criterion served by the case's own report carrying its evidence); test_case_guards for NPH-P03..P08 48 passed; case_io.py check: schema and synonym guard OK, no failure naming the case apart from the central test_guidance_claims. mri_probe.py: a contrast order and the MRI criterion receive the gadolinium study; a plain order the plain study.
+Pass 1: 0 errors found
+- Checked every note ruling against the plan and the note, the diff against 06b74446, the final policy (criteria, tiers, stop rule, sequence ids, musts vs prohibitions vs avoided actions, differential vs evidence), the stored exercise-test reports against the medications and gait, and the tier counts in metadata; perfect_agent.py -v and test_case_guards -k pass; no material error found.
+Cosmetic (not counted): added the missing "Reviewer status" header line to the log.
+Pass 2: 0 errors found
+- Nothing changed after Pass 1 (0 errors), so no unverified change to re-check. Re-ran perfect_agent.py -v (pass) and test_case_guards -k for NPH-P03..P08 (48 passed). No edits.

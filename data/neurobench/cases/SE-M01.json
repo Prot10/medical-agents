@@ -203,6 +203,7 @@
         "additional_observations": [
           "No hippocampal atrophy. No abnormal leptomeningeal or parenchymal enhancement."
         ],
+        "contrast_used": true,
         "findings": [
           {
             "borders": "Ill-defined",
@@ -234,6 +235,43 @@
       },
       "tool_name": "analyze_brain_mri",
       "trigger_action": "request_mri_brain_contrast"
+    },
+    {
+      "output": {
+        "additional_observations": [
+          "No hippocampal atrophy."
+        ],
+        "contrast_used": false,
+        "findings": [
+          {
+            "borders": "Ill-defined",
+            "location": "Left mesial temporal lobe (hippocampus and amygdala) and left lateral temporal neocortex",
+            "mass_effect": "Mild swelling of the left hippocampus and amygdala; no midline shift",
+            "signal_characteristics": {
+              "ADC": "Low ADC in the left hippocampus and left lateral temporal cortex",
+              "DWI": "Gyriform cortical diffusion restriction of the left hippocampus and lateral temporal cortex, extending across the middle and posterior cerebral artery territories",
+              "FLAIR": "T2/FLAIR hyperintensity of the left hippocampus and amygdala and of the left lateral temporal cortex"
+            },
+            "size": null,
+            "type": "Left temporal cortical and mesial temporal signal abnormality"
+          },
+          {
+            "borders": null,
+            "location": "Supratentorial and infratentorial",
+            "mass_effect": null,
+            "signal_characteristics": {
+              "SWI": "No hemorrhage or microhemorrhage"
+            },
+            "size": null,
+            "type": "No mass, hemorrhage or arterial territory infarct"
+          }
+        ],
+        "impression": "1. Left hippocampal and amygdala T2/FLAIR hyperintensity with mild swelling, and gyriform diffusion restriction of the left hippocampus and lateral temporal cortex crossing the middle and posterior cerebral artery territories. Most consistent with peri-ictal change and/or limbic encephalitis; an arterial infarct is unlikely given the non-territorial cortical distribution. 2. No mass, hemorrhage or midline shift.",
+        "recommended_actions": [],
+        "volumetrics": null
+      },
+      "tool_name": "analyze_brain_mri",
+      "trigger_action": "request_mri_brain"
     },
     {
       "output": {
@@ -402,46 +440,6 @@
       },
       "tool_name": "check_drug_interactions",
       "trigger_action": "request_asm_interaction_check"
-    },
-    {
-      "output": {
-        "query": "Treatment of status epilepticus and evaluation of new-onset non-convulsive status epilepticus",
-        "results": [
-          {
-            "evidence_level": "Level A",
-            "finding": "Convulsive status epilepticus is treated at 5 minutes with an adequately dosed benzodiazepine.",
-            "source": "[Glauser_2016]"
-          },
-          {
-            "evidence_level": "RCT",
-            "finding": "Levetiracetam, fosphenytoin and valproate were equally effective as second-line agents for benzodiazepine-refractory status epilepticus.",
-            "source": "[ESETT_2019]"
-          },
-          {
-            "evidence_level": "Guideline",
-            "finding": "Continuous EEG is recommended when non-convulsive status epilepticus is suspected or consciousness does not recover.",
-            "source": "[Brophy_2012]"
-          },
-          {
-            "evidence_level": "Guideline",
-            "finding": "Acyclovir is started on suspicion of HSV encephalitis without waiting for the PCR result.",
-            "source": "[Tunkel_2008]"
-          },
-          {
-            "evidence_level": "Consensus criteria",
-            "finding": "Possible autoimmune encephalitis can be recognized from clinical, MRI, CSF and EEG findings before antibody results are available.",
-            "source": "[Graus_2016]"
-          },
-          {
-            "evidence_level": "Consensus criteria",
-            "finding": "High-risk onconeural antibodies carry a high likelihood of an associated cancer and call for a tumour search, with FDG-PET when CT is negative.",
-            "source": "[Graus_2021]"
-          }
-        ],
-        "summary": "Convulsive status epilepticus is treated at 5 minutes with an adequately dosed benzodiazepine [Glauser_2016], and levetiracetam, fosphenytoin and valproate were equally effective second-line agents in ESETT [ESETT_2019]. New-onset non-convulsive status epilepticus without an evident cause is evaluated with continuous EEG, MRI and CSF analysis, with acyclovir started on suspicion of HSV encephalitis [Brophy_2012; Tunkel_2008]. Autoimmune encephalitis is diagnosed on clinical, MRI, CSF and EEG criteria [Graus_2016], and high-risk onconeural antibodies call for a tumour search [Graus_2021]."
-      },
-      "tool_name": "search_medical_literature",
-      "trigger_action": "request_se_encephalitis_literature"
     },
     {
       "output": {
@@ -830,7 +828,9 @@
       {
         "alternatives": [
           {
-            "required_arguments": {},
+            "required_arguments": {
+              "contrast": true
+            },
             "tool_name": "analyze_brain_mri"
           }
         ],
@@ -932,23 +932,6 @@
         "importance": "optional",
         "label": "Drug interaction check for the benzodiazepine and second-line ASM against metformin, lisinopril and alcohol",
         "rationale": "No interaction in the case changes the ASM choice; the check confirms that levetiracetam can be given and that an enzyme inducer would affect future cytotoxic treatment [ESETT_2019]."
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[Glauser_2016]",
-          "[ESETT_2019]"
-        ],
-        "criterion_id": "action-9-search-medical-literature",
-        "expected_evidence": "General evidence on SE treatment tiers and on the evaluation of new-onset NCSE",
-        "importance": "optional",
-        "label": "Literature review: treatment of status epilepticus and evaluation of new-onset NCSE",
-        "rationale": "General evidence only; not a clinical step in the pathway."
       }
     ],
     "assessment": {

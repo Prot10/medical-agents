@@ -74,21 +74,7 @@
       "recommended_actions": []
     },
     "drug_interactions": null,
-    "ecg": {
-      "axis": "normal",
-      "clinical_correlation": "",
-      "findings": [
-        "Normal sinus rhythm. Incomplete right bundle branch block, a common benign variant. No acute ST-T changes."
-      ],
-      "interpretation": "Normal sinus rhythm. Incomplete right bundle branch block. No acute ST-T changes.",
-      "intervals": {
-        "PR": "184 ms",
-        "QRS": "112 ms",
-        "QTc": "434 ms"
-      },
-      "rate": 88,
-      "rhythm": "normal sinus rhythm"
-    },
+    "ecg": null,
     "echo": {
       "chambers": {
         "LA": "normal size",
@@ -120,7 +106,7 @@
       "panels": {
         "prolactin": [
           {
-            "clinical_significance": null,
+            "clinical_significance": "Raised on risperidone, which commonly causes hyperprolactinemia; a random sample not timed to an event cannot be interpreted for the events.",
             "is_abnormal": true,
             "reference_range": "4-15 (male)",
             "test": "Prolactin",
@@ -135,30 +121,6 @@
     "specialized_test": null
   },
   "followup_outputs": [
-    {
-      "output": {
-        "assessment_type": "performance_status",
-        "findings": [
-          {
-            "domain": "activity",
-            "result": "walks with difficulty; needs assistance for longer distances"
-          },
-          {
-            "domain": "self-care and work",
-            "result": "needs occasional help from his father; not working"
-          }
-        ],
-        "impression": "Karnofsky 60 (requires occasional assistance but able to care for most needs), ECOG 2 (ambulatory and capable of self-care, unable to work, up more than 50% of waking hours).",
-        "recommended_actions": [],
-        "scores": {
-          "ECOG": "2",
-          "Karnofsky": "60/100"
-        },
-        "timing": "baseline"
-      },
-      "tool_name": "perform_clinical_assessment",
-      "trigger_action": "request_performance_status"
-    },
     {
       "output": {
         "findings": [
@@ -195,6 +157,30 @@
       },
       "tool_name": "order_specialized_test",
       "trigger_action": "request_neuropsych_battery"
+    },
+    {
+      "output": {
+        "assessment_type": "performance_status",
+        "findings": [
+          {
+            "domain": "activity",
+            "result": "walks with difficulty; needs assistance for longer distances"
+          },
+          {
+            "domain": "self-care and work",
+            "result": "needs occasional help from his father; not working"
+          }
+        ],
+        "impression": "Karnofsky 60 (requires occasional assistance but able to care for most needs), ECOG 2 (ambulatory and capable of self-care, unable to work, up more than 50% of waking hours).",
+        "recommended_actions": [],
+        "scores": {
+          "ECOG": "2",
+          "Karnofsky": "60/100"
+        },
+        "timing": "baseline"
+      },
+      "tool_name": "perform_clinical_assessment",
+      "trigger_action": "request_performance_status"
     }
   ],
   "ground_truth": {
@@ -222,6 +208,22 @@
       {
         "alternatives": [
           {
+            "required_arguments": {},
+            "tool_name": "analyze_ecg"
+          }
+        ],
+        "citations": [
+          "[NICE_CG109]"
+        ],
+        "criterion_id": "action-ecg",
+        "expected_evidence": "Sinus rhythm at 88 per minute with incomplete right bundle branch block; normal PR and QTc, no pre-excitation, Brugada pattern or heart block",
+        "importance": "required",
+        "label": "12-lead ECG",
+        "rationale": "His events include apparent loss of responsiveness; NICE advises a 12-lead ECG for everyone with transient loss of consciousness, to look for a cardiac cause such as long QT, pre-excitation, a Brugada pattern or heart block, and his medicines include risperidone."
+      },
+      {
+        "alternatives": [
+          {
             "required_arguments": {
               "panels": [
                 "sodium",
@@ -232,13 +234,13 @@
           }
         ],
         "citations": [
-          "[AAN_Functional_Seizures_2025]"
+          "Spasovski G et al. Eur J Endocrinol 2014;170:G1-G47"
         ],
         "criterion_id": "action-sodium-osmolality",
         "expected_evidence": "Sodium 134 mEq/L with osmolality 278 mOsm/kg, too mild to provoke seizures",
-        "importance": "recommended",
+        "importance": "required",
         "label": "Serum sodium and osmolality",
-        "rationale": "He drinks 7-8 L a day and had a hyponatremic seizure 18 months ago; a sodium answers whether the events could be provoked before they are attributed to anything else."
+        "rationale": "Safety test: he drinks 7 to 8 liters a day and had a hyponatremic seizure 18 months ago, so the sodium must be measured, not assumed, before the events are attributed to anything else; sodium and serum osmolality show whether a hypotonic hyponatremia could be provoking seizures (Spasovski 2014)."
       },
       {
         "alternatives": [
@@ -255,25 +257,9 @@
         ],
         "criterion_id": "action-4-analyze-eeg",
         "expected_evidence": "Habitual events recorded on video with no EEG change and a normal interictal record",
-        "importance": "optional",
+        "importance": "recommended",
         "label": "Video-EEG to record the habitual events",
-        "rationale": "Recording the habitual events on video-EEG without ictal change reaches the ILAE documented level of certainty and screens for co-occurring epilepsy, which a prior provoked seizure, risperidone and a family history keep in question (AAN 2025). Without the recording, the positive signs and the semiology of witnessed events support the diagnosis at a lower ILAE level of certainty (LaFrance 2013)."
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "analyze_ecg"
-          }
-        ],
-        "citations": [
-          "[Espay_2018]"
-        ],
-        "criterion_id": "action-ecg",
-        "expected_evidence": "No arrhythmia or QT prolongation",
-        "importance": "optional",
-        "label": "12-lead ECG",
-        "rationale": "The events were first reported as loss of consciousness and risperidone can prolong QT; an ECG is defensible but does not bear on the diagnosis."
+        "rationale": "A typical event was witnessed on examination, which supports the diagnosis at the clinically established level; recording a habitual event on video-EEG raises it to documented and screens for co-occurring epilepsy, as the AAN guideline advises where feasible (ILAE 2013; AAN 2025)."
       },
       {
         "alternatives": [
@@ -304,28 +290,10 @@
           "[Espay_2018]"
         ],
         "criterion_id": "action-neuropsych-battery",
-        "expected_evidence": "Profile of comorbid mood, anxiety and somatic symptom burden to guide therapy; no bearing on the diagnosis",
+        "expected_evidence": "Profile of comorbid anxiety, mood and dissociative symptoms to guide therapy, with performance validity passed; no bearing on the diagnosis",
         "importance": "optional",
         "label": "Neuropsychological assessment of mood, anxiety and dissociation",
         "rationale": "A battery with performance-validity measures can characterise the comorbidity that treatment will target; it does not make the diagnosis and is the most expensive item on this pathway."
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "query": "functional neurological disorder diagnosis treatment"
-            },
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[Espay_2018]"
-        ],
-        "criterion_id": "action-1-search-medical-literature",
-        "expected_evidence": "Background evidence only; the diagnosis and plan for this patient do not depend on a literature result",
-        "importance": "optional",
-        "label": "Search the literature on functional neurological disorder",
-        "rationale": "General evidence on positive diagnosis and treatment can inform the explanation and the referral; no step of the diagnostic work-up depends on it."
       }
     ],
     "assessment": {
@@ -359,7 +327,7 @@
           "[Espay_2018]"
         ],
         "criterion_id": "avoid-waste-2-order-echocardiogram",
-        "rationale": "No murmur, cardiac symptom or syncopal feature; the events keep responsiveness and recover at once.",
+        "rationale": "No murmur, cardiac symptom or syncopal feature: the events have eyes closed, responsiveness when tested and immediate recovery, and the 12-lead ECG answers the cardiac screening question.",
         "severity": "waste"
       },
       {
@@ -373,7 +341,7 @@
           "[Espay_2018]"
         ],
         "criterion_id": "avoid-waste-3-order-cardiac-monitoring",
-        "rationale": "The events keep responsiveness and recover at once, without syncopal features; a rhythm recording answers no question.",
+        "rationale": "The events have eyes closed, responsiveness when tested and immediate recovery, without syncopal features, and the 12-lead ECG answers the cardiac screening question; a rhythm recording adds nothing.",
         "severity": "waste"
       },
       {
@@ -518,6 +486,7 @@
       "An event witnessed on examination: asynchronous arm trembling with side-to-side head movement, eyes tightly closed, responsive throughout, immediate recovery.",
       "Video-EEG recorded four habitual events, one from apparent sleep with a waking background, all without ictal change.",
       "Sodium 134 mEq/L and osmolality 278 mOsm/kg: polydipsia has not produced a hyponatremia that could provoke seizures.",
+      "12-lead ECG on risperidone: sinus rhythm with incomplete right bundle branch block, normal QTc and no pre-excitation or Brugada pattern.",
       "Leg weakness with collapsing strength, a left Hoover sign and a gait that improves with dual tasking; reflexes are normal.",
       "Schizophrenia, the job loss and adolescent trauma are context and treatment targets, neither required nor sufficient for the diagnosis."
     ],
@@ -556,7 +525,9 @@
     "stop_rule": {
       "max_additional_actions": 0,
       "required_before_assessment": [
-        "action-3-perform-clinical-assessment"
+        "action-3-perform-clinical-assessment",
+        "action-ecg",
+        "action-sodium-osmolality"
       ]
     }
   },
@@ -620,7 +591,7 @@
         "formulary_status": "",
         "interactions": [],
         "proposed": "Risperidone 2 mg once daily at bedtime; Benztropine 1 mg twice daily; Melatonin 3 mg nightly",
-        "summary": "No interacting pair. Risperidone slightly lowers the seizure threshold and raises prolactin; antipsychotics and polydipsia predispose to hyponatremia; benztropine dries the mouth. Haloperidol is contraindicated by allergy.",
+        "summary": "No interacting pair. Risperidone slightly lowers the seizure threshold and raises prolactin; antipsychotics and polydipsia predispose to hyponatremia; benztropine dries the mouth. Haloperidol is contraindicated by his documented acute dystonic reaction.",
         "warnings": [
           "Risperidone: small, dose-related lowering of the seizure threshold; low risk at 2 mg daily.",
           "Risperidone: hyperprolactinemia is common and makes a post-event prolactin uninterpretable.",
@@ -629,7 +600,24 @@
         ]
       }
     },
-    "ecg": null,
+    "ecg": {
+      "axis": "normal",
+      "findings": [
+        "Sinus rhythm at 88 per minute with normal P-wave morphology.",
+        "PR interval 184 ms with no delta wave.",
+        "QRS 112 ms with an rSR' pattern in V1 and a narrow terminal S wave in I and V6: incomplete right bundle branch block.",
+        "No coved or saddleback ST elevation in V1-V2; no ST-segment or T-wave abnormality.",
+        "QTc 434 ms, within normal limits for a man."
+      ],
+      "interpretation": "Sinus rhythm at 88 per minute. Incomplete right bundle branch block. Normal PR interval and QTc. No pre-excitation, Brugada pattern, heart block or QT prolongation.",
+      "intervals": {
+        "PR": "184 ms",
+        "QRS": "112 ms",
+        "QTc": "434 ms"
+      },
+      "rate": 88,
+      "rhythm": "sinus rhythm"
+    },
     "echo": null,
     "eeg": {
       "activating_procedures": {
@@ -697,7 +685,7 @@
       "panels": {
         "Electrolytes and osmolality": [
           {
-            "clinical_significance": null,
+            "clinical_significance": "Mild hyponatremia, well above the levels at which hyponatremia provokes seizures; consistent with the reported high water intake.",
             "is_abnormal": true,
             "reference_range": "135-145",
             "test": "Sodium",
@@ -771,49 +759,7 @@
         ]
       }
     },
-    "literature_search": {
-      "functional neurological disorder diagnosis treatment": {
-        "query": "functional neurological disorder diagnosis treatment",
-        "results": [
-          {
-            "evidence_level": "narrative review",
-            "finding": "Diagnosis of functional neurological disorder rests on positive clinical features such as the Hoover sign, tremor entrainment and functional seizure semiology, not on the exclusion of other disease; treatment combines explanation, physiotherapy and psychological therapy.",
-            "source": "Espay AJ et al. JAMA Neurol 2018;75:1132-1141"
-          },
-          {
-            "evidence_level": "systematic review",
-            "finding": "Motor signs such as the Hoover sign, hip abductor sign, drift without pronation and dragging gait have high specificity; sensory signs such as midline splitting have low specificity.",
-            "source": "Daum C et al. J Neurol Neurosurg Psychiatry 2014;85:180-190"
-          },
-          {
-            "evidence_level": "ILAE consensus",
-            "finding": "Defines levels of certainty for psychogenic nonepileptic seizures; the documented level requires a typical event recorded on video-EEG without ictal EEG change.",
-            "source": "LaFrance WC Jr et al. Epilepsia 2013;54:2005-2018"
-          },
-          {
-            "evidence_level": "AAN evidence-based guideline",
-            "finding": "For functional seizures: assess for co-occurring epilepsy and psychiatric disorders, taper antiseizure medication without another indication, avoid benzodiazepines, and offer psychological therapy, which is possibly effective.",
-            "source": "Tolchin B et al. Neurology 2026;106:e214466"
-          },
-          {
-            "evidence_level": "randomised controlled trial",
-            "finding": "CBT added to standardised medical care did not reduce dissociative seizure frequency at 12 months; several secondary outcomes favoured CBT.",
-            "source": "Goldstein LH et al. Lancet Psychiatry 2020;7:491-505"
-          },
-          {
-            "evidence_level": "randomised controlled trial",
-            "finding": "Specialist physiotherapy for functional motor disorder was not superior to community neurological physiotherapy on physical function at 12 months; several secondary outcomes favoured it.",
-            "source": "Nielsen G et al. Lancet Neurol 2024;23:675-686"
-          },
-          {
-            "evidence_level": "systematic review",
-            "finding": "About 4% of patients diagnosed with conversion symptoms since 1970 later received another diagnosis.",
-            "source": "Stone J et al. BMJ 2005;331:989"
-          }
-        ],
-        "summary": "Guideline and trial evidence supports a positive clinical diagnosis of functional neurological disorder, video-EEG confirmation of functional seizures, tapering of unneeded antiseizure drugs and benzodiazepines, and physiotherapy and psychological treatment whose trial effects on primary outcomes were modest."
-      }
-    },
+    "literature_search": null,
     "mri": null,
     "specialized_test": null
   },
@@ -832,21 +778,20 @@
     "condition_name": "Functional neurological disorder (conversion disorder)",
     "criteria_pack_version": "1.0",
     "difficulty_description": "Moderate difficulty due to multiple confounding factors: (1) history of a true prior hyponatremia-induced seizure creating expectation bias, (2) current mild hyponatremia serving as a red herring, (3) risperidone confounding prolactin interpretation, (4) comorbid schizophrenia risking diagnostic overshadowing, and (5) family history of epilepsy. However, positive functional signs on examination and EEG findings are present to guide diagnosis.",
-    "difficulty_rationale": "Functional seizures and leg weakness in a man with schizophrenia, polydipsia and a prior hyponatremic seizure: the agent should check the sodium, find the positive signs, recognise the event semiology and avoid diagnostic overshadowing.",
+    "difficulty_rationale": "Functional seizures and leg weakness in a man with schizophrenia, polydipsia and a prior hyponatremic seizure: the agent should check the sodium and obtain an ECG, find the positive signs, recognise the event semiology and avoid diagnostic overshadowing.",
     "expected_agent_confidence": 0.58,
     "fallback_tool_kinds": {
       "cardiac_monitoring": "normal",
       "clinical_assessment": "case",
       "csf": "normal",
       "ct": "normal",
-      "ecg": "incidental",
       "echo": "normal",
       "labs": "case"
     },
     "generation_method": "real_case_seed",
-    "last_revised": "2026-10-24",
+    "last_revised": "2026-11-16",
     "policy_spec_status": "draft",
-    "revision_reason": "October 2026 review round: criteria, outputs and policy rebuilt per plans/FND.md. Close-out 24 Oct 2026: video-EEG optional and red-flag tests recommended, per the July 2026 agreement with the physicians that the examination is the only required diagnostic act.",
+    "revision_reason": "November 2026 review round: serum sodium and osmolality and a 12-lead ECG required as safety tests (Spasovski 2014; NICE CG109), with the ECG stored as a case report; video-EEG recommended (event witnessed on examination; ILAE 2013, AAN 2025). Earlier (October 2026): criteria, outputs and assessment rebuilt to the FND tiers.",
     "source": "MedCaseReasoning",
     "source_license": "CC-BY 4.0",
     "source_pmcid": "PMC6885238",

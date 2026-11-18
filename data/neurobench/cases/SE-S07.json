@@ -148,6 +148,7 @@
           "Effacement of the right frontal horn",
           "No hydrocephalus"
         ],
+        "contrast_used": true,
         "findings": [
           {
             "borders": "Irregular, ill-defined",
@@ -179,6 +180,44 @@
         "volumetrics": null
       },
       "tool_name": "analyze_brain_mri",
+      "trigger_action": "request_tumor_progression_mri_with_contrast"
+    },
+    {
+      "output": {
+        "additional_observations": [
+          "Effacement of the right frontal horn",
+          "No hydrocephalus"
+        ],
+        "contrast_used": false,
+        "findings": [
+          {
+            "borders": "Irregular, ill-defined",
+            "location": "Right frontal lobe",
+            "mass_effect": "Leftward midline shift 4 mm; right frontal horn effaced",
+            "signal_characteristics": {
+              "DWI": "Restricted diffusion (low ADC) in the solid rim of the mass",
+              "FLAIR": "Expanded T2/FLAIR hyperintensity compared with the MRI of 6 weeks earlier, including infiltrative-appearing signal toward the genu of the corpus callosum",
+              "SWI": "No new blood products"
+            },
+            "size": null,
+            "type": "Right frontal mass"
+          },
+          {
+            "borders": null,
+            "location": "Right frontal perilesional white matter",
+            "mass_effect": null,
+            "signal_characteristics": {
+              "FLAIR": "Extensive vasogenic edema, increased since prior"
+            },
+            "size": null,
+            "type": "Peritumoral edema"
+          }
+        ],
+        "impression": "1. Right frontal mass with restricted diffusion in its solid rim and expanded T2/FLAIR hyperintensity compared with the MRI of 6 weeks earlier, extending toward the genu of the corpus callosum. 2. Increased peritumoral vasogenic edema with 4 mm leftward midline shift. 3. No hemorrhage and no acute infarct outside the lesion.",
+        "recommended_actions": [],
+        "volumetrics": null
+      },
+      "tool_name": "analyze_brain_mri",
       "trigger_action": "request_tumor_progression_mri"
     },
     {
@@ -205,28 +244,6 @@
       },
       "tool_name": "check_drug_interactions",
       "trigger_action": "request_antiseizure_dexamethasone_interaction_check"
-    },
-    {
-      "output": {
-        "query": "status epilepticus treatment in glioma",
-        "results": [
-          {
-            "finding": "Convulsive status epilepticus is treated at 5 minutes with an adequately dosed benzodiazepine [Glauser_2016]."
-          },
-          {
-            "finding": "Levetiracetam, fosphenytoin and valproate were equally effective as second-line agents for benzodiazepine-refractory convulsive status epilepticus in the ESETT trial [ESETT_2019]."
-          },
-          {
-            "finding": "Seizures continuing after both tiers are refractory and are treated with an anaesthetic infusion under continuous EEG [Brophy_2012]."
-          },
-          {
-            "finding": "Continuous EEG for at least 24 hours is recommended when consciousness does not return after convulsions stop [Brophy_2012]."
-          }
-        ],
-        "summary": "Status epilepticus is treated in tiers: a benzodiazepine first, then one of three equally effective second-line drugs, then anaesthetic infusion under continuous EEG for refractory seizures [Glauser_2016; ESETT_2019; Brophy_2012]."
-      },
-      "tool_name": "search_medical_literature",
-      "trigger_action": "request_status_epilepticus_glioma_literature"
     },
     {
       "output": {
@@ -632,7 +649,9 @@
       {
         "alternatives": [
           {
-            "required_arguments": {},
+            "required_arguments": {
+              "contrast": true
+            },
             "tool_name": "analyze_brain_mri"
           }
         ],
@@ -660,22 +679,6 @@
         "importance": "recommended",
         "label": "Drug-interaction check: second-line ASM against dexamethasone, bevacizumab and citalopram",
         "rationale": "She depends on dexamethasone for peritumoral edema: an enzyme-inducing ASM would lower its exposure, which steers the second-line choice [ESETT_2019]."
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[Brophy_2012]"
-        ],
-        "criterion_id": "action-6-search-medical-literature",
-        "expected_evidence": "General evidence on tiered SE treatment",
-        "importance": "optional",
-        "label": "Literature: status epilepticus treatment in a patient with glioma",
-        "rationale": "Background evidence only; not a clinical step [Brophy_2012]."
       }
     ],
     "assessment": {

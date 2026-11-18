@@ -106,30 +106,6 @@
   "followup_outputs": [
     {
       "output": {
-        "assessment_type": "performance_status",
-        "findings": [
-          {
-            "domain": "activity",
-            "result": "bed-bound for 6 weeks; unable to bear weight"
-          },
-          {
-            "domain": "self-care and work",
-            "result": "dependent for transfers and most care; not attending school"
-          }
-        ],
-        "impression": "Karnofsky 40 (disabled; requires special care and assistance), ECOG 3 (capable of only limited self-care, confined to bed or chair more than 50% of waking hours).",
-        "recommended_actions": [],
-        "scores": {
-          "ECOG": "3",
-          "Karnofsky": "40/100"
-        },
-        "timing": "baseline"
-      },
-      "tool_name": "perform_clinical_assessment",
-      "trigger_action": "request_performance_status"
-    },
-    {
-      "output": {
         "findings": [
           {
             "domain": "global cognition",
@@ -154,15 +130,39 @@
           "GAD-7": "9 (mild)",
           "MoCA": "28/30",
           "PHQ-9": "17 (moderately severe)",
-          "RAVLT_delayed_recall": "z = -0.2",
+          "RAVLT_delayed_recall": "z = -0.4",
           "TOMM_trial_2": "49/50",
-          "Trail_Making_B": "z = -0.4"
+          "Trail_Making_B": "z = -0.6"
         },
         "recommended_actions": [],
         "test_type": "neuropsych_battery"
       },
       "tool_name": "order_specialized_test",
       "trigger_action": "request_neuropsych_battery"
+    },
+    {
+      "output": {
+        "assessment_type": "performance_status",
+        "findings": [
+          {
+            "domain": "activity",
+            "result": "bed-bound for 6 weeks; unable to bear weight"
+          },
+          {
+            "domain": "self-care and work",
+            "result": "dependent for transfers and most care; not attending school"
+          }
+        ],
+        "impression": "Karnofsky 40 (disabled; requires special care and assistance), ECOG 3 (capable of only limited self-care, confined to bed or chair more than 50% of waking hours).",
+        "recommended_actions": [],
+        "scores": {
+          "ECOG": "3",
+          "Karnofsky": "40/100"
+        },
+        "timing": "baseline"
+      },
+      "tool_name": "perform_clinical_assessment",
+      "trigger_action": "request_performance_status"
     }
   ],
   "ground_truth": {
@@ -190,6 +190,22 @@
       {
         "alternatives": [
           {
+            "required_arguments": {},
+            "tool_name": "analyze_ecg"
+          }
+        ],
+        "citations": [
+          "[NICE_CG109]"
+        ],
+        "criterion_id": "action-ecg",
+        "expected_evidence": "Sinus rhythm at 90 per minute, normal PR, QRS and QTc",
+        "importance": "required",
+        "label": "12-lead ECG",
+        "rationale": "Her events include apparent loss of responsiveness; NICE advises a 12-lead ECG for everyone with transient loss of consciousness, to look for a cardiac cause such as long QT, pre-excitation, a Brugada pattern or heart block, and her medicines include metoclopramide, which prolongs the QT interval, more so with her low magnesium."
+      },
+      {
+        "alternatives": [
+          {
             "required_arguments": {
               "panels": [
                 "CMP",
@@ -206,9 +222,9 @@
         ],
         "criterion_id": "action-5-interpret-labs",
         "expected_evidence": "Magnesium 1.6 with low albumin and prealbumin, low-normal thiamine 78 nmol/L and normal phosphate and potassium; none explains the weakness or the events",
-        "importance": "recommended",
+        "importance": "required",
         "label": "Check electrolytes, magnesium, phosphate and thiamine",
-        "rationale": "Four months of vomiting, a 15 kg weight loss, BMI 14.8 and nasogastric feeding: magnesium, phosphate, potassium and thiamine answer the refeeding and thiamine-deficiency questions, and a deficiency state is the organic mimic of her weakness to check."
+        "rationale": "Safety test: four months of vomiting, a 15 kg weight loss, BMI 14.8 and nasogastric feeding put her at high risk of refeeding syndrome, so potassium, magnesium and phosphate must be measured, not assumed, before and during refeeding (NICE CG32); thiamine and the electrolytes also answer the deficiency mimic of her weakness."
       },
       {
         "alternatives": [
@@ -225,9 +241,9 @@
         ],
         "criterion_id": "action-4-analyze-eeg",
         "expected_evidence": "Habitual events recorded on video with no EEG change and a normal interictal record",
-        "importance": "optional",
+        "importance": "recommended",
         "label": "Record the habitual events on video-EEG",
-        "rationale": "New unresponsive shaking events in two weeks, in a patient on a dopamine antagonist with metabolic derangement: recording the habitual events without ictal change reaches the ILAE documented level and answers the question of epileptic or provoked seizures. Without the recording, the positive signs and the semiology of witnessed events support the diagnosis at a lower ILAE level of certainty (LaFrance 2013)."
+        "rationale": "A typical event was witnessed on examination, which supports the diagnosis at the clinically established level; recording a habitual event on video-EEG raises it to documented and screens for co-occurring epilepsy, as the AAN guideline advises where feasible (ILAE 2013; AAN 2025)."
       },
       {
         "alternatives": [
@@ -263,24 +279,6 @@
         "importance": "optional",
         "label": "Neuropsychological assessment",
         "rationale": "A battery would quantify her low mood and a possible eating disorder for the treatment plan, but it does not make the diagnosis, which rests on the examination, and it is the most expensive item on this pathway."
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "query": "functional neurological disorder diagnosis treatment"
-            },
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[Espay_2018]"
-        ],
-        "criterion_id": "action-1-search-medical-literature",
-        "expected_evidence": "General evidence on positive diagnosis and on physiotherapy and psychological therapy for FND; no step of this patient's work-up depends on it",
-        "importance": "optional",
-        "label": "Search the literature on FND diagnosis and treatment",
-        "rationale": "A literature search is background reading, not a clinical step in this patient's pathway; no step of the work-up depends on it."
       }
     ],
     "assessment": {
@@ -297,11 +295,12 @@
       "required_recommendations": [
         "Make a positive diagnosis of functional neurological disorder (mixed: functional seizures and functional leg weakness) based on the Hoover sign on both sides, collapsing weakness and distractibility of the leg weakness, and the semiology of the habitual events, confirmed on video-EEG where recorded, and not by exclusion of other disease.",
         "Explain the diagnosis to the patient, and with consent to the family, as a common and genuine disorder of nervous system functioning that can improve, show the positive signs, and give written information, using a professional interpreter if needed and, with her consent, involving her father.",
-        "Refer for physiotherapy with expertise in functional motor disorder (motor retraining, Nielsen 2015 consensus).",
+        "Refer to a specialist multidisciplinary rehabilitation service for functional neurological disorder (physiotherapy, occupational therapy with a functional independence and equipment plan, and psychological therapy), given six weeks bed-bound, unable to bear weight and dependent for transfers and most care, starting once medically stable.",
         "Refer for psychological therapy by a clinician experienced in FND (CBT-informed) and treat the comorbid depression.",
         "Give the patient, family and ward a written plan for typical events: keep safe, do not restrain, wait for the event to end, and do not give emergency benzodiazepines or intubate for a typical functional seizure.",
         "Give thiamine before glucose-containing fluids or further feeding, replace magnesium, and monitor phosphate, potassium and magnesium for refeeding syndrome.",
         "Assess for an eating disorder.",
+        "Refer for gastroenterology evaluation of the intractable vomiting before attributing it to the functional disorder.",
         "Stop metoclopramide: a dopamine antagonist used beyond the recommended dose and duration, which can cause dystonia, akathisia and tardive dyskinesia that confound the movements."
       ]
     },
@@ -317,7 +316,7 @@
           "[Espay_2018]"
         ],
         "criterion_id": "avoid-waste-1-order-echocardiogram",
-        "rationale": "No cardiac question: her events are shaking with closed eyes and immediate recovery, not syncope.",
+        "rationale": "No structural cardiac question: her events are shaking with closed eyes and immediate recovery, not syncope, and the 12-lead ECG answers the cardiac screening question for the apparent unresponsiveness.",
         "severity": "waste"
       },
       {
@@ -503,6 +502,12 @@
         "likelihood": "low"
       },
       {
+        "diagnosis": "Upper gastrointestinal disease (motility disorder, superior mesenteric artery syndrome after weight loss)",
+        "icd_code": "K31.9",
+        "key_features": "Abdominal CT and upper endoscopy at regional hospitals were normal and a proton pump inhibitor did not help; the vomiting persists with a 15 kg weight loss, and gastroenterology evaluation is pending.",
+        "likelihood": "low"
+      },
+      {
         "diagnosis": "Eating disorder (anorexia nervosa), possibly coexisting",
         "icd_code": "F50.00",
         "key_features": "BMI 14.8 with a 15 kg weight loss calls for an assessment; no restriction or body-image concern is described, and an eating disorder would not produce the positive signs of functional weakness or the recorded events.",
@@ -545,6 +550,8 @@
       "max_additional_actions": 0,
       "required_before_assessment": [
         "action-3-perform-clinical-assessment",
+        "action-ecg",
+        "action-5-interpret-labs",
         "action-2-check-drug-interactions"
       ]
     }
@@ -619,7 +626,22 @@
         ]
       }
     },
-    "ecg": null,
+    "ecg": {
+      "axis": "normal",
+      "findings": [
+        "Sinus rhythm at 90 bpm.",
+        "PR 142 ms with no delta wave; QRS 84 ms; no coved ST elevation in V1-V2.",
+        "QTc 447 ms (Bazett), within the normal range for a woman. Normal ST segments and T waves."
+      ],
+      "interpretation": "Normal sinus rhythm. Normal PR, QRS and QTc intervals. No atrioventricular block, pre-excitation, Brugada pattern or repolarization abnormality.",
+      "intervals": {
+        "PR": "142 ms",
+        "QRS": "84 ms",
+        "QTc": "447 ms"
+      },
+      "rate": 90,
+      "rhythm": "normal sinus rhythm"
+    },
     "echo": null,
     "eeg": {
       "activating_procedures": {
@@ -802,7 +824,7 @@
         ],
         "Magnesium_phosphate_thiamine": [
           {
-            "clinical_significance": null,
+            "clinical_significance": "Hypomagnesemia; a risk factor for refeeding syndrome and QT prolongation.",
             "is_abnormal": true,
             "reference_range": "1.7-2.4",
             "test": "Magnesium",
@@ -890,49 +912,7 @@
         ]
       }
     },
-    "literature_search": {
-      "functional neurological disorder diagnosis treatment": {
-        "query": "functional neurological disorder diagnosis treatment",
-        "results": [
-          {
-            "evidence_level": "narrative review",
-            "finding": "Diagnosis of functional neurological disorder rests on positive clinical features such as the Hoover sign, tremor entrainment and functional seizure semiology, not on the exclusion of other disease; treatment combines explanation, physiotherapy and psychological therapy.",
-            "source": "Espay AJ et al. JAMA Neurol 2018;75:1132-1141"
-          },
-          {
-            "evidence_level": "systematic review",
-            "finding": "Motor signs such as the Hoover sign, hip abductor sign, drift without pronation and dragging gait have high specificity; sensory signs such as midline splitting have low specificity.",
-            "source": "Daum C et al. J Neurol Neurosurg Psychiatry 2014;85:180-190"
-          },
-          {
-            "evidence_level": "ILAE consensus",
-            "finding": "Defines levels of certainty for psychogenic nonepileptic seizures; the documented level requires a typical event recorded on video-EEG without ictal EEG change.",
-            "source": "LaFrance WC Jr et al. Epilepsia 2013;54:2005-2018"
-          },
-          {
-            "evidence_level": "AAN evidence-based guideline",
-            "finding": "For functional seizures: assess for co-occurring epilepsy and psychiatric disorders, taper antiseizure medication without another indication, avoid benzodiazepines, and offer psychological therapy, which is possibly effective.",
-            "source": "Tolchin B et al. Neurology 2026;106:e214466"
-          },
-          {
-            "evidence_level": "randomised controlled trial",
-            "finding": "CBT added to standardised medical care did not reduce dissociative seizure frequency at 12 months; several secondary outcomes favoured CBT.",
-            "source": "Goldstein LH et al. Lancet Psychiatry 2020;7:491-505"
-          },
-          {
-            "evidence_level": "randomised controlled trial",
-            "finding": "Specialist physiotherapy for functional motor disorder was not superior to community neurological physiotherapy on physical function at 12 months; several secondary outcomes favoured it.",
-            "source": "Nielsen G et al. Lancet Neurol 2024;23:675-686"
-          },
-          {
-            "evidence_level": "systematic review",
-            "finding": "About 4% of patients diagnosed with conversion symptoms since 1970 later received another diagnosis.",
-            "source": "Stone J et al. BMJ 2005;331:989"
-          }
-        ],
-        "summary": "Guideline and trial evidence supports a positive clinical diagnosis of functional neurological disorder, video-EEG confirmation of functional seizures, tapering of unneeded antiseizure drugs and benzodiazepines, and physiotherapy and psychological treatment whose trial effects on primary outcomes were modest."
-      }
-    },
+    "literature_search": null,
     "mri": null,
     "specialized_test": null
   },
@@ -943,7 +923,7 @@
     "condition_name": "Functional neurological disorder (conversion disorder)",
     "criteria_pack_version": "1.0",
     "difficulty_description": "Clear positive signs of functional leg weakness and typical events seen on examination and recorded on video-EEG; the agent must separate them from severe malnutrition, a dopamine-blocking antiemetic and a referral diagnosis of psychosis, and manage the nutritional and drug risks.",
-    "difficulty_rationale": "Mixed functional seizures and functional leg weakness in severe malnutrition: the examination and the event semiology make the diagnosis, with video-EEG confirmation if recorded, targeted electrolytes and thiamine answer the nutritional mimic, and the medication review finds metoclopramide to stop.",
+    "difficulty_rationale": "Mixed functional seizures and functional leg weakness in severe malnutrition: the examination and the event semiology make the diagnosis, with video-EEG confirmation if recorded; electrolytes, magnesium, phosphate and a 12-lead ECG are required safety tests before refeeding and on a QT-prolonging antiemetic, the medication review finds metoclopramide to stop, and the vomiting needs gastroenterology evaluation.",
     "expected_agent_confidence": 0.85,
     "fallback_tool_kinds": {
       "cardiac_monitoring": "normal",
@@ -953,9 +933,9 @@
       "echo": "normal"
     },
     "generation_method": "real_case_seed",
-    "last_revised": "2026-10-24",
+    "last_revised": "2026-11-16",
     "policy_spec_status": "draft",
-    "revision_reason": "October 2026 review round: policy tiers, reports and assessment rebuilt to the FND condition plan. Close-out 24 Oct 2026: video-EEG optional and red-flag tests recommended, per the July 2026 agreement with the physicians that the examination is the only required diagnostic act.",
+    "revision_reason": "November 2026: refeeding safety labs and a 12-lead ECG required, video-EEG recommended, multidisciplinary rehabilitation and gastroenterology musts.",
     "source": "MedCaseReasoning",
     "source_license": "CC-BY 4.0",
     "source_pmcid": "PMC4607000",

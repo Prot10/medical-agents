@@ -171,9 +171,60 @@
       "output": {
         "additional_observations": [
           "No restricted diffusion in a vascular territory.",
+          "No mesial temporal FLAIR hyperintensity or swelling."
+        ],
+        "contrast_used": false,
+        "findings": [
+          {
+            "borders": "Gyriform, following the cortical ribbon",
+            "location": "Bilateral cortex, left hemisphere greater than right, frontal and temporoparietal",
+            "mass_effect": null,
+            "signal_characteristics": {
+              "ADC": "Corresponding low ADC",
+              "DWI": "Gyriform restricted diffusion along the cortical ribbon",
+              "FLAIR": "Cortical hyperintensity"
+            },
+            "size": "Extensive bilateral cortical involvement",
+            "type": "cortical ribboning"
+          },
+          {
+            "borders": null,
+            "location": "Bilateral caudate nuclei and putamina, and the dorsomedial thalami",
+            "mass_effect": null,
+            "signal_characteristics": {
+              "ADC": "Corresponding low ADC",
+              "DWI": "Restricted diffusion in the caudate and putamen; milder restriction in the dorsomedial thalami, less intense than in the striatum",
+              "FLAIR": "Hyperintensity"
+            },
+            "size": null,
+            "type": "deep gray nuclei signal change"
+          },
+          {
+            "borders": null,
+            "location": "Bilateral cerebral hemispheres",
+            "mass_effect": null,
+            "signal_characteristics": {
+              "FLAIR": "Diffuse cortical volume loss"
+            },
+            "size": null,
+            "type": "cortical atrophy"
+          }
+        ],
+        "impression": "1. Extensive bilateral gyriform cortical restricted diffusion (cortical ribboning), left greater than right. 2. Restricted diffusion and FLAIR hyperintensity in the caudate nuclei and putamina, with milder dorsomedial thalamic restriction; no pulvinar predominance. 3. Diffuse cortical volume loss. 4. No hemorrhage, mass lesion or territorial infarct. The combination of cortical ribboning with deep gray nuclei restricted diffusion is characteristic of prion disease; status epilepticus and hypoxic injury can produce cortical diffusion restriction and cannot be excluded on imaging alone. Clinical correlation recommended.",
+        "recommended_actions": [],
+        "volumetrics": null
+      },
+      "tool_name": "analyze_brain_mri",
+      "trigger_action": "request_mri_brain_dwi"
+    },
+    {
+      "output": {
+        "additional_observations": [
+          "No restricted diffusion in a vascular territory.",
           "No leptomeningeal or parenchymal enhancement after contrast.",
           "No mesial temporal FLAIR hyperintensity or swelling."
         ],
+        "contrast_used": true,
         "findings": [
           {
             "borders": "Gyriform, following the cortical ribbon",
@@ -215,7 +266,7 @@
         "volumetrics": null
       },
       "tool_name": "analyze_brain_mri",
-      "trigger_action": "request_mri_brain_dwi"
+      "trigger_action": "request_mri_brain_contrast"
     },
     {
       "output": {
@@ -312,36 +363,6 @@
       },
       "tool_name": "check_drug_interactions",
       "trigger_action": "request_asm_quetiapine_escitalopram_interaction_check"
-    },
-    {
-      "output": {
-        "query": "Sporadic Creutzfeldt-Jakob disease diagnostic criteria, CSF biomarkers and EEG patterns",
-        "results": [
-          {
-            "evidence_level": "Diagnostic criteria",
-            "finding": "Current diagnostic criteria for probable sporadic Creutzfeldt-Jakob disease combine rapidly progressive dementia and typical clinical features with a positive RT-QuIC assay, a characteristic MRI pattern of cortical and striatal diffusion restriction, or periodic sharp wave complexes on EEG; RT-QuIC has high specificity, and 14-3-3 and total tau are less specific surrogate markers of rapid neuronal loss.",
-            "source": "[Hermann_2021]"
-          },
-          {
-            "evidence_level": "Consensus terminology",
-            "finding": "Generalized periodic discharges and electrographic seizures are separate patterns with separate definitions; a seizure requires evolution in frequency, morphology or location, or a clinical correlate, which an invariant periodic pattern lacks.",
-            "source": "[ACNS_2021]"
-          },
-          {
-            "evidence_level": "Consensus criteria",
-            "finding": "In patients with an encephalopathy, periodic discharges at 2.5 Hz or less meet criteria for non-convulsive status epilepticus only with typical spatiotemporal evolution, subtle ictal clinical phenomena or improvement after IV antiseizure medication.",
-            "source": "[Salzburg_NCSE_2015]"
-          },
-          {
-            "evidence_level": "Guideline",
-            "finding": "Continuous EEG for at least 24 hours is recommended when non-convulsive seizures are suspected in a patient who does not regain consciousness after a convulsion.",
-            "source": "[Brophy_2012]"
-          }
-        ],
-        "summary": "Probable sporadic Creutzfeldt-Jakob disease is defined by rapidly progressive dementia with a positive RT-QuIC assay, a characteristic MRI pattern or periodic sharp wave complexes; RT-QuIC is the most specific of these markers [Hermann_2021]. Periodic discharges and electrographic seizures are distinguished by evolution and clinical correlates [ACNS_2021; Salzburg_NCSE_2015], and continuous EEG for at least 24 hours is recommended when consciousness does not return after a convulsion [Brophy_2012]."
-      },
-      "tool_name": "search_medical_literature",
-      "trigger_action": "request_prion_disease_biomarker_literature"
     },
     {
       "output": {
@@ -646,7 +667,15 @@
       {
         "alternatives": [
           {
-            "required_arguments": {},
+            "required_arguments": {
+              "contrast": false
+            },
+            "tool_name": "analyze_brain_mri"
+          },
+          {
+            "required_arguments": {
+              "contrast": true
+            },
             "tool_name": "analyze_brain_mri"
           }
         ],
@@ -655,7 +684,7 @@
           "[Glauser_2016]"
         ],
         "criterion_id": "action-4-analyze-brain-mri",
-        "expected_evidence": "Bilateral gyriform cortical restricted diffusion (left greater than right) with caudate and putaminal restriction, milder dorsomedial thalamic restriction and FLAIR hyperintensity; no mesial temporal change, infarct or enhancement",
+        "expected_evidence": "Bilateral gyriform cortical restricted diffusion (left greater than right) with caudate and putaminal restriction, milder dorsomedial thalamic restriction and FLAIR hyperintensity; no mesial temporal change or infarct",
         "importance": "required",
         "label": "MRI brain with DWI and FLAIR for the cause of the rapidly progressive dementia and new seizures",
         "rationale": "New-onset status epilepticus on a rapidly progressive dementia needs MRI; the outside study is not available here, and the cortical and striatal diffusion pattern is one of the diagnostic markers of prion disease while also excluding encephalitis and a structural lesion [Hermann_2021; Glauser_2016]."
@@ -720,22 +749,6 @@
         "importance": "recommended",
         "label": "Drug-interaction check of the candidate ASMs against quetiapine and escitalopram",
         "rationale": "Her quetiapine and escitalopram prolong the QT interval together and are induced or displaced by some ASMs, which narrows the sensible choice; no single interaction forbids the first-choice drug, so the check is recommended [Brophy_2012]."
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[Hermann_2021]"
-        ],
-        "criterion_id": "action-7-search-medical-literature",
-        "expected_evidence": "General evidence on RT-QuIC, 14-3-3 and total tau, and on the EEG definitions of periodic discharges and electrographic seizures",
-        "importance": "optional",
-        "label": "Literature on prion disease diagnostic criteria and biomarkers",
-        "rationale": "Optional background on the diagnostic markers and on separating periodic discharges from seizures; it is not a clinical step [Hermann_2021]."
       }
     ],
     "assessment": {

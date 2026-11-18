@@ -424,26 +424,6 @@
     },
     {
       "output": {
-        "query": "exertional syncope structural heart disease evaluation guideline",
-        "results": [
-          {
-            "evidence_level": "Guideline recommendation",
-            "finding": "Syncope during exertion is a high-risk feature requiring early in-hospital evaluation; echocardiography is recommended when structural heart disease is known or suspected, and identifies obstructive lesions such as aortic stenosis, hypertrophic obstructive cardiomyopathy, cardiac tumours and thrombi.",
-            "source": "Brignole M et al., 2018 ESC Guidelines for the diagnosis and management of syncope. Eur Heart J 2018;39:1883-1948"
-          },
-          {
-            "evidence_level": "Guideline recommendation",
-            "finding": "When syncope is due to a structural cardiac lesion, treatment is directed at the lesion; tilt testing and exercise testing are not used to confirm a structural cause.",
-            "source": "Brignole M et al., 2018 ESC Guidelines for the diagnosis and management of syncope. Eur Heart J 2018;39:1883-1948"
-          }
-        ],
-        "summary": "ESC 2018 lists exertional syncope as high risk and recommends echocardiography when structural heart disease is suspected."
-      },
-      "tool_name": "search_medical_literature",
-      "trigger_action": "search_exertional_structural_heart_disease"
-    },
-    {
-      "output": {
         "chambers": {
           "Left atrium": "Diameter 31 mm, normal",
           "Left ventricle": "Normal size (end-diastolic diameter 47 mm), wall thickness 9 mm, LVEF 62% (biplane Simpson)",
@@ -717,22 +697,6 @@
         "importance": "optional",
         "label": "Medication review",
         "rationale": "His only regular drug is an albuterol inhaler, a cause of tachycardia and ectopy; no interaction changes the surgical plan."
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[ESC_2018]"
-        ],
-        "criterion_id": "action-8-search-medical-literature",
-        "expected_evidence": "General guideline evidence on exertional syncope; no decision depends on it",
-        "importance": "optional",
-        "label": "Guideline lookup",
-        "rationale": "Guideline lookup is optional; the decision rests on the ECG, monitoring and imaging results already obtained (ESC 2018)."
       }
     ],
     "assessment": {
@@ -842,11 +806,58 @@
         "criterion_id": "avoid-harm-6-exercise-stress-test",
         "rationale": "Exertional syncope with a mobile RV outflow tract mass causing severe obstruction: exercise reproduces the collapse and risks embolisation, and the diagnosis is already structural (ESC 2018; Fletcher GF et al., AHA exercise standards, Circulation 2013).",
         "severity": "harm"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "echo_type": "bubble_study"
+            },
+            "tool_name": "order_echocardiogram"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "avoid-waste-bubble-study",
+        "rationale": "No stroke, TIA, unexplained hypoxaemia or suspected intracardiac shunt, and the interatrial septum is intact on the TTE: a bubble study plays no part in the evaluation of syncope from an obstructing right ventricular outflow tract mass.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "echo_type": "exercise_echo"
+            },
+            "tool_name": "order_echocardiogram"
+          }
+        ],
+        "citations": [
+          "[ESC_2018]",
+          "[Fletcher_2013]"
+        ],
+        "criterion_id": "avoid-harm-exercise-echo",
+        "rationale": "Exertional syncope with a mobile RV outflow tract mass causing severe dynamic obstruction: exercise, with or without echocardiographic imaging, can reproduce the collapse and risks embolisation, and the diagnosis is already structural (ESC 2018; Fletcher GF et al., AHA exercise standards, Circulation 2013).",
+        "severity": "harm"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "modality": "coronary_CTA"
+            },
+            "tool_name": "order_advanced_imaging"
+          }
+        ],
+        "citations": [
+          "[ESC_2018]"
+        ],
+        "criterion_id": "avoid-waste-coronary-cta",
+        "rationale": "No angina or troponin rise in a 22-year-old, and the right precordial ST depression is RV strain from the outflow obstruction: coronary imaging follows the usual ischaemia indications and does not address syncope from an obstructing right ventricular outflow tract mass (ESC 2018).",
+        "severity": "waste"
       }
     ],
     "diagnosis": {
       "accepted": [
-        "Cardiac syncope due to right ventricular outflow tract myxoma causing intermittent dynamic RVOT obstruction",
+        "Cardiac syncope due to a right ventricular outflow tract mass most consistent with myxoma (histology pending), causing intermittent dynamic RVOT obstruction",
         "cardiac myxoma",
         "right ventricular myxoma",
         "rvot myxoma",
@@ -1253,26 +1264,7 @@
         ]
       }
     },
-    "literature_search": {
-      "general": {
-        "query": "syncope initial evaluation and risk stratification",
-        "results": [
-          {
-            "journal": "Eur Heart J",
-            "key_finding": "Initial evaluation comprises history, physical examination including supine and standing blood pressure, and a 12-lead ECG. High-risk features (syncope during exertion or supine, palpitations before the event, known structural or coronary disease, family history of sudden death under 40, high-risk ECG findings) call for early in-hospital evaluation with immediate ECG monitoring. Echocardiography is indicated when structural heart disease is known or suspected; EEG, brain imaging and routine laboratory panels are not recommended without a specific indication.",
-            "title": "2018 ESC Guidelines for the diagnosis and management of syncope (Brignole M et al., Eur Heart J 2018;39:1883-1948)",
-            "year": "2018"
-          },
-          {
-            "journal": "Circulation",
-            "key_finding": "Risk stratification at the initial evaluation separates patients needing in-hospital monitoring and cardiac testing from those suitable for outpatient evaluation; targeted rather than routine blood testing is advised.",
-            "title": "2017 ACC/AHA/HRS Guideline for the evaluation and management of patients with syncope (Shen WK et al.)",
-            "year": "2017"
-          }
-        ],
-        "summary": "Guidelines base syncope work-up on the initial evaluation (history, examination, orthostatic BP, 12-lead ECG) and risk stratification; high-risk patients receive in-hospital ECG monitoring and targeted cardiac testing."
-      }
-    },
+    "literature_search": null,
     "mri": null
   },
   "metadata": {
@@ -1290,9 +1282,9 @@
       "mri": "normal"
     },
     "generation_method": "real_case_seed",
-    "last_revised": "2026-05-26",
+    "last_revised": "2026-11-17",
     "policy_spec_status": "draft",
-    "revision_reason": "policy migration to schema v2",
+    "revision_reason": "November 2026 physician review: the mass is labelled most consistent with myxoma until histology; served off-pathway bubble study and coronary CT angiography labelled as waste and the exercise echocardiogram as harmful, like the exercise test.",
     "source": "MedCaseReasoning",
     "source_license": "CC-BY 4.0",
     "source_pmcid": "PMC4301803",

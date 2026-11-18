@@ -1,0 +1,38 @@
+# VASC-DEM-M04
+
+## Reviewer notes
+Reviewer status: R1 in_progress, no R2 | Approved before this round: no
+
+| note id | ruling | what changed (field paths) |
+|---|---|---|
+| 2914e61e-79a9-417f-807f-af359ea82c2c | FIXED (plan C2, D2) | ground_truth.action_criteria[action-5-order-specialized-test]: required -> recommended; removed from stop_rule.required_before_assessment; label "...to characterise the focal parietal profile and to document a baseline for follow-up"; rationale "...sets a baseline for return to teaching, driving and rehabilitation; the bedside parietal testing, the history and the MRI establish the disorder [VASCOG_2014]." |
+| 11986a51-9598-4ea2-bf28-dc9cdc584f9b | FIXED (plan C4, D4) | action_criteria[action-9-analyze-ecg] and [action-6-cervical-vessel-imaging] (MRA or duplex): recommended -> required, both added to stop_rule.required_before_assessment (now screen, labs, MRI, ECG, cervical vessels); rationales state the infarct was never investigated. New assessment.required_recommendations[2]: "If the ECG and vessel imaging show no cause, arrange echocardiography and prolonged rhythm monitoring, which would change the antithrombotic choice [AHA_ASA_2021_secondary]." action-10 (TTE) and action-11 (monitoring) stay optional, outside the stop rule |
+| ec3158d4-68fd-4d64-81bf-6363a0acbabd | FIXED (plan D16) | key_clinical_evidence[4] -> "Preserved medial temporal lobes make typical Alzheimer disease less likely but do not exclude early or atypical forms; here the abrupt onset, stable course, Gerstmann syndrome and the matching infarct strongly favour a vascular cause". key_clinical_evidence[1]: "delayed recall is the first domain to fail" -> "Amnestic presentations are typical of Alzheimer's disease, but non-amnestic variants exist; ...". required_recommendations[0]: "not Alzheimer disease" -> "a vascular cause is strongly favoured over Alzheimer disease" (reasons kept). action-4-analyze-brain-mri rationale "answer the Alzheimer question" -> "inform, without settling, the Alzheimer question"; metadata.key_educational_points[1] "powerful argument against early Alzheimer's disease" -> "argues against typical amnestic Alzheimer's disease, although non-amnestic variants exist". The rejected labels alzheimer/alzheimers stay (an AD-only answer remains wrong, D16) |
+
+## Own findings
+| dim | severity | field path | finding | action |
+|---|---|---|---|---|
+| B | minor | initial_tool_outputs.specialized_test.findings[*].reference_range | Plan class C6 (D6): percentile rows used "25th-75th percentile"; no row lies in the 9th-24th band, so no flag changes | FIXED: reference_range "9th percentile or above (25th-75th average)" on all 8 rows; flags unchanged (all at or below the 3rd, or at or above the 34th) |
+| C | minor | ground_truth.avoided_actions | Plan class C11 (D12): stored SPECT, DTI, CT perfusion and perfusion MRI follow-ups matched no criterion or label | FIXED: added avoid-waste-perfusion-spect, avoid-waste-dti-tractography, avoid-waste-ct-perfusion (infarct six months old), avoid-waste-perfusion-mri; speech-language evaluation left unlabelled (agraphia, rehabilitation). Duplex (credited) already first in followup_outputs. Stored reports kept |
+
+## Changes
+The diagnosis (strategic single-infarct vascular dementia, left angular gyrus infarct with Gerstmann syndrome) is unchanged. The case no longer states that absent medial temporal atrophy strongly excludes Alzheimer disease or that delayed recall must be the first domain to fail: preserved hippocampi and normal recall make typical Alzheimer disease less likely without excluding early or atypical forms, and the abrupt onset, stable course, Gerstmann syndrome and matching infarct strongly favour a vascular cause (key evidence, main must, MRI rationale, teaching point). Because this infarct was never investigated, the ECG and non-invasive vessel imaging (MRA or duplex) are now required before the assessment, and a new must asks for echocardiography and prolonged monitoring if they show no cause; echo and monitoring stay optional. The neuropsychological battery is recommended, not required, and is kept for return to teaching, driving and rehabilitation. Battery reference ranges use the AACN wording (no score changes label). SPECT, DTI, CT perfusion and perfusion MRI are labelled waste. Stop rule: screen, labs, MRI, ECG, vessel imaging. Checks: perfect_agent.py passes (both vessel-imaging alternatives receive their own stored reports); test_case_guards (M04) 8 passed. No MRI edited.
+
+## Verification
+16 Nov 2026: perfect_agent.py -v passes; served-report probe over every criterion and avoided alternative (optional included): each answered by the case's own stored report where one exists, no avoided label matches a criterion call; test_case_guards -k (VASC-DEM-M01..M06): 48 passed; case_io.py check: schema and synonym guard OK, no test failure names these cases. No MRI output edited (mri_probe not needed). No em or en dash in added text.
+Pass 1: 1 errors found
+1. Plan class C6 applied incompletely: the two "<1st percentile" rows (Finger localisation (Benton), Right-left orientation) kept reference_range "25th-75th percentile" while the other six rows of the same battery use "9th percentile or above (25th-75th average)" (the log said all 8 rows). Both fixed; flags stay "yes".
+Cosmetic (not counted): none
+Re-checked after the fixes: perfect_agent.py -v passes; test_case_guards -k (M01-M06) 48 passed; case_io.py check: schema and synonym guard OK, no test failure names these cases. No MRI edited.
+Pass 2: 0 errors found
+Checked notes 2914e61e, 11986a51 and ec3158d4 against the plan (C2, C4, D16) and the final case: battery tier and rationale, ECG and vessel imaging required and in the stop rule, conditional echo and monitoring must (both optional, stored reports normal), key evidence 1 and 4, must 0, MRI rationale, teaching point, all battery ranges, the four new waste labels and the follow-up order. No change.
+Cosmetic (not counted): none (key_clinical_evidence[1] and [4] end with the same clause; left as it is, correct)
+Re-checked after the pass 2 fixes: perfect_agent.py passes for M01-M06; test_case_guards -k (M01-M06) 48 passed; case_io.py check: schema and synonym guard OK, no test failure names these cases. No MRI edited.
+Pass 3: 0 errors found
+Checked notes 2914e61e, 11986a51 and ec3158d4 against the plan (C2, C4, D16) and the final case: battery tier, ECG and vessel imaging required and in the stop rule, conditional echo/monitoring must, AD wording in key evidence, must 0, MRI rationale and teaching point, battery ranges, MoCA arithmetic. Matcher probed with 'Alzheimer disease less likely but not excluded': accepted. No change.
+Cosmetic (not counted): none
+Re-checked after the pass 3 fixes: perfect_agent.py -v passes for M01-M06, and a served-report probe over every criterion alternative shows each answered by the case's own stored report; test_case_guards -k (M01-M06) 48 passed; case_io.py check: schema and synonym guard OK, no test failure names these cases. No MRI edited.
+Pass 4: 0 errors found
+Checked every note ruling against the plan and the final case (label, musts vs prohibitions vs avoided actions, differential, key evidence, red herrings, stop-rule ids required, sequence ids, battery rows and labels, MoCA arithmetic, stored outputs vs patient medications and values, no leakage in the patient block). No change.
+Cosmetic (not counted): none
+Re-checked: perfect_agent.py -v passes for M01-M06; test_case_guards -k (M01-M06) 48 passed; case_io.py check: schema and synonym guard OK, no test failure names these cases.

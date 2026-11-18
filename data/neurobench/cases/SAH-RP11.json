@@ -195,6 +195,41 @@
     {
       "output": {
         "additional_observations": [],
+        "contrast_used": false,
+        "findings": [
+          {
+            "borders": null,
+            "location": "Basal cisterns, right Sylvian fissure",
+            "mass_effect": null,
+            "signal_characteristics": {
+              "FLAIR": "Hyperintense sulcal and cisternal signal"
+            },
+            "size": null,
+            "type": "Subarachnoid blood"
+          },
+          {
+            "borders": null,
+            "location": "Periventricular, juxtacortical, infratentorial",
+            "mass_effect": null,
+            "signal_characteristics": {
+              "DWI": "No restricted diffusion",
+              "FLAIR": "Multiple T2/FLAIR hyperintense lesions"
+            },
+            "size": null,
+            "type": "White matter lesions"
+          }
+        ],
+        "impression": "1. FLAIR sulcal hyperintensity in the basal cisterns and right Sylvian fissure, consistent with subarachnoid hemorrhage. 2. Multiple T2/FLAIR hyperintense periventricular, juxtacortical and infratentorial white matter lesions without restricted diffusion. 3. No asymmetric subcortical white matter signal abnormality. 4. No intraparenchymal hemorrhage. No midline shift",
+        "recommended_actions": [],
+        "volumetrics": null
+      },
+      "tool_name": "analyze_brain_mri",
+      "trigger_action": "request_mri_ms_sah"
+    },
+    {
+      "output": {
+        "additional_observations": [],
+        "contrast_used": true,
         "findings": [
           {
             "borders": null,
@@ -224,7 +259,7 @@
         "volumetrics": null
       },
       "tool_name": "analyze_brain_mri",
-      "trigger_action": "request_mri_ms_sah"
+      "trigger_action": "request_mri_ms_sah_with_contrast"
     },
     {
       "output": {
@@ -364,36 +399,6 @@
       },
       "tool_name": "order_advanced_imaging",
       "trigger_action": "request_mr_angiography"
-    },
-    {
-      "output": {
-        "query": "aneurysmal SAH management Hunt-Hess WFNS Fisher coiling clipping",
-        "results": [
-          {
-            "evidence_level": "cohort",
-            "finding": "The Hunt and Hess scale grades the clinical severity of aneurysmal SAH from I to V and correlates with surgical risk and outcome.",
-            "source": "[Hunt_Hess_1968]"
-          },
-          {
-            "evidence_level": "cohort",
-            "finding": "The amount and distribution of subarachnoid blood on the admission CT predicts later vasospasm.",
-            "source": "[Fisher_1980]"
-          },
-          {
-            "evidence_level": "guideline recommendation",
-            "finding": "Surgical or endovascular treatment of the ruptured aneurysm should be performed as early as feasible, preferably within 24 hours of onset; early enteral nimodipine improves outcome.",
-            "source": "[Hoh_2023]"
-          },
-          {
-            "evidence_level": "randomized controlled trial",
-            "finding": "In ruptured aneurysms suitable for both techniques, endovascular coiling gave a higher rate of independent survival at one year than neurosurgical clipping.",
-            "source": "[Molyneux_2002]"
-          }
-        ],
-        "summary": "Clinical grade (Hunt and Hess, WFNS) and CT blood burden (Fisher) stratify outcome and vasospasm risk. Guidelines recommend securing the ruptured aneurysm as early as feasible, preferably within 24 hours, and early enteral nimodipine. Where an aneurysm suits both techniques, coiling was associated with better one-year independent survival than clipping."
-      },
-      "tool_name": "search_medical_literature",
-      "trigger_action": "request_sah_grading_and_treatment_literature"
     },
     {
       "output": {
@@ -673,7 +678,15 @@
       {
         "alternatives": [
           {
-            "required_arguments": {},
+            "required_arguments": {
+              "contrast": false
+            },
+            "tool_name": "analyze_brain_mri"
+          },
+          {
+            "required_arguments": {
+              "contrast": true
+            },
             "tool_name": "analyze_brain_mri"
           }
         ],
@@ -681,9 +694,9 @@
           "[Hoh_2023]"
         ],
         "criterion_id": "mri-brain-ms-natalizumab",
-        "expected_evidence": "Known-pattern MS lesions without enhancement or restricted diffusion; no asymmetric subcortical white matter lesion; subarachnoid blood on FLAIR",
+        "expected_evidence": "Known-pattern MS lesions without restricted diffusion; no asymmetric subcortical white matter lesion; subarachnoid blood on FLAIR",
         "importance": "recommended",
-        "label": "Obtain brain MRI with FLAIR, DWI and contrast to document the MS lesions and screen for new lesions in a patient on natalizumab with a high JC virus index, without delaying the securing procedure",
+        "label": "Obtain brain MRI with FLAIR and DWI to document the MS lesions and screen for new lesions in a patient on natalizumab with a high JC virus index, without delaying the securing procedure",
         "rationale": "On natalizumab with a high JC virus antibody index, MRI is the surveillance test for PML; an MRI during the admission documents the MS lesion burden and screens for a new lesion before the next infusion is planned."
       },
       {
@@ -755,26 +768,6 @@
         "importance": "optional",
         "label": "Consider serial transcranial Doppler during the vasospasm-risk window to monitor for vasospasm and delayed cerebral ischemia",
         "rationale": "Baseline velocities on admission give a reference for surveillance during the vasospasm window; reasonable, not mandatory."
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "query": "aneurysmal SAH management Hunt-Hess WFNS Fisher coiling clipping"
-            },
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[Hunt_Hess_1968]",
-          "[Fisher_1980]",
-          "[Hoh_2023]"
-        ],
-        "criterion_id": "action-6-search-medical-literature",
-        "expected_evidence": "General evidence on grading scales and on coiling versus clipping",
-        "importance": "optional",
-        "label": "Search medical literature for current SAH grading scales (Hunt-Hess, WFNS, modified Fisher) and clipping vs endovascular coiling indications",
-        "rationale": "General evidence on grading and on the choice and timing of aneurysm treatment; not a clinical step."
       }
     ],
     "assessment": {

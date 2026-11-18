@@ -129,6 +129,38 @@
   "followup_outputs": [
     {
       "output": {
+        "additional_observations": [
+          "No midline shift",
+          "Ventricles normal in size",
+          "No acute haemorrhage",
+          "No extra-axial collections"
+        ],
+        "contrast_used": true,
+        "findings": [
+          {
+            "borders": "Ill-defined",
+            "location": "Medial temporal lobe (left hippocampus and amygdala)",
+            "mass_effect": "None",
+            "signal_characteristics": {
+              "DWI": "No restricted diffusion",
+              "FLAIR": "Subtle hyperintensity",
+              "T1": "Isointense",
+              "T2": "Mildly hyperintense",
+              "post_contrast": "No pathological enhancement"
+            },
+            "size": "Approximately 1.4 x 0.7 cm",
+            "type": "Subtle FLAIR hyperintensity"
+          }
+        ],
+        "impression": "Possible subtle left temporal/hippocampal FLAIR signal change, which may represent early limbic encephalitis. Cannot exclude artefact. No acute infarction, no enhancement, no mass effect",
+        "recommended_actions": [],
+        "volumetrics": null
+      },
+      "tool_name": "analyze_brain_mri",
+      "trigger_action": "request_contrast_mri"
+    },
+    {
+      "output": {
         "activating_procedures": {},
         "artifacts": [],
         "background": {
@@ -160,26 +192,6 @@
         "eeg_type": "continuous_icu"
       },
       "trigger_action": "request_continuous_eeg"
-    },
-    {
-      "output": {
-        "query": "Anti-NMDAR encephalitis first-line immunotherapy",
-        "results": [
-          {
-            "evidence_level": "observational cohort (n=577)",
-            "finding": "First-line immunotherapy (corticosteroids, IVIG, plasma exchange) or tumour removal was followed by improvement within 4 weeks in 53%; among first-line failures, second-line rituximab or cyclophosphamide was associated with better outcome; 81% had mRS 0-2 at 24 months.",
-            "source": "Titulaer MJ et al. Lancet Neurol 2013;12:157-165"
-          },
-          {
-            "evidence_level": "expert consensus recommendations",
-            "finding": "Recommends first-line high-dose corticosteroids, IVIG or plasma exchange, with combination therapy common in severe disease, removal of an associated tumour, and second-line rituximab or cyclophosphamide when the response to first-line therapy is inadequate.",
-            "source": "Abboud H et al. J Neurol Neurosurg Psychiatry 2021;92:757-768"
-          }
-        ],
-        "summary": "Published cohort data and consensus recommendations on acute immunotherapy for anti-NMDA receptor encephalitis."
-      },
-      "tool_name": "search_medical_literature",
-      "trigger_action": "request_immunotherapy_first_line"
     },
     {
       "output": {
@@ -684,6 +696,12 @@
               "study": "pelvis_abdomen_ultrasound"
             },
             "tool_name": "order_body_imaging"
+          },
+          {
+            "required_arguments": {
+              "study": "pelvis_abdomen_MRI"
+            },
+            "tool_name": "order_body_imaging"
           }
         ],
         "citations": [
@@ -693,7 +711,7 @@
         "criterion_id": "action-5-order-body-imaging",
         "expected_evidence": "Left ovarian 3.8 cm complex cystic mass with fat and calcification, consistent with a mature cystic teratoma",
         "importance": "required",
-        "label": "Screen for an ovarian teratoma with pelvic and abdominal ultrasound",
+        "label": "Screen for an ovarian teratoma with pelvic and abdominal ultrasound or pelvic MRI",
         "rationale": "Women of reproductive age carry the highest teratoma risk; tumour removal is part of first-line treatment."
       },
       {
@@ -750,22 +768,6 @@
         "importance": "recommended",
         "label": "Check the patient's medications against the drugs the acute plan needs (aciclovir, corticosteroids, IVIG, antiseizure medication)",
         "rationale": "She started quetiapine 2 days ago and takes sertraline, so the check guides antipsychotic withdrawal and the hyponatraemia review."
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[Graus_2016]"
-        ],
-        "criterion_id": "action-7-search-medical-literature",
-        "expected_evidence": "General published evidence on anti-NMDAR encephalitis diagnosis and immunotherapy",
-        "importance": "optional",
-        "label": "Optionally review published evidence on anti-NMDAR encephalitis diagnosis and immunotherapy",
-        "rationale": "Background reading only; no diagnostic or management step depends on it."
       }
     ],
     "assessment": {
@@ -777,15 +779,16 @@
         "Do not interpret a negative serum anti-NMDAR antibody as ruling out the disease; the CSF assay is the gold standard and may be positive when serum is negative."
       ],
       "required_recommendations": [
-        "Start IV aciclovir 10 mg/kg every 8 hours at presentation, and stop it once CSF HSV PCR is negative and the antibody diagnosis is established; repeat the PCR on a second CSF sample if the first LP was within 72 hours of onset and HSV encephalitis remains plausible.",
-        "Start first-line immunotherapy without waiting for the antibody result once infection is reasonably excluded: IV methylprednisolone 1 g daily for 5 days with IVIG 0.4 g/kg/day for 5 days (2 g/kg total) or plasma exchange (5 to 7 exchanges).",
+        "Start IV aciclovir 10 mg/kg every 8 hours at presentation, with empirical bacterial meningitis cover (ceftriaxone 2 g IV every 12 hours with vancomycin) until the CSF cell count, Gram stain and culture exclude bacterial infection (Abboud 2021, ESCMID 2016); stop aciclovir once CSF HSV PCR is negative and the antibody diagnosis is established. HSV PCR can be negative if done too early (for example within 24 hours of onset) and is repeated if clinical suspicion of HSV encephalitis remains high (Graus 2016).",
+        "Start first-line immunotherapy once infection is reasonably excluded on the CSF results, without waiting for the antibody result: IV methylprednisolone 1 g daily for 3 to 7 days, combined from the start with IVIG (2 g/kg over 2 to 5 days) or plasma exchange (5 to 10 sessions every other day), because the presentation is severe (combative agitation, a generalised seizure and intermittent mutism) (Abboud 2021). IVIG is preferred here (combative agitation, in which plasma exchange is less suitable); the moderate hyponatraemia (129 mEq/L) and the 3.8 cm teratoma favour plasma exchange, which remains the alternative and is used if sodium falls; monitor sodium, as IVIG can worsen hyponatraemia.",
+        "After the acute course, bridge with a gradual oral prednisone taper, or monthly IVIG or IV methylprednisolone, while recovery or second-line therapy takes effect (Abboud 2021).",
         "Arrange prompt surgical removal of the left ovarian teratoma (laparoscopic, ovary-sparing where feasible) as part of first-line treatment, with gynaecology.",
         "Treat seizures with an antiseizure medication such as levetiracetam or lacosamide; avoid valproate in a woman able to become pregnant; seizures respond mainly to immunotherapy.",
         "Monitor with continuous EEG for non-convulsive seizures while consciousness fluctuates or seizures persist.",
         "Admit to a neurology ward with seizure precautions and continuous cardiac monitoring.",
-        "If there is no meaningful clinical improvement 10 to 14 days after first-line therapy, escalate to rituximab (375 mg/m\u00b2 weekly for 4 doses or 1 g twice 2 weeks apart, after hepatitis B screening) and/or cyclophosphamide; discuss fertility preservation before cyclophosphamide.",
-        "Treat agitation, insomnia and catatonia with benzodiazepines (lorazepam) first; stop quetiapine and monitor CK and temperature.",
-        "Treat the moderate hyponatraemia (129 mEq/L) as SIADH after review of sertraline: fluid restriction, correcting by no more than 10 mEq/L in 24 hours.",
+        "If there is no clinical or radiological improvement 2 to 4 weeks after completion of first-line therapy, escalate to rituximab (375 mg/m\u00b2 weekly for 4 doses or 1000 mg twice 2 weeks apart, after hepatitis B screening) and/or IV cyclophosphamide 600 to 1000 mg/m\u00b2 monthly; discuss fertility preservation before cyclophosphamide (Abboud 2021).",
+        "Treat agitation, insomnia and catatonia with benzodiazepines (lorazepam) first; stop quetiapine and monitor CK and temperature (Lejuste 2016).",
+        "Treat the moderate hyponatraemia (129 mEq/L) as SIADH after review of sertraline: fluid restriction, correcting slowly, by no more than 10 mEq/L in the first 24 hours (Spasovski 2014), to avoid osmotic demyelination.",
         "Neurology-led care with psychiatry for behavioural management; gynaecology for the teratoma."
       ]
     },
@@ -914,6 +917,7 @@
       "CSF IgG anti-GluN1 positive (titre 1:160) on cell-based assay: definite anti-NMDAR encephalitis (Graus 2016); serum positive (1:80) is read with the CSF.",
       "MRI shows only subtle left hippocampal FLAIR signal without restricted diffusion or haemorrhage; MRI is normal or non-specific in about two thirds of patients and here excludes HSV encephalitis and structural causes.",
       "Routine EEG shows diffuse slowing with right temporal rhythmic delta, and continuous EEG captures right temporal seizures; extreme delta brush is absent, which excludes nothing.",
+      "The equivocal left medial temporal MRI signal and the right temporal EEG seizures and right anterior temporal FDG-PET hypermetabolism are discordant; anti-NMDAR encephalitis is a diffuse process in which lateralised findings need not agree, and neither side indicates a focal lesion.",
       "Pelvic ultrasound shows a 3.8 cm left ovarian mature cystic teratoma: its removal is part of first-line treatment. Moderate hyponatraemia (129 mEq/L, SIADH pattern) needs its own correction.",
       "Earlier immunotherapy and tumour removal are associated with better outcome (Titulaer 2013)."
     ],
@@ -1484,39 +1488,7 @@
         ]
       }
     },
-    "literature_search": {
-      "anti-NMDA receptor encephalitis diagnosis and treatment": {
-        "query": "anti-NMDA receptor encephalitis diagnosis and treatment",
-        "results": [
-          {
-            "evidence_level": "expert consensus criteria",
-            "finding": "Definite anti-NMDAR encephalitis requires one or more of six major symptom groups and IgG anti-GluN1 antibodies, with CSF testing included; probable disease requires four groups (or three with a teratoma) of rapid onset plus an abnormal EEG or CSF pleocytosis or oligoclonal bands.",
-            "source": "Graus F et al. Lancet Neurol 2016;15:391-404"
-          },
-          {
-            "evidence_level": "retrospective cohort",
-            "finding": "All patients had antibodies in CSF, whereas about 14% were negative in serum; CSF titres related more closely to outcome than serum titres.",
-            "source": "Gresa-Arribas N et al. Lancet Neurol 2014;13:167-177"
-          },
-          {
-            "evidence_level": "observational cohort (n=577)",
-            "finding": "38% had a tumour, mostly ovarian teratoma; 53% improved within 4 weeks of first-line immunotherapy or tumour removal; second-line rituximab or cyclophosphamide after first-line failure was associated with better outcome; 81% had mRS 0-2 at 24 months.",
-            "source": "Titulaer MJ et al. Lancet Neurol 2013;12:157-165"
-          },
-          {
-            "evidence_level": "retrospective case series",
-            "finding": "Extreme delta brush was found in 7 of 23 adults with anti-NMDA receptor encephalitis and was associated with a more prolonged illness.",
-            "source": "Schmitt SE et al. Neurology 2012;79:1094-1100"
-          },
-          {
-            "evidence_level": "retrospective cohort",
-            "finding": "Severe intolerance to antipsychotics (rigidity, hyperthermia, rhabdomyolysis, neuroleptic-malignant-like reactions) was frequent in patients with anti-NMDA receptor encephalitis who received them.",
-            "source": "Lejuste F et al. Neurol Neuroimmunol Neuroinflamm 2016;3:e280"
-          }
-        ],
-        "summary": "Published criteria and cohort data on anti-NMDA receptor encephalitis: definite diagnosis rests on CSF IgG anti-GluN1 antibodies; first-line immunotherapy and tumour removal are followed by second-line agents when there is no response."
-      }
-    },
+    "literature_search": null,
     "microbiology": null,
     "mri": {
       "additional_observations": [
@@ -1525,6 +1497,7 @@
         "No acute haemorrhage",
         "No extra-axial collections"
       ],
+      "contrast_used": false,
       "findings": [
         {
           "borders": "Ill-defined",
@@ -1534,14 +1507,13 @@
             "DWI": "No restricted diffusion",
             "FLAIR": "Subtle hyperintensity",
             "T1": "Isointense",
-            "T2": "Mildly hyperintense",
-            "post_contrast": "No pathological enhancement"
+            "T2": "Mildly hyperintense"
           },
           "size": "Approximately 1.4 x 0.7 cm",
           "type": "Subtle FLAIR hyperintensity"
         }
       ],
-      "impression": "Possible subtle left temporal/hippocampal FLAIR signal change, which may represent early limbic encephalitis. Cannot exclude artefact. No acute infarction, no enhancement, no mass effect",
+      "impression": "Possible subtle left temporal/hippocampal FLAIR signal change, which may represent early limbic encephalitis. Cannot exclude artefact. No acute infarction, no mass effect",
       "recommended_actions": [],
       "volumetrics": null
     }

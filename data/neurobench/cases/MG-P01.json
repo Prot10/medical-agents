@@ -65,21 +65,7 @@
       "recommended_actions": []
     },
     "drug_interactions": null,
-    "ecg": {
-      "axis": "normal",
-      "clinical_correlation": "",
-      "findings": [
-        "Normal sinus rhythm. Borderline left-axis deviation, non-specific. No acute ST-T changes."
-      ],
-      "interpretation": "Largely normal ECG with a benign incidental finding",
-      "intervals": {
-        "PR": "162 ms",
-        "QRS": "82 ms",
-        "QTc": "403 ms"
-      },
-      "rate": 74,
-      "rhythm": "normal sinus rhythm"
-    },
+    "ecg": null,
     "echo": {
       "chambers": {
         "LA": "normal size",
@@ -273,9 +259,9 @@
     {
       "output": {
         "abnormal_values_summary": [],
-        "interpretation": "Clustered AChR, clustered MuSK and LRP4 antibodies not detected by cell-based assay. A negative result does not exclude myasthenia gravis; clinical correlation recommended.",
+        "interpretation": "Clustered AChR and clustered MuSK antibodies not detected by live cell-based assay (reference neuroimmunology laboratory). A negative result does not exclude myasthenia gravis.",
         "panels": {
-          "Cell-based assay panel (reference neuroimmunology laboratory)": [
+          "Cell-based assay panel (clustered AChR, clustered MuSK)": [
             {
               "clinical_significance": null,
               "is_abnormal": false,
@@ -291,7 +277,19 @@
               "test": "Clustered MuSK antibody, cell-based assay",
               "unit": "qualitative",
               "value": "Negative"
-            },
+            }
+          ]
+        }
+      },
+      "tool_name": "interpret_labs",
+      "trigger_action": "request_clustered_achr_cell_based_assay"
+    },
+    {
+      "output": {
+        "abnormal_values_summary": [],
+        "interpretation": "LRP4 antibody not detected by cell-based assay. A negative result does not exclude myasthenia gravis.",
+        "panels": {
+          "LRP4 antibody (cell-based assay)": [
             {
               "clinical_significance": null,
               "is_abnormal": false,
@@ -304,7 +302,7 @@
         }
       },
       "tool_name": "interpret_labs",
-      "trigger_action": "request_cell_based_assay_lrp4"
+      "trigger_action": "request_lrp4_antibody"
     },
     {
       "output": {
@@ -513,13 +511,14 @@
           }
         ],
         "citations": [
+          "[Jacob_2025]",
           "[Gilhus_2016]"
         ],
         "criterion_id": "action-2-order-specialized-test",
         "expected_evidence": "No decrement of 10% or more (maximum 7%), normal CMAPs, no facilitation.",
         "importance": "required",
         "label": "Order repetitive nerve stimulation including facial and proximal muscles",
-        "rationale": "Neurophysiology is the next step with negative serology; RNS is done first and its normality leads to SFEMG (Jacob 2025)."
+        "rationale": "Neurophysiology is mandatory with negative serology; RNS is the initial study and its normality leads to SFEMG (Jacob 2025)."
       },
       {
         "alternatives": [
@@ -530,7 +529,20 @@
               ]
             },
             "tool_name": "interpret_labs"
-          },
+          }
+        ],
+        "citations": [
+          "[Jacob_2025]",
+          "[Evoli_2019]"
+        ],
+        "criterion_id": "action-7-interpret-labs",
+        "expected_evidence": "Clustered AChR and clustered MuSK antibodies not detected by live cell-based assay.",
+        "importance": "required",
+        "label": "Send the high-sensitivity cell-based assay (clustered AChR and clustered MuSK)",
+        "rationale": "Seronegative MG is diagnosed only after all antibody tests, cell-based assays included, are negative (Jacob 2025); when radioimmunoprecipitation is negative and the clinical picture is consistent, the live cell-based assay for clustered AChR and clustered MuSK is sent (Fionda 2026, serology statement 5). The order is keyed on the clustered AChR term; the reference laboratory reports both antibodies."
+      },
+      {
+        "alternatives": [
           {
             "required_arguments": {
               "panels": [
@@ -541,13 +553,13 @@
           }
         ],
         "citations": [
-          "[Punga_2022]"
+          "[Jacob_2025]"
         ],
-        "criterion_id": "action-7-interpret-labs",
-        "expected_evidence": "Clustered AChR, clustered MuSK and LRP4 not detected by cell-based assay.",
+        "criterion_id": "action-lrp4-antibody",
+        "expected_evidence": "LRP4 antibody not detected by cell-based assay.",
         "importance": "recommended",
-        "label": "Send a cell-based antibody panel (clustered AChR, MuSK, LRP4)",
-        "rationale": "In double-seronegative patients with persistent suspicion, a reference-laboratory cell-based panel detects antibodies missed by standard assays (Evoli 2019)."
+        "label": "Test LRP4 antibody (cell-based assay)",
+        "rationale": "The sources diverge: ABN 2025 includes LRP4 in the antibody panel of a seronegative patient, while the Italian recommendations say LRP4 'may be tested' in double-seronegative patients (Fionda 2026, serology statement 6). The label rests on LRP4 negativity, so it is recommended; it never replaces the clustered AChR and MuSK assay."
       },
       {
         "alternatives": [
@@ -628,13 +640,29 @@
           }
         ],
         "citations": [
-          "[Gilhus_2016]"
+          "[Jacob_2025]"
         ],
         "criterion_id": "action-respiratory-function",
         "expected_evidence": "FVC 93% predicted (51 mL/kg), MIP -62 and MEP 88 cmH2O: normal.",
-        "importance": "recommended",
+        "importance": "required",
         "label": "Measure respiratory function (FVC, MIP, MEP)",
-        "rationale": "Bulbar symptoms (dysarthria, dysphagia for solids) call for a respiratory baseline."
+        "rationale": "Dysphagia for solids with mildly impaired swallowing on modified barium swallow and fatigable dysarthria call for a respiratory baseline (FVC, MIP, MEP) before treatment, to trend against the ABN escalation criteria (Jacob 2025)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_ecg"
+          }
+        ],
+        "citations": [
+          "[Jacob_2025]"
+        ],
+        "criterion_id": "action-baseline-ecg",
+        "expected_evidence": "Sinus rhythm at 82/min with normal PR (162 ms), QRS (82 ms) and QTc (403 ms); borderline, non-specific left-axis deviation.",
+        "importance": "recommended",
+        "label": "Baseline 12-lead ECG before starting pyridostigmine",
+        "rationale": "Pyridostigmine can cause bradycardia and atrioventricular block; ABN 2025 advises a baseline ECG before it is started (Jacob 2025)."
       },
       {
         "alternatives": [
@@ -651,34 +679,21 @@
         "importance": "optional",
         "label": "Check her medicines before starting pyridostigmine",
         "rationale": "Sertraline, clonazepam, pregabalin and omeprazole carry no interaction with pyridostigmine that changes management."
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[Sanders_2016]"
-        ],
-        "criterion_id": "action-5-search-medical-literature",
-        "expected_evidence": "General consensus guidance on serology and neurophysiology.",
-        "importance": "optional",
-        "label": "Literature on MG diagnosis",
-        "rationale": "Not a clinical step; optional reference only."
       }
     ],
     "assessment": {
       "prohibited_recommendations": [
         "Avoid fluoroquinolones, aminoglycosides, macrolides and IV magnesium unless no alternative exists and the patient is monitored; use non-depolarising neuromuscular blockers only at reduced dose with quantitative monitoring.",
-        "Do not start high-dose prednisone (above 20 mg/day) as an outpatient; start low and titrate, or start high dose only with inpatient monitoring, because initial steroid-induced worsening can precipitate crisis.",
+        "Do not start corticosteroids as an outpatient while bulbar weakness is significant; start them in hospital with bulbar and respiratory monitoring (Evoli 2019).",
         "Do not attribute fatigable ptosis, diplopia or bulbar weakness to a functional or anxiety-related cause on the basis of negative antibodies and a normal RNS; single-fiber EMG decides."
       ],
       "required_recommendations": [
         "Record seronegative generalized MG as the diagnosis, replacing the functional label, and explain it to the patient and her primary care physician.",
-        "Start pyridostigmine 30 mg orally three times daily, titrating to 60 mg four to five times daily, and document the objective response (MG-ADL or QMG).",
-        "If symptoms persist on pyridostigmine, start prednisone low (10-20 mg/day, increased by 5-10 mg every 3-7 days), with a steroid-sparing agent (azathioprine after TPMT/NUDT15 testing) if long-term treatment is needed.",
+        "Start pyridostigmine 30 mg three to four times daily after a baseline ECG, titrating to effect (usually up to 60 mg four to five times daily); the maximum is 360 mg/day, with specialist review above 300 mg/day (Jacob 2025). Record the MGFA class (here IIb) and a baseline MG-ADL, with QMG where available, to document the objective response against the goal of MG-ADL 0-1 (Fionda 2026; Jacob 2025).",
+        "If symptoms persist on pyridostigmine, start prednisone in hospital, because her bulbar involvement makes steroid-induced worsening dangerous (Evoli 2019): 5-10 mg daily increased by 5 mg on alternate days to 30 mg daily, with bulbar and respiratory monitoring (Jacob 2025). The sources diverge on the setting: ABN 2025 also allows an outpatient start, from 5-10 mg increased by 5 mg every 3-5 days to 30 mg (up to 1 mg/kg, not above 60 mg, after specialist discussion) with worsening expected around days 5-10, while Evoli 2019 advises admission for steroid initiation whenever bulbar weakness is present. Plan a steroid-sparing agent (azathioprine after TPMT, and NUDT15 where available, testing) if long-term treatment is needed.",
+        "Before long-term immunosuppression: HbA1c, lipids, blood pressure and weight before steroids; hepatitis B (HBsAg, anti-HBc) and hepatitis C serology, TB screening (IGRA) and HIV test; vaccinations updated at least four weeks before, including HPV (Jacob 2025; Fionda 2026). During steroids: periodic blood pressure, glucose, weight and eye checks, calcium and vitamin D, and bone densitometry (Fionda 2026).",
+        "Arrange a speech and language therapy swallowing assessment, since she has dysphagia for solids with mildly impaired swallowing on modified barium swallow (Jacob 2025).",
+        "Discuss thymectomy only if immunotherapy fails: there is no thymoma, and evidence for thymectomy in seronegative MG is lacking (Jacob 2025); it may be considered when immunotherapy fails (ICG 2020).",
         "Repeat AChR and MuSK antibodies in about 6 months, since antibodies can appear later in seronegative patients (Evoli 2019).",
         "Use clonazepam sparingly and avoid it if bulbar or respiratory weakness progresses."
       ]
@@ -757,6 +772,22 @@
         "criterion_id": "avoid-waste-6-order-cardiac-monitoring",
         "rationale": "No arrhythmia or autonomic symptom; cardiac monitoring does not contribute to MG diagnosis or staging.",
         "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "speech_language_evaluation"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[Jacob_2025]"
+        ],
+        "criterion_id": "avoid-waste-speech-language-evaluation",
+        "rationale": "Her fatigable dysarthria is documented in the history and language is normal; the speech and language battery tests motor speech and language and never assesses swallowing, which needs a speech and language therapy swallowing assessment (Jacob 2025).",
+        "severity": "waste"
       }
     ],
     "diagnosis": {
@@ -775,8 +806,7 @@
       ],
       "icd_codes": [
         "G70.00",
-        "G70.0",
-        "G70.01"
+        "G70.0"
       ],
       "rejected": [
         "functional neurological disorder",
@@ -822,7 +852,7 @@
     ],
     "key_clinical_evidence": [
       "Fatigable dysarthria and dysphagia worse late in the day, fatigue-induced right ptosis and adduction lag: a bulbar-predominant generalized MG phenotype (MGFA IIb).",
-      "AChR and MuSK antibodies are negative by radioimmunoprecipitation and the cell-based panel (clustered AChR, MuSK, LRP4) is negative: seronegative MG.",
+      "AChR and MuSK antibodies are negative by radioimmunoprecipitation, the live cell-based assay (clustered AChR and clustered MuSK) is negative and LRP4 antibody is negative: seronegative MG.",
       "RNS is normal; SFEMG shows increased jitter with blocking in orbicularis oculi and extensor digitorum communis, which establishes the disorder of neuromuscular transmission.",
       "Mediastinal CT with contrast is indicated in every patient with MG to detect thymoma. Here it shows no thymoma.",
       "A previous functional label and anxiety disorder are an anchoring risk; objective fatigability and SFEMG override them."
@@ -848,29 +878,46 @@
       {
         "after_criterion_id": "action-3-order-specialized-test",
         "before_criterion_id": "action-1-interpret-labs",
-        "citations": [],
-        "reason": "AChR antibody testing precedes single-fiber EMG; SFEMG is reserved for seronegative patients or a normal RNS (Jacob 2025).",
+        "citations": [
+          "[Jacob_2025]"
+        ],
+        "reason": "Serology comes first: with positive AChR antibodies SFEMG is rarely needed, while every antibody-negative patient needs neurophysiology, RNS first and SFEMG where expertise is available (Jacob 2025).",
         "severity": "soft"
       },
       {
         "after_criterion_id": "action-3-order-specialized-test",
         "before_criterion_id": "action-2-order-specialized-test",
-        "citations": [],
-        "reason": "Repetitive nerve stimulation is done first; SFEMG follows when RNS is normal (Jacob 2025).",
+        "citations": [
+          "[Jacob_2025]"
+        ],
+        "reason": "RNS is the initial neurophysiological test; SFEMG is considered when RNS is normal and suspicion persists, where expertise is available (Jacob 2025).",
         "severity": "soft"
       },
       {
         "after_criterion_id": "action-7-interpret-labs",
         "before_criterion_id": "action-1-interpret-labs",
-        "citations": [],
+        "citations": [
+          "[Evoli_2019]"
+        ],
         "reason": "Standard AChR and MuSK assays come first; the cell-based panel is for double-seronegative patients (Evoli 2019).",
         "severity": "soft"
       },
       {
         "after_criterion_id": "action-7-interpret-labs",
         "before_criterion_id": "action-musk-antibody",
-        "citations": [],
+        "citations": [
+          "[Evoli_2019]"
+        ],
         "reason": "MuSK testing by standard assay precedes the cell-based panel, which is for double-seronegative patients (Evoli 2019).",
+        "severity": "soft"
+      },
+      {
+        "after_criterion_id": "action-lrp4-antibody",
+        "before_criterion_id": "action-1-interpret-labs",
+        "citations": [
+          "[Jacob_2025]"
+        ],
+        "reason": "Standard AChR antibody testing comes first; LRP4 is tested in double-seronegative patients (Jacob 2025; Fionda 2026, serology statement 6).",
         "severity": "soft"
       }
     ],
@@ -880,8 +927,10 @@
         "action-1-interpret-labs",
         "action-musk-antibody",
         "action-2-order-specialized-test",
+        "action-7-interpret-labs",
         "action-3-order-specialized-test",
-        "action-4-order-body-imaging"
+        "action-4-order-body-imaging",
+        "action-respiratory-function"
       ]
     }
   },
@@ -924,11 +973,25 @@
         "summary": "No interaction requiring a change; benzodiazepine caution.",
         "warnings": [
           "Muscarinic adverse effects (cramps, diarrhea, sweating, hypersalivation) are dose related and may overlap with irritable bowel symptoms.",
-          "Drugs that impair neuromuscular transmission (aminoglycosides, fluoroquinolones, macrolides, IV magnesium, neuromuscular blockers, beta-blockers) can worsen myasthenic weakness."
+          "Drugs that impair neuromuscular transmission (aminoglycosides, fluoroquinolones, macrolides, IV magnesium, neuromuscular blockers, beta-blockers) can worsen weakness from impaired neuromuscular transmission."
         ]
       }
     },
-    "ecg": null,
+    "ecg": {
+      "axis": "borderline left axis (-30 degrees)",
+      "clinical_correlation": "",
+      "findings": [
+        "Normal sinus rhythm. Borderline left-axis deviation, non-specific. No acute ST-T changes."
+      ],
+      "interpretation": "Largely normal ECG with a benign incidental finding",
+      "intervals": {
+        "PR": "162 ms",
+        "QRS": "82 ms",
+        "QTc": "403 ms"
+      },
+      "rate": 82,
+      "rhythm": "normal sinus rhythm"
+    },
     "echo": null,
     "eeg": null,
     "labs": {
@@ -1093,29 +1156,7 @@
         ]
       }
     },
-    "literature_search": {
-      "myasthenia gravis diagnosis seronegative guidance": {
-        "query": "myasthenia gravis diagnosis seronegative guidance",
-        "results": [
-          {
-            "evidence_level": "consensus guideline",
-            "finding": "Pyridostigmine is the initial symptomatic treatment; corticosteroids or immunosuppressive therapy are used when treatment goals are not met; thymectomy is recommended for thymoma and should be considered in AChR-positive generalized MG; IVIG and plasma exchange are used for impending or manifest crisis and before surgery in patients with significant bulbar or respiratory weakness.",
-            "source": "Sanders DB et al., Neurology 2016;87:419-425 (international consensus guidance)"
-          },
-          {
-            "evidence_level": "consensus guideline",
-            "finding": "Thymectomy recommendations were updated after MGTX for non-thymomatous AChR-positive generalized MG aged 18-65; eculizumab is an option in severe refractory AChR-positive generalized MG; methotrexate may be considered as a steroid-sparing agent.",
-            "source": "Narayanaswami P et al., Neurology 2021;96:114-122 (2020 update)"
-          },
-          {
-            "evidence_level": "randomized controlled trial",
-            "finding": "Extended transsternal thymectomy plus prednisone improved the time-weighted quantitative MG score and reduced prednisone requirement over three years compared with prednisone alone in non-thymomatous AChR-positive generalized MG.",
-            "source": "Wolfe GI et al., N Engl J Med 2016;375:511-522 (MGTX)"
-          }
-        ],
-        "summary": "Consensus guidance (Sanders DB et al., Neurology 2016;87:419-425; update Narayanaswami P et al., Neurology 2021;96:114-122) recommends AChR antibody testing first, MuSK testing when AChR antibodies are absent, and electrodiagnostic confirmation by repetitive nerve stimulation or single-fibre EMG. Chest CT or MRI is recommended in all patients to detect thymoma. In the MGTX trial (Wolfe GI et al., N Engl J Med 2016;375:511-522) thymectomy improved outcomes over three years in non-thymomatous AChR-positive generalized MG aged 18-65."
-      }
-    },
+    "literature_search": null,
     "mri": null,
     "specialized_test": {
       "findings": [
@@ -1176,15 +1217,14 @@
       "advanced_imaging": "normal",
       "cardiac_monitoring": "normal",
       "csf": "normal",
-      "ecg": "incidental",
       "echo": "normal",
       "eeg": "normal",
       "mri": "normal"
     },
     "generated": "2026-03-29",
-    "last_revised": "2026-08-07",
+    "last_revised": "2026-11-17",
     "policy_spec_status": "draft",
-    "revision_reason": "per-case audit: withdrew order_specialized_test respiratory_function; withdrew order_specialized_test ice_pack_test",
+    "revision_reason": "Live cell-based assay for clustered AChR and MuSK required before the seronegative label, LRP4 as its own recommended test with the guideline divergence stated; respiratory function required; baseline ECG before pyridostigmine; sourced SFEMG constraint reasons; steroid start in hospital for bulbar involvement, pre-immunosuppression screening, SLT swallowing assessment, thymectomy position and MG severity recording in the management",
     "version": "policy-v1",
     "vocab_gap": [
       "emg_ncs_useless_via_param_conflation: pack lists order_specialized_test:emg_ncs as USELESS, but coherence validator treats tool_name overlap as a contradiction regardless of tool_parameters; cannot encode without removing required RNS/SFEMG entries. Suggest extending validator to compare tool_name + tool_parameters or fleet-wide pattern."

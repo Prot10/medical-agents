@@ -128,7 +128,7 @@
       "medication_list_review": {
         "alternatives": [],
         "contraindications": [
-          "Class IC antiarrhythmics (flecainide, propafenone) without an AV-nodal blocking drug in atrial flutter: slowing of the flutter rate can allow 1:1 conduction."
+          "Class IC antiarrhythmics (flecainide, propafenone) without an AV-nodal blocking drug in an organised atrial tachyarrhythmia: slowing of the atrial rate can allow 1:1 conduction."
         ],
         "formulary_status": "On formulary",
         "interactions": [
@@ -352,7 +352,7 @@
         "proposed": "Metoprolol (proposed rate-control agent)",
         "summary": "Medication list reviewed: Lisinopril 10 mg daily, hydrochlorothiazide 25 mg daily and atorvastatin 40 mg at bedtime; no AV-nodal blocking drug and no anticoagulant; allergy: penicillin (rash).",
         "warnings": [
-          "Mild obstructive sleep apnoea: watch for nocturnal bradycardia during 4:1 conduction.",
+          "Mild obstructive sleep apnoea: watch for nocturnal bradycardia.",
           "Diet-controlled diabetes: beta-blockade can blunt the adrenergic warning signs of hypoglycaemia (low risk without insulin or sulfonylurea)."
         ]
       },
@@ -371,7 +371,7 @@
         "proposed": "Bisoprolol (proposed rate-control agent)",
         "summary": "Medication list reviewed: Lisinopril 10 mg daily, hydrochlorothiazide 25 mg daily and atorvastatin 40 mg at bedtime; no AV-nodal blocking drug and no anticoagulant; allergy: penicillin (rash).",
         "warnings": [
-          "Mild obstructive sleep apnoea: watch for nocturnal bradycardia during 4:1 conduction."
+          "Mild obstructive sleep apnoea: watch for nocturnal bradycardia."
         ]
       },
       "tool_name": "check_drug_interactions",
@@ -420,10 +420,43 @@
         "additional_observations": [
           "No acute infarction",
           "No hemorrhage",
+          "No mass lesion",
+          "Normal ventricular system, no hydrocephalus",
+          "Mild age-appropriate cortical volume loss"
+        ],
+        "contrast_used": false,
+        "findings": [
+          {
+            "borders": null,
+            "location": "Periventricular white matter, bilateral",
+            "mass_effect": null,
+            "signal_characteristics": {
+              "DWI": "No restricted diffusion",
+              "FLAIR": "Hyperintense punctate foci",
+              "T1": "Hypointense",
+              "T2": "Hyperintense"
+            },
+            "size": "Scattered punctate foci",
+            "type": "Chronic small vessel ischemic changes"
+          }
+        ],
+        "impression": "No acute intracranial abnormality. Scattered punctate periventricular T2/FLAIR hyperintensities without restricted diffusion, consistent with mild chronic small vessel ischemic disease. No mass lesion or hemorrhage. Normal ventricular system",
+        "recommended_actions": [],
+        "volumetrics": null
+      },
+      "tool_name": "analyze_brain_mri",
+      "trigger_action": "request_brain_mri"
+    },
+    {
+      "output": {
+        "additional_observations": [
+          "No acute infarction",
+          "No hemorrhage",
           "No mass lesion or enhancing lesion",
           "Normal ventricular system, no hydrocephalus",
           "Mild age-appropriate cortical volume loss"
         ],
+        "contrast_used": true,
         "findings": [
           {
             "borders": null,
@@ -444,7 +477,7 @@
         "volumetrics": null
       },
       "tool_name": "analyze_brain_mri",
-      "trigger_action": "request_brain_mri"
+      "trigger_action": "request_brain_mri_with_contrast"
     },
     {
       "output": {
@@ -501,36 +534,6 @@
       },
       "tool_name": "order_specialized_test",
       "trigger_action": "request_exercise_stress_test"
-    },
-    {
-      "output": {
-        "query": "Atrial flutter: rate control, anticoagulation and cavotricuspid isthmus ablation",
-        "results": [
-          {
-            "evidence_level": "Class I",
-            "finding": "Catheter ablation of the cavotricuspid isthmus is recommended for symptomatic, recurrent episodes of typical (CTI-dependent) flutter, and should be considered after the first symptomatic episode.",
-            "source": "Brugada J et al., 2019 ESC Guidelines for the management of patients with supraventricular tachycardia. Eur Heart J 2020;41:655-720"
-          },
-          {
-            "evidence_level": "Class III",
-            "finding": "Class IC antiarrhythmic drugs should not be used in atrial flutter without AV-nodal blockade, because slowing the flutter cycle can produce 1:1 conduction.",
-            "source": "Brugada J et al., 2019 ESC Guidelines for the management of patients with supraventricular tachycardia. Eur Heart J 2020;41:655-720"
-          },
-          {
-            "evidence_level": "Class I",
-            "finding": "Oral anticoagulation, preferably a direct oral anticoagulant, is recommended for patients with a CHA2DS2-VA score of 2 or more; the same thromboembolic risk assessment applies to atrial flutter.",
-            "source": "Van Gelder IC et al., 2024 ESC Guidelines for the management of atrial fibrillation. Eur Heart J 2024;45:3314-3414"
-          },
-          {
-            "evidence_level": "Class I",
-            "finding": "Syncope with an ECG-documented supraventricular tachyarrhythmia is arrhythmic syncope; treatment is directed at the arrhythmia, with catheter ablation as first choice.",
-            "source": "Brignole M et al., 2018 ESC Guidelines for the diagnosis and management of syncope. Eur Heart J 2018;39:1883-1948"
-          }
-        ],
-        "summary": "CTI ablation is the preferred therapy for symptomatic typical flutter; class IC drugs need AV-nodal blockade; anticoagulation follows CHA2DS2-VA as in atrial fibrillation."
-      },
-      "tool_name": "search_medical_literature",
-      "trigger_action": "search_atrial_flutter"
     },
     {
       "output": {
@@ -766,22 +769,6 @@
         "importance": "recommended",
         "label": "Interaction check for the planned rate-control drug or anticoagulant",
         "rationale": "Two new drugs are planned (a beta-blocker and an anticoagulant) on top of two antihypertensives; the check confirms dose and the interactions to monitor."
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[ESC_2018]"
-        ],
-        "criterion_id": "action-5-search-medical-literature",
-        "expected_evidence": "General guideline evidence on CTI ablation and anticoagulation in flutter; no decision depends on it",
-        "importance": "optional",
-        "label": "Guideline lookup on atrial flutter management",
-        "rationale": "Guideline lookup is optional; the decision rests on the ECG, monitoring and imaging results already obtained (ESC 2018)."
       }
     ],
     "assessment": {
@@ -881,11 +868,57 @@
           }
         ],
         "citations": [
-          "[ESC_2018]"
+          "[Fletcher_2013]"
         ],
         "criterion_id": "avoid-waste-6-exercise-stress-test",
-        "rationale": "Exercise testing adds no decision before rate control and adrenergic drive can provoke 1:1 conduction; the cause is typical atrial flutter with paroxysmal 1:1 atrioventricular conduction.",
+        "rationale": "Typical atrial flutter with paroxysmal 1:1 atrioventricular conduction at about 300 bpm that caused loss of consciousness on telemetry is an uncontrolled symptomatic arrhythmia, an absolute contraindication to exercise testing (Fletcher 2013); adrenergic drive can provoke 1:1 conduction again, and the test adds no decision before rate control.",
+        "severity": "harm"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "electrophysiology_study"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[ESC_2018]"
+        ],
+        "criterion_id": "avoid-waste-electrophysiology-study",
+        "rationale": "The diagnosis and the treatment indication are established non-invasively (typical atrial flutter with paroxysmal 1:1 conduction on the ECG and telemetry); a diagnostic electrophysiology study is indicated only when the non-invasive evaluation is non-diagnostic (ESC 2018), and cavotricuspid isthmus ablation is a referral decision, not a test.",
         "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "echo_type": "bubble_study"
+            },
+            "tool_name": "order_echocardiogram"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "avoid-waste-bubble-study",
+        "rationale": "No stroke, TIA, unexplained hypoxaemia or suspected intracardiac shunt: a bubble study plays no part in the evaluation of syncope from typical atrial flutter with paroxysmal 1:1 atrioventricular conduction.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "echo_type": "exercise_echo"
+            },
+            "tool_name": "order_echocardiogram"
+          }
+        ],
+        "citations": [
+          "[Fletcher_2013]"
+        ],
+        "criterion_id": "avoid-harm-exercise-echo",
+        "rationale": "Typical atrial flutter with paroxysmal 1:1 atrioventricular conduction at about 300 bpm that caused loss of consciousness on telemetry is an uncontrolled symptomatic arrhythmia, an absolute contraindication to exercise testing with or without echocardiographic imaging (Fletcher 2013); adrenergic drive can provoke 1:1 conduction again, and an exercise echocardiogram adds no decision before rate control.",
+        "severity": "harm"
       }
     ],
     "diagnosis": {
@@ -1028,7 +1061,7 @@
       "medication_list_review": {
         "alternatives": [],
         "contraindications": [
-          "Class IC antiarrhythmics (flecainide, propafenone) without an AV-nodal blocking drug in atrial flutter: slowing of the flutter rate can allow 1:1 conduction."
+          "Class IC antiarrhythmics (flecainide, propafenone) without an AV-nodal blocking drug in an organised atrial tachyarrhythmia: slowing of the atrial rate can allow 1:1 conduction."
         ],
         "formulary_status": "On formulary",
         "interactions": [
@@ -1217,26 +1250,7 @@
         ]
       }
     },
-    "literature_search": {
-      "general": {
-        "query": "syncope initial evaluation and risk stratification",
-        "results": [
-          {
-            "journal": "Eur Heart J",
-            "key_finding": "Initial evaluation comprises history, physical examination including supine and standing blood pressure, and a 12-lead ECG. High-risk features (syncope during exertion or supine, palpitations before the event, known structural or coronary disease, family history of sudden death under 40, high-risk ECG findings) call for early in-hospital evaluation with immediate ECG monitoring. Echocardiography is indicated when structural heart disease is known or suspected; EEG, brain imaging and routine laboratory panels are not recommended without a specific indication.",
-            "title": "2018 ESC Guidelines for the diagnosis and management of syncope (Brignole M et al., Eur Heart J 2018;39:1883-1948)",
-            "year": "2018"
-          },
-          {
-            "journal": "Circulation",
-            "key_finding": "Risk stratification at the initial evaluation separates patients needing in-hospital monitoring and cardiac testing from those suitable for outpatient evaluation; targeted rather than routine blood testing is advised.",
-            "title": "2017 ACC/AHA/HRS Guideline for the evaluation and management of patients with syncope (Shen WK et al.)",
-            "year": "2017"
-          }
-        ],
-        "summary": "Guidelines base syncope work-up on the initial evaluation (history, examination, orthostatic BP, 12-lead ECG) and risk stratification; high-risk patients receive in-hospital ECG monitoring and targeted cardiac testing."
-      }
-    },
+    "literature_search": null,
     "mri": null,
     "specialized_test": null
   },
@@ -1265,11 +1279,11 @@
       "mri": "normal",
       "specialized_test": "tilt_table_aborted"
     },
-    "last_revised": "2026-06-17",
+    "last_revised": "2026-11-17",
     "policy_spec_status": "draft",
     "real_seed_note": "Constructed/synthetic case. No real patient source. Mechanism (atrial flutter with 1:1 conduction causing syncope) is a well-established clinical entity; all case data are fabricated for benchmarking purposes.",
     "real_seed_pmid": null,
-    "revision_reason": "v5 balance-to-30 generation; regenerated for diversity (was SMVT/ischemic dup of RS05); new subtype: atrial flutter with 1:1 conduction causing syncope; new demographics: 67yo Caucasian male",
+    "revision_reason": "November 2026 physician review: avoided labels for the off-pathway electrophysiology study, bubble study and exercise echocardiogram that the case answers when ordered. Exercise testing and exercise echocardiography labelled harmful: an uncontrolled symptomatic arrhythmia is an absolute contraindication (Fletcher 2013). Drug-interaction outputs reworded so that they neither name the diagnosis nor quote a result that the work-up orders.",
     "version": "policy-v1",
     "vocab_gap": []
   },

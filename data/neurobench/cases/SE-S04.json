@@ -153,6 +153,7 @@
     {
       "output": {
         "additional_observations": [],
+        "contrast_used": true,
         "findings": [
           {
             "borders": null,
@@ -194,6 +195,51 @@
       },
       "tool_name": "analyze_brain_mri",
       "trigger_action": "request_mri_brain_contrast"
+    },
+    {
+      "output": {
+        "additional_observations": [],
+        "contrast_used": false,
+        "findings": [
+          {
+            "borders": null,
+            "location": "Bilateral periventricular and subcortical",
+            "mass_effect": null,
+            "signal_characteristics": {
+              "DWI": "No acute DWI restriction",
+              "FLAIR": "Multiple small T2/FLAIR white matter hyperintensities"
+            },
+            "size": null,
+            "type": "Nonspecific white matter hyperintensities"
+          },
+          {
+            "borders": null,
+            "location": "Bilateral thalami",
+            "mass_effect": null,
+            "signal_characteristics": {
+              "DWI": "Minimal DWI restriction bilateral thalami",
+              "FLAIR": "Subtle thalamic FLAIR signal change"
+            },
+            "size": null,
+            "type": "Peri-ictal changes"
+          },
+          {
+            "borders": null,
+            "location": "Parieto-occipital and posterior cortex",
+            "mass_effect": null,
+            "signal_characteristics": {
+              "FLAIR": "No cortical or subcortical vasogenic edema"
+            },
+            "size": null,
+            "type": "No PRES pattern"
+          }
+        ],
+        "impression": "1. Multiple small periventricular and subcortical T2/FLAIR white matter hyperintensities without restricted diffusion; imaging differential includes small vessel ischemia or inflammatory change. 2. Subtle bilateral thalamic FLAIR signal with minimal diffusion restriction, consistent with peri-ictal change. 3. No infarct, vasogenic edema, hemorrhage or mass. Repeat MRI may be considered to document resolution of the thalamic signal.",
+        "recommended_actions": [],
+        "volumetrics": null
+      },
+      "tool_name": "analyze_brain_mri",
+      "trigger_action": "request_mri_brain"
     },
     {
       "output": {
@@ -305,31 +351,6 @@
       },
       "tool_name": "check_drug_interactions",
       "trigger_action": "request_asm_carnitine_interaction_check"
-    },
-    {
-      "output": {
-        "query": "Valproate-associated hyperammonemic encephalopathy: management",
-        "results": [
-          {
-            "evidence_level": "Review",
-            "finding": "Valproate-associated hyperammonemia can occur with levels in or below the therapeutic range and presents with encephalopathy and increased seizures.",
-            "source": "[Lheureux_2009]"
-          },
-          {
-            "evidence_level": "Review",
-            "finding": "Management is withdrawal of valproate and IV L-carnitine, typically a 100 mg/kg loading dose (maximum 6 g) followed by 15 mg/kg every 4 hours.",
-            "source": "[Lheureux_2009]"
-          },
-          {
-            "evidence_level": "RCT",
-            "finding": "Levetiracetam, fosphenytoin and valproate were equally effective second-line agents for benzodiazepine-refractory convulsive status epilepticus.",
-            "source": "[ESETT_2019]"
-          }
-        ],
-        "summary": "Valproate-associated hyperammonemia can occur at any valproate level and is managed by withdrawing valproate and giving IV L-carnitine [Lheureux_2009]. Of the second-line agents for status epilepticus, levetiracetam, fosphenytoin and valproate were equally effective in ESETT [ESETT_2019]."
-      },
-      "tool_name": "search_medical_literature",
-      "trigger_action": "request_valproate_hyperammonemia_literature"
     },
     {
       "output": {
@@ -573,7 +594,9 @@
       {
         "alternatives": [
           {
-            "required_arguments": {},
+            "required_arguments": {
+              "contrast": true
+            },
             "tool_name": "analyze_brain_mri"
           }
         ],
@@ -652,22 +675,6 @@
         "importance": "required",
         "label": "Drug-interaction check for the second-line ASM: carbamazepine SJS, hyperammonemia on valproate, prednisone",
         "rationale": "Her carbamazepine SJS excludes the aromatic ASMs and the hyperammonemia excludes valproate, which leaves the choice among the remaining second-line drugs to this check [ESETT_2019; Lheureux_2009]."
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[Lheureux_2009]"
-        ],
-        "criterion_id": "action-7-search-medical-literature",
-        "expected_evidence": "General evidence on valproate withdrawal and L-carnitine for valproate-associated hyperammonemia",
-        "importance": "optional",
-        "label": "Literature: valproate-associated hyperammonemic encephalopathy",
-        "rationale": "Background evidence only; not a clinical step of the work-up."
       }
     ],
     "assessment": {
@@ -1305,7 +1312,7 @@
     "case_body_concerns": [],
     "citation_gap": [],
     "criteria_pack_version": "1.0",
-    "difficulty_rationale": "6 required actions (labs, CT, continuous EEG, MRI, CSF, drug check) with recommended blood cultures and serum antibody panel and optional literature; GCSE with a low valproate level and valproate-associated hyperammonemia in active SLE on prednisone with fever; teaching points are stopping valproate with L-carnitine, carbamazepine SJS cross-reactivity, excluding infection and neuropsychiatric lupus; 1 grounded red herring.",
+    "difficulty_rationale": "6 required actions (labs, CT, continuous EEG, MRI, CSF, drug check) with recommended blood cultures and serum antibody panel; GCSE with a low valproate level and valproate-associated hyperammonemia in active SLE on prednisone with fever; teaching points are stopping valproate with L-carnitine, carbamazepine SJS cross-reactivity, excluding infection and neuropsychiatric lupus; 1 grounded red herring.",
     "fallback_tool_kinds": {
       "cardiac_monitoring": "incidental",
       "ecg": "incidental",

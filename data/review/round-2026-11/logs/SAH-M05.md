@@ -1,0 +1,6 @@
+# SAH-M05
+
+## Class changes
+- LIT (literature search is not a clinical step; R1 ruling, ROUND_POLICY ruling 5 extended, Nov 2026 class 1): removed criterion action-6-search-medical-literature (optional); removed 1 literature follow-up(s). Any literature query is now answered by the neutral library text.
+- MRI-CONTRAST: followup[11] order_body_imaging pelvis_abdomen MRI (request_pelvis_abdomen_mri) contrast false -> true (decision 5): its liver finding reports 'no enhancement on the available sequences', an enhancement assessment, which contradicted contrast false; text unchanged. No stored brain MRI and no MRI criterion; the case fallback brain MRI has no gadolinium content (probe: gad_text=n for plain and contrast orders), so it stays null. No criterion names the body MRI.
+- MRI-CONTRAST verified: checked diff vs 393c547e, mri_probe (plain, contrast, both orders; no stored brain MRI, served by the case fallback, no gadolinium text) and perfect_agent -v (pass); fallback MRI free of gadolinium content and null; no brain-MRI criterion; body-imaging MRI contrast flag against its text; nothing else changed. Pelvis-abdomen MRI contrast false -> true is decision 5 (its liver finding assesses enhancement); creatinine 1.2 and a sulfa allergy do not contraindicate gadolinium. No error found.

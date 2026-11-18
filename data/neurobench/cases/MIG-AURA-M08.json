@@ -99,26 +99,6 @@
       },
       "tool_name": "check_drug_interactions",
       "trigger_action": "check_sertraline_sumatriptan_serotonin_syndrome"
-    },
-    {
-      "output": {
-        "query": "triptan SSRI co-prescription serotonin syndrome risk evidence",
-        "results": [
-          {
-            "evidence_level": "position paper",
-            "finding": "The case reports behind the 2006 FDA alert seldom met the Hunter criteria; the available evidence does not support limiting the use of triptans with SSRIs or SNRIs, though vigilance is advised.",
-            "source": "Evans RW, Tepper SJ, Shapiro RE, Sun-Edelstein C, Tietjen GE. The FDA alert on serotonin syndrome with use of triptans combined with selective serotonin reuptake inhibitors or selective serotonin-norepinephrine reuptake inhibitors: American Headache Society position paper. Headache 2010;50:1089-1099"
-          },
-          {
-            "evidence_level": "retrospective cohort",
-            "finding": "In a large health-system cohort of patients co-prescribed a triptan and an SSRI or SNRI, serotonin syndrome was rare, with an estimated incidence of 0.6 to 2.3 cases per 10,000 person-years of exposure.",
-            "source": "Orlova Y, Rizzoli P, Loder E. Association of coprescription of triptan antimigraine drugs and selective serotonin reuptake inhibitor or selective norepinephrine reuptake inhibitor antidepressants with serotonin syndrome. JAMA Neurol 2018;75:566-572"
-          }
-        ],
-        "summary": "Serotonin syndrome with triptan plus SSRI or SNRI co-prescription is rare; the AHS does not advise against the combination."
-      },
-      "tool_name": "search_medical_literature",
-      "trigger_action": "search_triptan_ssri_serotonin_syndrome_evidence"
     }
   ],
   "ground_truth": {
@@ -180,20 +160,6 @@
         "importance": "required",
         "label": "Check sumatriptan against sertraline (serotonin syndrome question) and the options for further treatment",
         "rationale": "Required: the patient takes sertraline and sumatriptan together and asks about the interaction; the check decides whether the effective acute treatment continues. The FDA 2006 alert is weighed against the AHS 2010 position paper and the 2018 cohort data."
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [],
-        "criterion_id": "action-1-search-medical-literature",
-        "expected_evidence": "General evidence on the observed rate of serotonin syndrome with triptan plus SSRI",
-        "importance": "optional",
-        "label": "Literature on triptan and SSRI co-prescription",
-        "rationale": "Background reading only; not a clinical step in the patient's pathway."
       }
     ],
     "assessment": {
@@ -205,7 +171,7 @@
         "Explain the diagnosis: migraine with typical visual and sensory aura (ICHD-3 1.2.1); the normal examination and typical features need no further tests.",
         "Continue sumatriptan with sertraline, with counselling: the combination is serotonergic but serotonin syndrome is rare (AHS 2010 position paper); she should seek care for agitation, tremor, clonus, sweating or fever, and avoid adding other serotonergic drugs such as tramadol or St John's wort.",
         "Take sumatriptan at headache onset, not during the aura, and on fewer than 10 days a month (medication-overuse risk).",
-        "Answer her question about sertraline: the predisposition predates it (father's and sister's migraine, earlier brief visual episodes); continuing it is reasonable if the depression is responding, and any change is agreed with her prescriber rather than made abruptly.",
+        "Answer her question about sertraline: the onset 2 weeks after starting it is a temporal association that does not establish cause; her father's and sister's migraine suggest a susceptibility, and the earlier brief flashes she attributed to one eye are too poorly characterised to count as aura. Continuing sertraline is reasonable if the depression is responding, acknowledging that its contribution to the attacks is uncertain; any change is agreed with her prescriber rather than made abruptly.",
         "Keep a headache diary; prevention is not indicated at about one attack a month (AHS 2021); if attacks become more frequent, choose a preventive compatible with sertraline and her depression (for example candesartan, only with reliable contraception as it is contraindicated in pregnancy; topiramate only under the pregnancy prevention programme)."
       ]
     },
@@ -267,7 +233,7 @@
     ],
     "diagnosis": {
       "accepted": [
-        "Migraine with visual and somatosensory aura (ICHD-3 1.2.1); likely genetically predisposed migraine unmasked by sertraline; sertraline-sumatriptan co-administration acceptable with counselling",
+        "Migraine with visual and somatosensory aura (ICHD-3 1.2.1), onset after starting sertraline (causal role uncertain); sertraline-sumatriptan co-administration acceptable with counselling",
         "migraine with aura",
         "migraine with typical aura",
         "classic migraine"
@@ -323,12 +289,12 @@
     ],
     "key_clinical_evidence": [
       "Four stereotyped attacks with visual then sensory aura and headache meet ICHD-3 1.2.1.",
-      "Family history and earlier brief visual episodes show the migraine predisposition predates sertraline.",
+      "Onset 2 weeks after starting sertraline is a temporal association, not proof of cause; the family history suggests a migraine susceptibility, and the earlier brief visual flashes are too poorly characterised to count as aura.",
       "Triptan plus SSRI: serotonin syndrome is rare; the AHS 2010 position paper does not advise against co-prescription, and counselling is enough."
     ],
     "red_herrings": [
       {
-        "correct_interpretation": "Her father's and sister's migraine and the earlier brief visual episodes show a predisposition that predates sertraline; the attacks meet migraine with typical aura whatever the trigger.",
+        "correct_interpretation": "The temporal association does not establish that sertraline caused the attacks: her father's and sister's migraine suggest a susceptibility (the earlier brief flashes are too poorly characterised to count as aura), the attacks meet migraine with typical aura whatever the trigger, and sertraline can be continued if it is helping, with its contribution acknowledged as uncertain.",
         "data_point": "Aura onset 2 weeks after starting sertraline",
         "field_path": "patient.history_present_illness",
         "intended_effect": "May anchor on sertraline as the cause of the attacks and lead to stopping an effective antidepressant",
@@ -466,14 +432,12 @@
   },
   "metadata": {
     "authoring_agent": "condition-expert:MIG-AURA",
-    "case_body_concerns": [
-      "Useless-tool entries dropped because the case has neither output nor fallback (silent irrelevance, per authoring guide \u00a71): ['analyze_ecg', 'analyze_eeg', 'interpret_labs']"
-    ],
+    "case_body_concerns": [],
     "citation_gap": [],
     "condition_name": "Migraine with aura emerging with SSRI \u2014 sertraline-sumatriptan interaction knowledge gap",
     "criteria_pack_version": "1.0",
-    "difficulty_description": "Moderate: drug interaction nuance (serotonin syndrome concern vs actual evidence); prior incomplete aura history unrecognised; identifying genetic predisposition vs SSRI causation",
-    "difficulty_rationale": "Moderate: SSRI and triptan interaction counselling against the FDA alert, and recognising that the migraine predisposition predates the SSRI",
+    "difficulty_description": "Moderate: drug interaction nuance (serotonin syndrome concern vs actual evidence); prior brief visual episodes too poorly characterised to count as aura; weighing a family predisposition against an uncertain SSRI contribution",
+    "difficulty_rationale": "Moderate: SSRI and triptan interaction counselling against the FDA alert, and recognising that onset after starting the SSRI is an association of uncertain causal weight in a patient with a family history of migraine",
     "expected_agent_confidence": 0.6,
     "fallback_tool_kinds": {
       "cardiac_monitoring": "normal",
@@ -548,7 +512,7 @@
       "Major depressive disorder \u2014 on sertraline",
       "Generalised anxiety disorder \u2014 not medicated",
       "No hypertension, diabetes, or cardiac disease",
-      "Prior 2-3 years of brief monocular visual flashes (unreported)"
+      "Brief visual flashes over the past 2-3 years, attributed by her to one eye (never assessed)"
     ],
     "sex": "female",
     "vitals": {

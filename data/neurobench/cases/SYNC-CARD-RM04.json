@@ -390,21 +390,7 @@
         ]
       }
     },
-    "literature_search": {
-      "syncope_cardiac_differential": {
-        "query": "syncope evaluation emergency department differential diagnosis guidelines",
-        "results": [
-          {
-            "authors": "Brignole M et al.",
-            "journal": "European Heart Journal",
-            "key_finding": "The initial evaluation of syncope must include a 12-lead ECG, clinical history, physical examination, and orthostatic blood pressure measurement. High-risk features include syncope during exertion, supine position, without prodrome, or with new ECG abnormalities.",
-            "title": "2018 ESC Guidelines for the diagnosis and management of syncope",
-            "year": "2018"
-          }
-        ],
-        "summary": "Initial syncope evaluation per ESC 2018 guidelines requires ECG, history, and physical examination. High-risk features mandate inpatient admission and further cardiac workup."
-      }
-    },
+    "literature_search": null,
     "mri": {
       "additional_observations": [
         "No acute intracranial abnormality"
@@ -800,11 +786,11 @@
           "No acute intracranial hemorrhage",
           "No restricted diffusion to suggest acute infarction",
           "No mass effect or midline shift",
-          "No enhancing lesion",
           "Normal ventricular size and configuration",
           "No sinus thrombosis on susceptibility-weighted imaging",
           "Age-appropriate parenchymal volume"
         ],
+        "contrast_used": false,
         "findings": [],
         "impression": "No acute intracranial abnormality. No hemorrhage, mass, or restricted diffusion. Normal study.",
         "recommended_actions": [],
@@ -815,33 +801,23 @@
     },
     {
       "output": {
-        "query": "acute pulmonary embolism risk stratification and initial management guideline",
-        "results": [
-          {
-            "evidence_level": "Guideline recommendation",
-            "finding": "In suspected PE with high clinical probability, CT pulmonary angiography is performed directly; D-dimer is not measured because a normal value does not safely exclude PE.",
-            "source": "Konstantinides SV et al., 2019 ESC Guidelines for the diagnosis and management of acute pulmonary embolism. Eur Heart J 2020;41:543-603"
-          },
-          {
-            "evidence_level": "Guideline recommendation",
-            "finding": "Haemodynamically stable PE with RV dysfunction on echocardiography or CT and an elevated troponin is classed intermediate-high risk; these patients are anticoagulated and monitored, and routine primary systemic thrombolysis is not recommended.",
-            "source": "Konstantinides SV et al., 2019 ESC Guidelines for the diagnosis and management of acute pulmonary embolism. Eur Heart J 2020;41:543-603"
-          },
-          {
-            "evidence_level": "Guideline recommendation",
-            "finding": "LMWH or fondaparinux is preferred to unfractionated heparin for initial anticoagulation; unfractionated heparin is used when primary reperfusion is considered, with severe renal impairment, or in severe obesity. Rescue thrombolysis is given on haemodynamic deterioration; surgical embolectomy or catheter-directed treatment is the alternative when thrombolysis is contraindicated, as within 3 weeks of major surgery.",
-            "source": "Konstantinides SV et al., 2019 ESC Guidelines for the diagnosis and management of acute pulmonary embolism. Eur Heart J 2020;41:543-603"
-          },
-          {
-            "evidence_level": "Guideline recommendation",
-            "finding": "A direct oral anticoagulant is preferred to a vitamin K antagonist; anticoagulation is stopped after 3 months when a first PE was provoked by a major transient or reversible risk factor.",
-            "source": "Konstantinides SV et al., 2019 ESC Guidelines for the diagnosis and management of acute pulmonary embolism. Eur Heart J 2020;41:543-603"
-          }
+        "additional_observations": [
+          "No acute intracranial hemorrhage",
+          "No restricted diffusion to suggest acute infarction",
+          "No mass effect or midline shift",
+          "No enhancing lesion",
+          "Normal ventricular size and configuration",
+          "No sinus thrombosis on susceptibility-weighted imaging",
+          "Age-appropriate parenchymal volume"
         ],
-        "summary": "ESC 2019 stratifies acute PE by haemodynamic status, PESI or sPESI, RV dysfunction and troponin, and sets anticoagulation, monitoring and reperfusion by risk class."
+        "contrast_used": true,
+        "findings": [],
+        "impression": "No acute intracranial abnormality. No hemorrhage, mass, or restricted diffusion. Normal study.",
+        "recommended_actions": [],
+        "volumetrics": null
       },
-      "tool_name": "search_medical_literature",
-      "trigger_action": "search_pulmonary_embolism"
+      "tool_name": "analyze_brain_mri",
+      "trigger_action": "request_brain_mri_with_contrast"
     },
     {
       "output": {
@@ -1039,7 +1015,6 @@
         "alternatives": [
           {
             "required_arguments": {
-              "contrast": true,
               "study": "chest_CTA"
             },
             "tool_name": "order_body_imaging"
@@ -1113,22 +1088,6 @@
         "importance": "optional",
         "label": "Right leg venous duplex",
         "rationale": "Compression ultrasound documents the source DVT in the tender right calf; with PE already confirmed on CT it does not change anticoagulation (ESC 2019)."
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[ESC_2018]"
-        ],
-        "criterion_id": "action-7-search-medical-literature",
-        "expected_evidence": "General guideline evidence on PE risk classes and treatment; no decision depends on it",
-        "importance": "optional",
-        "label": "Guideline lookup on acute PE management",
-        "rationale": "Guideline lookup is optional; the decision rests on the ECG, monitoring and imaging results already obtained (ESC 2018)."
       }
     ],
     "assessment": {
@@ -1264,6 +1223,64 @@
         "criterion_id": "avoid-harm-7-exercise-stress-test",
         "rationale": "Acute pulmonary embolism with RV dysfunction and a DVT is an absolute contraindication to exercise testing (Fletcher GF et al., AHA exercise standards, Circulation 2013).",
         "severity": "harm"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "echo_type": "bubble_study"
+            },
+            "tool_name": "order_echocardiogram"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "avoid-waste-bubble-study",
+        "rationale": "No stroke or TIA, no suspected intracardiac shunt, and the hypoxaemia is explained by the emboli: a bubble study plays no part in the evaluation of syncope from acute pulmonary embolism.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "echo_type": "exercise_echo"
+            },
+            "tool_name": "order_echocardiogram"
+          }
+        ],
+        "citations": [
+          "[Fletcher_2013]"
+        ],
+        "criterion_id": "avoid-harm-exercise-echo",
+        "rationale": "Acute pulmonary embolism with RV dysfunction and a DVT is an absolute contraindication to exercise echocardiography (Fletcher GF et al., AHA exercise standards, Circulation 2013).",
+        "severity": "harm"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "study": "chest_CT"
+            },
+            "tool_name": "order_body_imaging"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "avoid-waste-chest-ct",
+        "rationale": "In acute pulmonary embolism the chest is imaged by CT pulmonary angiography; a chest CT that is not a pulmonary angiogram is not adequate to assess the pulmonary arteries and adds nothing.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "echo_type": "TEE"
+            },
+            "tool_name": "order_echocardiogram"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "avoid-waste-tee",
+        "rationale": "No endocarditis, atrial thrombus or valve question that transthoracic imaging leaves open: TEE adds nothing to the evaluation of syncope from acute pulmonary embolism, which CT pulmonary angiography confirms.",
+        "severity": "waste"
       }
     ],
     "diagnosis": {
@@ -1670,26 +1687,7 @@
         ]
       }
     },
-    "literature_search": {
-      "general": {
-        "query": "syncope initial evaluation and risk stratification",
-        "results": [
-          {
-            "journal": "Eur Heart J",
-            "key_finding": "Initial evaluation comprises history, physical examination including supine and standing blood pressure, and a 12-lead ECG. High-risk features (syncope during exertion or supine, palpitations before the event, known structural or coronary disease, family history of sudden death under 40, high-risk ECG findings) call for early in-hospital evaluation with immediate ECG monitoring. Echocardiography is indicated when structural heart disease is known or suspected; EEG, brain imaging and routine laboratory panels are not recommended without a specific indication.",
-            "title": "2018 ESC Guidelines for the diagnosis and management of syncope (Brignole M et al., Eur Heart J 2018;39:1883-1948)",
-            "year": "2018"
-          },
-          {
-            "journal": "Circulation",
-            "key_finding": "Risk stratification at the initial evaluation separates patients needing in-hospital monitoring and cardiac testing from those suitable for outpatient evaluation; targeted rather than routine blood testing is advised.",
-            "title": "2017 ACC/AHA/HRS Guideline for the evaluation and management of patients with syncope (Shen WK et al.)",
-            "year": "2017"
-          }
-        ],
-        "summary": "Guidelines base syncope work-up on the initial evaluation (history, examination, orthostatic BP, 12-lead ECG) and risk stratification; high-risk patients receive in-hospital ECG monitoring and targeted cardiac testing."
-      }
-    },
+    "literature_search": null,
     "mri": null,
     "specialized_test": null
   },
@@ -1709,13 +1707,13 @@
     "difficulty_rationale": "Six required steps (ECG, troponin/BNP/pregnancy test, TTE, telemetry, CT pulmonary angiography, medication review) and three red herrings; the troponin and precordial T-wave inversion invite an ACS diagnosis, the post-operative context invites dismissal of calf tenderness and dyspnoea, and the rescue plan must account for the recent surgery.",
     "expected_agent_confidence": 0.6,
     "generation_method": "real_case_seed",
-    "last_revised": "2026-06-17",
+    "last_revised": "2026-11-17",
     "policy_spec_status": "draft",
     "real_seed_license": "CC-BY 4.0",
     "real_seed_note": "Seeded from: Suwanwongse K, Shabarek N. 'Recurrent Syncope as a Presentation of Pulmonary Embolism.' Cureus. 2020 Jan 10;12(1):e6567. PMID 32064202. PMC7008764. CC-BY 4.0. Core elements adopted: submassive bilateral PE presenting as recurrent syncope, S1Q3T3 ECG pattern initially misread as non-specific ST-T changes, confirmed by CTPA. Patient demographics, surgical risk factor, full clinical workup, and tool outputs are independently authored.",
     "real_seed_pmcid": "PMC7008764",
     "real_seed_pmid": "32064202",
-    "revision_reason": "v5 balance-to-30 generation",
+    "revision_reason": "November 2026 review: served off-pathway bubble study, exercise echo, non-angiographic chest CT and TEE reports labelled (waste; exercise echo harm); the CT pulmonary angiography criterion no longer requires a separate contrast flag (a chest CTA is a contrast study by definition)",
     "version": "policy-v1",
     "vocab_gap": []
   },

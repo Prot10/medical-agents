@@ -40,7 +40,7 @@
           "region": "cervical spine"
         },
         {
-          "finding": "normal calibre and signal; no enhancement",
+          "finding": "normal calibre and signal",
           "interpretation": "normal",
           "region": "spinal cord"
         },
@@ -237,27 +237,6 @@
       "output": {
         "findings": [
           {
-            "description": "20 fiber pairs. Mean MCD 72 microseconds (reference <35). Increased jitter in 15 of 20 pairs (75%); blocking in 26% of pairs.",
-            "muscle": "Right extensor digitorum (voluntary activation)"
-          }
-        ],
-        "impression": "Abnormal single-fiber EMG of the extensor digitorum: markedly increased jitter with impulse blocking, consistent with a disorder of neuromuscular transmission. Clinical correlation recommended.",
-        "quantitative_data": {
-          "blocking": "26% of pairs",
-          "mean_MCD": "72 microseconds (reference <35)",
-          "muscle": "right extensor digitorum",
-          "pairs_with_increased_jitter": "15/20 (75%)"
-        },
-        "recommended_actions": [],
-        "test_type": "emg_single_fiber"
-      },
-      "tool_name": "order_specialized_test",
-      "trigger_action": "request_emg_single_fiber"
-    },
-    {
-      "output": {
-        "findings": [
-          {
             "reference_range": ">=80% predicted",
             "result": "3.30 L (88% predicted; 39 mL/kg)",
             "test": "FVC"
@@ -289,6 +268,27 @@
       },
       "tool_name": "order_specialized_test",
       "trigger_action": "request_respiratory_function"
+    },
+    {
+      "output": {
+        "findings": [
+          {
+            "description": "20 fiber pairs. Mean MCD 72 microseconds (reference <35). Increased jitter in 15 of 20 pairs (75%); blocking in 26% of pairs.",
+            "muscle": "Right extensor digitorum (voluntary activation)"
+          }
+        ],
+        "impression": "Abnormal single-fiber EMG of the extensor digitorum: markedly increased jitter with impulse blocking, consistent with a disorder of neuromuscular transmission. Clinical correlation recommended.",
+        "quantitative_data": {
+          "blocking": "26% of pairs",
+          "mean_MCD": "72 microseconds (reference <35)",
+          "muscle": "right extensor digitorum",
+          "pairs_with_increased_jitter": "15/20 (75%)"
+        },
+        "recommended_actions": [],
+        "test_type": "emg_single_fiber"
+      },
+      "tool_name": "order_specialized_test",
+      "trigger_action": "request_emg_single_fiber"
     },
     {
       "output": {
@@ -488,12 +488,14 @@
             "tool_name": "order_specialized_test"
           }
         ],
-        "citations": [],
+        "citations": [
+          "[Jacob_2025]"
+        ],
         "criterion_id": "action-2-order-specialized-test",
         "expected_evidence": "Decrement of 19% neck extensors, 16% trapezius, 12% nasalis, none in ADM; normal needle EMG",
         "importance": "required",
         "label": "Order repetitive nerve stimulation including neck and facial muscles, with needle EMG",
-        "rationale": "In axial-predominant weakness RNS of proximal and facial muscles is more sensitive than distal limb RNS; needle EMG separates MG from neck extensor myopathy and motor neuron disease (Jacob S et al., Pract Neurol 2025)."
+        "rationale": "In axial-predominant weakness RNS of proximal and facial muscles is more sensitive than distal limb RNS. It stays required although AChR antibodies are positive, because the needle EMG of the same study, including the cervical paraspinal muscles, is what separates MG from isolated neck extensor myopathy and motor neuron disease in the head-drop differential (Jacob S et al., Pract Neurol 2025)."
       },
       {
         "alternatives": [
@@ -520,7 +522,7 @@
           }
         ],
         "citations": [
-          "[Wolfe_2016]"
+          "[Jacob_2025]"
         ],
         "criterion_id": "action-4-order-body-imaging",
         "expected_evidence": "No anterior mediastinal mass; thymic involution appropriate for age",
@@ -537,12 +539,34 @@
             "tool_name": "order_specialized_test"
           }
         ],
-        "citations": [],
+        "citations": [
+          "[Jacob_2025]"
+        ],
         "criterion_id": "action-7-order-specialized-test",
         "expected_evidence": "FVC 88% predicted (39 mL/kg), MIP -64 and MEP 88 cmH2O, effective cough",
-        "importance": "recommended",
+        "importance": "required",
         "label": "Measure baseline respiratory function (FVC, MIP, MEP)",
-        "rationale": "Dysphagia and dysphonia are bulbar involvement and the planned steroids can cause early worsening: baseline FVC, MIP and MEP stage the respiratory risk (Lawn ND et al., Arch Neurol 2001)."
+        "rationale": "Dysphagia and dysphonia are bulbar involvement and the planned steroids can cause early worsening: a baseline FVC with MIP and MEP stages respiratory involvement and is the reference for serial measurement against the ABN escalation criteria (Jacob S et al., Pract Neurol 2025)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_brain_mri"
+          },
+          {
+            "required_arguments": {
+              "study": "spine_MRI"
+            },
+            "tool_name": "order_body_imaging"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "action-brain-cervical-mri",
+        "expected_evidence": "Mild multilevel cervical spondylosis without cord compression or cord signal change",
+        "importance": "optional",
+        "label": "Brain and cervical spine MRI if cervical myelopathy is still considered",
+        "rationale": "Known cervical spondylosis raises cervical myelopathy as a cause of head drop; with normal limb strength, reflexes and sensation it is unlikely, so MRI of the cervical spine is acceptable but not needed."
       },
       {
         "alternatives": [
@@ -564,45 +588,50 @@
         "alternatives": [
           {
             "required_arguments": {},
-            "tool_name": "check_drug_interactions"
+            "tool_name": "analyze_ecg"
           }
         ],
-        "citations": [],
-        "criterion_id": "action-6-check-drug-interactions",
-        "expected_evidence": "No interaction with the current medicines; statin association noted",
-        "importance": "optional",
-        "label": "Check his medicines against pyridostigmine",
-        "rationale": "Metformin, amlodipine, aspirin and atorvastatin have no pharmacokinetic interaction with pyridostigmine; optional."
+        "citations": [
+          "[Jacob_2025]"
+        ],
+        "criterion_id": "action-baseline-ecg",
+        "expected_evidence": "Sinus rhythm at 70/min, PR 176 ms, QRS 92 ms, QTc 440 ms; left ventricular hypertrophy by voltage criteria, no ischaemic change.",
+        "importance": "recommended",
+        "label": "Baseline 12-lead ECG before starting pyridostigmine",
+        "rationale": "Pyridostigmine can cause bradycardia and atrioventricular block, which matter more with his coronary disease; ABN 2025 advises a baseline ECG before it is started (Jacob 2025)."
       },
       {
         "alternatives": [
           {
             "required_arguments": {},
-            "tool_name": "search_medical_literature"
+            "tool_name": "check_drug_interactions"
           }
         ],
         "citations": [
-          "[Sanders_2016]"
+          "[Narayanaswami_2021]"
         ],
-        "criterion_id": "action-5-search-medical-literature",
-        "expected_evidence": "General guidance on MG management",
-        "importance": "optional",
-        "label": "Review guidance on the management of generalized myasthenia gravis",
-        "rationale": "Background reading on management; not a clinical step in the work-up."
+        "criterion_id": "action-6-check-drug-interactions",
+        "expected_evidence": "No pharmacokinetic interaction with pyridostigmine; statin association with worsening MG noted; bradycardia caution with his coronary disease",
+        "importance": "recommended",
+        "label": "Check his medicines against MG and pyridostigmine",
+        "rationale": "He takes atorvastatin, which ICG 2020 Table 1 lists among drugs used with caution in MG, and has coronary disease, in which the bradycardic effect of pyridostigmine matters; the check documents both before pyridostigmine starts (ICG 2020)."
       }
     ],
     "assessment": {
       "prohibited_recommendations": [
-        "Do not start high-dose prednisone (above 20 mg/day) as an outpatient; start low and titrate, or start high dose only with inpatient monitoring, because initial steroid-induced worsening can precipitate crisis.",
+        "Do not start prednisone at full dose (for example 1 mg/kg daily) at once; escalate from a low dose, because steroid initiation can transiently worsen MG (Jacob 2025).",
         "Avoid fluoroquinolones, aminoglycosides, macrolides and IV magnesium unless no alternative exists and the patient is monitored; use non-depolarising neuromuscular blockers only at reduced dose with quantitative monitoring.",
         "Do not attribute the head drop to Parkinson disease antecollis and start or escalate dopaminergic treatment instead of treating MG."
       ],
       "required_recommendations": [
         "Diagnose AChR antibody-positive generalized myasthenia gravis with axial (neck extensor) predominance and mild bulbar weakness, MGFA class IIIa: fatigable head drop, AChR binding antibody 8.0 nmol/L, decrement in neck, trapezius and facial muscles with a normal needle EMG, no thymoma; the parkinsonism does not explain the head drop.",
-        "Start pyridostigmine 30 mg three times daily, titrating to effect up to 60 mg four to five times daily, watching for bradycardia given his coronary disease.",
-        "Start prednisone low (10-20 mg/day, increasing by 5-10 mg every 3-7 days) with bone protection and close glucose monitoring and diabetes treatment adjustment, and add an early steroid-sparing agent (azathioprine after TPMT testing) to limit steroid exposure [Sanders_2016].",
+        "Start pyridostigmine 30 mg three to four times daily after a baseline ECG with a heart-rate watch because of his coronary disease, titrating to effect (usually up to 60 mg four to five times daily); the maximum is 360 mg/day, with specialist review above 300 mg/day (Jacob 2025).",
+        "If symptoms persist on pyridostigmine, start prednisone 5-10 mg daily and increase by 5 mg every 3-5 days to 30 mg daily (up to 1 mg/kg, not above 60 mg, only after specialist discussion), warning that weakness may worsen around days 5-10 (Jacob 2025). Start azathioprine early alongside the steroid, after TPMT (and NUDT15 where available) testing, because diabetes, ischaemic heart disease and his age raise the risk of steroid toxicity (Jacob 2025; Fionda 2026); monitor glucose closely and adjust his diabetes treatment when prednisone starts.",
+        "Before long-term immunosuppression, without delaying urgent treatment: HbA1c, lipids, blood pressure and weight before steroids; hepatitis B (HBsAg, anti-HBc) and hepatitis C serology, TB screening (IGRA) and HIV test; vaccinations updated at least four weeks before (Jacob 2025; Fionda 2026). During steroids: periodic blood pressure, glucose, weight and eye checks, calcium and vitamin D, and bone densitometry (Fionda 2026).",
+        "Continue atorvastatin for his coronary disease: statins are used with caution in MG (ICG 2020 Table 1), so review it if weakness worsens, but a statin taken unchanged for six years with a normal CK does not explain the head drop.",
         "Fit a soft or head-supporting cervical collar for the head drop while treatment takes effect.",
-        "Arrange speech and language therapy swallowing assessment with diet modification as needed, and advise him to seek care at once for choking, worsening dysphagia or breathlessness."
+        "Arrange speech and language therapy swallowing assessment with diet modification as needed, and advise him to seek care at once for choking, worsening dysphagia or breathlessness.",
+        "Record the MGFA class (here IIIa) and a baseline MG-ADL, with QMG where available, to follow treatment against the goal of MG-ADL 0-1 (Fionda 2026; Jacob 2025)."
       ]
     },
     "avoided_actions": [
@@ -667,6 +696,102 @@
         "criterion_id": "avoid-waste-5-order-cardiac-monitoring",
         "rationale": "No palpitations, syncope or arrhythmia; cardiac monitoring does not contribute to the diagnosis of MG.",
         "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "assessment_type": "gait_and_balance_timed"
+            },
+            "tool_name": "perform_clinical_assessment"
+          }
+        ],
+        "citations": [
+          "[Jacob_2025]"
+        ],
+        "criterion_id": "avoid-waste-gait-and-balance-timed",
+        "rationale": "His shuffling, mildly festinating gait is documented on examination; a timed gait and balance battery does not address the head drop or the bulbar weakness that this admission must diagnose (Jacob 2025).",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "assessment_type": "levodopa_challenge"
+            },
+            "tool_name": "perform_clinical_assessment"
+          }
+        ],
+        "citations": [
+          "[Jacob_2025]"
+        ],
+        "criterion_id": "avoid-waste-levodopa-challenge",
+        "rationale": "A levodopa challenge characterizes the coexisting parkinsonism but does not address the head drop, which is neck extensor weakness rather than antecollis; it belongs to a later movement-disorder assessment, not this admission (Jacob 2025).",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "speech_language_evaluation"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[Jacob_2025]"
+        ],
+        "criterion_id": "avoid-waste-speech-language-evaluation",
+        "rationale": "His fatigable dysphonia is documented in the history and nothing suggests a language disorder; the speech and language battery tests motor speech and language and never assesses swallowing, which needs a speech and language therapy swallowing assessment for his dysphagia (Jacob 2025).",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "study": "spine_CT"
+            },
+            "tool_name": "order_body_imaging"
+          }
+        ],
+        "citations": [
+          "[Jacob_2025]"
+        ],
+        "criterion_id": "avoid-waste-spine-ct",
+        "rationale": "The cervical MRI already shows mild spondylosis without cord compression or signal change, and limb strength, reflexes and sensation are normal; a cervical spine CT duplicates it with radiation and answers no new question (Jacob 2025).",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "modality": "coronary_CTA"
+            },
+            "tool_name": "order_advanced_imaging"
+          }
+        ],
+        "citations": [
+          "[Narayanaswami_2021]"
+        ],
+        "criterion_id": "avoid-waste-coronary-cta",
+        "rationale": "His coronary disease is known, stable and asymptomatic, and the ECG shows no ischaemic change; coronary CT angiography needs iodinated contrast, which is used with caution in MG (ICG 2020 Table 1), and informs neither the diagnosis nor the MG treatment.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "modality": "coronary_angiography"
+            },
+            "tool_name": "order_advanced_imaging"
+          }
+        ],
+        "citations": [
+          "[Narayanaswami_2021]"
+        ],
+        "criterion_id": "avoid-harm-coronary-angiography",
+        "rationale": "Invasive coronary angiography has no indication in stable, asymptomatic chronic coronary disease without a change in symptoms (Virani 2023 AHA/ACC chronic coronary disease guideline), carries the risks of arterial catheterization and uses iodinated contrast, which is used with caution in MG (ICG 2020 Table 1); it does not inform the diagnosis of the head drop.",
+        "severity": "harm"
       }
     ],
     "diagnosis": {
@@ -681,8 +806,7 @@
       ],
       "icd_codes": [
         "G70.00",
-        "G70.0",
-        "G70.01"
+        "G70.0"
       ],
       "rejected": [
         "isolated neck extensor myopathy",
@@ -739,7 +863,7 @@
       "Coexisting parkinsonism (hypomimia, bradykinesia, asymmetric rigidity, festination) and a father with Parkinson disease.",
       "AChR binding antibody 8.0 nmol/L with elevated blocking antibody; MuSK negative; CK and thyroid function normal.",
       "RNS: decrement of 19% in neck extensors, 16% in trapezius and 12% in nasalis with none in ADM; normal needle EMG.",
-      "Mediastinal CT with contrast is indicated in every patient with MG to detect thymoma. Here it shows no thymoma; at 73 thymectomy is not routinely indicated without thymoma (MGTX enrolled patients up to 65).",
+      "Mediastinal CT with contrast is indicated in every patient with MG to detect thymoma. Here it shows no thymoma; at 73 thymectomy is not routinely indicated without thymoma (ABN 2025 discusses it up to 65; ICG 2020 recommends it at 18-50).",
       "Head drop is a recognized presentation of late-onset MG and must be separated from neck extensor myopathy, motor neuron disease and parkinsonian antecollis."
     ],
     "red_herrings": [
@@ -777,15 +901,19 @@
       {
         "after_criterion_id": "action-3-order-specialized-test",
         "before_criterion_id": "action-1-interpret-labs",
-        "citations": [],
-        "reason": "AChR antibody testing precedes single-fiber EMG; SFEMG is reserved for seronegative patients or a normal RNS (Jacob 2025).",
+        "citations": [
+          "[Jacob_2025]"
+        ],
+        "reason": "Serology comes first: with positive AChR antibodies SFEMG is rarely needed, while every antibody-negative patient needs neurophysiology, RNS first and SFEMG where expertise is available (Jacob 2025).",
         "severity": "soft"
       },
       {
         "after_criterion_id": "action-3-order-specialized-test",
         "before_criterion_id": "action-2-order-specialized-test",
-        "citations": [],
-        "reason": "Repetitive nerve stimulation is done first; SFEMG follows when RNS is normal (Jacob 2025).",
+        "citations": [
+          "[Jacob_2025]"
+        ],
+        "reason": "RNS is the initial neurophysiological test; SFEMG is considered when RNS is normal and suspicion persists, where expertise is available (Jacob 2025).",
         "severity": "soft"
       }
     ],
@@ -794,7 +922,8 @@
       "required_before_assessment": [
         "action-1-interpret-labs",
         "action-2-order-specialized-test",
-        "action-4-order-body-imaging"
+        "action-4-order-body-imaging",
+        "action-7-order-specialized-test"
       ]
     }
   },
@@ -825,10 +954,10 @@
         "formulary_status": "on formulary",
         "interactions": [
           "Metformin, amlodipine, aspirin: no clinically relevant interaction with pyridostigmine.",
-          "Atorvastatin: no pharmacokinetic interaction with pyridostigmine. Statins have been reported to unmask or worsen myasthenia gravis in case reports; causality is not established."
+          "Atorvastatin: no pharmacokinetic interaction with pyridostigmine. Statins have been reported to unmask or worsen disorders of neuromuscular transmission in case reports; causality is not established."
         ],
         "proposed": "pyridostigmine",
-        "summary": "No interactions between pyridostigmine and the current medicines; statins carry a reported, unproven association with worsening of myasthenia gravis.",
+        "summary": "No interactions between pyridostigmine and the current medicines; statins carry a reported, unproven association with worsening of neuromuscular transmission disorders.",
         "warnings": [
           "Pyridostigmine: muscarinic adverse effects include increased secretions, diarrhea, cramps and bradycardia; use with care in coronary artery disease."
         ]
@@ -925,27 +1054,29 @@
         ]
       }
     },
-    "literature_search": {
-      "myasthenia gravis": {
-        "query": "myasthenia gravis diagnosis and treatment guidance",
-        "results": [
-          {
-            "evidence_level": "consensus guideline",
-            "finding": "Consensus guidance recommends AChR antibody testing first, MuSK testing when AChR antibodies are absent, and electrodiagnostic confirmation by repetitive nerve stimulation or single-fiber EMG. Chest CT or MRI is recommended in all patients to detect thymoma.",
-            "source": "Sanders DB et al., Neurology 2016;87:419-425; Narayanaswami P et al., Neurology 2021;96:114-122"
-          },
-          {
-            "evidence_level": "randomized controlled trial",
-            "finding": "In the MGTX trial thymectomy improved outcomes over three years in non-thymomatous AChR-positive generalized MG aged 18-65.",
-            "source": "Wolfe GI et al., N Engl J Med 2016;375:511-522 (MGTX)"
-          }
-        ],
-        "summary": "Consensus guidance (Sanders 2016; update Narayanaswami 2021): AChR antibody testing first, MuSK when AChR antibodies are absent, RNS or single-fiber EMG for electrodiagnostic confirmation, chest CT or MRI in all patients for thymoma. MGTX (Wolfe 2016): thymectomy improved three-year outcomes in non-thymomatous AChR-positive generalized MG aged 18-65."
-      }
-    },
+    "literature_search": null,
     "mri": {
-      "additional_observations": [],
-      "findings": [],
+      "additional_observations": [
+        "No cord compression or cord signal change",
+        "No acute infarct, haemorrhage or mass",
+        "Brainstem and cerebellum normal"
+      ],
+      "findings": [
+        {
+          "location": "cervical spine, C4-5 and C5-6 most marked",
+          "signal_characteristics": {
+            "T2": "disc-osteophyte complexes without cord contact; normal cord calibre and signal"
+          },
+          "type": "degenerative_change"
+        },
+        {
+          "location": "substantia nigra, both sides",
+          "signal_characteristics": {
+            "SWI": "mildly reduced nigral signal"
+          },
+          "type": "susceptibility_change"
+        }
+      ],
       "impression": "MRI brain and cervical spine: 1. Mild multilevel cervical spondylosis without cord contact, cord compression or cord signal change. 2. Mildly reduced signal of the substantia nigra on susceptibility-weighted imaging, of uncertain significance at this age. 3. No acute intracranial abnormality.",
       "recommended_actions": [],
       "volumetrics": null
@@ -995,7 +1126,7 @@
     "condition_name": "Late-onset AChR+ MG presenting as head drop with coexisting parkinsonism",
     "criteria_pack_version": "1.0",
     "difficulty_description": "Moderate: head drop in a man with parkinsonism invites antecollis, myelopathy or myopathy; AChR antibody and an axial RNS decrement with a normal needle EMG establish MG.",
-    "difficulty_rationale": "3 required actions (AChR serology with thyroid function, RNS with neck and facial muscles, mediastinal CT), respiratory function recommended; 4 red herrings (nigral SWI change, parkinsonism, cervical spondylosis, atorvastatin); axial-predominant AChR+ MG.",
+    "difficulty_rationale": "4 required actions (AChR serology with thyroid function, RNS with neck and facial muscles and needle EMG, mediastinal CT, respiratory function); baseline ECG and medication review recommended; 4 red herrings (nigral SWI change, parkinsonism, cervical spondylosis, atorvastatin); axial-predominant AChR+ MG.",
     "expected_agent_confidence": 0.84,
     "fallback_tool_kinds": {
       "cardiac_monitoring": "normal",
@@ -1004,9 +1135,9 @@
       "eeg": "normal"
     },
     "generation_method": "real_case_seed",
-    "last_revised": "2026-10-24",
+    "last_revised": "2026-11-17",
     "policy_spec_status": "draft",
-    "revision_reason": "per-case audit: baseline panels named by an optimal action and absent from the payload actually served (TSH). Reported as unremarkable only after checking that nothing in the case \u2014 no abnormal row, no interpretation, no expected_finding, no reasoning \u2014 states an abnormality for them",
+    "revision_reason": "Respiratory function required for bulbar symptoms; baseline ECG recommended; medication review recommended for the statin; brain and cervical MRI an optional criterion with findings stated; SFEMG after the core work-up with sourced constraint reasons; off-question assessments, spine CT and coronary CT angiography labelled waste and invasive coronary angiography labelled harmful; ABN outpatient steroid titration with early azathioprine, pre-immunosuppression screening and steroid monitoring, a statin statement and MG severity recording in the management; thymectomy statement per ABN 2025 and ICG 2020",
     "source": "MedCaseReasoning",
     "source_license": "CC-BY 4.0",
     "source_pmcid": "PMC11352080",

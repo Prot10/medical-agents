@@ -130,17 +130,34 @@
         ]
       }
     },
-    "literature_search": {
-      "general": {
-        "query": "general",
-        "results": [],
-        "summary": "No directly applicable, high-quality evidence was retrieved for this query. Recommend correlating with current society guidelines."
-      }
-    },
+    "literature_search": null,
     "mri": null,
     "specialized_test": null
   },
   "followup_outputs": [
+    {
+      "output": {
+        "additional_observations": [],
+        "contrast_used": true,
+        "findings": [
+          {
+            "borders": null,
+            "location": "bilateral periventricular white matter",
+            "mass_effect": null,
+            "signal_characteristics": {
+              "description": "Mild, punctate T2/FLAIR hyperintensities"
+            },
+            "size": null,
+            "type": "white matter signal"
+          }
+        ],
+        "impression": "MRI brain essentially within normal limits for age. Mild non-specific periventricular T2/FLAIR signal changes bilaterally, likely representing incidental white matter changes. No focal lesion, mass effect, restricted diffusion, or pathological enhancement. Normal appearance of the hippocampi bilaterally",
+        "recommended_actions": [],
+        "volumetrics": null
+      },
+      "tool_name": "analyze_brain_mri",
+      "trigger_action": "request_contrast_mri"
+    },
     {
       "output": {
         "activating_procedures": {},
@@ -302,11 +319,19 @@
             "result": "repeat bedside screen during the admission; formal scoring incomplete"
           },
           {
-            "domain": "observation",
-            "result": "persisting disorientation and impaired attention and recall"
+            "domain": "orientation",
+            "result": "disoriented to date, as at baseline"
+          },
+          {
+            "domain": "visuospatial/executive",
+            "result": "disorganised clock, as at baseline"
+          },
+          {
+            "domain": "behaviour during testing",
+            "result": "tangential, intermittent vacant staring, inconsistent cooperation, as at baseline"
           }
         ],
-        "impression": "Persisting marked impairment of orientation, attention and recall on repeat screening.",
+        "impression": "Repeat bedside screen during the admission: findings unchanged from the baseline screen (disorientation to date and impaired executive items).",
         "recommended_actions": [],
         "timing": "post_intervention"
       },
@@ -723,6 +748,12 @@
               "study": "pelvis_abdomen_ultrasound"
             },
             "tool_name": "order_body_imaging"
+          },
+          {
+            "required_arguments": {
+              "study": "pelvis_abdomen_MRI"
+            },
+            "tool_name": "order_body_imaging"
           }
         ],
         "citations": [
@@ -732,7 +763,7 @@
         "criterion_id": "action-5-order-body-imaging",
         "expected_evidence": "Left ovarian 2.6 cm mature cystic teratoma",
         "importance": "required",
-        "label": "Perform pelvic and abdominal ultrasound to screen for an ovarian teratoma",
+        "label": "Perform pelvic and abdominal ultrasound or pelvic MRI to screen for an ovarian teratoma",
         "rationale": "Young women carry the highest teratoma risk; tumor removal is part of first-line treatment."
       },
       {
@@ -756,6 +787,24 @@
       {
         "alternatives": [
           {
+            "required_arguments": {
+              "modality": "FDG_PET"
+            },
+            "tool_name": "order_advanced_imaging"
+          }
+        ],
+        "citations": [
+          "[Abboud_2021]"
+        ],
+        "criterion_id": "brain-fdg-pet",
+        "expected_evidence": "Mild bilateral frontal hypermetabolism with bilateral parieto-occipital hypometabolism",
+        "importance": "optional",
+        "label": "Optionally obtain brain FDG-PET while suspicion is high and MRI, CSF cells, protein and bands are uninformative",
+        "rationale": "Before the antibody result the MRI is essentially normal and the CSF bland; brain FDG-PET can show the frontal hypermetabolism and parieto-occipital hypometabolism of anti-NMDAR encephalitis and support early suspicion, but it does not establish the diagnosis."
+      },
+      {
+        "alternatives": [
+          {
             "required_arguments": {},
             "tool_name": "check_drug_interactions"
           }
@@ -768,40 +817,25 @@
         "importance": "optional",
         "label": "Optionally check her sertraline and loratadine against the acute agents",
         "rationale": "Sertraline adds a sodium and QTc caution but no interaction that changes management."
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[Graus_2016]"
-        ],
-        "criterion_id": "action-6-search-medical-literature",
-        "expected_evidence": "General published evidence on anti-NMDAR encephalitis diagnosis and immunotherapy",
-        "importance": "optional",
-        "label": "Optionally review published evidence on anti-NMDAR encephalitis diagnosis and immunotherapy",
-        "rationale": "Background reading only: no diagnostic or management step of this case depends on it."
       }
     ],
     "assessment": {
       "prohibited_recommendations": [
         "Do not give haloperidol or other high-potency D2 antagonists for agitation: patients with anti-NMDAR encephalitis are prone to severe extrapyramidal and neuroleptic-malignant-like reactions.",
-        "Do not delay immunotherapy while waiting for the anti-NMDAR antibody result when clinical probability is high: antibody turnaround can take 1 to 2 weeks and delay worsens outcome.",
+        "Do not delay immunotherapy now that the CSF anti-GluN1 result is positive, for example while awaiting repeat testing, serum confirmation or the teratoma operation.",
         "Do not attribute the presentation to a primary psychiatric disorder while seizures, dyskinesias, autonomic instability, an abnormal EEG or CSF inflammation remain unexplained.",
         "Do not perform lumbar puncture without prior imaging in a patient with altered consciousness, focal signs, or new seizures: exclude mass effect first.",
         "Do not interpret a negative serum anti-NMDAR antibody as ruling out the disease; the CSF assay is the gold standard and may be positive when serum is negative."
       ],
       "required_recommendations": [
-        "Start IV acyclovir 10 mg/kg every 8 hours at presentation, and stop it once CSF HSV PCR is negative and the antibody diagnosis is established; repeat the PCR on a second CSF sample if the first LP was within 72 hours of onset and HSV encephalitis remains plausible.",
-        "Start first-line immunotherapy without waiting for the antibody result once infection is reasonably excluded: IV methylprednisolone 1 g daily for 5 days with IVIG 0.4 g/kg/day for 5 days (2 g/kg total) or plasma exchange (5 to 7 exchanges).",
+        "Start IV acyclovir 10 mg/kg every 8 hours at presentation, with empirical bacterial meningitis cover (ceftriaxone 2 g IV every 12 hours with vancomycin; a cephalosporin is acceptable after a non-severe penicillin rash) until the CSF cell count, Gram stain and culture exclude bacterial infection (Abboud 2021, ESCMID 2016); stop acyclovir once CSF HSV PCR is negative and the antibody diagnosis is established. HSV PCR can be negative if done too early (for example within 24 hours of onset) and is repeated if clinical suspicion of HSV encephalitis remains high (Graus 2016).",
+        "Start first-line immunotherapy now that the CSF anti-GluN1 result establishes definite anti-NMDAR encephalitis; before it, neither the possible nor the probable Graus 2016 criteria were met: IV methylprednisolone 1 g daily for 3 to 7 days, adding plasma exchange (5 to 10 sessions every other day) if there is no clinical improvement by the end of the steroid course; combined therapy from the start is reserved for severe presentations, and this one is mild (Abboud 2021). Plasma exchange is preferred here (the ovarian teratoma, a tumor-associated risk for which plasma exchange is advised first), with central venous access and hemodynamic monitoring; no agitation, bleeding disorder or marked dysautonomia favors IVIG (2 g/kg over 2 to 5 days), which remains the alternative, with sodium monitoring, as IVIG can worsen hyponatremia.",
+        "After the acute course, bridge with a gradual oral prednisone taper, or monthly IVIG or IV methylprednisolone, while recovery or second-line therapy takes effect (Abboud 2021).",
         "Arrange prompt surgical removal of the left ovarian teratoma (laparoscopic, ovary-sparing where feasible) as part of first-line treatment, with gynecology.",
         "Monitor with continuous EEG for non-convulsive seizures while consciousness fluctuates or seizures persist.",
         "Admit to a neurology ward with seizure precautions and continuous cardiac monitoring.",
-        "If there is no meaningful clinical improvement 10 to 14 days after first-line therapy, escalate to rituximab (375 mg/m\u00b2 weekly for 4 doses or 1 g twice 2 weeks apart, after hepatitis B screening) and/or cyclophosphamide; discuss fertility preservation before cyclophosphamide.",
-        "Treat agitation and insomnia with benzodiazepines (lorazepam) first.",
+        "If there is no clinical or radiological improvement 2 to 4 weeks after completion of first-line therapy, escalate to rituximab (375 mg/m\u00b2 weekly for 4 doses or 1000 mg twice 2 weeks apart, after hepatitis B screening) and/or IV cyclophosphamide 600 to 1000 mg/m\u00b2 monthly; discuss fertility preservation before cyclophosphamide (Abboud 2021).",
+        "Treat agitation and insomnia with benzodiazepines (lorazepam) first (Lejuste 2016).",
         "Neurology-led care with psychiatry for behavioral management; gynecology for the teratoma."
       ]
     },
@@ -1042,10 +1076,10 @@
     "drug_interactions": {
       "general": {
         "alternatives": [
-          "Plasma exchange (5 to 7 exchanges) is an alternative to IVIG."
+          "Plasma exchange (5 to 10 sessions every other day) is an alternative to IVIG."
         ],
         "contraindications": [
-          "Class warning: haloperidol and other high-potency dopamine D2 antagonists are associated with severe extrapyramidal and neuroleptic malignant-like reactions in anti-NMDA receptor encephalitis."
+          "Class warning: haloperidol and other high-potency dopamine D2 antagonists are associated with severe extrapyramidal and neuroleptic malignant-like reactions in autoimmune encephalitis."
         ],
         "formulary_status": "all agents on formulary",
         "interactions": [
@@ -1063,7 +1097,7 @@
         "warnings": [
           "Rituximab: screen for hepatitis B (HBsAg, anti-HBc) before the first dose.",
           "Cyclophosphamide is gonadotoxic and teratogenic: discuss fertility preservation and contraception.",
-          "Penicillin allergy (rash): not relevant to the agents above."
+          "Penicillin allergy (rash): not relevant to the agents above; after a non-severe penicillin rash a third-generation cephalosporin such as ceftriaxone may be given."
         ]
       }
     },
@@ -1465,37 +1499,11 @@
         ]
       }
     },
-    "literature_search": {
-      "anti-NMDA receptor encephalitis diagnosis and treatment": {
-        "query": "anti-NMDA receptor encephalitis diagnosis and treatment",
-        "results": [
-          {
-            "evidence_level": "expert consensus criteria",
-            "finding": "Definite anti-NMDAR encephalitis requires one or more of six major symptom groups and IgG anti-GluN1 antibodies, with CSF testing included; probable disease requires four groups (or three with a teratoma) of rapid onset plus an abnormal EEG or CSF pleocytosis or oligoclonal bands.",
-            "source": "Graus F et al. Lancet Neurol 2016;15:391-404"
-          },
-          {
-            "evidence_level": "retrospective cohort",
-            "finding": "All patients had antibodies in CSF, whereas about 14% were negative in serum; CSF titers related more closely to outcome than serum titers.",
-            "source": "Gresa-Arribas N et al. Lancet Neurol 2014;13:167-177"
-          },
-          {
-            "evidence_level": "observational cohort (n=577)",
-            "finding": "38% had a tumor, mostly ovarian teratoma; 53% improved within 4 weeks of first-line immunotherapy or tumor removal; second-line rituximab or cyclophosphamide after first-line failure was associated with better outcome; 81% had mRS 0-2 at 24 months.",
-            "source": "Titulaer MJ et al. Lancet Neurol 2013;12:157-165"
-          },
-          {
-            "evidence_level": "retrospective case series",
-            "finding": "Extreme delta brush was found in 7 of 23 adults with anti-NMDAR encephalitis and was associated with a more prolonged illness.",
-            "source": "Schmitt SE et al. Neurology 2012;79:1094-1100"
-          }
-        ],
-        "summary": "Published criteria and cohort data on anti-NMDA receptor encephalitis: definite diagnosis rests on CSF IgG anti-GluN1 antibodies; first-line immunotherapy and tumor removal are followed by second-line agents when there is no response."
-      }
-    },
+    "literature_search": null,
     "microbiology": null,
     "mri": {
       "additional_observations": [],
+      "contrast_used": false,
       "findings": [
         {
           "borders": null,
@@ -1508,7 +1516,7 @@
           "type": "white matter signal"
         }
       ],
-      "impression": "MRI brain essentially within normal limits for age. Mild non-specific periventricular T2/FLAIR signal changes bilaterally, likely representing incidental white matter changes. No focal lesion, mass effect, restricted diffusion, or pathological enhancement. Normal appearance of the hippocampi bilaterally",
+      "impression": "MRI brain essentially within normal limits for age. Mild non-specific periventricular T2/FLAIR signal changes bilaterally, likely representing incidental white matter changes. No focal lesion, mass effect or restricted diffusion. Normal appearance of the hippocampi bilaterally",
       "recommended_actions": [],
       "volumetrics": null
     }
@@ -1526,8 +1534,7 @@
       "cardiac_monitoring": "sinus_tachycardia",
       "ct": "incidental",
       "drug_interactions": "normal",
-      "echo": "normal",
-      "literature_search": "normal"
+      "echo": "normal"
     },
     "last_revised": "2026-08-10",
     "policy_spec_status": "draft",

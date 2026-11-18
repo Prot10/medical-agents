@@ -1,0 +1,31 @@
+# VASC-DEM-S03
+
+## Reviewer notes
+Reviewer status: R1 in_progress, no R2 | Approved before this round: no
+
+| note id | ruling | what changed (field paths) |
+|---|---|---|
+| 593a77db-8038-4921-a5f7-8ce76c9fd5c2 | FIXED (plan C7, D7) | initial_tool_outputs.mri.findings[1].location "Bilateral thalami, right putamen, left caudate, pons, bilateral corona radiata" (7 sites) -> "Bilateral thalami, both putamina, left caudate, pons, bilateral corona radiata" (8); impression item 2 "Eight chronic lacunes: both thalami, both putamina, left caudate, pons, both coronae radiatae." Count "8 lacunes" kept. Checked: action-5 expected_evidence, differential[0] and [3], red_herrings[1] all say eight; the SPECT and CT fallback name only some sites, which is consistent with those modalities. mri_probe.py clean (non-contrast MRI, contrast_used null, unchanged) |
+
+## Own findings
+| dim | severity | field path | finding | action |
+|---|---|---|---|---|
+| C | major | ground_truth.action_criteria[action-4-perform-clinical-assessment]; stop_rule | Plan class C1 (D1): timed gait was required and in the stop rule | FIXED: importance -> recommended, removed from the stop rule (now screen, labs, MRI); rationale "...the diagnosis, and its distinction from NPH, does not depend on it [VASCOG_2014]" |
+| C | minor | ground_truth.assessment.required_recommendations[1]; prohibited_recommendations[4]; key_clinical_evidence[3] | With gait testing recommended, the falls must depended on the TUG result and the prohibition demanded "measuring gait" | FIXED: must "Treat the three falls in a year, on turning or rising, with a markedly short-stepped gait as an immediate falls risk..."; prohibition "...without assessing the gait disorder that the small-vessel disease produces"; kce "Three falls in a year with a markedly short-stepped gait (Timed Up and Go 24.6 s when tested)..." |
+| C | minor | initial_tool_outputs.specialized_test | Plan class C6 (D6): RAVLT delayed free recall 15th flagged "yes" | FIXED: percentile rows reference_range "9th percentile or above (25th-75th average)"; that row "low average"; impression "with low-average free recall" |
+| C | minor | ground_truth.action_criteria[action-5-analyze-brain-mri].rationale | "The vascular attribution and the distinction from NPH both rest on the imaging" (C8 sufficiency) | FIXED: the burden "read with the cognitive profile and the gait, informs the vascular attribution, and the ventricular and sulcal morphology makes the distinction from NPH [STRIVE_2] [VasCog2_WSO_2025]" |
+| E | minor | ground_truth.action_criteria[action-6-order-specialized-test].label | "to settle the ... attribution" | FIXED: "to characterise the executive-versus-amnestic profile" |
+| B | minor | ground_truth.differential[2].key_features | "no levodopa responsiveness to establish" read as a call for a levodopa test, now labelled waste | FIXED: "...no rest tremor and no rigidity, arm swing is preserved, and the label adds nothing to the vascular diagnosis" |
+| C | minor | ground_truth.avoided_actions | Plan class C11 (D12): stored SPECT, levodopa challenge, DTI and contrast pelvis/abdomen CT matched no criterion or label | FIXED: added avoid-waste-perfusion-spect (order_advanced_imaging modality perfusion_SPECT, [NICE_NG97]), avoid-waste-levodopa-challenge (perform_clinical_assessment assessment_type levodopa_challenge, [VASCOG_2014]), avoid-waste-dti-tractography (modality DTI_tractography, [STRIVE_2]), avoid-waste-pelvis-abdomen-ct (order_body_imaging study pelvis_abdomen_CT: no abdominal indication, kidney disease and prostate known, ultrasound answers any renal question without contrast at eGFR 38). TEE covered by the wildcard echo label; speech-language and pelvis ultrasound stay unlabelled (plan table). Follow-ups already credited-first |
+
+## Changes
+The diagnosis is unchanged. The MRI now lists all eight lacunes: the left putamen was missing, and the findings and impression read "both thalami, both putamina, left caudate, pons, both coronae radiatae". Every other mention of eight lacunes already agreed. Timed gait testing is recommended, not required, and is out of the stop rule (screen, labs, MRI). The falls must, a prohibition and the key evidence now rest on the three falls and the short-stepped gait in the history and examination, not on the test result. The RAVLT 15th percentile is labelled low average (AACN 2020). The MRI rationale rests the attribution on concordance and the NPH distinction on ventricular morphology. Ordering perfusion SPECT, a levodopa challenge, DTI or a contrast pelvis/abdomen CT is labelled waste; the stored reports are kept. Checks: perfect_agent.py passes; mri_probe.py clean; test_case_guards 48 passed for the batch; case_io check, no failure naming the case.
+
+## Verification
+Pass 1: 0 errors found
+Checked: 593a77db, MRI lists eight lacunes (2 thalami, 2 putamina, left caudate, pons, 2 coronae radiatae) in the findings and impression, and every other count says eight; C1 gait recommended with the falls must and prohibition no longer depending on the test; C6 RAVLT 15th low average; C11 labels consistent (pelvis CT is a contrast study at eGFR 38, ultrasound unlabelled); mri_probe clean; perfect_agent, case_io check and test_case_guards pass.
+Cosmetic (not counted): none.
+Condition audit (17 Nov 2026): 1 error found and fixed. C, minor, ground_truth.avoided_actions[avoid-waste-levodopa-challenge].citations: [VASCOG_2014] does not address levodopa challenge testing and the plan's C11 table gives this label no citation; 19 other VASC-DEM cases carry it uncited (the P05 and P06 verifiers removed the same citation and flagged S01-S05 for the lead). FIXED: citation removed, rationale and severity unchanged. Re-checked: perfect_agent.py passes; test_case_guards clean for VASC-DEM.
+Pass 5: 0 errors found
+Checked the condition-audit change only: ground_truth.avoided_actions[avoid-waste-levodopa-challenge].citations is now empty, matching the plan's C11 table (levodopa_challenge: waste, no citation) and the other VASC-DEM cases; rationale and severity unchanged and consistent with the exam (no rest tremor or rigidity, arm swing preserved); no criterion matches the same call. perfect_agent.py -v passes; test_case_guards (S02-S05) 32 passed. No changes made.
+Cosmetic (not counted): none.

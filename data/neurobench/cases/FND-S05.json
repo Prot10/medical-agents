@@ -74,21 +74,7 @@
       "recommended_actions": []
     },
     "drug_interactions": null,
-    "ecg": {
-      "axis": "normal",
-      "clinical_correlation": "",
-      "findings": [
-        "Normal sinus rhythm. Normal axis and intervals. No acute ST-T changes."
-      ],
-      "interpretation": "Normal ECG",
-      "intervals": {
-        "PR": "164 ms",
-        "QRS": "96 ms",
-        "QTc": "419 ms"
-      },
-      "rate": 63,
-      "rhythm": "normal sinus rhythm"
-    },
+    "ecg": null,
     "echo": {
       "chambers": {
         "LA": "normal size",
@@ -120,30 +106,6 @@
   "followup_outputs": [
     {
       "output": {
-        "assessment_type": "performance_status",
-        "findings": [
-          {
-            "domain": "activity",
-            "result": "unable to walk for 3 days"
-          },
-          {
-            "domain": "self-care and work",
-            "result": "needs assistance with transfers and mobility; not working"
-          }
-        ],
-        "impression": "Karnofsky 50 (requires considerable assistance and frequent care), ECOG 3 (capable of only limited self-care, confined to bed or chair more than 50% of waking hours).",
-        "recommended_actions": [],
-        "scores": {
-          "ECOG": "3",
-          "Karnofsky": "50/100"
-        },
-        "timing": "baseline"
-      },
-      "tool_name": "perform_clinical_assessment",
-      "trigger_action": "request_performance_status"
-    },
-    {
-      "output": {
         "findings": [
           {
             "domain": "global cognition",
@@ -168,15 +130,39 @@
           "GAD-7": "13 (moderate)",
           "MoCA": "28/30",
           "PHQ-9": "8 (mild)",
-          "RAVLT_delayed_recall": "z = -0.2",
+          "RAVLT_delayed_recall": "z = 0.2",
           "TOMM_trial_2": "49/50",
-          "Trail_Making_B": "z = -0.4"
+          "Trail_Making_B": "z = 0.0"
         },
         "recommended_actions": [],
         "test_type": "neuropsych_battery"
       },
       "tool_name": "order_specialized_test",
       "trigger_action": "request_neuropsych_battery"
+    },
+    {
+      "output": {
+        "assessment_type": "performance_status",
+        "findings": [
+          {
+            "domain": "activity",
+            "result": "unable to walk for 3 days"
+          },
+          {
+            "domain": "self-care and work",
+            "result": "needs assistance with transfers and mobility; not working"
+          }
+        ],
+        "impression": "Karnofsky 50 (requires considerable assistance and frequent care), ECOG 3 (capable of only limited self-care, confined to bed or chair more than 50% of waking hours).",
+        "recommended_actions": [],
+        "scores": {
+          "ECOG": "3",
+          "Karnofsky": "50/100"
+        },
+        "timing": "baseline"
+      },
+      "tool_name": "perform_clinical_assessment",
+      "trigger_action": "request_performance_status"
     }
   ],
   "ground_truth": {
@@ -204,6 +190,22 @@
       {
         "alternatives": [
           {
+            "required_arguments": {},
+            "tool_name": "analyze_ecg"
+          }
+        ],
+        "citations": [
+          "[NICE_CG109]"
+        ],
+        "criterion_id": "action-ecg",
+        "expected_evidence": "Sinus rhythm at 96 per minute, normal PR, QRS and QTc",
+        "importance": "required",
+        "label": "12-lead ECG",
+        "rationale": "Her events include apparent loss of responsiveness; NICE advises a 12-lead ECG for everyone with transient loss of consciousness, to look for a cardiac cause such as long QT, pre-excitation, a Brugada pattern or heart block."
+      },
+      {
+        "alternatives": [
+          {
             "required_arguments": {
               "contrast": false
             },
@@ -211,30 +213,14 @@
           }
         ],
         "citations": [
-          "[Espay_2018]"
+          "[Espay_2018]",
+          "[AHA_ASA_Stroke_2026]"
         ],
         "criterion_id": "action-4-analyze-brain-mri",
         "expected_evidence": "No T2/FLAIR lesion or restricted diffusion to account for the right leg weakness",
-        "importance": "recommended",
-        "label": "Non-contrast brain MRI, once",
-        "rationale": "Acute right leg weakness with a remitting episode in the same limb two years ago raises demyelination or a structural lesion; one non-contrast MRI with DWI answers that question, and gadolinium adds nothing without a known demyelinating disease (Espay 2018)."
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "analyze_ecg"
-          }
-        ],
-        "citations": [
-          "[NICE_CG109]",
-          "[NICE_NG217]"
-        ],
-        "criterion_id": "action-ecg",
-        "expected_evidence": "Sinus rhythm with normal conduction and QT interval",
-        "importance": "optional",
-        "label": "12-lead ECG",
-        "rationale": "Episodes of apparent unresponsiveness: NICE advises a 12-lead ECG after transient loss of consciousness (CG109) and after a suspected seizure (NG217). The event semiology already favours functional seizures, so it does not contribute to the diagnosis."
+        "importance": "required",
+        "label": "Non-contrast brain MRI with DWI",
+        "rationale": "A new focal deficit of 3 days is imaged whatever the examination shows: positive functional signs do not exclude a coexisting acute infarct or demyelinating lesion, since functional disorder coexists with neurological disease (Espay 2018; AHA/ASA 2026). The remitting episode in the same leg two years ago adds the demyelination question; gadolinium adds nothing without a known demyelinating disease."
       },
       {
         "alternatives": [
@@ -247,14 +233,13 @@
         ],
         "citations": [
           "[ILAE_PNES_2013]",
-          "[AAN_Functional_Seizures_2025]",
-          "[Avbersek_2010]"
+          "[AAN_Functional_Seizures_2025]"
         ],
         "criterion_id": "action-5-analyze-eeg",
         "expected_evidence": "Habitual events recorded on video with no EEG change and a normal interictal record",
-        "importance": "optional",
+        "importance": "required",
         "label": "Video-EEG to capture a habitual event",
-        "rationale": "The events have one feature that favours epileptic seizures (eyes open with upward gaze), so the semiology is less conclusive than usual; a habitual event recorded on video-EEG without ictal change reaches the ILAE documented level and lets co-occurring epilepsy be assessed (LaFrance 2013; AAN 2025). Without the recording, the positive signs and the semiology of witnessed events support the diagnosis at a lower ILAE level of certainty (LaFrance 2013)."
+        "rationale": "No habitual event has been seen by a clinician, only described by her roommate, so the history supports functional seizures only at the possible level; a habitual event recorded on video-EEG without ictal change documents the diagnosis and screens for co-occurring epilepsy, which matters more here because the events have one feature that favours epileptic seizures (eyes open with upward gaze) (ILAE 2013; AAN 2025)."
       },
       {
         "alternatives": [
@@ -289,24 +274,6 @@
         "importance": "optional",
         "label": "Neuropsychological assessment of the comorbidity",
         "rationale": "Generalized anxiety disorder is a treatment target; a battery can quantify it but does not make the diagnosis and is not needed before treatment (Espay 2018)."
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "query": "functional neurological disorder diagnosis treatment"
-            },
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[Espay_2018]"
-        ],
-        "criterion_id": "action-1-search-medical-literature",
-        "expected_evidence": "General evidence on positive signs and treatment trials in FND",
-        "importance": "optional",
-        "label": "Search the literature on FND diagnosis and treatment",
-        "rationale": "Background reading only; the diagnosis and the plan rest on this patient's examination and recorded data, not on a search."
       }
     ],
     "assessment": {
@@ -319,7 +286,7 @@
         "Give gadolinium contrast without a specific indication."
       ],
       "required_recommendations": [
-        "Make a positive diagnosis of functional neurological disorder (mixed: functional seizures and functional right leg weakness) based on the Hoover sign, collapsing weakness and distractible tremor and the semiology of the habitual events, confirmed on video-EEG where recorded, and not by exclusion of other disease.",
+        "Make a positive diagnosis of functional neurological disorder (mixed: functional seizures and functional right leg weakness) based on the Hoover sign, collapsing weakness and distractible tremor and the habitual event recorded on video-EEG without ictal change, and not by exclusion of other disease.",
         "Explain the diagnosis to the patient, and with consent to the family, as a common and genuine disorder of nervous system functioning that can improve, show the positive signs, and give written information.",
         "Refer for physiotherapy with expertise in functional motor disorder (motor retraining, Nielsen 2015 consensus).",
         "Refer for psychological therapy by a clinician experienced in FND (CBT-informed) and treat the comorbid anxiety.",
@@ -479,7 +446,7 @@
       {
         "diagnosis": "Multiple sclerosis",
         "icd_code": "G35",
-        "key_features": "A remitting episode of right leg weakness two years ago raises demyelination, but the Hoover sign and collapsing weakness with normal reflexes and flexor plantars are incompatible with a central lesion, and the non-contrast MRI shows no white matter lesion.",
+        "key_features": "A remitting episode of right leg weakness two years ago raises demyelination; the Hoover sign and collapsing weakness with normal reflexes and flexor plantars show that the current weakness is functional but do not exclude a coexisting lesion, and the non-contrast MRI shows no white matter lesion.",
         "likelihood": "low"
       },
       {
@@ -493,7 +460,7 @@
       "Positive signs of functional weakness and tremor: right Hoover sign, collapsing weakness of the right leg and a right hand tremor that stops with serial 7s; midline-splitting sensory loss and normal walking when unobserved are supportive only.",
       "Event semiology: bilateral arm shaking for 2-3 minutes with no incontinence, no postictal confusion and immediate recovery; the open eyes are an atypical feature, so the semiology alone does not settle the events.",
       "Video-EEG recorded one habitual event, confirmed as typical by the roommate, with no EEG change and responsiveness to command during the shaking; the interictal record is normal.",
-      "A single non-contrast brain MRI, indicated by the prior remitting right leg episode, shows no white matter lesion or other structural cause.",
+      "A non-contrast brain MRI with DWI, indicated by the 3-day focal deficit and the prior remitting right leg episode, shows no restricted diffusion, white matter lesion or other structural cause.",
       "The recent divorce and custody dispute and her generalized anxiety are supportive context and a treatment target; a stressor is neither required nor sufficient for the diagnosis."
     ],
     "red_herrings": [
@@ -527,14 +494,17 @@
         "citations": [
           "[Espay_2018]"
         ],
-        "reason": "The examination comes first: its positive signs decide whether imaging has a specific question to answer (Espay 2018).",
+        "reason": "The examination comes first: it defines the deficit the imaging must explain and takes minutes, so it does not delay the MRI (Espay 2018).",
         "severity": "soft"
       }
     ],
     "stop_rule": {
       "max_additional_actions": 0,
       "required_before_assessment": [
-        "action-3-perform-clinical-assessment"
+        "action-3-perform-clinical-assessment",
+        "action-ecg",
+        "action-4-analyze-brain-mri",
+        "action-5-analyze-eeg"
       ]
     }
   },
@@ -598,7 +568,24 @@
         ]
       }
     },
-    "ecg": null,
+    "ecg": {
+      "axis": "normal (+60 degrees)",
+      "findings": [
+        "Sinus rhythm at 96 per minute with normal P-wave morphology.",
+        "PR interval 152 ms with no delta wave; QRS 86 ms with normal morphology and no bundle branch block.",
+        "No coved or saddleback ST elevation in V1-V2; no ST-segment or T-wave abnormality.",
+        "QTc 430 ms, within normal limits for a woman."
+      ],
+      "interpretation": "Normal 12-lead ECG: sinus rhythm at 96 per minute with normal PR, QRS and QTc intervals. No pre-excitation, Brugada pattern, heart block or QT prolongation.",
+      "intervals": {
+        "PR": "152 ms",
+        "QRS": "86 ms",
+        "QT": "340 ms",
+        "QTc": "430 ms (Bazett)"
+      },
+      "rate": 96,
+      "rhythm": "sinus rhythm"
+    },
     "echo": null,
     "eeg": {
       "activating_procedures": {
@@ -632,49 +619,7 @@
       "recommended_actions": []
     },
     "labs": null,
-    "literature_search": {
-      "functional neurological disorder diagnosis treatment": {
-        "query": "functional neurological disorder diagnosis treatment",
-        "results": [
-          {
-            "evidence_level": "narrative review",
-            "finding": "Diagnosis of functional neurological disorder rests on positive clinical features such as the Hoover sign, tremor entrainment and functional seizure semiology, not on the exclusion of other disease; treatment combines explanation, physiotherapy and psychological therapy.",
-            "source": "Espay AJ et al. JAMA Neurol 2018;75:1132-1141"
-          },
-          {
-            "evidence_level": "systematic review",
-            "finding": "Motor signs such as the Hoover sign, hip abductor sign, drift without pronation and dragging gait have high specificity; sensory signs such as midline splitting have low specificity.",
-            "source": "Daum C et al. J Neurol Neurosurg Psychiatry 2014;85:180-190"
-          },
-          {
-            "evidence_level": "ILAE consensus",
-            "finding": "Defines levels of certainty for psychogenic nonepileptic seizures; the documented level requires a typical event recorded on video-EEG without ictal EEG change.",
-            "source": "LaFrance WC Jr et al. Epilepsia 2013;54:2005-2018"
-          },
-          {
-            "evidence_level": "AAN evidence-based guideline",
-            "finding": "For functional seizures: assess for co-occurring epilepsy and psychiatric disorders, taper antiseizure medication without another indication, avoid benzodiazepines, and offer psychological therapy, which is possibly effective.",
-            "source": "Tolchin B et al. Neurology 2026;106:e214466"
-          },
-          {
-            "evidence_level": "randomised controlled trial",
-            "finding": "CBT added to standardised medical care did not reduce dissociative seizure frequency at 12 months; several secondary outcomes favoured CBT.",
-            "source": "Goldstein LH et al. Lancet Psychiatry 2020;7:491-505"
-          },
-          {
-            "evidence_level": "randomised controlled trial",
-            "finding": "Specialist physiotherapy for functional motor disorder was not superior to community neurological physiotherapy on physical function at 12 months; several secondary outcomes favoured it.",
-            "source": "Nielsen G et al. Lancet Neurol 2024;23:675-686"
-          },
-          {
-            "evidence_level": "systematic review",
-            "finding": "About 4% of patients diagnosed with conversion symptoms since 1970 later received another diagnosis.",
-            "source": "Stone J et al. BMJ 2005;331:989"
-          }
-        ],
-        "summary": "Guideline and trial evidence supports a positive clinical diagnosis of functional neurological disorder, video-EEG confirmation of functional seizures, tapering of unneeded antiseizure drugs and benzodiazepines, and physiotherapy and psychological treatment whose trial effects on primary outcomes were modest."
-      }
-    },
+    "literature_search": null,
     "mri": {
       "additional_observations": [
         "Technique: sagittal T1, axial T2, axial and sagittal FLAIR, DWI with ADC, SWI; no contrast administered",
@@ -695,19 +640,18 @@
     "case_body_concerns": [],
     "citation_gap": [],
     "criteria_pack_version": "1.0",
-    "difficulty_rationale": "Clear positive signs of functional right leg weakness and tremor, but the events include an atypical feature (eyes open), so a video-EEG capture adds most here; one non-contrast MRI answers the demyelination question raised by the prior remitting episode.",
+    "difficulty_rationale": "Clear positive signs of functional right leg weakness and tremor, but no event has been seen by a clinician and the events include an atypical feature (eyes open), so a habitual event must be recorded on video-EEG; the 3-day focal deficit needs a non-contrast MRI with DWI, and the events with apparent loss of responsiveness a 12-lead ECG.",
     "fallback_tool_kinds": {
       "cardiac_monitoring": "normal",
       "clinical_assessment": "case",
       "csf": "normal",
       "ct": "normal",
-      "ecg": "normal",
       "echo": "normal"
     },
-    "last_revised": "2026-10-24",
+    "last_revised": "2026-11-16",
     "notes": "Straightforward FND with PNES and functional right leg weakness. The Hoover sign is diagnostic of the weakness; a video-EEG capture confirms the events.",
     "policy_spec_status": "draft",
-    "revision_reason": "October 2026 review round: criteria rebuilt to the pack tiers (exam required, MRI recommended), non-contrast MRI, canonical literature and medication outputs, case-specific differential, evidence and assessment. Close-out 24 Oct 2026: video-EEG optional and red-flag tests recommended, per the July 2026 agreement with the physicians that the examination is the only required diagnostic act.",
+    "revision_reason": "November 2026 review round: video-EEG required (no event seen by a clinician; ILAE 2013, AAN 2025), non-contrast brain MRI with DWI required for the 3-day focal deficit (Espay 2018; AHA/ASA 2026), 12-lead ECG required for the events with apparent loss of responsiveness (NICE CG109), with a stored case ECG. Earlier (October 2026): criteria rebuilt to the pack tiers, non-contrast MRI, case-specific differential, evidence and assessment.",
     "version": "policy-v1",
     "vocab_gap": []
   },

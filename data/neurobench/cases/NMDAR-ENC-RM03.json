@@ -111,6 +111,53 @@
   "followup_outputs": [
     {
       "output": {
+        "additional_observations": [
+          "No midline shift",
+          "Ventricles are mildly prominent, compatible with age-related involutional changes",
+          "No hydrocephalus",
+          "No extra-axial collections",
+          "No acute hemorrhage",
+          "Normal vascular flow voids",
+          "No leptomeningeal enhancement",
+          "Mild generalized cerebral atrophy appropriate for age"
+        ],
+        "contrast_used": true,
+        "findings": [
+          {
+            "borders": "Ill-defined",
+            "location": "Left medial temporal lobe, predominantly involving the hippocampus",
+            "mass_effect": "None",
+            "signal_characteristics": {
+              "DWI": "No restricted diffusion",
+              "FLAIR": "Subtle hyperintensity, could represent early pathology versus artifact",
+              "T1": "Isointense to slightly hypointense",
+              "T2": "Mildly hyperintense",
+              "post_contrast": "No pathological enhancement"
+            },
+            "size": "Approximately 1.2 x 0.6 cm",
+            "type": "Subtle FLAIR hyperintensity"
+          },
+          {
+            "borders": "Ill-defined",
+            "location": "Periventricular and subcortical white matter, bilateral",
+            "mass_effect": "None",
+            "signal_characteristics": {
+              "FLAIR": "Scattered punctate hyperintensities",
+              "T2": "Hyperintense"
+            },
+            "size": null,
+            "type": "Age-related white matter changes"
+          }
+        ],
+        "impression": "1. Subtle FLAIR hyperintensity in the left medial temporal lobe (hippocampus) without restricted diffusion, enhancement or mass effect. 2. Mild scattered periventricular white matter changes and generalized atrophy, likely age-related. No acute infarct, haemorrhage or leptomeningeal enhancement.",
+        "recommended_actions": [],
+        "volumetrics": null
+      },
+      "tool_name": "analyze_brain_mri",
+      "trigger_action": "request_contrast_mri"
+    },
+    {
+      "output": {
         "activating_procedures": {},
         "artifacts": [
           {
@@ -164,8 +211,39 @@
     },
     {
       "output": {
+        "findings": [
+          {
+            "finding": "no hypermetabolic lymph node, lung or mediastinal lesion; mild upper-lobe centrilobular emphysema on the CT component",
+            "interpretation": "physiological uptake only",
+            "region": "neck, thorax and mediastinum"
+          },
+          {
+            "finding": "physiological uptake; non-avid 1.2 cm simple left renal cyst; no adnexal or nodal uptake",
+            "interpretation": "unremarkable",
+            "region": "abdomen and pelvis"
+          },
+          {
+            "finding": "physiological uptake; no focal hypermetabolic lesion",
+            "interpretation": "unremarkable",
+            "region": "skeleton and bone marrow"
+          }
+        ],
+        "impression": "No hypermetabolic lesion suggesting malignancy.",
+        "modality": "whole_body_FDG_PET",
+        "quantitative_data": {
+          "liver_SUVmean": "2.2",
+          "mediastinal_blood_pool_SUVmean": "1.7"
+        },
+        "recommended_actions": [],
+        "tracer_or_protocol": "F-18 fluorodeoxyglucose PET with low-dose CT, skull base to mid-thigh"
+      },
+      "tool_name": "order_advanced_imaging",
+      "trigger_action": "order_whole_body_fdg_pet"
+    },
+    {
+      "output": {
         "alternatives": [
-          "Plasma exchange (5 to 7 exchanges) as an alternative to IVIG"
+          "Plasma exchange (5 to 10 sessions every other day) as an alternative to IVIG"
         ],
         "contraindications": [],
         "formulary_status": "IV methylprednisolone and IVIG both available on formulary",
@@ -185,31 +263,6 @@
       },
       "tool_name": "check_drug_interactions",
       "trigger_action": "check_immunotherapy_drug_interactions"
-    },
-    {
-      "output": {
-        "query": "paraneoplastic and autoimmune encephalitis in older adults NMDAR antibodies",
-        "results": [
-          {
-            "evidence_level": "observational cohort",
-            "finding": "Patients aged 45 or more had fewer teratomas; tumours, mostly carcinomas, were found in about a quarter.",
-            "source": "Titulaer MJ et al. Neurology 2013;81:1058-1063"
-          },
-          {
-            "evidence_level": "expert consensus criteria",
-            "finding": "Updated paraneoplastic neurological syndrome criteria classify NMDAR antibodies as intermediate risk for cancer and Hu, CV2/CRMP5, Ma2, Yo and Ri antibodies as high risk (cancer in more than 70%).",
-            "source": "Graus F et al. Neurol Neuroimmunol Neuroinflamm 2021;8:e1014"
-          },
-          {
-            "evidence_level": "observational cohort (n=577)",
-            "finding": "38% had a tumour, mostly ovarian teratoma, with the highest frequency in women of reproductive age; tumours were rare in men and in children.",
-            "source": "Titulaer MJ et al. Lancet Neurol 2013;12:157-165"
-          }
-        ],
-        "summary": "In older patients anti-NMDAR encephalitis is less often associated with teratoma and more often with carcinoma; anti-NMDAR is an intermediate-risk antibody for an underlying cancer, unlike the high-risk onconeural antibodies of classical paraneoplastic limbic encephalitis."
-      },
-      "tool_name": "search_medical_literature",
-      "trigger_action": "search_paraneoplastic_encephalitis_older_adults"
     },
     {
       "output": {
@@ -368,7 +421,7 @@
         "findings": [
           {
             "domain": "activity",
-            "result": "confined to bed or chair for most of the day; mobilises only with assistance"
+            "result": "walks with supervision; up and about less than half of waking hours"
           },
           {
             "domain": "self-care and work",
@@ -625,6 +678,25 @@
         "alternatives": [
           {
             "required_arguments": {
+              "modality": "whole_body_FDG_PET"
+            },
+            "tool_name": "order_advanced_imaging"
+          }
+        ],
+        "citations": [
+          "[Abboud_2021]",
+          "[Titulaer_late_2013]"
+        ],
+        "criterion_id": "whole-body-pet-tumour-screen",
+        "expected_evidence": "No hypermetabolic lesion suggesting malignancy",
+        "importance": "recommended",
+        "label": "Obtain whole-body FDG-PET after the negative CT of the chest, abdomen and pelvis",
+        "rationale": "In an older former heavy smoker the suspicion of an underlying carcinoma stays high after a negative CT, and whole-body FDG-PET is the next screening step."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
               "panels": [
                 "serum_osmolality",
                 "urine_osmolality"
@@ -657,22 +729,6 @@
         "importance": "recommended",
         "label": "Check her citalopram, co-amilozide and inhalers against the planned immunotherapy and antiseizure drugs",
         "rationale": "She takes a thiazide and an SSRI with a sodium of 128, and steroids will add to diuretic potassium loss."
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[Titulaer_late_2013]"
-        ],
-        "criterion_id": "action-6-search-medical-literature",
-        "expected_evidence": "Published evidence on tumour associations of anti-NMDAR encephalitis in older adults",
-        "importance": "optional",
-        "label": "Optionally review published evidence on tumour associations of anti-NMDAR encephalitis in older adults",
-        "rationale": "Background reading only; it is not a clinical step and nothing in the work-up depends on it."
       }
     ],
     "assessment": {
@@ -684,15 +740,16 @@
         "Do not interpret a negative serum anti-NMDAR antibody as ruling out the disease; the CSF assay is the gold standard and may be positive when serum is negative."
       ],
       "required_recommendations": [
-        "Start IV aciclovir 10 mg/kg every 8 hours at presentation, and stop it once CSF HSV PCR is negative and the antibody diagnosis is established; repeat the PCR on a second CSF sample if the first LP was within 72 hours of onset and HSV encephalitis remains plausible.",
-        "Start first-line immunotherapy without waiting for the antibody result once infection is reasonably excluded: IV methylprednisolone 1 g daily for 5 days with IVIG 0.4 g/kg/day for 5 days (2 g/kg total) or plasma exchange (5 to 7 exchanges). Monitor potassium and glucose during the steroid pulse (thiazide, salbutamol).",
-        "Contrast-enhanced CT of the chest, abdomen and pelvis shows no tumour: in a 62-year-old former heavy smoker, repeat tumour screening during follow-up if the course is refractory or the disease relapses.",
+        "Start IV aciclovir 10 mg/kg every 8 hours at presentation, with empirical bacterial meningitis cover (ceftriaxone 2 g IV every 12 hours with vancomycin, a cephalosporin being acceptable after her non-severe penicillin rash, and co-trimoxazole for Listeria at her age instead of amoxicillin, monitoring potassium because trimethoprim raises it with amiloride) until the CSF cell count, Gram stain and culture exclude bacterial infection (Abboud 2021, ESCMID 2016); stop aciclovir once CSF HSV PCR is negative and the antibody diagnosis is established. HSV PCR can be negative if done too early (for example within 24 hours of onset) and is repeated if clinical suspicion of HSV encephalitis remains high (Graus 2016).",
+        "Start first-line immunotherapy once infection is reasonably excluded on the CSF results, without waiting for the antibody result, because the Graus 2016 criteria for possible autoimmune encephalitis are met (memory deficit, seizures, CSF pleocytosis, MRI): IV methylprednisolone 1 g daily for 3 to 7 days, adding IVIG (2 g/kg over 2 to 5 days) if there is no clinical improvement by the end of the steroid course; combined therapy from the start is reserved for severe presentations, and this one is ward-level (Abboud 2021). IVIG is preferred here (orthostatic hypotension, which argues against plasma-exchange volume shifts); sodium 128 mEq/L and the thrombotic risk of her age and 50 pack-year smoking history favour plasma exchange (5 to 10 sessions every other day), which remains the alternative. If IVIG is given, use hydration, a slow infusion rate and VTE prophylaxis, and check serum osmolality before treating a fall in sodium. Monitor potassium and glucose during the steroid pulse (thiazide, salbutamol).",
+        "After the acute course, bridge with a gradual oral prednisone taper, or monthly IVIG or IV methylprednisolone, while recovery or second-line therapy takes effect (Abboud 2021).",
+        "Contrast CT of the chest, abdomen and pelvis shows no tumour; at 62 and a former smoker, obtain whole-body FDG-PET now, and repeat screening during follow-up if the course is refractory or relapsing (Abboud 2021).",
         "Treat seizures with an antiseizure medication such as levetiracetam or lacosamide; seizures respond mainly to immunotherapy.",
         "Monitor with continuous EEG for non-convulsive seizures while consciousness fluctuates or seizures persist.",
         "Admit to a neurology ward with seizure precautions, continuous cardiac monitoring and fall precautions for orthostatic hypotension.",
-        "If there is no meaningful clinical improvement 10 to 14 days after first-line therapy, escalate to rituximab (375 mg/m\u00b2 weekly for 4 doses or 1 g twice 2 weeks apart, after hepatitis B screening) and/or cyclophosphamide.",
-        "Treat the moderate hyponatraemia (128 mEq/L): stop the co-amilozide (thiazide) and review citalopram, assess volume status given the orthostatic hypotension (cautious isotonic saline if hypovolaemic, fluid restriction if SIADH), and correct by no more than 10 mmol/L in 24 hours.",
-        "Treat agitation and insomnia with low-dose benzodiazepines (lorazepam) first.",
+        "If there is no clinical or radiological improvement 2 to 4 weeks after completion of first-line therapy, escalate to rituximab (375 mg/m\u00b2 weekly for 4 doses or 1000 mg twice 2 weeks apart, after hepatitis B screening) and/or IV cyclophosphamide 600 to 1000 mg/m\u00b2 monthly (Abboud 2021).",
+        "Treat the moderate hyponatraemia (128 mEq/L): stop the co-amilozide (thiazide) and review citalopram, assess volume status given the orthostatic hypotension (cautious isotonic saline if hypovolaemic, fluid restriction if SIADH), correcting slowly, by no more than 10 mmol/L in the first 24 hours (Spasovski 2014), to avoid osmotic demyelination.",
+        "Treat agitation and insomnia with low-dose benzodiazepines (lorazepam) first (Lejuste 2016).",
         "Neurology-led care with psychiatry for behavioural management."
       ]
     },
@@ -812,7 +869,7 @@
       {
         "diagnosis": "Classical paraneoplastic limbic encephalitis (anti-Hu, anti-CV2/CRMP5)",
         "icd_code": "G13.1",
-        "key_features": "Raised by her 50 pack-year smoking history, but the onconeural antibodies are negative and CT of the chest, abdomen and pelvis shows no tumour.",
+        "key_features": "Raised by her 50 pack-year smoking history, but the onconeural antibodies are negative, CT of the chest, abdomen and pelvis shows no tumour and whole-body FDG-PET shows no hypermetabolic lesion.",
         "likelihood": "low"
       },
       {
@@ -851,7 +908,7 @@
       "CSF IgG anti-GluN1 positive (titre 1:64) on cell-based assay: definite anti-NMDAR encephalitis (Graus 2016); serum positive at a low titre (1:40) is read with the CSF.",
       "MRI subtle left hippocampal FLAIR signal without restricted diffusion; MRI is normal or non-specific in about two thirds and excludes HSV encephalitis and structural causes.",
       "EEG diffuse slowing, FIRDA and left temporal seizures, without periodic sharp-wave complexes; extreme delta brush, when present, supports but does not establish the diagnosis.",
-      "At 62, tumours are mostly carcinomas (Titulaer late-onset 2013): CT of the chest, abdomen and pelvis shows none, and screening is repeated if the course is refractory.",
+      "At 62, tumours are mostly carcinomas (Titulaer late-onset 2013): CT of the chest, abdomen and pelvis and whole-body FDG-PET show none, and screening is repeated if the course is refractory or relapsing.",
       "Sodium 128 mEq/L on a thiazide and citalopram is worked up and corrected separately; earlier immunotherapy is associated with better outcome (Titulaer 2013)."
     ],
     "red_herrings": [
@@ -979,7 +1036,7 @@
       "general": {
         "alternatives": [],
         "contraindications": [
-          "Class warning: haloperidol and other high-potency D2 antagonists are associated with severe neuroleptic intolerance (rigidity, hyperthermia, rhabdomyolysis) in anti-NMDAR encephalitis."
+          "Class warning: haloperidol and other high-potency D2 antagonists are associated with severe neuroleptic intolerance (rigidity, hyperthermia, rhabdomyolysis) in autoimmune encephalitis."
         ],
         "formulary_status": "on formulary",
         "interactions": [
@@ -1504,34 +1561,7 @@
         ]
       }
     },
-    "literature_search": {
-      "anti-NMDA receptor encephalitis diagnosis and treatment": {
-        "query": "anti-NMDA receptor encephalitis diagnosis and treatment",
-        "results": [
-          {
-            "evidence_level": "expert consensus criteria",
-            "finding": "Definite anti-NMDAR encephalitis requires one or more of six major symptom groups and IgG anti-GluN1 antibodies, with CSF testing included; probable disease requires four groups (or three with a teratoma) of rapid onset plus an abnormal EEG or CSF pleocytosis or oligoclonal bands.",
-            "source": "Graus F et al. Lancet Neurol 2016;15:391-404"
-          },
-          {
-            "evidence_level": "retrospective cohort",
-            "finding": "All patients had antibodies in CSF, whereas about 14% were negative in serum; CSF titres related more closely to outcome than serum titres.",
-            "source": "Gresa-Arribas N et al. Lancet Neurol 2014;13:167-177"
-          },
-          {
-            "evidence_level": "observational cohort (n=577)",
-            "finding": "38% had a tumour, mostly ovarian teratoma; 53% improved within 4 weeks of first-line immunotherapy or tumour removal; second-line rituximab or cyclophosphamide after first-line failure was associated with better outcome; 81% had mRS 0-2 at 24 months.",
-            "source": "Titulaer MJ et al. Lancet Neurol 2013;12:157-165"
-          },
-          {
-            "evidence_level": "observational cohort",
-            "finding": "Patients aged 45 or more had fewer teratomas; tumours, mostly carcinomas, were found in about a quarter.",
-            "source": "Titulaer MJ et al. Neurology 2013;81:1058-1063"
-          }
-        ],
-        "summary": "Published criteria and cohort data on anti-NMDA receptor encephalitis: definite diagnosis rests on CSF IgG anti-GluN1 antibodies; first-line immunotherapy and tumour removal are followed by second-line agents when there is no response."
-      }
-    },
+    "literature_search": null,
     "microbiology": null,
     "mri": {
       "additional_observations": [
@@ -1541,9 +1571,9 @@
         "No extra-axial collections",
         "No acute hemorrhage",
         "Normal vascular flow voids",
-        "No leptomeningeal enhancement",
         "Mild generalized cerebral atrophy appropriate for age"
       ],
+      "contrast_used": false,
       "findings": [
         {
           "borders": "Ill-defined",
@@ -1553,8 +1583,7 @@
             "DWI": "No restricted diffusion",
             "FLAIR": "Subtle hyperintensity, could represent early pathology versus artifact",
             "T1": "Isointense to slightly hypointense",
-            "T2": "Mildly hyperintense",
-            "post_contrast": "No pathological enhancement"
+            "T2": "Mildly hyperintense"
           },
           "size": "Approximately 1.2 x 0.6 cm",
           "type": "Subtle FLAIR hyperintensity"
@@ -1571,7 +1600,7 @@
           "type": "Age-related white matter changes"
         }
       ],
-      "impression": "1. Subtle FLAIR hyperintensity in the left medial temporal lobe (hippocampus) without restricted diffusion, enhancement or mass effect. 2. Mild scattered periventricular white matter changes and generalized atrophy, likely age-related. No acute infarct, haemorrhage or leptomeningeal enhancement.",
+      "impression": "1. Subtle FLAIR hyperintensity in the left medial temporal lobe (hippocampus) without restricted diffusion or mass effect. 2. Mild scattered periventricular white matter changes and generalized atrophy, likely age-related. No acute infarct or haemorrhage.",
       "recommended_actions": [],
       "volumetrics": null
     }

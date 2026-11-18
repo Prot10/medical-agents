@@ -111,46 +111,6 @@
       },
       "tool_name": "check_drug_interactions",
       "trigger_action": "check_estradiol_oestradiol_transdermal_hrt_hormone_replacement_therapy_oestrogen"
-    },
-    {
-      "output": {
-        "query": "typical aura without headache onset or change in later life",
-        "results": [
-          {
-            "evidence_level": "consensus classification",
-            "finding": "Typical aura not accompanied or followed within 60 minutes by headache. In some patients the headache becomes less marked or disappears with age while the aura continues; when aura without headache starts or changes in later life, the distinction from transient ischaemic attack needs careful assessment.",
-            "source": "Headache Classification Committee of the IHS. ICHD-3. Cephalalgia 2018;38:1-211 (1.2.1.2 Typical aura without headache)"
-          },
-          {
-            "evidence_level": "case series",
-            "finding": "Spreading visual and sensory symptoms that march over minutes, build up and then clear, with repeated identical episodes, distinguish late-life migraine accompaniments from ischaemic events.",
-            "source": "Fisher CM. Late-life migraine accompaniments as a cause of unexplained transient ischemic attacks. Can J Neurol Sci 1980;7:9-17"
-          }
-        ],
-        "summary": "Aura without headache is a recognised migraine form that becomes more common with age; its march over minutes and identical repetition separate it from TIA."
-      },
-      "tool_name": "search_medical_literature",
-      "trigger_action": "search_typical_aura_without_headache_older_age_change"
-    },
-    {
-      "output": {
-        "query": "hormone replacement therapy in women with migraine with aura",
-        "results": [
-          {
-            "evidence_level": "national guideline",
-            "finding": "Transdermal rather than oral HRT is advised for women at increased risk of venous thromboembolism; the risk of VTE with transdermal HRT at standard doses is no greater than baseline.",
-            "source": "NICE NG23. Menopause: identification and management (2015, updated 2024)"
-          },
-          {
-            "evidence_level": "narrative review",
-            "finding": "Migraine with aura is not a contraindication to HRT; transdermal oestrogen at the lowest dose that controls symptoms gives stable oestrogen levels and is preferred.",
-            "source": "MacGregor EA. Migraine, menopause and hormone replacement therapy. Post Reprod Health 2018;24:11-18"
-          }
-        ],
-        "summary": "HRT is not contraindicated in migraine with aura; transdermal oestradiol at the lowest effective dose is the preferred route."
-      },
-      "tool_name": "search_medical_literature",
-      "trigger_action": "search_hrt_in_women_with_migraine_with_aura"
     }
   ],
   "ground_truth": {
@@ -188,6 +148,28 @@
         "importance": "recommended",
         "label": "Brain MRI for a change in attack pattern at 48 (aura without headache)",
         "rationale": "A change in attack pattern, with aura now occurring without headache in her late forties, is a red flag; MRI excludes infarction and an occipital lesion and is preferred to CT (Evans RW et al., Headache 2020;60:318-336; AAN 2000)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "modality": "MR_angiography"
+            },
+            "tool_name": "order_advanced_imaging"
+          },
+          {
+            "required_arguments": {
+              "modality": "carotid_duplex"
+            },
+            "tool_name": "order_advanced_imaging"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "action-vessel-imaging-optional",
+        "expected_evidence": "No arterial stenosis, occlusion or dissection",
+        "importance": "optional",
+        "label": "Vessel imaging (MR angiography or carotid duplex) if the clinical assessment leaves a real suspicion of ischaemia",
+        "rationale": "The attacks are identical to 20 years of typical aura, so routine vascular testing is not required; but the pattern has changed at 48 and a normal DWI does not exclude TIA, so cerebrovascular evaluation is acceptable when residual suspicion remains (NICE NG128)."
       },
       {
         "alternatives": [
@@ -258,31 +240,15 @@
         "importance": "recommended",
         "label": "Check HRT before advising on her menopausal symptoms",
         "rationale": "She has hot flushes and asks about hormones; whether and how HRT can be used with migraine aura is the management question (NICE NG23)."
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[ICHD_3]"
-        ],
-        "criterion_id": "action-1-search-medical-literature",
-        "expected_evidence": "General evidence on aura without headache with age and on HRT route in migraine with aura",
-        "importance": "optional",
-        "label": "Search the literature on aura without headache in later life and on HRT",
-        "rationale": "Background reading only; the diagnosis rests on the history and examination."
       }
     ],
     "assessment": {
       "prohibited_recommendations": [
-        "Do not start antiplatelet or anticoagulant therapy for presumed TIA: the episodes have the features of migraine aura (positive visual symptoms spreading over 20-30 minutes, identical to 20 years of previous auras) and imaging shows no infarct.",
+        "Do not start antiplatelet or anticoagulant therapy on the TIA label alone: the stereotyped attacks have the features of migraine aura (positive visual symptoms spreading over 20-30 minutes, identical to 20 years of previous auras); a normal MRI excludes infarction, not TIA, so the decision rests on these features.",
         "Do not continue or start combined hormonal contraception (pill, patch or ring): migraine with aura is UKMEC category 4; offer a progestogen-only method or an IUD."
       ],
       "required_recommendations": [
-        "Explain that the episodes are her usual visual aura without the headache (ICHD-3 1.2.1.2), a recognised change with age and around the menopause, and that her history, examination and MRI show no sign of TIA or structural disease.",
+        "Explain that the episodes are her usual visual aura without the headache (ICHD-3 1.2.1.2), a recognised change with age and around the menopause; the MRI shows no infarct or structural disease, and the TIA question is answered by the identical features of her lifelong aura.",
         "If HRT is wanted for menopausal symptoms, migraine with aura is not a contraindication: prefer transdermal oestradiol at the lowest effective dose, with micronised progesterone or a levonorgestrel IUS for endometrial protection, and review if the aura changes (NICE NG23).",
         "Discuss contraception until the menopause is confirmed: combined methods are UKMEC category 4 with aura, and a levonorgestrel IUS gives contraception and, with oestradiol, endometrial protection.",
         "No acute or preventive migraine medicine is needed for brief non-disabling aura without headache; ask her to keep a diary and to seek review if an aura lasts over 60 minutes, changes character or brings new symptoms."
@@ -389,7 +355,7 @@
       {
         "diagnosis": "Posterior circulation TIA",
         "icd_code": "G45.9",
-        "key_features": "Positive zigzag lights expanding over 20-30 minutes, identical to 20 years of aura and recurring 2-3 times a month, in a normotensive non-smoker; TIA symptoms are usually negative and maximal at onset. MRI shows no infarct.",
+        "key_features": "Positive zigzag lights expanding over 20-30 minutes, identical to 20 years of aura and recurring 2-3 times a month, in a normotensive non-smoker; TIA symptoms are usually negative and maximal at onset. MRI shows no infarct (a normal DWI does not exclude TIA; the distinction is clinical).",
         "likelihood": "low"
       },
       {
@@ -421,7 +387,7 @@
         "correct_interpretation": "The aura is identical to 20 years of her typical aura: positive, homonymous and spreading over 20-30 minutes; only the headache has gone.",
         "data_point": "Visual episodes without headache in a 48-year-old who has read that they could be TIA or retinal artery occlusion",
         "field_path": "patient.history_present_illness",
-        "intended_effect": "May anchor on TIA or amaurosis and lead to antiplatelet therapy or a vascular work-up",
+        "intended_effect": "May anchor on TIA or amaurosis and lead to antiplatelet therapy or a routine vascular work-up without a real suspicion of ischaemia",
         "location": "patient.history_present_illness"
       },
       {
@@ -567,9 +533,7 @@
   },
   "metadata": {
     "authoring_agent": "condition-expert:MIG-AURA",
-    "case_body_concerns": [
-      "Useless-tool entries dropped because the case has neither output nor fallback (silent irrelevance, per authoring guide \u00a71): ['analyze_ecg', 'order_specialized_test']"
-    ],
+    "case_body_concerns": [],
     "citation_gap": [],
     "condition_name": "Acephalic migraine (typical aura without headache) \u2014 perimenopausal phenotype change and HRT counselling",
     "criteria_pack_version": "1.0",

@@ -769,7 +769,7 @@
         "expected_evidence": "Four chronic infarcts: right occipital (PCA, from the basilar tip), two right MCA cortical and one right internal border-zone; Fazekas 2, no microbleeds",
         "importance": "required",
         "label": "Obtain brain MRI with SWI and assign each chronic infarct to its arterial territory, with the white matter grade and microbleed status",
-        "rationale": "Territory assignment of the infarcts is what separates a carotid from a cardioembolic mechanism, and SWI informs the anticoagulation decision."
+        "rationale": "Territory assignment of the infarcts weighs a carotid against a cardioembolic mechanism (the PCA infarct lies outside the carotid territory), and SWI informs the anticoagulation decision."
       },
       {
         "alternatives": [
@@ -814,7 +814,9 @@
       {
         "alternatives": [
           {
-            "required_arguments": {},
+            "required_arguments": {
+              "echo_type": "TTE"
+            },
             "tool_name": "order_echocardiogram"
           }
         ],
@@ -864,7 +866,7 @@
           "[AHA_ASA_2021_secondary]"
         ],
         "criterion_id": "action-10-check-drug-interactions",
-        "expected_evidence": "Anticoagulant plus aspirin: bleeding risk roughly doubled without stroke benefit, so aspirin is stopped when the anticoagulant starts",
+        "expected_evidence": "Anticoagulant plus aspirin: bleeding risk roughly doubled without stroke benefit, so aspirin is not continued alongside the anticoagulant without a separate indication or a defined peri-procedural plan",
         "importance": "recommended",
         "label": "Check the anticoagulant to be started against his aspirin and the rest of his medication list",
         "rationale": "He takes aspirin for polyvascular disease and will start an oral anticoagulant for atrial fibrillation."
@@ -873,16 +875,16 @@
     "assessment": {
       "prohibited_recommendations": [
         "Do not stop at the first mechanism found: atrial fibrillation and a severe ipsilateral stenosis are both active, and treating one leaves the other untreated.",
-        "Do not continue aspirin alongside the new anticoagulant outside a defined peri-procedural plan.",
-        "Do not lower blood pressure aggressively while a severe stenosis with border-zone infarction remains untreated.",
-        "Do not withhold anticoagulation because of age, cognitive impairment or the planned carotid surgery.",
+        "Do not continue aspirin alongside the new anticoagulant without a separate indication agreed with vascular surgery or a defined peri-procedural plan.",
+        "Do not lower blood pressure aggressively, or to the point of symptomatic or orthostatic hypotension, while a severe stenosis with border-zone infarction remains untreated.",
+        "Do not withhold anticoagulation because of age, cognitive impairment or possible carotid surgery.",
         "Do not certify fitness to drive; the dense hemianopia is disqualifying independently of the cognition."
       ],
       "required_recommendations": [
-        "Diagnose multi-infarct vascular dementia with two mechanisms by territory: cardioembolism from atrial fibrillation (right PCA infarct) and the symptomatic right carotid stenosis (right MCA cortical and internal border-zone infarcts) [VASCOG_2014].",
-        "Start a DOAC (e.g. apixaban 5 mg twice daily: no dose-reduction criterion met at 76 years, 83 kg, creatinine 1.27 mg/dL) and stop aspirin, which has no separate indication [AHA_ASA_2021_secondary].",
-        "Refer the symptomatic 80-90% right internal carotid stenosis to the vascular team without delay for carotid endarterectomy, the last ipsilateral event being 5 months ago; endarterectomy is preferred over stenting at 76, and stenting would add antiplatelet therapy to the anticoagulant [AHA_ASA_2021_secondary].",
-        "Until the stenosis is treated, lower blood pressure gradually and individually (154/86), avoiding systolic pressure below about 120 mmHg and orthostatic hypotension because of the border-zone infarct; then aim for below 130/80 mmHg [AHA_ASA_2021_secondary].",
+        "Diagnose multi-infarct vascular dementia with two coexisting potential stroke mechanisms, atrial fibrillation and the right carotid stenosis: the right PCA infarct lies outside the carotid territory and supports an additional embolic source, while the right MCA and border-zone infarcts may reflect haemodynamic compromise, artery-to-artery embolism or cardioembolism [VASCOG_2014].",
+        "Start a DOAC for the atrial fibrillation (e.g. apixaban 5 mg twice daily: no dose-reduction criterion met at 76 years, 83 kg, creatinine 1.27 mg/dL) and agree the antiplatelet plan with vascular surgery: anticoagulant monotherapy is generally reasonable for the stable femoropopliteal bypass, and peri-procedural antiplatelet needs follow the carotid decision [ESC_AF_2024].",
+        "Refer urgently to the vascular team to assess eligibility for carotid revascularisation of the 80-90% right ICA stenosis: the last ipsilateral event was 5 months ago, so the expected benefit is smaller than after a recent event; weigh disability, life expectancy, operative risk and optimised medical therapy [AHA_ASA_2021_secondary].",
+        "Until the stenosis is treated, lower blood pressure gradually and individually (154/86), avoiding symptomatic and orthostatic hypotension because of the border-zone infarct; then aim for below 130/80 mmHg [AHA_ASA_2021_secondary].",
         "Intensify lipid lowering to LDL below 55 mg/dL (92 mg/dL on atorvastatin 40 mg): very high risk with ischaemic strokes, peripheral arterial disease, diabetes and hypertension; atorvastatin 80 mg, adding ezetimibe if needed [ACC_AHA_dyslipidemia_2026].",
         "Individualise the HbA1c target to about below 8.0% (8.1% on metformin and empagliflozin) without agents that cause hypoglycaemia [ADA_older_adults_2026].",
         "Arrange hemianopia and cognitive rehabilitation, confirm he does not drive, and review with his wife in 6-12 months."
@@ -967,11 +969,137 @@
         "criterion_id": "avoid-waste-5-order-ct-scan",
         "rationale": "MRI is available and not contraindicated; CT cannot show microbleeds, siderosis or small lacunes.",
         "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "modality": "perfusion_SPECT"
+            },
+            "tool_name": "order_advanced_imaging"
+          }
+        ],
+        "citations": [
+          "[NICE_NG97]"
+        ],
+        "criterion_id": "avoid-waste-perfusion-spect",
+        "rationale": "Perfusion SPECT adds nothing to the MRI in vascular cognitive impairment; the MRI already shows the four infarcts and their territories [NICE_NG97].",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "assessment_type": "levodopa_challenge"
+            },
+            "tool_name": "perform_clinical_assessment"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "avoid-waste-levodopa-challenge",
+        "rationale": "No rigidity, bradykinesia or rest tremor on examination; the mildly increased left arm tone is pyramidal, and there is no parkinsonism to test.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "modality": "cardiac_MRI"
+            },
+            "tool_name": "order_advanced_imaging"
+          }
+        ],
+        "citations": [
+          "[AHA_ASA_2021_secondary]"
+        ],
+        "criterion_id": "avoid-waste-cardiac-mri",
+        "rationale": "No cardiac question that the ECG and TTE have not answered: the atrial fibrillation already settles anticoagulation [AHA_ASA_2021_secondary].",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "test_type": "electrophysiology_study"
+            },
+            "tool_name": "order_specialized_test"
+          }
+        ],
+        "citations": [
+          "[ESC_AF_2024]"
+        ],
+        "criterion_id": "avoid-harm-electrophysiology-study",
+        "rationale": "Invasive intracardiac study with no arrhythmic indication: the atrial fibrillation is documented on the ECG, with no syncope or conduction disease [ESC_AF_2024].",
+        "severity": "harm"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "modality": "DTI_tractography"
+            },
+            "tool_name": "order_advanced_imaging"
+          }
+        ],
+        "citations": [
+          "[STRIVE_2]"
+        ],
+        "criterion_id": "avoid-waste-dti-tractography",
+        "rationale": "A research or problem-solving sequence that does not change diagnosis or management [STRIVE_2].",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "modality": "CT_perfusion"
+            },
+            "tool_name": "order_advanced_imaging"
+          }
+        ],
+        "citations": [
+          "[AHA_ASA_2021_secondary]"
+        ],
+        "criterion_id": "avoid-waste-ct-perfusion",
+        "rationale": "Perfusion imaging is for acute stroke; these infarcts are chronic, and duplex and MRA already grade the stenosis for the revascularisation decision [AHA_ASA_2021_secondary].",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "modality": "perfusion_MRI"
+            },
+            "tool_name": "order_advanced_imaging"
+          }
+        ],
+        "citations": [
+          "[STRIVE_2]"
+        ],
+        "criterion_id": "avoid-waste-perfusion-mri",
+        "rationale": "A research or problem-solving sequence that does not change diagnosis or management [STRIVE_2].",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "echo_type": "TEE"
+            },
+            "tool_name": "order_echocardiogram"
+          }
+        ],
+        "citations": [
+          "[AHA_ASA_2021_secondary]"
+        ],
+        "criterion_id": "avoid-waste-tee",
+        "rationale": "Atrial fibrillation already settles anticoagulation; TEE would not change management [AHA_ASA_2021_secondary].",
+        "severity": "waste"
       }
     ],
     "diagnosis": {
       "accepted": [
-        "Vascular dementia: multi-infarct type with two coexisting mechanisms, cardioembolism from untreated atrial fibrillation and severe symptomatic right internal carotid stenosis with a haemodynamic component",
+        "Vascular dementia: multi-infarct type with two coexisting potential stroke mechanisms, untreated atrial fibrillation and severe symptomatic right internal carotid stenosis",
         "vascular dementia",
         "major vascular neurocognitive disorder",
         "major neurocognitive disorder due to vascular disease",
@@ -1008,13 +1136,13 @@
       {
         "diagnosis": "Cardioembolic multi-infarct dementia alone",
         "icd_code": "F01.50",
-        "key_features": "The atrial fibrillation is real and needs anticoagulation, but it cannot explain a right internal border-zone infarct, and a severe ipsilateral stenosis with right-predominant white matter change needs its own management",
+        "key_features": "The atrial fibrillation is real and needs anticoagulation, and cardioembolism may account for some of the right-hemispheric infarcts, but an internal border-zone infarct ipsilateral to a severe stenosis suggests a haemodynamic or artery-to-artery contribution, and the stenosis with right-predominant white matter change needs its own management",
         "likelihood": "low"
       },
       {
         "diagnosis": "Large-artery atherosclerotic mechanism alone",
         "icd_code": "I65.21",
-        "key_features": "The severe right stenosis explains the right MCA and border-zone infarcts, but not the right occipital infarct in a PCA arising from the basilar tip, and atrial fibrillation is documented",
+        "key_features": "The severe right stenosis can explain the right MCA and border-zone infarcts, but not the right occipital infarct in a PCA arising from the basilar tip, and atrial fibrillation is documented",
         "likelihood": "low"
       },
       {
@@ -1037,15 +1165,15 @@
       }
     ],
     "key_clinical_evidence": [
-      "Finding one mechanism does not exclude another: a right internal border-zone infarct is haemodynamic, while a right PCA infarct with a non-fetal PCA lies outside the territory of the stenosed carotid",
-      "Territory assignment is the analytic tool: lesions downstream of the stenosed vessel belong to the stenosis, lesions in territories it does not supply belong to the embolic source",
-      "The two treatments interact (anticoagulation for the arrhythmia, endarterectomy for the stenosis), so the antithrombotic plan is made jointly, and endarterectomy avoids the antiplatelet therapy stenting would need",
+      "Finding one mechanism does not exclude another: a right PCA infarct with a non-fetal PCA lies outside the territory of the stenosed carotid and supports an embolic source, while the right internal border-zone infarct suggests a haemodynamic component of the stenosis, although embolism can also produce border-zone lesions",
+      "Territory assignment weighs the mechanisms without assigning each infarct with certainty: lesions in territories the stenosed carotid does not supply point to a second, embolic source, while lesions downstream of it may reflect the stenosis (haemodynamic or artery-to-artery) or cardioembolism",
+      "The two treatments interact (anticoagulation for the arrhythmia, possible revascularisation for the stenosis), so the antithrombotic plan is made jointly with the vascular team; stenting would add antiplatelet therapy to the anticoagulant",
       "A border-zone infarct calls for cautious blood-pressure lowering until the stenosis is treated",
       "The uninvestigated hemianopia two years ago was the first stroke in this sequence"
     ],
     "red_herrings": [
       {
-        "correct_interpretation": "Atrial fibrillation cannot produce an internal border-zone lesion or right-predominant white matter change; a severe ipsilateral carotid stenosis is also present and needs its own management",
+        "correct_interpretation": "Atrial fibrillation may account for some infarcts, but it does not explain the whole picture: an ipsilateral internal border-zone infarct and right-predominant white matter change point to a severe right carotid stenosis, which is present and needs its own management",
         "data_point": "Atrial fibrillation on the first ECG",
         "field_path": "initial_tool_outputs.ecg",
         "intended_effect": "Explains everything as cardioembolic, closes the mechanism question and leaves the carotid stenosis unimaged",
@@ -1573,13 +1701,13 @@
       "findings": [
         {
           "abnormal": "yes",
-          "reference_range": "25th-75th percentile",
+          "reference_range": "9th percentile or above (25th-75th average)",
           "test": "Trail Making Test Part B (education-adjusted)",
           "value": "3rd percentile"
         },
         {
           "abnormal": "yes",
-          "reference_range": "25th-75th percentile",
+          "reference_range": "9th percentile or above (25th-75th average)",
           "test": "Symbol Digit Modalities Test",
           "value": "5th percentile"
         },
@@ -1591,30 +1719,30 @@
         },
         {
           "abnormal": "yes",
-          "reference_range": "25th-75th percentile",
+          "reference_range": "9th percentile or above (25th-75th average)",
           "test": "Rey figure copy",
           "value": "6th percentile"
         },
         {
-          "abnormal": "yes",
-          "reference_range": "25th-75th percentile",
+          "abnormal": "low average",
+          "reference_range": "9th percentile or above (25th-75th average)",
           "test": "RAVLT delayed free recall",
           "value": "20th percentile"
         },
         {
           "abnormal": "no",
-          "reference_range": "25th-75th percentile",
+          "reference_range": "9th percentile or above (25th-75th average)",
           "test": "RAVLT delayed recognition",
           "value": "44th percentile"
         },
         {
           "abnormal": "no",
-          "reference_range": "25th-75th percentile",
+          "reference_range": "9th percentile or above (25th-75th average)",
           "test": "Boston Naming Test (education-adjusted)",
           "value": "40th percentile"
         }
       ],
-      "impression": "1. Impaired set-shifting and processing speed (TMT-B 3rd, SDMT 5th percentile, education-adjusted). 2. Impaired visuoconstruction (Rey copy 6th percentile) and marked hemianopic reading impairment with left-sided omissions. 3. Mildly reduced free recall with normal recognition (retrieval pattern); naming preserved. Clinical correlation recommended.",
+      "impression": "1. Impaired set-shifting and processing speed (TMT-B 3rd, SDMT 5th percentile, education-adjusted). 2. Impaired visuoconstruction (Rey copy 6th percentile) and marked hemianopic reading impairment with left-sided omissions. 3. Free recall in the low-average range (RAVLT 20th percentile) with normal recognition (retrieval pattern); naming preserved. Clinical correlation recommended.",
       "quantitative_data": {
         "norms": "education-adjusted for 8 years of schooling",
         "pattern": "executive and visual, recognition preserved"
@@ -1639,9 +1767,9 @@
       "eeg": "normal"
     },
     "key_educational_points": [
-      "Two stroke mechanisms can coexist, and territory assignment is how they are separated",
-      "An internal border-zone infarct is haemodynamic and calls for cautious blood-pressure lowering until the stenosis is treated",
-      "Anticoagulation and carotid revascularisation must be planned together, not sequentially",
+      "Two stroke mechanisms can coexist; territory assignment helps weigh them, though it cannot assign every infarct with certainty",
+      "An internal border-zone infarct beyond a severe stenosis suggests a haemodynamic component and calls for cautious blood-pressure lowering until the stenosis is treated",
+      "Anticoagulation and any carotid revascularisation must be planned together, not sequentially",
       "An uninvestigated visual field defect is often the first stroke in a sequence"
     ],
     "last_revised": "2026-08-08",

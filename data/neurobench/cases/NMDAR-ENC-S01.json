@@ -111,6 +111,51 @@
   "followup_outputs": [
     {
       "output": {
+        "additional_observations": [
+          "No midline shift",
+          "Ventricles normal in size and configuration",
+          "No hydrocephalus",
+          "No extra-axial collections",
+          "No acute hemorrhage",
+          "Normal vascular flow voids"
+        ],
+        "contrast_used": true,
+        "findings": [
+          {
+            "borders": "Ill-defined",
+            "location": "Bilateral medial temporal lobes, more prominent on the left",
+            "mass_effect": "None",
+            "signal_characteristics": {
+              "DWI": "No restricted diffusion",
+              "FLAIR": "Hyperintense",
+              "T1": "Isointense to hypointense",
+              "T2": "Hyperintense",
+              "post_contrast": "No pathological enhancement"
+            },
+            "size": "Left: 2.1 x 1.4 cm, Right: 1.3 x 0.9 cm",
+            "type": "FLAIR hyperintensity"
+          },
+          {
+            "borders": "Ill-defined",
+            "location": "Bilateral insular cortices",
+            "mass_effect": "None",
+            "signal_characteristics": {
+              "DWI": "No restricted diffusion",
+              "FLAIR": "Subtle hyperintensity"
+            },
+            "size": null,
+            "type": "Mild cortical signal abnormality"
+          }
+        ],
+        "impression": "1. Bilateral medial temporal T2/FLAIR hyperintensity, left greater than right (left 2.1 x 1.4 cm, right 1.3 x 0.9 cm), without restricted diffusion, enhancement or mass effect. 2. Subtle bilateral insular cortical FLAIR signal without restricted diffusion. No hemorrhage. An infectious encephalitis cannot be excluded on imaging.",
+        "recommended_actions": [],
+        "volumetrics": null
+      },
+      "tool_name": "analyze_brain_mri",
+      "trigger_action": "request_contrast_mri"
+    },
+    {
+      "output": {
         "activating_procedures": {},
         "artifacts": [
           {
@@ -165,7 +210,7 @@
     {
       "output": {
         "alternatives": [
-          "Plasma exchange (5 to 7 exchanges) as an alternative to IVIG",
+          "Plasma exchange (5 to 10 sessions every other day) as an alternative to IVIG",
           "Antiseizure medication: levetiracetam or lacosamide; valproate is avoided in women able to become pregnant",
           "Second-line agents: rituximab 375 mg/m2 weekly for 4 doses, or cyclophosphamide"
         ],
@@ -191,36 +236,6 @@
       },
       "tool_name": "check_drug_interactions",
       "trigger_action": "request_check_drug_interactions"
-    },
-    {
-      "output": {
-        "query": "anti-NMDA receptor encephalitis diagnosis treatment ovarian teratoma",
-        "results": [
-          {
-            "evidence_level": "expert consensus criteria",
-            "finding": "Definite anti-NMDAR encephalitis requires one or more of six major symptom groups and IgG anti-GluN1 antibodies, with CSF testing included; probable disease requires four groups (or three with a teratoma) of rapid onset plus an abnormal EEG or CSF pleocytosis or oligoclonal bands.",
-            "source": "Graus F et al. Lancet Neurol 2016;15:391-404"
-          },
-          {
-            "evidence_level": "retrospective cohort",
-            "finding": "All patients had antibodies in CSF, whereas about 14% were negative in serum; CSF titers related more closely to outcome than serum titers.",
-            "source": "Gresa-Arribas N et al. Lancet Neurol 2014;13:167-177"
-          },
-          {
-            "evidence_level": "observational cohort (n=577)",
-            "finding": "38% had a tumor, mostly ovarian teratoma; 53% improved within 4 weeks of first-line immunotherapy or tumor removal; second-line rituximab or cyclophosphamide after first-line failure was associated with better outcome; 81% had mRS 0-2 at 24 months.",
-            "source": "Titulaer MJ et al. Lancet Neurol 2013;12:157-165"
-          },
-          {
-            "evidence_level": "narrative review of cohort data",
-            "finding": "About 70% of patients have prodromal headache, fever or a viral-like illness before psychiatric symptoms, seizures, dyskinesias, autonomic instability and hypoventilation develop.",
-            "source": "Dalmau J et al. Lancet Neurol 2011;10:63-74"
-          }
-        ],
-        "summary": "Published criteria and cohort data on anti-NMDA receptor encephalitis: definite diagnosis rests on CSF IgG anti-GluN1 antibodies; first-line immunotherapy and tumor removal are followed by second-line agents when there is no response."
-      },
-      "tool_name": "search_medical_literature",
-      "trigger_action": "request_search_medical_literature"
     },
     {
       "output": {
@@ -763,6 +778,12 @@
               "study": "pelvis_abdomen_ultrasound"
             },
             "tool_name": "order_body_imaging"
+          },
+          {
+            "required_arguments": {
+              "study": "pelvis_abdomen_MRI"
+            },
+            "tool_name": "order_body_imaging"
           }
         ],
         "citations": [
@@ -772,7 +793,7 @@
         "criterion_id": "action-5-order-body-imaging",
         "expected_evidence": "Right ovarian 1.8 cm mature cystic teratoma",
         "importance": "required",
-        "label": "Screen for an ovarian teratoma with pelvic and abdominal ultrasound",
+        "label": "Screen for an ovarian teratoma with pelvic and abdominal ultrasound or pelvic MRI",
         "rationale": "Young women carry the highest teratoma risk; tumor removal is part of first-line treatment."
       },
       {
@@ -808,23 +829,6 @@
         "importance": "optional",
         "label": "Check interactions between the planned treatment and her combined oral contraceptive",
         "rationale": "Estrogen adds to the thrombotic risk of IVIG and immobility; it does not change the choice of immunotherapy."
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[Graus_2016]",
-          "[Titulaer_2013]"
-        ],
-        "criterion_id": "action-6-search-medical-literature",
-        "expected_evidence": "General published evidence on anti-NMDAR encephalitis diagnosis and immunotherapy",
-        "importance": "optional",
-        "label": "Optionally consult the published evidence on anti-NMDAR encephalitis diagnosis and immunotherapy",
-        "rationale": "Background evidence only; no clinical decision in this case depends on it."
       }
     ],
     "assessment": {
@@ -836,14 +840,15 @@
         "Do not interpret a negative serum anti-NMDAR antibody as ruling out the disease; the CSF assay is the gold standard and may be positive when serum is negative."
       ],
       "required_recommendations": [
-        "Start IV acyclovir 10 mg/kg every 8 hours at presentation, given the fever and medial temporal signal, and stop it once CSF HSV PCR is negative and the antibody diagnosis is established; repeat the PCR on a second CSF sample if the first LP was within 72 hours of onset and HSV encephalitis remains plausible.",
-        "Start first-line immunotherapy without waiting for the antibody result once infection is reasonably excluded: IV methylprednisolone 1 g daily for 5 days with IVIG 0.4 g/kg/day for 5 days (2 g/kg total) or plasma exchange (5 to 7 exchanges).",
+        "Start IV acyclovir 10 mg/kg every 8 hours at presentation, given the fever and medial temporal signal, with empirical bacterial meningitis cover (ceftriaxone 2 g IV every 12 hours with vancomycin) until the CSF cell count, Gram stain and culture exclude bacterial infection (Abboud 2021, ESCMID 2016); stop acyclovir once CSF HSV PCR is negative and the antibody diagnosis is established. HSV PCR can be negative if done too early (for example within 24 hours of onset) and is repeated if clinical suspicion of HSV encephalitis remains high (Graus 2016).",
+        "Start first-line immunotherapy once infection is reasonably excluded on the CSF results, without waiting for the antibody result: IV methylprednisolone 1 g daily for 3 to 7 days, combined from the start with IVIG (2 g/kg over 2 to 5 days) or plasma exchange (5 to 10 sessions every other day), because the presentation is severe (autonomic instability with tachycardia to 130 bpm and labile blood pressure, with generalized seizures and fluctuating consciousness) (Abboud 2021). IVIG is preferred here (agitation, and autonomic instability, in which plasma-exchange volume shifts are poorly tolerated), with sodium monitoring, as IVIG can worsen hyponatremia (sodium 133 mEq/L), and with hydration, a slow infusion rate and VTE prophylaxis, and the estrogen-containing contraceptive stopped; the combined oral contraceptive and the ovarian teratoma favor plasma exchange, which remains the alternative, with central venous access and hemodynamic monitoring.",
+        "After the acute course, bridge with a gradual oral prednisone taper, or monthly IVIG or IV methylprednisolone, while recovery or second-line therapy takes effect (Abboud 2021).",
         "Arrange prompt surgical removal of the right ovarian teratoma (laparoscopic, ovary-sparing where feasible) as part of first-line treatment, with gynecology.",
         "Start an antiseizure medication such as levetiracetam or lacosamide, with a benzodiazepine for seizures lasting more than 5 minutes; avoid valproate in a woman able to become pregnant; seizures respond mainly to immunotherapy.",
         "Monitor with continuous EEG for non-convulsive seizures while consciousness fluctuates or seizures persist.",
         "Admit to a neurology ward with seizure precautions and continuous cardiac monitoring.",
-        "If there is no meaningful clinical improvement 10 to 14 days after first-line therapy, escalate to rituximab (375 mg/m2 weekly for 4 doses or 1 g twice 2 weeks apart, after hepatitis B screening) and/or cyclophosphamide; discuss fertility preservation before cyclophosphamide.",
-        "Treat agitation and insomnia with benzodiazepines (lorazepam) first.",
+        "If there is no clinical or radiological improvement 2 to 4 weeks after completion of first-line therapy, escalate to rituximab (375 mg/m2 weekly for 4 doses or 1000 mg twice 2 weeks apart, after hepatitis B screening) and/or IV cyclophosphamide 600 to 1000 mg/m2 monthly; discuss fertility preservation before cyclophosphamide (Abboud 2021).",
+        "Treat agitation and insomnia with benzodiazepines (lorazepam) first (Lejuste 2016).",
         "Stop the combined oral contraceptive while she is bed-bound and receiving IVIG (venous thromboembolism risk) and give VTE prophylaxis.",
         "Neurology-led care with psychiatry for behavioral management; gynecology for the teratoma."
       ]
@@ -1079,8 +1084,8 @@
         "WBC": "59 cells/uL"
       },
       "glucose": "62.0 mg/dL",
-      "glucose_ratio": "0.63 (serum glucose 98 mg/dL)",
-      "interpretation": "Opening pressure 24 cmH2O. Lymphocytic pleocytosis (WBC 59 cells/uL, 95% lymphocytes) with elevated protein (78.3 mg/dL) and a normal CSF/serum glucose ratio (0.63). Six CSF-restricted oligoclonal bands and elevated IgG index (0.85). HSV-1, HSV-2, VZV and enterovirus PCR negative; Gram stain and bacterial culture negative; cytology reactive lymphocytes, no malignant cells. CSF anti-NMDA receptor (GluN1) IgG positive, titer 1:320, on cell-based assay. Clinical correlation recommended.",
+      "glucose_ratio": "0.58 (serum glucose 106 mg/dL)",
+      "interpretation": "Opening pressure 24 cmH2O. Lymphocytic pleocytosis (WBC 59 cells/uL, 95% lymphocytes) with elevated protein (78.3 mg/dL) and a normal CSF/serum glucose ratio (0.58). Six CSF-restricted oligoclonal bands and elevated IgG index (0.85). HSV-1, HSV-2, VZV and enterovirus PCR negative; Gram stain and bacterial culture negative; cytology reactive lymphocytes, no malignant cells. CSF anti-NMDA receptor (GluN1) IgG positive, titer 1:320, on cell-based assay. Clinical correlation recommended.",
       "opening_pressure": "24 cmH2O (mildly elevated)",
       "protein": "78.3 mg/dL",
       "special_tests": {
@@ -1571,6 +1576,7 @@
         "No acute hemorrhage",
         "Normal vascular flow voids"
       ],
+      "contrast_used": false,
       "findings": [
         {
           "borders": "Ill-defined",
@@ -1580,8 +1586,7 @@
             "DWI": "No restricted diffusion",
             "FLAIR": "Hyperintense",
             "T1": "Isointense to hypointense",
-            "T2": "Hyperintense",
-            "post_contrast": "No pathological enhancement"
+            "T2": "Hyperintense"
           },
           "size": "Left: 2.1 x 1.4 cm, Right: 1.3 x 0.9 cm",
           "type": "FLAIR hyperintensity"
@@ -1598,7 +1603,7 @@
           "type": "Mild cortical signal abnormality"
         }
       ],
-      "impression": "1. Bilateral medial temporal T2/FLAIR hyperintensity, left greater than right (left 2.1 x 1.4 cm, right 1.3 x 0.9 cm), without restricted diffusion, enhancement or mass effect. 2. Subtle bilateral insular cortical FLAIR signal without restricted diffusion. No hemorrhage. An infectious encephalitis cannot be excluded on imaging.",
+      "impression": "1. Bilateral medial temporal T2/FLAIR hyperintensity, left greater than right (left 2.1 x 1.4 cm, right 1.3 x 0.9 cm), without restricted diffusion or mass effect. 2. Subtle bilateral insular cortical FLAIR signal without restricted diffusion. No hemorrhage. An infectious encephalitis cannot be excluded on imaging.",
       "recommended_actions": [],
       "volumetrics": null
     }

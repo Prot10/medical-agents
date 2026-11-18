@@ -106,30 +106,6 @@
   "followup_outputs": [
     {
       "output": {
-        "assessment_type": "performance_status",
-        "findings": [
-          {
-            "domain": "activity",
-            "result": "walks with a dragging left leg"
-          },
-          {
-            "domain": "self-care and work",
-            "result": "cares for self; unable to teach at present"
-          }
-        ],
-        "impression": "Karnofsky 70 (cares for self; unable to carry on normal activity or active work), ECOG 2 (ambulatory and capable of self-care, unable to work, up more than 50% of waking hours).",
-        "recommended_actions": [],
-        "scores": {
-          "ECOG": "2",
-          "Karnofsky": "70/100"
-        },
-        "timing": "baseline"
-      },
-      "tool_name": "perform_clinical_assessment",
-      "trigger_action": "request_performance_status"
-    },
-    {
-      "output": {
         "findings": [
           {
             "domain": "global cognition",
@@ -154,15 +130,39 @@
           "GAD-7": "15 (severe)",
           "MoCA": "28/30",
           "PHQ-9": "9 (mild)",
-          "RAVLT_delayed_recall": "z = -0.2",
+          "RAVLT_delayed_recall": "z = 0.0",
           "TOMM_trial_2": "49/50",
-          "Trail_Making_B": "z = -0.4"
+          "Trail_Making_B": "z = -0.3"
         },
         "recommended_actions": [],
         "test_type": "neuropsych_battery"
       },
       "tool_name": "order_specialized_test",
       "trigger_action": "request_neuropsych_battery"
+    },
+    {
+      "output": {
+        "assessment_type": "performance_status",
+        "findings": [
+          {
+            "domain": "activity",
+            "result": "walks with a dragging left leg"
+          },
+          {
+            "domain": "self-care and work",
+            "result": "cares for self; unable to teach at present"
+          }
+        ],
+        "impression": "Karnofsky 70 (cares for self; unable to carry on normal activity or active work), ECOG 2 (ambulatory and capable of self-care, unable to work, up more than 50% of waking hours).",
+        "recommended_actions": [],
+        "scores": {
+          "ECOG": "2",
+          "Karnofsky": "70/100"
+        },
+        "timing": "baseline"
+      },
+      "tool_name": "perform_clinical_assessment",
+      "trigger_action": "request_performance_status"
     }
   ],
   "ground_truth": {
@@ -190,6 +190,22 @@
       {
         "alternatives": [
           {
+            "required_arguments": {},
+            "tool_name": "analyze_ecg"
+          }
+        ],
+        "citations": [
+          "[NICE_CG109]"
+        ],
+        "criterion_id": "action-ecg",
+        "expected_evidence": "Sinus rhythm at 86 per minute, normal PR, QRS and QTc",
+        "importance": "required",
+        "label": "12-lead ECG",
+        "rationale": "Her events include apparent loss of responsiveness; NICE advises a 12-lead ECG for everyone with transient loss of consciousness, to look for a cardiac cause such as long QT, pre-excitation, a Brugada pattern or heart block, and her medicines include ondansetron."
+      },
+      {
+        "alternatives": [
+          {
             "required_arguments": {
               "panels": [
                 "sodium",
@@ -205,9 +221,9 @@
         ],
         "criterion_id": "action-5-interpret-labs",
         "expected_evidence": "Mild hypotonic hyponatremia (sodium 131, serum osmolality 268) with maximally dilute urine (62 mOsm/kg): water excess from polydipsia, too mild to explain the events",
-        "importance": "recommended",
+        "importance": "required",
         "label": "Measure serum sodium and serum and urine osmolality",
-        "rationale": "She drinks 4 to 6 liters a day, takes desmopressin and sertraline, and had a sodium of 129 at the outside emergency department; current sodium and osmolalities show whether the hyponatremia is severe enough to provoke seizures and whether it is water excess or inappropriate ADH."
+        "rationale": "Safety test: she has documented recurrent hyponatremia, drinks 4 to 6 liters a day and takes desmopressin and sertraline, with a sodium of 129 at the outside emergency department, so the current sodium must be measured, not assumed, before desmopressin is stopped and fluid restricted; sodium and the osmolalities also show whether the hyponatremia could provoke seizures and whether it is water excess or inappropriate ADH (Spasovski 2014)."
       },
       {
         "alternatives": [
@@ -224,9 +240,9 @@
         ],
         "criterion_id": "action-4-analyze-eeg",
         "expected_evidence": "Habitual events recorded on video with no EEG change and a normal interictal record",
-        "importance": "optional",
+        "importance": "recommended",
         "label": "Record the habitual events on video-EEG",
-        "rationale": "Three shaking events in two weeks in a patient who fears epilepsy and has hyponatremia: capturing the habitual events without ictal change reaches the ILAE documented level of certainty and answers the question of co-occurring epileptic seizures. Without the recording, the positive signs and the semiology of witnessed events support the diagnosis at a lower ILAE level of certainty (LaFrance 2013)."
+        "rationale": "A typical event was witnessed on examination, which supports the diagnosis at the clinically established level; recording a habitual event on video-EEG raises it to documented and screens for co-occurring epilepsy, as the AAN guideline advises where feasible (ILAE 2013; AAN 2025)."
       },
       {
         "alternatives": [
@@ -262,24 +278,6 @@
         "importance": "optional",
         "label": "Neuropsychological assessment",
         "rationale": "A battery would quantify her anxiety, low mood and compulsive drinking for the treatment plan, but it does not make the diagnosis, which rests on the examination, and it is the most expensive item on this pathway."
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "query": "functional neurological disorder diagnosis treatment"
-            },
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[Espay_2018]"
-        ],
-        "criterion_id": "action-1-search-medical-literature",
-        "expected_evidence": "General evidence on positive diagnosis and on physiotherapy and psychological therapy for FND; no step of this patient's work-up depends on it",
-        "importance": "optional",
-        "label": "Search the literature on FND diagnosis and treatment",
-        "rationale": "A literature search is background reading, not a clinical step in this patient's pathway; no step of the work-up depends on it."
       }
     ],
     "assessment": {
@@ -300,7 +298,7 @@
         "Refer for psychological therapy by a clinician experienced in FND (CBT-informed) and treat the comorbid generalized anxiety disorder and compulsive water drinking, and screen for depression.",
         "Give the patient, family and ward a written plan for typical events: keep safe, do not restrain, wait for the event to end, and do not give emergency benzodiazepines or intubate for a typical functional seizure.",
         "Stop desmopressin: with primary polydipsia it causes water retention and can produce severe hyponatremia.",
-        "Restrict fluid intake with serial serum sodium measurements, and review sertraline (which can cause SIADH) with her psychiatrist as an added hyponatremia risk."
+        "Restrict fluid intake after stopping desmopressin, measure serum sodium every 4 to 6 hours with a fluid balance and urine output chart for the first 48 hours, and keep the rise in sodium to no more than 10 mmol/L in the first 24 hours and 8 mmol/L in each further 24 hours, since a water diuresis can correct chronic hyponatremia too fast; review sertraline (a cause of SIADH) with her psychiatrist."
       ]
     },
     "avoided_actions": [
@@ -315,7 +313,7 @@
           "[Espay_2018]"
         ],
         "criterion_id": "avoid-waste-1-order-echocardiogram",
-        "rationale": "No cardiac question: the events are shaking with preserved responsiveness, not syncope, and the heart examination is not in question.",
+        "rationale": "No structural cardiac question: the events are shaking with the eyes closed and responsiveness preserved on examination, not syncope, and the 12-lead ECG answers the cardiac screening question for the reported unresponsiveness.",
         "severity": "waste"
       },
       {
@@ -329,7 +327,7 @@
           "[Espay_2018]"
         ],
         "criterion_id": "avoid-waste-2-order-cardiac-monitoring",
-        "rationale": "Rhythm monitoring answers syncope; her events are prolonged shaking with eyes closed and preserved awareness, recorded on video-EEG with a normal background.",
+        "rationale": "Rhythm monitoring answers syncope; her events are prolonged shaking with eyes closed, awareness preserved by her own account and a response to her name despite apparent unresponsiveness to witnesses, recorded on video-EEG with a normal background.",
         "severity": "waste"
       },
       {
@@ -508,6 +506,8 @@
       "max_additional_actions": 0,
       "required_before_assessment": [
         "action-3-perform-clinical-assessment",
+        "action-ecg",
+        "action-5-interpret-labs",
         "action-2-check-drug-interactions"
       ]
     }
@@ -591,7 +591,22 @@
         ]
       }
     },
-    "ecg": null,
+    "ecg": {
+      "axis": "normal",
+      "findings": [
+        "Sinus rhythm at 86 bpm with normal P-wave morphology.",
+        "PR 148 ms with no delta wave; QRS 86 ms with no right bundle branch block pattern and no coved ST elevation in V1-V2.",
+        "QTc 431 ms (Bazett). No ST-segment or T-wave abnormality."
+      ],
+      "interpretation": "Normal sinus rhythm. Normal PR, QRS and QTc intervals. No pre-excitation, Brugada pattern, heart block or repolarization abnormality.",
+      "intervals": {
+        "PR": "148 ms",
+        "QRS": "86 ms",
+        "QTc": "431 ms"
+      },
+      "rate": 86,
+      "rhythm": "normal sinus rhythm"
+    },
     "echo": null,
     "eeg": {
       "activating_procedures": {
@@ -831,49 +846,7 @@
         ]
       }
     },
-    "literature_search": {
-      "functional neurological disorder diagnosis treatment": {
-        "query": "functional neurological disorder diagnosis treatment",
-        "results": [
-          {
-            "evidence_level": "narrative review",
-            "finding": "Diagnosis of functional neurological disorder rests on positive clinical features such as the Hoover sign, tremor entrainment and functional seizure semiology, not on the exclusion of other disease; treatment combines explanation, physiotherapy and psychological therapy.",
-            "source": "Espay AJ et al. JAMA Neurol 2018;75:1132-1141"
-          },
-          {
-            "evidence_level": "systematic review",
-            "finding": "Motor signs such as the Hoover sign, hip abductor sign, drift without pronation and dragging gait have high specificity; sensory signs such as midline splitting have low specificity.",
-            "source": "Daum C et al. J Neurol Neurosurg Psychiatry 2014;85:180-190"
-          },
-          {
-            "evidence_level": "ILAE consensus",
-            "finding": "Defines levels of certainty for psychogenic nonepileptic seizures; the documented level requires a typical event recorded on video-EEG without ictal EEG change.",
-            "source": "LaFrance WC Jr et al. Epilepsia 2013;54:2005-2018"
-          },
-          {
-            "evidence_level": "AAN evidence-based guideline",
-            "finding": "For functional seizures: assess for co-occurring epilepsy and psychiatric disorders, taper antiseizure medication without another indication, avoid benzodiazepines, and offer psychological therapy, which is possibly effective.",
-            "source": "Tolchin B et al. Neurology 2026;106:e214466"
-          },
-          {
-            "evidence_level": "randomised controlled trial",
-            "finding": "CBT added to standardised medical care did not reduce dissociative seizure frequency at 12 months; several secondary outcomes favoured CBT.",
-            "source": "Goldstein LH et al. Lancet Psychiatry 2020;7:491-505"
-          },
-          {
-            "evidence_level": "randomised controlled trial",
-            "finding": "Specialist physiotherapy for functional motor disorder was not superior to community neurological physiotherapy on physical function at 12 months; several secondary outcomes favoured it.",
-            "source": "Nielsen G et al. Lancet Neurol 2024;23:675-686"
-          },
-          {
-            "evidence_level": "systematic review",
-            "finding": "About 4% of patients diagnosed with conversion symptoms since 1970 later received another diagnosis.",
-            "source": "Stone J et al. BMJ 2005;331:989"
-          }
-        ],
-        "summary": "Guideline and trial evidence supports a positive clinical diagnosis of functional neurological disorder, video-EEG confirmation of functional seizures, tapering of unneeded antiseizure drugs and benzodiazepines, and physiotherapy and psychological treatment whose trial effects on primary outcomes were modest."
-      }
-    },
+    "literature_search": null,
     "mri": null,
     "specialized_test": null
   },
@@ -894,7 +867,7 @@
     "created_by": "neurobench_generator",
     "criteria_pack_version": "1.0",
     "difficulty_description": "Moderate: coexisting primary polydipsia with mild hyponatremia, and desmopressin on the medication list, invite attributing the events to hyponatremic seizures, and a grandmother with epilepsy adds misdirection. The agent must make the diagnosis from the positive signs and the event semiology, judge the hyponatremia too mild to explain them, and stop the desmopressin.",
-    "difficulty_rationale": "Mixed functional seizures and functional leg weakness with a metabolic confounder: the examination and the event semiology make the diagnosis, with video-EEG confirmation if recorded, sodium and osmolalities answer the hyponatremia question, and the medication review finds a contraindicated drug.",
+    "difficulty_rationale": "Mixed functional seizures and functional leg weakness with a metabolic confounder: the examination and the event semiology make the diagnosis, with video-EEG confirmation if recorded; sodium and the osmolalities are a required safety measurement before desmopressin is stopped and fluid restricted, the ECG screens the events with apparent unresponsiveness for a cardiac cause, and the medication review finds a contraindicated drug.",
     "expected_agent_confidence": 0.6,
     "fallback_tool_kinds": {
       "cardiac_monitoring": "normal",
@@ -904,9 +877,9 @@
       "echo": "normal"
     },
     "generation_method": "real_case_seed",
-    "last_revised": "2026-10-24",
+    "last_revised": "2026-11-16",
     "policy_spec_status": "draft",
-    "revision_reason": "October 2026 review round: policy tiers, reports and assessment rebuilt to the FND condition plan. Close-out 24 Oct 2026: video-EEG optional and red-flag tests recommended, per the July 2026 agreement with the physicians that the examination is the only required diagnostic act.",
+    "revision_reason": "November 2026: sodium and osmolalities and a 12-lead ECG required as safety tests, video-EEG recommended, sodium correction-rate must.",
     "source": "MedCaseReasoning",
     "source_license": "CC-BY 4.0",
     "source_pmcid": "PMC11440527",

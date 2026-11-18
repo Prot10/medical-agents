@@ -74,21 +74,7 @@
       "recommended_actions": []
     },
     "drug_interactions": null,
-    "ecg": {
-      "axis": "normal",
-      "clinical_correlation": "",
-      "findings": [
-        "Normal sinus rhythm. Normal axis and intervals. No acute ST-T changes."
-      ],
-      "interpretation": "Normal ECG",
-      "intervals": {
-        "PR": "192 ms",
-        "QRS": "94 ms",
-        "QTc": "425 ms"
-      },
-      "rate": 74,
-      "rhythm": "normal sinus rhythm"
-    },
+    "ecg": null,
     "echo": {
       "chambers": {
         "LA": "normal size",
@@ -120,6 +106,43 @@
   "followup_outputs": [
     {
       "output": {
+        "findings": [
+          {
+            "domain": "global cognition",
+            "result": "MoCA 28/30"
+          },
+          {
+            "domain": "memory, attention, executive function, language, visuospatial",
+            "result": "cognitive performance within normal limits across memory, attention, executive, language and visuospatial domains"
+          },
+          {
+            "domain": "mood and anxiety (self-report)",
+            "result": "moderate depressive and anxiety symptoms, trauma-related symptoms above the screening threshold and elevated dissociative experiences"
+          },
+          {
+            "domain": "effort",
+            "result": "performance validity measures passed (TOMM trial 2 50/50)"
+          }
+        ],
+        "impression": "Cognitive performance within normal limits across memory, attention, executive, language and visuospatial domains. Self-report measures show moderate depressive and anxiety symptoms, trauma-related symptoms above the screening threshold and elevated dissociative experiences. Performance validity measures passed.",
+        "quantitative_data": {
+          "DES-II": "33",
+          "GAD-7": "11 (moderate)",
+          "MoCA": "28/30",
+          "PCL-5": "49",
+          "PHQ-9": "12 (moderate)",
+          "RAVLT_delayed_recall": "z = -0.3",
+          "TOMM_trial_2": "50/50",
+          "Trail_Making_B": "z = -0.1"
+        },
+        "recommended_actions": [],
+        "test_type": "neuropsych_battery"
+      },
+      "tool_name": "order_specialized_test",
+      "trigger_action": "request_neuropsych_battery"
+    },
+    {
+      "output": {
         "assessment_type": "performance_status",
         "findings": [
           {
@@ -141,43 +164,6 @@
       },
       "tool_name": "perform_clinical_assessment",
       "trigger_action": "request_performance_status"
-    },
-    {
-      "output": {
-        "findings": [
-          {
-            "domain": "global cognition",
-            "result": "MoCA 28/30"
-          },
-          {
-            "domain": "memory, attention, executive function, language, visuospatial",
-            "result": "cognitive performance within normal limits across memory, attention, executive, language and visuospatial domains"
-          },
-          {
-            "domain": "mood and anxiety (self-report)",
-            "result": "moderate depressive and anxiety symptoms, trauma-related symptoms above the screening threshold and elevated dissociative experiences"
-          },
-          {
-            "domain": "effort",
-            "result": "performance validity measures passed (TOMM trial 2 49/50)"
-          }
-        ],
-        "impression": "Cognitive performance within normal limits across memory, attention, executive, language and visuospatial domains. Self-report measures show moderate depressive and anxiety symptoms, trauma-related symptoms above the screening threshold and elevated dissociative experiences. Performance validity measures passed.",
-        "quantitative_data": {
-          "DES-II": "33",
-          "GAD-7": "11 (moderate)",
-          "MoCA": "28/30",
-          "PCL-5": "49",
-          "PHQ-9": "12 (moderate)",
-          "RAVLT_delayed_recall": "z = -0.2",
-          "TOMM_trial_2": "49/50",
-          "Trail_Making_B": "z = -0.4"
-        },
-        "recommended_actions": [],
-        "test_type": "neuropsych_battery"
-      },
-      "tool_name": "order_specialized_test",
-      "trigger_action": "request_neuropsych_battery"
     }
   ],
   "ground_truth": {
@@ -197,10 +183,26 @@
           "[Espay_2018]"
         ],
         "criterion_id": "action-3-perform-clinical-assessment",
-        "expected_evidence": "Left Hoover sign, drift without pronation, dragging gait and entraining tremor; hemisensory loss supportive only",
+        "expected_evidence": "Left Hoover sign, drift without pronation, dragging gait and entraining tremor, with the left arm held against gravity despite 1-2/5 on testing; hemisensory loss supportive only",
         "importance": "required",
         "label": "Examine for positive functional signs",
         "rationale": "The left-sided weakness and tremor are diagnosed at the bedside: Hoover sign, drift without pronation, dragging gait and tremor entrainment are signs of clinical incompatibility (DSM-5 criterion B; Daum 2014)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_ecg"
+          }
+        ],
+        "citations": [
+          "[NICE_CG109]"
+        ],
+        "criterion_id": "action-ecg",
+        "expected_evidence": "Sinus rhythm at 88 per minute, normal PR, QRS and QTc",
+        "importance": "required",
+        "label": "12-lead ECG",
+        "rationale": "Her events include apparent loss of responsiveness; NICE advises a 12-lead ECG for everyone with transient loss of consciousness, to look for a cardiac cause such as long QT, pre-excitation, a Brugada pattern or heart block."
       },
       {
         "alternatives": [
@@ -212,30 +214,14 @@
           }
         ],
         "citations": [
-          "[Espay_2018]"
+          "[Espay_2018]",
+          "[AHA_ASA_Stroke_2026]"
         ],
         "criterion_id": "action-4-analyze-brain-mri",
         "expected_evidence": "No acute infarct on DWI and no other lesion to explain the left-sided deficit",
-        "importance": "recommended",
-        "label": "Non-contrast brain MRI, once",
-        "rationale": "Left hemiparesis evolving over 24 hours in a woman with migraine, who herself raised a migraine-related stroke, is triaged as a possible stroke; one non-contrast MRI with DWI answers that question, and gadolinium adds nothing (Espay 2018)."
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "analyze_ecg"
-          }
-        ],
-        "citations": [
-          "[NICE_CG109]",
-          "[NICE_NG217]"
-        ],
-        "criterion_id": "action-ecg",
-        "expected_evidence": "Sinus rhythm with normal conduction and QT interval",
-        "importance": "optional",
-        "label": "12-lead ECG",
-        "rationale": "Episodes of apparent unresponsiveness: NICE advises a 12-lead ECG after transient loss of consciousness (CG109) and after a suspected seizure (NG217). The event semiology already favours functional seizures, so it does not contribute to the diagnosis."
+        "importance": "required",
+        "label": "Non-contrast brain MRI with DWI",
+        "rationale": "A new focal deficit of 24 hours is imaged whatever the examination shows: positive functional signs do not exclude a coexisting acute infarct, since functional disorder coexists with neurological disease (Espay 2018; AHA/ASA 2026). She has migraine and herself raised a migraine-related stroke; one non-contrast MRI with DWI answers that question, and gadolinium adds nothing."
       },
       {
         "alternatives": [
@@ -248,14 +234,13 @@
         ],
         "citations": [
           "[ILAE_PNES_2013]",
-          "[Avbersek_2010]",
           "[AAN_Functional_Seizures_2025]"
         ],
         "criterion_id": "action-5-analyze-eeg",
         "expected_evidence": "Habitual events recorded on video with no EEG change and a normal interictal record",
-        "importance": "optional",
+        "importance": "required",
         "label": "Video-EEG to capture a habitual event",
-        "rationale": "Staring spells with unresponsiveness can be focal impaired-awareness seizures; eyelid fluttering and immediate recovery support functional seizures but no single feature is diagnostic, so the ILAE documented level rests on a habitual event recorded without ictal change (LaFrance 2013; Avbersek 2010; AAN 2025). Without the recording, the positive signs and the semiology of witnessed events support the diagnosis at a lower ILAE level of certainty (LaFrance 2013)."
+        "rationale": "No habitual event has been seen by a clinician, only described by her coworker, so the history supports functional seizures only at the possible level; staring spells with unresponsiveness can be focal impaired-awareness seizures, and a habitual event recorded on video-EEG without ictal change documents the diagnosis and screens for co-occurring epilepsy (ILAE 2013; AAN 2025)."
       },
       {
         "alternatives": [
@@ -290,24 +275,6 @@
         "importance": "optional",
         "label": "Neuropsychological assessment of the comorbidity",
         "rationale": "Depression and post-traumatic stress symptoms are treatment targets; a battery can quantify them but does not make the diagnosis (Espay 2018)."
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {
-              "query": "functional neurological disorder diagnosis treatment"
-            },
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[Espay_2018]"
-        ],
-        "criterion_id": "action-1-search-medical-literature",
-        "expected_evidence": "General evidence on positive signs and treatment trials in FND",
-        "importance": "optional",
-        "label": "Search the literature on FND diagnosis and treatment",
-        "rationale": "Background reading only; the diagnosis and the plan rest on this patient's examination and recorded data, not on a search."
       }
     ],
     "assessment": {
@@ -320,7 +287,7 @@
         "Give gadolinium contrast without a specific indication."
       ],
       "required_recommendations": [
-        "Make a positive diagnosis of functional neurological disorder (mixed: functional seizures with functional left-sided weakness and tremor) based on the left Hoover sign, drift without pronation, dragging monoplegic gait and tremor entrainment and the semiology of the habitual staring events, confirmed on video-EEG where recorded, and not by exclusion of other disease.",
+        "Make a positive diagnosis of functional neurological disorder (mixed: functional seizures with functional left-sided weakness and tremor) based on the left Hoover sign, drift without pronation, dragging monoplegic gait and tremor entrainment and the habitual staring event recorded on video-EEG without ictal change, and not by exclusion of other disease.",
         "Explain the diagnosis to the patient, and with consent to the family, as a common and genuine disorder of nervous system functioning that can improve, show the positive signs, and give written information.",
         "Refer for physiotherapy with expertise in functional motor disorder (motor retraining, Nielsen 2015 consensus).",
         "Refer for psychological therapy by a clinician experienced in FND (CBT-informed) and treat the comorbid post-traumatic stress disorder and depression, with a trauma-informed approach given the adolescent sexual abuse.",
@@ -496,7 +463,7 @@
       {
         "diagnosis": "Multiple sclerosis",
         "icd_code": "G35",
-        "key_features": "A prior unexplained episode of right leg weakness raises demyelination, but the current signs are incompatible with a central lesion and the MRI shows no white matter lesion.",
+        "key_features": "A prior unexplained episode of right leg weakness raises demyelination; the current signs show that the weakness is functional but do not exclude a coexisting lesion, and the MRI shows no white matter lesion.",
         "likelihood": "low"
       }
     ],
@@ -545,14 +512,17 @@
         "citations": [
           "[Espay_2018]"
         ],
-        "reason": "The examination comes first: its positive signs decide whether imaging has a specific question to answer (Espay 2018).",
+        "reason": "The examination comes first: it defines the deficit the imaging must explain and takes minutes, so it does not delay the MRI (Espay 2018).",
         "severity": "soft"
       }
     ],
     "stop_rule": {
       "max_additional_actions": 0,
       "required_before_assessment": [
-        "action-3-perform-clinical-assessment"
+        "action-3-perform-clinical-assessment",
+        "action-ecg",
+        "action-4-analyze-brain-mri",
+        "action-5-analyze-eeg"
       ]
     }
   },
@@ -562,7 +532,7 @@
     "clinical_assessment": {
       "assessment_type": "functional_neuro_signs",
       "criteria_met": {
-        "distractibility_of_deficit": true,
+        "distractibility_of_deficit": false,
         "drift_without_pronation": true,
         "functional_seizure_semiology_observed": false,
         "give_way_weakness": false,
@@ -577,16 +547,20 @@
           "sign": "Hoover sign"
         },
         {
-          "result": "Left arm drifts down with eyes closed without pronation of the forearm.",
+          "result": "Both arms held outstretched against gravity; with eyes closed the left arm then drifts down slowly without pronation of the forearm.",
           "sign": "Drift without pronation"
         },
         {
-          "result": "Left hand tremor takes up the frequency of the rhythm she copies with the right hand, or stops during the task.",
-          "sign": "Tremor entrainment and distractibility"
+          "result": "Left hand tremor takes up the frequency of the rhythm she taps with the right hand.",
+          "sign": "Tremor entrainment"
         },
         {
           "result": "Left leg dragged behind with the foot kept on the floor.",
           "sign": "Dragging monoplegic gait"
+        },
+        {
+          "result": "The left arm is 1-2/5 on formal testing yet is held outstretched against gravity.",
+          "sign": "Inconsistency"
         },
         {
           "result": "Left hemisensory loss including the face that follows no nerve or root distribution; normal walking when unaware of being observed; not counted as rule-in signs.",
@@ -597,7 +571,7 @@
           "sign": "Reflexes and plantar responses"
         }
       ],
-      "impression": "Positive signs of functional weakness and tremor: left Hoover sign, drift without pronation of the left arm, dragging monoplegic gait and left hand tremor entrainment. The pattern is inconsistent with a structural lesion. No event was observed during the examination.",
+      "impression": "Positive signs of functional weakness and tremor: left Hoover sign, drift without pronation of the left arm, dragging monoplegic gait and left hand tremor entrainment, with the left arm held against gravity despite 1-2/5 strength on testing. The pattern is inconsistent with a structural lesion. No event was observed during the examination.",
       "pre_post_comparison": null,
       "recommended_actions": [],
       "scores": {
@@ -623,7 +597,24 @@
         ]
       }
     },
-    "ecg": null,
+    "ecg": {
+      "axis": "normal (+55 degrees)",
+      "findings": [
+        "Sinus rhythm at 88 per minute with normal P-wave morphology.",
+        "PR interval 158 ms with no delta wave; QRS 84 ms with normal morphology and no bundle branch block.",
+        "No coved or saddleback ST elevation in V1-V2; no ST-segment or T-wave abnormality.",
+        "QTc 426 ms, within normal limits for a woman."
+      ],
+      "interpretation": "Normal 12-lead ECG: sinus rhythm at 88 per minute with normal PR, QRS and QTc intervals. No pre-excitation, Brugada pattern, heart block or QT prolongation.",
+      "intervals": {
+        "PR": "158 ms",
+        "QRS": "84 ms",
+        "QT": "352 ms",
+        "QTc": "426 ms (Bazett)"
+      },
+      "rate": 88,
+      "rhythm": "sinus rhythm"
+    },
     "echo": null,
     "eeg": {
       "activating_procedures": {
@@ -657,49 +648,7 @@
       "recommended_actions": []
     },
     "labs": null,
-    "literature_search": {
-      "functional neurological disorder diagnosis treatment": {
-        "query": "functional neurological disorder diagnosis treatment",
-        "results": [
-          {
-            "evidence_level": "narrative review",
-            "finding": "Diagnosis of functional neurological disorder rests on positive clinical features such as the Hoover sign, tremor entrainment and functional seizure semiology, not on the exclusion of other disease; treatment combines explanation, physiotherapy and psychological therapy.",
-            "source": "Espay AJ et al. JAMA Neurol 2018;75:1132-1141"
-          },
-          {
-            "evidence_level": "systematic review",
-            "finding": "Motor signs such as the Hoover sign, hip abductor sign, drift without pronation and dragging gait have high specificity; sensory signs such as midline splitting have low specificity.",
-            "source": "Daum C et al. J Neurol Neurosurg Psychiatry 2014;85:180-190"
-          },
-          {
-            "evidence_level": "ILAE consensus",
-            "finding": "Defines levels of certainty for psychogenic nonepileptic seizures; the documented level requires a typical event recorded on video-EEG without ictal EEG change.",
-            "source": "LaFrance WC Jr et al. Epilepsia 2013;54:2005-2018"
-          },
-          {
-            "evidence_level": "AAN evidence-based guideline",
-            "finding": "For functional seizures: assess for co-occurring epilepsy and psychiatric disorders, taper antiseizure medication without another indication, avoid benzodiazepines, and offer psychological therapy, which is possibly effective.",
-            "source": "Tolchin B et al. Neurology 2026;106:e214466"
-          },
-          {
-            "evidence_level": "randomised controlled trial",
-            "finding": "CBT added to standardised medical care did not reduce dissociative seizure frequency at 12 months; several secondary outcomes favoured CBT.",
-            "source": "Goldstein LH et al. Lancet Psychiatry 2020;7:491-505"
-          },
-          {
-            "evidence_level": "randomised controlled trial",
-            "finding": "Specialist physiotherapy for functional motor disorder was not superior to community neurological physiotherapy on physical function at 12 months; several secondary outcomes favoured it.",
-            "source": "Nielsen G et al. Lancet Neurol 2024;23:675-686"
-          },
-          {
-            "evidence_level": "systematic review",
-            "finding": "About 4% of patients diagnosed with conversion symptoms since 1970 later received another diagnosis.",
-            "source": "Stone J et al. BMJ 2005;331:989"
-          }
-        ],
-        "summary": "Guideline and trial evidence supports a positive clinical diagnosis of functional neurological disorder, video-EEG confirmation of functional seizures, tapering of unneeded antiseizure drugs and benzodiazepines, and physiotherapy and psychological treatment whose trial effects on primary outcomes were modest."
-      }
-    },
+    "literature_search": null,
     "mri": {
       "additional_observations": [
         "Technique: sagittal T1, axial T2, axial FLAIR, DWI with ADC, SWI; no contrast administered",
@@ -720,19 +669,18 @@
     "case_body_concerns": [],
     "citation_gap": [],
     "criteria_pack_version": "1.0",
-    "difficulty_rationale": "Clear positive signs of functional left-sided weakness and tremor and typical staring events, with two prompts to over-investigate (migraine-stroke concern, family history of epilepsy); the work-up is the examination and one non-contrast MRI, with a video-EEG capture to confirm the events if needed.",
+    "difficulty_rationale": "Clear positive signs of functional left-sided weakness and tremor, with two prompts to over-investigate (migraine-stroke concern, family history of epilepsy); the 24-hour focal deficit needs one non-contrast MRI with DWI, the staring spells (none seen by a clinician) a habitual event recorded on video-EEG, and the events with apparent loss of responsiveness a 12-lead ECG.",
     "fallback_tool_kinds": {
       "cardiac_monitoring": "normal",
       "clinical_assessment": "case",
       "csf": "normal",
       "ct": "normal",
-      "ecg": "normal",
       "echo": "normal"
     },
-    "last_revised": "2026-10-24",
+    "last_revised": "2026-11-16",
     "notes": "Straightforward FND with PNES and functional left hemisensorimotor syndrome. PTSD with identified precipitants.",
     "policy_spec_status": "draft",
-    "revision_reason": "October 2026 review round: criteria rebuilt to the pack tiers (exam required, MRI recommended), non-contrast MRI, canonical literature and medication outputs, case-specific differential, evidence and assessment. Close-out 24 Oct 2026: video-EEG optional and red-flag tests recommended, per the July 2026 agreement with the physicians that the examination is the only required diagnostic act.",
+    "revision_reason": "November 2026 review round: non-contrast brain MRI with DWI required for the 24-hour focal deficit (Espay 2018; AHA/ASA 2026), video-EEG required (no event seen by a clinician; ILAE 2013, AAN 2025), 12-lead ECG required for the events with apparent loss of responsiveness (NICE CG109), with a stored case ECG; motor examination states the arm held against gravity despite 1-2/5 testing, and the tremor entrains throughout. Earlier (October 2026): criteria rebuilt to the pack tiers, non-contrast MRI, case-specific differential, evidence and assessment.",
     "version": "policy-v1",
     "vocab_gap": []
   },
@@ -788,7 +736,7 @@
       "cranial_nerves": "Normal. Pupils equal and reactive. No nystagmus.",
       "gait": "Drags the left leg behind with the foot on the floor, holding on to furniture; walked normally out of the bathroom when unaware of being observed.",
       "mental_status": "Alert and oriented x4. Calm demeanor but reports feeling dissociated.",
-      "motor": "Left arm 1-2/5 on formal testing; with arms outstretched and eyes closed the left arm drifts down without pronation. Hoover sign positive on the left: left hip extension is weak on direct testing but returns to full strength, felt under the left heel, during contralateral right hip flexion against resistance. Left hand tremor that stops when she taps a rhythm with the right hand. Right side 5/5.",
+      "motor": "Left arm 1-2/5 on formal testing, yet she holds both arms outstretched against gravity; with eyes closed the left arm then drifts down slowly without pronation. Hoover sign positive on the left: left hip extension is weak on direct testing but returns to full strength, felt under the left heel, during contralateral right hip flexion against resistance. Left hand tremor that takes up the rhythm she taps with the right hand. Right side 5/5.",
       "reflexes": "Normal 2+ throughout. No pathological reflexes.",
       "sensory": "Left hemisensory loss to face, arm, leg without following anatomical nerve distributions. Loss does not comply with dermatomal pattern."
     },

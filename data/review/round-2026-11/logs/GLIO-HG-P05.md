@@ -1,0 +1,34 @@
+# GLIO-HG-P05
+
+## Class changes
+- MRI-CONTRAST: split initial_tool_outputs.mri (mri_split initial). The gadolinium study (contrast_used true, text unchanged) is now followup[0] request_contrast_mri, first in the pathway because it is the core diagnostic study. The plain copy (contrast_used false) lost the three post_contrast keys and the 'no leptomeningeal enhancement' observation. 'No additional enhancing intracranial lesion' became 'No additional intracranial lesion' and the periventricular lesion is no longer called non-enhancing. The impression no longer mentions the patchy enhancement; measurements, midline extension and ventricular findings are kept. action-1-analyze-brain-mri keeps contrast: true, protocol tumor, with no plain alternative: EANO 2021 and RANO require gadolinium-enhanced MRI to define the enhancing target and plan biopsy or resection, and a plain study cannot answer that. Its expected_evidence is unchanged because it already matches the unchanged gadolinium report the criterion now receives (perfect_agent: followup request_contrast_mri). The stop rule and the hard MRI-before-tissue constraint are unchanged.
+- MRI-CONTRAST verified: checked the plain initial copy for residual gadolinium keys, findings, observations and impression clauses and for impression/findings consistency (sizes, laterality, numbering); the gadolinium follow-up equals the base report plus contrast_used true; contrast_used true/false per decision, no stored brain MRI left null, case fallback MRI is null; action-1-analyze-brain-mri contrast true per EANO 2021/RANO with expected_evidence matching the gadolinium report it receives; mri_probe: plain, contrast and both orders in either sequence answered by the case, never the library; pathway and criterion order sensible; nothing outside the MRI split changed versus 393c547e; perfect_agent -v passes; changed ground_truth.red_herrings[0].field_path and location from initial_tool_outputs.mri.findings[0].signal_characteristics.post_contrast (removed by the split, test_red_herring_paths_resolve failed) to followup_outputs[0].output.findings[0].signal_characteristics.post_contrast, the gadolinium study that carries the patchy enhancement the red herring describes.
+
+## Reviewer notes
+No November 2026 note targets this case (data/review/round-2026-11/notes/GLIO-HG.md covers S02 to S06 only). The R2 annotation file for this case holds only October-round comments (9046c896, bc69f5ec, e8cfa028), all present in round-2026-10/notes/GLIO-HG.json and already ruled in October; per the addendum they are not redone. The current case still reflects those October fixes (checked). Rulings file: empty list.
+
+| note id | ruling | what changed (field paths) |
+| --- | --- | --- |
+| (none this round) | NO-ACTION | none |
+
+## Own findings
+| dim | severity | field path | finding | action |
+| --- | --- | --- | --- | --- |
+| C | major | ground_truth.assessment.required_recommendations[2] (new) | Plan class C3 (D5): the HPI records over-the-counter ibuprofen for headache and there was no NSAID must before the thalamic biopsy. Added "Avoid ibuprofen and other NSAIDs before the stereotactic biopsy and while on dexamethasone; use paracetamol for headache." after the dexamethasone must; the later musts moved down by one. | FIXED |
+| B | minor | followup_outputs[6].output.findings[0].result and .site (trigger obtain_resection) | Template garble: "Resection specimen from the Right thalamus, posterolateral enhancing component (MRI-guided stereotactic target) lesion" and site "(MRI-guided stereotactic target)" in an open resection report. Now "Resection specimen from the right thalamic lesion, multiple fragments, aggregate 3.5 cm", site "Right thalamus, open resection". This off-pathway report is kept (resection is not the scored approach; no reviewer or guideline here asks to mark it as an avoided action). | FIXED |
+| B | minor | fallback_tool_outputs.tissue_diagnosis.findings[0].result and .site | Same garble in the open-biopsy fallback; now "Open biopsy fragments from the posterolateral enhancing component of the right thalamic lesion, aggregate 1.4 cm; frozen section concordant", site "Right thalamus, open biopsy". | FIXED |
+
+## Changes
+One plan-class change and two text corrections, no reviewer note this round. A new must tells the clinician to avoid ibuprofen and other NSAIDs before the stereotactic biopsy and while she is on dexamethasone, using paracetamol for headache, because she has been taking over-the-counter ibuprofen (plan C3, D5). The off-pathway resection and open-biopsy reports had a garbled specimen line copied from the stereotactic target description; both now name the specimen and site plainly, with histology and molecular results unchanged. No MRI, criterion, tier or sequence constraint changed.
+
+## Verification
+Checks after the edits: perfect_agent.py -v passes and every criterion receives its own report; test_case_guards (-k on the six worker cases) 48 passed; case_io.py check: schema OK, synonym guard OK, no test failure names this case.
+Pass 1: 0 errors found
+- Verified: the C3 NSAID must matches D5 and the HPI (over-the-counter ibuprofen); no aspirin in the medication list; the resection and open-biopsy specimen/site wording changes leave histology and molecular rows unchanged; the hydrocephalus must covers the third-ventricle compression.
+- Checked by the independent verifier: perfect_agent.py -v passes and each criterion receives its own report; test_case_guards -k for the six cases 48 passed; case_io.py check schema and synonym guard OK, no test failure names this case; no literature output or criterion left (class LIT); MRI pair served from the case (mri_probe); no em dash in added text; rulings file is an empty list, correct because the R2 annotation file holds only October note ids for this case.
+Cosmetic (not counted): none changed.
+Condition auditor (blind leak pass): the drug-interaction follow-up warnings[0] said the venous thromboembolism risk is "already increased with high-grade glioma", naming the case diagnosis in an output any interaction query receives. Now "... which is already increased after neurosurgery and with reduced mobility." perfect_agent.py pass; test_case_guards -k GLIO-HG- pass; case_io check: no failure names the case.
+Pass 3: 0 errors found
+- Focused verifier: checked the post-pass-1 condition-audit change only: drug-interaction warnings[0] no longer names the diagnosis; the VTE warning still matches the patient's ethinyl estradiol/norethindrone, the progestogen-only/IUD alternative and the planned neurosurgery; no other diagnosis term in the output. perfect_agent.py -v passes; test_case_guards -k on the eight pass-3 cases: 64 passed.
+Pass 4: 0 errors found
+- Focused verifier: Pass 3 found 0 errors and nothing was written after it, so no change was left unverified. perfect_agent.py -v passes; test_case_guards -k on the eight pass-4 cases: 64 passed.

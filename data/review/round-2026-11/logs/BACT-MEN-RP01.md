@@ -1,0 +1,5 @@
+# BACT-MEN-RP01
+
+## Class changes
+- MRI-CONTRAST: no stored brain MRI and no MRI criterion, only the case fallback MRI (decision 3: one slot, cannot be split, contrast_used stays null). Removed its gadolinium content so it reports only non-contrast sequences: dropped the 'dural venous sinuses patent on post-contrast images' observation and the T1_post_contrast key; finding 0 type -> 'sulcal FLAIR hyperintensity', location narrowed to the frontal convexities where the FLAIR change lies; impression item 1 now 'Subtle sulcal FLAIR hyperintensity over both frontal convexities'. No criterion, stop rule or sequence constraint names an MRI; no order_body_imaging MRI with contrast false.
+- MRI-CONTRAST verified: checked diff vs 393c547e, mri_probe (plain, contrast, both orders) and perfect_agent -v (pass); fallback MRI (decision 3, contrast_used null) free of gadolinium keys, findings, observations and impression clauses; impression matches findings; no brain-MRI criterion, no stored brain MRI so no LIBRARY answer to an MRI order; no body-imaging MRI describing enhancement with contrast false; nothing else changed. No error found.

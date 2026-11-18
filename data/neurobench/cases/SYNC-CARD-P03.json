@@ -286,26 +286,6 @@
     },
     {
       "output": {
-        "alternatives": [
-          "Ibuprofen 400 mg every 6-8 h if paracetamol alone does not control fever and renal function is normal"
-        ],
-        "contraindications": [],
-        "formulary_status": "On formulary",
-        "interactions": [
-          "No current medications: no drug-drug interaction"
-        ],
-        "proposed": "Paracetamol (acetaminophen) 1 g orally every 6 h, maximum 4 g/day, reviewed against the current medication list (none)",
-        "summary": "Paracetamol: no interaction with the (empty) medication list and no cardiac ion-channel effect; standard hepatic dose limit applies.",
-        "warnings": [
-          "Hepatotoxicity above 4 g/day or with heavy alcohol use; reduce the maximum in low body weight or hepatic impairment",
-          "No sodium-channel, potassium-channel or QT effect"
-        ]
-      },
-      "tool_name": "check_drug_interactions",
-      "trigger_action": "check_paracetamol_acetaminophen_interactions"
-    },
-    {
-      "output": {
         "findings": [
           {
             "interpretation": "Pathogenic",
@@ -359,25 +339,23 @@
     },
     {
       "output": {
-        "query": "Brugada syndrome syncope fever ICD indication",
-        "results": [
-          {
-            "journal": "Eur Heart J",
-            "key_finding": "Brugada syndrome is diagnosed with a spontaneous type 1 pattern, or with a fever- or drug-induced type 1 pattern accompanied by arrhythmic syncope or a family history. All patients should avoid drugs that may induce ST elevation (brugadadrugs.org), avoid excessive alcohol and large meals, and treat fever promptly with antipyretics. An ICD should be considered in patients with a type 1 pattern and arrhythmic syncope (IIa); quinidine or epicardial substrate ablation is an option for electrical storm or recurrent shocks. A sodium-channel-blocker challenge adds nothing once a type 1 pattern has been recorded.",
-            "title": "2022 ESC Guidelines for the management of patients with ventricular arrhythmias and the prevention of sudden cardiac death (Zeppenfeld K et al., Eur Heart J 2022;43:3997-4126)",
-            "year": "2022"
-          },
-          {
-            "journal": "Heart Rhythm",
-            "key_finding": "Lists drugs to avoid (class IC antiarrhythmics, procainamide, several tricyclic antidepressants, lithium, propofol and some anaesthetics, cocaine) and drugs preferably avoided, maintained at brugadadrugs.org.",
-            "title": "Drugs and Brugada syndrome patients: review of the literature, recommendations, and an up-to-date website (Postema PG et al., Heart Rhythm 2009;6:1335-1341)",
-            "year": "2009"
-          }
+        "alternatives": [
+          "Ibuprofen 400 mg every 6-8 h if paracetamol alone does not control fever and renal function is normal"
         ],
-        "summary": "ESC 2022: in Brugada syndrome, avoid ST-elevating drugs, treat fever promptly, and consider an ICD after arrhythmic syncope with a type 1 pattern (IIa); quinidine for storm or recurrent shocks."
+        "contraindications": [],
+        "formulary_status": "On formulary",
+        "interactions": [
+          "No current medications: no drug-drug interaction"
+        ],
+        "proposed": "Paracetamol (acetaminophen) 1 g orally every 6 h, maximum 4 g/day, reviewed against the current medication list (none)",
+        "summary": "Paracetamol: no interaction with the (empty) medication list and no cardiac ion-channel effect; standard hepatic dose limit applies.",
+        "warnings": [
+          "Hepatotoxicity above 4 g/day or with heavy alcohol use; reduce the maximum in low body weight or hepatic impairment",
+          "No sodium-channel, potassium-channel or QT effect"
+        ]
       },
-      "tool_name": "search_medical_literature",
-      "trigger_action": "search_literature_brugada"
+      "tool_name": "check_drug_interactions",
+      "trigger_action": "check_paracetamol_acetaminophen_interactions"
     },
     {
       "output": {
@@ -412,6 +390,24 @@
       },
       "tool_name": "order_specialized_test",
       "trigger_action": "request_exercise_stress_test"
+    },
+    {
+      "output": {
+        "additional_observations": [
+          "No intracranial mass or lesion",
+          "Normal brain parenchyma without atrophy, edema, or signal abnormality",
+          "Normal ventricular system and sulcal pattern for age",
+          "Normal posterior fossa structures",
+          "No abnormal enhancement after gadolinium administration"
+        ],
+        "contrast_used": true,
+        "findings": [],
+        "impression": "Normal brain MRI with and without gadolinium contrast. No structural intracranial abnormality identified.",
+        "recommended_actions": [],
+        "volumetrics": null
+      },
+      "tool_name": "analyze_brain_mri",
+      "trigger_action": "request_contrast_mri"
     }
   ],
   "ground_truth": {
@@ -491,13 +487,14 @@
           }
         ],
         "citations": [
-          "[ESC_2018]"
+          "[ESC_2018]",
+          "[ESC_2022_VA_SCD]"
         ],
         "criterion_id": "action-3-order-echocardiogram",
         "expected_evidence": "Structurally normal heart: normal LV and RV size and function, no valve disease or effusion",
-        "importance": "recommended",
-        "label": "Echocardiogram to exclude structural disease and myocarditis",
-        "rationale": "Echocardiography excludes structural heart disease, myocarditis and RV cardiomyopathy as the substrate of the ventricular ectopy (ESC 2018); a Brugada diagnosis requires a structurally normal heart."
+        "importance": "required",
+        "label": "Transthoracic echocardiogram to exclude structural heart disease (induced type 1 pattern)",
+        "rationale": "A fever-induced type 1 pattern supports Brugada syndrome only in the absence of other heart disease (ESC 2022, IIa C): echocardiography excludes structural heart disease, myocarditis and RV cardiomyopathy as the substrate of the ventricular ectopy (ESC 2018)."
       },
       {
         "alternatives": [
@@ -589,22 +586,6 @@
         "importance": "optional",
         "label": "Medication review before starting the antipyretic",
         "rationale": "He takes no medication, so a review changes nothing; the decision that matters is avoiding the drugs on the brugadadrugs.org list, which is a must, not a test (ESC 2022)."
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[ESC_2018]"
-        ],
-        "criterion_id": "action-8-search-medical-literature",
-        "expected_evidence": "ESC 2022 Brugada syndrome recommendations",
-        "importance": "optional",
-        "label": "Guideline lookup on Brugada syndrome management",
-        "rationale": "Guideline lookup is optional; the decision rests on the ECG, monitoring and imaging results already obtained (ESC 2018)."
       }
     ],
     "assessment": {
@@ -622,7 +603,7 @@
         "Quinidine (or substrate ablation) is the option for electrical storm or recurrent ICD shocks (ESC 2022)",
         "Genetic counselling and SCN5A testing, with cascade screening (ECG including high precordial leads) of first-degree relatives, including the brother with fever-related syncope and the daughter (ESC 2022)",
         "Advise prompt antipyretic treatment of any future fever",
-        "Advise no driving until treated; after ICD implantation for arrhythmic syncope, Group 1 driving is restricted for about 3 months (ESC 2018; national rules apply)"
+        "Advise no driving until treated; after ICD implantation the Group 1 restriction follows national licensing rules (ESC 2018 syncope Practical Instructions: 1 month after an ICD)"
       ]
     },
     "avoided_actions": [
@@ -727,6 +708,22 @@
         "criterion_id": "avoid-harm-sodium-channel-blocker-challenge",
         "rationale": "A sodium-channel-blocker (ajmaline or flecainide) challenge adds nothing once a type 1 pattern is documented (ESC 2022) and can provoke ventricular arrhythmia, here in a patient with fever-dependent polymorphic NSVT.",
         "severity": "harm"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "echo_type": "exercise_echo"
+            },
+            "tool_name": "order_echocardiogram"
+          }
+        ],
+        "citations": [
+          "[ESC_2018]"
+        ],
+        "criterion_id": "avoid-waste-exercise-echo",
+        "rationale": "The events are fever-related, not exertional; exercise echocardiography adds nothing to the Brugada syndrome diagnosis or ICD decision.",
+        "severity": "waste"
       }
     ],
     "diagnosis": {
@@ -848,6 +845,7 @@
       "max_additional_actions": 3,
       "required_before_assessment": [
         "action-1-analyze-ecg",
+        "action-3-order-echocardiogram",
         "action-4-order-cardiac-monitoring"
       ]
     }
@@ -1147,36 +1145,17 @@
         ]
       }
     },
-    "literature_search": {
-      "general": {
-        "query": "syncope initial evaluation and risk stratification",
-        "results": [
-          {
-            "journal": "Eur Heart J",
-            "key_finding": "Initial evaluation comprises history, physical examination including supine and standing blood pressure, and a 12-lead ECG. High-risk features (syncope during exertion or supine, palpitations before the event, known structural or coronary disease, family history of sudden death under 40, high-risk ECG findings) call for early in-hospital evaluation with immediate ECG monitoring. Echocardiography is indicated when structural heart disease is known or suspected; EEG, brain imaging and routine laboratory panels are not recommended without a specific indication.",
-            "title": "2018 ESC Guidelines for the diagnosis and management of syncope (Brignole M et al., Eur Heart J 2018;39:1883-1948)",
-            "year": "2018"
-          },
-          {
-            "journal": "Circulation",
-            "key_finding": "Risk stratification at the initial evaluation separates patients needing in-hospital monitoring and cardiac testing from those suitable for outpatient evaluation; targeted rather than routine blood testing is advised.",
-            "title": "2017 ACC/AHA/HRS Guideline for the evaluation and management of patients with syncope (Shen WK et al.)",
-            "year": "2017"
-          }
-        ],
-        "summary": "Guidelines base syncope work-up on the initial evaluation (history, examination, orthostatic BP, 12-lead ECG) and risk stratification; high-risk patients receive in-hospital ECG monitoring and targeted cardiac testing."
-      }
-    },
+    "literature_search": null,
     "mri": {
       "additional_observations": [
         "No intracranial mass or lesion",
         "Normal brain parenchyma without atrophy, edema, or signal abnormality",
         "Normal ventricular system and sulcal pattern for age",
-        "Normal posterior fossa structures",
-        "No abnormal enhancement after gadolinium administration"
+        "Normal posterior fossa structures"
       ],
+      "contrast_used": false,
       "findings": [],
-      "impression": "Normal brain MRI with and without gadolinium contrast. No structural intracranial abnormality identified.",
+      "impression": "Normal brain MRI. No structural intracranial abnormality identified.",
       "recommended_actions": [],
       "volumetrics": null
     }
@@ -1202,7 +1181,7 @@
       "Influenza infection being accepted as the 'cause' of syncope through dehydration/hypotension rather than recognizing fever as a channelopathy trigger",
       "Lack of awareness of Brugada syndrome's high prevalence in Southeast Asian (especially Filipino) populations"
     ],
-    "difficulty_rationale": "2 required actions, 3 red herrings (febrile-seizure framing, viral illness anchoring, a prior normal afebrile ECG); requires recognising the fever-associated type 1 pattern as Brugada syndrome with arrhythmic syncope and choosing fever control, drug avoidance and ICD.",
+    "difficulty_rationale": "3 required actions, 3 red herrings (febrile-seizure framing, viral illness anchoring, a prior normal afebrile ECG); requires recognising the fever-associated type 1 pattern as Brugada syndrome with arrhythmic syncope and choosing fever control, drug avoidance and ICD.",
     "expected_agent_confidence": 0.35,
     "fallback_tool_kinds": {
       "csf": "normal",
@@ -1210,9 +1189,9 @@
       "drug_interactions": "normal",
       "specialized_test": "normal"
     },
-    "last_revised": "2026-10-24",
+    "last_revised": "2026-11-17",
     "policy_spec_status": "draft",
-    "revision_reason": "per-case audit: a required literature or interaction check returned an empty payload while its expected_finding promised specific published evidence, so the judge assessed the agent against knowledge the simulation withheld",
+    "revision_reason": "November 2026 review: echocardiography required and in the stop rule (an induced type 1 pattern needs structural heart disease excluded); driving advice re-attributed; exercise echo labelled waste; gene panel moved before the drug check",
     "version": "policy-v1",
     "vocab_gap": []
   },

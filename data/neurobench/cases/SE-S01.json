@@ -117,6 +117,43 @@
     {
       "output": {
         "additional_observations": [],
+        "contrast_used": false,
+        "findings": [
+          {
+            "borders": null,
+            "location": "Whole brain",
+            "mass_effect": null,
+            "signal_characteristics": {
+              "DWI": "No restricted diffusion",
+              "FLAIR": "No cortical or hippocampal hyperintensity",
+              "T1": "Normal",
+              "T2": "Normal"
+            },
+            "size": null,
+            "type": "No structural lesion"
+          },
+          {
+            "borders": null,
+            "location": "Bilateral hippocampi",
+            "mass_effect": null,
+            "signal_characteristics": {
+              "T2": "Symmetric size and signal; preserved internal architecture"
+            },
+            "size": null,
+            "type": "Normal hippocampi"
+          }
+        ],
+        "impression": "Normal MRI of the brain. No structural lesion, restricted diffusion or hemorrhage; hippocampi symmetric and normal in signal.",
+        "recommended_actions": [],
+        "volumetrics": null
+      },
+      "tool_name": "analyze_brain_mri",
+      "trigger_action": "request_mri_brain"
+    },
+    {
+      "output": {
+        "additional_observations": [],
+        "contrast_used": true,
         "findings": [
           {
             "borders": null,
@@ -172,36 +209,6 @@
       },
       "tool_name": "check_drug_interactions",
       "trigger_action": "request_asm_alcohol_interaction_check"
-    },
-    {
-      "output": {
-        "query": "Status epilepticus treatment after a failed first benzodiazepine; second-line antiseizure options",
-        "results": [
-          {
-            "evidence_level": "Consensus",
-            "finding": "Convulsive status epilepticus is defined operationally at 5 minutes of continuous convulsive activity, when treatment should start.",
-            "source": "[ILAE_2015_SE]"
-          },
-          {
-            "evidence_level": "Level A",
-            "finding": "An adequately dosed IV benzodiazepine is the first-line treatment and may be repeated once if seizures continue.",
-            "source": "[Glauser_2016]"
-          },
-          {
-            "evidence_level": "RCT",
-            "finding": "Levetiracetam, fosphenytoin and valproate were equally effective second-line agents for benzodiazepine-refractory convulsive status epilepticus.",
-            "source": "[ESETT_2019]"
-          },
-          {
-            "evidence_level": "Guideline",
-            "finding": "Seizures continuing after a benzodiazepine and a second-line agent are refractory and are treated with an anaesthetic infusion under continuous EEG.",
-            "source": "[Brophy_2012]"
-          }
-        ],
-        "summary": "Convulsive status epilepticus is treated at 5 minutes with an adequately dosed benzodiazepine, repeated once if needed [ILAE_2015_SE; Glauser_2016]. Levetiracetam, fosphenytoin and valproate were equally effective second-line agents in ESETT [ESETT_2019]. Seizures continuing after both tiers are refractory and are treated with an anaesthetic infusion under continuous EEG [Brophy_2012]."
-      },
-      "tool_name": "search_medical_literature",
-      "trigger_action": "request_se_second_line_literature"
     },
     {
       "output": {
@@ -413,7 +420,15 @@
       {
         "alternatives": [
           {
-            "required_arguments": {},
+            "required_arguments": {
+              "contrast": false
+            },
+            "tool_name": "analyze_brain_mri"
+          },
+          {
+            "required_arguments": {
+              "contrast": true
+            },
             "tool_name": "analyze_brain_mri"
           }
         ],
@@ -421,7 +436,7 @@
           "[Brophy_2012]"
         ],
         "criterion_id": "action-4-analyze-brain-mri",
-        "expected_evidence": "Normal MRI: no structural lesion, restricted diffusion or abnormal enhancement",
+        "expected_evidence": "Normal MRI: no structural lesion or restricted diffusion",
         "importance": "optional",
         "label": "MRI brain to exclude a new structural cause (optional in known JME with an explained trigger)",
         "rationale": "MRI is indicated when SE is new-onset, unexplained or refractory; in a known generalized epilepsy with a low valproate level, sleep loss and alcohol, and a normal CT, it is not needed acutely [Brophy_2012]."
@@ -441,23 +456,6 @@
         "importance": "recommended",
         "label": "Drug-interaction check for the benzodiazepine and second-line ASM with valproate and recent alcohol",
         "rationale": "The benzodiazepine and the second-line ASM are given on top of maintenance valproate and a blood alcohol of 0.18 g/dL; the check informs sedation risk and the choice among equally effective second-line drugs [ESETT_2019]."
-      },
-      {
-        "alternatives": [
-          {
-            "required_arguments": {},
-            "tool_name": "search_medical_literature"
-          }
-        ],
-        "citations": [
-          "[Glauser_2016]",
-          "[ESETT_2019]"
-        ],
-        "criterion_id": "action-6-search-medical-literature",
-        "expected_evidence": "General treatment evidence for convulsive SE after a failed benzodiazepine",
-        "importance": "optional",
-        "label": "Literature: second-line treatment of convulsive SE",
-        "rationale": "Background evidence only; not a clinical step of the work-up."
       }
     ],
     "assessment": {
@@ -991,7 +989,7 @@
     "case_body_concerns": [],
     "citation_gap": [],
     "criteria_pack_version": "1.0",
-    "difficulty_rationale": "3 required actions (labs, CT, continuous EEG) with a recommended drug check and optional MRI and literature; classic JME breakthrough GCSE after a failed prehospital benzodiazepine; teaching points are ASM choice in a generalized epilepsy, post-convulsive lactic acidosis and seizure-related hyperthermia; 3 grounded red herrings.",
+    "difficulty_rationale": "3 required actions (labs, CT, continuous EEG) with a recommended drug check and optional MRI; classic JME breakthrough GCSE after a failed prehospital benzodiazepine; teaching points are ASM choice in a generalized epilepsy, post-convulsive lactic acidosis and seizure-related hyperthermia; 3 grounded red herrings.",
     "fallback_tool_kinds": {
       "cardiac_monitoring": "normal",
       "ecg": "incidental",

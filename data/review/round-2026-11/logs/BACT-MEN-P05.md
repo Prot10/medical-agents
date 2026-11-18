@@ -1,0 +1,6 @@
+# BACT-MEN-P05
+
+## Class changes
+- LIT (literature search is not a clinical step; R1 ruling, ROUND_POLICY ruling 5 extended, Nov 2026 class 1): removed fallback literature_search output. Any literature query is now answered by the neutral library text.
+- MRI-CONTRAST: no stored brain MRI and no MRI criterion, only the case fallback MRI (decision 3: one slot, cannot be split, contrast_used stays null). Removed its gadolinium content so it reports only non-contrast sequences: dropped the 'dural venous sinuses and cortical veins patent on post-contrast images' observation and both T1_post_contrast keys; finding 0 type -> 'sulcal FLAIR hyperintensity'; impression item 1 rewritten from the FLAIR/DWI findings, 'venous thrombosis' removed from item 4 (it was assessed only on post-contrast images). No criterion, stop rule or sequence constraint names an MRI; no order_body_imaging MRI with contrast false.
+- MRI-CONTRAST verified: checked diff vs 393c547e, mri_probe (plain, contrast, both orders) and perfect_agent -v (pass); fallback MRI (decision 3, contrast_used null) free of gadolinium keys, findings, observations and impression clauses; impression matches findings; no brain-MRI criterion, no stored brain MRI so no LIBRARY answer to an MRI order; no body-imaging MRI describing enhancement with contrast false; nothing else changed. No error found.
