@@ -102,3 +102,35 @@ reviewers agree on where the problem is but not on the answer. The other 7 (exte
 imaging in M01/M02, etiological work-up gating the acute decision, echo before EVT, dissection
 without infarct filed under ISCH-STR, antiphospholipid panel) agree on both. R1's dysphagia
 (10 cases), LDL target (5) and airway notes have no R2 counterpart.
+
+## Case-level metric from the annotations (Andrea's rule, 25 Nov)
+
+Rule: a case with annotations has not passed. `bin/case_agreement.py` gives each reviewer, per
+case: FAIL (at least one field note or case comment, whatever the severity or status), PASS (no
+annotation and the case decided, `approved` or `needs_changes`), NOT REVIEWED (no annotation, not
+decided: opened only, excluded). Agreement statistics on the 2x2 table: observed agreement, Cohen's
+kappa, Gwet's AC1, PABAK, specific agreement on FAIL and on PASS.
+
+Result on the current data (snapshot 25 Nov):
+
+- 29 cases were opened by both. 8 drop out as NOT REVIEWED: R2 opened ALS-M01, ALS-M08,
+  ALZ-EARLY-M01, FEPI-TEMP-M01, MIG-AURA-M01, NPH-M01, VASC-DEM-M01 for 0-30 seconds without
+  notes (the first case of a condition list), R1 opened ISCH-STR-RS02 last and stopped, and in the
+  re-check R2 opened FEPI-TEMP-M02 without notes.
+- 20 pairs remain, all ISCH-STR, all FAIL for both: agreement 1.00, specific agreement on FAIL
+  1.00, kappa undefined (no case passes), AC1 1.00, PABAK 1.00. (RS01, `approved` by R2 with 6
+  comments, is a FAIL under the rule.)
+- The number says nothing yet: the two reviews are of different cases (R2 on 22-26 Sep, R1 on
+  22 Nov; all 30 ISCH-STR files changed in between, 14 commits of the October round), and nothing
+  can pass for R1 in the full review: R1 has 320 FAIL and 0 PASS there (it never decides a case
+  without notes), while in the re-check R1 passed 7 of 10. R2 passes 94 of 299 full-review cases
+  and 0 of 10 re-check cases.
+
+What a valid measure needs: both reviewers on the same frozen version, every case decided (an
+`approved` click when there is nothing to note, or the case cannot pass), and a set where passing
+is possible. The re-check set meets the first and the last: each physician did 10 of the 20 frozen
+copies in `data/review/sets/recheck-2026-11/`, so each doing the other's 10 gives 20 pairs on the
+same version. A finer level is the same rule per section of the case, read deterministically from
+`field_path` (patient and tool reports, diagnosis and differential, action criteria, avoided
+actions, sequence, stop rule, assessment); it needs field notes rather than case comments (R2's
+482 case comments, mostly before November, carry no path).
