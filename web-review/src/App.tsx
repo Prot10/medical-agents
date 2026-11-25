@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { Loader2 } from "lucide-react"
 
 import type { ReviewerProfile } from "@/api/types"
+import { AgentApp } from "@/components/agent/AgentApp"
 import { CodeEntryGate } from "@/components/gate/CodeEntryGate"
 import { ConditionPicker } from "@/components/gate/ConditionPicker"
 import { WorkspaceChooser } from "@/components/gate/WorkspaceChooser"
@@ -33,6 +34,8 @@ export function App() {
 // After the code: the choice screen, then the chosen view.
 function SignedIn({ profile }: { profile: ReviewerProfile }) {
   const workspace = useReviewStore((s) => s.workspace)
+  // An agent-mode code opens the agent-mode study and nothing else.
+  if (profile.sections?.length) return <AgentApp profile={profile} />
   if (!workspace) return <WorkspaceChooser profile={profile} />
   if (workspace.kind === "full") {
     if (!workspace.condition) return <ConditionPicker profile={profile} />

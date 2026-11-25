@@ -17,6 +17,8 @@ export interface ReviewerProfile {
   role: ReviewerRole
   specialty: string | null
   credentials: string | null
+  /** Non-empty for an agent-mode code, which opens the agent-mode study only. */
+  sections?: string[]
 }
 
 export interface DatasetSummary {

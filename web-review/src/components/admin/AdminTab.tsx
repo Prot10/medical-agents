@@ -3,6 +3,7 @@ import {
   Flame,
   GitCompareArrows,
   Loader2,
+  Stethoscope,
   Users,
   Wrench,
 } from "lucide-react"
@@ -19,6 +20,7 @@ import { useAdminToolReview } from "@/hooks/useToolReview"
 import { conditionShort } from "@/lib/conditions"
 import { cn, formatDuration } from "@/lib/utils"
 import { useReviewStore } from "@/stores/reviewStore"
+import { AgentModeAdmin } from "@/components/admin/AgentModeAdmin"
 import { SeverityPill } from "@/components/ui/SeverityPill"
 import { StatusPill } from "@/components/ui/StatusPill"
 import type {
@@ -28,7 +30,7 @@ import type {
   ReviewStatus,
 } from "@/api/types"
 
-type AdminView = "agreement" | "progress" | "hotspots" | "diff" | "tools"
+type AdminView = "agreement" | "progress" | "hotspots" | "diff" | "tools" | "agent"
 
 const VIEWS: Array<{ id: AdminView; label: string; icon: React.ComponentType<{ className?: string }> }> = [
   { id: "agreement", label: "Inter-rater agreement", icon: GitCompareArrows },
@@ -36,6 +38,7 @@ const VIEWS: Array<{ id: AdminView; label: string; icon: React.ComponentType<{ c
   { id: "hotspots", label: "Field hotspots", icon: Flame },
   { id: "diff", label: "Side-by-side diff", icon: Users },
   { id: "tools", label: "Tool proposals", icon: Wrench },
+  { id: "agent", label: "Agent mode", icon: Stethoscope },
 ]
 
 export function AdminTab() {
@@ -74,6 +77,7 @@ export function AdminTab() {
         {view === "hotspots" && <HotspotsView />}
         {view === "diff" && <DiffView />}
         {view === "tools" && <ToolReviewView />}
+        {view === "agent" && <AgentModeAdmin />}
       </div>
     </div>
   )

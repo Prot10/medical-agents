@@ -72,14 +72,14 @@ export function CodeEntryGate() {
                 Welcome, {welcomeName}.
               </p>
               <p className="text-muted-foreground mt-2 text-sm">
-                Loading your review workspace…
+                Loading your workspace…
               </p>
             </motion.div>
           ) : (
             <>
               <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
-                Enter the reviewer code you were provided. Your annotations are
-                private to you and saved against this code.
+                Enter the code you were provided. Your work is private to
+                you and saved against this code.
               </p>
 
               {sessionMessage && !error && (
