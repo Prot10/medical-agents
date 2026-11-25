@@ -4,7 +4,7 @@
 
 ANNOTATIONS_DIR is a copy of the review app's `data/review/annotations/neurobench` (one folder
 per reviewer code, one JSON file per case). A note is "handled" when its id is in this round's
-`ledger.jsonl` or in the October round's notes (`data/review/round-2026-10/notes/*.json`, if
+`ledger.jsonl`, in a follow-up round's ledger (`round-2026-11b/ledger.jsonl`, ...) or in the October round's notes (`data/review/round-2026-10/notes/*.json`, if
 present). Item ids: field annotations and case comments use their own `id`; a policy verdict
 uses `<reviewer_code[:6]>:<case_id>:policy_verdict`, as in new_notes.jsonl. A handled item whose
 text or verdict changed since it was ruled on is printed too, flagged CHANGED (the ledger stores
@@ -38,15 +38,19 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("annotations"); ap.add_argument("--jsonl", help="also write the new items to this file")
     a = ap.parse_args()
-    ruled: dict[str, str | None] = {}
-    ledger = HERE / "ledger.jsonl"
-    if ledger.exists():
-        for line in ledger.read_text().splitlines():
-            if line.strip():
-                r = json.loads(line); ruled[r["note_id"]] = r.get("text_sha256")
+    # A policy-verdict id (<code[:6]>:<case>:policy_verdict) is the same in every review set, so one
+    # id can have been ruled more than once (e.g. neurobench in 2026-11, recheck-2026-11 in 2026-11b):
+    # keep every ruled digest and treat the item as handled when any of them matches.
+    ruled: dict[str, set] = {}
+    # every round ledger since November: this round's and the follow-up rounds (round-2026-11b, ...)
+    for ledger in [HERE / "ledger.jsonl", *sorted(HERE.parent.glob("round-2026-11?/ledger.jsonl"))]:
+        if ledger.exists():
+            for line in ledger.read_text().splitlines():
+                if line.strip():
+                    r = json.loads(line); ruled.setdefault(r["note_id"], set()).add(r.get("text_sha256"))
     for f in glob.glob(str(HERE.parent / "round-2026-10/notes/*.json")):
         for n in json.loads(Path(f).read_text()):
-            ruled.setdefault(n["id"], digest(n))
+            ruled.setdefault(n["id"], set()).add(digest(n))
     new = []
     for item in flatten(a.annotations):
         nid = item["note_id"]
@@ -54,7 +58,7 @@ def main() -> None:
             item["empty_verdict"] = True
         if nid not in ruled:
             new.append(item)
-        elif ruled[nid] and ruled[nid] != digest(item):
+        elif not (ruled[nid] & {None, digest(item)}):
             item["changed_since_ruling"] = True; new.append(item)
     for item in new:
         flag = " CHANGED" if item.get("changed_since_ruling") else ""
