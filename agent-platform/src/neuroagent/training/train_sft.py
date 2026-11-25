@@ -85,6 +85,7 @@ def train(
     learning_rate: float = 1e-4,
     max_length: int = 32768,
     max_steps: int = -1,
+    lora_rank: int = 16,
 ) -> None:
     if model_key not in KEY_TO_MODEL:
         raise ValueError(f"model must be one of {sorted(KEY_TO_MODEL)}")
@@ -141,8 +142,8 @@ def train(
         processing_class=tokenizer,
         train_dataset=Dataset.from_list(kept),
         peft_config=LoraConfig(
-            r=16,
-            lora_alpha=32,
+            r=lora_rank,
+            lora_alpha=2 * lora_rank,
             lora_dropout=0.05,
             target_modules="all-linear",
             task_type="CAUSAL_LM",
@@ -182,6 +183,7 @@ def main() -> None:
     parser.add_argument("--learning-rate", type=float, default=1e-4)
     parser.add_argument("--max-length", type=int, default=32768)
     parser.add_argument("--max-steps", type=int, default=-1, help="stop early; for smoke fits")
+    parser.add_argument("--lora-rank", type=int, default=16, help="LoRA rank; alpha is twice the rank")
     args = parser.parse_args()
     train(
         model_key=args.model,
@@ -193,6 +195,7 @@ def main() -> None:
         learning_rate=args.learning_rate,
         max_length=args.max_length,
         max_steps=args.max_steps,
+        lora_rank=args.lora_rank,
     )
 
 

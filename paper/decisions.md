@@ -248,6 +248,9 @@ Baselines (Andrea, 25 Nov):
 - Smoke on the CERN gateway (Qwen3.8-27B, training case SE-M02): both loops complete; rules 4 tests, 57k tokens; panel 2 tests, 85k tokens.
 - Runner: `agent-platform/scripts/training/baselines_rtx.sh` (RTX pod), results in EOS `runs/baselines_test_20261125/`, SFT adapter in `checkpoints/sft-reference/qwen3.5-9b`. Also runs no test (narrative) and Gemma / Granite untrained for Fig. 2. No test menu (free order) is not in it: it needs the gateway inside the pod.
 
+First test results of the baselines (25 Nov, Qwen3.5-9B, 119 test cases × 3 seeds, draft policies): required tests ordered 32% untrained, 36% rules in the prompt, 33% SFT, 40% multi-agent panel (156k tokens per case against 57k); Qwen3.8-27B 43% untrained, 52% rules, 53% panel. Numbers in EOS `runs/baselines_test_20261125/`.
+- Stronger SFT (Andrea, 25 Nov): the first SFT (2 epochs, lr 1e-4, LoRA r16; loss 1.2 → 0.3) left the work-up unchanged on test. Two more adapters on the same episodes, 4 epochs at lr 2e-4 with r16 and r64; the three, and the untrained model, are run on validation (60 × 3 seeds) and on 60 training cases (does it imitate?); the highest validation policy score is chosen, as for model A, and only that one goes to test. Runner `agent-platform/scripts/training/sft_tune_rtx.sh`, results in EOS `runs/sft_tune_20261125/`.
+
 Open points for Andrea:
 - PhysioNet access for each physician and where the MIMIC-IV cases are served for the two studies.
 - One neurologist who has not seen the policies, as a third rater.
