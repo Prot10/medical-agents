@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import sys
 from collections import Counter
 from pathlib import Path
 
@@ -729,6 +730,7 @@ def test_mimic_draw_is_stratified_by_condition_and_computed_from_the_cases(tmp_p
     assert "odd" not in capsys.readouterr().err
 
 
+@pytest.mark.skipif(sys.platform == "darwin", reason="the push script refuses to run on macOS by design")
 def test_push_script_dry_run_draws_and_prints_counts_only(tmp_path):
     """The script's own path up to the copy, on the stand-in folder: it draws, prints counts per
     condition, writes nothing and contacts no server."""
