@@ -207,8 +207,44 @@ tail -3 ~/Backups/neurobench-review-backups/pull.log
 
 ## Agent mode on the VPS
 
-The synthetic section is served by the same service once deployed; the MIMIC section must never be enabled here (leave `REVIEW_AGENT_MIMIC_*` unset: the PhysioNet DUA forbids MIMIC data on this server). Add the physicians' codes (`sections: [agent_synthetic]`) to `reviewer_codes.yaml` and push it with `--force-codes`. After the first deploy that includes agent mode, reinstall the backup script so that `data/review/agent-mode/` is in the daily snapshot:
+Both sections of agent mode (`agent-platform/docs/review-agent-mode.md`) are served by the same service.
+
+### Synthetic section
+
+Served once deployed. Add the physicians' codes (`sections: [agent_synthetic]`) to `reviewer_codes.yaml` and push it with `--force-codes`. After the first deploy that includes agent mode, reinstall the backup script so that `data/review/agent-mode/` is in the daily snapshot:
 
 ```bash
 scp deployment/hostinger/backup-annotations.sh hostinger:/home/neuroreview/bin/backup-annotations.sh
 ```
+
+### MIMIC section
+
+Decided by Andrea on 25 Nov 2026: the MIMIC section runs here too. Only the processed benchmark cases go on the VPS (the final 100), never raw MIMIC data, and they live **outside the repo tree**:
+
+```
+/home/neuroreview/mimic-agent-mode/cases/           the 100 case JSON files (read-only for the app)
+/home/neuroreview/mimic-agent-mode/records/         physicians' MIMIC records (the only path the app writes there)
+/home/neuroreview/mimic-agent-mode/agent-mode.env   REVIEW_AGENT_MIMIC_CASES_DIR / REVIEW_AGENT_MIMIC_LOG_DIR
+```
+
+`deploy.sh` only ever writes under `/home/neuroreview/medical-agents`, so it never syncs, overwrites or deletes these, and they never enter git. The app refuses to start the section from a path inside the repo.
+
+To enable it:
+
+```bash
+# 1. Once: install the unit that reads agent-mode.env and may write the records directory.
+scp deployment/hostinger/neurobench-review.service hostinger:/etc/systemd/system/neurobench-review.service
+ssh hostinger 'systemctl daemon-reload'
+
+# 2. From rockhopper or lxplus (EOS mounted; never from the Mac, so the cases never touch its disk):
+deployment/hostinger/push-mimic-cases.sh --dry-run <EOS folder of the final 100 cases>   # counts only
+deployment/hostinger/push-mimic-cases.sh <EOS folder of the final 100 cases>
+```
+
+The script refuses a folder that does not hold exactly 100 case files (`EXPECTED=N` to override), copies them straight from EOS to the VPS over SSH, writes `agent-mode.env`, sets owner and modes (700/600) and restarts the service. It prints counts only. It needs an SSH destination that logs in as root on the VPS: the `hostinger` alias, or `VPS_HOST=root@<address>`. Once a physician has a MIMIC record it refuses to change the case set (`FORCE=1` to override).
+
+To add MIMIC codes, add rows with `sections: [agent_mimic]` (or `[agent_synthetic, agent_mimic]`) and an `id` to `reviewer_codes.yaml`, only for physicians credentialed on PhysioNet, and push with `./deployment/hostinger/deploy.sh --force-codes`. A code without `agent_mimic` gets 404 on the section.
+
+To disable the section: `ssh hostinger 'rm /home/neuroreview/mimic-agent-mode/agent-mode.env && systemctl restart neurobench-review'` (cases and records stay).
+
+MIMIC records are **not** in the daily snapshot: that archive is pulled to the Mac, and the records hold record-derived text. They stay on the VPS only; export them there with `export_physician_episodes.py --section mimic --output <path outside the repo>`.

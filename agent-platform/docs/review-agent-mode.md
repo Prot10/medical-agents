@@ -58,7 +58,7 @@ reviewers:
 - `linked_review_codes`: synthetic cases that person opened in the dataset review (any version
   or review set, read from `data/review/annotations/`) are left out of their list.
 - Sections: **Synthetic cases** (`agent_synthetic`) and **MIMIC cases** (`agent_mimic`, give it
-  only to physicians credentialed on PhysioNet).
+  only to physicians credentialed on PhysioNet). A code sees only the sections it lists.
 
 ## Case sets
 
@@ -74,17 +74,25 @@ and seed. Cases are served in the listed order, one at a time.
 ## Enabling the MIMIC section
 
 It exists only on a server whose environment sets both variables; otherwise no route serves it
-and the UI does not show it. The PhysioNet DUA keeps MIMIC off the public review server.
+and the UI does not show it. Only the processed benchmark cases are served (the final 100), never
+raw MIMIC data.
 
 ```bash
 export REVIEW_AGENT_MIMIC_CASES_DIR=/path/to/final-100   # case JSON files, or a folder holding cases/
-export REVIEW_AGENT_MIMIC_LOG_DIR=/path/outside/the/repo/agent-mode-logs
+export REVIEW_AGENT_MIMIC_LOG_DIR=/path/outside/the/repo/records
 uv run uvicorn neuroagent.review_api.app:app --host 127.0.0.1 --port 8889
 ```
 
-Both paths must be outside the repository (start-up refuses otherwise). Nothing from the cases is
-copied anywhere; the records are written under the log directory only; a malformed case file is
-reported by name and field, never by content.
+Both paths must be outside the repository (start-up refuses otherwise), so nothing of MIMIC can
+enter git or be touched by a deploy. Nothing from the cases is copied anywhere; the records are
+written under the log directory only; a malformed case file is reported by name and field, never
+by content.
+
+On the review VPS (Andrea's decision of 25 Nov 2026) both live under
+`/home/neuroreview/mimic-agent-mode/`: `cases/`, `records/` and `agent-mode.env`, which the
+systemd unit reads. `deployment/hostinger/push-mimic-cases.sh <folder>` copies the cases there
+from the EOS workspace and enables the section; it is run from rockhopper or lxplus, never from
+the Mac. See `deployment/hostinger/README.md`.
 
 ## Storage
 
@@ -94,7 +102,10 @@ reported by name and field, never by content.
 ```
 
 `<records>` is `data/review/agent-mode/` (gitignored; `REVIEW_AGENT_MODE_DIR` overrides it) for
-the synthetic section and `REVIEW_AGENT_MIMIC_LOG_DIR` for MIMIC. The record
+the synthetic section and `REVIEW_AGENT_MIMIC_LOG_DIR` for MIMIC, so the two sections' records
+never share a directory: on the VPS, `medical-agents/data/review/agent-mode/synthetic/...` and
+`mimic-agent-mode/records/mimic/...`. The daily backup that the Mac pulls holds the synthetic
+records only. The record
 (`schemas/agent_mode.py::AgentRecord`) holds:
 
 - `episode`: a `ClinicalEpisode` with the benchmark's event types (`run.started`,
@@ -125,6 +136,15 @@ uv run python agent-platform/scripts/review/export_physician_episodes.py \
 ```
 
 writes one benchmark run folder per physician (`episodes/<case>.json`, `rewards.jsonl`,
-`summary.json`, `manifest.json`) plus `physician.jsonl` with the physician-only data. For MIMIC,
-run it on the host that holds the records, with the two variables set and an `--output` outside
-the repository.
+`summary.json`, `manifest.json`) plus `physician.jsonl` with the physician-only data. One run of
+the script exports one section, so the two are never mixed. For MIMIC, run it on the host that
+holds the records (the VPS), with the two variables set; the export is written only to the
+`--output` given on the command line, which must be outside the repository:
+
+```bash
+set -a; . /home/neuroreview/mimic-agent-mode/agent-mode.env; set +a
+.venv/bin/python agent-platform/scripts/review/export_physician_episodes.py \
+  --section mimic --output /home/neuroreview/mimic-agent-mode/export --allow-draft-policies
+```
+
+The admin view lists the sections one under the other, each with its own codes and episodes.

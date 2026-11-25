@@ -33,6 +33,9 @@ set -euo pipefail
 # What this script never touches on the VPS:
 #   - data/review/annotations/ . reviewer-produced data, server-owned (never --delete'd)
 #   - data/review/agent-mode/ .. physicians' agent-mode records, server-owned
+#   - /home/neuroreview/mimic-agent-mode/ ... MIMIC cases and records of agent mode: outside
+#                                the repo tree on purpose, so nothing here syncs, chowns or deletes them
+#                                (push-mimic-cases.sh copies the cases, from rockhopper or lxplus)
 #   - data/review/backups/ ..... daily snapshots from the backup timer
 #   - .venv/, node_modules/ .... installed on the VPS, never synced
 #   - reviewer_codes.yaml ...... gated behind --force-codes; never wiped on routine deploy

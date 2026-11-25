@@ -582,6 +582,53 @@ def test_mimic_section_served_from_the_configured_directories_only(tmp_path, mon
     assert not (tmp_path / "records").exists()
     assert (tmp_path / "mimic-logs" / "mimic" / section.set_id / "phys-both" / f"{case.case_id}.json").exists()
 
+    # The two sections stay apart: their records never share a directory, the admin view lists
+    # each section with its own episodes, and an export covers one section at a time.
+    synthetic = app.state.agent_mode.sections["synthetic"]
+    state = both.post(f"{SYNTH}/cases/1/start").json()
+    _send(both, state, "submit_assessment", ASSESSMENT, "reasoning")
+    assert synthetic.records_dir == tmp_path / "records" and section.records_dir == tmp_path / "mimic-logs"
+    assert not list((tmp_path / "records").rglob(f"{case.case_id}*"))
+    assert not list((tmp_path / "mimic-logs").rglob(f"{synthetic.case_ids[0]}*"))
+    overview = {s["key"]: s for s in _client(app, ADMIN).get("/api/v1/admin/agent-mode/overview").json()["sections"]}
+    assert list(overview) == ["synthetic", "mimic"] and overview["mimic"]["record_derived"] is True
+    assert [e["case_id"] for e in overview["mimic"]["episodes"]] == [case.case_id]
+    assert [e["case_id"] for e in overview["synthetic"]["episodes"]] == [synthetic.case_ids[0]]
+    assert {r["reviewer_id"] for r in overview["mimic"]["reviewers"]} == {"phys-both"}  # only codes listing the section
+    assert overview["mimic"]["episodes"][0]["row"]["reward"]["scalar"] >= 0
+    admin = _client(app, ADMIN)
+    assert admin.get("/api/v1/admin/agent-mode/sections/mimic/reviewers/phys-both/cases/1").json()["case_id"] == case.case_id
+    assert admin.get("/api/v1/admin/agent-mode/sections/synthetic/reviewers/phys-both/cases/1").json()["case_id"] == synthetic.case_ids[0]
+
+    spec = importlib.util.spec_from_file_location("export", REPO_ROOT / "agent-platform/scripts/review/export_physician_episodes.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    # The MIMIC export goes only where the command line says, and never inside the repository.
+    with pytest.raises(SystemExit, match="never written inside the repository"):
+        module.export_section(section, REPO_ROOT / "outputs" / "physicians-mimic", limits={}, allow_draft=True)
+    assert not (REPO_ROOT / "outputs" / "physicians-mimic").exists()
+    assert module.export_section(section, tmp_path / "mimic-export", limits={}, allow_draft=True) == {"phys-both": 1}
+    assert [p.stem for p in (tmp_path / "mimic-export" / "phys-both" / "episodes").glob("*.json")] == [case.case_id]
+    assert module.export_section(synthetic, tmp_path / "synthetic-export", limits={}, allow_draft=True) == {"phys-both": 1}
+    assert [p.stem for p in (tmp_path / "synthetic-export" / "phys-both" / "episodes").glob("*.json")] == [synthetic.case_ids[0]]
+
+
+def test_vps_deployment_keeps_mimic_outside_the_repo_tree():
+    """On the VPS the MIMIC cases and records live beside the repo, not in it: the unit reads
+    their location from a file there, may write only the records, and the deploy script never
+    acts on that directory."""
+    hostinger = REPO_ROOT / "deployment" / "hostinger"
+    unit = (hostinger / "neurobench-review.service").read_text()
+    assert "ProtectHome=read-only" in unit
+    assert "EnvironmentFile=-/home/neuroreview/mimic-agent-mode/agent-mode.env" in unit
+    assert "ReadWritePaths=-/home/neuroreview/mimic-agent-mode/records" in unit
+    assert "mimic-agent-mode/cases" not in "".join(line for line in unit.splitlines() if line.startswith("ReadWritePaths"))
+    deploy = [line for line in (hostinger / "deploy.sh").read_text().splitlines() if not line.lstrip().startswith("#")]
+    assert not any("mimic" in line.lower() for line in deploy)
+    push = (hostinger / "push-mimic-cases.sh").read_text()
+    assert 'REMOTE_ROOT="/home/${VPS_USER}/mimic-agent-mode"' in push and "medical-agents" not in push
+    assert "/eos/" not in push, "the source folder is an argument, never a path written in the repo"
+
 
 def test_mimic_directories_inside_the_repository_are_refused(tmp_path):
     env = {"REVIEW_AGENT_MIMIC_CASES_DIR": str(tmp_path), "REVIEW_AGENT_MIMIC_LOG_DIR": str(REPO_ROOT / "data/review/agent-mode")}

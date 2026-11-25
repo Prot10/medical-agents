@@ -182,4 +182,7 @@ a physician works a case as the agent does. A code with `sections: [agent_synthe
 loop with the physician's actions, so nothing agent-facing is re-implemented. Sets are in
 `config/review/agent_mode_sets.yaml`, records in `data/review/agent-mode/` (gitignored). The
 MIMIC section exists only when `REVIEW_AGENT_MIMIC_CASES_DIR` and `REVIEW_AGENT_MIMIC_LOG_DIR`
-are set (never on the public VPS).
+are set; both must be outside the repo tree. On the review VPS (decided 25 Nov 2026) they are
+under `/home/neuroreview/mimic-agent-mode/`, filled by `deployment/hostinger/push-mimic-cases.sh`
+(processed cases only, run from rockhopper or lxplus), and its records stay apart from the
+synthetic ones.

@@ -3,7 +3,8 @@
 ``config/review/agent_mode_sets.yaml`` declares the sections. The synthetic section serves frozen
 copies of NeuroBench cases kept in the repo, so a later case edit never changes what a physician
 worked on. The MIMIC section exists only where the deployment names its two directories in the
-environment; its cases are read from there at start-up and nothing of it is written in the repo.
+environment; its cases are read from there at start-up, both directories must be outside the
+repo tree, and its records never share a directory with the synthetic ones.
 """
 
 from __future__ import annotations

@@ -46,8 +46,11 @@ sections:
     description: >-
       Cases built from de-identified hospital records. A test that was not performed during the
       recorded admission is answered "not available".
-    # This section exists only on a server whose environment names both directories (the PhysioNet
-    # DUA keeps MIMIC off the public review server). Nothing of it is ever copied into the repo.
+    # This section exists only on a server whose environment names both directories. Only the
+    # processed benchmark cases are served, never raw MIMIC data, and nothing of it is ever copied
+    # into the repo: both directories must be outside the repo tree (start-up refuses otherwise),
+    # so no deploy syncs or deletes them. On the review VPS they are under
+    # /home/neuroreview/mimic-agent-mode (deployment/hostinger/push-mimic-cases.sh).
     #   REVIEW_AGENT_MIMIC_CASES_DIR  the final cases: a folder of case JSON files, or one holding cases/
     #   REVIEW_AGENT_MIMIC_LOG_DIR    where this section's records are written (outside the repo)
     cases_dir_env: REVIEW_AGENT_MIMIC_CASES_DIR
