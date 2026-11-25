@@ -43,6 +43,7 @@ Updated 18 Nov 2026. One line per decision, with its date. The block "Second cri
   - [ ] ~100 model work-ups on MIMIC-IV admissions rated blind → does our score agree with the physicians?
   - Both studies run on MIMIC-IV admissions (Andrea, 18 Nov): the physicians reviewed the synthetic cases and their policies, and have not seen the admissions. Needs personal PhysioNet access for each physician, a place to serve the cases that respects the data use agreement (not the public review site), and at least one neurologist who has not seen the policies.
 - In the Methods: role and experience of the physicians, not their names.
+- **25 Nov (Andrea): how to make the clinical part attack-proof.** Our two neurologists are not senior. The physicians matter most where they define what is right (the policies, then the blind rating), little where they check (the LLM translation). Decisions: guideline cited per policy; one senior neurologist audits a policy sample and rates blind; raters independent of the policies; physicians' level stated and claims worded to it. Ranking, comparison with 22 papers and action list: `paper/clinician-involvement.md` §4.
 
 ## Where things go (17 Nov)
 NMI: **Main** at most 6 figures/tables and ~3,500 words · **Extended Data (ED)** at most 10, inside the article · **Supplementary** no limit, separate PDF.
