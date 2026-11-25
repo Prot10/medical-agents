@@ -1,5 +1,5 @@
 import { Loader2, Plus, X } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 import type { JsonValue } from "@/api/agentTypes"
 import { Button } from "@/components/ui/Button"
@@ -36,6 +36,14 @@ export function AssessmentForm({
   const [diagnosis, setDiagnosis] = useState("")
   const [icd, setIcd] = useState("")
   const [differential, setDifferential] = useState<Hypothesis[]>([])
+  // "Add an alternative" puts the cursor in the new row, so typing goes where it is expected.
+  const [focusRow, setFocusRow] = useState<number | null>(null)
+  const rowInputs = useRef<Array<HTMLInputElement | null>>([])
+  useEffect(() => {
+    if (focusRow == null) return
+    rowInputs.current[focusRow]?.focus()
+    setFocusRow(null)
+  }, [focusRow])
   const [confidence, setConfidence] = useState<number | null>(null)
   const [urgency, setUrgency] = useState<string | null>(null)
   const [recommendations, setRecommendations] = useState<string[]>([])
@@ -111,6 +119,9 @@ export function AssessmentForm({
             <div key={i} className="rounded-md border border-border/80 bg-background p-2.5">
               <div className="flex items-center gap-2">
                 <input
+                  ref={(node) => {
+                    rowInputs.current[i] = node
+                  }}
                   type="text"
                   value={row.diagnosis}
                   onChange={(e) => setRow(i, { diagnosis: e.target.value })}
@@ -140,7 +151,10 @@ export function AssessmentForm({
         {differential.length < 6 && (
           <button
             type="button"
-            onClick={() => setDifferential([...differential, { diagnosis: "", confidence: null }])}
+            onClick={() => {
+              setDifferential([...differential, { diagnosis: "", confidence: null }])
+              setFocusRow(differential.length)
+            }}
             className="mt-2 inline-flex items-center gap-1.5 text-sm text-primary hover:underline"
           >
             <Plus className="w-4 h-4" />

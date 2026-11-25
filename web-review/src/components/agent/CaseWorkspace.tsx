@@ -1,5 +1,5 @@
 import { ArrowDown, CircleCheck, Code2, Info, Loader2, TriangleAlert } from "lucide-react"
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 import type { CaseState, JsonValue } from "@/api/agentTypes"
 import { ReviewApiError } from "@/api/client"
@@ -96,6 +96,13 @@ function ActiveCase({
     return () => observer.disconnect()
   }, [])
   const active = mustAssess ? "assess" : mode
+  // The panel scrolls on its own: every new step, tab and form starts at its top, so the
+  // search box and the first field (the primary diagnosis) are always in view.
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const scrollToTop = useCallback(() => scrollRef.current?.scrollTo({ top: 0 }), [])
+  useEffect(() => {
+    scrollToTop()
+  }, [state.expected_step, active, scrollToTop])
   const tools = (state.tools ?? []).filter((tool) => tool.function.name !== state.submit_name)
 
   const dispatch = (name: string, args: Record<string, JsonValue>, rationale: string) =>
@@ -154,7 +161,16 @@ function ActiveCase({
                 ) : (
                   <TriangleAlert className="w-4 h-4 mt-0.5 flex-shrink-0" />
                 )}
-                <p className="leading-relaxed break-words min-w-0">{state.notice}</p>
+                {mustAssess && !state.notice.startsWith("The previous") ? (
+                  <div className="min-w-0">
+                    <p className="font-medium leading-relaxed">This is the last step: please give your assessment now.</p>
+                    <p className="mt-1 text-xs text-muted-foreground leading-relaxed break-words">
+                      The agent is told: “{state.notice}”
+                    </p>
+                  </div>
+                ) : (
+                  <p className="leading-relaxed break-words min-w-0">{state.notice}</p>
+                )}
               </div>
             )}
             {!mustAssess && (
@@ -183,7 +199,7 @@ function ActiveCase({
             )}
           </div>
 
-          <div className="px-4 sm:px-5 py-4 overflow-y-auto min-h-0">
+          <div ref={scrollRef} className="px-4 sm:px-5 py-4 overflow-y-auto min-h-0">
             {send.isError && (
               <p className="mb-3 rounded-md border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-sm text-rose-700 dark:text-rose-300" role="alert">
                 {send.error instanceof ReviewApiError ? send.error.message : "The step was not sent. Check your connection and try again."}
@@ -197,6 +213,7 @@ function ActiveCase({
                 onSend={dispatch}
                 onToolOpened={telemetry.noteTool}
                 onSearch={telemetry.noteSearch}
+                onViewChange={scrollToTop}
               />
             ) : (
               <AssessmentForm
@@ -247,7 +264,7 @@ function CaseDone({ state }: { state: CaseState }) {
         <div className="mt-6 flex flex-col sm:flex-row gap-2 justify-center">
           {state.next != null && (
             <Button size="lg" onClick={() => openCase(state.next)}>
-              Start case {state.next}
+              Go to case {state.next}
             </Button>
           )}
           <Button size="lg" variant="outline" onClick={() => openCase(null)}>
