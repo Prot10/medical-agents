@@ -34,9 +34,11 @@ The same nginx serves Kosmico (`web.kosmico.ai`, `api.kosmico.ai`) and the revie
 
 Pipeline: build `web-review/dist` locally → rsync code + data + dist → `uv sync` on VPS → `systemctl restart neurobench-review` → smoke-test the public URL.
 
-### What ships (review-API only)
+### What ships
 
-The deploy script ships **only** the parts of the repo `review_api` imports at runtime — never the agent platform, training, evaluation, or LLM-client code:
+The deploy script ships **only** the parts of the repo `review_api` imports at runtime. Since agent mode (`agent-platform/docs/review-agent-mode.md`) that includes the benchmark harness it drives; training, the run API and the agent platform stay off the VPS, and no model is called from it:
+
+- `agent-platform/src/neuroagent/{harness,tools,evaluation,llm}/` + `model_registry.py`, `agent-platform/config/profiles/`, `agent-platform/config/tools/fallback_library.yaml` — the harness, MockServer and reward that agent mode uses
 
 - `agent-platform/src/neuroagent/__init__.py` + `agent-platform/src/neuroagent/review_api/` — the review backend
 - `agent-platform/pyproject.toml` — workspace member manifest
@@ -48,7 +50,7 @@ The deploy script ships **only** the parts of the repo `review_api` imports at r
 - `data/neurobench/` — 600 benchmark cases
 - `web-review/dist/` — built static frontend
 
-VPS footprint after a deploy: ~26 MB total (mostly the NeuroBench dataset). The script **never deletes** `data/review/annotations/` or `data/review/backups/` — reviewer data and snapshots are server-owned.
+VPS footprint after a deploy: ~26 MB total (mostly the NeuroBench dataset). The script **never deletes** `data/review/annotations/`, `data/review/agent-mode/` or `data/review/backups/` — reviewer data and snapshots are server-owned.
 
 ### Flags
 
@@ -140,7 +142,7 @@ ssh hostinger 'pm2 status'
 
 ## Backups
 
-`data/review/annotations/` (case reviews) and `data/review/tool_reviews/` (tool-output reviews) are the only state worth preserving — the schema files come from the deploy and the case fleet is in git. A systemd timer snapshots both on the VPS, and the Mac pulls the snapshots every day.
+`data/review/annotations/` (case reviews), `data/review/tool_reviews/` (tool-output reviews) and `data/review/agent-mode/` (physicians' agent-mode records) are the only state worth preserving — the schema files come from the deploy and the case fleet is in git. A systemd timer snapshots them on the VPS, and the Mac pulls the snapshots every day.
 
 ### Schedule
 
@@ -148,7 +150,7 @@ ssh hostinger 'pm2 status'
 
 ### What it does
 
-`/home/neuroreview/bin/backup-annotations.sh` tars `data/review/annotations/` and `data/review/tool_reviews/` into `data/review/backups/review-data-YYYY-MM-DD.tar.gz`, and refuses to publish an archive that does not hold every file on disk. Snapshots made before 21 Oct 2026 are named `annotations-YYYY-MM-DD.tar.gz` and hold annotations only. Tarballs older than **365 days** are pruned automatically (override with `KEEP_DAYS=N` in the systemd unit's `Environment=` if needed). At ~3 MB per worst-case tarball that's ~1 GB of disk over a full year — negligible against 45 GB free.
+`/home/neuroreview/bin/backup-annotations.sh` tars `data/review/annotations/`, `data/review/tool_reviews/` and `data/review/agent-mode/` into `data/review/backups/review-data-YYYY-MM-DD.tar.gz`, and refuses to publish an archive that does not hold every file on disk. Snapshots made before 21 Oct 2026 are named `annotations-YYYY-MM-DD.tar.gz` and hold annotations only. Tarballs older than **365 days** are pruned automatically (override with `KEEP_DAYS=N` in the systemd unit's `Environment=` if needed). At ~3 MB per worst-case tarball that's ~1 GB of disk over a full year — negligible against 45 GB free.
 
 The script is atomic (`.tar.gz.tmp` → `mv` rename) and idempotent — running it twice on the same day overwrites that day's snapshot rather than failing.
 
@@ -201,4 +203,12 @@ launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.andreaprotani.neurob
 # Pull now, and read the log.
 launchctl kickstart gui/$(id -u)/com.andreaprotani.neurobench-review-backups
 tail -3 ~/Backups/neurobench-review-backups/pull.log
+```
+
+## Agent mode on the VPS
+
+The synthetic section is served by the same service once deployed; the MIMIC section must never be enabled here (leave `REVIEW_AGENT_MIMIC_*` unset: the PhysioNet DUA forbids MIMIC data on this server). Add the physicians' codes (`sections: [agent_synthetic]`) to `reviewer_codes.yaml` and push it with `--force-codes`. After the first deploy that includes agent mode, reinstall the backup script so that `data/review/agent-mode/` is in the daily snapshot:
+
+```bash
+scp deployment/hostinger/backup-annotations.sh hostinger:/home/neuroreview/bin/backup-annotations.sh
 ```

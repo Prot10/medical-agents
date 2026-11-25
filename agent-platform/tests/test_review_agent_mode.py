@@ -347,6 +347,10 @@ def test_last_turn_must_be_the_assessment_and_invalid_actions_end_the_case(app):
     assert state["status"] == "failed" and state["failure"]["reason"] == "invalid_action"
     record = _record(app, "phys-synth")
     assert record.episode.events[-1].type == "run.failed" and record.invalid_attempts == 3
+    # A failed episode stays in the denominator: the admin view scores it like a failed model run.
+    (episode,) = _client(app, ADMIN).get("/api/v1/admin/agent-mode/overview").json()["sections"][0]["episodes"]
+    assert episode["status"] == "failed" and episode["row"]["failure_reason"] == "invalid_action"
+    assert episode["row"]["reward"]["diagnosis"] == 0
 
 
 def test_invalid_assessment_is_rejected_by_the_harness_not_by_the_app(app):

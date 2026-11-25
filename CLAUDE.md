@@ -175,3 +175,11 @@ admin role unlocks aggregate endpoints under `/api/v1/admin/...`. Annotation sto
 per (reviewer, version, case). `review_api/services/policy_eligibility.py` implements the
 approval rule (two independent all-dimension approvals, no unresolved errors, third reviewer on
 disagreement). Tabs: Overview / Cases / Methodology / Admin.
+
+Agent mode (`agent-platform/docs/review-agent-mode.md`): a second study in the same app, in which
+a physician works a case as the agent does. A code with `sections: [agent_synthetic]` (and/or
+`agent_mimic`) opens only that; `review_api/services/agent_mode/engine.py` replays the policy
+loop with the physician's actions, so nothing agent-facing is re-implemented. Sets are in
+`config/review/agent_mode_sets.yaml`, records in `data/review/agent-mode/` (gitignored). The
+MIMIC section exists only when `REVIEW_AGENT_MIMIC_CASES_DIR` and `REVIEW_AGENT_MIMIC_LOG_DIR`
+are set (never on the public VPS).

@@ -4,11 +4,12 @@ set -euo pipefail
 # ─────────────────────────────────────────────────────────
 # Daily snapshot of the NeuroBench review data.
 #
-# The "database" is two JSON trees under data/review/:
+# The "database" is three JSON trees under data/review/:
 #   annotations/{version}/{reviewer_code}/{case_id}.json   case reviews
 #   tool_reviews/{version}/{reviewer_code}.json            tool-output reviews
+#   agent-mode/{section}/{set}/{reviewer id}/{case_id}.*   physicians' agent-mode records
 #
-# This script tars both into:
+# This script tars them into:
 #   data/review/backups/review-data-YYYY-MM-DD.tar.gz
 # and prunes snapshots older than $KEEP_DAYS days. Snapshots made before
 # 21 Oct 2026 are named annotations-YYYY-MM-DD.tar.gz and hold annotations
@@ -26,7 +27,7 @@ set -euo pipefail
 # ─────────────────────────────────────────────────────────
 
 DATA_ROOT="/home/neuroreview/medical-agents/data/review"
-TREES=(annotations tool_reviews)
+TREES=(annotations tool_reviews agent-mode)
 BACKUP_DIR="$DATA_ROOT/backups"
 KEEP_DAYS="${KEEP_DAYS:-365}"
 
@@ -36,6 +37,8 @@ PRESENT=()
 for tree in "${TREES[@]}"; do
     if [ -d "$DATA_ROOT/$tree" ]; then
         PRESENT+=("$tree")
+    elif [ "$tree" = agent-mode ]; then
+        :  # created by the first physician who opens a case
     else
         echo "warning: no $tree directory at $DATA_ROOT/$tree" >&2
     fi
