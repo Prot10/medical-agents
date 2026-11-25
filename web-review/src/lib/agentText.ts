@@ -1,9 +1,11 @@
 // Presentational helpers for agent mode. They only restyle agent-facing text; the content is
 // never changed (the raw view shows the same text verbatim).
 
-/** "interpret_labs" → "Interpret labs". */
+const ACRONYMS = /\b(eeg|mri|ecg|csf|ct|icd)\b/g
+
+/** "interpret_labs" → "Interpret labs", "analyze_eeg" → "Analyze EEG". */
 export function humanize(name: string): string {
-  const text = name.replace(/_/g, " ").trim()
+  const text = name.replace(/_/g, " ").trim().replace(ACRONYMS, (word) => word.toUpperCase())
   return text.charAt(0).toUpperCase() + text.slice(1)
 }
 

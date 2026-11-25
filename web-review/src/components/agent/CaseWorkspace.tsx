@@ -1,5 +1,5 @@
-import { CircleCheck, Code2, Info, Loader2, TriangleAlert } from "lucide-react"
-import { useState } from "react"
+import { ArrowDown, CircleCheck, Code2, Info, Loader2, TriangleAlert } from "lucide-react"
+import { useEffect, useRef, useState } from "react"
 
 import type { CaseState, JsonValue } from "@/api/agentTypes"
 import { ReviewApiError } from "@/api/client"
@@ -84,6 +84,17 @@ function ActiveCase({
   const [mode, setMode] = useState<"order" | "assess">("order")
   const [rawOpen, setRawOpen] = useState(false)
   const mustAssess = !!state.require_assessment
+  // On a narrow screen the next step sits under the chart: a button leads to it while it is
+  // out of view.
+  const padRef = useRef<HTMLElement>(null)
+  const [padVisible, setPadVisible] = useState(true)
+  useEffect(() => {
+    const node = padRef.current
+    if (!node) return
+    const observer = new IntersectionObserver(([entry]) => setPadVisible(entry.isIntersecting))
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [])
   const active = mustAssess ? "assess" : mode
   const tools = (state.tools ?? []).filter((tool) => tool.function.name !== state.submit_name)
 
@@ -115,8 +126,9 @@ function ActiveCase({
         </main>
 
         <aside
+          ref={padRef}
           aria-label="Next step"
-          className="bg-card border border-border rounded-xl shadow-sm lg:sticky lg:top-[4.5rem] lg:max-h-[calc(100vh-5.5rem)] flex flex-col min-w-0"
+          className="scroll-mt-16 bg-card border border-border rounded-xl shadow-sm lg:sticky lg:top-[4.5rem] lg:max-h-[calc(100vh-5.5rem)] flex flex-col min-w-0"
         >
           <div className="px-4 sm:px-5 pt-4 pb-3 border-b border-border">
             <div className="flex items-baseline justify-between gap-3">
@@ -196,6 +208,17 @@ function ActiveCase({
           </div>
         </aside>
       </div>
+
+      {!padVisible && (
+        <button
+          type="button"
+          onClick={() => padRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
+          className="lg:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-20 inline-flex items-center gap-2 h-11 px-5 rounded-full bg-primary text-primary-foreground text-sm font-medium shadow-lg"
+        >
+          Go to step {state.turn}
+          <ArrowDown className="w-4 h-4" />
+        </button>
+      )}
 
       {state.raw && <RawViewDialog raw={state.raw} open={rawOpen} onOpenChange={setRawOpen} />}
     </div>

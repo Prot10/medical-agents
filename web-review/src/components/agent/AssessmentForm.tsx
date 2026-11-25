@@ -197,7 +197,12 @@ export function AssessmentForm({
       </div>
 
       {confirming ? (
-        <div className="rounded-lg border border-primary/40 bg-primary/5 p-3.5" role="alertdialog" aria-label="Confirm the assessment">
+        <div
+          ref={(node) => node?.scrollIntoView({ block: "nearest" })}
+          className="rounded-lg border border-primary/40 bg-primary/5 p-3.5"
+          role="alertdialog"
+          aria-label="Confirm the assessment"
+        >
           <p className="text-sm font-medium">Submit this assessment and finish the case?</p>
           <p className="mt-0.5 text-[13px] text-muted-foreground">The case is then locked: nothing can be changed or added.</p>
           <div className="mt-3 flex gap-2 justify-end">
