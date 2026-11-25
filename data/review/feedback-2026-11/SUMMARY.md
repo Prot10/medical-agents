@@ -1,0 +1,74 @@
+# Physician feedback, 21-22 November 2026
+
+Two tasks asked of both reviewers after the 18 Nov deploy (`deploy.sh --keep-cases`): the
+re-check of 20 corrected cases (review set `recheck-2026-11`) and a full review of one condition
+already reviewed by the other physician (the same-condition comparison). R1 = NB-KSC, R2 = NB-87M.
+
+Snapshot: VPS backup taken 2026-11-25T10:39Z (649 annotation files). Copies:
+`~/Backups/neurobench-review-backups/manual/review-data-2026-11-25T1039Z.tar.gz`, the same tarball
+and readable notes in `notes/` (gitignored: reviewer text stays off git), and the full annotation
+tree mirrored into the local `data/review/annotations/`. Re-export with
+`python3 -I data/review/feedback-2026-11/bin/export_notes.py <snapshot>/annotations data/review/feedback-2026-11/notes`.
+No annotation file changed after 22 Nov 19:57 UTC. 94 items are not in any round's ledger
+(54 full review, 40 re-check, by `round-2026-11/bin/new_notes_since.py`).
+
+## Re-check (20 corrected cases)
+
+The physicians split the set instead of each doing all 20, so no re-check case has two reviews.
+FEPI-TEMP-M02 was opened by both; R2 left it `pending` with no notes.
+
+| | Cases | Approved | Needs changes | Not submitted |
+|---|---|---|---|---|
+| R1 | ALS, ALZ-EARLY, FEPI-TEMP, FND, FTD, MIG-AURA, MS-RR, NPH, PD, VASC-DEM | 7 | 0 | 3 (ALS-P05, MIG-AURA-P06, MS-RR-RS05, 2 errors each) |
+| R2 | BACT-MEN, GBS, GLIO-HG, HEP-ENC, ISCH-STR, MG, NMDAR-ENC, SAH, SE, SYNC-CARD | 0 | 10 | 0 |
+
+R2's ten verdicts by dimension (needs_revision): stopping 8, diagnosis 5, actions 2, assessment 2,
+scenario 2, sequencing 1, avoided actions 0. On the 86 verdicts of 3-15 Nov the weak dimensions
+were assessment (48) and actions (33); after the corrections they are 2 and 2 out of 10. Most R2
+notes are now `issue`, one per case, and narrow (a citation, a missing ICD code, a GCS item).
+
+Three groups explain most of the remaining notes:
+
+1. **Stop rule display (central, review app).** 6 of R2's notes (SAH-M01, HEP-ENC-P05,
+   SYNC-CARD-M02, MG-S03, BACT-MEN-M03, GLIO-HG-S05) read "Further actions allowed after that: N"
+   as a cap on all later actions, so recommended actions placed after the required set look
+   impossible. In the reward (`policy_reward.py`, stopping) recommended and optional criteria
+   never count as extra; N only tolerates unjustified actions. The app text causes the reading.
+   The same box shows tool names only, so two criteria with one tool appear as
+   `interpret_labs / interpret_labs` (R1, ALS-P05) or two `order_ct_scan` (R1, five ISCH-STR
+   notes ask to tell non-contrast CT from CTA).
+2. **"First order" MRI display (central, review app).** R1 (ALS-P05, MS-RR-RS05) reads the
+   non-contrast initial MRI, labelled "First order of this tool", as the answer to the required
+   contrast MRI. The MockServer serves the contrast follow-up to a `contrast: true` order
+   (perfect-agent check `-v`, 25 Nov), so the data are right and the label is wrong.
+3. **Case content.** Missing ICD codes for a named component (HEP-ENC-P05 Wernicke,
+   SYNC-CARD-M02 bifascicular block), GCS/FVC arithmetic (SE-M07, GBS-RM12), SE-M07 classified
+   as NCSE although myoclonus is visible (ILAE 2015: myoclonic SE), SAH-M01 blood-pressure must
+   vs ESO 2026, NMDAR-ENC-P01 and ISCH-STR-RP02 a required test left recommended, MIG-AURA-P06
+   MRI to required, MS-RR-RS05 McDonald 2024 wording, BACT-MEN-M03 NICE duration.
+
+## Same-condition full review: ISCH-STR
+
+R1 reviewed ISCH-STR, the condition R2 reviewed in September (23 needs_changes, 5 approved,
+97 notes, all ruled in the October round). R1 opened 21 of 30 cases on 22 Nov in 80 minutes
+(about 4 minutes each), wrote 54 notes (all `error`, in English), submitted none and gave no
+policy verdict. RS03-RS05 and S01-S06 were not opened; RS02 was opened with no notes.
+The cases R1 saw are the October-corrected version (hash 88bd8dc0), not what R2 saw.
+
+Classes in R1's notes (cases):
+
+| Class | Cases | Relation to R2 / October round |
+|---|---|---|
+| Stop rule mixes the acute reperfusion decision with the etiological work-up (drug-interaction check, echo, NOTCH3, antiphospholipid panel required before the assessment) | 13 | New. R2 never raised it. It questions what the stop rule means, not one case. |
+| Dysphagia screening missing from the musts | 9 | New class. |
+| Wake-up stroke: extended-window imaging should be required | M01, M02, M03, P05 | R2 raised it on M01 (06456aa6); October added CTP as recommended. R1 wants it required. |
+| NIHSS: visual extinction scored on item 3 and item 11 | M02, M03, RP04 | October open question 1. R1 now agrees with R2 (item 11 only). |
+| Over-strict IVT prohibitions vs AHA/ASA 2026 (moyamoya, prior infarct, intradural dissection, apixaban) | P02, RM01, RM04, RM02 | October open questions 2-3: R1 answers RM01 and RM04 (individualize), RP04 (aPTT 46 s: do not give IVT). |
+| LDL < 70 target in non-atherosclerotic stroke | P05, RM01, RM04, RP03 | New, copied across cases. |
+| Dissection without infarct filed under ischemic stroke | RM02, RM03 | New. Condition assignment. |
+| Others: DAPT after IVT, CTP volumes, CHA2DS2-VASc 7 vs 6, pregnancy CTA, TTP prophylaxis, endocarditis antibiotics | single cases | ISCH-STR-RP02: both physicians (R2 in the re-check, R1 here) touch the TTP handling and the CT-vs-MRI first study. |
+
+Agreement cannot be measured as planned: R1 did not submit verdicts, the two reviews saw different
+versions, and R2's ISCH-STR notes are mostly case comments (85 of 97) while R1's are field notes. Two R1 notes on
+ISCH-STR-P01 repeat the ISCH-STR-M05 text word for word, including a clopidogrel-omeprazole
+interaction although P01 has no omeprazole, so some notes were templated.
