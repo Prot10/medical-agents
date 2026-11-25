@@ -238,6 +238,15 @@ Runs this plan needs and that do not exist yet (none launched on 18 Nov):
 - [ ] the second split (ED Fig. 9), one seed;
 - [ ] the share of ordered tests the policy asks for and the cost relative to the required work-up, as reported measures in the benchmark summary.
 
+Baselines (Andrea, 25 Nov):
+- Run on the NeuroBench test split now (119 cases × 3 seeds), not on validation first: these agents choose no checkpoint, so opening the test for them biases nothing. A and B still open the test only once their adapters are fixed.
+- Supervised fine-tuning imitates the scripted perfect agent (required then recommended criteria of the policy, in an order that respects the sequence constraints, then the accepted diagnosis) on the 419 training cases: `training_data/sft_reference_episodes.jsonl`, scalar 0.99, 5.3 tests per case. Assessment urgency follows the encounter type (emergency → emergent, inpatient → urgent, outpatient → routine), since policies state none and the score does not use it.
+- The larger model of Fig. 6b is Qwen3.8-27B (same family, chat template and sampling as Qwen3.5-9B; registered as evaluation-only).
+- Rules in the prompt: `RULES_ADDENDUM` in `harness/context.py`, appended to the policy prompt (loop `loop.rules`); it says what the policy score checks with nothing specific to a case. Awaits Andrea's reading of the text.
+- Multi-agent panel: `harness/panel.py`, loop `loop.panel`. Five roles (hypothesis, test chooser, challenger, stewardship, checklist), each a text-only call of at most 400 tokens that hears the earlier roles of the same step; the model as chair then makes one typed call, with the discussion as one-off feedback (never replayed, never in SFT). Tokens per case include every role.
+- Smoke on the CERN gateway (Qwen3.8-27B, training case SE-M02): both loops complete; rules 4 tests, 57k tokens; panel 2 tests, 85k tokens.
+- Runner: `agent-platform/scripts/training/baselines_rtx.sh` (RTX pod), results in EOS `runs/baselines_test_20261125/`, SFT adapter in `checkpoints/sft-reference/qwen3.5-9b`. Also runs no test (narrative) and Gemma / Granite untrained for Fig. 2. No test menu (free order) is not in it: it needs the gateway inside the pod.
+
 Open points for Andrea:
 - PhysioNet access for each physician and where the MIMIC-IV cases are served for the two studies.
 - One neurologist who has not seen the policies, as a third rater.

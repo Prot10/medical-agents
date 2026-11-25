@@ -153,7 +153,7 @@ def train(
             max_steps=max_steps,
             learning_rate=learning_rate,
             lr_scheduler_type="cosine",
-            warmup_ratio=0.03,
+            warmup_steps=0.03,  # a float in [0, 1) is a ratio (transformers 5; warmup_ratio is gone)
             per_device_train_batch_size=1,
             gradient_accumulation_steps=8,
             gradient_checkpointing=True,

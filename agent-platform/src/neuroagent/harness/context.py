@@ -42,6 +42,24 @@ in the case and returned observations. Prefer the smallest safe, diagnostically 
 not order tests that cannot change management. Submit as soon as the evidence is sufficient. This
 system is for research and clinician support, not autonomous care."""
 
+# Baseline "rules in the prompt" (Fig. 6, Supp. Table 4): what the policy score checks, said in
+# words, with nothing specific to a case or a condition. It is appended to the policy prompt, so
+# the two runs differ only by this text.
+RULES_ADDENDUM = """How the work-up is judged, in the same way for every case:
+- Before giving a diagnosis, order the tests that clinical practice requires to confirm it and to
+  rule out the dangerous alternatives for this presentation. A correct diagnosis reached without
+  them counts as an incomplete work-up.
+- Every test must answer a question this case raises. A test that cannot change the diagnosis or
+  the management is penalised, each one separately, and so is a test repeated after its result.
+- Order the tests in the sequence clinical practice requires: a test that makes a later one safe
+  or interpretable comes first.
+- Never order a test or a treatment that is contraindicated for this patient or could harm them.
+- Once the required work-up is complete, stop ordering and submit the assessment: tests after that
+  point are penalised.
+- The assessment gives the diagnosis, its ICD-10 code, the urgency and the recommendations that
+  follow from the findings.
+- Cost matters only among tests that answer the same question: then prefer the cheaper one."""
+
 REACT_ADDENDUM = """This is the isolated ReAct ablation. Before the structured action, provide a
 brief rationale in the assistant content, then make exactly one function call in the same response
 (a tool, or submit_assessment). Never answer in prose alone. Do not reveal hidden chain-of-thought;
@@ -174,6 +192,7 @@ def transcript(
     react: bool = False,
     narrative: bool = False,
     free_order: bool = False,
+    rules: bool = False,
     correction: str | None = None,
 ) -> list[dict[str, Any]]:
     """Chat messages for the next model request, or the full SFT example.
@@ -185,13 +204,15 @@ def transcript(
     carries a one-off ``correction`` instead. The ReAct rationale is replayed only in the
     ablation, never in SFT examples. The narrative baseline has no tool catalogue, so its system
     prompt does not mention ordering. The free-order ablation has one free-text ``request_test``
-    tool and its own system prompt.
+    tool and its own system prompt. The rules baseline appends the case-independent scoring rules
+    to the policy prompt.
     """
     system = (
         NARRATIVE_SYSTEM_PROMPT if narrative
         else FREE_ORDER_SYSTEM_PROMPT if free_order
         else POLICY_SYSTEM_PROMPT
     )
+    system += ("\n\n" + RULES_ADDENDUM) if rules else ""
     system += ("\n\n" + REACT_ADDENDUM) if react else ""
     messages: list[dict[str, Any]] = [
         {"role": "system", "content": system},

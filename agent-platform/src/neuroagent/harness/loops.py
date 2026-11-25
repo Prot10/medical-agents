@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from dataclasses import replace
+
 from neuroagent_schemas import (
     ActionProposed,
     ActionRejected,
@@ -15,9 +17,11 @@ from neuroagent_schemas import (
     SubmitAssessment,
 )
 
+
 from .adapters import ActionDecodeError
 from .free_order import FreeOrderEnvironment, FreeOrderGatekeeper, translation_event
 from .interfaces import ModelTurn, RunContext
+from .panel import PANEL_NAMESPACE, PANEL_ROLES, ROLE_MAX_TOKENS, chair_instruction, role_messages
 
 
 class ClinicalPolicyLoop:
@@ -32,6 +36,7 @@ class ClinicalPolicyLoop:
     react = False
     narrative = False
     free_order = False
+    rules = False
 
     def run(self, context: RunContext):
         self._start(context)
@@ -90,6 +95,7 @@ class ClinicalPolicyLoop:
                     react=self.react,
                     narrative=self.narrative,
                     free_order=self.free_order,
+                    rules=self.rules,
                     correction=correction,
                 )
             except ActionDecodeError as exc:
@@ -230,3 +236,75 @@ class FreeOrderLoop(ClinicalPolicyLoop):
 
     def _after_observation(self, context: RunContext, turn: int) -> None:
         context.episode_store.append(translation_event(turn, context.environment.translations[-1]))
+
+
+class RulesInPromptLoop(ClinicalPolicyLoop):
+    """Baseline: the canonical loop with the case-independent scoring rules in the system prompt."""
+
+    loop_id = "rules-in-prompt"
+    rules = True
+
+
+class MultiAgentPanelLoop(ClinicalPolicyLoop):
+    """Baseline: five roles discuss each step, then the model as chair takes one typed action.
+
+    In the style of MAI-DxO (see ``panel.py``). The discussion runs once per clinical turn; an
+    invalid chair output is retried with the same discussion plus the correction, inside the same
+    invalid-action budget as every other loop. The role tokens are added to the turn's counts, so
+    tokens per case cover the whole panel.
+    """
+
+    loop_id = "multi-agent-panel"
+
+    def _request_valid_action(
+        self, context: RunContext, turn: int, require_assessment: bool
+    ) -> ModelTurn | None:
+        case = context.environment.case
+        episode = context.episode_store.load()
+        tools = self._catalogue(context)
+        said: list[tuple[str, str]] = []
+        prompt_tokens = completion_tokens = 0
+        for name, role_prompt in PANEL_ROLES:
+            messages = role_messages(case, episode, tools, role_prompt, said, final_turn=require_assessment)
+            try:
+                text, used_prompt, used_completion = context.model.discuss(messages, max_tokens=ROLE_MAX_TOKENS)
+            except Exception as exc:
+                self._fail(context, turn, "model_error", f"{type(exc).__name__}: {exc}")
+                return None
+            said.append((name, text))
+            prompt_tokens += used_prompt
+            completion_tokens += used_completion
+        discussion = chair_instruction(said)
+        correction: str | None = None
+        while True:
+            try:
+                chair = context.model.next_action(
+                    case=case,
+                    episode=episode,
+                    allowed_tools=tools,
+                    require_assessment=require_assessment,
+                    correction=discussion if correction is None else f"{discussion}\n\n{correction}",
+                )
+                break
+            except ActionDecodeError as exc:
+                context.invalid_actions += 1
+                retry_allowed = context.invalid_actions <= context.max_invalid_actions
+                context.episode_store.append(
+                    ActionRejected(turn=turn, reason=str(exc), retry_allowed=retry_allowed)
+                )
+                if not retry_allowed:
+                    self._fail(context, turn, "invalid_action", str(exc))
+                    return None
+                correction = (
+                    f"The previous response was invalid: {exc}. "
+                    "Return exactly one valid structured action."
+                )
+            except Exception as exc:
+                self._fail(context, turn, "model_error", f"{type(exc).__name__}: {exc}")
+                return None
+        return replace(
+            chair,
+            prompt_tokens=chair.prompt_tokens + prompt_tokens,
+            completion_tokens=chair.completion_tokens + completion_tokens,
+            plugin_payload={**chair.plugin_payload, PANEL_NAMESPACE: dict(said)},
+        )

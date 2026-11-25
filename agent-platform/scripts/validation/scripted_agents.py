@@ -22,6 +22,14 @@ perfect > no_tool and perfect > shotgun on the mean scalar of every condition; a
 reaches the perfect agent on one condition means the reward must be fixed first.
 
     uv run python agent-platform/scripts/validation/scripted_agents.py --output outputs/paper/e0
+
+Reference episodes for the supervised fine-tuning baseline (Fig. 6, decided 25 Nov 2026): the
+perfect agent on the training cases, written as candidate episode records for `train_sft`
+(`--allow-candidates`; they are scripted, not physician-approved). The urgency of the assessment
+follows the encounter type, since the policies do not state one:
+
+    uv run python agent-platform/scripts/validation/scripted_agents.py --agents perfect --split train \
+        --output outputs/paper/sft-reference --sft-records training_data/sft_reference_episodes.jsonl
 """
 
 from __future__ import annotations
@@ -33,17 +41,19 @@ import statistics
 from multiprocessing import Pool
 from pathlib import Path
 
-from neuroagent.datasets import DATASETS, DEFAULT_DATASET_VERSION, load_dataset
+from neuroagent.datasets import DATASETS, DEFAULT_DATASET_VERSION, load_dataset, split_case_ids
 from neuroagent.evaluation.benchmark import PROFILES_DIR, episode_row, summarize
 from neuroagent.evaluation.policy_reward import ClinicalPolicyReward
 from neuroagent.harness import NeuroBenchEnvironment
 from neuroagent.harness.interfaces import ModelTurn, RunContext
 from neuroagent.harness.loops import ClinicalPolicyLoop
 from neuroagent.harness.profile import load_profiles
+from neuroagent.training.data.episodes import EpisodeRecord
 from neuroagent.tools.cost_tracker import CostTracker
 from neuroagent_schemas import ActionImportance, NeuroBenchCase, SubmitAssessment, ToolAction
 
 AGENTS = ("perfect", "no_tool", "shotgun")
+URGENCY = {"emergency": "emergent", "inpatient": "urgent", "outpatient": "routine"}
 PROFILE = "policy-qwen3.5-9b"
 
 
@@ -131,7 +141,7 @@ class ScriptedModel:
             primary_diagnosis=policy.diagnosis.accepted[0],
             icd10_code=policy.diagnosis.icd_codes[0] if policy.diagnosis.icd_codes else None,
             confidence=0.9,
-            urgency="urgent",
+            urgency=URGENCY[case.encounter_type.value],
             recommendations=list(policy.assessment.required_recommendations),
         ))
 
@@ -182,16 +192,53 @@ def report(rows: list[dict]) -> dict:
     return {"by_condition": table, "components": means, "h1_failures": failures}
 
 
+def write_sft_records(episodes_dir: Path, cases: list[NeuroBenchCase], path: Path) -> None:
+    """Completed perfect-agent episodes as `candidate_not_gold` records; failed ones are left out."""
+    from neuroagent_schemas import ClinicalEpisode, RunCompleted
+
+    records, skipped = [], []
+    for case in cases:
+        episode = ClinicalEpisode.model_validate_json((episodes_dir / f"{case.case_id}.json").read_text())
+        if not isinstance(episode.events[-1], RunCompleted):
+            skipped.append(case.case_id)
+            continue
+        records.append(EpisodeRecord(
+            candidate_id=f"scripted-perfect/{case.case_id}",
+            case_id=case.case_id,
+            label="candidate_not_gold",
+            provenance={"source": "scripted_agents.py perfect", "policy_review": case.ground_truth.review_status.value},
+            episode=episode,
+        ))
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("".join(record.model_dump_json() + "\n" for record in records))
+    print(f"SFT records: {len(records)} written to {path}, {len(skipped)} incomplete left out {skipped[:5]}")
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--agents", nargs="+", choices=AGENTS, default=list(AGENTS))
-    parser.add_argument("--cases", nargs="+", help="case ids (default: all)")
+    selection = parser.add_mutually_exclusive_group()
+    selection.add_argument("--cases", nargs="+", help="case ids (default: all)")
+    selection.add_argument("--split", choices=["train", "validation", "test"])
+    parser.add_argument(
+        "--sft-records",
+        type=Path,
+        help="also write the perfect agent's completed episodes as SFT candidate records (train split only)",
+    )
     parser.add_argument("--workers", type=int, default=8)
     args = parser.parse_args(argv)
     _, cases = load_dataset(DATASETS[DEFAULT_DATASET_VERSION].path)
     battery = shotgun_battery(cases)
-    selected = [cases[c] for c in args.cases] if args.cases else list(cases.values())
+    if args.sft_records and (args.split != "train" or "perfect" not in args.agents):
+        parser.error("--sft-records needs --split train and the perfect agent")
+    dataset_path = DATASETS[DEFAULT_DATASET_VERSION].path
+    if args.cases:
+        selected = [cases[c] for c in args.cases]
+    elif args.split:
+        selected = [cases[c] for c in split_case_ids(dataset_path, args.split)]
+    else:
+        selected = list(cases.values())
     for agent in args.agents:
         (args.output / agent / "episodes").mkdir(parents=True, exist_ok=True)
     jobs = [(agent, case, battery, args.output) for agent in args.agents for case in selected]
@@ -201,6 +248,8 @@ def main(argv: list[str] | None = None) -> None:
         agent_rows = [r for r in rows if r["agent"] == agent]
         (args.output / agent / "rewards.jsonl").write_text("".join(json.dumps(r) + "\n" for r in agent_rows))
         (args.output / agent / "summary.json").write_text(json.dumps(summarize(agent_rows), indent=2))
+    if args.sft_records:
+        write_sft_records(args.output / "perfect" / "episodes", selected, args.sft_records)
     (args.output / "shotgun_battery.json").write_text(json.dumps(
         [{"tool": p.tool_name, "arguments": p.required_arguments} for p, _ in battery], indent=1))
     if set(args.agents) == set(AGENTS):

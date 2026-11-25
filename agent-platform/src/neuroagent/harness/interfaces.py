@@ -33,6 +33,7 @@ class ModelAdapter(Protocol):
         react: bool = False,
         narrative: bool = False,
         free_order: bool = False,
+        rules: bool = False,
         correction: str | None = None,
     ) -> ModelTurn: ...
 

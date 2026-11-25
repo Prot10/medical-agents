@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Serve one preregistered under-10B benchmark model with vLLM.
-# Usage: ./serve_model.sh [qwen3.5-9b|granite-4.1-8b|gemma-4-e4b] [port]
+# Serve one preregistered benchmark model with vLLM.
+# Usage: ./serve_model.sh [qwen3.5-9b|qwen3.8-27b|granite-4.1-8b|gemma-4-e4b] [port]
+# qwen3.8-27b (~54 GB in bf16) needs the RTX PRO 6000; it does not fit an A100-40GB.
 #
 # Environment:
 #   HF_HOME                  model cache (default: the EOS cache; stage it in /dev/shm for fast loads)
@@ -72,6 +73,15 @@ case "$MODEL" in
       --enable-auto-tool-choice \
       --tool-call-parser qwen3_coder
     ;;
+  qwen3.8-27b)
+    # Same family, template and tool-call syntax as Qwen3.5-9B.
+    "${VLLM[@]}" \
+      --model Qwen/Qwen3.8-27B \
+      "${COMMON_FLAGS[@]}" \
+      --language-model-only \
+      --enable-auto-tool-choice \
+      --tool-call-parser qwen3_coder
+    ;;
   gemma-4-e4b)
     "${VLLM[@]}" \
       --model google/gemma-4-E4B-it \
@@ -89,7 +99,7 @@ case "$MODEL" in
     ;;
   *)
     echo "Unknown model: $MODEL" >&2
-    echo "Supported: qwen3.5-9b, granite-4.1-8b, gemma-4-e4b" >&2
+    echo "Supported: qwen3.5-9b, qwen3.8-27b, granite-4.1-8b, gemma-4-e4b" >&2
     exit 1
     ;;
 esac

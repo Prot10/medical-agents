@@ -5,6 +5,7 @@ from .context import (
     FREE_ORDER_SYSTEM_PROMPT,
     NARRATIVE_SYSTEM_PROMPT,
     POLICY_SYSTEM_PROMPT,
+    RULES_ADDENDUM,
     format_patient_info,
     transcript,
 )
@@ -24,8 +25,10 @@ from .loops import (
     ClinicalPolicyLoop,
     DirectAnswerLoop,
     FreeOrderLoop,
+    MultiAgentPanelLoop,
     NarrativeOnlyLoop,
     ReactAblationLoop,
+    RulesInPromptLoop,
 )
 from .plugins import builtin_plugins
 from .profile import HarnessProfile, load_profile, load_profiles
@@ -52,13 +55,16 @@ __all__ = [
     "MemoryEpisodeStore",
     "ModelAdapter",
     "ModelTurn",
+    "MultiAgentPanelLoop",
     "NarrativeOnlyLoop",
     "NativeToolModelAdapter",
     "NeuroBenchEnvironment",
     "Plugin",
     "PluginConfig",
+    "RULES_ADDENDUM",
     "ReactAblationLoop",
     "RewardScorer",
+    "RulesInPromptLoop",
     "RunContext",
     "ServiceRegistry",
     "boot_profile",

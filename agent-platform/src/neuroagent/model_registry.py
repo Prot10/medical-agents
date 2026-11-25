@@ -1,4 +1,7 @@
-"""The fixed under-10B model panel used by benchmark and training profiles.
+"""The fixed model panel used by benchmark and training profiles.
+
+The three under-10B models are the panel the paper trains and compares; Qwen3.8-27B is the larger
+untrained reference of Fig. 6 (25 Nov 2026), evaluated only, never trained.
 
 ``request_defaults`` are sent with every chat request for that model: the sampling settings each
 model card recommends, plus the thinking switch. Qwen3.5 and Gemma 4 think by default; with
@@ -42,6 +45,23 @@ AVAILABLE_MODELS: list[dict] = [
         # Prefix cache on, MTP off: re-prefilling the transcript every turn is what costs, and MTP
         # adds no throughput with the cache on. On vLLM 0.23 the two together moved logprobs well
         # past the batching noise floor (2 Nov 2026); 0.32 does not, vllm#53912 is still open.
+        "engine_kwargs": {"enable_prefix_caching": True},
+    },
+    {
+        "key": "qwen3.8-27b",
+        "name": "Qwen3.8-27B",
+        "hf_model_id": "Qwen/Qwen3.8-27B",
+        "description": "Larger Qwen of the same family (Fig. 6 reference); evaluated untrained only.",
+        "size_gb": 54.0,
+        "expected_load_seconds": 600,
+        # Model card, instruct (non-thinking) mode: the same settings as Qwen3.5-9B.
+        "request_defaults": {
+            "temperature": 0.7,
+            "top_p": 0.8,
+            "top_k": 20,
+            "presence_penalty": 1.5,
+            "chat_template_kwargs": {"enable_thinking": False},
+        },
         "engine_kwargs": {"enable_prefix_caching": True},
     },
     {

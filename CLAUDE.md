@@ -60,8 +60,9 @@ command wraps both (`cern help`). In short, to choose:
   sparse-logits loss), `train_grpo.py` (RLVR: benchmark loop as rollout on a colocated vLLM engine,
   DAPO loss, token-level IS correction, rollouts persisted; weights only on EOS via `--weights-dir`),
   `data/episodes.py` (episode records)
-- `agent-platform/config/profiles/*.yaml` — the fifteen checked experiment profiles (model × loop:
-  policy, direct, narrative, react, free-order); arbitrary model ids are rejected. Models live in
+- `agent-platform/config/profiles/*.yaml` — the twenty checked experiment profiles (model × loop:
+  policy, direct, narrative, react, free-order; and the Fig. 6 baselines rules-in-prompt and
+  multi-agent panel, `harness/panel.py`); arbitrary model ids are rejected. Models live in
   `model_registry.py` with their per-request defaults
 - `agent-platform/config/tools/costs.yaml` — per-tool cost registry (Medicare reference rates); the
   vocabulary in `tools/vocabulary.py` derives every enum from it
@@ -126,7 +127,8 @@ HF_HOME=/dev/shm/hf uv run python -m neuroagent.training.train_grpo --model qwen
   function that builds inference requests
 - Panel: Qwen3.5-9B, IBM Granite 4.1 8B, Gemma 4 E4B, all native tool calling. Sampling and the
   thinking switch are frozen per model at the model card's recommendation in
-  `model_registry.request_defaults`; profiles do not override them, replication is by `--seed`
+  `model_registry.request_defaults`; profiles do not override them, replication is by `--seed`.
+  Qwen3.8-27B is registered too, as the larger untrained reference of Fig. 6 (evaluated, never trained)
 - 16 tools: analyze_brain_mri, analyze_eeg, analyze_ecg, interpret_labs, analyze_csf, order_ct_scan,
   order_echocardiogram, order_cardiac_monitoring, order_advanced_imaging, order_specialized_test,
   search_medical_literature, check_drug_interactions, order_body_imaging, order_microbiology,

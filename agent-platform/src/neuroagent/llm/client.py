@@ -61,9 +61,12 @@ class LLMClient:
         tools: list[dict[str, Any]] | None = None,
         tool_choice: str | None = None,
         response_format: dict[str, Any] | None = None,
+        max_tokens: int | None = None,
     ) -> LLMResponse:
         kwargs: dict[str, Any] = {"model": self.model, "messages": _wire_messages(messages)}
         kwargs.update({key: value for key, value in self.request.items() if key in _NAMED_PARAMETERS})
+        if max_tokens is not None:
+            kwargs["max_tokens"] = max_tokens
         extra_body = {key: value for key, value in self.request.items() if key not in _NAMED_PARAMETERS}
         if extra_body:
             kwargs["extra_body"] = extra_body

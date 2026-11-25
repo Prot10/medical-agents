@@ -87,6 +87,7 @@ class NativeToolModelAdapter:
         react: bool = False,
         narrative: bool = False,
         free_order: bool = False,
+        rules: bool = False,
         correction: str | None = None,
     ) -> ModelTurn:
         # The catalogue is identical on every turn so the rendered transcript chains as prefixes
@@ -101,7 +102,13 @@ class NativeToolModelAdapter:
         try:
             response = self.client.chat(
                 transcript(
-                    case, episode, react=react, narrative=narrative, free_order=free_order, correction=correction
+                    case,
+                    episode,
+                    react=react,
+                    narrative=narrative,
+                    free_order=free_order,
+                    rules=rules,
+                    correction=correction,
                 ),
                 tools=tools,
                 tool_choice="auto",
@@ -139,4 +146,16 @@ class NativeToolModelAdapter:
             completion_tokens=_usage(response, "completion_tokens"),
             latency_seconds=response.latency_seconds,
             plugin_payload=payload,
+        )
+
+    def discuss(self, messages: list[dict[str, Any]], *, max_tokens: int) -> tuple[str, int, int]:
+        """One text-only reply (no tool catalogue): a role's contribution in the multi-agent panel.
+
+        Returns the text and its prompt and completion token counts.
+        """
+        response = self.client.chat(messages, max_tokens=max_tokens)
+        return (
+            (response.content or "").strip(),
+            _usage(response, "prompt_tokens"),
+            _usage(response, "completion_tokens"),
         )

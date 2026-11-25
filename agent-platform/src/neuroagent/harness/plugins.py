@@ -21,8 +21,10 @@ from .loops import (
     ClinicalPolicyLoop,
     DirectAnswerLoop,
     FreeOrderLoop,
+    MultiAgentPanelLoop,
     NarrativeOnlyLoop,
     ReactAblationLoop,
+    RulesInPromptLoop,
 )
 
 # Translations and off-catalogue reports are shared by every free-order run (gitignored).
@@ -85,6 +87,8 @@ def builtin_plugins() -> dict[str, Plugin]:
         _simple("loop.react", "loop", lambda _: ReactAblationLoop()),
         _simple("loop.narrative", "loop", lambda _: NarrativeOnlyLoop()),
         _simple("loop.free_order", "loop", _free_order_loop),
+        _simple("loop.rules", "loop", lambda _: RulesInPromptLoop()),
+        _simple("loop.panel", "loop", lambda _: MultiAgentPanelLoop()),
         _simple(
             "reward.policy",
             "reward",
