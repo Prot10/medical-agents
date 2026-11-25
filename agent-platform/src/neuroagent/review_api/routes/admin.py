@@ -41,7 +41,7 @@ def get_agreement(
     return inter_rater_agreement(
         request.app.state.annotation_store,
         version,
-        registry.all(),
+        registry.dataset_reviewers(),
         case_objects,
     )
 
@@ -57,7 +57,7 @@ def get_all_progress(
     return all_reviewers_progress(
         request.app.state.annotation_store,
         version,
-        registry.all(),
+        registry.dataset_reviewers(),
         case_objects,
     )
 
@@ -70,7 +70,7 @@ def get_field_hotspots(
     registry: ReviewerCodeRegistry = Depends(get_reviewer_registry),
 ) -> list[dict[str, Any]]:
     version, case_objects = _require_dataset(request, version)
-    reviewer_codes = [r.code for r in registry.all() if r.role == "reviewer"]
+    reviewer_codes = [r.code for r in registry.dataset_reviewers() if r.role == "reviewer"]
     return field_hotspots(
         request.app.state.annotation_store,
         version,
@@ -97,7 +97,7 @@ def get_case_diff(
         request.app.state.annotation_store,
         version,
         case_id,
-        registry.all(),
+        registry.dataset_reviewers(),
     )
 
 
@@ -112,5 +112,5 @@ def get_tool_review_summary(
     return tool_review_summary(
         request.app.state.tool_review_store,
         version,
-        registry.all(),
+        registry.dataset_reviewers(),
     )

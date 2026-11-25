@@ -25,6 +25,11 @@ REVIEWER_CODES_PATH = REVIEW_CONFIG_DIR / "reviewer_codes.yaml"
 # Fixed case subsets re-reviewed in their own space (services/review_sets.py).
 REVIEW_SETS_PATH = REVIEW_CONFIG_DIR / "review_sets.yaml"
 
+# Agent mode ("work the case as the agent"): its sections and case sets, and where the synthetic
+# section's records go. The MIMIC section's directories come from the environment only.
+AGENT_MODE_SETS_PATH = REVIEW_CONFIG_DIR / "agent_mode_sets.yaml"
+AGENT_MODE_RECORDS_DIR = REVIEW_DATA_DIR / "agent-mode"
+
 # Sources for the tool catalog (existing 12-tool list + per-condition mapping).
 TOOL_COSTS_PATH = _REPO_ROOT / "agent-platform" / "config" / "tools" / "costs.yaml"
 CONDITIONS_YAML_PATH = (

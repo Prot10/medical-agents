@@ -25,12 +25,12 @@ def get_auth_limiter(request: Request) -> AuthRateLimiter | None:
     return getattr(request.app.state, "auth_limiter", None)
 
 
-def current_reviewer(
+def authenticated_code(
     request: Request,
     x_reviewer_code: str | None = Header(default=None, alias="X-Reviewer-Code"),
     registry: ReviewerCodeRegistry = Depends(get_reviewer_registry),
 ) -> ReviewerCode:
-    """Resolve the calling reviewer or 401, with brute-force throttling."""
+    """Resolve the calling code (of either kind) or 401, with brute-force throttling."""
     limiter = get_auth_limiter(request)
     key = AuthRateLimiter.client_key(request) if limiter else ""
 
@@ -54,6 +54,31 @@ def current_reviewer(
         )
     if limiter:
         limiter.record_success(key)
+    return reviewer
+
+
+def current_reviewer(
+    reviewer: ReviewerCode = Depends(authenticated_code),
+) -> ReviewerCode:
+    """Resolve a dataset-review code. An agent-mode code is refused on every dataset-review route:
+    it must never reach a case file, a policy or a ground truth."""
+    if reviewer.is_agent_mode:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="This code opens the agent-mode study only",
+        )
+    return reviewer
+
+
+def agent_mode_reviewer(
+    reviewer: ReviewerCode = Depends(authenticated_code),
+) -> ReviewerCode:
+    """Resolve an agent-mode code or 403 (dataset-review and admin codes do not work cases)."""
+    if not reviewer.is_agent_mode:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="This code does not open the agent-mode study",
+        )
     return reviewer
 
 

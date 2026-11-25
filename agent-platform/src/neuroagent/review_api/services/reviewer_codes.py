@@ -104,3 +104,8 @@ class ReviewerCodeRegistry:
     def all(self) -> list[ReviewerCode]:
         self.reload_if_stale()
         return list(self._codes.values())
+
+    def dataset_reviewers(self) -> list[ReviewerCode]:
+        """Every code of the dataset review: agent-mode codes are a separate study and are left
+        out of its progress, agreement and hotspot views."""
+        return [model for model in self.all() if not model.is_agent_mode]

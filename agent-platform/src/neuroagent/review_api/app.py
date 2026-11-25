@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import logging
 import os
+from pathlib import Path
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -16,6 +17,8 @@ from fastapi.responses import JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 
 from .config import (
+    AGENT_MODE_RECORDS_DIR,
+    AGENT_MODE_SETS_PATH,
     ANNOTATIONS_DIR,
     AVAILABLE_DATASETS,
     CONDITION_TOOL_GUIDANCE_PATH,
@@ -27,6 +30,8 @@ from .config import (
     TOOL_REVIEWS_DIR,
     WEB_DIST,
 )
+from .services.agent_mode.sets import load_agent_mode
+from .services.agent_mode.store import AgentRecordStore
 from .services.annotation_store import AnnotationStore
 from .services.dataset_loader import load_dataset
 from .services.rate_limit import AuthRateLimiter
@@ -72,7 +77,7 @@ def create_app() -> FastAPI:
     app = FastAPI(
         title="NeuroBench Review API",
         description="Dataset review and annotation API for NeuroBench cases.",
-        version="0.1.0",
+        version="0.2.0",
     )
 
     # Security headers + request-body cap. Added first so it runs outermost.
@@ -154,7 +159,15 @@ def create_app() -> FastAPI:
     app.state.annotation_store = AnnotationStore(ANNOTATIONS_DIR, extra_versions=review_sets)
     app.state.tool_review_store = ToolReviewStore(TOOL_REVIEWS_DIR)
 
+    # Agent mode. REVIEW_AGENT_MODE_DIR moves the synthetic records (tests, a second instance).
+    app.state.agent_mode = load_agent_mode(
+        AGENT_MODE_SETS_PATH,
+        records_root=Path(os.environ.get("REVIEW_AGENT_MODE_DIR") or AGENT_MODE_RECORDS_DIR),
+    )
+    app.state.agent_record_store = AgentRecordStore()
+
     from .routes import admin as admin_routes
+    from .routes import agent_mode as agent_mode_routes
     from .routes import annotations as annotations_routes
     from .routes import datasets as datasets_routes
     from .routes import methodology as methodology_routes
@@ -169,6 +182,8 @@ def create_app() -> FastAPI:
     app.include_router(methodology_routes.router, prefix="/api/v1")
     app.include_router(tool_review_routes.router, prefix="/api/v1")
     app.include_router(admin_routes.router, prefix="/api/v1")
+    app.include_router(agent_mode_routes.router, prefix="/api/v1")
+    app.include_router(agent_mode_routes.admin_router, prefix="/api/v1")
 
     if WEB_DIST.exists():
         app.mount("/", StaticFiles(directory=str(WEB_DIST), html=True), name="static")
