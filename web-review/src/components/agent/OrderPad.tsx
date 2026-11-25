@@ -13,6 +13,8 @@ interface OrderPadProps {
   onSend: (name: string, args: Record<string, JsonValue>, rationale: string) => void
   onToolOpened: (name: string) => void
   onSearch: (term: string) => void
+  /** Called when the pad switches between the catalogue and a tool's form. */
+  onViewChange?: () => void
 }
 
 /** Where an entry of the catalogue mentions the search term, so a value deep in a long
@@ -31,9 +33,13 @@ function matchHint(tool: ToolDefinition, term: string): string | null | undefine
 }
 
 /** The catalogue the agent is given, in the agent's order, and the order form of one tool. */
-export function OrderPad({ tools, sending, onSend, onToolOpened, onSearch }: OrderPadProps) {
+export function OrderPad({ tools, sending, onSend, onToolOpened, onSearch, onViewChange }: OrderPadProps) {
   const [search, setSearch] = useState("")
   const [selected, setSelected] = useState<string | null>(null)
+  // A tool's form, and the catalogue on the way back, start at their top.
+  useEffect(() => {
+    onViewChange?.()
+  }, [selected, onViewChange])
   const tool = tools.find((t) => t.function.name === selected) ?? null
 
   // The filter term is noted once typing has stopped, not per keystroke.

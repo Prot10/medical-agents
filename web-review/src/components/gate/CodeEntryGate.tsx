@@ -100,7 +100,7 @@ export function CodeEntryGate() {
                     autoFocus
                     spellCheck={false}
                     autoComplete="off"
-                    placeholder="NEURO-XXXX"
+                    placeholder="NB-XXXX-XXXX-XXXX"
                     className="w-full bg-background border border-input rounded-md h-11 px-3.5 text-base font-mono tracking-wider tabular-nums focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring transition"
                   />
                 </label>
