@@ -63,22 +63,50 @@ reviewers:
 ## Case sets
 
 `agent-platform/config/review/agent_mode_sets.yaml` declares both sections, with the drawing rule
-and seed. Cases are served in the listed order, one at a time.
+and seed. Each section has 20 cases, served in the listed order, one at a time.
 
-- **Synthetic**: `agent-synthetic-2026-11`, 8 cases: 2 per condition from the test split (which
-  holds out 4 conditions), seed 20261125, frozen in `data/review/sets/agent-synthetic-2026-11/`.
-  A new draw is a new set id: `agent-platform/scripts/review/draw_agent_mode_set.py`.
-- **MIMIC**: every case in the configured folder, ids sorted then shuffled with the seed in the
-  file (or the order of `REVIEW_AGENT_MIMIC_CASE_LIST`, a text file of case ids).
+- **Synthetic**: `agent-synthetic-2026-11-v2`, 20 cases, one per condition, drawn from all
+  splits with seed 20261125 and put in a seeded random order
+  (`agent-platform/scripts/review/draw_agent_mode_set.py --split all --per-condition 1`). The
+  case files are frozen in `data/review/sets/agent-synthetic-2026-11-v2/cases`, with their
+  hashes in `manifest.json`.
+- **MIMIC**: 20 of the final 100 cases, stratified by condition: one case per condition present,
+  the remaining slots shared in proportion to the cases each condition has left (largest
+  remainder), then a seeded draw within each condition and a seeded random order. With the
+  counts ISCH 38, MS 22, SAH 12, HEP 10, SE 9, GBS 3, FND 2, FEPI 2, BACT 2 this gives 6, 4, 2,
+  2, 2, 1, 1, 1, 1; the numbers are computed from the cases, not written anywhere. The draw is
+  `agent-platform/scripts/review/draw_mimic_set.py` (plain `python3`), run by
+  `push-mimic-cases.sh` where the cases are: it prints counts per condition only, and the app
+  serves the ids of the list file `REVIEW_AGENT_MIMIC_CASE_LIST` names, in that order.
+
+### Refreshing the synthetic set after case corrections
+
+The frozen copies were taken from master `dac5c514`. When the cases are corrected afterwards
+(e.g. a review round), take the corrections into the set without changing which cases are in it
+or their order:
+
+```bash
+uv run python agent-platform/scripts/review/draw_agent_mode_set.py --refresh agent-synthetic-2026-11-v2
+```
+
+It re-copies the same case ids from `data/neurobench/cases`, rewrites `manifest.json` (per-case
+hashes, `cases_sha256`, source commit) and prints which cases changed. Commit the result and
+deploy. It refuses once any physician record exists for the set (`--force` overrides): from then
+on what a physician worked on must not change, and a new selection or version is a new set id.
+The check reads the records of the machine it runs on (`data/review/agent-mode` or
+`REVIEW_AGENT_MODE_DIR`), so for a deployed set look at the admin view of the server first. Each
+record keeps the sha256 of the case file it was worked on, so a record can always be matched to
+the version of the case.
 
 ## Enabling the MIMIC section
 
 It exists only on a server whose environment sets both variables; otherwise no route serves it
-and the UI does not show it. Only the processed benchmark cases are served (the final 100), never
-raw MIMIC data.
+and the UI does not show it. Only processed benchmark cases are served (20 of the final 100),
+never raw MIMIC data.
 
 ```bash
-export REVIEW_AGENT_MIMIC_CASES_DIR=/path/to/final-100   # case JSON files, or a folder holding cases/
+export REVIEW_AGENT_MIMIC_CASES_DIR=/path/to/cases       # case JSON files, or a folder holding cases/
+export REVIEW_AGENT_MIMIC_CASE_LIST=/path/to/case-list.txt   # optional: the ids to serve, in order
 export REVIEW_AGENT_MIMIC_LOG_DIR=/path/outside/the/repo/records
 uv run uvicorn neuroagent.review_api.app:app --host 127.0.0.1 --port 8889
 ```
@@ -89,10 +117,11 @@ written under the log directory only; a malformed case file is reported by name 
 by content.
 
 On the review VPS (Andrea's decision of 25 Nov 2026) both live under
-`/home/neuroreview/mimic-agent-mode/`: `cases/`, `records/` and `agent-mode.env`, which the
-systemd unit reads. `deployment/hostinger/push-mimic-cases.sh <folder>` copies the cases there
-from the EOS workspace and enables the section; it is run from rockhopper or lxplus, never from
-the Mac. See `deployment/hostinger/README.md`.
+`/home/neuroreview/mimic-agent-mode/`: `cases/` (the 20 drawn cases), `case-list.txt` (their
+ids in serving order), `records/` and `agent-mode.env`, which the systemd unit reads.
+`deployment/hostinger/push-mimic-cases.sh <folder>` draws the set, copies only the drawn cases
+there from the EOS workspace and enables the section; the other 80 never leave EOS. It is run
+from rockhopper or lxplus, never from the Mac. See `deployment/hostinger/README.md`.
 
 ## Storage
 

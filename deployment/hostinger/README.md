@@ -219,12 +219,13 @@ scp deployment/hostinger/backup-annotations.sh hostinger:/home/neuroreview/bin/b
 
 ### MIMIC section
 
-Decided by Andrea on 25 Nov 2026: the MIMIC section runs here too. Only the processed benchmark cases go on the VPS (the final 100), never raw MIMIC data, and they live **outside the repo tree**:
+Decided by Andrea on 25 Nov 2026: the MIMIC section runs here too, with 20 of the final 100 processed benchmark cases. Never raw MIMIC data; the 80 cases that are not drawn never leave EOS. Everything lives **outside the repo tree**:
 
 ```
-/home/neuroreview/mimic-agent-mode/cases/           the 100 case JSON files (read-only for the app)
+/home/neuroreview/mimic-agent-mode/cases/           the 20 drawn case JSON files (read-only for the app)
+/home/neuroreview/mimic-agent-mode/case-list.txt    their ids, in the order they are served
 /home/neuroreview/mimic-agent-mode/records/         physicians' MIMIC records (the only path the app writes there)
-/home/neuroreview/mimic-agent-mode/agent-mode.env   REVIEW_AGENT_MIMIC_CASES_DIR / REVIEW_AGENT_MIMIC_LOG_DIR
+/home/neuroreview/mimic-agent-mode/agent-mode.env   the three REVIEW_AGENT_MIMIC_* variables
 ```
 
 `deploy.sh` only ever writes under `/home/neuroreview/medical-agents`, so it never syncs, overwrites or deletes these, and they never enter git. The app refuses to start the section from a path inside the repo.
@@ -236,12 +237,20 @@ To enable it:
 scp deployment/hostinger/neurobench-review.service hostinger:/etc/systemd/system/neurobench-review.service
 ssh hostinger 'systemctl daemon-reload'
 
-# 2. From rockhopper or lxplus (EOS mounted; never from the Mac, so the cases never touch its disk):
-deployment/hostinger/push-mimic-cases.sh --dry-run <EOS folder of the final 100 cases>   # counts only
+# 2. From rockhopper or lxplus (EOS mounted; never from the Mac, so the cases never touch its disk),
+#    in a checkout of this repo:
+deployment/hostinger/push-mimic-cases.sh --dry-run <EOS folder of the final 100 cases>   # counts per condition only
 deployment/hostinger/push-mimic-cases.sh <EOS folder of the final 100 cases>
 ```
 
-The script refuses a folder that does not hold exactly 100 case files (`EXPECTED=N` to override), copies them straight from EOS to the VPS over SSH, writes `agent-mode.env`, sets owner and modes (700/600) and restarts the service. It prints counts only. It needs an SSH destination that logs in as root on the VPS: the `hostinger` alias, or `VPS_HOST=root@<address>`. Once a physician has a MIMIC record it refuses to change the case set (`FORCE=1` to override).
+What the script does:
+
+1. Refuses a folder that does not hold exactly 100 case files (`EXPECTED=N` to override), and refuses to run on macOS.
+2. Draws the set with `agent-platform/scripts/review/draw_mimic_set.py` (plain `python3`, seed `SEED=20261125`, `DRAW=20`): stratified by condition, one case per condition present, the remaining slots in proportion to what each condition has left by largest remainder, a seeded draw within each condition, a seeded random order. It reads only each case's id and condition, and prints only how many cases each condition gives (expected for the final 100: ISCH 6, MS 4, SAH 2, HEP 2, SE 2, GBS 1, FND 1, FEPI 1, BACT 1). No case id or text is printed.
+3. Writes the 20 ids to `agent-mode-mimic-set.txt` next to the source folder on EOS, and refuses a later run that would draw a different set (`FORCE=1` to replace it).
+4. Copies only those 20 files straight from EOS to the VPS over SSH, with the list as `case-list.txt`, writes `agent-mode.env`, sets owner and modes (700/600) and restarts the service.
+
+It needs an SSH destination that logs in as root on the VPS: the `hostinger` alias, or `VPS_HOST=root@<address>`. Once a physician has a MIMIC record it refuses to change the case set (`FORCE=1` to override).
 
 To add MIMIC codes, add rows with `sections: [agent_mimic]` (or `[agent_synthetic, agent_mimic]`) and an `id` to `reviewer_codes.yaml`, only for physicians credentialed on PhysioNet, and push with `./deployment/hostinger/deploy.sh --force-codes`. A code without `agent_mimic` gets 404 on the section.
 

@@ -16,29 +16,47 @@ show_step_budget: false
 
 sections:
   synthetic:
-    set_id: agent-synthetic-2026-11
+    set_id: agent-synthetic-2026-11-v2
     title: Synthetic cases
     description: >-
       NeuroBench cases. Each one starts from the presentation alone; order what you need and
       give your assessment.
-    # Frozen copies (master dac5c514, after the November 2026 corrections): a later case edit
-    # never changes what a physician worked on. A new draw is a new set id, never an edit.
-    cases_dir: data/review/sets/agent-synthetic-2026-11
-    # Drawn on 25 Nov 2026 with agent-platform/scripts/review/draw_agent_mode_set.py
-    #   --set-id agent-synthetic-2026-11 --seed 20261125 --split test --per-condition 2
-    # Rule: from the test split (data/neurobench/splits/test_cases.txt, 119 cases), per condition
-    # in alphabetical order, 2 cases at random with Python random.Random(20261125); the drawn
-    # cases are then shuffled with the same generator until no two neighbours share a condition.
-    # The test split holds out 4 whole conditions, so the set has 8 cases.
+    # Frozen copies of the cases (data/review/sets/<set id>/cases, hashes in manifest.json): a
+    # later case edit does not change what a physician works on. To take corrected cases into
+    # the set before anyone has worked it (same cases, same order):
+    #   draw_agent_mode_set.py --refresh agent-synthetic-2026-11-v2
+    # which refuses once a physician record exists. A different selection is a new set id.
+    cases_dir: data/review/sets/agent-synthetic-2026-11-v2
+    # Drawn on 25 Nov 2026 (cases of master dac5c514) with
+    #   agent-platform/scripts/review/draw_agent_mode_set.py
+    #     --set-id agent-synthetic-2026-11-v2 --seed 20261125 --split all --per-condition 1
+    # Rule: 20 cases, one per condition. From the cases of the three split files (train,
+    # validation, test: 598 cases, the 2 excluded ones stay out), per condition in alphabetical
+    # order, 1 case at random with Python random.Random(20261125); the 20 are then shuffled with
+    # the same generator (repeated until no two neighbours share a condition, which one case per
+    # condition always satisfies), so neither grouping nor order hints at the condition.
+    # It replaces the 8-case set agent-synthetic-2026-11, removed before anyone worked it.
     cases:
-      - HEP-ENC-P05
-      - GLIO-HG-M01
-      - MG-M02
-      - BACT-MEN-S04
-      - GLIO-HG-RM01
-      - HEP-ENC-P09
-      - BACT-MEN-S06
-      - MG-P04
+      - SE-S03
+      - GLIO-HG-RP01
+      - FEPI-TEMP-RP04
+      - GBS-RP15
+      - FTD-M08
+      - FND-M02
+      - MS-RR-RP03
+      - BACT-MEN-RM01
+      - SAH-P07
+      - MG-RS17
+      - NMDAR-ENC-M01
+      - PD-RM01
+      - ISCH-STR-P01
+      - MIG-AURA-S03
+      - NPH-M04
+      - SYNC-CARD-S03
+      - ALS-S09
+      - VASC-DEM-S06
+      - HEP-ENC-P03
+      - ALZ-EARLY-S06
 
   mimic:
     set_id: mimic-final-100
@@ -55,9 +73,15 @@ sections:
     #   REVIEW_AGENT_MIMIC_LOG_DIR    where this section's records are written (outside the repo)
     cases_dir_env: REVIEW_AGENT_MIMIC_CASES_DIR
     records_dir_env: REVIEW_AGENT_MIMIC_LOG_DIR
-    # Order: every case in the folder, ids sorted, then shuffled with random.Random(order_seed).
-    # To serve a chosen subset or order instead, point REVIEW_AGENT_MIMIC_CASE_LIST at a text
-    # file of case ids (one per line).
+    # The set: 20 of the final 100 cases, drawn by deployment/hostinger/push-mimic-cases.sh
+    # (agent-platform/scripts/review/draw_mimic_set.py, seed 20261125) where the cases are, since
+    # nothing of MIMIC is in the repo. Rule: stratified by condition; one case per condition
+    # present, the remaining slots shared in proportion to the cases each condition has left, by
+    # largest remainder; then a seeded random draw within each condition and a seeded random
+    # order. Only the drawn cases are copied to the server, with the ordered ids in the file
+    # REVIEW_AGENT_MIMIC_CASE_LIST names; the app serves that list in that order.
+    # Without a list, every case in the folder is served: ids sorted, then shuffled with
+    # random.Random(order_seed).
     order_seed: 20261125
     case_list_env: REVIEW_AGENT_MIMIC_CASE_LIST
-    expected_cases: 100
+    expected_cases: 20

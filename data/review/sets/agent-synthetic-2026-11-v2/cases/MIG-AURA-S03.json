@@ -1,0 +1,466 @@
+{
+  "case_id": "MIG-AURA-S03",
+  "condition": "migraine_with_aura",
+  "difficulty": "straightforward",
+  "encounter_type": "outpatient",
+  "fallback_tool_outputs": {
+    "advanced_imaging": null,
+    "cardiac_monitoring": {
+      "duration_hours": 24,
+      "events": [],
+      "findings": [
+        "No sustained arrhythmia. No pauses greater than 2 seconds. No AV block."
+      ],
+      "heart_rate_range": {
+        "average": 82,
+        "max": 131,
+        "min": 53
+      },
+      "impression": "Normal 24-hour Holter monitor.",
+      "monitor_type": "holter_24h",
+      "recommended_actions": [],
+      "rhythm_summary": "Sinus rhythm throughout the recording"
+    },
+    "csf": {
+      "appearance": "clear and colourless",
+      "cell_count": {
+        "rbc": "0 /uL",
+        "wbc": "2 /uL"
+      },
+      "glucose": "62 mg/dL",
+      "glucose_ratio": "0.6",
+      "interpretation": "Unremarkable CSF. Normal cell count, protein, and glucose.",
+      "opening_pressure": "16 cm H2O",
+      "protein": "38 mg/dL",
+      "special_tests": {}
+    },
+    "ct": {
+      "additional_observations": [],
+      "angiography_findings": null,
+      "contrast_used": false,
+      "findings": [
+        {
+          "density": "hyperdense",
+          "description": "calcified focus consistent with an old, benign granuloma",
+          "location": "right frontal lobe",
+          "size": "3 mm",
+          "type": "calcification"
+        }
+      ],
+      "impression": "No acute intracranial abnormality. Incidental calcified granuloma, benign.",
+      "recommended_actions": []
+    },
+    "drug_interactions": null,
+    "ecg": null,
+    "echo": {
+      "chambers": {
+        "LA": "normal size",
+        "LV": "normal size and systolic function",
+        "RA": "normal size",
+        "RV": "normal size and function"
+      },
+      "echo_type": "TTE",
+      "ejection_fraction": 66.0,
+      "findings": [
+        "Structurally normal heart. No intracardiac thrombus or vegetation. No pericardial effusion."
+      ],
+      "impression": "Normal transthoracic echocardiogram.",
+      "recommended_actions": [],
+      "valves": {
+        "aortic": "structurally normal",
+        "mitral": "structurally normal",
+        "pulmonic": "normal",
+        "tricuspid": "normal"
+      },
+      "wall_motion": "no regional wall-motion abnormality"
+    },
+    "eeg": null,
+    "labs": null,
+    "literature_search": null,
+    "mri": null,
+    "specialized_test": null
+  },
+  "followup_outputs": [
+    {
+      "output": {
+        "alternatives": [
+          "Another oral triptan (rizatriptan, zolmitriptan) if sumatriptan fails.",
+          "Antiemetic for nausea: metoclopramide 10 mg or domperidone 10 mg."
+        ],
+        "contraindications": [
+          "Ischaemic heart disease, previous stroke or TIA, peripheral vascular disease, uncontrolled hypertension.",
+          "Hemiplegic or basilar-type migraine (outside the licence).",
+          "Within 24 h of an ergot or another triptan; within 2 weeks of an MAO-A inhibitor."
+        ],
+        "formulary_status": "Sumatriptan 50 mg and 100 mg tablets on formulary.",
+        "interactions": [
+          "Ibuprofen: no pharmacokinetic interaction with sumatriptan; a triptan with an NSAID is more effective than either alone.",
+          "Caffeine: no pharmacokinetic interaction with sumatriptan."
+        ],
+        "proposed": "Sumatriptan 50-100 mg orally at headache onset",
+        "summary": "No interaction with ibuprofen or caffeine and no recorded contraindication to a triptan. Sources: sumatriptan SmPC; NICE CG150.",
+        "warnings": [
+          "Take at the start of the headache, not during the aura: a dose taken during the aura is ineffective.",
+          "Triptan use on 10 or more days a month, or simple analgesics on 15 or more days, risks medication-overuse headache; caffeine-containing combination analgesics count toward the 10-day limit.",
+          "High daily caffeine intake is associated with more frequent headache, and abrupt withdrawal causes withdrawal headache; reduce gradually."
+        ]
+      },
+      "tool_name": "check_drug_interactions",
+      "trigger_action": "check_sumatriptan_triptan_caffeine_ibuprofen"
+    }
+  ],
+  "ground_truth": {
+    "action_criteria": [
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "assessment_type": "structured_headache_history_ichd3"
+            },
+            "tool_name": "perform_clinical_assessment"
+          }
+        ],
+        "citations": [
+          "[ICHD_3]"
+        ],
+        "criterion_id": "action-3-perform-clinical-assessment",
+        "expected_evidence": "Stereotyped visual aura over 20-25 min followed by headache, 5 of 6 criterion C characteristics; frequency now about 2 a month with identifiable triggers; no red flag",
+        "importance": "required",
+        "label": "Take a structured headache and aura history with neurological examination and red-flag review, applying every ICHD-3 1.2 criterion explicitly",
+        "rationale": "Migraine with typical aura is a clinical diagnosis (ICHD-3 1.2.1); the history also quantifies frequency and disability, identifies triggers and screens for the red flags that would justify imaging (AHS neuroimaging evidence assessment, Evans RW et al., Headache 2020;60:318-336)."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "drug": "sumatriptan"
+            },
+            "tool_name": "check_drug_interactions"
+          },
+          {
+            "required_arguments": {
+              "drug": "triptan"
+            },
+            "tool_name": "check_drug_interactions"
+          },
+          {
+            "required_arguments": {
+              "drug": "rizatriptan"
+            },
+            "tool_name": "check_drug_interactions"
+          },
+          {
+            "required_arguments": {
+              "drug": "ibuprofen"
+            },
+            "tool_name": "check_drug_interactions"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "action-2-check-drug-interactions",
+        "expected_evidence": "A first triptan raises no interaction with her ibuprofen or coffee and no vascular contraindication",
+        "importance": "optional",
+        "label": "Optionally check the proposed triptan against her current medicines",
+        "rationale": "She takes only ibuprofen and has no vascular disease, so the check does not change management. Sources: sumatriptan SmPC; NICE CG150."
+      }
+    ],
+    "assessment": {
+      "prohibited_recommendations": [
+        "Do not continue or start combined hormonal contraception (pill, patch or ring): migraine with aura is UKMEC category 4; offer a progestogen-only method or an IUD."
+      ],
+      "required_recommendations": [
+        "Make the diagnosis of migraine with typical visual aura (ICHD-3 1.2.1) on clinical grounds: no red flag is present, so no neuroimaging is needed.",
+        "Start sumatriptan 50-100 mg at headache onset (not during the aura), which may be combined with ibuprofen 400-600 mg, with an antiemetic (metoclopramide 10 mg or domperidone 10 mg) for nausea.",
+        "Address triggers: regular sleep, stress management, and a gradual reduction of caffeine (about one cup less each week) to avoid withdrawal headache.",
+        "Keep a headache diary; if disabling headache days stay at 2 or more a month after the trigger changes, discuss preventive treatment (AHS 2021), choosing an agent compatible with her contraception and pregnancy plans.",
+        "Advise that combined hormonal contraception (pill, patch or ring) is UKMEC category 4 in migraine with aura; if contraception is wanted, offer a progestogen-only method or an IUD."
+      ]
+    },
+    "avoided_actions": [
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "order_ct_scan"
+          }
+        ],
+        "citations": [
+          "[AHS_neuroimaging_2020]"
+        ],
+        "criterion_id": "avoid-waste-1-order-ct-scan",
+        "rationale": "Head CT is less sensitive than MRI for migraine-relevant structural causes and is not indicated in typical migraine with aura; even when imaging is warranted, MRI is preferred",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "analyze_csf"
+          }
+        ],
+        "citations": [
+          "[ICHD_3]"
+        ],
+        "criterion_id": "avoid-waste-2-analyze-csf",
+        "rationale": "Lumbar puncture is not indicated in migraine with aura; reserve it for suspected subarachnoid haemorrhage with a normal CT or for meningitis, neither of which is present here.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "order_echocardiogram"
+          }
+        ],
+        "citations": [],
+        "criterion_id": "avoid-waste-3-order-echocardiogram",
+        "rationale": "Routine transthoracic or bubble echocardiography (PFO screening) is not indicated in migraine with aura; PFO closure did not meet its migraine end points in the MIST, PRIMA and PREMIUM trials.",
+        "severity": "waste"
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {},
+            "tool_name": "order_cardiac_monitoring"
+          }
+        ],
+        "citations": [
+          "[ICHD_3]"
+        ],
+        "criterion_id": "avoid-waste-4-order-cardiac-monitoring",
+        "rationale": "Ambulatory cardiac monitoring is not indicated in typical migraine with aura; it has a role only when cardioembolic stroke is in question.",
+        "severity": "waste"
+      }
+    ],
+    "diagnosis": {
+      "accepted": [
+        "Migraine with typical visual aura (ICHD-3 1.2.1)",
+        "migraine with aura",
+        "migraine with typical aura",
+        "classic migraine"
+      ],
+      "icd_codes": [
+        "G43.109",
+        "G43.1",
+        "G43.119",
+        "G43.909"
+      ],
+      "rejected": [
+        "migraine without aura",
+        "occipital seizure",
+        "idiopathic intracranial hypertension",
+        "IIH",
+        "tension type headache"
+      ]
+    },
+    "differential": [
+      {
+        "diagnosis": "Migraine without aura",
+        "icd_code": "G43.009",
+        "key_features": "A reproducible, stereotyped visual aura precedes every headache: this is migraine with aura.",
+        "likelihood": "low"
+      },
+      {
+        "diagnosis": "Focal occipital seizure",
+        "icd_code": "G40.109",
+        "key_features": "Aura spreading over 20-25 min is too slow for seizure propagation; no impaired awareness",
+        "likelihood": "very_low"
+      },
+      {
+        "diagnosis": "Idiopathic intracranial hypertension",
+        "icd_code": "G93.2",
+        "key_features": "No papilloedema, episodic rather than daily headache, normal BMI (21.3), normal examination.",
+        "likelihood": "very_low"
+      },
+      {
+        "diagnosis": "Tension-type headache",
+        "icd_code": "G44.2",
+        "key_features": "Severe unilateral throbbing with photophobia, phonophobia and nausea is migrainous, not tension-type",
+        "likelihood": "very_low"
+      }
+    ],
+    "key_clinical_evidence": [
+      "Classic visual aura (expanding scintillating scotoma) over 20-25 min followed by headache is the most common form of migraine aura",
+      "Routine MRI is not indicated when ICHD-3 criteria are met and the examination is normal [AHS_neuroimaging_2020]",
+      "Increasing frequency with identifiable triggers (stress, sleep, caffeine) is a treatment question, not a reason for diagnostic testing",
+      "Combined hormonal contraception is UKMEC category 4 in migraine with aura"
+    ],
+    "red_herrings": [
+      {
+        "correct_interpretation": "The attacks began at 19, years before the PhD, and are stereotyped; high caffeine intake raises attack frequency but does not change the diagnosis; address it as a modifiable trigger",
+        "data_point": "High caffeine intake (3-4 cups a day) as a possible cause of secondary headache",
+        "field_path": "patient.history_present_illness",
+        "intended_effect": "High caffeine intake can cause daily or medication-overuse headache and may distract from the migraine diagnosis",
+        "location": "patient.history_present_illness"
+      }
+    ],
+    "review_status": "draft",
+    "sequence_constraints": [],
+    "stop_rule": {
+      "max_additional_actions": 0,
+      "required_before_assessment": [
+        "action-3-perform-clinical-assessment"
+      ]
+    }
+  },
+  "initial_tool_outputs": {
+    "advanced_imaging": null,
+    "cardiac_monitoring": null,
+    "clinical_assessment": {
+      "assessment_type": "structured_headache_history_ichd3",
+      "criteria_met": {
+        "at_least_one_positive_aura_symptom": true,
+        "at_least_one_unilateral_aura_symptom": true,
+        "at_least_three_of_six_characteristics": true,
+        "at_least_two_attacks": true,
+        "aura_accompanied_or_followed_within_sixty_minutes_by_headache": true,
+        "each_symptom_lasts_five_to_sixty_minutes_motor_up_to_seventy_two_hours": true,
+        "gradual_spread_over_at_least_five_minutes": true,
+        "not_better_accounted_for_by_another_diagnosis": true,
+        "one_or_more_fully_reversible_aura_symptoms": true,
+        "two_or_more_aura_symptoms_in_succession": false
+      },
+      "findings": [
+        {
+          "element": "Attack count",
+          "result": "Stereotyped attacks since age 19: 8-10 a year, rising to about 2 a month over the past 6 months."
+        },
+        {
+          "element": "Aura type",
+          "result": "Visual only: paracentral scotoma expanding into a shimmering crescent that moves into one hemifield (either side). No sensory, speech, motor or brainstem symptoms."
+        },
+        {
+          "element": "Spread and duration",
+          "result": "Gradual expansion over 20-25 min; fully reversible."
+        },
+        {
+          "element": "Succession",
+          "result": "Single aura modality; no succession."
+        },
+        {
+          "element": "Positive symptoms",
+          "result": "Scintillating, shimmering arc."
+        },
+        {
+          "element": "Headache",
+          "result": "Unilateral throbbing headache, usually right-sided, 7/10, after the aura resolves, with nausea and photophobia; lasts 4-8 h. About 2 headache days a month now, with missed study days."
+        },
+        {
+          "element": "Triggers and treatment",
+          "result": "Stress, irregular sleep, 3-4 cups of coffee a day. Ibuprofen 400-600 mg partly effective; triptan-naive."
+        },
+        {
+          "element": "Examination today",
+          "result": "Headache-free. Normal cranial nerves, visual fields by confrontation, no papilloedema; normal power, reflexes, sensation, coordination and gait. BP 110/68 mmHg."
+        },
+        {
+          "element": "Red-flag review (SNNOOP10)",
+          "result": "Systemic symptoms or fever: absent. Neoplasia history: absent. Neurological deficit between attacks: absent. Sudden onset: absent. Onset after 50: absent (onset at 19). Pattern change: frequency increase with identifiable triggers, aura and headache character unchanged. Positional or Valsalva trigger: absent. Papilloedema: absent. Pregnancy: not reported. Aura always on the same side: absent. No red flag present."
+        }
+      ],
+      "impression": "Recurrent fully reversible visual aura with gradual spread over 20-25 min, followed by headache: meets ICHD-3 1.2.1.1 typical aura with headache (criterion C 5 of 6). Frequency rising with stress, sleep disruption and high caffeine intake. No red flag; normal examination.",
+      "pre_post_comparison": null,
+      "recommended_actions": [],
+      "scores": {
+        "ICHD-3 criterion C characteristics met": "5 of 6 (at least 3 required)",
+        "aura modalities documented": "visual",
+        "monthly headache days": "about 2, with disability"
+      }
+    },
+    "csf": null,
+    "ct": null,
+    "ecg": null,
+    "echo": null,
+    "eeg": null,
+    "labs": null,
+    "mri": null,
+    "specialized_test": null
+  },
+  "metadata": {
+    "authoring_agent": "condition-expert:MIG-AURA",
+    "case_body_concerns": [],
+    "citation_gap": [],
+    "condition_name": "Migraine with typical visual aura",
+    "criteria_pack_version": "1.0",
+    "difficulty_description": "Straightforward: classic expanding visual aura over 20-25 min followed by headache, 5-year history, strong family history, normal examination; ICHD-3 criteria met without imaging",
+    "difficulty_rationale": "Straightforward: classic visual aura, young patient, no red flags; increasing frequency is a treatment question, not a diagnostic puzzle",
+    "expected_agent_confidence": 0.88,
+    "fallback_tool_kinds": {
+      "cardiac_monitoring": "normal",
+      "csf": "normal",
+      "ct": "incidental",
+      "echo": "normal"
+    },
+    "last_revised": "2026-08-10",
+    "policy_spec_status": "draft",
+    "revision_reason": "independent migraine review: corrected 3-of-6 ICHD-3 assessment, removed authored routine tests, retained explicit red-flag exceptions",
+    "version": "policy-v1",
+    "vocab_gap": []
+  },
+  "patient": {
+    "age": 24,
+    "chief_complaint": "Recurrent visual aura with headache since college, now increasing in frequency",
+    "clinical_history": {
+      "allergies": [
+        "No known drug allergies"
+      ],
+      "family_history": [
+        "Mother and maternal grandmother both had migraines (visual aura pattern); no family history of stroke or migraine with motor weakness"
+      ],
+      "medications": [
+        {
+          "dose": "400-600 mg",
+          "drug": "Ibuprofen",
+          "frequency": "as needed for headache",
+          "indication": "Migraine \u2014 partial effect"
+        }
+      ],
+      "past_medical_history": [],
+      "social_history": {
+        "note": "PhD candidate (computational biology); non-smoker; 3-4 cups coffee daily; social alcohol; no illicit drugs"
+      }
+    },
+    "demographics": {
+      "age": 24,
+      "bmi": 21.3,
+      "height_cm": 162,
+      "sex": "female",
+      "weight_kg": 55.9
+    },
+    "ethnicity": "East Asian",
+    "history_present_illness": "A 24-year-old Chinese-American woman presented to the neurology clinic for evaluation of recurrent headaches with visual phenomena that started at age 19. Until recently she had approximately 8-10 attacks per year. Each begins with a small blind spot near the center of her vision that gradually expands over 20-25 minutes into a bright, shimmering, crescent-shaped arc that sweeps into the periphery of one side of her vision (either side) and then disappears. Following the resolution of the visual phenomenon, she develops a moderate-to-severe unilateral throbbing headache (typically right-sided, 7/10 intensity) with nausea and sensitivity to light, lasting 4-8 hours. She has missed several days of university and now graduate school due to these headaches.\n\nShe notes an increase in attack frequency to about two a month since starting her PhD program 6 months ago, attributing it to stress, irregular sleep, and frequent caffeine intake (3-4 cups coffee daily). Her mother and maternal grandmother both had migraines throughout their reproductive years. She takes over-the-counter ibuprofen which gives partial relief. She has not tried triptans. She is not on oral contraceptives. She had a normal physical examination with her university health provider 4 months ago. She denies any limb weakness, numbness, speech difficulty, loss of consciousness, or any episodes that differ from her typical pattern.",
+    "hpi": "A 24-year-old Chinese-American woman presented to the neurology clinic for evaluation of recurrent headaches with visual phenomena that started at age 19. Until recently she had approximately 8-10 attacks per year. Each begins with a small blind spot near the center of her vision that gradually expands over 20-25 minutes into a bright, shimmering, crescent-shaped arc that sweeps into the periphery of one side of her vision (either side) and then disappears. Following the resolution of the visual phenomenon, she develops a moderate-to-severe unilateral throbbing headache (typically right-sided, 7/10 intensity) with nausea and sensitivity to light, lasting 4-8 hours. She has missed several days of university and now graduate school due to these headaches.\n\nShe notes an increase in attack frequency to about two a month since starting her PhD program 6 months ago, attributing it to stress, irregular sleep, and frequent caffeine intake (3-4 cups coffee daily). Her mother and maternal grandmother both had migraines throughout their reproductive years. She takes over-the-counter ibuprofen which gives partial relief. She has not tried triptans. She is not on oral contraceptives. She had a normal physical examination with her university health provider 4 months ago. She denies any limb weakness, numbness, speech difficulty, loss of consciousness, or any episodes that differ from her typical pattern.",
+    "neurological_exam": {
+      "coordination": "Finger-nose and heel-shin normal bilaterally.",
+      "cranial_nerves": "Normal cranial nerves. Visual fields full by confrontation. PERRLA. No papilledema.",
+      "gait": "Normal gait. Romberg negative.",
+      "mental_status": "Alert; oriented. Normal cognition.",
+      "motor": "Motor strength 5/5 throughout. No pronator drift.",
+      "reflexes": "DTR 2+ symmetric. Plantar responses flexor bilaterally.",
+      "sensory": "Sensation intact to light touch and pinprick throughout."
+    },
+    "patient_id": "UNKNOWN",
+    "physical_exam": {
+      "abdomen": "Soft",
+      "cardiovascular": "Regular rate and rhythm; no murmurs",
+      "extremities": "No edema",
+      "general": "Well-appearing young woman; headache-free at this appointment",
+      "neurological": "Alert; oriented. Normal cranial nerves. Visual fields full by confrontation. PERRLA. No papilledema. Motor 5/5. DTR 2+ symmetric. Sensation intact. Coordination normal. Gait normal.",
+      "respiratory": "Clear"
+    },
+    "pmh": [
+      "No significant medical history",
+      "No prior neurological diagnosis"
+    ],
+    "sex": "female",
+    "vitals": {
+      "bp_diastolic": 68,
+      "bp_systolic": 110,
+      "hr": 72,
+      "rr": 13,
+      "spo2": 99,
+      "temp": 36.6
+    }
+  },
+  "schema_version": "2.0"
+}

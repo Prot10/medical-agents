@@ -177,24 +177,72 @@ def test_agent_codes_are_left_out_of_the_dataset_review_admin_views(app):
 # ── The case set ────────────────────────────────────────────────────────────────────────────
 
 
-def test_synthetic_set_is_the_declared_draw_frozen_from_the_test_split(app):
-    section = app.state.agent_mode.sections["synthetic"]
-    dataset = DATASETS["neurobench"].path
-    test_split = set(split_case_ids(dataset, "test"))
-    assert set(section.case_ids) <= test_split
-    conditions = [section.cases[case_id].condition.value for case_id in section.case_ids]
-    assert set(Counter(conditions).values()) == {2}
-    assert all(a != b for a, b in zip(conditions, conditions[1:])), "neighbours must not share a condition"
-    # The frozen copies are byte-identical to the corrected cases they were taken from.
-    frozen = REPO_ROOT / "data/review/sets" / section.set_id / "cases"
-    assert sorted(p.stem for p in frozen.glob("*.json")) == sorted(section.case_ids)
-    # The file records its own rule: the draw script reproduces the list from the seed.
-    spec = importlib.util.spec_from_file_location("draw", REPO_ROOT / "agent-platform/scripts/review/draw_agent_mode_set.py")
+def _script(name: str):
+    spec = importlib.util.spec_from_file_location(name, REPO_ROOT / "agent-platform/scripts/review" / f"{name}.py")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
+    return module
+
+
+def test_synthetic_set_is_the_declared_draw_one_case_per_condition(app):
+    section = app.state.agent_mode.sections["synthetic"]
+    dataset = DATASETS["neurobench"].path
     all_cases = app.state.all_datasets["neurobench"][1]
-    drawn = module.draw({c: all_cases[c].condition.value for c in test_split}, 2, 20261125)
+    assert section.set_id == "agent-synthetic-2026-11-v2" and len(section.case_ids) == 20
+    conditions = [section.cases[case_id].condition.value for case_id in section.case_ids]
+    assert sorted(conditions) == sorted({case.condition.value for case in all_cases.values()})  # all 20, once each
+    # The order follows no grouping a physician could read: not the conditions' order, not the ids'.
+    assert conditions != sorted(conditions) and list(section.case_ids) != sorted(section.case_ids)
+    # The file records its own rule: the draw script reproduces the list from the seed.
+    module = _script("draw_agent_mode_set")
+    pool = module.pool(dataset, "all")
+    assert len(pool) == 598 and set(pool) == {c for split in ("train", "validation", "test") for c in split_case_ids(dataset, split)}
+    drawn = module.draw({c: all_cases[c].condition.value for c in pool}, 1, 20261125)
     assert tuple(drawn) == section.case_ids
+    # The frozen copies are the listed cases, and the manifest holds their hashes.
+    set_dir = REPO_ROOT / "data/review/sets" / section.set_id
+    manifest = json.loads((set_dir / "manifest.json").read_text())
+    assert manifest["per_case"] == dict(sorted(section.case_sha256.items())) == module.set_hashes(set_dir / "cases")
+    assert not (REPO_ROOT / "data/review/sets/agent-synthetic-2026-11").exists()  # the 8-case set is gone
+
+
+def test_frozen_set_is_refreshed_from_corrected_cases_without_changing_its_cases(tmp_path):
+    """Corrections made after the draw are taken in by re-copying the same case ids; once a
+    physician has a record for the set, the refresh is refused."""
+    module = _script("draw_agent_mode_set")
+    source, sets_dir, records = tmp_path / "source", tmp_path / "sets", tmp_path / "records"
+    cases_dir = sets_dir / "demo-set" / "cases"
+    source.mkdir()
+    cases_dir.mkdir(parents=True)
+    for case_id in ("A-S01", "B-S01", "C-S01"):
+        (source / f"{case_id}.json").write_text(json.dumps({"case_id": case_id, "v": 1}))
+    for case_id in ("A-S01", "B-S01"):
+        (cases_dir / f"{case_id}.json").write_text(json.dumps({"case_id": case_id, "v": 1}))
+    first = module.write_manifest(cases_dir.parent, set_id="demo-set", action="draw")
+    (source / "B-S01.json").write_text(json.dumps({"case_id": "B-S01", "v": 2}))  # corrected later
+
+    result = module.refresh("demo-set", source=source, sets_dir=sets_dir, records_root=records)
+    assert result["changed"] == ["B-S01"] and result["cases"] == 2
+    assert sorted(p.stem for p in cases_dir.glob("*.json")) == ["A-S01", "B-S01"]  # same cases, C never enters
+    assert json.loads((cases_dir / "B-S01.json").read_text())["v"] == 2
+    manifest = json.loads((cases_dir.parent / "manifest.json").read_text())
+    assert manifest["action"] == "refresh" and manifest["cases_sha256"] == result["cases_sha256"] != first["cases_sha256"]
+    assert manifest["per_case"]["A-S01"] == first["per_case"]["A-S01"]
+
+    record = records / "synthetic" / "demo-set" / "phys-01" / "A-S01.json"
+    record.parent.mkdir(parents=True)
+    record.write_text("{}")
+    record.with_suffix(".events.jsonl").write_text("")
+    (source / "A-S01.json").write_text(json.dumps({"case_id": "A-S01", "v": 3}))
+    with pytest.raises(SystemExit, match="1 physician record"):
+        module.refresh("demo-set", source=source, sets_dir=sets_dir, records_root=records)
+    assert json.loads((cases_dir / "A-S01.json").read_text())["v"] == 1
+    assert module.refresh("demo-set", source=source, sets_dir=sets_dir, records_root=records, force=True)["changed"] == ["A-S01"]
+    (source / "B-S01.json").unlink()
+    with pytest.raises(SystemExit, match="no longer in"):
+        module.refresh("demo-set", source=source, sets_dir=sets_dir, records_root=records, force=True)
+    with pytest.raises(SystemExit, match="no frozen set"):
+        module.refresh("other-set", source=source, sets_dir=sets_dir, records_root=records)
 
 
 def test_limits_are_those_of_the_checked_policy_profile(app):
@@ -423,9 +471,9 @@ def test_cases_reviewed_under_a_linked_code_are_skipped(app):
     (app.state.annotations_dir / "neurobench" / REVIEWER).mkdir(parents=True)
     (app.state.annotations_dir / "neurobench" / REVIEWER / f"{section.case_ids[2]}.json").write_text("{}")
     linked = _client(app, AGENT_LINKED).get(SYNTH).json()
-    assert [c["number"] for c in linked["cases"]] == [2, 4, 5, 6, 7, 8] and linked["current"] == 2
+    assert [c["number"] for c in linked["cases"]] == [2, *range(4, 21)] and linked["current"] == 2
     assert _client(app, AGENT_LINKED).post(f"{SYNTH}/cases/1/start").status_code == 409
-    assert len(_client(app, AGENT).get(SYNTH).json()["cases"]) == 8
+    assert len(_client(app, AGENT).get(SYNTH).json()["cases"]) == 20
 
 
 # ── Storage ─────────────────────────────────────────────────────────────────────────────────
@@ -464,7 +512,7 @@ def test_record_is_a_benchmark_episode_with_physician_data_and_provenance(app):
 
     provenance = record.provenance
     assert provenance["case"]["file_sha256"] == section.case_sha256[case.case_id]
-    assert provenance["set"] == {"section": "synthetic", "id": section.set_id, "sha256": section.set_sha256, "cases": 8}
+    assert provenance["set"] == {"section": "synthetic", "id": section.set_id, "sha256": section.set_sha256, "cases": 20}
     assert provenance["profile"]["limits_from"] == "policy-qwen3.5-9b" and provenance["profile"]["max_turns"] == 12
     assert set(provenance["agent_facing"]) == {"system_prompt_sha256", "presentation_sha256", "catalogue_sha256", "tools", "show_step_budget"}
     assert provenance["app"]["version"] and "commit" in provenance["app"]["git"]
@@ -490,7 +538,7 @@ def test_admin_sees_progress_and_the_reward_from_the_same_scorer(app):
     (section,) = overview["sections"]
     people = {row["reviewer_id"]: row for row in section["reviewers"]}
     assert people["phys-synth"] | {"name": "Dr Synthetic"} == {
-        "reviewer_id": "phys-synth", "name": "Dr Synthetic", "active": True, "assigned": 8, "done": 1, "failed": 0, "in_progress": 1,
+        "reviewer_id": "phys-synth", "name": "Dr Synthetic", "active": True, "assigned": 20, "done": 1, "failed": 0, "in_progress": 1,
     }
     assert people["phys-both"]["done"] == 0
     finished, open_case = section["episodes"]
@@ -517,9 +565,7 @@ def test_export_writes_a_benchmark_run_folder_per_physician(app, tmp_path):
     state = client.post(f"{SYNTH}/cases/1/start").json()
     state = _send(client, state, "interpret_labs", LABS).json()
     _send(client, state, "submit_assessment", ASSESSMENT, "reasoning")
-    spec = importlib.util.spec_from_file_location("export", REPO_ROOT / "agent-platform/scripts/review/export_physician_episodes.py")
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
+    module = _script("export_physician_episodes")
     section = app.state.agent_mode.sections["synthetic"]
     with pytest.raises(ValueError):  # draft policies need the explicit flag, as in the benchmark
         module.export_section(section, tmp_path / "strict", limits={}, allow_draft=False)
@@ -600,9 +646,7 @@ def test_mimic_section_served_from_the_configured_directories_only(tmp_path, mon
     assert admin.get("/api/v1/admin/agent-mode/sections/mimic/reviewers/phys-both/cases/1").json()["case_id"] == case.case_id
     assert admin.get("/api/v1/admin/agent-mode/sections/synthetic/reviewers/phys-both/cases/1").json()["case_id"] == synthetic.case_ids[0]
 
-    spec = importlib.util.spec_from_file_location("export", REPO_ROOT / "agent-platform/scripts/review/export_physician_episodes.py")
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
+    module = _script("export_physician_episodes")
     # The MIMIC export goes only where the command line says, and never inside the repository.
     with pytest.raises(SystemExit, match="never written inside the repository"):
         module.export_section(section, REPO_ROOT / "outputs" / "physicians-mimic", limits={}, allow_draft=True)
@@ -628,6 +672,93 @@ def test_vps_deployment_keeps_mimic_outside_the_repo_tree():
     push = (hostinger / "push-mimic-cases.sh").read_text()
     assert 'REMOTE_ROOT="/home/${VPS_USER}/mimic-agent-mode"' in push and "medical-agents" not in push
     assert "/eos/" not in push, "the source folder is an argument, never a path written in the repo"
+    # Only the drawn cases leave EOS: the copy sends the files the draw listed, nothing else.
+    assert "draw_mimic_set.py" in push and "--files-from=-" in push
+    assert not [line for line in push.splitlines() if "rsync" in line and "--include" in line]
+    assert "REVIEW_AGENT_MIMIC_CASE_LIST=$REMOTE_ROOT/case-list.txt" in push
+
+
+MIMIC_COUNTS = {"ISCH": 38, "MS": 22, "SAH": 12, "HEP": 10, "SE": 9, "GBS": 3, "FND": 2, "FEPI": 2, "BACT": 2}
+MIMIC_DRAW = {"ISCH": 6, "MS": 4, "SAH": 2, "HEP": 2, "SE": 2, "GBS": 1, "FND": 1, "FEPI": 1, "BACT": 1}
+
+
+def _fake_hundred(folder: Path) -> dict[str, str]:
+    """A folder shaped like the final 100: stand-in files holding a case id and a condition."""
+    folder.mkdir(parents=True)
+    conditions = {}
+    for condition, size in MIMIC_COUNTS.items():
+        for index in range(size):
+            case_id = f"STANDIN-{condition}-{index:03d}"
+            conditions[case_id] = condition
+            (folder / f"{case_id}.json").write_text(json.dumps({"case_id": case_id, "condition": condition, "text": "PRIVATE"}))
+    return conditions
+
+
+def test_mimic_draw_is_stratified_by_condition_and_computed_from_the_cases(tmp_path, capsys):
+    """One per condition present, the rest in proportion by largest remainder, then seeded draws.
+    Run on a fake 100-case folder of stand-ins with the counts of the final cases."""
+    module = _script("draw_mimic_set")
+    conditions = _fake_hundred(tmp_path / "final")
+    assert module.allocate(MIMIC_COUNTS, 20) == MIMIC_DRAW
+    # Computed, not written down: other folders give other allocations, never more than a condition has.
+    assert module.allocate({"A": 1, "B": 1, "C": 30}, 20) == {"A": 1, "B": 1, "C": 18}
+    assert module.allocate({"A": 50, "B": 50}, 20) == {"A": 10, "B": 10}
+    assert module.allocate({"A": 2, "B": 2}, 4) == {"A": 2, "B": 2}
+    with pytest.raises(ValueError):
+        module.allocate({"A": 5, "B": 5, "C": 5}, 2)
+
+    lists = [tmp_path / "list.txt", tmp_path / "copy.txt"]
+    assert module.main([str(tmp_path / "final"), "--seed", "20261125", "--write", str(lists[0]), "--write", str(lists[1])]) == 0
+    drawn = lists[0].read_text().split()
+    assert lists[1].read_text() == lists[0].read_text()
+    assert len(drawn) == len(set(drawn)) == 20 and set(drawn) <= set(conditions)
+    assert Counter(conditions[case_id] for case_id in drawn) == MIMIC_DRAW
+    order = [conditions[case_id] for case_id in drawn]
+    assert order != sorted(order)  # not grouped by condition
+    # Same seed, same set; another seed, another set with the same allocation.
+    assert module.draw(conditions, 20, 20261125)[0] == drawn
+    other, allocation = module.draw(conditions, 20, 7)
+    assert other != drawn and allocation == MIMIC_DRAW
+    # Only counts per condition are printed: no case id, no case text.
+    printed = capsys.readouterr().out
+    assert "ISCH" in printed and "6 of 38" in printed
+    assert "STANDIN-" not in printed and "PRIVATE" not in printed
+
+    (tmp_path / "final" / "odd.json").write_text(json.dumps({"case_id": "SOMETHING-ELSE", "condition": "MS"}))
+    assert module.main([str(tmp_path / "final"), "--seed", "1"]) == 1
+    assert "odd" not in capsys.readouterr().err
+
+
+def test_push_script_dry_run_draws_and_prints_counts_only(tmp_path):
+    """The script's own path up to the copy, on the stand-in folder: it draws, prints counts per
+    condition, writes nothing and contacts no server."""
+    import subprocess
+
+    _fake_hundred(tmp_path / "eos" / "final")
+    script = REPO_ROOT / "deployment" / "hostinger" / "push-mimic-cases.sh"
+    run = subprocess.run(["bash", str(script), "--dry-run", str(tmp_path / "eos" / "final")],
+                         capture_output=True, text=True, env={"PATH": "/usr/bin:/bin", "VPS_HOST": "unreachable.invalid"})
+    assert run.returncode == 0, run.stderr
+    assert "6 of 38" in run.stdout and "Dry run: nothing written, nothing copied" in run.stdout
+    assert "STANDIN-" not in run.stdout + run.stderr and "PRIVATE" not in run.stdout + run.stderr
+    assert sorted(p.name for p in (tmp_path / "eos").iterdir()) == ["final"]  # no list written
+    (tmp_path / "eos" / "final" / "STANDIN-MS-000.json").unlink()
+    run = subprocess.run(["bash", str(script), "--dry-run", str(tmp_path / "eos" / "final")],
+                         capture_output=True, text=True, env={"PATH": "/usr/bin:/bin"})
+    assert run.returncode == 1 and "99 (expected 100)" in run.stdout
+
+
+def test_mimic_section_serves_the_drawn_list_in_its_order(tmp_path, monkeypatch):
+    cases = _stand_in_record_cases(tmp_path / "mimic-cases")
+    case_list = tmp_path / "case-list.txt"
+    case_list.write_text("MG-S03\nSAH-M01\n")  # two of the three files, in the drawn order
+    env = {"REVIEW_AGENT_MIMIC_CASES_DIR": str(cases), "REVIEW_AGENT_MIMIC_LOG_DIR": str(tmp_path / "logs"),
+           "REVIEW_AGENT_MIMIC_CASE_LIST": str(case_list)}
+    section = load_agent_mode(AGENT_MODE_SETS_PATH, records_root=tmp_path, env=env).sections["mimic"]
+    assert section.case_ids == ("MG-S03", "SAH-M01")
+    case_list.write_text("MG-S03\nNOT-THERE\n")
+    with pytest.raises(ValueError, match="1 unknown"):
+        load_agent_mode(AGENT_MODE_SETS_PATH, records_root=tmp_path, env=env)
 
 
 def test_mimic_directories_inside_the_repository_are_refused(tmp_path):
