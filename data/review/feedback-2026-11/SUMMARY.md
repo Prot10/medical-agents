@@ -72,3 +72,33 @@ Agreement cannot be measured as planned: R1 did not submit verdicts, the two rev
 versions, and R2's ISCH-STR notes are mostly case comments (85 of 97) while R1's are field notes. Two R1 notes on
 ISCH-STR-P01 repeat the ISCH-STR-M05 text word for word, including a clopidogrel-omeprazole
 interaction although P01 has no omeprazole, so some notes were templated.
+
+## Agreement on ISCH-STR (computed 25 Nov)
+
+`bin/agreement.py` on the 20 cases where R1 left notes (RS02 has none). Every note of both
+reviewers on them (R1 54, R2 73 from September) was given one policy dimension and a short issue
+label, and pairs raising the same problem on the same case were matched, by a subagent reading
+the notes (`notes/ischstr_classified.json`, gitignored; spot-checked). Caveat for every number:
+the two reviews saw different versions (R2 the September cases, R1 the October-corrected ones,
+where all 73 R2 notes had been ruled FIXED), so this measures agreement on what is wrong across
+two rounds, not two independent reads of one case.
+
+| Level | Agreement | Cohen kappa | Gwet AC1 | PABAK |
+|---|---|---|---|---|
+| Case verdict (needs changes vs approved; unsubmitted cases with an `error` count as needs changes) | 19/20 = 0.95 | 0.00 | 0.95 | 0.90 |
+| Case x dimension, pooled (140) | 0.66 | 0.24 | 0.40 | 0.33 |
+| Issue (same problem, same case) | 13 matches; Dice 0.21 | | | |
+
+Kappa is 0 on the verdict because R1 flags every case (prevalence paradox); AC1 and PABAK are
+the meaningful figures there. Per dimension the reviewers look at different things: R2 flags
+scenario plausibility (NIHSS, labs, history) in 17/20 cases and R1 in 4; R1 flags the stop rule in
+12/20 and R2 in 1; both flag the assessment (musts, treatment decisions) in 13/20. Actions
+(kappa 0.43) and avoided actions (0.64) agree best; scenario and stopping do not agree (AC1 -0.50
+and 0.02).
+
+Of the 13 matched issues, about 6 have R1 objecting to the October fix of R2's note (RNF213
+testing, IVT in moyamoya, apixaban, intradural V4, CTA in pregnancy, CHA2DS2-VASc), so the
+reviewers agree on where the problem is but not on the answer. The other 7 (extended-window
+imaging in M01/M02, etiological work-up gating the acute decision, echo before EVT, dissection
+without infarct filed under ISCH-STR, antiphospholipid panel) agree on both. R1's dysphagia
+(10 cases), LDL target (5) and airway notes have no R2 counterpart.
