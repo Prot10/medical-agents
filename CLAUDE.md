@@ -175,3 +175,17 @@ admin role unlocks aggregate endpoints under `/api/v1/admin/...`. Annotation sto
 per (reviewer, version, case). `review_api/services/policy_eligibility.py` implements the
 approval rule (two independent all-dimension approvals, no unresolved errors, third reviewer on
 disagreement). Tabs: Overview / Cases / Methodology / Admin.
+
+Agent mode (`agent-platform/docs/review-agent-mode.md`): a second study in the same app, in which
+a physician works a case as the agent does. A code with `sections: [agent_synthetic]` (and/or
+`agent_mimic`) opens only that; `review_api/services/agent_mode/engine.py` replays the policy
+loop with the physician's actions, so nothing agent-facing is re-implemented. Sets are in
+`config/review/agent_mode_sets.yaml` (20 cases per section: synthetic one per condition, frozen in
+`data/review/sets/agent-synthetic-2026-11-v2`, refreshed after case corrections with
+`scripts/review/draw_agent_mode_set.py --refresh`; MIMIC 20 of the final 100, stratified by
+condition), records in `data/review/agent-mode/` (gitignored). The
+MIMIC section exists only when `REVIEW_AGENT_MIMIC_CASES_DIR` and `REVIEW_AGENT_MIMIC_LOG_DIR`
+are set; both must be outside the repo tree. On the review VPS (decided 25 Nov 2026) they are
+under `/home/neuroreview/mimic-agent-mode/`, filled by `deployment/hostinger/push-mimic-cases.sh`
+(draws the 20 and copies only those; run from rockhopper or lxplus), and its records stay apart from the
+synthetic ones.

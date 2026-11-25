@@ -15,6 +15,12 @@ WorkingDirectory=/home/neuroreview/medical-agents
 # the venv is already populated. Refresh deps with `uv sync` before restart.
 ExecStart=/home/neuroreview/medical-agents/.venv/bin/uvicorn neuroagent.review_api.app:app --host 127.0.0.1 --port 8889
 
+# Agent mode, MIMIC section. The file sets REVIEW_AGENT_MIMIC_CASES_DIR and
+# REVIEW_AGENT_MIMIC_LOG_DIR (both under /home/neuroreview/mimic-agent-mode, outside the repo
+# tree, so a deploy never touches them). It is written by push-mimic-cases.sh once the cases are
+# in place; while it is absent ("-" prefix) the section simply does not exist.
+EnvironmentFile=-/home/neuroreview/mimic-agent-mode/agent-mode.env
+
 Restart=always
 RestartSec=5
 StandardOutput=journal
@@ -25,6 +31,9 @@ NoNewPrivileges=true
 ProtectSystem=strict
 ProtectHome=read-only
 ReadWritePaths=/home/neuroreview/medical-agents/data
+# The MIMIC records directory, the only other place the app writes ("-": ignored until it exists).
+# The MIMIC cases directory stays read-only under ProtectHome.
+ReadWritePaths=-/home/neuroreview/mimic-agent-mode/records
 PrivateTmp=true
 ProtectKernelTunables=true
 ProtectKernelModules=true

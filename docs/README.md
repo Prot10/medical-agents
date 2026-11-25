@@ -11,6 +11,7 @@ Start with the repository `README.md` and the executable contract in
 | `agent-platform/docs/clinical-policy-harness.md` | Runtime, profiles, reward, review and experiments |
 | `agent-platform/docs/models.md` | Fixed model panel and vLLM serving |
 | `agent-platform/docs/web-api.md` | Runs, episodes and model endpoints |
+| `agent-platform/docs/review-agent-mode.md` | Review app, agent mode: physicians work a case as the agent does (codes, sections, storage, MIMIC) |
 | `agent-platform/docs/tools.md` | Clinical tool contracts |
 | `agent-platform/docs/hospital-rules.md` | Hospital policy configuration |
 | `agent-platform/docs/patient-data.md` | Patient and case data handling |

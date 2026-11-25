@@ -34,9 +34,11 @@ The same nginx serves Kosmico (`web.kosmico.ai`, `api.kosmico.ai`) and the revie
 
 Pipeline: build `web-review/dist` locally → rsync code + data + dist → `uv sync` on VPS → `systemctl restart neurobench-review` → smoke-test the public URL.
 
-### What ships (review-API only)
+### What ships
 
-The deploy script ships **only** the parts of the repo `review_api` imports at runtime — never the agent platform, training, evaluation, or LLM-client code:
+The deploy script ships **only** the parts of the repo `review_api` imports at runtime. Since agent mode (`agent-platform/docs/review-agent-mode.md`) that includes the benchmark harness it drives; training, the run API and the agent platform stay off the VPS, and no model is called from it:
+
+- `agent-platform/src/neuroagent/{harness,tools,evaluation,llm}/` + `model_registry.py`, `agent-platform/config/profiles/`, `agent-platform/config/tools/fallback_library.yaml` — the harness, MockServer and reward that agent mode uses
 
 - `agent-platform/src/neuroagent/__init__.py` + `agent-platform/src/neuroagent/review_api/` — the review backend
 - `agent-platform/pyproject.toml` — workspace member manifest
@@ -48,7 +50,7 @@ The deploy script ships **only** the parts of the repo `review_api` imports at r
 - `data/neurobench/` — 600 benchmark cases
 - `web-review/dist/` — built static frontend
 
-VPS footprint after a deploy: ~26 MB total (mostly the NeuroBench dataset). The script **never deletes** `data/review/annotations/` or `data/review/backups/` — reviewer data and snapshots are server-owned.
+VPS footprint after a deploy: ~26 MB total (mostly the NeuroBench dataset). The script **never deletes** `data/review/annotations/`, `data/review/agent-mode/` or `data/review/backups/` — reviewer data and snapshots are server-owned.
 
 ### Flags
 
@@ -140,7 +142,7 @@ ssh hostinger 'pm2 status'
 
 ## Backups
 
-`data/review/annotations/` (case reviews) and `data/review/tool_reviews/` (tool-output reviews) are the only state worth preserving — the schema files come from the deploy and the case fleet is in git. A systemd timer snapshots both on the VPS, and the Mac pulls the snapshots every day.
+`data/review/annotations/` (case reviews), `data/review/tool_reviews/` (tool-output reviews) and `data/review/agent-mode/` (physicians' agent-mode records) are the only state worth preserving — the schema files come from the deploy and the case fleet is in git. A systemd timer snapshots them on the VPS, and the Mac pulls the snapshots every day.
 
 ### Schedule
 
@@ -148,7 +150,7 @@ ssh hostinger 'pm2 status'
 
 ### What it does
 
-`/home/neuroreview/bin/backup-annotations.sh` tars `data/review/annotations/` and `data/review/tool_reviews/` into `data/review/backups/review-data-YYYY-MM-DD.tar.gz`, and refuses to publish an archive that does not hold every file on disk. Snapshots made before 21 Oct 2026 are named `annotations-YYYY-MM-DD.tar.gz` and hold annotations only. Tarballs older than **365 days** are pruned automatically (override with `KEEP_DAYS=N` in the systemd unit's `Environment=` if needed). At ~3 MB per worst-case tarball that's ~1 GB of disk over a full year — negligible against 45 GB free.
+`/home/neuroreview/bin/backup-annotations.sh` tars `data/review/annotations/`, `data/review/tool_reviews/` and `data/review/agent-mode/` into `data/review/backups/review-data-YYYY-MM-DD.tar.gz`, and refuses to publish an archive that does not hold every file on disk. Snapshots made before 21 Oct 2026 are named `annotations-YYYY-MM-DD.tar.gz` and hold annotations only. Tarballs older than **365 days** are pruned automatically (override with `KEEP_DAYS=N` in the systemd unit's `Environment=` if needed). At ~3 MB per worst-case tarball that's ~1 GB of disk over a full year — negligible against 45 GB free.
 
 The script is atomic (`.tar.gz.tmp` → `mv` rename) and idempotent — running it twice on the same day overwrites that day's snapshot rather than failing.
 
@@ -202,3 +204,56 @@ launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.andreaprotani.neurob
 launchctl kickstart gui/$(id -u)/com.andreaprotani.neurobench-review-backups
 tail -3 ~/Backups/neurobench-review-backups/pull.log
 ```
+
+## Agent mode on the VPS
+
+Both sections of agent mode (`agent-platform/docs/review-agent-mode.md`) are served by the same service.
+
+### Synthetic section
+
+Served once deployed. Add the physicians' codes (`sections: [agent_synthetic]`) to `reviewer_codes.yaml` and push it with `--force-codes`. After the first deploy that includes agent mode, reinstall the backup script so that `data/review/agent-mode/` is in the daily snapshot:
+
+```bash
+scp deployment/hostinger/backup-annotations.sh hostinger:/home/neuroreview/bin/backup-annotations.sh
+```
+
+### MIMIC section
+
+Decided by Andrea on 25 Nov 2026: the MIMIC section runs here too, with 20 of the final 100 processed benchmark cases. Never raw MIMIC data; the 80 cases that are not drawn never leave EOS. Everything lives **outside the repo tree**:
+
+```
+/home/neuroreview/mimic-agent-mode/cases/           the 20 drawn case JSON files (read-only for the app)
+/home/neuroreview/mimic-agent-mode/case-list.txt    their ids, in the order they are served
+/home/neuroreview/mimic-agent-mode/records/         physicians' MIMIC records (the only path the app writes there)
+/home/neuroreview/mimic-agent-mode/agent-mode.env   the three REVIEW_AGENT_MIMIC_* variables
+```
+
+`deploy.sh` only ever writes under `/home/neuroreview/medical-agents`, so it never syncs, overwrites or deletes these, and they never enter git. The app refuses to start the section from a path inside the repo.
+
+To enable it:
+
+```bash
+# 1. Once: install the unit that reads agent-mode.env and may write the records directory.
+scp deployment/hostinger/neurobench-review.service hostinger:/etc/systemd/system/neurobench-review.service
+ssh hostinger 'systemctl daemon-reload'
+
+# 2. From rockhopper or lxplus (EOS mounted; never from the Mac, so the cases never touch its disk),
+#    in a checkout of this repo:
+deployment/hostinger/push-mimic-cases.sh --dry-run <EOS folder of the final 100 cases>   # counts per condition only
+deployment/hostinger/push-mimic-cases.sh <EOS folder of the final 100 cases>
+```
+
+What the script does:
+
+1. Refuses a folder that does not hold exactly 100 case files (`EXPECTED=N` to override), and refuses to run on macOS.
+2. Draws the set with `agent-platform/scripts/review/draw_mimic_set.py` (plain `python3`, seed `SEED=20261125`, `DRAW=20`): stratified by condition, one case per condition present, the remaining slots in proportion to what each condition has left by largest remainder, a seeded draw within each condition, a seeded random order. It reads only each case's id and condition, and prints only how many cases each condition gives (expected for the final 100: ISCH 6, MS 4, SAH 2, HEP 2, SE 2, GBS 1, FND 1, FEPI 1, BACT 1). No case id or text is printed.
+3. Writes the 20 ids to `agent-mode-mimic-set.txt` next to the source folder on EOS, and refuses a later run that would draw a different set (`FORCE=1` to replace it).
+4. Copies only those 20 files straight from EOS to the VPS over SSH, with the list as `case-list.txt`, writes `agent-mode.env`, sets owner and modes (700/600) and restarts the service.
+
+It needs an SSH destination that logs in as root on the VPS: the `hostinger` alias, or `VPS_HOST=root@<address>`. Once a physician has a MIMIC record it refuses to change the case set (`FORCE=1` to override).
+
+To add MIMIC codes, add rows with `sections: [agent_mimic]` (or `[agent_synthetic, agent_mimic]`) and an `id` to `reviewer_codes.yaml`, only for physicians credentialed on PhysioNet, and push with `./deployment/hostinger/deploy.sh --force-codes`. A code without `agent_mimic` gets 404 on the section.
+
+To disable the section: `ssh hostinger 'rm /home/neuroreview/mimic-agent-mode/agent-mode.env && systemctl restart neurobench-review'` (cases and records stay).
+
+MIMIC records are **not** in the daily snapshot: that archive is pulled to the Mac, and the records hold record-derived text. They stay on the VPS only; export them there with `export_physician_episodes.py --section mimic --output <path outside the repo>`.

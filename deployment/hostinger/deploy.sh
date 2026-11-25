@@ -15,7 +15,10 @@ set -euo pipefail
 # the VPS minimal):
 #   - agent-platform/src/neuroagent/__init__.py .......... package marker
 #   - agent-platform/src/neuroagent/datasets.py .......... shared dataset registry (review_api imports it)
-#   - agent-platform/src/neuroagent/review_api/ .......... the only runtime code
+#   - agent-platform/src/neuroagent/review_api/ .......... the review backend
+#   - agent-platform/src/neuroagent/{harness,tools,evaluation,llm}/ + model_registry.py
+#                                                          the benchmark harness that agent mode drives
+#   - agent-platform/config/profiles/, config/tools/fallback_library.yaml ... its configuration
 #   - agent-platform/pyproject.toml ...................... workspace member manifest
 #   - agent-platform/config/review/ ...................... reviewer-config dir
 #   - agent-platform/config/tools/costs.yaml ............. tool catalog cost summaries
@@ -29,6 +32,10 @@ set -euo pipefail
 #
 # What this script never touches on the VPS:
 #   - data/review/annotations/ . reviewer-produced data, server-owned (never --delete'd)
+#   - data/review/agent-mode/ .. physicians' agent-mode records, server-owned
+#   - /home/neuroreview/mimic-agent-mode/ ... MIMIC cases and records of agent mode: outside
+#                                the repo tree on purpose, so nothing here syncs, chowns or deletes them
+#                                (push-mimic-cases.sh copies the cases, from rockhopper or lxplus)
 #   - data/review/backups/ ..... daily snapshots from the backup timer
 #   - .venv/, node_modules/ .... installed on the VPS, never synced
 #   - reviewer_codes.yaml ...... gated behind --force-codes; never wiped on routine deploy
@@ -86,11 +93,11 @@ fi
 # Editable installs in the uv workspace mean syncing source is enough — no
 # dist/ build needed for Python. --delete keeps the remote tidy but the
 # excludes below protect server-owned state (annotations, .venv, logs).
-echo -e "${YELLOW}[2/5] Rsyncing source (review_api only)...${NC}"
+echo -e "${YELLOW}[2/5] Rsyncing source (review_api and the harness it drives)...${NC}"
 
-# Only ship neuroagent.review_api + the package's __init__.py. The rest of
-# neuroagent (agent/, api/, evaluation/, llm/, memory/, rules/, tools/,
-# training/) is never imported by review_api and stays off the VPS.
+# Ship neuroagent.review_api + the package's __init__.py, then (below) the harness modules
+# agent mode imports. The rest of neuroagent (agent/, api/, memory/, rules/, training/) is
+# never imported by review_api and stays off the VPS.
 rsync -az --delete \
   --exclude '__pycache__/' \
   --exclude '*.pyc' \
@@ -105,6 +112,28 @@ rsync -az agent-platform/src/neuroagent/__init__.py \
 # It lives outside review_api/ so it must be shipped explicitly.
 rsync -az agent-platform/src/neuroagent/datasets.py \
   "$VPS_HOST:$VPS_PATH/agent-platform/src/neuroagent/datasets.py"
+
+# Agent mode (review_api/services/agent_mode) drives the benchmark harness itself, so a physician
+# gets exactly the agent's presentation, catalogue and observations: the harness, the tools with
+# the MockServer, the reward (admin view) and the modules they import go with it. No model is
+# ever called from the VPS; llm/ is shipped only because the harness imports its types.
+for module in harness tools evaluation llm; do
+  rsync -az --delete \
+    --exclude '__pycache__/' \
+    --exclude '*.pyc' \
+    "agent-platform/src/neuroagent/$module/" \
+    "$VPS_HOST:$VPS_PATH/agent-platform/src/neuroagent/$module/"
+done
+rsync -az agent-platform/src/neuroagent/model_registry.py \
+  "$VPS_HOST:$VPS_PATH/agent-platform/src/neuroagent/model_registry.py"
+# Its configuration: the checked profiles (turn limits) and the whole tool configuration (the
+# cost registry and the fallback library that answers off-pathway orders).
+ssh "$VPS_HOST" "mkdir -p $VPS_PATH/agent-platform/config/profiles $VPS_PATH/agent-platform/config/tools"
+rsync -az --delete agent-platform/config/profiles/ "$VPS_HOST:$VPS_PATH/agent-platform/config/profiles/"
+rsync -az agent-platform/config/tools/fallback_library.yaml \
+  "$VPS_HOST:$VPS_PATH/agent-platform/config/tools/fallback_library.yaml"
+# The commit this copy runs from, recorded in every agent-mode record (the VPS has no git tree).
+git rev-parse HEAD > agent-platform/config/review/deployed_commit.txt
 
 # agent-platform/pyproject.toml is the workspace member manifest — required
 # even if we only use review_api, because `uv sync` resolves the workspace.
