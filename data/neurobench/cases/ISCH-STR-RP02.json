@@ -96,6 +96,41 @@
     },
     {
       "output": {
+        "additional_observations": [
+          "Left internal carotid, both vertebral and the basilar arteries are normal in calibre without dissection",
+          "No intracranial aneurysm",
+          "Abdominal shielding used; estimated fetal dose negligible"
+        ],
+        "angiography_findings": null,
+        "contrast_used": true,
+        "findings": [
+          {
+            "density": null,
+            "description": "CTA: Tapered eccentric narrowing of the right cervical internal carotid artery beginning about 2 cm distal to the bifurcation and extending about 2 cm cranially, residual lumen about 1.5 mm, with a crescentic non-enhancing mural thickening; carotid bulb spared.",
+            "location": "Right internal carotid artery, cervical segment",
+            "size": "About 2 cm in craniocaudal length",
+            "type": "Arterial dissection"
+          },
+          {
+            "density": null,
+            "description": "CTA: Abrupt non-opacification of the right MCA superior division M2 branch near its origin; M1 and inferior division opacify normally.",
+            "location": "Right middle cerebral artery, superior division M2",
+            "size": null,
+            "type": "Branch occlusion"
+          }
+        ],
+        "impression": "1. Dissection of the right cervical internal carotid artery beginning about 2 cm distal to the bifurcation, sparing the bulb, with intramural haematoma and a residual lumen of about 1.5 mm. 2. Occlusion of the right M2 superior division branch. 3. No other cervical or intracranial arterial abnormality.",
+        "recommended_actions": []
+      },
+      "tool_name": "order_ct_scan",
+      "tool_parameters": {
+        "angiography": true,
+        "contrast": true
+      },
+      "trigger_action": "request_ct_angiography"
+    },
+    {
+      "output": {
         "chambers": {
           "Left atrium": "Normal size, volume index 22 mL/m2",
           "Left ventricle": "Normal size and wall thickness; normal systolic function",
@@ -205,48 +240,6 @@
               "value": 1.1
             }
           ],
-          "Antiphospholipid antibodies": [
-            {
-              "clinical_significance": null,
-              "is_abnormal": false,
-              "reference_range": "Negative",
-              "test": "Lupus anticoagulant (dRVVT screen and confirm)",
-              "unit": "",
-              "value": "Negative"
-            },
-            {
-              "clinical_significance": null,
-              "is_abnormal": false,
-              "reference_range": "<15",
-              "test": "Anticardiolipin IgG",
-              "unit": "GPL units",
-              "value": 8.2
-            },
-            {
-              "clinical_significance": null,
-              "is_abnormal": false,
-              "reference_range": "<15",
-              "test": "Anticardiolipin IgM",
-              "unit": "MPL units",
-              "value": 5.1
-            },
-            {
-              "clinical_significance": null,
-              "is_abnormal": false,
-              "reference_range": "<20",
-              "test": "Anti-beta-2 glycoprotein I IgG",
-              "unit": "SGU",
-              "value": 4.8
-            },
-            {
-              "clinical_significance": null,
-              "is_abnormal": false,
-              "reference_range": "<20",
-              "test": "Anti-beta-2 glycoprotein I IgM",
-              "unit": "SMU",
-              "value": 3.9
-            }
-          ],
           "Hemolysis Workup": [
             {
               "clinical_significance": null,
@@ -300,7 +293,59 @@
         }
       },
       "tool_name": "interpret_labs",
-      "trigger_action": "request_ttp_hemolysis_smear_ldh_haptoglobin_adamts13_antiphospholipid_lupus_anticoagulant"
+      "trigger_action": "request_ttp_hemolysis_smear_ldh_haptoglobin_adamts13"
+    },
+    {
+      "output": {
+        "abnormal_values_summary": [],
+        "interpretation": "No abnormal values: lupus anticoagulant, anticardiolipin and anti-beta-2 glycoprotein I antibodies negative.",
+        "panels": {
+          "Antiphospholipid antibodies": [
+            {
+              "clinical_significance": null,
+              "is_abnormal": false,
+              "reference_range": "Negative",
+              "test": "Lupus anticoagulant (dRVVT screen and confirm)",
+              "unit": "",
+              "value": "Negative"
+            },
+            {
+              "clinical_significance": null,
+              "is_abnormal": false,
+              "reference_range": "<15",
+              "test": "Anticardiolipin IgG",
+              "unit": "GPL units",
+              "value": 8.2
+            },
+            {
+              "clinical_significance": null,
+              "is_abnormal": false,
+              "reference_range": "<15",
+              "test": "Anticardiolipin IgM",
+              "unit": "MPL units",
+              "value": 5.1
+            },
+            {
+              "clinical_significance": null,
+              "is_abnormal": false,
+              "reference_range": "<20",
+              "test": "Anti-beta-2 glycoprotein I IgG",
+              "unit": "SGU",
+              "value": 4.8
+            },
+            {
+              "clinical_significance": null,
+              "is_abnormal": false,
+              "reference_range": "<20",
+              "test": "Anti-beta-2 glycoprotein I IgM",
+              "unit": "SMU",
+              "value": 3.9
+            }
+          ]
+        }
+      },
+      "tool_name": "interpret_labs",
+      "trigger_action": "request_antiphospholipid_lupus_anticoagulant"
     },
     {
       "output": {
@@ -662,6 +707,12 @@
               "contrast": false
             },
             "tool_name": "order_ct_scan"
+          },
+          {
+            "required_arguments": {
+              "contrast": false
+            },
+            "tool_name": "analyze_brain_mri"
           }
         ],
         "citations": [
@@ -670,8 +721,8 @@
         "criterion_id": "action-1-order-ct-scan",
         "expected_evidence": "No haemorrhage; no acute infarct and no hyperdense vessel sign (ASPECTS 10 on the right); small old left MCA territory infarct.",
         "importance": "required",
-        "label": "Non-contrast head CT on arrival",
-        "rationale": "Excludes haemorrhage before any reperfusion or antithrombotic decision; the fetal radiation dose of a head CT is negligible, and pregnancy does not justify delaying it."
+        "label": "First brain imaging on arrival: MRI without gadolinium (preferred in pregnancy when available without delay) or non-contrast CT",
+        "rationale": "Excludes haemorrhage before any reperfusion or antithrombotic decision. MRI and CT are equivalent first studies: MRI is preferred in pregnancy when it is available at once, CT is acceptable when it is not (the fetal dose of a head CT is negligible), and pregnancy does not justify delaying imaging."
       },
       {
         "alternatives": [
@@ -720,6 +771,13 @@
               "contrast": false
             },
             "tool_name": "analyze_brain_mri"
+          },
+          {
+            "required_arguments": {
+              "angiography": true,
+              "contrast": true
+            },
+            "tool_name": "order_ct_scan"
           }
         ],
         "citations": [
@@ -730,8 +788,8 @@
         "criterion_id": "action-4-analyze-brain-mri",
         "expected_evidence": "DWI infarct of the right insula and frontal operculum (2.2 x 1.5 cm); right M2 superior division branch occlusion; right cervical ICA dissection beginning about 2 cm above the bifurcation with acute intramural hematoma; MR venography normal.",
         "importance": "required",
-        "label": "MRI brain without gadolinium, with time-of-flight MRA of the head and neck, fat-saturated T1 of the neck and MR venography",
-        "rationale": "In pregnancy MRI without gadolinium is the vessel and tissue study: it shows the infarct, the occluded branch and the cervical dissection and excludes venous thrombosis, so CTA would add fetal radiation and iodinated contrast without new information."
+        "label": "Vessel and tissue imaging: MRI without gadolinium with time-of-flight MRA of the head and neck, fat-saturated T1 of the neck and MR venography, or CTA of the head and neck if MRI would delay the acute evaluation",
+        "rationale": "In pregnancy non-contrast MRI with MRA is appropriate when immediately available: it shows the infarct, the occluded branch and the cervical dissection and excludes venous thrombosis. CTA of the head and neck is an acceptable alternative if MRI would delay the evaluation; fetal radiation and iodinated contrast are not by themselves reasons to avoid it."
       },
       {
         "alternatives": [
@@ -807,23 +865,7 @@
                 "peripheral smear",
                 "LDH",
                 "haptoglobin",
-                "ADAMTS13",
-                "antiphospholipid",
-                "lupus anticoagulant",
-                "CBC"
-              ]
-            },
-            "tool_name": "interpret_labs"
-          },
-          {
-            "required_arguments": {
-              "panels": [
-                "peripheral smear",
-                "LDH",
-                "haptoglobin",
-                "ADAMTS13",
-                "antiphospholipid",
-                "lupus anticoagulant"
+                "ADAMTS13"
               ]
             },
             "tool_name": "interpret_labs"
@@ -834,10 +876,31 @@
           "[ISTH_TTP_2020]"
         ],
         "criterion_id": "action-5-interpret-labs",
-        "expected_evidence": "No active TTP: no schistocytes, LDH 195 U/L and haptoglobin 85 mg/dL normal, with platelets 154 x10^9/L; ADAMTS13 activity 15 percent with inhibitor 1.1 BU/mL (relapse risk); lupus anticoagulant, anticardiolipin and anti-beta-2 glycoprotein I antibodies negative.",
+        "expected_evidence": "No active TTP: no schistocytes, LDH 195 U/L and haptoglobin 85 mg/dL normal, with platelets 154 x10^9/L; ADAMTS13 activity 15 percent with inhibitor 1.1 BU/mL (relapse risk).",
+        "importance": "required",
+        "label": "Screen for TTP relapse: peripheral smear, LDH, haptoglobin and ADAMTS13 activity with inhibitor",
+        "rationale": "Prior immune TTP with ADAMTS13 16 percent a week ago makes relapse the anchoring alternative; the hematology plan and the exclusion of relapse rest on these results."
+      },
+      {
+        "alternatives": [
+          {
+            "required_arguments": {
+              "panels": [
+                "antiphospholipid",
+                "lupus anticoagulant"
+              ]
+            },
+            "tool_name": "interpret_labs"
+          }
+        ],
+        "citations": [
+          "[AHA_ASA_2021_secondary]"
+        ],
+        "criterion_id": "antiphospholipid-antibodies",
+        "expected_evidence": "Lupus anticoagulant, anticardiolipin and anti-beta-2 glycoprotein I antibodies negative.",
         "importance": "recommended",
-        "label": "Screen for TTP relapse (smear, LDH, haptoglobin, ADAMTS13) and antiphospholipid antibodies",
-        "rationale": "Prior TTP with ADAMTS13 16 percent a week ago makes relapse the anchoring alternative, and a previous preterm delivery at 22 weeks makes antiphospholipid antibodies relevant; inherited thrombophilia testing is not indicated for a dissection and protein S is uninterpretable in pregnancy."
+        "label": "Antiphospholipid antibodies (lupus anticoagulant, anticardiolipin, anti-beta-2 glycoprotein I)",
+        "rationale": "A previous preterm delivery at 22 weeks makes antiphospholipid antibodies relevant; inherited thrombophilia testing is not indicated for a dissection and protein S is uninterpretable in pregnancy."
       },
       {
         "alternatives": [
@@ -851,7 +914,7 @@
         ],
         "criterion_id": "action-8-check-drug-interactions",
         "expected_evidence": "Low-dose aspirin (or enoxaparin) is compatible with pregnancy at 18 weeks and her medicines; warfarin, DOACs and statins are avoided in pregnancy; gadolinium avoided.",
-        "importance": "required",
+        "importance": "recommended",
         "label": "Check the antithrombotic plan against pregnancy and her medicines",
         "rationale": "Pregnancy changes the antithrombotic and secondary-prevention choices (no warfarin, no DOAC, no statin), so the plan is checked before it is written."
       }
@@ -859,19 +922,20 @@
     "assessment": {
       "prohibited_recommendations": [
         "Do not give IV thrombolysis for this non-disabling deficit (NIHSS 2, hemiparesis resolved).",
-        "Do not attribute the deficit to TTP relapse or start plasma exchange without thrombocytopenia or hemolysis: the infarct is explained by the carotid dissection.",
+        "Do not attribute the deficit to TTP relapse: there is no thrombocytopenia or haemolysis, and the infarct is explained by the carotid dissection.",
         "Do not give gadolinium-based contrast in pregnancy: non-contrast MRI, time-of-flight MRA and MR venography answer the clinical question.",
         "Do not prescribe warfarin, a DOAC or a statin during pregnancy.",
-        "Do not lower blood pressure aggressively in the acute phase: continue her usual antihypertensive treatment and avoid hypotension, which threatens both the tissue beyond the occluded branch and placental perfusion."
+        "Do not lower blood pressure aggressively in the acute phase: reassess her antihypertensive treatment, including the hydrochlorothiazide, individually with the stroke and obstetric teams (BP 132/78 mmHg) and avoid hypotension, which threatens both the tissue beyond the occluded branch and placental perfusion."
       ],
       "required_recommendations": [
         "Establish last known well and the NIHSS (2: facial palsy 1, dysarthria 1). The first episode of left arm and leg weakness, during exertion about 90 minutes before the examination, resolved completely after about 30 minutes, so last known well resets to the end of that episode, before the facial weakness, dysarthria and tingling began about 60 minutes after the first onset (about 30 minutes before the examination). By either clock she is well within 4.5 hours.",
         "IV thrombolysis: do not give, because the deficit is minor and non-disabling (NIHSS 2, the hemiparesis has resolved); give antiplatelet therapy instead. Pregnancy is not the reason: a disabling deficit within 4.5 hours would be treated after a rapid obstetric risk-benefit discussion. Thrombectomy: not indicated, because the occlusion is in an M2 superior division branch (a medium vessel occlusion with no graded indication) and the deficit is non-disabling.",
-        "Use MRI without gadolinium, with time-of-flight MRA of the head and neck, fat-saturated T1 of the neck and MR venography, as the vessel and tissue study: it shows the infarct, the occluded M2 branch and the cervical ICA dissection and excludes venous thrombosis, so CTA would add fetal radiation and iodinated contrast without new information. CT or CTA are not withheld when they are needed for a reperfusion decision.",
+        "Screen swallowing at the bedside with a validated tool before any oral food, fluids or oral medication, and keep nil by mouth until the screen is passed (AHA/ASA 2026); given the dysarthria, keep aspiration precautions (head of bed raised, suction at hand) and refer for a formal swallowing assessment if the screen fails.",
+        "Use MRI without gadolinium, with time-of-flight MRA of the head and neck, fat-saturated T1 of the neck and MR venography, as the vessel and tissue study when it is immediately available; if MRI would delay the acute evaluation, CTA of the head and neck is acceptable in pregnancy (low fetal dose, iodinated contrast not contraindicated).",
         "Admit to a stroke unit with continuous cardiac monitoring (telemetry) for at least the first 24 hours, with frequent neurological checks for early worsening.",
         "Start low-dose aspirin (81 to 150 mg daily) now for the right cervical internal carotid artery dissection and continue it for at least 3 to 6 months; it is safe at 18 weeks and also serves as pre-eclampsia prophylaxis for her chronic hypertension. Enoxaparin is the alternative if anticoagulation is chosen. Do not use warfarin or a DOAC in pregnancy.",
         "Do not start a statin: the mechanism is a dissection, not atherosclerosis, and statins are avoided in pregnancy; reassess lipids and any statin indication after delivery and breastfeeding.",
-        "Involve hematology: there is no active TTP (platelets 154 x10^9/L, no schistocytes, normal LDH and haptoglobin), but ADAMTS13 activity remains low (15 percent, inhibitor 1.1 BU/mL) during pregnancy, a high relapse risk; hematology to decide on prophylactic treatment and to monitor platelet count and hemolysis markers for the rest of the pregnancy, with urgent plasma exchange if thrombocytopenia or hemolysis appears.",
+        "Involve hematology: there is no active TTP (platelets 154 x10^9/L, no schistocytes, normal LDH and haptoglobin), but ADAMTS13 activity remains low (15 percent, inhibitor 1.1 BU/mL) during pregnancy, a high relapse risk; hematology to decide on prophylactic treatment and to monitor platelet count and hemolysis markers for the rest of the pregnancy, with urgent plasma exchange if thrombocytopenia or hemolysis appears; prophylactic treatment, which may include plasma exchange or immunosuppression, does not require an overt haematological relapse.",
         "Involve maternal-fetal medicine from admission: fetal assessment, review of hydrochlorothiazide (labetalol or nifedipine are first-line in pregnancy), and a delivery and anesthesia plan that accounts for the antithrombotic agent.",
         "Repeat non-invasive vessel imaging (MRA without gadolinium) at 3 to 6 months to assess healing of the dissection and decide the duration of antithrombotic therapy; advise against neck manipulation and heavy straining until then."
       ]
@@ -1044,15 +1108,6 @@
     "review_status": "draft",
     "sequence_constraints": [
       {
-        "after_criterion_id": "action-4-analyze-brain-mri",
-        "before_criterion_id": "action-1-order-ct-scan",
-        "citations": [
-          "[AHA_ASA_Stroke_2026]"
-        ],
-        "reason": "Non-contrast CT excludes haemorrhage before vessel imaging and the reperfusion decision.",
-        "severity": "soft"
-      },
-      {
         "after_criterion_id": "action-9-order-echocardiogram",
         "before_criterion_id": "action-4-analyze-brain-mri",
         "citations": [
@@ -1074,11 +1129,10 @@
     "stop_rule": {
       "max_additional_actions": 1,
       "required_before_assessment": [
-        "action-1-order-ct-scan",
         "action-3-interpret-labs",
         "action-6-analyze-ecg",
         "action-4-analyze-brain-mri",
-        "action-8-check-drug-interactions"
+        "action-5-interpret-labs"
       ]
     }
   },
