@@ -60,7 +60,7 @@ command wraps both (`cern help`). In short, to choose:
   sparse-logits loss), `train_grpo.py` (RLVR: benchmark loop as rollout on a colocated vLLM engine,
   DAPO loss, token-level IS correction, rollouts persisted; weights only on EOS via `--weights-dir`),
   `data/episodes.py` (episode records)
-- `agent-platform/config/profiles/*.yaml` — the twenty-three checked experiment profiles (model × loop:
+- `agent-platform/config/profiles/*.yaml` — the twenty-nine checked experiment profiles (model × loop:
   policy, direct, narrative, react, free-order; and the Fig. 6 baselines rules-in-prompt and
   multi-agent panel, `harness/panel.py`); arbitrary model ids are rejected. Models live in
   `model_registry.py` with their per-request defaults

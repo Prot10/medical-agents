@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 # Larger untrained references of other families (Andrea, 26 Nov 2026): beside Qwen3.8-27B, which is a
 # newer generation of the panel's own family, Gemma 4 31B and Granite 4.1 30B (larger siblings of the
-# panel models) and Llama 3.3 70B FP8 (older, much larger). Policy loop only, test split, 3 seeds.
+# panel models) and Llama 3.3 70B FP8 (older, much larger). Each set up as Qwen3.8-27B was, without
+# training: the policy prompt, the rules in the prompt, and the multi-agent panel. Test split, 3 seeds.
 #
 # Runs in the RTX pod after sft_tune_rtx.sh, reusing the baselines source tree and venv:
 #   CODE=/eos/.../code bash $CODE/big_models_rtx.sh
 # $CODE/big_models_files.tar holds the registry, serve script and profiles added on 26 Nov.
-# Results in /tmp/bl/<model>/untrained (next to the other baselines), synced to $OUT; ends with BIG_EXIT=done.
+# Results in /tmp/bl/<model>/{untrained,rules,panel} (next to the other baselines), synced to $OUT; ends with BIG_EXIT=done.
 set -uo pipefail
 CODE=${CODE:-/eos/project-d/diagbox/dvc/aprotani/medical-agents/code}
 R=${R:-/tmp/ma-baselines_bd86d10d} V=${V:-/tmp/venv-baselines_bd86d10d}
@@ -35,12 +36,14 @@ for spec in gemma-4-31b:google/gemma-4-31B-it:0.90:24 granite-4.1-30b:ibm-granit
   up=; for _ in $(seq 1 120); do curl -sf -m 10 localhost:8000/v1/models > /dev/null && { up=1; break; }; sleep 15; done
   [ -n "$up" ] || { mark "server failed: $key"; continue; }
   mark "server up: $key"
-  for s in $SEEDS; do
-    dir="$L/$key/untrained/seed-$s"; [ -f "$dir/summary.json" ] && continue; mkdir -p "$dir"
-    python -m neuroagent.evaluation.benchmark --profile "policy-$key" --split test --seed "$s" --concurrency "$conc" \
-      --allow-draft-policies --resume --output "$dir" > "$dir.log" 2>&1
-    mark "$key/untrained seed=$s exit=$?"
-    rsync -a "$L/$key" "$OUT/"
+  for arm in policy:untrained rules:rules panel:panel; do
+    for s in $SEEDS; do
+      dir="$L/$key/${arm#*:}/seed-$s"; [ -f "$dir/summary.json" ] && continue; mkdir -p "$dir"
+      python -m neuroagent.evaluation.benchmark --profile "${arm%%:*}-$key" --split test --seed "$s" \
+        --concurrency "$conc" --allow-draft-policies --resume --output "$dir" > "$dir.log" 2>&1
+      mark "$key/${arm#*:} seed=$s exit=$?"
+      rsync -a "$L/$key" "$OUT/"
+    done
   done
 done
 pkill -f 'scripts/runtime/[v]llm_serve.py'
