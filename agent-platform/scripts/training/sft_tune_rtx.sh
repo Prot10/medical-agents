@@ -39,7 +39,8 @@ train() {  # train VARIANT RANK
     --allow-candidates --epochs 4 --learning-rate 2e-4 --lora-rank "$rank" --output "${ADAPTER[$v]}" > "$L/train_$v.log" 2>&1
   mark "train $v exit=$?"
 }
-train v2 16 & sleep 120; train v3 64 & wait
+# Wait on the two trainings only: a bare `wait` would also wait on the endless sync loop.
+train v2 16 & T2=$!; sleep 120; train v3 64 & T3=$!; wait $T2 $T3
 
 # One server, the base model plus every adapter (aliases v1, v2, v3).
 mods=""; for v in v1 v2 v3; do
@@ -48,8 +49,8 @@ mods=""; for v in v1 v2 v3; do
 done
 pkill -f 'scripts/runtime/[v]llm_serve.py'; sleep 10
 LORA_MODULES="$mods" MAX_NUM_SEQS=32 nohup bash agent-platform/scripts/runtime/serve_model.sh qwen3.5-9b > "$L/serve.log" 2>&1 &
-for _ in $(seq 1 120); do curl -sf localhost:8000/v1/models > /dev/null && break; sleep 15; done
-curl -sf localhost:8000/v1/models > /dev/null || { mark "SFT_EXIT=server"; exit 1; }
+for _ in $(seq 1 120); do curl -sf -m 10 localhost:8000/v1/models > /dev/null && break; sleep 15; done
+curl -sf -m 10 localhost:8000/v1/models > /dev/null || { mark "SFT_EXIT=server"; exit 1; }
 mark "server up:$mods"
 
 VAL=$(cat data/neurobench/splits/validation_cases.txt)

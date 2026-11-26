@@ -1,7 +1,9 @@
 """The fixed model panel used by benchmark and training profiles.
 
 The three under-10B models are the panel the paper trains and compares; Qwen3.8-27B is the larger
-untrained reference of Fig. 6 (25 Nov 2026), evaluated only, never trained.
+untrained reference of Fig. 6 (25 Nov 2026), evaluated only, never trained. Gemma 4 31B, Granite 4.1
+30B and Llama 3.3 70B (FP8) are larger untrained references from other families (Andrea, 26 Nov
+2026): the two larger siblings of the panel models, and an older, much larger model.
 
 ``request_defaults`` are sent with every chat request for that model: the sampling settings each
 model card recommends, plus the thinking switch. Qwen3.5 and Gemma 4 think by default; with
@@ -87,6 +89,42 @@ AVAILABLE_MODELS: list[dict] = [
             "top_k": 64,
             "chat_template_kwargs": {"enable_thinking": False},
         },
+    },
+    {
+        "key": "gemma-4-31b",
+        "name": "Gemma 4 31B",
+        "hf_model_id": "google/gemma-4-31B-it",
+        "description": "Larger Gemma 4 (dense); untrained reference, evaluated only.",
+        "size_gb": 63.0,
+        "expected_load_seconds": 600,
+        # Model card: the same standardized sampling as Gemma 4 E4B.
+        "request_defaults": {
+            "temperature": 1.0,
+            "top_p": 0.95,
+            "top_k": 64,
+            "chat_template_kwargs": {"enable_thinking": False},
+        },
+    },
+    {
+        "key": "granite-4.1-30b",
+        "name": "Granite 4.1 30B",
+        "hf_model_id": "ibm-granite/granite-4.1-30b",
+        "description": "Larger Granite 4.1 (dense, bf16); untrained reference, evaluated only.",
+        "size_gb": 58.0,
+        "expected_load_seconds": 600,
+        # No recommended sampling (generation_config is empty): greedy, as Granite 4.1 8B.
+        "request_defaults": {"temperature": 0.0},
+    },
+    {
+        "key": "llama-3.3-70b",
+        "name": "Llama 3.3 70B (FP8)",
+        "hf_model_id": "RedHatAI/Llama-3.3-70B-Instruct-FP8-dynamic",
+        "description": "Older (Dec 2024), much larger model of another family; FP8 so it fits the RTX "
+        "PRO 6000. Untrained reference, evaluated only.",
+        "size_gb": 71.0,
+        "expected_load_seconds": 900,
+        # generation_config.json of the model.
+        "request_defaults": {"temperature": 0.6, "top_p": 0.9},
     },
 ]
 
