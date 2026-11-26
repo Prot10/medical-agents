@@ -21,11 +21,13 @@ export function WorkspaceChooser({ profile }: { profile: ReviewerProfile }) {
   const chooseWorkspace = useReviewStore((s) => s.chooseWorkspace)
   const signOut = useReviewStore((s) => s.signOut)
   const sets = useReviewSets()
+  // A guided code opens its assigned sets only: no full review to fall back on.
+  const guided = (profile.review_sets ?? []).length > 0
 
   // No review set on the server: there is nothing to choose.
   useEffect(() => {
-    if (sets.data && sets.data.length === 0) chooseWorkspace({ kind: "full" })
-  }, [sets.data, chooseWorkspace])
+    if (!guided && sets.data && sets.data.length === 0) chooseWorkspace({ kind: "full" })
+  }, [guided, sets.data, chooseWorkspace])
 
   const firstName = profile.name.split(" ")[0] || profile.name
 
@@ -73,7 +75,7 @@ export function WorkspaceChooser({ profile }: { profile: ReviewerProfile }) {
                 onOpen={() => chooseWorkspace({ kind: "set", setId: set.id })}
               />
             ))}
-            <FullReviewCard onOpen={() => chooseWorkspace({ kind: "full" })} />
+            {!guided && <FullReviewCard onOpen={() => chooseWorkspace({ kind: "full" })} />}
           </div>
         )}
 
@@ -103,11 +105,14 @@ function SetCard({
 }) {
   const progress = useSetProgress(set.id, set.case_ids)
   const finished = progress.total > 0 && progress.done === progress.total
+  const second = set.kind === "second_review"
   const cta = finished
     ? "See your answers"
     : progress.done > 0 || progress.started > 0
       ? `Continue · case ${progress.nextNumber} of ${progress.total}`
-      : "Start the re-check"
+      : second
+        ? "Start the review"
+        : "Start the re-check"
 
   return (
     <ChoiceCard
@@ -116,8 +121,12 @@ function SetCard({
       icon={finished ? <CheckCircle2 className="w-5 h-5" /> : <ClipboardCheck className="w-5 h-5" />}
       badge={finished ? "Done" : "New · start here"}
       title={set.name}
-      meta={`${set.case_count} cases · one per condition`}
-      body="We corrected these cases after your notes. Review each one as before and tell us whether it is now right."
+      meta={second ? `${set.case_count} cases` : `${set.case_count} cases · one per condition`}
+      body={
+        second
+          ? set.description
+          : "We corrected these cases after your notes. Review each one as before and tell us whether it is now right."
+      }
       progressLabel={`${progress.done} of ${progress.total} reviewed`}
       progressValue={progress.total ? progress.done / progress.total : 0}
       cta={cta}

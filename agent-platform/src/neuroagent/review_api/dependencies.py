@@ -6,6 +6,7 @@ from fastapi import Depends, Header, HTTPException, Request, status
 
 from .schemas.reviewers import ReviewerCode
 from .services.rate_limit import AuthRateLimiter
+from .services.review_sets import visible_sets
 from .services.reviewer_codes import ReviewerCodeRegistry
 
 
@@ -58,15 +59,34 @@ def authenticated_code(
 
 
 def current_reviewer(
+    request: Request,
     reviewer: ReviewerCode = Depends(authenticated_code),
 ) -> ReviewerCode:
     """Resolve a dataset-review code. An agent-mode code is refused on every dataset-review route:
-    it must never reach a case file, a policy or a ground truth."""
+    it must never reach a case file, a policy or a ground truth.
+
+    On a route addressed by ``{version}``, a guided code (assigned review sets) reaches only its
+    sets, and no code reaches a set it is not shown (an ``assigned_only`` set of someone else).
+    """
     if reviewer.is_agent_mode:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="This code opens the agent-mode study only",
         )
+    sets = getattr(request.app.state, "review_sets", {})
+    try:
+        allowed = {s.id for s in visible_sets(reviewer, sets)}
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc)) from exc
+    version = request.path_params.get("version")
+    if version is not None:
+        if reviewer.is_guided and version not in allowed:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="This code opens its assigned review set only",
+            )
+        if version in sets and version not in allowed:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Review set not assigned to this code")
     return reviewer
 
 

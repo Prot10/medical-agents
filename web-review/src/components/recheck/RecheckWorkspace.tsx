@@ -42,6 +42,8 @@ export function RecheckWorkspace({
   const setSelectedCaseId = useReviewStore((s) => s.setSelectedCaseId)
   const cases = useCases(reviewSet.id)
   const progress = useSetProgress(reviewSet.id, reviewSet.case_ids)
+  // A guided code works in its assigned set only: no way out to the full review.
+  const guided = (profile.review_sets ?? []).length > 0
 
   const caseById = new Map<string, CaseIndexEntry>()
   for (const c of cases.data ?? []) caseById.set(c.case_id, c)
@@ -93,10 +95,11 @@ export function RecheckWorkspace({
           <CaseDetail
             key={selectedCaseId}
             caseId={selectedCaseId}
-            backLabel="All re-check cases"
+            backLabel={reviewSet.kind === "second_review" ? "All cases" : "All re-check cases"}
           />
         ) : (
           <RecheckIntro
+            guided={guided}
             reviewSet={reviewSet}
             caseById={caseById}
             progress={progress}
@@ -116,6 +119,7 @@ function RecheckHeader({ profile, title }: { profile: ReviewerProfile; title: st
   const setDarkMode = useReviewStore((s) => s.setDarkMode)
   const chooseWorkspace = useReviewStore((s) => s.chooseWorkspace)
   const isMutating = useIsMutating() > 0
+  const guided = (profile.review_sets ?? []).length > 0
   const [guidelinesOpen, setGuidelinesOpen] = useState(false)
 
   return (
@@ -134,16 +138,18 @@ function RecheckHeader({ profile, title }: { profile: ReviewerProfile; title: st
 
       <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
         <SaveIndicator saving={isMutating} />
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => chooseWorkspace({ kind: "full" })}
-          title="Leave the re-check and open the full review"
-          className="text-muted-foreground hover:text-foreground"
-        >
-          <LayoutGrid className="w-4 h-4" />
-          <span className="hidden md:inline">Full review</span>
-        </Button>
+        {!guided && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => chooseWorkspace({ kind: "full" })}
+            title="Leave the re-check and open the full review"
+            className="text-muted-foreground hover:text-foreground"
+          >
+            <LayoutGrid className="w-4 h-4" />
+            <span className="hidden md:inline">Full review</span>
+          </Button>
+        )}
         <button
           type="button"
           onClick={() => setGuidelinesOpen(true)}
@@ -170,12 +176,38 @@ function RecheckHeader({ profile, title }: { profile: ReviewerProfile; title: st
 // ---------------------------------------------------------------------------
 // Landing: what to do, and the list of cases
 
+// What the landing says, per kind of set.
+const INTRO = {
+  recheck: {
+    badge: (n: number) => `${n} cases · one per condition`,
+    title: "Are these cases right now?",
+    steps: [
+      ["Read the case", "Same view as before: patient, tests, pathway and policy."],
+      ["Mark what is still wrong", "Click any field to leave a note, as you did before."],
+      ["Give your verdict", "Approve if it is correct now, or ask for changes."],
+    ],
+    done: (n: number) => `All ${n} cases re-checked. Thank you!`,
+  },
+  second_review: {
+    badge: (n: number) => `${n} cases`,
+    title: "Review these cases",
+    steps: [
+      ["Read the case", "Same view as the full review: patient, tests, pathway and policy."],
+      ["Mark what is wrong", "Click any field to leave a note on it."],
+      ["Give your verdict", "Rate every dimension, then submit the case."],
+    ],
+    done: (n: number) => `All ${n} cases reviewed. Thank you!`,
+  },
+} as const
+
 function RecheckIntro({
+  guided,
   reviewSet,
   caseById,
   progress,
   onOpen,
 }: {
+  guided: boolean
   reviewSet: ReviewSet
   caseById: Map<string, CaseIndexEntry>
   progress: SetProgress
@@ -184,6 +216,7 @@ function RecheckIntro({
   const chooseWorkspace = useReviewStore((s) => s.chooseWorkspace)
   const finished = progress.total > 0 && progress.done === progress.total
   const started = progress.done > 0 || progress.started > 0
+  const text = INTRO[reviewSet.kind] ?? INTRO.recheck
 
   return (
     <div className="space-y-6">
@@ -203,43 +236,41 @@ function RecheckIntro({
             </div>
             <div className="flex-1">
               <h1 className="text-xl font-semibold tracking-tight">
-                All {progress.total} cases re-checked. Thank you!
+                {text.done(progress.total)}
               </h1>
               <p className="text-sm text-muted-foreground mt-1">
                 Your answers are saved. You can still open any case below to change them.
               </p>
             </div>
-            <Button variant="secondary" onClick={() => chooseWorkspace({ kind: "full" })}>
-              <LayoutGrid className="w-4 h-4" />
-              Go to the full review
-            </Button>
+            {!guided && (
+              <Button variant="secondary" onClick={() => chooseWorkspace({ kind: "full" })}>
+                <LayoutGrid className="w-4 h-4" />
+                Go to the full review
+              </Button>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-6 lg:gap-10 items-center">
             <div>
               <div className="inline-flex items-center gap-2 text-xs font-medium text-primary bg-primary/10 border border-primary/20 rounded-full px-2.5 py-1 mb-4">
                 <ClipboardCheck className="w-3.5 h-3.5" />
-                {reviewSet.case_count} cases · one per condition
+                {text.badge(reviewSet.case_count)}
               </div>
               <h1 className="text-xl sm:text-2xl font-semibold tracking-tight">
-                Are these cases right now?
+                {text.title}
               </h1>
               <p className="text-sm text-muted-foreground mt-2 max-w-2xl leading-relaxed">
                 {reviewSet.description}
               </p>
               <ol className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3">
-                {[
-                  ["Read the case", "Same view as before: patient, tests, pathway and policy."],
-                  ["Mark what is still wrong", "Click any field to leave a note, as you did before."],
-                  ["Give your verdict", "Approve if it is correct now, or ask for changes."],
-                ].map(([title, text], i) => (
+                {text.steps.map(([title, body], i) => (
                   <li key={title} className="flex gap-3 rounded-xl bg-secondary/50 border border-border p-3">
                     <span className="w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-semibold flex items-center justify-center flex-shrink-0">
                       {i + 1}
                     </span>
                     <span>
                       <span className="block text-sm font-medium leading-tight">{title}</span>
-                      <span className="block text-xs text-muted-foreground mt-1 leading-snug">{text}</span>
+                      <span className="block text-xs text-muted-foreground mt-1 leading-snug">{body}</span>
                     </span>
                   </li>
                 ))}

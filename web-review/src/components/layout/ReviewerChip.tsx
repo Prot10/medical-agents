@@ -80,16 +80,19 @@ export function ReviewerChip({ profile }: { profile: ReviewerProfile }) {
             <Shield className="w-3.5 h-3.5" />
             {profile.role === "admin" ? "Researcher (admin)" : "Reviewer"}
           </div>
-          <Popover.Close asChild>
-            <button
-              type="button"
-              onClick={() => chooseWorkspace(null)}
-              className="mt-1 w-full flex items-center gap-2 px-2 py-2 text-sm rounded-md text-foreground hover:bg-secondary/70 transition-colors"
-            >
-              <ArrowLeftRight className="w-4 h-4" />
-              Change view
-            </button>
-          </Popover.Close>
+          {/* A code guided into one set has no other view to change to. */}
+          {(profile.review_sets ?? []).length !== 1 && (
+            <Popover.Close asChild>
+              <button
+                type="button"
+                onClick={() => chooseWorkspace(null)}
+                className="mt-1 w-full flex items-center gap-2 px-2 py-2 text-sm rounded-md text-foreground hover:bg-secondary/70 transition-colors"
+              >
+                <ArrowLeftRight className="w-4 h-4" />
+                Change view
+              </button>
+            </Popover.Close>
+          )}
           <button
             type="button"
             onClick={signOut}

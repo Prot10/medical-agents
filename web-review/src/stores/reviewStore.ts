@@ -46,6 +46,8 @@ export interface ReviewStore {
 
   handleAuthExpired: () => void
   setProfile: (profile: ReviewerProfile | null) => void
+  /** Same code, fresh profile from the server (assignments may have changed): keeps the view. */
+  refreshProfile: (profile: ReviewerProfile) => void
   chooseWorkspace: (workspace: Workspace | null) => void
   /** Full review only: work on one condition (`null` goes back to the condition picker). */
   chooseCondition: (condition: string | null) => void
@@ -154,6 +156,12 @@ export const useReviewStore = create<ReviewStore>((set) => ({
     // A new code always lands on the choice screen.
     storeWorkspace(null)
     set({ profile, workspace: null, sessionMessage: null })
+  },
+  refreshProfile: (profile) => {
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(profile))
+    }
+    set({ profile })
   },
   chooseWorkspace: (workspace) => {
     storeWorkspace(workspace)

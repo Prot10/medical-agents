@@ -19,6 +19,8 @@ export interface ReviewerProfile {
   credentials: string | null
   /** Non-empty for an agent-mode code, which opens the agent-mode study only. */
   sections?: string[]
+  /** Non-empty for a guided code, which opens these review sets only (no full review). */
+  review_sets?: string[]
 }
 
 export interface DatasetSummary {
@@ -465,4 +467,7 @@ export interface ReviewSet {
   description: string
   case_ids: string[]
   case_count: number
+  /** recheck: corrected cases, "is it right now?"; second_review: cases another physician
+   * already reviewed in this exact version, reviewed again independently. */
+  kind: "recheck" | "second_review"
 }

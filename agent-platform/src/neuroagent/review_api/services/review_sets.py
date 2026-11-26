@@ -10,13 +10,21 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any, Literal
 
 import yaml
 
 from neuroagent.datasets import DATASETS, REPO_ROOT, load_dataset
 
+if TYPE_CHECKING:
+    from ..schemas.reviewers import ReviewerCode
+
 _SET_ID_PATTERN = re.compile(r"^[A-Za-z0-9_\-]{1,64}$")
+
+# recheck: corrected cases, "is it right now?". second_review: cases another physician already
+# reviewed in this exact version, reviewed again independently (inter-physician agreement).
+SetKind = Literal["recheck", "second_review"]
+_KINDS: tuple[str, ...] = ("recheck", "second_review")
 
 
 @dataclass(frozen=True, slots=True)
@@ -28,6 +36,9 @@ class ReviewSet:
     case_ids: tuple[str, ...]
     # Own frozen case files (holding cases/<case id>.json), or None to serve the base's files.
     cases_dir: Path | None = None
+    kind: SetKind = "recheck"
+    # Shown only to the codes that list it in their `review_sets` (and to admins).
+    assigned_only: bool = False
 
 
 def load_review_sets(path: Path) -> dict[str, ReviewSet]:
@@ -49,6 +60,12 @@ def load_review_sets(path: Path) -> dict[str, ReviewSet]:
         case_ids = tuple(body.get("cases") or ())
         if not case_ids or len(set(case_ids)) != len(case_ids):
             raise ValueError(f"Review set {set_id!r}: cases must be a non-empty list without repeats")
+        kind = body.get("kind", "recheck")
+        if kind not in _KINDS:
+            raise ValueError(f"Review set {set_id!r}: unknown kind {kind!r}")
+        assigned_only = body.get("assigned_only", False)
+        if not isinstance(assigned_only, bool):
+            raise ValueError(f"Review set {set_id!r}: assigned_only must be true or false")
         sets[set_id] = ReviewSet(
             id=set_id,
             base=base,
@@ -56,6 +73,8 @@ def load_review_sets(path: Path) -> dict[str, ReviewSet]:
             description=str(body.get("description") or "").strip(),
             case_ids=case_ids,
             cases_dir=REPO_ROOT / body["cases_dir"] if body.get("cases_dir") else None,
+            kind=kind,
+            assigned_only=assigned_only,
         )
     return sets
 
@@ -83,3 +102,23 @@ def subset_dataset(
         {c: index[c] for c in review_set.case_ids},
         {c: objects[c] for c in review_set.case_ids},
     )
+
+
+def visible_sets(reviewer: ReviewerCode, sets: dict[str, ReviewSet]) -> list[ReviewSet]:
+    """The sets a code may open, in file order.
+
+    A guided code (with ``review_sets``) opens exactly its assigned sets. An admin opens every
+    set. Any other code opens the sets that are not ``assigned_only``.
+
+    Raises:
+        ValueError: A guided code names a set that does not exist (a misconfigured code must
+            fail loudly, not fall back to the full review).
+    """
+    if reviewer.is_guided:
+        unknown = [s for s in reviewer.review_sets if s not in sets]
+        if unknown:
+            raise ValueError(f"Reviewer code assigned to unknown review set(s): {unknown}")
+        return [sets[s] for s in sets if s in reviewer.review_sets]
+    if reviewer.role == "admin":
+        return list(sets.values())
+    return [s for s in sets.values() if not s.assigned_only]

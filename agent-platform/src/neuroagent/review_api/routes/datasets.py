@@ -14,6 +14,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status
 from ..config import AVAILABLE_DATASETS
 from ..dependencies import current_reviewer
 from ..schemas.reviewers import ReviewerCode
+from ..services.review_sets import visible_sets
 
 router = APIRouter(tags=["datasets"])
 
@@ -25,9 +26,11 @@ def _datasets(request: Request) -> dict[str, tuple[dict, dict]]:
 @router.get("/datasets")
 def list_datasets(
     request: Request,
-    _reviewer: ReviewerCode = Depends(current_reviewer),
+    reviewer: ReviewerCode = Depends(current_reviewer),
 ) -> list[dict[str, Any]]:
-    """List every registered dataset with its case count."""
+    """List every registered dataset with its case count (none for a guided code)."""
+    if reviewer.is_guided:
+        return []
     all_datasets = _datasets(request)
     default_version: str = request.app.state.default_dataset_version
     out: list[dict[str, Any]] = []
@@ -88,9 +91,10 @@ def get_case(
 @router.get("/review-sets")
 def list_review_sets(
     request: Request,
-    _reviewer: ReviewerCode = Depends(current_reviewer),
+    reviewer: ReviewerCode = Depends(current_reviewer),
 ) -> list[dict[str, Any]]:
-    """Every review set (a fixed case subset re-reviewed in its own space), in file order.
+    """The review sets this code may open (a fixed case subset reviewed in its own space), in
+    file order: a guided code's assigned sets, else every set not reserved to assigned codes.
 
     A set's id is a dataset version: its cases, reviews and progress use the same routes.
     """
@@ -102,6 +106,7 @@ def list_review_sets(
             "description": s.description,
             "case_ids": list(s.case_ids),
             "case_count": len(s.case_ids),
+            "kind": s.kind,
         }
-        for s in getattr(request.app.state, "review_sets", {}).values()
+        for s in visible_sets(reviewer, getattr(request.app.state, "review_sets", {}))
     ]

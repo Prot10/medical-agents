@@ -34,6 +34,10 @@ class ReviewerCode(BaseModel):
     id: str | None = None
     # The same person's dataset-review code(s): synthetic cases they reviewed there are skipped.
     linked_review_codes: list[str] = Field(default_factory=list)
+    # Assigned review sets (config/review/review_sets.yaml). A code with `review_sets` is guided:
+    # it opens those sets and nothing else (no full review, no other set). Removing the field
+    # gives the full review back; the annotations of either space are never touched.
+    review_sets: list[str] = Field(default_factory=list)
 
     @field_validator("id")
     @classmethod
@@ -55,11 +59,19 @@ class ReviewerCode(BaseModel):
             raise ValueError("an agent-mode code (with sections) cannot be an admin")
         if len(set(self.sections)) != len(self.sections):
             raise ValueError("sections must not repeat")
+        if self.review_sets and (self.sections or self.role != "reviewer"):
+            raise ValueError("review_sets is for dataset-review codes only (not agent-mode, not admin)")
+        if len(set(self.review_sets)) != len(self.review_sets):
+            raise ValueError("review_sets must not repeat")
         return self
 
     @property
     def is_agent_mode(self) -> bool:
         return bool(self.sections)
+
+    @property
+    def is_guided(self) -> bool:
+        return bool(self.review_sets)
 
     @property
     def public_id(self) -> str:
@@ -88,3 +100,5 @@ class ReviewerProfile(BaseModel):
     credentials: str | None = None
     # Non-empty for an agent-mode code: the client then shows the agent-mode study only.
     sections: list[AgentSection] = Field(default_factory=list)
+    # Non-empty for a guided code: the client opens these review sets only.
+    review_sets: list[str] = Field(default_factory=list)
